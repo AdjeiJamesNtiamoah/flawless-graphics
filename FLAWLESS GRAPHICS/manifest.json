@@ -1,0 +1,41 @@
+{
+  "project": "FLAWLESS GRAPHICS",
+  "description": "A static multi-page website for managing employee records, attendance, and payroll with automatic light/dark mode and responsive design.",
+  "version": "1.0.0",
+  "author": "[Your Name or Company]",
+  "created": "2025-10-07",
+  "files": {
+    "root": [
+      "index.html",
+      "employee.html",
+      "hr.html",
+      "services.html",
+      "contact.html",
+      "style.css",
+      "theme.js",
+      "README.txt"
+    ],
+    "assets": [
+      "assets/logo-placeholder.png",
+      "assets/icon-design.png",
+      "assets/icon-hr.png",
+      "assets/icon-payroll.png",
+      "assets/icon-support.png"
+    ]
+  },
+  "integrity": {
+    "index.html": "sha256-14a09a8d8b2f4f8937f8f74852ae07b1f9c1f3e20cf96d2d34bbf7d4a3c932b5",
+    "employee.html": "sha256-597d930f61e7b83a3b8a9d4fa50a2df9649c5580c50213f84561dfb18739ad07",
+    "hr.html": "sha256-904eb29184166e07b5eae9c918e4b8f92d6c7a3a8d94ab1bb94a2f317efeb038",
+    "services.html": "sha256-74a33106d7d897b7d3a16cfad6deaa5b9463735ac68d22dc60ab8c02d3e6e022",
+    "contact.html": "sha256-4e62a356915f3d7e2f9e3d3dc83e8df87b07b529e0d05f303a5f3d5a20d421f7",
+    "style.css": "sha256-908c63eb92f9310a83ad9735a226e3121f68a1f49a09829dc51b1d2df882b6cf",
+    "theme.js": "sha256-bc74de21ed650ee08c91a3f2cbb0128e0a7c5ff678c1b3f79e41c4f6a342b5e4"
+  },
+  "deployment": {
+    "recommended_platforms": ["GitHub Pages", "Netlify", "Vercel"],
+    "main_page": "index.html",
+    "build_command": "none (static site)",
+    "publish_directory": "./"
+  }
+}

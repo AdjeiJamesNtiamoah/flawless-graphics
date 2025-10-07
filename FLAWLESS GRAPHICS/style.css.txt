@@ -1,0 +1,124 @@
+:root {
+  --primary: #2c3e50;
+  --secondary: #3498db;
+  --text: #333;
+  --bg: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #ecf0f1;
+    --secondary: #2980b9;
+    --text: #eee;
+    --bg: #121212;
+  }
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding: 0;
+  transition: background 0.4s, color 0.4s;
+}
+
+header {
+  background: var(--primary);
+  color: var(--bg);
+  padding: 1rem 2rem;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  height: 50px;
+  margin-right: 10px;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--bg);
+  font-weight: 500;
+}
+
+.nav-links a.active {
+  border-bottom: 2px solid var(--secondary);
+}
+
+.hero {
+  text-align: center;
+  padding: 5rem 2rem;
+  background: linear-gradient(120deg, var(--secondary), var(--primary));
+  color: white;
+}
+
+.hero-text h2 {
+  font-size: 2.5rem;
+}
+
+.hero-text p {
+  margin: 1rem 0;
+}
+
+.buttons .btn {
+  background: white;
+  color: var(--secondary);
+  padding: 0.8rem 1.5rem;
+  text-decoration: none;
+  margin: 0.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.buttons .btn.secondary {
+  background: var(--secondary);
+  color: white;
+}
+
+.buttons .btn:hover {
+  opacity: 0.8;
+}
+
+.features {
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.feature-grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  margin-top: 2rem;
+}
+
+.feature {
+  border: 1px solid var(--secondary);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+footer {
+  background: var(--primary);
+  color: var(--bg);
+  text-align: center;
+  padding: 1.5rem 0;
+  margin-top: 3rem;
+}
