@@ -8,38 +8,54 @@
 </head>
 <body>
   <header>
-    <h1>FLAWLESS GRAPHICS</h1>
+    <div class="logo">
+      <img src="logo.png" alt="FLAWLESS GRAPHICS Logo" class="logo-img">
+      <h1>FLAWLESS GRAPHICS</h1>
+    </div>
     <nav>
       <a href="index.html">Home</a>
       <a href="employee.html">Employee Portal</a>
       <a href="hr-dashboard.html" class="active">HR Dashboard</a>
+      <a href="services.html">Services</a>
+      <a href="contact.html">Contact</a>
     </nav>
   </header>
 
-  <section class="dashboard">
-    <h2>HR Dashboard</h2>
-    <p>Welcome to the HR Management Center. Manage employees, track attendance, and process payroll here.</p>
+  <main class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2>HR Dashboard</h2>
+      <ul>
+        <li><a href="#">Employee Reports</a></li>
+        <li><a href="#">Attendance Summary</a></li>
+        <li><a href="#">Payroll Analytics</a></li>
+        <li><a href="#">Performance Overview</a></li>
+      </ul>
+    </aside>
 
-    <div class="dashboard-cards">
-      <div class="card">
-        <h3>Employee Profiles</h3>
-        <p>Maintain and update employee records effortlessly.</p>
-        <a href="employee.html" class="btn">Manage Employees</a>
-      </div>
+    <!-- Main Dashboard Content -->
+    <section class="dashboard-main">
+      <h2>Welcome to HR Dashboard</h2>
+      <p>Here you can manage employee profiles, view reports, and oversee attendance and payroll operations.</p>
 
-      <div class="card">
-        <h3>Attendance Tracking</h3>
-        <p>Track employee work hours and attendance in real time.</p>
-        <a href="#" class="btn">View Attendance</a>
-      </div>
+      <div class="summary-cards">
+        <div class="card">
+          <h3>Total Employees</h3>
+          <p>24</p>
+        </div>
 
-      <div class="card">
-        <h3>Payroll Management</h3>
-        <p>Automate payroll and generate payslips easily.</p>
-        <a href="#" class="btn">Process Payroll</a>
+        <div class="card">
+          <h3>Active Attendance</h3>
+          <p>19</p>
+        </div>
+
+        <div class="card">
+          <h3>Pending Payrolls</h3>
+          <p>5</p>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
   <footer>
     <p>© 2025 FLAWLESS GRAPHICS. All rights reserved.</p>
