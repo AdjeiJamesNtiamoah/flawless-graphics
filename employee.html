@@ -20,35 +20,54 @@
     </nav>
   </header>
 
-  <section class="form-section">
+<section class="form-section">
+  <div class="form-container">
     <h2>Add Employee Details</h2>
     <form id="employeeForm">
-      <label>Full Name:</label>
-      <input type="text" id="name" required>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="name" placeholder="Enter full name" required>
+      </div>
 
-      <label>Position/Title:</label>
-      <input type="text" id="position" required>
+      <div class="form-group">
+        <label>Position/Title</label>
+        <input type="text" id="position" placeholder="Enter position" required>
+      </div>
 
-      <label>Email:</label>
-      <input type="email" id="email" required>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="e.g. example@email.com" required>
+      </div>
 
-      <label>Phone:</label>
-      <input type="tel" id="phone" required>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" id="phone" placeholder="e.g. +233 24 000 0000" required>
+      </div>
 
-      <label>Department:</label>
-      <input type="text" id="department" required>
+      <div class="form-group">
+        <label>Department</label>
+        <input type="text" id="department" placeholder="Enter department" required>
+      </div>
 
-      <label>Date of Hire:</label>
-      <input type="date" id="hireDate" required>
+      <div class="form-group">
+        <label>Date of Hire</label>
+        <input type="date" id="hireDate" required>
+      </div>
 
-      <label>Salary:</label>
-      <input type="number" id="salary" placeholder="e.g. 2500" required>
+      <div class="form-group">
+        <label>Salary (GHS)</label>
+        <input type="number" id="salary" placeholder="e.g. 2500" required>
+      </div>
 
-      <button type="submit">Save Employee</button>
+      <button type="submit" class="save-btn">Save Employee</button>
     </form>
 
-    <div id="employeeList"></div>
-  </section>
+    <div id="employeeList" class="employee-list">
+      <h3>Saved Employees</h3>
+      <ul></ul>
+    </div>
+  </div>
+</section>
 
   <script>
     // Save data in browser for now (temporary)
@@ -94,3 +113,4 @@
 
 </body>
 </html>
+
