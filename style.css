@@ -107,6 +107,23 @@ nav a:hover {
   transform: scale(1.05);
 }
 
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  padding: 15px 0;
+  background: linear-gradient(90deg, #0078ff, #00c6ff, #0078ff);
+  background-size: 300% 300%;
+  animation: navGradient 6s ease infinite;
+}
+
+@keyframes navGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+
 .hero {
   text-align: center;
   padding: 5rem 2rem;
@@ -547,6 +564,7 @@ footer {
   font-style: italic;
   margin-top: 30px;
 }
+
 
 
 
