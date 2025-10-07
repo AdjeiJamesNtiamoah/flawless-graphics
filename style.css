@@ -62,6 +62,51 @@ header {
   border-bottom: 2px solid var(--secondary);
 }
 
+/* 🌟 Animated Navigation Links */
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  background: #001f3f;
+  padding: 15px 0;
+}
+
+nav a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  position: relative;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+/* Underline animation effect */
+nav a::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #00c6ff;
+  transition: width 0.4s ease;
+}
+
+/* Hover and active states */
+nav a:hover {
+  color: #00c6ff;
+}
+
+nav a:hover::after,
+nav a.active::after {
+  width: 100%;
+}
+
+/* Optional: slight “pop” animation */
+nav a:hover {
+  transform: scale(1.05);
+}
+
 .hero {
   text-align: center;
   padding: 5rem 2rem;
@@ -502,6 +547,7 @@ footer {
   font-style: italic;
   margin-top: 30px;
 }
+
 
 
 
