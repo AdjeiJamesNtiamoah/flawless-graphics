@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HR Dashboard | FLAWLESS GRAPHICS</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">
+        <img src="assets/logo-placeholder.png" alt="FLAWLESS GRAPHICS Logo" />
+        <h1>FLAWLESS GRAPHICS</h1>
+        <p class="tagline">[Your Company Tagline Here]</p>
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="employee.html">Employee Login</a></li>
+        <li><a href="hr.html" class="active">HR Dashboard</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="dashboard">
+    <h2>HR Dashboard</h2>
+    <p>View employee attendance and payroll summary.</p>
+
+    <div class="dashboard-section">
+      <h3>Employee Attendance</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Employee ID</th>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Days Present</th>
+            <th>Days Absent</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>EMP001</td><td>John Doe</td><td>Design</td><td>22</td><td>2</td></tr>
+          <tr><td>EMP002</td><td>Jane Smith</td><td>Development</td><td>21</td><td>3</td></tr>
+          <tr><td>EMP003</td><td>Michael Lee</td><td>HR</td><td>23</td><td>1</td></tr>
+          <tr><td>EMP004</td><td>Sarah Johnson</td><td>Marketing</td><td>20</td><td>4</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="dashboard-section">
+      <h3>Payroll Summary</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Employee ID</th>
+            <th>Name</th>
+            <th>Basic Salary ($)</th>
+            <th>Bonus ($)</th>
+            <th>Deductions ($)</th>
+            <th>Net Pay ($)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>EMP001</td><td>John Doe</td><td>3000</td><td>200</td><td>50</td><td>3150</td></tr>
+          <tr><td>EMP002</td><td>Jane Smith</td><td>3200</td><td>150</td><td>100</td><td>3250</td></tr>
+          <tr><td>EMP003</td><td>Michael Lee</td><td>2800</td><td>300</td><td>0</td><td>3100</td></tr>
+          <tr><td>EMP004</td><td>Sarah Johnson</td><td>3100</td><td>100</td><td>80</td><td>3120</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="note">This is sample data for demonstration. Actual records will appear after system integration.</p>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 FLAWLESS GRAPHICS. All rights reserved.</p>
+    <p>Contact: [your-email@example.com] | [your-phone-number]</p>
+  </footer>
+
+  <script src="theme.js"></script>
+</body>
+</html>

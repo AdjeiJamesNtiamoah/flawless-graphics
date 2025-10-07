@@ -1,0 +1,6 @@
+assets/
+  ├── logo-placeholder.png
+  ├── icon-design.png
+  ├── icon-hr.png
+  ├── icon-payroll.png
+  └── icon-support.png
