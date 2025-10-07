@@ -203,5 +203,51 @@ footer {
 }
 
 
+/* 🌟 Hero Section Fade-in Enhancement */
+#hero {
+  text-align: center;
+  padding: 120px 20px;
+  background: linear-gradient(135deg, #0078ff, #00d4ff);
+  color: white;
+}
+
+#hero h1 {
+  font-size: 2.8rem;
+  margin-bottom: 10px;
+}
+
+#hero p {
+  font-size: 1.2rem;
+  margin-bottom: 25px;
+}
+
+.cta-button {
+  background: #fff;
+  color: #0078ff;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 6px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.cta-button:hover {
+  transform: scale(1.05);
+  background: #e6f3ff;
+}
+
+/* Ensure fade-in classes still work */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 
 
