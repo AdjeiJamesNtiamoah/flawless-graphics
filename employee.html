@@ -3,54 +3,94 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Employee Login | FLAWLESS GRAPHICS</title>
+  <title>Employee Portal - FLAWLESS GRAPHICS</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
   <header>
-    <h1>Employee Login</h1>
-  </header>
-  <main>
-    <p>[Placeholder for employee login form]</p>
-  </main>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Employee Login | FLAWLESS GRAPHICS</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header>
-    <nav>
-      <img src="assets/logo-placeholder.png" alt="FLAWLESS GRAPHICS Logo" class="logo">
-      <ul>
+    <nav class="navbar">
+      <div class="logo">FLAWLESS GRAPHICS</div>
+      <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
-        <li><a href="employee.html" class="active">Employee Login</a></li>
-        <li><a href="hr.html">HR Dashboard</a></li>
-        <li><a href="services.html">Services</a></li>
+        <li><a href="employee.html" class="active">Employee Portal</a></li>
+        <li><a href="hr-dashboard.html">HR Dashboard</a></li>
         <li><a href="contact.html">Contact</a></li>
       </ul>
     </nav>
   </header>
 
-  <main class="content">
-    <h1>Employee Portal</h1>
-    <p>Welcome to the FLAWLESS GRAPHICS Employee Portal. Use this page to log in and access your work profile, attendance, and payroll details.</p>
+  <section class="form-section">
+    <h2>Add Employee Details</h2>
+    <form id="employeeForm">
+      <label>Full Name:</label>
+      <input type="text" id="name" required>
 
-    <div class="form-card">
-      <form>
-        <label>Employee ID</label>
-        <input type="text" placeholder="Enter your ID">
-        <label>Password</label>
-        <input type="password" placeholder="Enter your password">
-        <button type="submit">Login</button>
-      </form>
-    </div>
-  </main>
+      <label>Position/Title:</label>
+      <input type="text" id="position" required>
+
+      <label>Email:</label>
+      <input type="email" id="email" required>
+
+      <label>Phone:</label>
+      <input type="tel" id="phone" required>
+
+      <label>Department:</label>
+      <input type="text" id="department" required>
+
+      <label>Date of Hire:</label>
+      <input type="date" id="hireDate" required>
+
+      <label>Salary:</label>
+      <input type="number" id="salary" placeholder="e.g. 2500" required>
+
+      <button type="submit">Save Employee</button>
+    </form>
+
+    <div id="employeeList"></div>
+  </section>
+
+  <script>
+    // Save data in browser for now (temporary)
+    const form = document.getElementById('employeeForm');
+    const employeeList = document.getElementById('employeeList');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const employee = {
+        name: document.getElementById('name').value,
+        position: document.getElementById('position').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        department: document.getElementById('department').value,
+        hireDate: document.getElementById('hireDate').value,
+        salary: document.getElementById('salary').value
+      };
+
+      // Save to local storage
+      let records = JSON.parse(localStorage.getItem('employees')) || [];
+      records.push(employee);
+      localStorage.setItem('employees', JSON.stringify(records));
+
+      alert('✅ Employee saved successfully!');
+      form.reset();
+      displayEmployees();
+    });
+
+    function displayEmployees() {
+      const records = JSON.parse(localStorage.getItem('employees')) || [];
+      employeeList.innerHTML = `
+        <h3>Saved Employees</h3>
+        <ul>
+          ${records.map(emp => `
+            <li><strong>${emp.name}</strong> — ${emp.position}, ${emp.department}</li>
+          `).join('')}
+        </ul>
+      `;
+    }
+
+    displayEmployees();
+  </script>
+
 </body>
 </html>
-
