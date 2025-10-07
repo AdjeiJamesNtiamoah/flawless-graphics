@@ -249,58 +249,104 @@ footer {
   transform: translateY(0);
 }
 
-/* 🌟 Employee Portal Form */
+/* 🌟 Employee Portal Form Styling */
 .form-section {
-  max-width: 600px;
-  margin: 60px auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 60px 20px;
+  background: #f4f7fb;
+  min-height: 100vh;
+}
+
+.form-container {
   background: #fff;
-  padding: 30px;
+  padding: 40px 50px;
   border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 600px;
 }
 
-.form-section h2 {
+.form-container h2 {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   color: #0078ff;
+  font-size: 1.8rem;
 }
 
-form label {
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
   display: block;
-  margin-top: 10px;
-  font-weight: bold;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #333;
 }
 
-form input {
+.form-group input {
   width: 100%;
   padding: 10px;
-  margin-top: 5px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
 }
 
-form button {
-  margin-top: 20px;
-  width: 100%;
-  padding: 12px;
+.form-group input:focus {
+  border-color: #0078ff;
+  outline: none;
+}
+
+.save-btn {
   background: #0078ff;
-  color: white;
+  color: #fff;
   border: none;
+  padding: 12px;
   border-radius: 5px;
+  width: 100%;
+  font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
-  font-weight: bold;
+  transition: background 0.3s ease;
 }
 
-form button:hover {
+.save-btn:hover {
   background: #005fcc;
 }
 
-#employeeList {
-  margin-top: 25px;
+.employee-list {
+  margin-top: 30px;
   background: #f9f9f9;
   padding: 15px;
-  border-radius: 5px;
+  border-radius: 8px;
 }
+
+.employee-list h3 {
+  color: #0078ff;
+  margin-bottom: 10px;
+}
+
+.employee-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.employee-list li {
+  padding: 8px;
+  border-bottom: 1px solid #e1e1e1;
+  color: #333;
+}
+
+@media (max-width: 600px) {
+  .form-container {
+    padding: 25px;
+  }
+}
+
+
 
 
 
