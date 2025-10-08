@@ -132,29 +132,91 @@
     row.insertCell(5).textContent = emp.dateOfHire;
     row.insertCell(6).textContent = emp.salary;
 
+    // Action buttons cell
+    const actionCell = row.insertCell(7);
+
+    // Edit button
+    const editBtn = document.createElement('button');
+    editBtn.textContent = 'Edit';
+    editBtn.classList.add('edit-btn');
+    editBtn.onclick = function() {
+      editEmployee(index);
+    };
+    actionCell.appendChild(editBtn);
+
     // Delete button
-    const deleteCell = row.insertCell(7);
     const deleteBtn = document.createElement('button');
     deleteBtn.textContent = 'Delete';
     deleteBtn.classList.add('delete-btn');
     deleteBtn.onclick = function() {
       deleteEmployee(index);
     };
-    deleteCell.appendChild(deleteBtn);
+    actionCell.appendChild(deleteBtn);
   }
 
   function deleteEmployee(index) {
     const savedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
     savedEmployees.splice(index, 1);
     localStorage.setItem('employees', JSON.stringify(savedEmployees));
+    refreshTable();
+  }
 
-    // Refresh the table
+  function editEmployee(index) {
+    const savedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
+    const emp = savedEmployees[index];
+
+    // Fill form with existing employee data
+    document.getElementById('fullName').value = emp.name;
+    document.getElementById('position').value = emp.position;
+    document.getElementById('email').value = emp.email;
+    document.getElementById('phone').value = emp.phone;
+    document.getElementById('department').value = emp.department;
+    document.getElementById('dateOfHire').value = emp.dateOfHire;
+    document.getElementById('salary').value = emp.salary;
+
+    // Change button to Update
+    const saveBtn = document.querySelector('button[onclick="saveEmployee()"]');
+    saveBtn.textContent = 'Update Employee';
+    saveBtn.onclick = function() {
+      updateEmployee(index);
+    };
+  }
+
+  function updateEmployee(index) {
+    const updatedEmployee = {
+      name: document.getElementById('fullName').value,
+      position: document.getElementById('position').value,
+      email: document.getElementById('email').value,
+      phone: document.getElementById('phone').value,
+      department: document.getElementById('department').value,
+      dateOfHire: document.getElementById('dateOfHire').value,
+      salary: document.getElementById('salary').value
+    };
+
+    const savedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
+    savedEmployees[index] = updatedEmployee;
+    localStorage.setItem('employees', JSON.stringify(savedEmployees));
+
+    // Reset button
+    const saveBtn = document.querySelector('.form-section button');
+    saveBtn.textContent = 'Save Employee';
+    saveBtn.onclick = function() {
+      saveEmployee();
+    };
+
+    document.getElementById('employeeForm').reset();
+    refreshTable();
+  }
+
+  function refreshTable() {
     const tableBody = document.querySelector('#employeeTable tbody');
     tableBody.innerHTML = '';
+    const savedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
     savedEmployees.forEach((emp, i) => addToTable(emp, i));
   }
 </script>
 </body>
 </html>
+
 
 
