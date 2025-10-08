@@ -120,10 +120,15 @@
     }
   </script>
 <script>
-  // Load employees from localStorage into the HR dashboard report
-  document.addEventListener('DOMContentLoaded', () => {
+  // Function to load or refresh employee report
+  function loadEmployeeReport() {
     const reportBody = document.querySelector('#reportTable tbody');
-    const employees = JSON.parse(localStorage.getItem('employees')) || [];
+    reportBody.innerHTML = ''; // clear old data
+
+    // Try both possible keys
+    let employees = JSON.parse(localStorage.getItem('employees')) 
+                 || JSON.parse(localStorage.getItem('employeeData')) 
+                 || [];
 
     if (employees.length === 0) {
       reportBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#888;">No employee records found.</td></tr>`;
@@ -144,6 +149,16 @@
       `;
       reportBody.appendChild(row);
     });
+  }
+
+  // Initial load
+  document.addEventListener('DOMContentLoaded', loadEmployeeReport);
+
+  // Listen for changes in localStorage (real-time sync between tabs/pages)
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'employees' || event.key === 'employeeData') {
+      loadEmployeeReport();
+    }
   });
 </script>
 </body>
