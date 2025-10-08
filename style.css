@@ -296,6 +296,14 @@ footer p {
   transform: scale(1.05);
 }
 
+@media (prefers-color-scheme: dark) {
+  .hero {
+    background: linear-gradient(120deg, #1f2937, #374151, #111827);
+    background-size: 300% 300%;
+    animation: gradientShift 14s ease infinite;
+  }
+}
+
 /* Animation for gradient background */
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
@@ -392,4 +400,5 @@ footer p {
 .contact-info a:hover {
   text-decoration: underline;
 }
+
 
