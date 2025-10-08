@@ -842,6 +842,100 @@ mark {
   transform: translateY(0);
 }
 
+/* === HR Dashboard Cards === */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 25px;
+  padding: 30px;
+  justify-items: center;
+}
+
+.card {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  width: 100%;
+  max-width: 250px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card-icon {
+  font-size: 42px;
+  margin-bottom: 12px;
+}
+
+.card h3 {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.card p {
+  font-size: 14px;
+  color: #555;
+}
+
+/* Color themes */
+.card-blue {
+  border-top: 5px solid #007bff;
+}
+.card-blue .card-icon {
+  color: #007bff;
+}
+
+.card-green {
+  border-top: 5px solid #28a745;
+}
+.card-green .card-icon {
+  color: #28a745;
+}
+
+.card-gold {
+  border-top: 5px solid #ffc107;
+}
+.card-gold .card-icon {
+  color: #ffc107;
+}
+
+.card-purple {
+  border-top: 5px solid #6f42c1;
+}
+.card-purple .card-icon {
+  color: #6f42c1;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .card-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.hidden-section {
+  display: none;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.4s ease-in-out;
+}
+
+.hidden-section.show {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
 
 
 
