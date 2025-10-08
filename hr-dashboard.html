@@ -198,31 +198,32 @@
       window.onclick = e => modals.forEach(m => { if (e.target === m) m.style.display = "none"; });
     });
 
-    // --- Employee Report ---
-    function loadEmployeeReport() {
-      const tbody = document.querySelector("#employeeTable tbody");
-      tbody.innerHTML = "";
-      const employees = JSON.parse(localStorage.getItem("employees")) || [];
-      employees.forEach((emp, i) => {
-        tbody.innerHTML += `<tr>
-          <td>${i + 1}</td><td>${emp.fullName || ""}</td><td>${emp.position || ""}</td>
-          <td>${emp.department || ""}</td><td>${emp.email || ""}</td><td>${emp.phone || ""}</td>
-          <td>${emp.salary || ""}</td><td>${emp.hireDate || ""}</td></tr>`;
-      });
-    }
+function loadEmployeeReport() {
+  const tableBody = document.querySelector("#employeeTable tbody");
+  tableBody.innerHTML = "";
 
-    document.querySelector("#downloadReport").onclick = () => {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const employees = JSON.parse(localStorage.getItem("employees")) || [];
-      let y = 20;
-      doc.text("Employee Report", 14, y);
-      y += 10;
-      employees.forEach((emp, i) => {
-        doc.text(`${i + 1}. ${emp.fullName} - ${emp.position} - ${emp.department}`, 14, y += 10);
-      });
-      doc.save("Employee_Report.pdf");
-    };
+  // Get saved employees from localStorage
+  const employees = JSON.parse(localStorage.getItem("employees")) || [];
+
+  if (employees.length === 0) {
+    tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;">No employee data available.</td></tr>`;
+    return;
+  }
+
+  employees.forEach((emp, i) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${i + 1}</td>
+      <td>${emp.fullName || "—"}</td>
+      <td>${emp.position || "—"}</td>
+      <td>${emp.department || "—"}</td>
+      <td>${emp.email || "—"}</td>
+      <td>${emp.phone || "—"}</td>
+      <td>${emp.salary || "—"}</td>
+      <td>${emp.hireDate || "—"}</td>
+    `;
+    tableBody.appendChild(row);
+  });
 
     // --- Attendance ---
     function loadAttendance() {
