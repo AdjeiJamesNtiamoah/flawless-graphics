@@ -426,6 +426,84 @@ document.getElementById('downloadPDF').addEventListener('click', () => {
   doc.save('Employee_Report.pdf');
 });
 </script>
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const employeeCard = document.querySelector('[data-modal="employeeModal"]');
+  const modal = document.getElementById('employeeModal');
+  const closeBtn = modal.querySelector('.close');
+
+  // Open modal when Employee Report card is clicked
+  if (employeeCard) {
+    employeeCard.addEventListener('click', () => {
+      modal.style.display = 'block';
+      loadEmployeeReport();
+    });
+  }
+
+  // Close modal when clicking X
+  closeBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+
+  // Close when clicking outside the modal
+  window.addEventListener('click', (event) => {
+    if (event.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+});
+
+function loadEmployeeReport() {
+  const tbody = document.querySelector('#employeeTable tbody');
+  tbody.innerHTML = '';
+  const employees = JSON.parse(localStorage.getItem('employees')) || [];
+
+  employees.forEach((emp, i) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${i + 1}</td>
+      <td>${emp.fullName}</td>
+      <td>${emp.position}</td>
+      <td>${emp.department}</td>
+      <td>${emp.email}</td>
+      <td>${emp.phone}</td>
+      <td>${emp.salary}</td>
+      <td>${emp.hireDate}</td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+function generateEmployeePDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.text("Employee Report", 14, 15);
+  doc.setFontSize(10);
+
+  const employees = JSON.parse(localStorage.getItem('employees')) || [];
+  let startY = 30;
+
+  // Table Header
+  doc.text("No.", 14, startY);
+  doc.text("Name", 25, startY);
+  doc.text("Position", 70, startY);
+  doc.text("Dept.", 110, startY);
+  doc.text("Salary", 150, startY);
+
+  // Employee Data
+  employees.forEach((emp, i) => {
+    startY += 10;
+    doc.text(String(i + 1), 14, startY);
+    doc.text(emp.fullName || "", 25, startY);
+    doc.text(emp.position || "", 70, startY);
+    doc.text(emp.department || "", 110, startY);
+    doc.text(emp.salary || "", 150, startY);
+  });
+
+  doc.save("Employee_Report.pdf");
+}
+</script>
 </body>
 </html>
 
