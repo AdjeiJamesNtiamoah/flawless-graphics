@@ -385,6 +385,82 @@ document.getElementById("downloadPayroll").onclick = () => {
   doc.save("Payroll_Report.pdf");
 };
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const cards = document.querySelectorAll(".card");
+  const modals = document.querySelectorAll(".modal");
+  const closeBtns = document.querySelectorAll(".close");
+
+  // Open modal
+  cards.forEach(card => {
+    card.addEventListener("click", () => {
+      const modalId = card.getAttribute("data-modal");
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = "block";
+
+        // Load data dynamically
+        if (modalId === "employeeModal") loadEmployeeReport();
+        if (modalId === "attendanceModal") loadAttendance();
+        if (modalId === "payrollModal") loadPayroll();
+        if (modalId === "performanceModal") loadPerformance();
+      }
+    });
+  });
+
+  // Close modal when X is clicked
+  closeBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      modals.forEach(m => (m.style.display = "none"));
+    });
+  });
+
+  // Close when clicking outside modal content
+  window.addEventListener("click", e => {
+    modals.forEach(m => {
+      if (e.target === m) m.style.display = "none";
+    });
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const cards = document.querySelectorAll(".card");
+  const modals = document.querySelectorAll(".modal");
+  const closeBtns = document.querySelectorAll(".close");
+
+  // Open modal
+  cards.forEach(card => {
+    card.addEventListener("click", () => {
+      const modalId = card.getAttribute("data-modal");
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = "block";
+
+        // Load data dynamically
+        if (modalId === "employeeModal") loadEmployeeReport();
+        if (modalId === "attendanceModal") loadAttendance();
+        if (modalId === "payrollModal") loadPayroll();
+        if (modalId === "performanceModal") loadPerformance();
+      }
+    });
+  });
+
+  // Close modal when X is clicked
+  closeBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      modals.forEach(m => (m.style.display = "none"));
+    });
+  });
+
+  // Close when clicking outside modal content
+  window.addEventListener("click", e => {
+    modals.forEach(m => {
+      if (e.target === m) m.style.display = "none";
+    });
+  });
+});
+</script>
 
 </body>
 </html>
