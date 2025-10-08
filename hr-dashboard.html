@@ -750,6 +750,31 @@ function generatePerformancePDF() {
   doc.save("Performance_Report.pdf");
 }
 </script>
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+  
+  sidebarLinks.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+
+      // Highlight active link
+      sidebarLinks.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+
+      // Open corresponding modal
+      const modalId = link.getAttribute('data-modal');
+      if (modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.style.display = 'block';
+          openModal(modalId.replace('Modal', ''));
+        }
+      }
+    });
+  });
+});
+</script>
 </body>
 </html>
 
