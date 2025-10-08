@@ -91,51 +91,70 @@
   <footer>
     <p>© 2025 FLAWLESS GRAPHICS. All rights reserved.</p>
   </footer>
+<script>
+  // Load saved employees from localStorage
+  document.addEventListener('DOMContentLoaded', () => {
+    const savedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
+    savedEmployees.forEach((emp, index) => addToTable(emp, index));
+  });
 
-  <script>
-    // Load saved employees from localStorage
-    document.addEventListener('DOMContentLoaded', () => {
+  function saveEmployee() {
+    const employee = {
+      name: document.getElementById('fullName').value,
+      position: document.getElementById('position').value,
+      email: document.getElementById('email').value,
+      phone: document.getElementById('phone').value,
+      department: document.getElementById('department').value,
+      dateOfHire: document.getElementById('dateOfHire').value,
+      salary: document.getElementById('salary').value
+    };
+
+    if (employee.name && employee.position && employee.email) {
       const savedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
-      savedEmployees.forEach(emp => addToTable(emp));
-    });
-
-    function saveEmployee() {
-      const employee = {
-        name: document.getElementById('fullName').value,
-        position: document.getElementById('position').value,
-        email: document.getElementById('email').value,
-        phone: document.getElementById('phone').value,
-        department: document.getElementById('department').value,
-        dateOfHire: document.getElementById('dateOfHire').value,
-        salary: document.getElementById('salary').value
-      };
-
-      if (employee.name && employee.position && employee.email) {
-        addToTable(employee);
-        saveToLocal(employee);
-        document.getElementById('employeeForm').reset();
-      } else {
-        alert('Please fill all required fields!');
-      }
-    }
-
-    function addToTable(emp) {
-      const table = document.querySelector('#employeeTable tbody');
-      const row = table.insertRow();
-      row.insertCell(0).textContent = emp.name;
-      row.insertCell(1).textContent = emp.position;
-      row.insertCell(2).textContent = emp.department;
-      row.insertCell(3).textContent = emp.email;
-      row.insertCell(4).textContent = emp.phone;
-      row.insertCell(5).textContent = emp.dateOfHire;
-      row.insertCell(6).textContent = emp.salary;
-    }
-
-    function saveToLocal(emp) {
-      const savedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
-      savedEmployees.push(emp);
+      savedEmployees.push(employee);
       localStorage.setItem('employees', JSON.stringify(savedEmployees));
+
+      addToTable(employee, savedEmployees.length - 1);
+      document.getElementById('employeeForm').reset();
+    } else {
+      alert('Please fill all required fields!');
     }
-  </script>
+  }
+
+  function addToTable(emp, index) {
+    const table = document.querySelector('#employeeTable tbody');
+    const row = table.insertRow();
+
+    row.insertCell(0).textContent = emp.name;
+    row.insertCell(1).textContent = emp.position;
+    row.insertCell(2).textContent = emp.department;
+    row.insertCell(3).textContent = emp.email;
+    row.insertCell(4).textContent = emp.phone;
+    row.insertCell(5).textContent = emp.dateOfHire;
+    row.insertCell(6).textContent = emp.salary;
+
+    // Delete button
+    const deleteCell = row.insertCell(7);
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.classList.add('delete-btn');
+    deleteBtn.onclick = function() {
+      deleteEmployee(index);
+    };
+    deleteCell.appendChild(deleteBtn);
+  }
+
+  function deleteEmployee(index) {
+    const savedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
+    savedEmployees.splice(index, 1);
+    localStorage.setItem('employees', JSON.stringify(savedEmployees));
+
+    // Refresh the table
+    const tableBody = document.querySelector('#employeeTable tbody');
+    tableBody.innerHTML = '';
+    savedEmployees.forEach((emp, i) => addToTable(emp, i));
+  }
+</script>
 </body>
 </html>
+
