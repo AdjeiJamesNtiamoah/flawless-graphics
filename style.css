@@ -1888,6 +1888,28 @@ mark {
   to { transform: translateY(0); opacity: 1; }
 }
 
+/* Action Icons */
+.action-icon {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  margin: 0 5px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.action-icon:hover {
+  transform: scale(1.2);
+  opacity: 0.8;
+}
+
+.edit-icon {
+  filter: hue-rotate(210deg); /* makes it blue-ish */
+}
+
+.delete-icon {
+  filter: hue-rotate(0deg) brightness(0.8) saturate(1.5); /* red tone */
+}
+
 
 
 
