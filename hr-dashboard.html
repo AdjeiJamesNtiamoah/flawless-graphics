@@ -8,21 +8,73 @@
 </head>
 
 <body>
-  <!-- 🧩 All your dashboard content goes here -->
-  <header> ... </header>
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <img src="assets/logo-main.png" alt="Flawless Graphics Logo" class="logo-img">
+      <h1>FLAWLESS GRAPHICS</h1>
+    </div>
 
+    <nav>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="employee-portal.html">Employee Portal</a></li>
+        <li><a href="hr-dashboard.html" class="active">HR Dashboard</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- MAIN HR DASHBOARD CONTENT -->
   <main class="dashboard">
-    <!-- Cards and content go here -->
+    <h2>HR Dashboard</h2>
+    <p class="dashboard-intro">Access quick insights and manage employee information, payroll, and performance.</p>
+
+    <div class="dashboard-grid">
+      <div class="dashboard-card" onclick="openSection('employee-report')">
+        <img src="assets/employee-icon.png" alt="Employee Report">
+        <h3>Employee Report</h3>
+        <p>View and export all employee profiles and reports.</p>
+      </div>
+
+      <div class="dashboard-card" onclick="openSection('attendance-summary')">
+        <img src="assets/attendance-photo.jpg" alt="Attendance Summary">
+        <h3>Attendance Summary</h3>
+        <p>Track attendance data and daily check-ins.</p>
+      </div>
+
+      <div class="dashboard-card" onclick="openSection('payroll-analytics')">
+        <img src="assets/payroll-photo.jpg" alt="Payroll Analytics">
+        <h3>Payroll Analytics</h3>
+        <p>Analyze payroll trends and generate salary reports.</p>
+      </div>
+
+      <div class="dashboard-card" onclick="openSection('performance-overview')">
+        <img src="https://img.icons8.com/color/96/graph.png" alt="Performance Overview">
+        <h3>Performance Overview</h3>
+        <p>Monitor staff KPIs and performance growth.</p>
+      </div>
+    </div>
+
+    <!-- Dynamic Section Display -->
+    <div id="dynamic-section" class="hidden-section">
+      <button class="close-btn" onclick="closeSection()">✖</button>
+      <div id="section-content"></div>
+    </div>
   </main>
 
-  <footer> ... </footer>
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2025 FLAWLESS GRAPHICS | HR Management System</p>
+  </footer>
 
-  <!-- 👇 You’ll paste the JavaScript code right here -->
+  <!-- JAVASCRIPT -->
   <script>
     function openSection(section) {
       const sectionContent = document.getElementById("section-content");
       const sectionBox = document.getElementById("dynamic-section");
-
+      
       let content = "";
       switch (section) {
         case "employee-report":
@@ -38,7 +90,7 @@
           content = "<h2>Performance Overview</h2><p>Track performance KPIs, goals, and review summaries. (Placeholder for performance data)</p>";
           break;
       }
-
+      
       sectionContent.innerHTML = content;
       sectionBox.style.display = "block";
     }
@@ -50,40 +102,3 @@
 
 </body>
 </html>
-
-<main class="dashboard">
-  <h2>HR Dashboard</h2>
-  <p class="dashboard-intro">Access quick insights and manage employee information, payroll, and performance.</p>
-
-  <div class="dashboard-grid">
-    <div class="dashboard-card" onclick="openSection('employee-report')">
-      <img src="assets/employee-icon.png" alt="Employee Report">
-      <h3>Employee Report</h3>
-      <p>View and export all employee profiles and reports.</p>
-    </div>
-
-    <div class="dashboard-card" onclick="openSection('attendance-summary')">
-      <img src="assets/attendance-photo.jpg" alt="Attendance Summary">
-      <h3>Attendance Summary</h3>
-      <p>Track attendance data and daily check-ins.</p>
-    </div>
-
-    <div class="dashboard-card" onclick="openSection('payroll-analytics')">
-      <img src="assets/payroll-photo.jpg" alt="Payroll Analytics">
-      <h3>Payroll Analytics</h3>
-      <p>Analyze payroll trends and generate salary reports.</p>
-    </div>
-
-    <div class="dashboard-card" onclick="openSection('performance-overview')">
-      <img src="https://img.icons8.com/color/96/graph.png" alt="Performance Overview">
-      <h3>Performance Overview</h3>
-      <p>Monitor staff KPIs and performance growth.</p>
-    </div>
-  </div>
-
-  <!-- Dynamic Section Display -->
-  <div id="dynamic-section" class="hidden-section">
-    <button class="close-btn" onclick="closeSection()">✖</button>
-    <div id="section-content"></div>
-  </div>
-</main>
