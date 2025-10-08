@@ -330,7 +330,7 @@
   // Load data when dashboard opens
   document.addEventListener('DOMContentLoaded', loadEmployeeReport);
 </script>
-
+  
   <script>
 document.addEventListener('DOMContentLoaded', () => {
   const modals = document.querySelectorAll('.modal');
@@ -426,67 +426,68 @@ document.getElementById('downloadPDF').addEventListener('click', () => {
   doc.save('Employee_Report.pdf');
 });
 </script>
-  <script>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const employeeCard = document.querySelector('[data-modal="employeeModal"]');
   const modal = document.getElementById('employeeModal');
   const closeBtn = modal.querySelector('.close');
+  const totalInfo = document.getElementById('totalInfo');
+  const tableBody = document.querySelector('#employeeTable tbody');
 
   // Open modal when Employee Report card is clicked
-  if (employeeCard) {
-    employeeCard.addEventListener('click', () => {
-      modal.style.display = 'block';
-      loadEmployeeReport();
-    });
-  }
+  employeeCard.addEventListener('click', () => {
+    modal.style.display = 'block';
+    loadEmployeeReport();
+  });
 
-  // Close modal when clicking X
+  // Close modal
   closeBtn.addEventListener('click', () => {
     modal.style.display = 'none';
   });
-
-  // Close when clicking outside the modal
-  window.addEventListener('click', (event) => {
-    if (event.target === modal) {
-      modal.style.display = 'none';
-    }
+  window.addEventListener('click', (e) => {
+    if (e.target === modal) modal.style.display = 'none';
   });
 
-  // 🔄 Listen for updates to employee data (cross-tab or same-tab)
-  window.addEventListener('storage', (event) => {
-    if (event.key === 'employees') {
-      loadEmployeeReport();
-    }
-  });
-
-  // 🔄 Also auto-refresh every few seconds (for same-tab edits)
+  // Auto-refresh every few seconds
   setInterval(() => {
-    loadEmployeeReport();
+    if (modal.style.display === 'block') loadEmployeeReport();
   }, 3000);
+
+  // Storage listener for updates across tabs
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'employees' && modal.style.display === 'block') loadEmployeeReport();
+  });
 });
 
 function loadEmployeeReport() {
   const tbody = document.querySelector('#employeeTable tbody');
-  if (!tbody) return;
+  const totalInfo = document.getElementById('totalInfo');
   tbody.innerHTML = '';
 
   const employees = JSON.parse(localStorage.getItem('employees')) || [];
 
+  let totalSalary = 0;
   employees.forEach((emp, i) => {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${i + 1}</td>
-      <td>${emp.fullName}</td>
-      <td>${emp.position}</td>
-      <td>${emp.department}</td>
-      <td>${emp.email}</td>
-      <td>${emp.phone}</td>
-      <td>${emp.salary}</td>
-      <td>${emp.hireDate}</td>
+      <td>${emp.fullName || ''}</td>
+      <td>${emp.position || ''}</td>
+      <td>${emp.department || ''}</td>
+      <td>${emp.email || ''}</td>
+      <td>${emp.phone || ''}</td>
+      <td>${emp.salary || ''}</td>
+      <td>${emp.hireDate || ''}</td>
     `;
     tbody.appendChild(row);
+    totalSalary += parseFloat(emp.salary) || 0;
   });
+
+  totalInfo.innerHTML = `
+    <strong>Total Employees:</strong> ${employees.length} |
+    <strong>Total Payroll Cost:</strong> ₵${totalSalary.toLocaleString()}
+  `;
 }
 
 function generateEmployeePDF() {
