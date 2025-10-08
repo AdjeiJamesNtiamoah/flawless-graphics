@@ -55,27 +55,31 @@
   </div>
 
   <!-- Modals -->
-  <div id="employeeModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2>Employee Report</h2>
-      <table id="employeeTable" class="styled-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Full Name</th>
-            <th>Position</th>
-            <th>Department</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Salary</th>
-            <th>Hire Date</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
+<div id="employeeModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Employee Report</h2>
+
+    <!-- Download Button -->
+    <button id="downloadPDF" class="download-btn">📄 Download Report as PDF</button>
+
+    <table id="employeeTable" class="styled-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Full Name</th>
+          <th>Position</th>
+          <th>Department</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Salary</th>
+          <th>Hire Date</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
+</div>
 
   <div id="attendanceModal" class="modal">
     <div class="modal-content">
