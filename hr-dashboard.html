@@ -41,22 +41,39 @@
     <h1>Flawless Graphics HR Dashboard</h1>
   </header>
 
-  <!-- Employee Report Modal -->
-  <div class="modal" id="employeeModal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2>Employee Report</h2>
+ <!-- Employee Report Modal -->
+<div id="employeeModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Employee Report</h2>
+
+    <div class="employee-actions">
+      <button id="refreshEmployee">🔄 Refresh Data</button>
+      <button id="downloadEmployee">⬇️ Download as PDF</button>
+    </div>
+
+    <div class="table-container">
       <table id="employeeTable">
         <thead>
           <tr>
-            <th>#</th><th>Full Name</th><th>Position</th><th>Department</th><th>Email</th><th>Phone</th><th>Salary</th><th>Hire Date</th>
+            <th>No.</th>
+            <th>Name</th>
+            <th>Position</th>
+            <th>Department</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Salary</th>
+            <th>Hire Date</th>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody>
+          <!-- Data loads dynamically -->
+        </tbody>
       </table>
-      <button id="downloadReport">Download Report as PDF</button>
     </div>
   </div>
+</div>
+
 <div class="card" data-modal="employeeModal">
   <h3>Employee Report</h3>
   <p>View and export all employee profiles and reports.</p>
