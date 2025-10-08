@@ -248,6 +248,65 @@
       doc.save("Performance_Report.pdf");
     };
   </script>
+  
+<!-- Payroll Script -->
+<script>
+function loadPayroll() {
+  const tbody = document.querySelector("#payrollTable tbody");
+  tbody.innerHTML = "";
+  const employees = JSON.parse(localStorage.getItem("employees")) || [];
+  
+  const taxRate = 0.1; // 10% tax
+  let totalPayroll = 0;
+
+  employees.forEach(emp => {
+    const salary = parseFloat(emp.salary) || 0;
+    const tax = (salary * taxRate).toFixed(2);
+    const net = (salary - tax).toFixed(2);
+    totalPayroll += salary;
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${emp.fullName || ""}</td>
+        <td>${emp.department || ""}</td>
+        <td>${salary.toFixed(2)}</td>
+        <td>${tax}</td>
+        <td>${net}</td>
+      </tr>
+    `;
+  });
+
+  const avgSalary = employees.length ? (totalPayroll / employees.length).toFixed(2) : 0;
+  const maxSalary = employees.length ? Math.max(...employees.map(e => parseFloat(e.salary) || 0)) : 0;
+
+  document.getElementById("payrollSummary").innerHTML = `
+    <strong>Total Employees:</strong> ${employees.length}<br>
+    <strong>Total Payroll:</strong> GHS ${totalPayroll.toFixed(2)}<br>
+    <strong>Average Salary:</strong> GHS ${avgSalary}<br>
+    <strong>Highest Salary:</strong> GHS ${maxSalary.toFixed(2)}
+  `;
+}
+
+document.getElementById("downloadPayroll").onclick = () => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const employees = JSON.parse(localStorage.getItem("employees")) || [];
+  const taxRate = 0.1;
+  let y = 20;
+  doc.text("Payroll Report", 14, y);
+  y += 10;
+
+  employees.forEach(emp => {
+    const salary = parseFloat(emp.salary) || 0;
+    const tax = (salary * taxRate).toFixed(2);
+    const net = (salary - tax).toFixed(2);
+    y += 10;
+    doc.text(`${emp.fullName} (${emp.department}) - Salary: GHS ${salary.toFixed(2)}, Net: GHS ${net}`, 14, y);
+  });
+
+  doc.save("Payroll_Report.pdf");
+};
+</script>
 
 </body>
 </html>
