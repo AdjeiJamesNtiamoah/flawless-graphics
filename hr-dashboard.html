@@ -538,5 +538,59 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 </section>
+    <!-- Employee Report Modal -->
+<div id="employeeModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Employee Report</h2>
+    <p>All saved employee records are displayed below:</p>
+
+    <table id="employeeTable">
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Full Name</th>
+          <th>Position</th>
+          <th>Department</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Salary</th>
+          <th>Hire Date</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <button id="downloadReportBtn">⬇️ Download Report (PDF)</button>
+  </div>
+</div>
+
+<!-- Attendance Modal -->
+<div id="attendanceModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Attendance Summary</h2>
+    <p>View and manage employee attendance data here.</p>
+  </div>
+</div>
+
+<!-- Payroll Modal -->
+<div id="payrollModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Payroll Analytics</h2>
+    <p>Analyze payroll data, salary trends, and export payroll reports.</p>
+  </div>
+</div>
+
+<!-- Performance Modal -->
+<div id="performanceModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Performance Overview</h2>
+    <p>Monitor staff KPIs, performance goals, and team productivity.</p>
+  </div>
+</div>
+
 </body>
 </html>
