@@ -53,7 +53,10 @@
       <button id="downloadReport">Download Report as PDF</button>
     </div>
   </div>
-
+<div class="card" data-modal="employeeModal">
+  <h3>Employee Report</h3>
+  <p>View and export all employee profiles and reports.</p>
+</div>
   <!-- Attendance Modal -->
   <div class="modal" id="attendanceModal">
     <div class="modal-content">
@@ -68,7 +71,11 @@
       <button id="downloadAttendance">Download Attendance PDF</button>
     </div>
   </div>
-  
+  <div class="card" data-modal="attendanceModal">
+  <h3>Attendance Summary</h3>
+  <p>Track attendance data and daily check-ins.</p>
+</div>
+
 <!-- Payroll Analytics Modal -->
 <div class="modal" id="payrollModal">
   <div class="modal-content">
@@ -86,12 +93,14 @@
       </thead>
       <tbody></tbody>
     </table>
-
     <p id="payrollSummary"></p>
     <button id="downloadPayroll">Download Payroll PDF</button>
   </div>
 </div>
-
+<div class="card" data-modal="payrollModal">
+  <h3>Payroll Analytics</h3>
+  <p>Analyze payroll trends and generate salary reports.</p>
+</div>
   <!-- Performance Modal -->
   <div class="modal" id="performanceModal">
     <div class="modal-content">
@@ -106,7 +115,10 @@
       <button id="downloadPerformance">Download Performance PDF</button>
     </div>
   </div>
-
+<div class="card" data-modal="performanceModal">
+  <h3>Performance Overview</h3>
+  <p>Monitor staff KPIs and performance growth.</p>
+</div>
   <script>
     if (card.dataset.modal === "employeeModal") loadEmployeeReport();
 if (card.dataset.modal === "attendanceModal") loadAttendance();
