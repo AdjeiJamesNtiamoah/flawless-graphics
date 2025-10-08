@@ -756,6 +756,21 @@ mark {
   background-color: #f2f2f2;
 }
 
+/* Hide the employee report table by default */
+#employeeReportSection {
+  display: none;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+
+/* When visible */
+#employeeReportSection.show {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
 
 
 
