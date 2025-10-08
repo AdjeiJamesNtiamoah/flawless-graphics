@@ -1033,6 +1033,85 @@ mark {
   background-color: #0056b3;
 }
 
+/* --- Fixed Employee Report Modal Styling --- */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  overflow: auto;
+}
+
+.fixed-report {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  width: 90%;
+  max-width: 1100px;
+  height: 80%;
+  border-radius: 8px;
+  padding: 20px;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.fixed-report h2 {
+  text-align: center;
+  color: #004aad;
+  margin-top: 0;
+}
+
+#downloadBtn {
+  position: sticky;
+  top: 10px;
+  float: right;
+  background-color: #004aad;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+  z-index: 1000;
+}
+
+#downloadBtn:hover {
+  background-color: #003080;
+}
+
+.table-container {
+  margin-top: 60px;
+  overflow-y: auto;
+  max-height: 500px;
+}
+
+#employeeTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+#employeeTable th, #employeeTable td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+#employeeTable th {
+  background-color: #004aad;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
 
 
 
