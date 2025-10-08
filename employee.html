@@ -260,10 +260,61 @@
   a.setAttribute('download', 'employee_report.csv');
   a.click();
 }
+// --- FILTER EMPLOYEES IN REAL TIME ---
+function filterEmployees() {
+  const filter = document.getElementById('searchBar').value.toLowerCase();
+  const rows = document.querySelectorAll('#employeeTable tbody tr');
+
+  rows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(filter) ? '' : 'none';
+  });
+}
+
+// --- DOWNLOAD CSV WITH DATE AND TIME ---
+function downloadCSV() {
+  const employees = JSON.parse(localStorage.getItem('employees')) || [];
+  if (employees.length === 0) {
+    alert('No employee records found to export!');
+    return;
+  }
+
+  const csvRows = [];
+  const headers = ["Name", "Position", "Department", "Email", "Phone", "Date of Hire", "Salary"];
+  csvRows.push(headers.join(','));
+
+  for (const emp of employees) {
+    const values = [
+      emp.name,
+      emp.position,
+      emp.department,
+      emp.email,
+      emp.phone,
+      emp.dateOfHire,
+      emp.salary
+    ];
+    csvRows.push(values.join(','));
+  }
+
+  const csvContent = csvRows.join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+
+  // Add timestamp to filename
+  const now = new Date();
+  const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  const filename = `employee_report_${timestamp}.csv`;
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+}
 
 </script>
 </body>
 </html>
+
 
 
 
