@@ -1214,6 +1214,68 @@ mark {
   z-index: 5;
 }
 
+/* === Employee Report Modal Enhancements === */
+.modal-content.large {
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-bar {
+  background: #f7f9fc;
+  padding: 10px 15px;
+  font-weight: bold;
+  color: #333;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.table-container {
+  overflow-y: auto;
+  flex: 1;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Fixed Table Header */
+#employeeTable thead th {
+  position: sticky;
+  top: 0;
+  background-color: #007bff;
+  color: white;
+  z-index: 2;
+  text-align: left;
+  padding: 8px;
+}
+
+#employeeTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+#employeeTable td, #employeeTable th {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+
+.download-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  margin: 10px 0;
+  cursor: pointer;
+  border-radius: 4px;
+  align-self: flex-end;
+}
+.download-btn:hover {
+  background-color: #218838;
+}
+
 
 
 
