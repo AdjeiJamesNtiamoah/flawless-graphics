@@ -1,3 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HR Dashboard - FLAWLESS GRAPHICS</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- 🧩 All your dashboard content goes here -->
+  <header> ... </header>
+
+  <main class="dashboard">
+    <!-- Cards and content go here -->
+  </main>
+
+  <footer> ... </footer>
+
+  <!-- 👇 You’ll paste the JavaScript code right here -->
+  <script>
+    function openSection(section) {
+      const sectionContent = document.getElementById("section-content");
+      const sectionBox = document.getElementById("dynamic-section");
+
+      let content = "";
+      switch (section) {
+        case "employee-report":
+          content = "<h2>Employee Report</h2><p>Here you can manage, search, and export employee records. (Placeholder for employee data table)</p>";
+          break;
+        case "attendance-summary":
+          content = "<h2>Attendance Summary</h2><p>Display employee attendance charts, check-ins, and absence logs. (Placeholder for attendance summary)</p>";
+          break;
+        case "payroll-analytics":
+          content = "<h2>Payroll Analytics</h2><p>Show payroll charts, monthly reports, and payslip download options. (Placeholder for payroll analytics)</p>";
+          break;
+        case "performance-overview":
+          content = "<h2>Performance Overview</h2><p>Track performance KPIs, goals, and review summaries. (Placeholder for performance data)</p>";
+          break;
+      }
+
+      sectionContent.innerHTML = content;
+      sectionBox.style.display = "block";
+    }
+
+    function closeSection() {
+      document.getElementById("dynamic-section").style.display = "none";
+    }
+  </script>
+
+</body>
+</html>
+
 <main class="dashboard">
   <h2>HR Dashboard</h2>
   <p class="dashboard-intro">Access quick insights and manage employee information, payroll, and performance.</p>
