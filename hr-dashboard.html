@@ -591,6 +591,72 @@ document.addEventListener("DOMContentLoaded", () => {
     <p>Monitor staff KPIs, performance goals, and team productivity.</p>
   </div>
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const modals = document.querySelectorAll(".modal");
+  const closeBtns = document.querySelectorAll(".close");
+  const cards = document.querySelectorAll(".card");
 
+  // Open modal when clicking a card
+  cards.forEach(card => {
+    card.addEventListener("click", () => {
+      const modalId = card.getAttribute("data-modal");
+      const modal = document.getElementById(modalId);
+      modal.style.display = "flex";
+
+      // Load Employee Data dynamically
+      if (modalId === "employeeModal") {
+        const tbody = document.querySelector("#employeeTable tbody");
+        tbody.innerHTML = "";
+        const employees = JSON.parse(localStorage.getItem("employees")) || [];
+
+        employees.forEach((emp, i) => {
+          const row = `
+            <tr>
+              <td>${i + 1}</td>
+              <td>${emp.fullName}</td>
+              <td>${emp.position}</td>
+              <td>${emp.department}</td>
+              <td>${emp.email}</td>
+              <td>${emp.phone}</td>
+              <td>${emp.salary}</td>
+              <td>${emp.hireDate}</td>
+            </tr>`;
+          tbody.innerHTML += row;
+        });
+      }
+    });
+  });
+
+  // Close modals
+  closeBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      btn.closest(".modal").style.display = "none";
+    });
+  });
+
+  // Close when clicking outside modal
+  window.onclick = e => {
+    modals.forEach(modal => {
+      if (e.target === modal) modal.style.display = "none";
+    });
+  };
+
+  // Download as PDF
+  document.getElementById("downloadReportBtn").addEventListener("click", () => {
+    const doc = new jsPDF();
+    doc.text("Flawless Graphics Employee Report", 14, 20);
+    const employees = JSON.parse(localStorage.getItem("employees")) || [];
+    let y = 35;
+
+    employees.forEach((emp, i) => {
+      doc.text(`${i + 1}. ${emp.fullName} - ${emp.position} - ${emp.department}`, 14, y);
+      y += 8;
+    });
+
+    doc.save("Employee_Report.pdf");
+  });
+});
+</script>
 </body>
 </html>
