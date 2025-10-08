@@ -555,22 +555,39 @@ button:hover {
   align-items: center;
   margin-bottom: 15px;
 }
+/* --- Sticky Top Bar --- */
+.top-bar {
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  padding: 15px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #ddd;
+  z-index: 100;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
 
 #searchBar {
   flex: 1;
-  margin-right: 10px;
-  padding: 8px;
+  min-width: 250px;
+  max-width: 500px;
+  padding: 10px;
+  border-radius: 6px;
   border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 0.9rem;
+  font-size: 1rem;
   outline: none;
   transition: all 0.2s ease;
 }
 
 #searchBar:focus {
   border-color: #007bff;
-  box-shadow: 0 0 3px #007bff66;
+  box-shadow: 0 0 5px #007bff66;
 }
+
 
 .export-btn {
   background-color: #007bff;
@@ -619,6 +636,7 @@ mark {
 #employeeTable tr:hover {
   background-color: #e8f0ff;
 }
+
 
 
 
