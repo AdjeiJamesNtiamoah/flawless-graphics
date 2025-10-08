@@ -529,4 +529,24 @@ button:hover {
   background-color: #449d44;
 }
 
+.report-actions {
+  text-align: right;
+  margin-bottom: 10px;
+}
+
+.export-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.export-btn:hover {
+  background-color: #0056b3;
+}
+
 
