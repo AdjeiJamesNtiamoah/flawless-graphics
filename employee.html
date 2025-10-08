@@ -9,10 +9,10 @@
 <body>
   <header>
     <nav class="navbar">
-      <img src="assets/logo-main.png" alt="FLAWLESS GRAPHICS Logo" class="logo">
+      <img src="logo.gif" alt="FLAWLESS GRAPHICS Logo" class="logo">
       <ul>
         <li><a href="index.html">Home</a></li>
-        <li><a href="employee-portal.html" class="active">Employee Portal</a></li>
+        <li><a href="employee.html" class="active">Employee Portal</a></li>
         <li><a href="hr-dashboard.html">HR Dashboard</a></li>
         <li><a href="services.html">Services</a></li>
         <li><a href="contact.html">Contact</a></li>
@@ -23,7 +23,7 @@
   <main class="employee-portal">
     <section class="hero small-hero">
       <h1>Employee Portal</h1>
-      <p>Add and manage employee details efficiently.</p>
+      <p>Manage employee profiles, attendance, and payroll information easily.</p>
     </section>
 
     <section class="form-section">
@@ -33,30 +33,37 @@
           <label for="fullName">Full Name</label>
           <input type="text" id="fullName" placeholder="Enter full name" required>
         </div>
+
         <div class="form-group">
           <label for="position">Position/Title</label>
           <input type="text" id="position" placeholder="Enter position" required>
         </div>
+
         <div class="form-group">
           <label for="email">Email</label>
           <input type="email" id="email" placeholder="Enter email" required>
         </div>
+
         <div class="form-group">
           <label for="phone">Phone</label>
           <input type="tel" id="phone" placeholder="Enter phone number" required>
         </div>
+
         <div class="form-group">
           <label for="department">Department</label>
           <input type="text" id="department" placeholder="Enter department" required>
         </div>
+
         <div class="form-group">
           <label for="dateOfHire">Date of Hire</label>
           <input type="date" id="dateOfHire" required>
         </div>
+
         <div class="form-group">
           <label for="salary">Salary (₵)</label>
           <input type="number" id="salary" placeholder="₵0.00" required>
         </div>
+
         <button type="button" onclick="saveEmployee()">Save Employee</button>
       </form>
 
@@ -70,6 +77,7 @@
   </footer>
 
   <script>
+    // Save and display employees dynamically
     function saveEmployee() {
       const name = document.getElementById('fullName').value;
       const position = document.getElementById('position').value;
@@ -80,14 +88,13 @@
       const salary = document.getElementById('salary').value;
 
       if (name && position && email) {
-        const list = document.getElementById('employeeList');
-        const item = document.createElement('li');
-        item.textContent = `${name} — ${position} (${department}), ₵${salary}`;
-        list.appendChild(item);
-
+        const employeeList = document.getElementById('employeeList');
+        const li = document.createElement('li');
+        li.textContent = `${name} — ${position}, ${department} | ₵${salary}`;
+        employeeList.appendChild(li);
         document.getElementById('employeeForm').reset();
       } else {
-        alert('Please fill out all required fields.');
+        alert('Please fill all required fields!');
       }
     }
   </script>
