@@ -191,11 +191,18 @@
   </header>
 
   <main>
-    <!-- Top bar -->
-    <div class="top-bar">
-      <input type="text" id="searchBar" placeholder="🔍 Search employees by name, department, or position..." onkeyup="filterEmployees()">
-      <button class="add-btn" onclick="openModal()">+ Add Employee</button>
-    </div>
+   <!-- Top bar -->
+<div class="top-bar" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:25px;">
+  <input 
+    type="text" 
+    id="searchBar" 
+    placeholder="🔍 Search employees by name, department, or position..." 
+    onkeyup="filterEmployees()" 
+    style="flex:1;min-width:250px;max-width:500px;padding:10px;border-radius:6px;border:1px solid #ccc;font-size:1rem;outline:none;">
+  
+  <button class="add-btn" onclick="openModal()">+ Add Employee</button>
+</div>
+
 
     <!-- Employee Table -->
     <section>
@@ -348,3 +355,4 @@
   </script>
 </body>
 </html>
+
