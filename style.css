@@ -720,6 +720,42 @@ mark {
     transform: scale(1.07);
   }
 }
+#employee-report {
+  margin: 40px auto;
+  max-width: 1000px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+#employee-report h2 {
+  text-align: center;
+  color: #1a3d6d;
+  margin-bottom: 15px;
+}
+
+#reportTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+#reportTable th, #reportTable td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+#reportTable th {
+  background-color: #1a3d6d;
+  color: white;
+}
+
+#reportTable tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
 
 
 
