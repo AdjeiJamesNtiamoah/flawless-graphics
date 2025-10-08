@@ -380,6 +380,52 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 });
 </script>
+
+<!-- jsPDF CDN for generating PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+document.getElementById('downloadPDF').addEventListener('click', () => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.setFontSize(16);
+  doc.text('Employee Report', 14, 20);
+  doc.setFontSize(12);
+  doc.text('Generated on: ' + new Date().toLocaleString(), 14, 28);
+
+  const employees = JSON.parse(localStorage.getItem('employees')) || [];
+
+  if (employees.length === 0) {
+    doc.text('No employee records available.', 14, 40);
+  } else {
+    let startY = 40;
+    const lineHeight = 10;
+
+    // Table Header
+    doc.setFont(undefined, 'bold');
+    doc.text('No.', 14, startY);
+    doc.text('Name', 25, startY);
+    doc.text('Position', 70, startY);
+    doc.text('Dept.', 110, startY);
+    doc.text('Salary', 150, startY);
+    doc.setFont(undefined, 'normal');
+
+    // Employee Data
+    employees.forEach((emp, i) => {
+      startY += lineHeight;
+      doc.text(String(i + 1), 14, startY);
+      doc.text(emp.fullName || '', 25, startY);
+      doc.text(emp.position || '', 70, startY);
+      doc.text(emp.department || '', 110, startY);
+      doc.text(emp.salary || '', 150, startY);
+    });
+  }
+
+  // Save file
+  doc.save('Employee_Report.pdf');
+});
+</script>
 </body>
 </html>
 
