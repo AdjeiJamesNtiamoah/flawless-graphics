@@ -70,8 +70,15 @@
         <button type="button" onclick="saveEmployee()">Save Employee</button>
       </form>
 
-    <h3>Saved Employees</h3>
-<div class="report-actions">
+   <h3>Saved Employees</h3>
+
+<div class="employee-tools">
+  <input 
+    type="text" 
+    id="searchBar" 
+    placeholder="🔍 Search by name, department, or position..." 
+    onkeyup="filterEmployees()"
+  >
   <button class="export-btn" onclick="downloadCSV()">📄 Download Employee Report (CSV)</button>
 </div>
 
@@ -257,6 +264,7 @@
 </script>
 </body>
 </html>
+
 
 
 
