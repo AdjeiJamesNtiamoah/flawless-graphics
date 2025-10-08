@@ -27,62 +27,65 @@
   </header>
 
   <!-- MAIN HR DASHBOARD CONTENT -->
-  <main class="dashboard">
-    <h2>HR Dashboard</h2>
-    <p class="dashboard-intro">Access quick insights and manage employee information, payroll, and performance.</p>
-
-    <div class="dashboard-grid">
-      <div class="dashboard-card" onclick="openSection('employee-report')">
-        <img src="assets/employee-icon.png" alt="Employee Report">
-        <h3>Employee Report</h3>
-        <p>View and export all employee profiles and reports.</p>
-      </div>
-
-      <div class="dashboard-card" onclick="openSection('attendance-summary')">
-        <img src="assets/attendance-photo.jpg" alt="Attendance Summary">
-        <h3>Attendance Summary</h3>
-        <p>Track attendance data and daily check-ins.</p>
-      </div>
-
-      <div class="dashboard-card" onclick="openSection('payroll-analytics')">
-        <img src="assets/payroll-photo.jpg" alt="Payroll Analytics">
-        <h3>Payroll Analytics</h3>
-        <p>Analyze payroll trends and generate salary reports.</p>
-      </div>
-
-      <div class="dashboard-card" onclick="openSection('performance-overview')">
-        <img src="https://img.icons8.com/color/96/graph.png" alt="Performance Overview">
-        <h3>Performance Overview</h3>
-        <p>Monitor staff KPIs and performance growth.</p>
-      </div>
+<main class="dashboard">
+  <div class="feature-grid">
+    <div class="feature-card" id="cardReport">
+      <img src="assets/employee-report.jpg" alt="Employee Report" />
+      <h3>Employee Report</h3>
+      <p>View and export all employee profiles and reports.</p>
     </div>
-
-    <!-- Dynamic Section Display -->
-    <div id="dynamic-section" class="hidden-section">
-      <button class="close-btn" onclick="closeSection()">✖</button>
-      <div id="section-content"></div>
+    <div class="feature-card" id="cardAttendance">
+      <img src="assets/attendance.jpg" alt="Attendance Summary" />
+      <h3>Attendance Summary</h3>
+      <p>Track attendance data and daily check-ins.</p>
     </div>
+    <div class="feature-card" id="cardPayroll">
+      <img src="assets/payroll.jpg" alt="Payroll Analytics" />
+      <h3>Payroll Analytics</h3>
+      <p>Analyze payroll trends and generate salary reports.</p>
+    </div>
+    <div class="feature-card" id="cardPerformance">
+      <img src="assets/performance.jpg" alt="Performance Overview" />
+      <h3>Performance Overview</h3>
+      <p>Monitor staff KPIs and performance growth.</p>
+    </div>
+  </div>
 
-   <section id="employeeReportSection">
-  <h2>Employee Report</h2>
-  <table id="reportTable">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Full Name</th>
-        <th>Position</th>
-        <th>Department</th>
-        <th>Email</th>
-        <th>Phone</th>
-        <th>Salary</th>
-        <th>Hire Date</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</section>
-    
-  </main>
+  <!-- EXPANDABLE SECTIONS -->
+  <section id="employeeReportSection" class="hidden-section">
+    <h2>Employee Report</h2>
+    <table id="reportTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Full Name</th>
+          <th>Position</th>
+          <th>Department</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Salary</th>
+          <th>Hire Date</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section id="attendanceSection" class="hidden-section">
+    <h2>Attendance Summary</h2>
+    <p>Attendance data will appear here soon.</p>
+  </section>
+
+  <section id="payrollSection" class="hidden-section">
+    <h2>Payroll Analytics</h2>
+    <p>Payroll data and salary insights will appear here soon.</p>
+  </section>
+
+  <section id="performanceSection" class="hidden-section">
+    <h2>Performance Overview</h2>
+    <p>Performance tracking and KPIs will appear here soon.</p>
+  </section>
+</main>
 
   <!-- FOOTER -->
   <footer>
@@ -204,6 +207,54 @@
   window.addEventListener('storage', (event) => {
     if (event.key === 'employees') loadEmployeeReport();
   });
+</script>
+
+  <script>
+  // Toggle visibility of each dashboard section
+  function toggleSection(cardId, sectionId) {
+    document.getElementById(cardId).addEventListener('click', () => {
+      const section = document.getElementById(sectionId);
+      section.classList.toggle('show');
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  // Link each card to its section
+  toggleSection('cardReport', 'employeeReportSection');
+  toggleSection('cardAttendance', 'attendanceSection');
+  toggleSection('cardPayroll', 'payrollSection');
+  toggleSection('cardPerformance', 'performanceSection');
+
+  // Load employee data
+  function loadEmployeeReport() {
+    const reportBody = document.querySelector('#reportTable tbody');
+    reportBody.innerHTML = '';
+
+    const employees = JSON.parse(localStorage.getItem('employees')) || [];
+
+    if (employees.length === 0) {
+      reportBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#888;">No employee records found.</td></tr>`;
+      return;
+    }
+
+    employees.forEach((emp, index) => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${emp.name}</td>
+        <td>${emp.position}</td>
+        <td>${emp.department}</td>
+        <td>${emp.email}</td>
+        <td>${emp.phone}</td>
+        <td>${emp.salary}</td>
+        <td>${emp.hireDate}</td>
+      `;
+      reportBody.appendChild(row);
+    });
+  }
+
+  // Load data when dashboard opens
+  document.addEventListener('DOMContentLoaded', loadEmployeeReport);
 </script>
 </body>
 </html>
