@@ -344,10 +344,21 @@ function downloadCSV() {
   a.download = filename;
   a.click();
 }
+function refreshTable() {
+  const tableBody = document.querySelector('#employeeTable tbody');
+  tableBody.innerHTML = '';
+
+  const savedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
+  savedEmployees.forEach((emp, i) => addToTable(emp, i));
+}
+
+// Display when the page loads
+document.addEventListener('DOMContentLoaded', refreshTable);
 
 </script>
 </body>
 </html>
+
 
 
 
