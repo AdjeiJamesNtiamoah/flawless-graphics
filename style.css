@@ -949,6 +949,15 @@ mark {
   background-color: rgba(0, 0, 0, 0.6);
   animation: fadeIn 0.3s ease-in-out;
 }
+.modal-content p {
+  font-size: 16px;
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.modal-content strong {
+  color: #004aad;
+}
 
 @keyframes fadeIn {
   from {
@@ -1563,6 +1572,7 @@ mark {
 #downloadReport:hover {
   background: #003580;
 }
+
 
 
 
