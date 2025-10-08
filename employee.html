@@ -28,47 +28,63 @@
 
     <section class="form-section">
       <h2>Add Employee Details</h2>
+
       <form id="employeeForm">
-        <div class="form-group">
-          <label for="fullName">Full Name</label>
-          <input type="text" id="fullName" placeholder="Enter full name" required>
-        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" placeholder="Enter full name" required>
+          </div>
 
-        <div class="form-group">
-          <label for="position">Position/Title</label>
-          <input type="text" id="position" placeholder="Enter position" required>
-        </div>
+          <div class="form-group">
+            <label for="position">Position/Title</label>
+            <input type="text" id="position" placeholder="Enter position" required>
+          </div>
 
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" placeholder="Enter email" required>
-        </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="Enter email" required>
+          </div>
 
-        <div class="form-group">
-          <label for="phone">Phone</label>
-          <input type="tel" id="phone" placeholder="Enter phone number" required>
-        </div>
+          <div class="form-group">
+            <label for="phone">Phone</label>
+            <input type="tel" id="phone" placeholder="Enter phone number" required>
+          </div>
 
-        <div class="form-group">
-          <label for="department">Department</label>
-          <input type="text" id="department" placeholder="Enter department" required>
-        </div>
+          <div class="form-group">
+            <label for="department">Department</label>
+            <input type="text" id="department" placeholder="Enter department" required>
+          </div>
 
-        <div class="form-group">
-          <label for="dateOfHire">Date of Hire</label>
-          <input type="date" id="dateOfHire" required>
-        </div>
+          <div class="form-group">
+            <label for="dateOfHire">Date of Hire</label>
+            <input type="date" id="dateOfHire" required>
+          </div>
 
-        <div class="form-group">
-          <label for="salary">Salary (₵)</label>
-          <input type="number" id="salary" placeholder="₵0.00" required>
+          <div class="form-group">
+            <label for="salary">Salary (₵)</label>
+            <input type="number" id="salary" placeholder="₵0.00" required>
+          </div>
         </div>
 
         <button type="button" onclick="saveEmployee()">Save Employee</button>
       </form>
 
       <h3>Saved Employees</h3>
-      <ul id="employeeList"></ul>
+      <table id="employeeTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Position</th>
+            <th>Department</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Date of Hire</th>
+            <th>Salary (₵)</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </section>
   </main>
 
@@ -77,25 +93,48 @@
   </footer>
 
   <script>
-    // Save and display employees dynamically
-    function saveEmployee() {
-      const name = document.getElementById('fullName').value;
-      const position = document.getElementById('position').value;
-      const email = document.getElementById('email').value;
-      const phone = document.getElementById('phone').value;
-      const department = document.getElementById('department').value;
-      const hireDate = document.getElementById('dateOfHire').value;
-      const salary = document.getElementById('salary').value;
+    // Load saved employees from localStorage
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
+      savedEmployees.forEach(emp => addToTable(emp));
+    });
 
-      if (name && position && email) {
-        const employeeList = document.getElementById('employeeList');
-        const li = document.createElement('li');
-        li.textContent = `${name} — ${position}, ${department} | ₵${salary}`;
-        employeeList.appendChild(li);
+    function saveEmployee() {
+      const employee = {
+        name: document.getElementById('fullName').value,
+        position: document.getElementById('position').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        department: document.getElementById('department').value,
+        dateOfHire: document.getElementById('dateOfHire').value,
+        salary: document.getElementById('salary').value
+      };
+
+      if (employee.name && employee.position && employee.email) {
+        addToTable(employee);
+        saveToLocal(employee);
         document.getElementById('employeeForm').reset();
       } else {
         alert('Please fill all required fields!');
       }
+    }
+
+    function addToTable(emp) {
+      const table = document.querySelector('#employeeTable tbody');
+      const row = table.insertRow();
+      row.insertCell(0).textContent = emp.name;
+      row.insertCell(1).textContent = emp.position;
+      row.insertCell(2).textContent = emp.department;
+      row.insertCell(3).textContent = emp.email;
+      row.insertCell(4).textContent = emp.phone;
+      row.insertCell(5).textContent = emp.dateOfHire;
+      row.insertCell(6).textContent = emp.salary;
+    }
+
+    function saveToLocal(emp) {
+      const savedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
+      savedEmployees.push(emp);
+      localStorage.setItem('employees', JSON.stringify(savedEmployees));
     }
   </script>
 </body>
