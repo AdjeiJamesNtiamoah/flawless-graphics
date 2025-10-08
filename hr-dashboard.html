@@ -108,6 +108,11 @@
   </div>
 
   <script>
+    if (card.dataset.modal === "employeeModal") loadEmployeeReport();
+if (card.dataset.modal === "attendanceModal") loadAttendance();
+if (card.dataset.modal === "payrollModal") loadPayroll(); // 👈 add this line
+if (card.dataset.modal === "performanceModal") loadPerformance();
+
     // Modal open/close logic
     document.addEventListener("DOMContentLoaded", () => {
       const modals = document.querySelectorAll(".modal");
