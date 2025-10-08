@@ -936,6 +936,90 @@ mark {
   transform: translateY(0);
 }
 
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 85%;
+  max-width: 1000px;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  right: 20px;
+  top: 10px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.employee-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.employee-actions button {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.employee-actions button:hover {
+  background: #0056b3;
+}
+
+/* Table Styling */
+.table-container {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+/* Sticky Header */
+#employeeTable thead th {
+  position: sticky;
+  top: 0;
+  background: #f8f9fa;
+  z-index: 2;
+}
+
+#employeeTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#employeeTable th, #employeeTable td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+#employeeTable tr:hover {
+  background-color: #f1f1f1;
+}
+
 /* === Modal Styling === */
 .modal {
   display: none;
@@ -1613,6 +1697,7 @@ mark {
   max-height: 80%;
   overflow-y: auto;
 }
+
 
 
 
