@@ -26,25 +26,6 @@
       <p>Manage employee profiles, attendance, and payroll information easily.</p>
     </section>
 
-    <section class="form-section">
-      <h2>Add Employee Details</h2>
-<h2>Saved Employees</h2>
-<input type="text" id="searchBar" placeholder="Search by name, department, or position..." onkeyup="filterEmployees()">
-
-<table id="employeeTable">
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Full Name</th>
-      <th>Position/Title</th>
-      <th>Department</th>
-      <th>Email</th>
-      <th>Phone</th>
-      <th>Salary</th>
-      <th>Date of Hire</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
   <tbody>
     <!-- Employee rows will be inserted here dynamically -->
   </tbody>
@@ -92,29 +73,23 @@
       </form>
 
    <h3>Saved Employees</h3>
-
-<div class="employee-tools">
-  <input 
-    type="text" 
-    id="searchBar" 
-    placeholder="🔍 Search by name, department, or position..." 
-    onkeyup="filterEmployees()"
-  >
-  <button class="export-btn" onclick="downloadCSV()">📄 Download Employee Report (CSV)</button>
-</div>
+ <section class="form-section">
+      <h2>Add Employee Details</h2>
+<h2>Saved Employees</h2>
+<input type="text" id="searchBar" placeholder="🔍 Search by name, department, or position..." onkeyup="filterEmployees()">
 
 <table id="employeeTable">
-
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Position</th>
+      <th>#</th>
+      <th>Full Name</th>
+      <th>Position/Title</th>
       <th>Department</th>
       <th>Email</th>
       <th>Phone</th>
+      <th>Salary</th>
       <th>Date of Hire</th>
-      <th>Salary (₵)</th>
-      <th>Action</th>
+      <th>Actions</th>
     </tr>
   </thead>
     </section>
@@ -358,6 +333,7 @@ document.addEventListener('DOMContentLoaded', refreshTable);
 </script>
 </body>
 </html>
+
 
 
 
