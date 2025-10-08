@@ -3,119 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Employee Portal - FLAWLESS GRAPHICS</title>
+  <title>Employee Portal | FLAWLESS GRAPHICS</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-     <div class=" <img src="logo.gif" alt="FLAWLESS GRAPHICS Logo" class="logo-img">
-      <h1>FLAWLESS GRAPHICS</h1>
-    </div>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="employee.html">Employee Portal</a>
-      <a href="hr-dashboard.html">HR Dashboard</a>
-      <a href="services.html" class="active">Services</a>
-      <a href="contact.html">Contact</a>
+    <nav class="navbar">
+      <img src="assets/logo-main.png" alt="FLAWLESS GRAPHICS Logo" class="logo">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="employee-portal.html" class="active">Employee Portal</a></li>
+        <li><a href="hr-dashboard.html">HR Dashboard</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
     </nav>
   </header>
-<section class="form-section">
-  <div class="form-container">
-    <h2>Add Employee Details</h2>
-    <form id="employeeForm">
-      <div class="form-group">
-        <label>Full Name</label>
-        <input type="text" id="name" placeholder="Enter full name" required>
-      </div>
 
-      <div class="form-group">
-        <label>Position/Title</label>
-        <input type="text" id="position" placeholder="Enter position" required>
-      </div>
+  <main class="employee-portal">
+    <section class="hero small-hero">
+      <h1>Employee Portal</h1>
+      <p>Add and manage employee details efficiently.</p>
+    </section>
 
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="email" placeholder="e.g. example@email.com" required>
-      </div>
+    <section class="form-section">
+      <h2>Add Employee Details</h2>
+      <form id="employeeForm">
+        <div class="form-group">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" placeholder="Enter full name" required>
+        </div>
+        <div class="form-group">
+          <label for="position">Position/Title</label>
+          <input type="text" id="position" placeholder="Enter position" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="Enter email" required>
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone</label>
+          <input type="tel" id="phone" placeholder="Enter phone number" required>
+        </div>
+        <div class="form-group">
+          <label for="department">Department</label>
+          <input type="text" id="department" placeholder="Enter department" required>
+        </div>
+        <div class="form-group">
+          <label for="dateOfHire">Date of Hire</label>
+          <input type="date" id="dateOfHire" required>
+        </div>
+        <div class="form-group">
+          <label for="salary">Salary (₵)</label>
+          <input type="number" id="salary" placeholder="₵0.00" required>
+        </div>
+        <button type="button" onclick="saveEmployee()">Save Employee</button>
+      </form>
 
-      <div class="form-group">
-        <label>Phone</label>
-        <input type="tel" id="phone" placeholder="e.g. +233 24 000 0000" required>
-      </div>
-
-      <div class="form-group">
-        <label>Department</label>
-        <input type="text" id="department" placeholder="Enter department" required>
-      </div>
-
-      <div class="form-group">
-        <label>Date of Hire</label>
-        <input type="date" id="hireDate" required>
-      </div>
-
-      <div class="form-group">
-        <label>Salary (GHS)</label>
-        <input type="number" id="salary" placeholder="e.g. 2500" required>
-      </div>
-
-      <button type="submit" class="save-btn">Save Employee</button>
-    </form>
-
-    <div id="employeeList" class="employee-list">
       <h3>Saved Employees</h3>
-      <ul></ul>
-    </div>
-  </div>
-</section>
+      <ul id="employeeList"></ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 FLAWLESS GRAPHICS. All rights reserved.</p>
+  </footer>
 
   <script>
-    // Save data in browser for now (temporary)
-    const form = document.getElementById('employeeForm');
-    const employeeList = document.getElementById('employeeList');
+    function saveEmployee() {
+      const name = document.getElementById('fullName').value;
+      const position = document.getElementById('position').value;
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
+      const department = document.getElementById('department').value;
+      const hireDate = document.getElementById('dateOfHire').value;
+      const salary = document.getElementById('salary').value;
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const employee = {
-        name: document.getElementById('name').value,
-        position: document.getElementById('position').value,
-        email: document.getElementById('email').value,
-        phone: document.getElementById('phone').value,
-        department: document.getElementById('department').value,
-        hireDate: document.getElementById('hireDate').value,
-        salary: document.getElementById('salary').value
-      };
+      if (name && position && email) {
+        const list = document.getElementById('employeeList');
+        const item = document.createElement('li');
+        item.textContent = `${name} — ${position} (${department}), ₵${salary}`;
+        list.appendChild(item);
 
-      // Save to local storage
-      let records = JSON.parse(localStorage.getItem('employees')) || [];
-      records.push(employee);
-      localStorage.setItem('employees', JSON.stringify(records));
-
-      alert('✅ Employee saved successfully!');
-      form.reset();
-      displayEmployees();
-    });
-
-    function displayEmployees() {
-      const records = JSON.parse(localStorage.getItem('employees')) || [];
-      employeeList.innerHTML = `
-        <h3>Saved Employees</h3>
-        <ul>
-          ${records.map(emp => `
-            <li><strong>${emp.name}</strong> — ${emp.position}, ${emp.department}</li>
-          `).join('')}
-        </ul>
-      `;
+        document.getElementById('employeeForm').reset();
+      } else {
+        alert('Please fill out all required fields.');
+      }
     }
-
-    displayEmployees();
   </script>
-
 </body>
 </html>
-
-
-
-
-
-
-
