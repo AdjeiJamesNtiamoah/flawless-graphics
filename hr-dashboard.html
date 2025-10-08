@@ -595,6 +595,133 @@ function generateEmployeePDF() {
   doc.save("Employee_Report.pdf");
 }
 </script>
+
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const modals = {
+    attendance: document.getElementById('attendanceModal'),
+    payroll: document.getElementById('payrollModal'),
+    performance: document.getElementById('performanceModal'),
+  };
+
+  const cards = {
+    attendance: document.querySelector('[data-modal="attendanceModal"]'),
+    payroll: document.querySelector('[data-modal="payrollModal"]'),
+    performance: document.querySelector('[data-modal="performanceModal"]'),
+  };
+
+  const closeBtns = document.querySelectorAll('.modal .close');
+
+  // Open modals when cards are clicked
+  cards.attendance?.addEventListener('click', () => openModal('attendance'));
+  cards.payroll?.addEventListener('click', () => openModal('payroll'));
+  cards.performance?.addEventListener('click', () => openModal('performance'));
+
+  // Close modals when clicking X or outside
+  closeBtns.forEach(btn => {
+    btn.addEventListener('click', () => btn.closest('.modal').style.display = 'none');
+  });
+  window.onclick = (e) => {
+    Object.values(modals).forEach(modal => {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+  };
+});
+
+function openModal(type) {
+  const employees = JSON.parse(localStorage.getItem('employees')) || [];
+  const modal = document.getElementById(`${type}Modal`);
+  const tbody = modal.querySelector('tbody');
+  tbody.innerHTML = '';
+
+  if (type === 'attendance') {
+    let totalPresent = 0, totalAbsent = 0;
+    employees.forEach((emp, i) => {
+      const present = Math.floor(Math.random() * 22);
+      const absent = 22 - present;
+      totalPresent += present;
+      totalAbsent += absent;
+      const percent = ((present / 22) * 100).toFixed(1);
+      const row = `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${emp.fullName}</td>
+          <td>${emp.department}</td>
+          <td>${present}</td>
+          <td>${absent}</td>
+          <td>${percent}%</td>
+        </tr>`;
+      tbody.innerHTML += row;
+    });
+    document.getElementById('attendanceSummary').innerHTML =
+      `<strong>Total Employees:</strong> ${employees.length} |
+       <strong>Avg Attendance:</strong> ${(totalPresent / (employees.length * 22) * 100 || 0).toFixed(1)}%`;
+  }
+
+  if (type === 'payroll') {
+    let total = 0;
+    employees.forEach((emp, i) => {
+      const salary = parseFloat(emp.salary) || 0;
+      total += salary;
+      tbody.innerHTML += `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${emp.fullName}</td>
+          <td>${emp.department}</td>
+          <td>${emp.position}</td>
+          <td>${salary.toLocaleString()}</td>
+        </tr>`;
+    });
+    const avg = total / (employees.length || 1);
+    document.getElementById('payrollSummary').innerHTML =
+      `<strong>Total Employees:</strong> ${employees.length} |
+       <strong>Total Payroll:</strong> ₵${total.toLocaleString()} |
+       <strong>Average Salary:</strong> ₵${avg.toLocaleString()}`;
+  }
+
+  if (type === 'performance') {
+    const ratings = ['Excellent', 'Good', 'Average', 'Needs Improvement'];
+    employees.forEach((emp, i) => {
+      const rating = ratings[Math.floor(Math.random() * ratings.length)];
+      const remarks = rating === 'Excellent' ? 'Outstanding performance' :
+                      rating === 'Good' ? 'Reliable employee' :
+                      rating === 'Average' ? 'Consistent work' :
+                      'Needs closer supervision';
+      tbody.innerHTML += `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${emp.fullName}</td>
+          <td>${emp.department}</td>
+          <td>${rating}</td>
+          <td>${remarks}</td>
+        </tr>`;
+    });
+    document.getElementById('performanceSummary').innerHTML =
+      `<strong>Report Generated:</strong> ${new Date().toLocaleDateString()}`;
+  }
+
+  modal.style.display = 'block';
+}
+
+function generateAttendancePDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.text("Attendance Summary", 14, 15);
+  doc.save("Attendance_Report.pdf");
+}
+function generatePayrollPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.text("Payroll Analytics", 14, 15);
+  doc.save("Payroll_Report.pdf");
+}
+function generatePerformancePDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.text("Performance Overview", 14, 15);
+  doc.save("Performance_Report.pdf");
+}
+</script>
 </body>
 </html>
 
