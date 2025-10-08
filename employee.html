@@ -26,43 +26,48 @@
       <p>Manage employee profiles, attendance, and payroll information easily.</p>
     </section>
 
-  <tbody>
-    <!-- Employee rows will be inserted here dynamically -->
-  </tbody>
-</table>
+            <tbody>
+                <!-- Employee rows will be inserted here dynamically -->
+              </tbody>
+                </table>
 
-      <form id="employeeForm">
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="fullName">Full Name</label>
-            <input type="text" id="fullName" placeholder="Enter full name" required>
-          </div>
+                  <form id="employeeForm">
+                  <div class="form-grid">
+                  <div class="form-group">
+                  <label for="fullName">Full Name</label>
+                  <input type="text" id="fullName" placeholder="Enter full name" required>
+             </div>
 
-          <div class="form-group">
-            <label for="position">Position/Title</label>
-            <input type="text" id="position" placeholder="Enter position" required>
-          </div>
+             <div class="form-group">
+                <label for="position">Position/Title</label>
+                <input type="text" id="position" placeholder="Enter position" required>
+                </div>
 
-          <div class="form-group">
+            <div class="form-group">
             <label for="email">Email</label>
             <input type="email" id="email" placeholder="Enter email" required>
-          </div>
+            </div>
 
-          <div class="form-group">
+            <div class="form-group">
             <label for="phone">Phone</label>
             <input type="tel" id="phone" placeholder="Enter phone number" required>
-          </div>
+            </div>
 
-          <div class="form-group">
+            <div class="form-group">
             <label for="department">Department</label>
             <input type="text" id="department" placeholder="Enter department" required>
-          </div>
+            </div>
 
-          <div class="form-group">
+            <div class="form-group">
             <label for="dateOfHire">Date of Hire</label>
             <input type="date" id="dateOfHire" required>
-          </div>
-
+            </div>
+                    
+           <div class="form-group">
+            <label for="dateOfBirth">Date of Birth</label>
+            <input type="date" id="dateOfBirth" required>
+            </div>
+                    
           <div class="form-group">
             <label for="salary">Salary (₵)</label>
             <input type="number" id="salary" placeholder="₵0.00" required>
@@ -75,7 +80,9 @@
    <h3>Saved Employees</h3>
  <section class="form-section">
       <h2>Add Employee Details</h2>
-<h2>Saved Employees</h2>
+
+   
+            <h2>Saved Employees</h2>
 <input type="text" id="searchBar" placeholder="🔍 Search by name, department, or position..." onkeyup="filterEmployees()">
 
 <table id="employeeTable">
@@ -333,6 +340,7 @@ document.addEventListener('DOMContentLoaded', refreshTable);
 </script>
 </body>
 </html>
+
 
 
 
