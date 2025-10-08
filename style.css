@@ -1698,6 +1698,88 @@ mark {
   overflow-y: auto;
 }
 
+/* Dashboard Layout */
+.dashboard-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+/* Header Section */
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.dashboard-header h1 {
+  color: #007bff;
+  font-size: 2.2em;
+  margin-bottom: 10px;
+}
+
+.dashboard-header p {
+  color: #555;
+  font-size: 1.1em;
+}
+
+/* Card Grid Layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+}
+
+/* Card Styling */
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 25px 20px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+}
+
+/* Icon inside card */
+.card-icon {
+  font-size: 40px;
+  margin-bottom: 15px;
+}
+
+/* Card Text */
+.card h3 {
+  color: #007bff;
+  font-size: 1.2em;
+  margin-bottom: 8px;
+}
+
+.card p {
+  color: #555;
+  font-size: 0.95em;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-header h1 {
+    font-size: 1.6em;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 
 
 
