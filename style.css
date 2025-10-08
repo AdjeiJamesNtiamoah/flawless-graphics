@@ -594,5 +594,31 @@ mark {
   border-radius: 3px;
   padding: 0 2px;
 }
+#employeeTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+#employeeTable th, #employeeTable td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+#employeeTable th {
+  background-color: #1a3d6d;
+  color: white;
+}
+
+#employeeTable tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+#employeeTable tr:hover {
+  background-color: #e8f0ff;
+}
+
 
 
