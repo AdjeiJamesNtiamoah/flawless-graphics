@@ -465,4 +465,37 @@ button:hover {
   border-radius: 5px;
 }
 
+/* Employee Portal Layout */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+#employeeTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 0.95rem;
+}
+
+#employeeTable th, #employeeTable td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+#employeeTable th {
+  background-color: #003366;
+  color: #fff;
+}
+
+#employeeTable tr:nth-child(even) {
+  background-color: #f2f6ff;
+}
+
+#employeeTable tr:hover {
+  background-color: #dce9ff;
+}
+
 
