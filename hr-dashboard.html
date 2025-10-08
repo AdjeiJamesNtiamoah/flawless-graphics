@@ -50,26 +50,54 @@
       <p>Monitor staff KPIs and performance growth.</p>
     </div>
   </div>
-
-  <!-- EXPANDABLE SECTIONS -->
-  <section id="employeeReportSection" class="hidden-section">
+  
+<!-- EXPANDABLE SECTIONS -->
+<section id="employeeReportSection" class="hidden-section">
+  <div class="section-header">
     <h2>Employee Report</h2>
-    <table id="reportTable">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Full Name</th>
-          <th>Position</th>
-          <th>Department</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th>Salary</th>
-          <th>Hire Date</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </section>
+    <button class="collapse-btn">×</button>
+  </div>
+  <table id="reportTable">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Full Name</th>
+        <th>Position</th>
+        <th>Department</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Salary</th>
+        <th>Hire Date</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<section id="attendanceSection" class="hidden-section">
+  <div class="section-header">
+    <h2>Attendance Summary</h2>
+    <button class="collapse-btn">×</button>
+  </div>
+  <p>Attendance data will appear here soon.</p>
+</section>
+
+<section id="payrollSection" class="hidden-section">
+  <div class="section-header">
+    <h2>Payroll Analytics</h2>
+    <button class="collapse-btn">×</button>
+  </div>
+  <p>Payroll data and salary insights will appear here soon.</p>
+</section>
+
+<section id="performanceSection" class="hidden-section">
+  <div class="section-header">
+    <h2>Performance Overview</h2>
+    <button class="collapse-btn">×</button>
+  </div>
+  <p>Performance tracking and KPIs will appear here soon.</p>
+</section>
+
 
   <section id="attendanceSection" class="hidden-section">
     <h2>Attendance Summary</h2>
@@ -93,45 +121,42 @@
   </footer>
 
   <!-- JAVASCRIPT -->
-  <script>
-    function openSection(section) {
-      const sectionContent = document.getElementById("section-content");
-      const sectionBox = document.getElementById("dynamic-section");
-      
-      let content = "";
-      switch (section) {
-        case "employee-report":
-          content = "<h2>Employee Report</h2><p>Here you can manage, search, and export employee records. (Placeholder for employee data table)</p>";
-          break;
-        case "attendance-summary":
-          content = "<h2>Attendance Summary</h2><p>Display employee attendance charts, check-ins, and absence logs. (Placeholder for attendance summary)</p>";
-          break;
-        case "payroll-analytics":
-          content = "<h2>Payroll Analytics</h2><p>Show payroll charts, monthly reports, and payslip download options. (Placeholder for payroll analytics)</p>";
-          break;
-        case "performance-overview":
-          content = "<h2>Performance Overview</h2><p>Track performance KPIs, goals, and review summaries. (Placeholder for performance data)</p>";
-          break;
-      }
-      
-      sectionContent.innerHTML = content;
-      sectionBox.style.display = "block";
-    }
+ <script>
+  // Toggle visibility of each section
+  function toggleSection(cardId, sectionId) {
+    const card = document.getElementById(cardId);
+    const section = document.getElementById(sectionId);
+    const closeBtn = section.querySelector(".collapse-btn");
 
-    function closeSection() {
-      document.getElementById("dynamic-section").style.display = "none";
-    }
-  </script>
-<script>
-  // Function to load or refresh employee report
+    card.addEventListener("click", () => {
+      // Hide all other sections first
+      document.querySelectorAll(".hidden-section").forEach(sec => {
+        if (sec !== section) sec.classList.remove("show");
+      });
+      // Toggle the clicked one
+      section.classList.toggle("show");
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    // Collapse button handler
+    closeBtn.addEventListener("click", () => {
+      section.classList.remove("show");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  // Activate toggles
+  toggleSection("cardReport", "employeeReportSection");
+  toggleSection("cardAttendance", "attendanceSection");
+  toggleSection("cardPayroll", "payrollSection");
+  toggleSection("cardPerformance", "performanceSection");
+
+  // Load employee data into Employee Report
   function loadEmployeeReport() {
-    const reportBody = document.querySelector('#reportTable tbody');
-    reportBody.innerHTML = ''; // clear old data
+    const reportBody = document.querySelector("#reportTable tbody");
+    reportBody.innerHTML = "";
 
-    // Try both possible keys
-    let employees = JSON.parse(localStorage.getItem('employees')) 
-                 || JSON.parse(localStorage.getItem('employeeData')) 
-                 || [];
+    const employees = JSON.parse(localStorage.getItem("employees")) || [];
 
     if (employees.length === 0) {
       reportBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#888;">No employee records found.</td></tr>`;
@@ -139,7 +164,7 @@
     }
 
     employees.forEach((emp, index) => {
-      const row = document.createElement('tr');
+      const row = document.createElement("tr");
       row.innerHTML = `
         <td>${index + 1}</td>
         <td>${emp.name}</td>
@@ -154,16 +179,10 @@
     });
   }
 
-  // Initial load
-  document.addEventListener('DOMContentLoaded', loadEmployeeReport);
-
-  // Listen for changes in localStorage (real-time sync between tabs/pages)
-  window.addEventListener('storage', (event) => {
-    if (event.key === 'employees' || event.key === 'employeeData') {
-      loadEmployeeReport();
-    }
-  });
+  document.addEventListener("DOMContentLoaded", loadEmployeeReport);
 </script>
+</body>
+</html>
 
   <script>
   // Show/hide employee report
