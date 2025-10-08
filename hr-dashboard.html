@@ -83,6 +83,82 @@
   </div>
 </div>
 
+<!-- Attendance Summary Modal -->
+<div id="attendanceModal" class="modal">
+  <div class="modal-content large">
+    <span class="close">&times;</span>
+    <h2>Attendance Summary</h2>
+    <p id="attendanceSummary" class="summary-bar"></p>
+    <button onclick="generateAttendancePDF()" class="download-btn">Download Attendance (PDF)</button>
+
+    <div class="table-container">
+      <table id="attendanceTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Employee</th>
+            <th>Department</th>
+            <th>Days Present</th>
+            <th>Days Absent</th>
+            <th>Attendance %</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Payroll Analytics Modal -->
+<div id="payrollModal" class="modal">
+  <div class="modal-content large">
+    <span class="close">&times;</span>
+    <h2>Payroll Analytics</h2>
+    <p id="payrollSummary" class="summary-bar"></p>
+    <button onclick="generatePayrollPDF()" class="download-btn">Download Payroll (PDF)</button>
+
+    <div class="table-container">
+      <table id="payrollTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Employee</th>
+            <th>Department</th>
+            <th>Position</th>
+            <th>Salary (₵)</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Performance Overview Modal -->
+<div id="performanceModal" class="modal">
+  <div class="modal-content large">
+    <span class="close">&times;</span>
+    <h2>Performance Overview</h2>
+    <p id="performanceSummary" class="summary-bar"></p>
+    <button onclick="generatePerformancePDF()" class="download-btn">Download Performance (PDF)</button>
+
+    <div class="table-container">
+      <table id="performanceTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Employee</th>
+            <th>Department</th>
+            <th>Performance Rating</th>
+            <th>Remarks</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
   <div id="attendanceModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
