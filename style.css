@@ -715,6 +715,69 @@ footer {
   margin-bottom: 15px;
 }
 
+.dashboard {
+  padding: 60px 10%;
+  background: #f8fafc;
+  text-align: center;
+}
+
+.dashboard-intro {
+  color: #555;
+  margin-bottom: 40px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+}
+
+.dashboard-card {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.dashboard-card img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+}
+
+.dashboard-card h3 {
+  margin: 10px 0 5px;
+  color: #0078ff;
+}
+
+/* Hidden section styles */
+.hidden-section {
+  display: none;
+  margin-top: 50px;
+  background: white;
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  text-align: left;
+}
+
+.close-btn {
+  background: #ff3b3b;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  float: right;
+}
+
 
 
 
