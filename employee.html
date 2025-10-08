@@ -70,8 +70,13 @@
         <button type="button" onclick="saveEmployee()">Save Employee</button>
       </form>
 
-      <h3>Saved Employees</h3>
-   <table id="employeeTable">
+    <h3>Saved Employees</h3>
+<div class="report-actions">
+  <button class="export-btn" onclick="downloadCSV()">📄 Download Employee Report (CSV)</button>
+</div>
+
+<table id="employeeTable">
+
   <thead>
     <tr>
       <th>Name</th>
@@ -214,9 +219,45 @@
     const savedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
     savedEmployees.forEach((emp, i) => addToTable(emp, i));
   }
+
+  function downloadCSV() {
+  const employees = JSON.parse(localStorage.getItem('employees')) || [];
+  if (employees.length === 0) {
+    alert('No employee records found to export!');
+    return;
+  }
+
+  const csvRows = [];
+  const headers = ["Name", "Position", "Department", "Email", "Phone", "Date of Hire", "Salary"];
+  csvRows.push(headers.join(','));
+
+  for (const emp of employees) {
+    const values = [
+      emp.name,
+      emp.position,
+      emp.department,
+      emp.email,
+      emp.phone,
+      emp.dateOfHire,
+      emp.salary
+    ];
+    csvRows.push(values.join(','));
+  }
+
+  const csvContent = csvRows.join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.setAttribute('href', url);
+  a.setAttribute('download', 'employee_report.csv');
+  a.click();
+}
+
 </script>
 </body>
 </html>
+
 
 
 
