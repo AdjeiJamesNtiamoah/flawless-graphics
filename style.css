@@ -1385,14 +1385,15 @@ mark {
   position: fixed;
   top: 0;
   left: 0;
-  height: 100%;
+  height: 100vh;
   width: 240px;
   background: #004aad;
   color: #fff;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
-  z-index: 999;
+  transition: width 0.3s ease;
+  z-index: 1000;
+  overflow: hidden;
 }
 
 .sidebar.collapsed {
@@ -1424,11 +1425,13 @@ mark {
 }
 
 .sidebar-nav ul li a {
-  display: block;
+  display: flex;
+  align-items: center;
   color: #fff;
   padding: 15px 20px;
   text-decoration: none;
   transition: all 0.3s;
+  white-space: nowrap;
 }
 
 .sidebar-nav ul li a:hover,
@@ -1437,29 +1440,31 @@ mark {
   font-weight: bold;
 }
 
-/* Dashboard content next to sidebar */
+/* Dashboard content aligned next to sidebar */
 .dashboard-content {
-  margin-left: 260px;
+  margin-left: 240px;
   padding: 40px;
+  min-height: 100vh;
+  background: #f9f9fb;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+  gap: 25px;
   transition: margin-left 0.3s ease;
 }
 
 .sidebar.collapsed ~ .dashboard-content {
-  margin-left: 90px;
+  margin-left: 80px;
 }
 
-/* Cards */
+/* Card styles */
 .card {
   background: #fff;
-  border-radius: 8px;
-  padding: 20px;
+  border-radius: 10px;
+  padding: 25px;
   text-align: center;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
   cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: all 0.3s ease;
 }
 
 .card:hover {
@@ -1467,13 +1472,11 @@ mark {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Mobile view */
+/* Mobile responsiveness */
 @media (max-width: 768px) {
   .sidebar {
+    left: -240px;
     position: fixed;
-    width: 200px;
-    height: 100%;
-    left: -200px;
   }
 
   .sidebar.show {
@@ -1484,11 +1487,8 @@ mark {
     margin-left: 0;
     padding: 20px;
   }
-
-  #toggleSidebar {
-    display: block;
-  }
 }
+
 
 
 
