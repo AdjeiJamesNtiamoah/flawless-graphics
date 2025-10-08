@@ -427,6 +427,7 @@ document.getElementById('downloadPDF').addEventListener('click', () => {
 });
 </script>
   <script>
+<script>
 document.addEventListener('DOMContentLoaded', () => {
   const employeeCard = document.querySelector('[data-modal="employeeModal"]');
   const modal = document.getElementById('employeeModal');
@@ -451,11 +452,25 @@ document.addEventListener('DOMContentLoaded', () => {
       modal.style.display = 'none';
     }
   });
+
+  // 🔄 Listen for updates to employee data (cross-tab or same-tab)
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'employees') {
+      loadEmployeeReport();
+    }
+  });
+
+  // 🔄 Also auto-refresh every few seconds (for same-tab edits)
+  setInterval(() => {
+    loadEmployeeReport();
+  }, 3000);
 });
 
 function loadEmployeeReport() {
   const tbody = document.querySelector('#employeeTable tbody');
+  if (!tbody) return;
   tbody.innerHTML = '';
+
   const employees = JSON.parse(localStorage.getItem('employees')) || [];
 
   employees.forEach((emp, i) => {
