@@ -55,29 +55,31 @@
   </div>
 
   <!-- Modals -->
+<!-- Employee Report Modal -->
 <div id="employeeModal" class="modal">
-  <div class="modal-content">
+  <div class="modal-content fixed-report">
     <span class="close">&times;</span>
     <h2>Employee Report</h2>
 
-    <!-- Download Button -->
-    <button id="downloadPDF" class="download-btn">📄 Download Report as PDF</button>
+    <button id="downloadBtn" onclick="generateEmployeePDF()">📄 Download Report (PDF)</button>
 
-    <table id="employeeTable" class="styled-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Full Name</th>
-          <th>Position</th>
-          <th>Department</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th>Salary</th>
-          <th>Hire Date</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <div class="table-container">
+      <table id="employeeTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Full Name</th>
+            <th>Position</th>
+            <th>Department</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Salary</th>
+            <th>Hire Date</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
