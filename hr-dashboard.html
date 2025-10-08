@@ -483,6 +483,92 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const modal = document.getElementById("employeeModal");
+  const closeBtn = modal.querySelector(".close");
+  const refreshBtn = document.getElementById("refreshEmployee");
+  const downloadBtn = document.getElementById("downloadEmployee");
+
+  // Open modal when Employee Report card is clicked
+  document.querySelector('[data-modal="employeeModal"]').addEventListener("click", () => {
+    modal.style.display = "block";
+    loadEmployeeReport();
+  });
+
+  // Close modal
+  closeBtn.onclick = () => (modal.style.display = "none");
+  window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
+
+  // Load employees into table
+  function loadEmployeeReport() {
+    const tableBody = document.querySelector("#employeeTable tbody");
+    tableBody.innerHTML = "";
+
+    const employees = JSON.parse(localStorage.getItem("employees")) || [];
+
+    if (employees.length === 0) {
+      tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;">No employee data available.</td></tr>`;
+      return;
+    }
+
+    employees.forEach((emp, i) => {
+      const row = `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${emp.fullName || "—"}</td>
+          <td>${emp.position || "—"}</td>
+          <td>${emp.department || "—"}</td>
+          <td>${emp.email || "—"}</td>
+          <td>${emp.phone || "—"}</td>
+          <td>${emp.salary || "—"}</td>
+          <td>${emp.hireDate || "—"}</td>
+        </tr>
+      `;
+      tableBody.insertAdjacentHTML("beforeend", row);
+    });
+  }
+
+  // Refresh Button
+  refreshBtn.addEventListener("click", loadEmployeeReport);
+
+  // Download PDF
+  downloadBtn.addEventListener("click", () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    let y = 20;
+
+    doc.setFont(undefined, "bold");
+    doc.text("Employee Report", 14, y);
+    y += 10;
+
+    const employees = JSON.parse(localStorage.getItem("employees")) || [];
+    if (employees.length === 0) {
+      doc.text("No employee data available.", 14, y + 10);
+    } else {
+      doc.setFont(undefined, "bold");
+      doc.text("No.", 14, y);
+      doc.text("Name", 25, y);
+      doc.text("Position", 70, y);
+      doc.text("Dept.", 110, y);
+      doc.text("Salary", 150, y);
+      doc.setFont(undefined, "normal");
+
+      employees.forEach((emp, i) => {
+        y += 8;
+        doc.text(String(i + 1), 14, y);
+        doc.text(emp.fullName || "", 25, y);
+        doc.text(emp.position || "", 70, y);
+        doc.text(emp.department || "", 110, y);
+        doc.text(emp.salary || "", 150, y);
+      });
+    }
+
+    doc.save("Employee_Report.pdf");
+  });
+});
+</script>
 
 </body>
 </html>
