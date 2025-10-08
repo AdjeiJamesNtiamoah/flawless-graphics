@@ -28,6 +28,27 @@
 
     <section class="form-section">
       <h2>Add Employee Details</h2>
+<h2>Saved Employees</h2>
+<input type="text" id="searchBar" placeholder="Search by name, department, or position..." onkeyup="filterEmployees()">
+
+<table id="employeeTable">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Full Name</th>
+      <th>Position/Title</th>
+      <th>Department</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Salary</th>
+      <th>Date of Hire</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Employee rows will be inserted here dynamically -->
+  </tbody>
+</table>
 
       <form id="employeeForm">
         <div class="form-grid">
@@ -327,6 +348,7 @@ function downloadCSV() {
 </script>
 </body>
 </html>
+
 
 
 
