@@ -325,6 +325,56 @@
 
   // Load data when dashboard opens
   document.addEventListener('DOMContentLoaded', loadEmployeeReport);
+</script
+
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const modals = document.querySelectorAll('.modal');
+  const closeBtns = document.querySelectorAll('.close');
+  const cards = document.querySelectorAll('.card');
+
+  // Open modal when clicking card
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      const modalId = card.getAttribute('data-modal');
+      document.getElementById(modalId).style.display = 'block';
+
+      // Load employee data dynamically if Employee Report modal
+      if (modalId === 'employeeModal') {
+        const tbody = document.querySelector('#employeeTable tbody');
+        tbody.innerHTML = '';
+        const employees = JSON.parse(localStorage.getItem('employees')) || [];
+        employees.forEach((emp, i) => {
+          const row = `<tr>
+            <td>${i + 1}</td>
+            <td>${emp.fullName}</td>
+            <td>${emp.position}</td>
+            <td>${emp.department}</td>
+            <td>${emp.email}</td>
+            <td>${emp.phone}</td>
+            <td>${emp.salary}</td>
+            <td>${emp.hireDate}</td>
+          </tr>`;
+          tbody.innerHTML += row;
+        });
+      }
+    });
+  });
+
+  // Close modal when clicking X
+  closeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      modals.forEach(modal => (modal.style.display = 'none'));
+    });
+  });
+
+  // Close modal when clicking outside content
+  window.onclick = function (event) {
+    modals.forEach(modal => {
+      if (event.target === modal) modal.style.display = 'none';
+    });
+  };
+});
 </script>
 </body>
 </html>
