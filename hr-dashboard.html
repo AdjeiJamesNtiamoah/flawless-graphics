@@ -56,13 +56,12 @@
 
   <!-- Modals -->
 <!-- Employee Report Modal -->
-<!-- Employee Report Modal -->
 <div id="employeeModal" class="modal">
-  <div class="modal-content fixed-report">
+  <div class="modal-content large">
     <span class="close">&times;</span>
     <h2>Employee Report</h2>
-
-    <button id="downloadBtn" onclick="generateEmployeePDF()">📄 Download Report (PDF)</button>
+    <p id="totalInfo" class="summary-bar"></p>
+    <button onclick="generateEmployeePDF()" class="download-btn">Download Report as PDF</button>
 
     <div class="table-container">
       <table id="employeeTable">
