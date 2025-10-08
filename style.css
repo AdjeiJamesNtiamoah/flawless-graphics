@@ -513,4 +513,20 @@ button:hover {
   background-color: #b52b27;
 }
 
+.edit-btn {
+  background-color: #5cb85c;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  margin-right: 5px;
+  transition: background-color 0.2s ease;
+}
+
+.edit-btn:hover {
+  background-color: #449d44;
+}
+
 
