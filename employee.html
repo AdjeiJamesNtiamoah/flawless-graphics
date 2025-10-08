@@ -5,14 +5,73 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Employee Portal | FLAWLESS GRAPHICS</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* --- Table Styling --- */
+    #employeeTable {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+    #employeeTable th, #employeeTable td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+    #employeeTable th {
+      background-color: #1a3d6d;
+      color: white;
+    }
+    #employeeTable tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    #employeeTable tr:hover {
+      background-color: #e8f0ff;
+    }
+
+    /* --- Search Bar --- */
+    #searchBar {
+      margin-top: 10px;
+      padding: 8px;
+      width: 50%;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    /* --- Form Section --- */
+    .form-section {
+      margin: 20px 0;
+    }
+
+    .form-section input {
+      margin: 5px;
+      padding: 8px;
+      width: 200px;
+    }
+
+    .form-section button {
+      padding: 8px 15px;
+      background-color: #1a3d6d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .form-section button:hover {
+      background-color: #00509e;
+    }
+  </style>
 </head>
+
 <body>
   <header>
-    <nav class="navbar">
-      <img src="logo.gif" alt="FLAWLESS GRAPHICS Logo" class="logo">
+    <nav>
+      <img src="assets/logo-main.png" alt="Flawless Graphics Logo" class="logo">
+      <h1>FLAWLESS GRAPHICS</h1>
       <ul>
         <li><a href="index.html">Home</a></li>
-        <li><a href="employee.html" class="active">Employee Portal</a></li>
+        <li><a href="employee.html">Employee Portal</a></li>
         <li><a href="hr-dashboard.html">HR Dashboard</a></li>
         <li><a href="services.html">Services</a></li>
         <li><a href="contact.html">Contact</a></li>
@@ -20,334 +79,142 @@
     </nav>
   </header>
 
-  <main class="employee-portal">
-    <section class="hero small-hero">
-      <h1>Employee Portal</h1>
-      <p>Manage employee profiles, attendance, and payroll information easily.</p>
+  <main>
+    <section class="form-section">
+      <h2>Add Employee Details</h2>
+      <form id="employeeForm">
+        <input type="text" id="name" placeholder="Full Name" required>
+        <input type="text" id="position" placeholder="Position/Title" required>
+        <input type="text" id="department" placeholder="Department" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="tel" id="phone" placeholder="Phone" required>
+        <input type="number" id="salary" placeholder="Salary" required>
+        <input type="date" id="hireDate" required>
+        <button type="submit">Save Employee</button>
+      </form>
     </section>
 
-            <tbody>
-                <!-- Employee rows will be inserted here dynamically -->
-              </tbody>
-                </table>
+    <section>
+      <h2>Saved Employees</h2>
+      <input type="text" id="searchBar" placeholder="Search by name, department, or position..." onkeyup="filterEmployees()">
 
-                  <form id="employeeForm">
-                  <div class="form-grid">
-                  <div class="form-group">
-                  <label for="fullName">Full Name</label>
-                  <input type="text" id="fullName" placeholder="Enter full name" required>
-             </div>
-
-             <div class="form-group">
-                <label for="position">Position/Title</label>
-                <input type="text" id="position" placeholder="Enter position" required>
-                </div>
-
-            <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" placeholder="Enter email" required>
-            </div>
-
-            <div class="form-group">
-            <label for="phone">Phone</label>
-            <input type="tel" id="phone" placeholder="Enter phone number" required>
-            </div>
-
-            <div class="form-group">
-            <label for="department">Department</label>
-            <input type="text" id="department" placeholder="Enter department" required>
-            </div>
-
-            <div class="form-group">
-            <label for="dateOfHire">Date of Hire</label>
-            <input type="date" id="dateOfHire" required>
-            </div>
-                    
-           <div class="form-group">
-            <label for="dateOfBirth">Date of Birth</label>
-            <input type="date" id="dateOfBirth" required>
-            </div>
-                    
-          <div class="form-group">
-            <label for="salary">Salary (₵)</label>
-            <input type="number" id="salary" placeholder="₵0.00" required>
-          </div>
-        </div>
-
-        <button type="button" onclick="saveEmployee()">Save Employee</button>
-      </form>
-
-   <h3>Saved Employees</h3>
- <section class="form-section">
-      <h2>Add Employee Details</h2>
-
-   
-            <h2>Saved Employees</h2>
-<input type="text" id="searchBar" placeholder="🔍 Search by name, department, or position..." onkeyup="filterEmployees()">
-
-<table id="employeeTable">
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Full Name</th>
-      <th>Position/Title</th>
-      <th>Department</th>
-      <th>Email</th>
-      <th>Phone</th>
-      <th>Salary</th>
-      <th>Date of Hire</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
+      <table id="employeeTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Full Name</th>
+            <th>Position</th>
+            <th>Department</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Salary</th>
+            <th>Hire Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </section>
   </main>
 
-  <footer>
-    <p>© 2025 FLAWLESS GRAPHICS. All rights reserved.</p>
-  </footer>
-<script>
-  // Load saved employees from localStorage
-  document.addEventListener('DOMContentLoaded', () => {
-    const savedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
-    savedEmployees.forEach((emp, index) => addToTable(emp, index));
-  });
+  <script>
+    document.addEventListener('DOMContentLoaded', refreshTable);
 
-  function saveEmployee() {
-    const employee = {
-      name: document.getElementById('fullName').value,
-      position: document.getElementById('position').value,
-      email: document.getElementById('email').value,
-      phone: document.getElementById('phone').value,
-      department: document.getElementById('department').value,
-      dateOfHire: document.getElementById('dateOfHire').value,
-      salary: document.getElementById('salary').value
-    };
+    const form = document.getElementById('employeeForm');
+    let editIndex = null;
 
-    if (employee.name && employee.position && employee.email) {
-      const savedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
-      savedEmployees.push(employee);
-      localStorage.setItem('employees', JSON.stringify(savedEmployees));
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
 
-      addToTable(employee, savedEmployees.length - 1);
-      document.getElementById('employeeForm').reset();
-    } else {
-      alert('Please fill all required fields!');
-    }
-  }
+      const employee = {
+        name: document.getElementById('name').value,
+        position: document.getElementById('position').value,
+        department: document.getElementById('department').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        salary: document.getElementById('salary').value,
+        hireDate: document.getElementById('hireDate').value
+      };
 
-  function addToTable(emp, index) {
-    const table = document.querySelector('#employeeTable tbody');
-    const row = table.insertRow();
+      const employees = JSON.parse(localStorage.getItem('employees')) || [];
 
-    row.insertCell(0).textContent = emp.name;
-    row.insertCell(1).textContent = emp.position;
-    row.insertCell(2).textContent = emp.department;
-    row.insertCell(3).textContent = emp.email;
-    row.insertCell(4).textContent = emp.phone;
-    row.insertCell(5).textContent = emp.dateOfHire;
-    row.insertCell(6).textContent = emp.salary;
-
-    // Action buttons cell
-    const actionCell = row.insertCell(7);
-
-    // Edit button
-    const editBtn = document.createElement('button');
-    editBtn.textContent = 'Edit';
-    editBtn.classList.add('edit-btn');
-    editBtn.onclick = function() {
-      editEmployee(index);
-    };
-    actionCell.appendChild(editBtn);
-
-    // Delete button
-    const deleteBtn = document.createElement('button');
-    deleteBtn.textContent = 'Delete';
-    deleteBtn.classList.add('delete-btn');
-    deleteBtn.onclick = function() {
-      deleteEmployee(index);
-    };
-    actionCell.appendChild(deleteBtn);
-  }
-
-  function deleteEmployee(index) {
-    const savedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
-    savedEmployees.splice(index, 1);
-    localStorage.setItem('employees', JSON.stringify(savedEmployees));
-    refreshTable();
-  }
-
-  function editEmployee(index) {
-    const savedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
-    const emp = savedEmployees[index];
-
-    // Fill form with existing employee data
-    document.getElementById('fullName').value = emp.name;
-    document.getElementById('position').value = emp.position;
-    document.getElementById('email').value = emp.email;
-    document.getElementById('phone').value = emp.phone;
-    document.getElementById('department').value = emp.department;
-    document.getElementById('dateOfHire').value = emp.dateOfHire;
-    document.getElementById('salary').value = emp.salary;
-
-    // Change button to Update
-    const saveBtn = document.querySelector('button[onclick="saveEmployee()"]');
-    saveBtn.textContent = 'Update Employee';
-    saveBtn.onclick = function() {
-      updateEmployee(index);
-    };
-  }
-
-  function updateEmployee(index) {
-    const updatedEmployee = {
-      name: document.getElementById('fullName').value,
-      position: document.getElementById('position').value,
-      email: document.getElementById('email').value,
-      phone: document.getElementById('phone').value,
-      department: document.getElementById('department').value,
-      dateOfHire: document.getElementById('dateOfHire').value,
-      salary: document.getElementById('salary').value
-    };
-
-    const savedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
-    savedEmployees[index] = updatedEmployee;
-    localStorage.setItem('employees', JSON.stringify(savedEmployees));
-
-    // Reset button
-    const saveBtn = document.querySelector('.form-section button');
-    saveBtn.textContent = 'Save Employee';
-    saveBtn.onclick = function() {
-      saveEmployee();
-    };
-
-    document.getElementById('employeeForm').reset();
-    refreshTable();
-  }
-
-  function refreshTable() {
-    const tableBody = document.querySelector('#employeeTable tbody');
-    tableBody.innerHTML = '';
-    const savedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
-    savedEmployees.forEach((emp, i) => addToTable(emp, i));
-  }
-
-  function downloadCSV() {
-  const employees = JSON.parse(localStorage.getItem('employees')) || [];
-  if (employees.length === 0) {
-    alert('No employee records found to export!');
-    return;
-  }
-
-  const csvRows = [];
-  const headers = ["Name", "Position", "Department", "Email", "Phone", "Date of Hire", "Salary"];
-  csvRows.push(headers.join(','));
-
-  for (const emp of employees) {
-    const values = [
-      emp.name,
-      emp.position,
-      emp.department,
-      emp.email,
-      emp.phone,
-      emp.dateOfHire,
-      emp.salary
-    ];
-    csvRows.push(values.join(','));
-  }
-
-  const csvContent = csvRows.join('\n');
-  const blob = new Blob([csvContent], { type: 'text/csv' });
-  const url = window.URL.createObjectURL(blob);
-
-  const a = document.createElement('a');
-  a.setAttribute('href', url);
-  a.setAttribute('download', 'employee_report.csv');
-  a.click();
-}
-// --- FILTER EMPLOYEES IN REAL TIME ---
-function filterEmployees() {
-  const filter = document.getElementById('searchBar').value.toLowerCase();
-  const rows = document.querySelectorAll('#employeeTable tbody tr');
-
-  rows.forEach(row => {
-    const cells = row.querySelectorAll('td');
-    let matchFound = false;
-
-    cells.forEach(cell => {
-      const text = cell.textContent.toLowerCase();
-      if (text.includes(filter) && filter !== "") {
-        matchFound = true;
-        const regex = new RegExp(`(${filter})`, 'gi');
-        cell.innerHTML = cell.textContent.replace(regex, `<mark>$1</mark>`);
+      if (editIndex !== null) {
+        employees[editIndex] = employee;
+        editIndex = null;
       } else {
-        cell.innerHTML = cell.textContent; // remove previous highlights
+        employees.push(employee);
       }
+
+      localStorage.setItem('employees', JSON.stringify(employees));
+      form.reset();
+      refreshTable();
     });
 
-    row.style.display = matchFound || filter === "" ? "" : "none";
-  });
-}
+    function refreshTable() {
+      const tableBody = document.querySelector('#employeeTable tbody');
+      const employees = JSON.parse(localStorage.getItem('employees')) || [];
 
-// --- DOWNLOAD CSV WITH DATE AND TIME ---
-function downloadCSV() {
-  const employees = JSON.parse(localStorage.getItem('employees')) || [];
-  if (employees.length === 0) {
-    alert('No employee records found to export!');
-    return;
-  }
+      tableBody.innerHTML = '';
 
-  const csvRows = [];
-  const headers = ["Name", "Position", "Department", "Email", "Phone", "Date of Hire", "Salary"];
-  csvRows.push(headers.join(','));
+      employees.forEach((emp, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${emp.name}</td>
+          <td>${emp.position}</td>
+          <td>${emp.department}</td>
+          <td>${emp.email}</td>
+          <td>${emp.phone}</td>
+          <td>${emp.salary}</td>
+          <td>${emp.hireDate}</td>
+          <td>
+            <button onclick="editEmployee(${index})">Edit</button>
+            <button onclick="deleteEmployee(${index})" style="background:red;">Delete</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
 
-  for (const emp of employees) {
-    const values = [
-      emp.name,
-      emp.position,
-      emp.department,
-      emp.email,
-      emp.phone,
-      emp.dateOfHire,
-      emp.salary
-    ];
-    csvRows.push(values.join(','));
-  }
+    function editEmployee(index) {
+      const employees = JSON.parse(localStorage.getItem('employees')) || [];
+      const emp = employees[index];
+      editIndex = index;
 
-  const csvContent = csvRows.join('\n');
-  const blob = new Blob([csvContent], { type: 'text/csv' });
-  const url = window.URL.createObjectURL(blob);
+      document.getElementById('name').value = emp.name;
+      document.getElementById('position').value = emp.position;
+      document.getElementById('department').value = emp.department;
+      document.getElementById('email').value = emp.email;
+      document.getElementById('phone').value = emp.phone;
+      document.getElementById('salary').value = emp.salary;
+      document.getElementById('hireDate').value = emp.hireDate;
+    }
 
-  // Add timestamp to filename
-  const now = new Date();
-  const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
-  const filename = `employee_report_${timestamp}.csv`;
+    function deleteEmployee(index) {
+      const employees = JSON.parse(localStorage.getItem('employees')) || [];
+      if (confirm('Are you sure you want to delete this employee?')) {
+        employees.splice(index, 1);
+        localStorage.setItem('employees', JSON.stringify(employees));
+        refreshTable();
+      }
+    }
 
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-}
-function refreshTable() {
-  const tableBody = document.querySelector('#employeeTable tbody');
-  tableBody.innerHTML = '';
+    function filterEmployees() {
+      const filter = document.getElementById('searchBar').value.toLowerCase();
+      const rows = document.querySelectorAll('#employeeTable tbody tr');
 
-  const savedEmployees = JSON.parse(localStorage.getItem('employees')) || [];
-  savedEmployees.forEach((emp, i) => addToTable(emp, i));
-}
+      rows.forEach(row => {
+        const name = row.cells[1].textContent.toLowerCase();
+        const position = row.cells[2].textContent.toLowerCase();
+        const department = row.cells[3].textContent.toLowerCase();
 
-// Display when the page loads
-document.addEventListener('DOMContentLoaded', refreshTable);
-
-</script>
+        if (name.includes(filter) || position.includes(filter) || department.includes(filter)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+  </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
