@@ -133,7 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 </div>
 <script>
-// === Modal Handling ===
 document.addEventListener('DOMContentLoaded', () => {
   const modals = document.querySelectorAll('.modal');
   const closeBtns = document.querySelectorAll('.close');
@@ -145,10 +144,13 @@ document.addEventListener('DOMContentLoaded', () => {
     el.addEventListener('click', e => {
       e.preventDefault();
       const modalId = el.getAttribute('data-modal');
-      document.getElementById(modalId).style.display = 'block';
+      const modal = document.getElementById(modalId);
+      modal.style.display = 'block';
 
-      // If employee modal, load employee data
       if (modalId === 'employeeModal') loadEmployeeReport();
+      if (modalId === 'attendanceModal') loadAttendanceSummary();
+      if (modalId === 'payrollModal') loadPayrollAnalytics();
+      if (modalId === 'performanceModal') loadPerformanceOverview();
     });
   });
 
@@ -167,7 +169,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// === Load Employee Data from Local Storage ===
+
+// === Employee Report ===
 function loadEmployeeReport() {
   const tbody = document.querySelector('#employeeTable tbody');
   tbody.innerHTML = '';
@@ -189,7 +192,62 @@ function loadEmployeeReport() {
   });
 }
 
-// === Download as PDF ===
+
+// === Attendance Summary ===
+function loadAttendanceSummary() {
+  const employees = JSON.parse(localStorage.getItem('employees')) || [];
+  const totalEmployees = employees.length;
+  const todayPresent = Math.floor(Math.random() * totalEmployees); // simulate attendance
+
+  const attendanceRate = totalEmployees > 0 
+    ? ((todayPresent / totalEmployees) * 100).toFixed(1)
+    : 0;
+
+  document.querySelector('#attendanceModal .modal-content').innerHTML = `
+    <span class="close">&times;</span>
+    <h2>Attendance Summary</h2>
+    <p><strong>Total Employees:</strong> ${totalEmployees}</p>
+    <p><strong>Present Today:</strong> ${todayPresent}</p>
+    <p><strong>Attendance Rate:</strong> ${attendanceRate}%</p>
+  `;
+}
+
+
+// === Payroll Analytics ===
+function loadPayrollAnalytics() {
+  const employees = JSON.parse(localStorage.getItem('employees')) || [];
+  const totalPayroll = employees.reduce((sum, emp) => sum + (parseFloat(emp.salary) || 0), 0);
+  const avgSalary = employees.length ? (totalPayroll / employees.length).toFixed(2) : 0;
+  const maxSalary = employees.length ? Math.max(...employees.map(e => parseFloat(e.salary) || 0)) : 0;
+
+  document.querySelector('#payrollModal .modal-content').innerHTML = `
+    <span class="close">&times;</span>
+    <h2>Payroll Analytics</h2>
+    <p><strong>Total Employees:</strong> ${employees.length}</p>
+    <p><strong>Total Payroll:</strong> GHS ${totalPayroll.toFixed(2)}</p>
+    <p><strong>Average Salary:</strong> GHS ${avgSalary}</p>
+    <p><strong>Highest Salary:</strong> GHS ${maxSalary.toFixed(2)}</p>
+  `;
+}
+
+
+// === Performance Overview ===
+function loadPerformanceOverview() {
+  const employees = JSON.parse(localStorage.getItem('employees')) || [];
+  const totalEmployees = employees.length;
+  const avgPerformance = (Math.random() * 40 + 60).toFixed(1); // Simulated 60–100% score
+
+  document.querySelector('#performanceModal .modal-content').innerHTML = `
+    <span class="close">&times;</span>
+    <h2>Performance Overview</h2>
+    <p><strong>Total Employees:</strong> ${totalEmployees}</p>
+    <p><strong>Average Performance Score:</strong> ${avgPerformance}%</p>
+    <p>Keep improving! Performance data will soon include actual KPIs and department-level insights.</p>
+  `;
+}
+
+
+// === Download Employee Report as PDF ===
 document.addEventListener('click', e => {
   if (e.target.id === 'downloadReport') {
     const { jsPDF } = window.jspdf;
@@ -211,6 +269,7 @@ document.addEventListener('click', e => {
   }
 });
 </script>
+
 
 </body>
 </html>
