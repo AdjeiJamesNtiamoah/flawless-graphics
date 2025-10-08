@@ -571,6 +571,30 @@ button:hover {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
+/* --- Animated Sticky Top Bar --- */
+.top-bar {
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  padding: 15px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #ddd;
+  z-index: 100;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.top-bar.shrink {
+  padding: 8px 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: #f8f9fa;
+}
+
+/* Search bar */
 #searchBar {
   flex: 1;
   min-width: 250px;
@@ -636,6 +660,7 @@ mark {
 #employeeTable tr:hover {
   background-color: #e8f0ff;
 }
+
 
 
 
