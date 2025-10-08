@@ -266,8 +266,21 @@ function filterEmployees() {
   const rows = document.querySelectorAll('#employeeTable tbody tr');
 
   rows.forEach(row => {
-    const text = row.textContent.toLowerCase();
-    row.style.display = text.includes(filter) ? '' : 'none';
+    const cells = row.querySelectorAll('td');
+    let matchFound = false;
+
+    cells.forEach(cell => {
+      const text = cell.textContent.toLowerCase();
+      if (text.includes(filter) && filter !== "") {
+        matchFound = true;
+        const regex = new RegExp(`(${filter})`, 'gi');
+        cell.innerHTML = cell.textContent.replace(regex, `<mark>$1</mark>`);
+      } else {
+        cell.innerHTML = cell.textContent; // remove previous highlights
+      }
+    });
+
+    row.style.display = matchFound || filter === "" ? "" : "none";
   });
 }
 
@@ -314,6 +327,7 @@ function downloadCSV() {
 </script>
 </body>
 </html>
+
 
 
 
