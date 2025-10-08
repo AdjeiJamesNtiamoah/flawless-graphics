@@ -311,6 +311,55 @@
       });
     }
 
+    employees.forEach((emp, i) => {
+  const row = `
+    <tr>
+      <td>${i + 1}</td>
+      <td>${emp.fullName}</td>
+      <td>${emp.position}</td>
+      <td>${emp.department}</td>
+      <td>${emp.email}</td>
+      <td>${emp.phone}</td>
+      <td>${emp.salary}</td>
+      <td>${emp.hireDate}</td>
+      <td>
+        <img src="https://cdn-icons-png.flaticon.com/512/1159/1159633.png" 
+             alt="Edit" 
+             class="action-icon edit-icon" 
+             data-index="${i}">
+        <img src="https://cdn-icons-png.flaticon.com/512/1214/1214428.png" 
+             alt="Delete" 
+             class="action-icon delete-icon" 
+             data-index="${i}">
+      </td>
+    </tr>`;
+  tbody.innerHTML += row;
+});
+
+    // Handle Edit and Delete actions
+setTimeout(() => {
+  document.querySelectorAll(".delete-icon").forEach(icon => {
+    icon.addEventListener("click", e => {
+      const index = e.target.dataset.index;
+      if (confirm("Are you sure you want to delete this employee?")) {
+        employees.splice(index, 1);
+        localStorage.setItem("employees", JSON.stringify(employees));
+        alert("Employee deleted successfully!");
+        e.target.closest("tr").remove(); // remove row from table
+      }
+    });
+  });
+
+  document.querySelectorAll(".edit-icon").forEach(icon => {
+    icon.addEventListener("click", e => {
+      const index = e.target.dataset.index;
+      const emp = employees[index];
+      alert(`Editing ${emp.fullName}`);
+      // You can open an edit modal here in the next step
+    });
+  });
+}, 100);
+    
     function editEmployee(index) {
       const employees = JSON.parse(localStorage.getItem('employees')) || [];
       const emp = employees[index];
@@ -371,6 +420,7 @@
 </script>
 </body>
 </html>
+
 
 
 
