@@ -63,7 +63,7 @@
       <div id="section-content"></div>
     </div>
 
-    <section id="employee-report">
+   <section id="employeeReportSection">
   <h2>Employee Report</h2>
   <table id="reportTable">
     <thead>
@@ -161,6 +161,51 @@
     }
   });
 </script>
+
+  <script>
+  // Show/hide employee report
+  document.querySelector('.feature-card:nth-child(1)').addEventListener('click', () => {
+    const reportSection = document.getElementById('employeeReportSection');
+    reportSection.classList.toggle('show');
+  });
+
+  // Load employee data
+  function loadEmployeeReport() {
+    const reportBody = document.querySelector('#reportTable tbody');
+    reportBody.innerHTML = '';
+
+    const employees = JSON.parse(localStorage.getItem('employees')) || [];
+
+    if (employees.length === 0) {
+      reportBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#888;">No employee records found.</td></tr>`;
+      return;
+    }
+
+    employees.forEach((emp, index) => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${emp.name}</td>
+        <td>${emp.position}</td>
+        <td>${emp.department}</td>
+        <td>${emp.email}</td>
+        <td>${emp.phone}</td>
+        <td>${emp.salary}</td>
+        <td>${emp.hireDate}</td>
+      `;
+      reportBody.appendChild(row);
+    });
+  }
+
+  // Load on page load
+  document.addEventListener('DOMContentLoaded', loadEmployeeReport);
+
+  // Update when localStorage changes
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'employees') loadEmployeeReport();
+  });
+</script>
 </body>
 </html>
+
 
