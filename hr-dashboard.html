@@ -28,35 +28,80 @@
 
   <!-- MAIN HR DASHBOARD CONTENT -->
 <main class="dashboard">
-
   <div class="card-grid">
-    <div class="card card-blue" id="cardReport">
+    <div class="card card-blue" data-modal="employeeModal">
       <div class="card-icon">👤</div>
       <h3>Employee Report</h3>
       <p>View and export all employee profiles and reports.</p>
     </div>
 
-    <div class="card card-green" id="cardAttendance">
+    <div class="card card-green" data-modal="attendanceModal">
       <div class="card-icon">📅</div>
       <h3>Attendance Summary</h3>
       <p>Track attendance data and daily check-ins.</p>
     </div>
 
-    <div class="card card-gold" id="cardPayroll">
+    <div class="card card-gold" data-modal="payrollModal">
       <div class="card-icon">💰</div>
       <h3>Payroll Analytics</h3>
       <p>Analyze payroll trends and generate salary reports.</p>
     </div>
 
-    <div class="card card-purple" id="cardPerformance">
+    <div class="card card-purple" data-modal="performanceModal">
       <div class="card-icon">📈</div>
       <h3>Performance Overview</h3>
       <p>Monitor staff KPIs and performance growth.</p>
     </div>
   </div>
 
+  <!-- Modals -->
+  <div id="employeeModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Employee Report</h2>
+      <table id="employeeTable" class="styled-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Full Name</th>
+            <th>Position</th>
+            <th>Department</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Salary</th>
+            <th>Hire Date</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="attendanceModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Attendance Summary</h2>
+      <p>[Attendance details and summaries will go here]</p>
+    </div>
+  </div>
+
+  <div id="payrollModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Payroll Analytics</h2>
+      <p>[Payroll analytics charts and reports will go here]</p>
+    </div>
+  </div>
+
+  <div id="performanceModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Performance Overview</h2>
+      <p>[Performance tracking content will go here]</p>
+    </div>
+  </div>
 </main>
-  
+
 <!-- EXPANDABLE SECTIONS -->
 <section id="employeeReportSection" class="hidden-section">
   <div class="section-header">
