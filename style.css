@@ -1910,6 +1910,48 @@ mark {
   filter: hue-rotate(0deg) brightness(0.8) saturate(1.5); /* red tone */
 }
 
+#paymentForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+#paymentForm label {
+  font-weight: bold;
+}
+
+#paymentForm input, #paymentForm select {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #0056b3;
+}
+
+#paymentTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+#paymentTable th, #paymentTable td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
 
 
 
