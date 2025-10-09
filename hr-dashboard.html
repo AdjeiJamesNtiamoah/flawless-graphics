@@ -699,6 +699,61 @@ document.addEventListener("DOMContentLoaded", () => {
     doc.save("Employee_Report.pdf");
   });
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const employees = JSON.parse(localStorage.getItem("employees")) || [];
+  const payments = JSON.parse(localStorage.getItem("payments")) || [];
+
+  const employeeSelect = document.getElementById("employeeSelect");
+  const paymentForm = document.getElementById("paymentForm");
+  const paymentTable = document.querySelector("#paymentTable tbody");
+
+  // Populate employee dropdown
+  employees.forEach((emp, i) => {
+    const option = document.createElement("option");
+    option.value = emp.fullName;
+    option.textContent = emp.fullName;
+    employeeSelect.appendChild(option);
+  });
+
+  // Handle payment submission
+  paymentForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const payment = {
+      employee: employeeSelect.value,
+      amount: parseFloat(document.getElementById("amount").value),
+      date: document.getElementById("paymentDate").value,
+      status: "Completed",
+    };
+
+    payments.push(payment);
+    localStorage.setItem("payments", JSON.stringify(payments));
+
+    alert(`Payment of ₦${payment.amount.toLocaleString()} recorded for ${payment.employee}`);
+    paymentForm.reset();
+    loadPayments();
+  });
+
+  // Load payment table
+  function loadPayments() {
+    paymentTable.innerHTML = "";
+    payments.forEach((p, i) => {
+      const row = `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${p.employee}</td>
+          <td>₦${p.amount.toLocaleString()}</td>
+          <td>${p.date}</td>
+          <td>${p.status}</td>
+        </tr>`;
+      paymentTable.innerHTML += row;
+    });
+  }
+
+  loadPayments();
+});
+
 </script>
 </body>
 </html>
