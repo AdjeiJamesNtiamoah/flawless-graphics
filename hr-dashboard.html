@@ -781,6 +781,29 @@ document.addEventListener("DOMContentLoaded", () => {
       paymentTable.innerHTML += row;
     });
   }
+document.addEventListener("DOMContentLoaded", () => {
+  const payrollTableBody = document.querySelector("#payrollTable tbody");
+
+  function loadPayrollData() {
+    const payrollData = JSON.parse(localStorage.getItem("payroll")) || [];
+    payrollTableBody.innerHTML = "";
+
+    payrollData.forEach((record, index) => {
+      const row = `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${record.employee}</td>
+          <td>₦${record.totalPaid.toLocaleString()}</td>
+          <td>${record.paymentsMade}</td>
+          <td>${record.lastPayment}</td>
+        </tr>
+      `;
+      payrollTableBody.innerHTML += row;
+    });
+  }
+
+  loadPayrollData();
+});
 
   loadPayments();
 });
