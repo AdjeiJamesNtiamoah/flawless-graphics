@@ -703,39 +703,70 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
   const employees = JSON.parse(localStorage.getItem("employees")) || [];
   const payments = JSON.parse(localStorage.getItem("payments")) || [];
+  const payroll = JSON.parse(localStorage.getItem("payroll")) || [];
 
   const employeeSelect = document.getElementById("employeeSelect");
   const paymentForm = document.getElementById("paymentForm");
   const paymentTable = document.querySelector("#paymentTable tbody");
 
   // Populate employee dropdown
-  employees.forEach((emp, i) => {
+  employees.forEach(emp => {
     const option = document.createElement("option");
     option.value = emp.fullName;
     option.textContent = emp.fullName;
     employeeSelect.appendChild(option);
   });
 
-  // Handle payment submission
+  // Handle new payment
   paymentForm.addEventListener("submit", (e) => {
     e.preventDefault();
 
+    const selectedEmployee = employeeSelect.value;
+    const amount = parseFloat(document.getElementById("amount").value);
+    const date = document.getElementById("paymentDate").value;
+
     const payment = {
-      employee: employeeSelect.value,
-      amount: parseFloat(document.getElementById("amount").value),
-      date: document.getElementById("paymentDate").value,
-      status: "Completed",
+      employee: selectedEmployee,
+      amount,
+      date,
+      status: "Completed"
     };
 
+    // Save payment
     payments.push(payment);
     localStorage.setItem("payments", JSON.stringify(payments));
 
-    alert(`Payment of ₦${payment.amount.toLocaleString()} recorded for ${payment.employee}`);
+    // Update Payroll Data
+    updatePayroll(payment);
+
+    alert(`Payment of ₦${amount.toLocaleString()} recorded for ${selectedEmployee}`);
     paymentForm.reset();
     loadPayments();
   });
 
-  // Load payment table
+  // Update payroll records based on payment
+  function updatePayroll(payment) {
+    let payrollData = JSON.parse(localStorage.getItem("payroll")) || [];
+
+    const existingRecord = payrollData.find(p => p.employee === payment.employee);
+
+    if (existingRecord) {
+      existingRecord.totalPaid += payment.amount;
+      existingRecord.lastPayment = payment.date;
+      existingRecord.paymentsMade += 1;
+    } else {
+      payrollData.push({
+        employee: payment.employee,
+        totalPaid: payment.amount,
+        lastPayment: payment.date,
+        paymentsMade: 1
+      });
+    }
+
+    localStorage.setItem("payroll", JSON.stringify(payrollData));
+  }
+
+  // Load payments into table
   function loadPayments() {
     paymentTable.innerHTML = "";
     payments.forEach((p, i) => {
@@ -752,6 +783,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   loadPayments();
+});
     <button id="downloadPayments" class="btn-primary">Download Payment Report (PDF)</button>
 
 });
