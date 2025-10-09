@@ -801,7 +801,7 @@ document.addEventListener("DOMContentLoaded", () => {
       payrollTableBody.innerHTML += row;
     });
   }
-window.dispatchEvent(new Event("payrollUpdated"));
+window.addEventListener("payrollUpdated", loadPayrollData);
 
   loadPayrollData();
 });
