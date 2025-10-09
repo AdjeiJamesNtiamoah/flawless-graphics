@@ -109,8 +109,6 @@
             <th>Actions</th>
           </tr>
         </thead>
-<img src="https://cdn-icons-png.flaticon.com/512/1159/1159633.png" alt="Edit" class="action-icon edit-icon">
-<img src="https://cdn-icons-png.flaticon.com/512/1214/1214428.png" alt="Delete" class="action-icon delete-icon">
 
         <tbody>
           <!-- Data loads dynamically -->
@@ -172,6 +170,40 @@
     </table>
     <p id="payrollSummary"></p>
     <button id="downloadPayroll">Download Payroll PDF</button>
+  </div>
+</div>
+
+    <div id="paymentModal" class="modal">
+  <div class="modal-content large-modal">
+    <span class="close">&times;</span>
+    <h2>Payment Portal</h2>
+
+    <form id="paymentForm">
+      <label for="employeeSelect">Select Employee:</label>
+      <select id="employeeSelect" required></select>
+
+      <label for="amount">Amount (₦):</label>
+      <input type="number" id="amount" required>
+
+      <label for="paymentDate">Payment Date:</label>
+      <input type="date" id="paymentDate" required>
+
+      <button type="submit" class="btn-primary">Record Payment</button>
+    </form>
+
+    <h3>Payment History</h3>
+    <table id="paymentTable">
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Employee</th>
+          <th>Amount</th>
+          <th>Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
 </div>
 
