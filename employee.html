@@ -407,12 +407,27 @@ function showToast(message, type = "success") {
     toast.className = "toast";
   }, 3000);
 }
+// === Toast Notification Function with Animation ===
+function showToast(message, type = "success") {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.className = `toast ${type} show`;
+
+  // Keep it visible for 3 seconds, then fade out
+  setTimeout(() => {
+    toast.classList.add("hide");
+    setTimeout(() => {
+      toast.className = "toast";
+    }, 500);
+  }, 3000);
+}
 
   </script>
   <div id="toast" class="toast"></div>
 
 </body>
 </html>
+
 
 
 
