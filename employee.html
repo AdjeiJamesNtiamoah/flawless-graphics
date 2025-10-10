@@ -263,16 +263,15 @@
     form.addEventListener('submit', function(e) {
       e.preventDefault();
 
-      const employee = {
-        name: document.getElementById('name').value,
-        position: document.getElementById('position').value,
-        department: document.getElementById('department').value,
-        email: document.getElementById('email').value,
-        phone: document.getElementById('phone').value,
-        salary: document.getElementById('salary').value,
-        hireDate: document.getElementById('hireDate').value
-      };
-
+     const employee = {
+  fullName: document.getElementById("fullName").value.trim(),
+  position: document.getElementById("position").value.trim(),
+  department: document.getElementById("department").value.trim(),
+  email: document.getElementById("email").value.trim(),
+  phone: document.getElementById("phone").value.trim(),
+  salary: document.getElementById("salary").value.trim(),
+  hireDate: document.getElementById("hireDate").value.trim()
+};
 
       if (editIndex !== null) {
         employees[editIndex] = employee;
@@ -468,6 +467,7 @@ document.getElementById("employeeForm").addEventListener("submit", e => {
 
 </body>
 </html>
+
 
 
 
