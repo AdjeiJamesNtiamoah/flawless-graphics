@@ -286,28 +286,6 @@
       closeModal();
     });
 
-    
-document.getElementById("employeeForm").addEventListener("submit", e => {
-  e.preventDefault();
-
-  const newEmployee = {
-    fullName: document.getElementById("fullName").value,
-    position: document.getElementById("position").value,
-    department: document.getElementById("department").value,
-    email: document.getElementById("email").value,
-    phone: document.getElementById("phone").value,
-    salary: document.getElementById("salary").value,
-    hireDate: document.getElementById("hireDate").value
-  };
-
-  const employees = JSON.parse(localStorage.getItem("employees")) || [];
-  employees.push(newEmployee);
-  localStorage.setItem("employees", JSON.stringify(employees));
-
-  alert("Employee saved successfully!");
-  e.target.reset();
-});
-
     function refreshTable() {
       const tableBody = document.querySelector('#employeeTable tbody');
       const employees = JSON.parse(localStorage.getItem('employees')) || [];
@@ -440,8 +418,58 @@ setTimeout(() => {
     }
   });
 </script>
+
+  <script>
+document.getElementById("employeeForm").addEventListener("submit", e => {
+  e.preventDefault();
+
+  const newEmployee = {
+    fullName: document.getElementById("fullName").value,
+    position: document.getElementById("position").value,
+    department: document.getElementById("department").value,
+    email: document.getElementById("email").value,
+    phone: document.getElementById("phone").value,
+    salary: document.getElementById("salary").value,
+    hireDate: document.getElementById("hireDate").value
+  };
+
+  const employees = JSON.parse(localStorage.getItem("employees")) || [];
+  employees.push(newEmployee);
+  localStorage.setItem("employees", JSON.stringify(employees));
+
+  alert("✅ Employee saved successfully!");
+  e.target.reset();
+
+  // Dispatch event to notify HR Dashboard
+  window.dispatchEvent(new Event("storage"));
+});
+
+   
+document.getElementById("employeeForm").addEventListener("submit", e => {
+  e.preventDefault();
+
+  const newEmployee = {
+    fullName: document.getElementById("fullName").value,
+    position: document.getElementById("position").value,
+    department: document.getElementById("department").value,
+    email: document.getElementById("email").value,
+    phone: document.getElementById("phone").value,
+    salary: document.getElementById("salary").value,
+    hireDate: document.getElementById("hireDate").value
+  };
+
+  const employees = JSON.parse(localStorage.getItem("employees")) || [];
+  employees.push(newEmployee);
+  localStorage.setItem("employees", JSON.stringify(employees));
+
+  alert("Employee saved successfully!");
+  e.target.reset();
+});
+</script>
+
 </body>
 </html>
+
 
 
 
