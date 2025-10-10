@@ -218,6 +218,62 @@
     </div>
   </div>
 
+  <!-- Employee Report Modal -->
+  <div class="modal" id="employeeReportModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('employeeReportModal')">&times;</span>
+      <h2>Employee Report</h2>
+      <table id="employeeReportTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Full Name</th>
+            <th>Department</th>
+            <th>Position</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Payment Portal Modal -->
+  <div class="modal" id="paymentPortalModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('paymentPortalModal')">&times;</span>
+      <h2>Payment Portal</h2>
+      <form id="paymentForm">
+        <label for="selectEmployee">Select Employee</label>
+        <select id="selectEmployee"></select>
+        <label>Amount</label>
+        <input type="number" id="paymentAmount" placeholder="Enter amount" />
+        <label>Payment Date</label>
+        <input type="date" id="paymentDate" />
+        <button type="submit">Record Payment</button>
+      </form>
+      <div class="summary-box" id="paymentSummary"></div>
+    </div>
+  </div>
+
+  <!-- Attendance Modal -->
+  <div class="modal" id="attendanceModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('attendanceModal')">&times;</span>
+      <h2>Attendance Summary</h2>
+      <div class="summary-box" id="attendanceSummary">No attendance records yet.</div>
+    </div>
+  </div>
+
+  <!-- Payroll Modal -->
+  <div class="modal" id="payrollModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('payrollModal')">&times;</span>
+      <h2>Payroll Analytics</h2>
+      <div class="summary-box" id="payrollSummary">No payroll data available.</div>
+    </div>
+  </div>
+
   <!-- Performance Modal -->
   <div class="modal" id="performanceModal">
     <div class="modal-content">
@@ -248,18 +304,31 @@
   </div>
 
   <script>
-    // === Base Modal Functions ===
+    // === Modal Connections ===
     const modals = {
+      employeeReportBtn: "employeeReportModal",
+      paymentPortalBtn: "paymentPortalModal",
+      attendanceBtn: "attendanceModal",
+      payrollBtn: "payrollModal",
       performanceBtn: "performanceModal",
+      employeeCard: "employeeReportModal",
+      paymentCard: "paymentPortalModal",
+      attendanceCard: "attendanceModal",
+      payrollCard: "payrollModal",
       performanceCard: "performanceModal"
     };
 
     Object.keys(modals).forEach(id => {
-      document.getElementById(id).onclick = () => openModal(modals[id]);
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.onclick = () => openModal(modals[id]);
+      }
     });
 
     function openModal(id) {
       document.getElementById(id).style.display = "flex";
+      if (id === "employeeReportModal") renderEmployeeReport();
+      if (id === "paymentPortalModal") populateEmployeeSelect();
       if (id === "performanceModal") {
         populatePerformanceSelect();
         loadPerformanceSummary();
@@ -270,7 +339,31 @@
       document.getElementById(id).style.display = "none";
     }
 
-    // === Performance Rating Logic ===
+    // === Employee Report ===
+    function renderEmployeeReport() {
+      const employees = JSON.parse(localStorage.getItem("employees")) || [];
+      const tbody = document.querySelector("#employeeReportTable tbody");
+      tbody.innerHTML = employees.map((emp, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td><a href="#" class="employee-link" data-name="${emp.fullName}">${emp.fullName}</a></td>
+          <td>${emp.department}</td>
+          <td>${emp.position}</td>
+          <td>${emp.email || '-'}</td>
+        </tr>`).join("");
+    }
+
+    // === Payment Portal ===
+    function populateEmployeeSelect() {
+      const employees = JSON.parse(localStorage.getItem("employees")) || [];
+      const select = document.getElementById("selectEmployee");
+      select.innerHTML = `<option value="">Select Employee</option>`;
+      employees.forEach(emp => {
+        select.innerHTML += `<option value="${emp.fullName}">${emp.fullName}</option>`;
+      });
+    }
+
+    // === Performance Overview ===
     const starContainer = document.getElementById("starRating");
     let selectedRating = 0;
 
@@ -296,12 +389,10 @@
       e.preventDefault();
       const employee = document.getElementById("performanceEmployee").value;
       const comment = document.getElementById("performanceComment").value;
-
       if (!employee || selectedRating === 0) {
         alert("⚠️ Please select an employee and rating.");
         return;
       }
-
       const reviews = JSON.parse(localStorage.getItem("performance")) || [];
       reviews.push({
         employee,
@@ -309,7 +400,6 @@
         comment,
         date: new Date().toLocaleDateString()
       });
-
       localStorage.setItem("performance", JSON.stringify(reviews));
       alert("✅ Performance review saved!");
       e.target.reset();
@@ -321,94 +411,32 @@
     function loadPerformanceSummary() {
       const reviews = JSON.parse(localStorage.getItem("performance")) || [];
       const summaryDiv = document.getElementById("performanceSummary");
-
       if (reviews.length === 0) {
         summaryDiv.innerHTML = "No performance reviews yet.";
         return;
       }
-
-      const avg = (
-        reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-      ).toFixed(2);
-
+      const avg = (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(2);
       summaryDiv.innerHTML = `
         <p><b>Total Reviews:</b> ${reviews.length}</p>
         <p><b>Average Rating:</b> ⭐ ${avg}/5</p>
         <h4>Recent Reviews:</h4>
-        <ul>
-          ${reviews
-            .slice(-5)
-            .reverse()
-            .map(r => `<li>${r.date}: ${r.employee} — ${"★".repeat(r.rating)} (${r.comment || "No comment"})</li>`)
-            .join("")}
-        </ul>`;
+        <ul>${reviews.slice(-5).reverse().map(r => `<li>${r.date}: ${r.employee} — ${"★".repeat(r.rating)} (${r.comment || "No comment"})</li>`).join("")}</ul>`;
     }
+
+    // === Link Employee Report to Performance Overview ===
+    document.addEventListener("click", function (e) {
+      if (e.target.classList.contains("employee-link")) {
+        e.preventDefault();
+        const employeeName = e.target.dataset.name;
+        closeModal("employeeReportModal");
+        setTimeout(() => {
+          openModal("performanceModal");
+          const select = document.getElementById("performanceEmployee");
+          if (select) select.value = employeeName;
+        }, 200);
+      }
+    });
   </script>
-  <script>
-  // === LINK EMPLOYEE REPORT TO PERFORMANCE OVERVIEW ===
-
-  // Listen for clicks on employee names inside Employee Report table
-  document.addEventListener("click", function (e) {
-    if (e.target.classList.contains("employee-link")) {
-      e.preventDefault();
-      const employeeName = e.target.dataset.name;
-
-      // Open Performance Overview modal
-      openModal("performanceModal");
-
-      // Preselect that employee in dropdown
-      setTimeout(() => {
-        const select = document.getElementById("performanceEmployee");
-        if (select) {
-          select.value = employeeName;
-        }
-        loadPerformanceSummary();
-      }, 200);
-    }
-  });
-
-  // Modify Employee Report rendering so names become clickable
-  function renderEmployeeReport() {
-    const employees = JSON.parse(localStorage.getItem("employees")) || [];
-    const tbody = document.querySelector("#employeeReportTable tbody");
-    if (!tbody) return;
-
-    tbody.innerHTML = employees.map((emp, i) => `
-      <tr>
-        <td>${i + 1}</td>
-        <td><a href="#" class="employee-link" data-name="${emp.fullName}">${emp.fullName}</a></td>
-        <td>${emp.department}</td>
-        <td>${emp.position}</td>
-        <td>${emp.email || '-'}</td>
-      </tr>
-    `).join("");
-  }
-
-  // Call renderEmployeeReport when the Employee Report modal opens
-  document.getElementById("employeeReportBtn").addEventListener("click", () => {
-    openModal("employeeReportModal");
-    renderEmployeeReport();
-  });
-    <div class="modal" id="employeeReportModal">
-  <div class="modal-content">
-    <span class="close-btn" onclick="closeModal('employeeReportModal')">&times;</span>
-    <h2>Employee Report</h2>
-    <table id="employeeReportTable">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Full Name</th>
-          <th>Department</th>
-          <th>Position</th>
-          <th>Email</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</div>
-
-</script>
 
 </body>
 </html>
