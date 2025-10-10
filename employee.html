@@ -1,6 +1,368 @@
 <!DOCTYPE html>
 <html lang="en">
+<head><!DOCTYPE html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flawless Graphics - Employee Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8fafc;
+      color: #333;
+    }
+
+    header {
+      background-color: #003366;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 1.6em;
+      font-weight: 600;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .top-bar h2 {
+      margin: 0;
+    }
+
+    .search-bar input {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 220px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      background-color: #0056b3;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #003d80;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+
+    th {
+      background-color: #003366;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .actions img {
+      width: 20px;
+      margin-right: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .actions img:hover {
+      transform: scale(1.1);
+    }
+
+    /* Employee Cards View */
+    .cards-view {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .employee-card {
+      flex: 1 1 250px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      background: #fff;
+      transition: transform 0.2s;
+    }
+
+    .employee-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .employee-card h4 {
+      margin: 0 0 8px 0;
+      color: #003366;
+    }
+
+    .employee-card p {
+      margin: 2px 0;
+      font-size: 0.9em;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      width: 95%;
+      max-width: 500px;
+      position: relative;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.5em;
+      cursor: pointer;
+      color: #555;
+    }
+
+    form input, form select {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    @media (max-width: 768px) {
+      .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .search-bar input {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>Flawless Graphics Employee Portal</header>
+
+  <div class="container">
+    <div class="top-bar">
+      <h2>Manage Employees</h2>
+      <div class="buttons">
+        <button id="addEmployeeBtn">+ Add Employee</button>
+        <button id="toggleViewBtn">Switch to Cards View</button>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search by name, department, or position..." />
+    </div>
+
+    <!-- Employee Table -->
+    <table id="employeeTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Full Name</th>
+          <th>Department</th>
+          <th>Position</th>
+          <th>Email</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <!-- Cards View -->
+    <div class="cards-view" id="employeeCards" style="display:none;"></div>
+  </div>
+
+  <!-- Add/Edit Employee Modal -->
+  <div class="modal" id="employeeModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeModalBtn">&times;</span>
+      <h3 id="modalTitle">Add New Employee</h3>
+      <form id="employeeForm">
+        <input type="hidden" id="editIndex" />
+        <input type="text" id="fullName" placeholder="Full Name" required />
+        <input type="text" id="department" placeholder="Department" required />
+        <input type="text" id="position" placeholder="Position" required />
+        <input type="email" id="email" placeholder="Email Address" required />
+        <button type="submit">Save Employee</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const employeeTableBody = document.querySelector("#employeeTable tbody");
+    const employeeCards = document.getElementById("employeeCards");
+    const searchInput = document.getElementById("searchInput");
+    const addEmployeeBtn = document.getElementById("addEmployeeBtn");
+    const toggleViewBtn = document.getElementById("toggleViewBtn");
+    const employeeModal = document.getElementById("employeeModal");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+    const employeeForm = document.getElementById("employeeForm");
+    const modalTitle = document.getElementById("modalTitle");
+
+    let employees = JSON.parse(localStorage.getItem("employees")) || [];
+    let cardView = false;
+
+    // === Render Employee List ===
+    function renderEmployees(list = employees) {
+      employeeTableBody.innerHTML = "";
+      employeeCards.innerHTML = "";
+
+      list.forEach((emp, i) => {
+        employeeTableBody.innerHTML += `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${emp.fullName}</td>
+            <td>${emp.department}</td>
+            <td>${emp.position}</td>
+            <td>${emp.email}</td>
+            <td class="actions">
+              <img src="https://img.icons8.com/ios-glyphs/30/edit--v1.png" title="Edit" onclick="editEmployee(${i})">
+              <img src="https://img.icons8.com/ios-glyphs/30/filled-trash.png" title="Delete" onclick="deleteEmployee(${i})">
+            </td>
+          </tr>`;
+
+        employeeCards.innerHTML += `
+          <div class="employee-card">
+            <h4>${emp.fullName}</h4>
+            <p><b>Department:</b> ${emp.department}</p>
+            <p><b>Position:</b> ${emp.position}</p>
+            <p><b>Email:</b> ${emp.email}</p>
+            <div style="margin-top:8px;">
+              <img src="https://img.icons8.com/ios-glyphs/30/edit--v1.png" title="Edit" onclick="editEmployee(${i})">
+              <img src="https://img.icons8.com/ios-glyphs/30/filled-trash.png" title="Delete" onclick="deleteEmployee(${i})">
+            </div>
+          </div>`;
+      });
+    }
+
+    // === Add or Edit Employee ===
+    employeeForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const fullName = document.getElementById("fullName").value;
+      const department = document.getElementById("department").value;
+      const position = document.getElementById("position").value;
+      const email = document.getElementById("email").value;
+      const editIndex = document.getElementById("editIndex").value;
+
+      if (editIndex === "") {
+        employees.push({ fullName, department, position, email });
+      } else {
+        employees[editIndex] = { fullName, department, position, email };
+      }
+
+      localStorage.setItem("employees", JSON.stringify(employees));
+      employeeModal.style.display = "none";
+      employeeForm.reset();
+      renderEmployees();
+    });
+
+    // === Edit Employee ===
+    window.editEmployee = (index) => {
+      const emp = employees[index];
+      document.getElementById("fullName").value = emp.fullName;
+      document.getElementById("department").value = emp.department;
+      document.getElementById("position").value = emp.position;
+      document.getElementById("email").value = emp.email;
+      document.getElementById("editIndex").value = index;
+      modalTitle.textContent = "Edit Employee";
+      employeeModal.style.display = "flex";
+    };
+
+    // === Delete Employee ===
+    window.deleteEmployee = (index) => {
+      if (confirm("Are you sure you want to delete this employee?")) {
+        employees.splice(index, 1);
+        localStorage.setItem("employees", JSON.stringify(employees));
+        renderEmployees();
+      }
+    };
+
+    // === Search Filter ===
+    searchInput.addEventListener("input", (e) => {
+      const query = e.target.value.toLowerCase();
+      const filtered = employees.filter(emp =>
+        emp.fullName.toLowerCase().includes(query) ||
+        emp.department.toLowerCase().includes(query) ||
+        emp.position.toLowerCase().includes(query)
+      );
+      renderEmployees(filtered);
+    });
+
+    // === Toggle Views ===
+    toggleViewBtn.addEventListener("click", () => {
+      cardView = !cardView;
+      document.getElementById("employeeTable").style.display = cardView ? "none" : "table";
+      employeeCards.style.display = cardView ? "flex" : "none";
+      toggleViewBtn.textContent = cardView ? "Switch to Table View" : "Switch to Cards View";
+    });
+
+    // === Modal Controls ===
+    addEmployeeBtn.onclick = () => {
+      modalTitle.textContent = "Add New Employee";
+      document.getElementById("editIndex").value = "";
+      employeeForm.reset();
+      employeeModal.style.display = "flex";
+    };
+
+    closeModalBtn.onclick = () => employeeModal.style.display = "none";
+    window.onclick = (e) => {
+      if (e.target === employeeModal) employeeModal.style.display = "none";
+    };
+
+    renderEmployees();
+  </script>
+</body>
+</html>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Flawless Graphics - Employee Portal</title>
@@ -405,6 +767,7 @@ function showToast(message, type = "success") {
 
 </body>
 </html>
+
 
 
 
