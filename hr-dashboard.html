@@ -145,7 +145,9 @@
       cursor: pointer;
     }
 
-    .form-section input, .form-section select {
+    .form-section input,
+    .form-section select,
+    .form-section textarea {
       width: 100%;
       padding: 8px;
       margin-bottom: 10px;
@@ -169,6 +171,25 @@
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       margin-top: 10px;
     }
+
+    /* ⭐ Star Rating */
+    .stars {
+      display: flex;
+      gap: 5px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    .stars span {
+      font-size: 1.5em;
+      color: #ccc;
+      transition: color 0.2s;
+    }
+
+    .stars span.active {
+      color: gold;
+    }
+
   </style>
 </head>
 
@@ -197,101 +218,38 @@
     </div>
   </div>
 
-  <!-- Employee Report Modal -->
-  <div class="modal" id="employeeReportModal">
-    <div class="modal-content">
-      <span class="close-btn" onclick="closeModal('employeeReportModal')">&times;</span>
-      <h2>Employee Report</h2>
-      <div class="top-buttons">
-        <button onclick="loadEmployees()">🔄 Refresh</button>
-        <button onclick="downloadPDF()">📄 PDF</button>
-      </div>
-      <table id="employeeTable">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Full Name</th>
-            <th>Position</th>
-            <th>Department</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Salary</th>
-            <th>Hire Date</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Payment Portal Modal -->
-  <div class="modal" id="paymentPortalModal">
-    <div class="modal-content">
-      <span class="close-btn" onclick="closeModal('paymentPortalModal')">&times;</span>
-      <h2>Payment Portal</h2>
-      <form class="form-section" id="paymentForm">
-        <label>Employee</label>
-        <select id="employeeSelect" required></select>
-        <label>Amount</label>
-        <input type="number" id="paymentAmount" placeholder="Enter amount" required>
-        <label>Date</label>
-        <input type="date" id="paymentDate" required>
-        <button type="submit">Submit Payment</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Attendance Modal -->
-  <div class="modal" id="attendanceModal">
-    <div class="modal-content">
-      <span class="close-btn" onclick="closeModal('attendanceModal')">&times;</span>
-      <h2>Attendance Summary</h2>
-      <form class="form-section" id="attendanceForm">
-        <label>Employee</label>
-        <select id="attendanceEmployee" required></select>
-        <label>Date</label>
-        <input type="date" id="attendanceDate" required>
-        <label>Status</label>
-        <select id="attendanceStatus" required>
-          <option value="Present">Present</option>
-          <option value="Absent">Absent</option>
-          <option value="Leave">Leave</option>
-        </select>
-        <button type="submit">Record Attendance</button>
-      </form>
-
-      <div class="summary-box" id="attendanceSummary"></div>
-    </div>
-  </div>
-
-  <!-- Payroll Modal -->
-  <div class="modal" id="payrollModal">
-    <div class="modal-content">
-      <span class="close-btn" onclick="closeModal('payrollModal')">&times;</span>
-      <h2>Payroll Analytics</h2>
-      <div class="summary-box" id="payrollSummary"></div>
-    </div>
-  </div>
-
   <!-- Performance Modal -->
   <div class="modal" id="performanceModal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal('performanceModal')">&times;</span>
       <h2>Performance Overview</h2>
-      <p>Performance tracking coming soon.</p>
+
+      <form class="form-section" id="performanceForm">
+        <label>Employee</label>
+        <select id="performanceEmployee" required></select>
+
+        <label>Rating</label>
+        <div class="stars" id="starRating">
+          <span data-value="1">★</span>
+          <span data-value="2">★</span>
+          <span data-value="3">★</span>
+          <span data-value="4">★</span>
+          <span data-value="5">★</span>
+        </div>
+
+        <label>Comments</label>
+        <textarea id="performanceComment" rows="3" placeholder="Add feedback..."></textarea>
+
+        <button type="submit">Save Rating</button>
+      </form>
+
+      <div class="summary-box" id="performanceSummary"></div>
     </div>
   </div>
 
   <script>
+    // === Base Modal Functions ===
     const modals = {
-      employeeReportBtn: "employeeReportModal",
-      employeeCard: "employeeReportModal",
-      paymentPortalBtn: "paymentPortalModal",
-      paymentCard: "paymentPortalModal",
-      attendanceBtn: "attendanceModal",
-      attendanceCard: "attendanceModal",
-      payrollBtn: "payrollModal",
-      payrollCard: "payrollModal",
       performanceBtn: "performanceModal",
       performanceCard: "performanceModal"
     };
@@ -302,127 +260,88 @@
 
     function openModal(id) {
       document.getElementById(id).style.display = "flex";
-      if (id === "employeeReportModal") loadEmployees();
-      if (id === "paymentPortalModal") populateEmployeeSelect();
-      if (id === "attendanceModal") populateAttendanceSelect();
-      if (id === "payrollModal") loadPayrollData();
-      if (id === "attendanceModal") loadAttendanceSummary();
+      if (id === "performanceModal") {
+        populatePerformanceSelect();
+        loadPerformanceSummary();
+      }
     }
 
     function closeModal(id) {
       document.getElementById(id).style.display = "none";
     }
 
-    function loadEmployees() {
-      const employees = JSON.parse(localStorage.getItem("employees")) || [];
-      const tbody = document.querySelector("#employeeTable tbody");
-      tbody.innerHTML = "";
-      employees.forEach((emp, i) => {
-        tbody.innerHTML += `
-          <tr>
-            <td>${i + 1}</td>
-            <td>${emp.fullName || "—"}</td>
-            <td>${emp.position || "—"}</td>
-            <td>${emp.department || "—"}</td>
-            <td>${emp.email || "—"}</td>
-            <td>${emp.phone || "—"}</td>
-            <td>${emp.salary || "—"}</td>
-            <td>${emp.hireDate || "—"}</td>
-          </tr>`;
-      });
-    }
+    // === Performance Rating Logic ===
+    const starContainer = document.getElementById("starRating");
+    let selectedRating = 0;
 
-    function populateEmployeeSelect() {
+    starContainer.addEventListener("click", e => {
+      if (e.target.tagName === "SPAN") {
+        selectedRating = parseInt(e.target.dataset.value);
+        document.querySelectorAll(".stars span").forEach(star => {
+          star.classList.toggle("active", parseInt(star.dataset.value) <= selectedRating);
+        });
+      }
+    });
+
+    function populatePerformanceSelect() {
       const employees = JSON.parse(localStorage.getItem("employees")) || [];
-      const select = document.getElementById("employeeSelect");
+      const select = document.getElementById("performanceEmployee");
       select.innerHTML = `<option value="">Select Employee</option>`;
       employees.forEach(emp => {
         select.innerHTML += `<option value="${emp.fullName}">${emp.fullName}</option>`;
       });
     }
 
-    function populateAttendanceSelect() {
-      const employees = JSON.parse(localStorage.getItem("employees")) || [];
-      const select = document.getElementById("attendanceEmployee");
-      select.innerHTML = `<option value="">Select Employee</option>`;
-      employees.forEach(emp => {
-        select.innerHTML += `<option value="${emp.fullName}">${emp.fullName}</option>`;
-      });
-    }
-
-    // Payment Portal
-    document.getElementById("paymentForm").addEventListener("submit", e => {
+    document.getElementById("performanceForm").addEventListener("submit", e => {
       e.preventDefault();
-      const payment = {
-        employee: document.getElementById("employeeSelect").value,
-        amount: document.getElementById("paymentAmount").value,
-        date: document.getElementById("paymentDate").value
-      };
-      const payments = JSON.parse(localStorage.getItem("payments")) || [];
-      payments.push(payment);
-      localStorage.setItem("payments", JSON.stringify(payments));
-      alert("✅ Payment recorded!");
-      closeModal("paymentPortalModal");
-    });
+      const employee = document.getElementById("performanceEmployee").value;
+      const comment = document.getElementById("performanceComment").value;
 
-    // Attendance
-    document.getElementById("attendanceForm").addEventListener("submit", e => {
-      e.preventDefault();
-      const record = {
-        employee: document.getElementById("attendanceEmployee").value,
-        date: document.getElementById("attendanceDate").value,
-        status: document.getElementById("attendanceStatus").value
-      };
-      const attendance = JSON.parse(localStorage.getItem("attendance")) || [];
-      attendance.push(record);
-      localStorage.setItem("attendance", JSON.stringify(attendance));
-      loadAttendanceSummary();
-      alert("✅ Attendance recorded!");
-      e.target.reset();
-    });
-
-    function loadAttendanceSummary() {
-      const attendance = JSON.parse(localStorage.getItem("attendance")) || [];
-      const summaryDiv = document.getElementById("attendanceSummary");
-      if (attendance.length === 0) {
-        summaryDiv.innerHTML = "No attendance records yet.";
+      if (!employee || selectedRating === 0) {
+        alert("⚠️ Please select an employee and rating.");
         return;
       }
-      summaryDiv.innerHTML = "<h4>Recent Attendance Records:</h4><ul>" +
-        attendance.slice(-5).reverse().map(a => `<li>${a.date}: ${a.employee} - ${a.status}</li>`).join("") +
-        "</ul>";
-    }
 
-    // Payroll Analytics
-    function loadPayrollData() {
-      const employees = JSON.parse(localStorage.getItem("employees")) || [];
-      const payments = JSON.parse(localStorage.getItem("payments")) || [];
-      const totalSalary = employees.reduce((sum, e) => sum + (parseFloat(e.salary) || 0), 0);
-      const totalPaid = payments.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
-      const avgSalary = employees.length ? (totalSalary / employees.length).toFixed(2) : 0;
-      document.getElementById("payrollSummary").innerHTML = `
-        <p><b>Total Employees:</b> ${employees.length}</p>
-        <p><b>Total Salary:</b> ₵${totalSalary}</p>
-        <p><b>Total Paid:</b> ₵${totalPaid}</p>
-        <p><b>Average Salary:</b> ₵${avgSalary}</p>`;
-    }
+      const reviews = JSON.parse(localStorage.getItem("performance")) || [];
+      reviews.push({
+        employee,
+        rating: selectedRating,
+        comment,
+        date: new Date().toLocaleDateString()
+      });
 
-    // PDF Report
-    async function downloadPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.text("Employee Report", 15, 15);
-      const rows = [];
-      document.querySelectorAll("#employeeTable tbody tr").forEach(tr => {
-        const row = Array.from(tr.children).map(td => td.innerText);
-        rows.push(row);
-      });
-      let y = 30;
-      rows.forEach(row => {
-        doc.text(row.join(" | "), 15, y);
-        y += 10;
-      });
-      doc.save("Employee_Report.pdf");
+      localStorage.setItem("performance", JSON.stringify(reviews));
+      alert("✅ Performance review saved!");
+      e.target.reset();
+      selectedRating = 0;
+      document.querySelectorAll(".stars span").forEach(star => star.classList.remove("active"));
+      loadPerformanceSummary();
+    });
+
+    function loadPerformanceSummary() {
+      const reviews = JSON.parse(localStorage.getItem("performance")) || [];
+      const summaryDiv = document.getElementById("performanceSummary");
+
+      if (reviews.length === 0) {
+        summaryDiv.innerHTML = "No performance reviews yet.";
+        return;
+      }
+
+      const avg = (
+        reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      ).toFixed(2);
+
+      summaryDiv.innerHTML = `
+        <p><b>Total Reviews:</b> ${reviews.length}</p>
+        <p><b>Average Rating:</b> ⭐ ${avg}/5</p>
+        <h4>Recent Reviews:</h4>
+        <ul>
+          ${reviews
+            .slice(-5)
+            .reverse()
+            .map(r => `<li>${r.date}: ${r.employee} — ${"★".repeat(r.rating)} (${r.comment || "No comment"})</li>`)
+            .join("")}
+        </ul>`;
     }
   </script>
 </body>
