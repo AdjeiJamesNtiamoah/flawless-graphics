@@ -1,100 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
-    <main class="dashboard-container">
-  <header>
-    <nav>
-       <img src="logo.gif" alt="FLAWLESS GRAPHICS Logo" class="logo-img">
-      <h1>FLAWLESS GRAPHICS</h1>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="employee.html">Employee Portal</a></li>
-        <li><a href="hr-dashboard.html"class="active">HR Dashboard</a></li>
-        <li><a href="services.html">Services</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-    </nav>
-  </header>
-  <!-- Top Intro Section -->
-  <section class="dashboard-header">
-    <h1>Welcome to the HR Management Dashboard</h1>
-    <p>Manage employee data, analyze performance, and streamline HR processes — all in one place.</p>
-  </section>
-
-  <!-- HR Dashboard Cards -->
-  <section class="dashboard-grid">
-    <div class="card" data-modal="employeeModal">
-      <div class="card-icon">👤</div>
-      <h3>Employee Report</h3>
-      <p>View and export all employee profiles and reports.</p>
-    </div>
-      
-    <div class="card" data-modal="paymentModal">
-      <div class="icon">💳</div>
-      <h3>Payment Portal</h3>
-      <p>Process employee salaries and view payment records.</p>
-    </div>
-
-    <div class="card" data-modal="attendanceModal">
-      <div class="card-icon">🕒</div>
-      <h3>Attendance Summary</h3>
-      <p>Track attendance data and daily check-ins.</p>
-    </div>
-
-    <div class="card" data-modal="payrollModal">
-      <div class="card-icon">💰</div>
-      <h3>Payroll Analytics</h3>
-      <p>Analyze payroll trends and generate salary reports.</p>
-    </div>
-
-    <div class="card" data-modal="performanceModal">
-      <div class="card-icon">📈</div>
-      <h3>Performance Overview</h3>
-      <p>Monitor staff KPIs and performance growth.</p>
-    </div>
-  </section>
-
-</main>
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HR Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HR Dashboard | FLAWLESS GRAPHICS</title>
+  <link rel="stylesheet" href="style.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
-    /* Modal Styles */
-    .modal { display:none; position:fixed; z-index:2000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); overflow:auto; }
-    .modal-content { background:#fff; margin:5% auto; padding:30px; border-radius:10px; width:85%; max-width:900px; animation:fadeIn 0.4s ease; }
-    @keyframes fadeIn { from{opacity:0;transform:translateY(-20px);} to{opacity:1;transform:translateY(0);} }
-    .close { float:right; font-size:22px; cursor:pointer; color:#777; }
-    .close:hover { color:#000; }
-    h2 { color:#004aad; }
-    table { width:100%; border-collapse:collapse; margin-top:20px; }
-    th, td { border:1px solid #ddd; padding:8px; text-align:center; }
-    th { background:#004aad; color:#fff; position:sticky; top:0; }
-    button { background:#004aad; color:#fff; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; margin-top:15px; }
-    button:hover { background:#003580; }
-    input[type="number"] { width:60px; padding:5px; text-align:center; }
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background-color: #f8f9fc;
+      color: #333;
+    }
+
+    header {
+      background-color: #003366;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.3em;
+    }
+
+    .dashboard {
+      display: flex;
+    }
+
+    .sidebar {
+      background-color: #003366;
+      color: white;
+      width: 240px;
+      min-height: 100vh;
+      padding-top: 20px;
+      position: fixed;
+      left: 0;
+      top: 0;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      font-size: 1.5em;
+      margin-bottom: 30px;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 15px 20px;
+      text-decoration: none;
+      color: white;
+      transition: background 0.3s;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+      background-color: #0056b3;
+    }
+
+    .content {
+      margin-left: 260px;
+      padding: 30px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 900px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 20px 30px;
+      position: relative;
+    }
+
+    .modal-content::-webkit-scrollbar {
+      width: 8px;
+    }
+    .modal-content::-webkit-scrollbar-thumb {
+      background: #003366;
+      border-radius: 4px;
+    }
+
+    .close-btn {
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      font-size: 1.5em;
+      cursor: pointer;
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background: #003366;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    td {
+      background: #fff;
+    }
+
+    .top-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 15px 0;
+    }
+
+    .top-buttons button {
+      background-color: #0056b3;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .top-buttons button:hover {
+      background-color: #003d80;
+    }
+
+    .form-section input,
+    .form-section select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .form-section button {
+      background: #0056b3;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .form-section button:hover {
+      background: #003d80;
+    }
+
+    .summary-box {
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-top: 15px;
+    }
   </style>
 </head>
-<body>
 
+<body>
   <header>
-    <h1>Flawless Graphics HR Dashboard</h1>
+    FLAWLESS GRAPHICS HR Dashboard
   </header>
 
- <!-- Employee Report Modal -->
-<div id="employeeModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Employee Report</h2>
-
-    <div class="employee-actions">
-      <button id="refreshEmployee">🔄 Refresh Data</button>
-      <button id="downloadEmployee">⬇️ Download as PDF</button>
+  <div class="dashboard">
+    <div class="sidebar">
+      <h2>HR Dashboard</h2>
+      <a href="#" class="active" id="employeeReportBtn">Employee Report</a>
+      <a href="#" id="paymentPortalBtn">Payment Portal</a>
+      <a href="#" id="attendanceBtn">Attendance Summary</a>
+      <a href="#" id="payrollBtn">Payroll Analytics</a>
+      <a href="#" id="performanceBtn">Performance Overview</a>
     </div>
 
-    <div class="table-container">
+    <div class="content">
+      <h2>Welcome, HR Manager</h2>
+      <div class="cards">
+        <div class="card" id="employeeCard">👥 Employee Report</div>
+        <div class="card" id="paymentCard">💰 Payment Portal</div>
+        <div class="card" id="attendanceCard">🕒 Attendance Summary</div>
+        <div class="card" id="payrollCard">📊 Payroll Analytics</div>
+        <div class="card" id="performanceCard">⭐ Performance Overview</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Employee Report Modal -->
+  <div class="modal" id="employeeReportModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('employeeReportModal')">&times;</span>
+      <h2>Employee Report</h2>
+      <div class="top-buttons">
+        <button onclick="loadEmployees()">🔄 Refresh Data</button>
+        <button onclick="downloadPDF()">📄 Download as PDF</button>
+      </div>
+
       <table id="employeeTable">
         <thead>
           <tr>
@@ -106,440 +251,98 @@
             <th>Phone</th>
             <th>Salary</th>
             <th>Hire Date</th>
-            <th>Actions</th>
           </tr>
         </thead>
-
-        <tbody>
-          <!-- Data loads dynamically -->
-        </tbody>
+        <tbody></tbody>
       </table>
-     <button id="downloadEmployee">Download Employee Report (PDF)</button>
     </div>
   </div>
-</div>
 
+  <!-- Payment Portal Modal -->
+  <div class="modal" id="paymentPortalModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('paymentPortalModal')">&times;</span>
+      <h2>Payment Portal</h2>
+      <form class="form-section" id="paymentForm">
+        <label>Select Employee</label>
+        <select id="employeeSelect" required></select>
 
-  <!-- Employee Report Modal -->
-<div class="modal" id="employeeModal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Employee Report</h2>
-    <table id="employeeTable">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Full Name</th>
-          <th>Position</th>
-          <th>Department</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th>Salary</th>
-          <th>Hire Date</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
- 
+        <label>Payment Amount</label>
+        <input type="number" id="paymentAmount" placeholder="Enter amount" required />
+
+        <label>Payment Date</label>
+        <input type="date" id="paymentDate" required />
+
+        <button type="submit">Submit Payment</button>
+      </form>
+    </div>
   </div>
-</div>
-row.innerHTML = `
-  <td>${i + 1}</td>
-  <td>${emp.fullName}</td>
-  <td>${emp.position}</td>
-  <td>${emp.department}</td>
-  <td>${emp.email}</td>
-  <td>${emp.phone}</td>
-  <td>${emp.salary}</td>
-  <td>${emp.hireDate}</td>
-`;
 
-
-<!-- Attendance Modal -->
-<div class="modal" id="attendanceModal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Attendance Summary</h2>
-    <p>Attendance data will appear here.</p>
+  <!-- Attendance Summary Modal -->
+  <div class="modal" id="attendanceModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('attendanceModal')">&times;</span>
+      <h2>Attendance Summary</h2>
+      <p>Track and manage employee attendance.</p>
+      <div class="summary-box" id="attendanceSummary">No attendance data available yet.</div>
+    </div>
   </div>
-</div>
 
-<!-- Payroll Modal -->
-<div class="modal" id="payrollModal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Payroll Analytics</h2>
-    <table id="payrollTable">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Department</th>
-          <th>Salary (GHS)</th>
-          <th>Tax (10%)</th>
-          <th>Net Pay (GHS)</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-    <p id="payrollSummary"></p>
-    <button id="downloadPayroll">Download Payroll PDF</button>
+  <!-- Payroll Analytics Modal -->
+  <div class="modal" id="payrollModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('payrollModal')">&times;</span>
+      <h2>Payroll Analytics</h2>
+      <div class="summary-box" id="payrollSummary">Loading payroll data...</div>
+    </div>
   </div>
-</div>
 
-    <div id="paymentModal" class="modal">
-  <div class="modal-content large-modal">
-    <span class="close">&times;</span>
-    <h2>Payment Portal</h2>
-
-    <form id="paymentForm">
-      <label for="employeeSelect">Select Employee:</label>
-      <select id="employeeSelect" required></select>
-
-      <label for="amount">Amount (₦):</label>
-      <input type="number" id="amount" required>
-
-      <label for="paymentDate">Payment Date:</label>
-      <input type="date" id="paymentDate" required>
-
-      <button type="submit" class="btn-primary">Record Payment</button>
-    </form>
-
-    <h3>Payment History</h3>
-    <table id="paymentTable">
-      <thead>
-        <tr>
-          <th>No.</th>
-          <th>Employee</th>
-          <th>Amount</th>
-          <th>Date</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+  <!-- Performance Overview Modal -->
+  <div class="modal" id="performanceModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('performanceModal')">&times;</span>
+      <h2>Performance Overview</h2>
+      <p>Employee performance tracking coming soon.</p>
+    </div>
   </div>
-</div>
-
-<!-- Performance Modal -->
-<div class="modal" id="performanceModal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Performance Overview</h2>
-    <p>Performance details will appear here.</p>
-  </div>
-</div>
 
   <script>
- 
-    // Modal open/close logic
-    document.addEventListener("DOMContentLoaded", () => {
-      const modals = document.querySelectorAll(".modal");
-      const closeBtns = document.querySelectorAll(".close");
-      const cards = document.querySelectorAll(".card");
+    // modal controls
+    const modals = {
+      employeeReportBtn: "employeeReportModal",
+      employeeCard: "employeeReportModal",
+      paymentPortalBtn: "paymentPortalModal",
+      paymentCard: "paymentPortalModal",
+      attendanceBtn: "attendanceModal",
+      attendanceCard: "attendanceModal",
+      payrollBtn: "payrollModal",
+      payrollCard: "payrollModal",
+      performanceBtn: "performanceModal",
+      performanceCard: "performanceModal"
+    };
 
-      cards.forEach(card => {
-        card.addEventListener("click", () => {
-          document.getElementById(card.dataset.modal).style.display = "block";
-          if (card.dataset.modal === "employeeModal") loadEmployeeReport();
-          if (card.dataset.modal === "attendanceModal") loadAttendance();
-          if (card.dataset.modal === "performanceModal") loadPerformance();
-        });
-      });
-
-      closeBtns.forEach(btn => {
-        btn.onclick = () => btn.closest(".modal").style.display = "none";
-      });
-      window.onclick = e => modals.forEach(m => { if (e.target === m) m.style.display = "none"; });
+    Object.keys(modals).forEach(id => {
+      document.getElementById(id).onclick = () => openModal(modals[id]);
     });
 
-function loadEmployeeReport() {
-  const tableBody = document.querySelector("#employeeTable tbody");
-  tableBody.innerHTML = "";
+    function openModal(id) {
+      document.getElementById(id).style.display = "flex";
+      if (id === "employeeReportModal") loadEmployees();
+      if (id === "paymentPortalModal") populateEmployeeSelect();
+      if (id === "payrollModal") loadPayrollData();
+    }
 
-  // Get saved employees from localStorage
-  const employees = JSON.parse(localStorage.getItem("employees")) || [];
+    function closeModal(id) {
+      document.getElementById(id).style.display = "none";
+    }
 
-  if (employees.length === 0) {
-    tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;">No employee data available.</td></tr>`;
-    return;
-  }
-
-  employees.forEach((emp, i) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${i + 1}</td>
-      <td>${emp.fullName || "—"}</td>
-      <td>${emp.position || "—"}</td>
-      <td>${emp.department || "—"}</td>
-      <td>${emp.email || "—"}</td>
-      <td>${emp.phone || "—"}</td>
-      <td>${emp.salary || "—"}</td>
-      <td>${emp.hireDate || "—"}</td>
-    `;
-    tableBody.appendChild(row);
-  });
-
-    // --- Attendance ---
-    function loadAttendance() {
-      const tbody = document.querySelector("#attendanceTable tbody");
+    // load employees
+    function loadEmployees() {
+      const employees = JSON.parse(localStorage.getItem("employees")) || [];
+      const tbody = document.querySelector("#employeeTable tbody");
       tbody.innerHTML = "";
-      const employees = JSON.parse(localStorage.getItem("employees")) || [];
-      const attendance = JSON.parse(localStorage.getItem("attendance")) || {};
-      employees.forEach(emp => {
-        const checked = attendance[emp.fullName] ? "checked" : "";
-        tbody.innerHTML += `<tr><td>${emp.fullName}</td><td><input type='checkbox' ${checked}></td></tr>`;
-      });
-      updateAttendanceRate();
-    }
-
-    function updateAttendanceRate() {
-      const employees = JSON.parse(localStorage.getItem("employees")) || [];
-      const attendance = JSON.parse(localStorage.getItem("attendance")) || {};
-      const total = employees.length;
-      const present = Object.values(attendance).filter(v => v).length;
-      document.getElementById("attendanceRate").textContent = total ? `Attendance Rate: ${(present / total * 100).toFixed(1)}%` : "";
-    }
-
-    document.getElementById("saveAttendance").onclick = () => {
-      const rows = document.querySelectorAll("#attendanceTable tbody tr");
-      const attendance = {};
-      rows.forEach(r => {
-        const name = r.cells[0].textContent;
-        const present = r.querySelector("input").checked;
-        attendance[name] = present;
-      });
-      localStorage.setItem("attendance", JSON.stringify(attendance));
-      updateAttendanceRate();
-      alert("Attendance saved!");
-    };
-
-    document.getElementById("downloadAttendance").onclick = () => {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const attendance = JSON.parse(localStorage.getItem("attendance")) || {};
-      let y = 20;
-      doc.text("Attendance Report", 14, y);
-      for (const [name, present] of Object.entries(attendance)) {
-        y += 10;
-        doc.text(`${name}: ${present ? "Present" : "Absent"}`, 14, y);
-      }
-      doc.save("Attendance_Report.pdf");
-    };
-
-    // --- Performance ---
-    function loadPerformance() {
-      const tbody = document.querySelector("#performanceTable tbody");
-      tbody.innerHTML = "";
-      const employees = JSON.parse(localStorage.getItem("employees")) || [];
-      const performance = JSON.parse(localStorage.getItem("performance")) || {};
-      employees.forEach(emp => {
-        tbody.innerHTML += `<tr><td>${emp.fullName}</td>
-        <td><input type="number" min="0" max="100" value="${performance[emp.fullName] || ""}"></td></tr>`;
-      });
-      updateAveragePerformance();
-    }
-
-    function updateAveragePerformance() {
-      const performance = JSON.parse(localStorage.getItem("performance")) || {};
-      const scores = Object.values(performance).map(Number).filter(n => !isNaN(n));
-      const avg = scores.length ? (scores.reduce((a, b) => a + b) / scores.length).toFixed(1) : 0;
-      document.getElementById("avgPerformance").textContent = `Average Performance Score: ${avg}%`;
-    }
-
-    document.getElementById("savePerformance").onclick = () => {
-      const rows = document.querySelectorAll("#performanceTable tbody tr");
-      const performance = {};
-      rows.forEach(r => {
-        const name = r.cells[0].textContent;
-        const score = parseFloat(r.querySelector("input").value);
-        if (!isNaN(score)) performance[name] = score;
-      });
-      localStorage.setItem("performance", JSON.stringify(performance));
-      updateAveragePerformance();
-      alert("Performance saved!");
-    };
-
-    document.getElementById("downloadPerformance").onclick = () => {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const performance = JSON.parse(localStorage.getItem("performance")) || {};
-      let y = 20;
-      doc.text("Performance Report", 14, y);
-      for (const [name, score] of Object.entries(performance)) {
-        y += 10;
-        doc.text(`${name}: ${score}%`, 14, y);
-      }
-      doc.save("Performance_Report.pdf");
-    };
-  </script>
-  
-<!-- Payroll Script -->
-<script>
-function loadPayroll() {
-  const tbody = document.querySelector("#payrollTable tbody");
-  tbody.innerHTML = "";
-  const employees = JSON.parse(localStorage.getItem("employees")) || [];
-  
-  const taxRate = 0.1; // 10% tax
-  let totalPayroll = 0;
-
-  employees.forEach(emp => {
-    const salary = parseFloat(emp.salary) || 0;
-    const tax = (salary * taxRate).toFixed(2);
-    const net = (salary - tax).toFixed(2);
-    totalPayroll += salary;
-
-    tbody.innerHTML += `
-      <tr>
-        <td>${emp.fullName || ""}</td>
-        <td>${emp.department || ""}</td>
-        <td>${salary.toFixed(2)}</td>
-        <td>${tax}</td>
-        <td>${net}</td>
-      </tr>
-    `;
-  });
-
-  const avgSalary = employees.length ? (totalPayroll / employees.length).toFixed(2) : 0;
-  const maxSalary = employees.length ? Math.max(...employees.map(e => parseFloat(e.salary) || 0)) : 0;
-
-  document.getElementById("payrollSummary").innerHTML = `
-    <strong>Total Employees:</strong> ${employees.length}<br>
-    <strong>Total Payroll:</strong> GHS ${totalPayroll.toFixed(2)}<br>
-    <strong>Average Salary:</strong> GHS ${avgSalary}<br>
-    <strong>Highest Salary:</strong> GHS ${maxSalary.toFixed(2)}
-  `;
-}
-
-document.getElementById("downloadPayroll").onclick = () => {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  const employees = JSON.parse(localStorage.getItem("employees")) || [];
-  const taxRate = 0.1;
-  let y = 20;
-  doc.text("Payroll Report", 14, y);
-  y += 10;
-
-  employees.forEach(emp => {
-    const salary = parseFloat(emp.salary) || 0;
-    const tax = (salary * taxRate).toFixed(2);
-    const net = (salary - tax).toFixed(2);
-    y += 10;
-    doc.text(`${emp.fullName} (${emp.department}) - Salary: GHS ${salary.toFixed(2)}, Net: GHS ${net}`, 14, y);
-  });
-
-  doc.save("Payroll_Report.pdf");
-};
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const cards = document.querySelectorAll(".card");
-  const modals = document.querySelectorAll(".modal");
-  const closeBtns = document.querySelectorAll(".close");
-
-  // Open modal
-  cards.forEach(card => {
-    card.addEventListener("click", () => {
-      const modalId = card.getAttribute("data-modal");
-      const modal = document.getElementById(modalId);
-      if (modal) {
-        modal.style.display = "block";
-
-        // Load data dynamically
-        if (modalId === "employeeModal") loadEmployeeReport();
-        if (modalId === "attendanceModal") loadAttendance();
-        if (modalId === "payrollModal") loadPayroll();
-        if (modalId === "performanceModal") loadPerformance();
-      }
-    });
-  });
-
-  // Close modal when X is clicked
-  closeBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      modals.forEach(m => (m.style.display = "none"));
-    });
-  });
-
-  // Close when clicking outside modal content
-  window.addEventListener("click", e => {
-    modals.forEach(m => {
-      if (e.target === m) m.style.display = "none";
-    });
-  });
-});
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const cards = document.querySelectorAll(".card");
-  const modals = document.querySelectorAll(".modal");
-  const closeBtns = document.querySelectorAll(".close");
-
-  // Open modal
-  cards.forEach(card => {
-    card.addEventListener("click", () => {
-      const modalId = card.getAttribute("data-modal");
-      const modal = document.getElementById(modalId);
-      if (modal) {
-        modal.style.display = "block";
-
-        // Load data dynamically
-        if (modalId === "employeeModal") loadEmployeeReport();
-        if (modalId === "attendanceModal") loadAttendance();
-        if (modalId === "payrollModal") loadPayroll();
-        if (modalId === "performanceModal") loadPerformance();
-      }
-    });
-  });
-
-  // Close modal when X is clicked
-  closeBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      modals.forEach(m => (m.style.display = "none"));
-    });
-  });
-
-  // Close when clicking outside modal content
-  window.addEventListener("click", e => {
-    modals.forEach(m => {
-      if (e.target === m) m.style.display = "none";
-    });
-  });
-});
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const modal = document.getElementById("employeeModal");
-  const closeBtn = modal.querySelector(".close");
-  const refreshBtn = document.getElementById("refreshEmployee");
-  const downloadBtn = document.getElementById("downloadEmployee");
-
-  // Open modal when Employee Report card is clicked
-  document.querySelector('[data-modal="employeeModal"]').addEventListener("click", () => {
-    modal.style.display = "block";
-    loadEmployeeReport();
-  });
-
-  // Close modal
-  closeBtn.onclick = () => (modal.style.display = "none");
-  window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
-
-  // Load employees into table
-  function loadEmployeeReport() {
-    const tableBody = document.querySelector("#employeeTable tbody");
-    tableBody.innerHTML = "";
-
-    const employees = JSON.parse(localStorage.getItem("employees")) || [];
-
-    if (employees.length === 0) {
-      tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;">No employee data available.</td></tr>`;
-      return;
-    }
-
-    employees.forEach((emp, i) => {
-      const row = `
-        <tr>
+      employees.forEach((emp, i) => {
+        const row = `<tr>
           <td>${i + 1}</td>
           <td>${emp.fullName || "—"}</td>
           <td>${emp.position || "—"}</td>
@@ -548,463 +351,64 @@ document.addEventListener("DOMContentLoaded", () => {
           <td>${emp.phone || "—"}</td>
           <td>${emp.salary || "—"}</td>
           <td>${emp.hireDate || "—"}</td>
-        </tr>
-      `;
-      tableBody.insertAdjacentHTML("beforeend", row);
-    });
-  }
-
-  // Refresh Button
-  refreshBtn.addEventListener("click", loadEmployeeReport);
-
-  // Download PDF
-  downloadBtn.addEventListener("click", () => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    let y = 20;
-
-    doc.setFont(undefined, "bold");
-    doc.text("Employee Report", 14, y);
-    y += 10;
-
-    const employees = JSON.parse(localStorage.getItem("employees")) || [];
-    if (employees.length === 0) {
-      doc.text("No employee data available.", 14, y + 10);
-    } else {
-      doc.setFont(undefined, "bold");
-      doc.text("No.", 14, y);
-      doc.text("Name", 25, y);
-      doc.text("Position", 70, y);
-      doc.text("Dept.", 110, y);
-      doc.text("Salary", 150, y);
-      doc.setFont(undefined, "normal");
-
-      employees.forEach((emp, i) => {
-        y += 8;
-        doc.text(String(i + 1), 14, y);
-        doc.text(emp.fullName || "", 25, y);
-        doc.text(emp.position || "", 70, y);
-        doc.text(emp.department || "", 110, y);
-        doc.text(emp.salary || "", 150, y);
+        </tr>`;
+        tbody.innerHTML += row;
       });
     }
 
-    doc.save("Employee_Report.pdf");
-  });
-});
-</section>
-    <!-- Employee Report Modal -->
-<div id="employeeModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Employee Report</h2>
-    <p>All saved employee records are displayed below:</p>
+    // populate employee dropdown
+    function populateEmployeeSelect() {
+      const employees = JSON.parse(localStorage.getItem("employees")) || [];
+      const select = document.getElementById("employeeSelect");
+      select.innerHTML = `<option value="">-- Select Employee --</option>`;
+      employees.forEach(emp => {
+        const opt = document.createElement("option");
+        opt.value = emp.fullName;
+        opt.textContent = emp.fullName || "Unnamed";
+        select.appendChild(opt);
+      });
+    }
 
-    <table id="employeeTable">
-      <thead>
-        <tr>
-          <th>No.</th>
-          <th>Full Name</th>
-          <th>Position</th>
-          <th>Department</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th>Salary</th>
-          <th>Hire Date</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-
-    <button id="downloadReportBtn">⬇️ Download Report (PDF)</button>
-  </div>
-</div>
-
-<!-- Attendance Modal -->
-<div id="attendanceModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Attendance Summary</h2>
-    <p>View and manage employee attendance data here.</p>
-  </div>
-</div>
-
-<!-- Payroll Modal -->
-<div id="payrollModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Payroll Analytics</h2>
-    <p>Analyze payroll data, salary trends, and export payroll reports.</p>
-  </div>
-</div>
-
-<!-- Performance Modal -->
-<div id="performanceModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Performance Overview</h2>
-    <p>Monitor staff KPIs, performance goals, and team productivity.</p>
-  </div>
-</div>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const modals = document.querySelectorAll(".modal");
-  const closeBtns = document.querySelectorAll(".close");
-  const cards = document.querySelectorAll(".card");
-
-  // Open modal when clicking a card
-  cards.forEach(card => {
-    card.addEventListener("click", () => {
-      const modalId = card.getAttribute("data-modal");
-      const modal = document.getElementById(modalId);
-      modal.style.display = "flex";
-
-      // Load Employee Data dynamically
-      if (modalId === "employeeModal") {
-        const tbody = document.querySelector("#employeeTable tbody");
-        tbody.innerHTML = "";
-        const employees = JSON.parse(localStorage.getItem("employees")) || [];
-
-        employees.forEach((emp, i) => {
-          const row = `
-            <tr>
-              <td>${i + 1}</td>
-              <td>${emp.fullName}</td>
-              <td>${emp.position}</td>
-              <td>${emp.department}</td>
-              <td>${emp.email}</td>
-              <td>${emp.phone}</td>
-              <td>${emp.salary}</td>
-              <td>${emp.hireDate}</td>
-            </tr>`;
-          tbody.innerHTML += row;
-        });
+    // payroll summary
+    function loadPayrollData() {
+      const employees = JSON.parse(localStorage.getItem("employees")) || [];
+      if (employees.length === 0) {
+        document.getElementById("payrollSummary").textContent = "No payroll data available.";
+        return;
       }
-    });
-  });
-
-  // Close modals
-  closeBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      btn.closest(".modal").style.display = "none";
-    });
-  });
-
-  // Close when clicking outside modal
-  window.onclick = e => {
-    modals.forEach(modal => {
-      if (e.target === modal) modal.style.display = "none";
-    });
-  };
-
-  // Download as PDF
-  document.getElementById("downloadReportBtn").addEventListener("click", () => {
-    const doc = new jsPDF();
-    doc.text("Flawless Graphics Employee Report", 14, 20);
-    const employees = JSON.parse(localStorage.getItem("employees")) || [];
-    let y = 35;
-
-    employees.forEach((emp, i) => {
-      doc.text(`${i + 1}. ${emp.fullName} - ${emp.position} - ${emp.department}`, 14, y);
-      y += 8;
-    });
-
-    doc.save("Employee_Report.pdf");
-  });
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  const employees = JSON.parse(localStorage.getItem("employees")) || [];
-  const payments = JSON.parse(localStorage.getItem("payments")) || [];
-  const payroll = JSON.parse(localStorage.getItem("payroll")) || [];
-
-  const employeeSelect = document.getElementById("employeeSelect");
-  const paymentForm = document.getElementById("paymentForm");
-  const paymentTable = document.querySelector("#paymentTable tbody");
-
-  // Populate employee dropdown
-  employees.forEach(emp => {
-    const option = document.createElement("option");
-    option.value = emp.fullName;
-    option.textContent = emp.fullName;
-    employeeSelect.appendChild(option);
-  });
-
-  // Handle new payment
-  paymentForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const selectedEmployee = employeeSelect.value;
-    const amount = parseFloat(document.getElementById("amount").value);
-    const date = document.getElementById("paymentDate").value;
-
-    const payment = {
-      employee: selectedEmployee,
-      amount,
-      date,
-      status: "Completed"
-    };
-
-    // Save payment
-    payments.push(payment);
-    localStorage.setItem("payments", JSON.stringify(payments));
-
-    // Update Payroll Data
-    updatePayroll(payment);
-
-    alert(`Payment of ₦${amount.toLocaleString()} recorded for ${selectedEmployee}`);
-    paymentForm.reset();
-    loadPayments();
-  });
-
-  // Update payroll records based on payment
-  function updatePayroll(payment) {
-    let payrollData = JSON.parse(localStorage.getItem("payroll")) || [];
-
-    const existingRecord = payrollData.find(p => p.employee === payment.employee);
-
-    if (existingRecord) {
-      existingRecord.totalPaid += payment.amount;
-      existingRecord.lastPayment = payment.date;
-      existingRecord.paymentsMade += 1;
-    } else {
-      payrollData.push({
-        employee: payment.employee,
-        totalPaid: payment.amount,
-        lastPayment: payment.date,
-        paymentsMade: 1
-      });
-    }
-
-    localStorage.setItem("payroll", JSON.stringify(payrollData));
-  }
-
-  // Load payments into table
-  function loadPayments() {
-    paymentTable.innerHTML = "";
-    payments.forEach((p, i) => {
-      const row = `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${p.employee}</td>
-          <td>₦${p.amount.toLocaleString()}</td>
-          <td>${p.date}</td>
-          <td>${p.status}</td>
-        </tr>`;
-      paymentTable.innerHTML += row;
-    });
-  }
-document.addEventListener("DOMContentLoaded", () => {
-  const payrollTableBody = document.querySelector("#payrollTable tbody");
-
-  function loadPayrollData() {
-    const payrollData = JSON.parse(localStorage.getItem("payroll")) || [];
-    payrollTableBody.innerHTML = "";
-
-    payrollData.forEach((record, index) => {
-      const row = `
-        <tr>
-          <td>${index + 1}</td>
-          <td>${record.employee}</td>
-          <td>₦${record.totalPaid.toLocaleString()}</td>
-          <td>${record.paymentsMade}</td>
-          <td>${record.lastPayment}</td>
-        </tr>
+      const totalSalary = employees.reduce((acc, emp) => acc + (parseFloat(emp.salary) || 0), 0);
+      const avgSalary = (totalSalary / employees.length).toFixed(2);
+      document.getElementById("payrollSummary").innerHTML = `
+        <p>Total Employees: <b>${employees.length}</b></p>
+        <p>Total Monthly Salary: <b>₵${totalSalary}</b></p>
+        <p>Average Salary: <b>₵${avgSalary}</b></p>
       `;
-      payrollTableBody.innerHTML += row;
-    });
-  }
-window.addEventListener("payrollUpdated", loadPayrollData);
-
-  loadPayrollData();
-});
-
-  loadPayments();
-});
-    <button id="downloadPayments" class="btn-primary">Download Payment Report (PDF)</button>
-
-});
-window.addEventListener("payrollUpdated", loadPayrollData);
-document.addEventListener("DOMContentLoaded", () => {
-  const employeeTableBody = document.querySelector("#employeeTable tbody");
-
-  function loadEmployeeData() {
-    const employees = JSON.parse(localStorage.getItem("employees")) || [];
-    employeeTableBody.innerHTML = "";
-
-    if (employees.length === 0) {
-      employeeTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#999;">No employee records found.</td></tr>`;
-      return;
     }
 
-    employees.forEach((emp, i) => {
-      const row = `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${emp.fullName}</td>
-          <td>${emp.position}</td>
-          <td>${emp.department}</td>
-          <td>${emp.email}</td>
-          <td>${emp.phone}</td>
-          <td>${emp.salary}</td>
-          <td>${emp.hireDate}</td>
-        </tr>`;
-      employeeTableBody.innerHTML += row;
+    // payment form
+    document.getElementById("paymentForm").addEventListener("submit", e => {
+      e.preventDefault();
+      alert("✅ Payment recorded successfully!");
+      closeModal("paymentPortalModal");
     });
-  }
 
-  // Load employees when modal opens
-  const employeeReportCard = document.querySelector('[data-modal="employeeModal"]');
-  if (employeeReportCard) {
-    employeeReportCard.addEventListener("click", loadEmployeeData);
-  }
-});
-
-</script>
-    <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const employeeTableBody = document.querySelector("#employeeTable tbody");
-
-  function loadEmployeeData() {
-    const employees = JSON.parse(localStorage.getItem("employees")) || [];
-    employeeTableBody.innerHTML = "";
-
-    if (employees.length === 0) {
-      employeeTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#999;">No employee records found.</td></tr>`;
-      return;
+    // PDF download
+    async function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("Employee Report", 15, 15);
+      const rows = [];
+      document.querySelectorAll("#employeeTable tbody tr").forEach(tr => {
+        const row = Array.from(tr.children).map(td => td.innerText);
+        rows.push(row);
+      });
+      let y = 30;
+      rows.forEach(row => {
+        doc.text(row.join(" | "), 15, y);
+        y += 10;
+      });
+      doc.save("Employee_Report.pdf");
     }
-
-    employees.forEach((emp, i) => {
-      const row = `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${emp.fullName}</td>
-          <td>${emp.position}</td>
-          <td>${emp.department}</td>
-          <td>${emp.email}</td>
-          <td>${emp.phone}</td>
-          <td>${emp.salary}</td>
-          <td>${emp.hireDate}</td>
-        </tr>`;
-      employeeTableBody.innerHTML += row;
-    });
-  }
-
-  // Load employee data when modal opens
-  const employeeReportCard = document.querySelector('[data-modal="employeeModal"]');
-  if (employeeReportCard) {
-    employeeReportCard.addEventListener("click", loadEmployeeData);
-  }
-
-  // 🔁 Auto-refresh when localStorage changes
-  window.addEventListener("storage", loadEmployeeData);
-});
-</script>
-<!-- 💰 Payment Portal Modal -->
-<div id="paymentModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Employee Payment Portal</h2>
-    <p>Process salary payments and manage payroll records.</p>
-
-    <label for="employeeSelect">Select Employee:</label>
-    <select id="employeeSelect">
-      <option value="">-- Select Employee --</option>
-    </select>
-
-    <label for="paymentAmount">Amount Paid:</label>
-    <input type="number" id="paymentAmount" placeholder="Enter amount" />
-
-    <button id="makePayment">Record Payment</button>
-
-    <h3>Payment History</h3>
-    <table id="paymentHistory">
-      <thead>
-        <tr>
-          <th>No.</th>
-          <th>Employee</th>
-          <th>Amount</th>
-          <th>Date</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</div>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const employeeSelect = document.getElementById("employeeSelect");
-  const paymentAmount = document.getElementById("paymentAmount");
-  const makePaymentBtn = document.getElementById("makePayment");
-  const paymentHistoryBody = document.querySelector("#paymentHistory tbody");
-
-  // 🔹 Load employee list from localStorage
-  function loadEmployees() {
-    const employees = JSON.parse(localStorage.getItem("employees")) || [];
-    employeeSelect.innerHTML = `<option value="">-- Select Employee --</option>`;
-
-    employees.forEach(emp => {
-      const opt = document.createElement("option");
-      opt.value = emp.fullName;
-      opt.textContent = emp.fullName;
-      employeeSelect.appendChild(opt);
-    });
-  }
-
-  // 🔹 Load payment history
-  function loadPaymentHistory() {
-    const payments = JSON.parse(localStorage.getItem("payroll")) || [];
-    paymentHistoryBody.innerHTML = "";
-
-    payments.forEach((p, i) => {
-      const row = `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${p.employee}</td>
-          <td>₦${p.amount.toLocaleString()}</td>
-          <td>${p.date}</td>
-        </tr>`;
-      paymentHistoryBody.innerHTML += row;
-    });
-  }
-
-  // 🔹 Record payment
-  makePaymentBtn.addEventListener("click", () => {
-    const name = employeeSelect.value;
-    const amount = parseFloat(paymentAmount.value);
-
-    if (!name || isNaN(amount) || amount <= 0) {
-      alert("⚠️ Please select an employee and enter a valid amount.");
-      return;
-    }
-
-    const payments = JSON.parse(localStorage.getItem("payroll")) || [];
-    const newPayment = {
-      employee: name,
-      amount,
-      date: new Date().toLocaleString(),
-    };
-
-    payments.push(newPayment);
-    localStorage.setItem("payroll", JSON.stringify(payments));
-    paymentAmount.value = "";
-
-    loadPaymentHistory();
-
-    // 🔄 Update Payroll Analytics
-    window.dispatchEvent(new Event("payrollUpdated"));
-
-    alert(`✅ Payment recorded for ${name}`);
-  });
-
-  // Initialize
-  loadEmployees();
-  loadPaymentHistory();
-
-  // Refresh employee list when new employees are added
-  window.addEventListener("storage", loadEmployees);
-});
-
-</script>
+  </script>
 </body>
 </html>
