@@ -273,7 +273,6 @@
         hireDate: document.getElementById('hireDate').value
       };
 
-      const employees = JSON.parse(localStorage.getItem('employees')) || [];
 
       if (editIndex !== null) {
         employees[editIndex] = employee;
@@ -469,6 +468,7 @@ document.getElementById("employeeForm").addEventListener("submit", e => {
 
 </body>
 </html>
+
 
 
 
