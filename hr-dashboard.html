@@ -239,22 +239,39 @@
   </div>
 
   <!-- Payment Portal Modal -->
-  <div class="modal" id="paymentPortalModal">
-    <div class="modal-content">
-      <span class="close-btn" onclick="closeModal('paymentPortalModal')">&times;</span>
-      <h2>Payment Portal</h2>
-      <form id="paymentForm">
-        <label for="selectEmployee">Select Employee</label>
-        <select id="selectEmployee"></select>
-        <label>Amount</label>
-        <input type="number" id="paymentAmount" placeholder="Enter amount" />
-        <label>Payment Date</label>
-        <input type="date" id="paymentDate" />
-        <button type="submit">Record Payment</button>
-      </form>
-      <div class="summary-box" id="paymentSummary"></div>
-    </div>
+ <!-- Payment Portal Modal -->
+<div class="modal" id="paymentPortalModal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal('paymentPortalModal')">&times;</span>
+    <h2>Payment Portal</h2>
+
+    <form id="paymentForm">
+      <label for="selectEmployee">Select Employee</label>
+      <select id="selectEmployee"></select>
+
+      <label>Amount</label>
+      <input type="number" id="paymentAmount" placeholder="Enter amount" required />
+
+      <label>Payment Date</label>
+      <input type="date" id="paymentDate" required />
+
+      <button type="submit">Record Payment</button>
+    </form>
+
+    <h3>Payment History</h3>
+    <table id="paymentTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Employee</th>
+          <th>Amount</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
+</div>
 
   <!-- Attendance Modal -->
   <div class="modal" id="attendanceModal">
