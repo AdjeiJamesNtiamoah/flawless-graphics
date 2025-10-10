@@ -812,6 +812,40 @@ window.addEventListener("payrollUpdated", loadPayrollData);
 
 });
 window.addEventListener("payrollUpdated", loadPayrollData);
+document.addEventListener("DOMContentLoaded", () => {
+  const employeeTableBody = document.querySelector("#employeeTable tbody");
+
+  function loadEmployeeData() {
+    const employees = JSON.parse(localStorage.getItem("employees")) || [];
+    employeeTableBody.innerHTML = "";
+
+    if (employees.length === 0) {
+      employeeTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#999;">No employee records found.</td></tr>`;
+      return;
+    }
+
+    employees.forEach((emp, i) => {
+      const row = `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${emp.fullName}</td>
+          <td>${emp.position}</td>
+          <td>${emp.department}</td>
+          <td>${emp.email}</td>
+          <td>${emp.phone}</td>
+          <td>${emp.salary}</td>
+          <td>${emp.hireDate}</td>
+        </tr>`;
+      employeeTableBody.innerHTML += row;
+    });
+  }
+
+  // Load employees when modal opens
+  const employeeReportCard = document.querySelector('[data-modal="employeeModal"]');
+  if (employeeReportCard) {
+    employeeReportCard.addEventListener("click", loadEmployeeData);
+  }
+});
 
 </script>
 </body>
