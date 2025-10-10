@@ -291,11 +291,14 @@
       const email = document.getElementById("email").value;
       const editIndex = document.getElementById("editIndex").value;
 
-      if (editIndex === "") {
-        employees.push({ fullName, department, position, email });
-      } else {
-        employees[editIndex] = { fullName, department, position, email };
-      }
+     if (editIndex === "") {
+  employees.push({ fullName, department, position, email });
+  showToast("✅ Employee added successfully!", "success");
+} else {
+  employees[editIndex] = { fullName, department, position, email };
+  showToast("✏️ Employee updated successfully!", "edit");
+}
+
 
       localStorage.setItem("employees", JSON.stringify(employees));
       employeeModal.style.display = "none";
@@ -396,6 +399,7 @@ function showToast(message, type = "success") {
 
 </body>
 </html>
+
 
 
 
