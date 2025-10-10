@@ -918,6 +918,80 @@ document.addEventListener("DOMContentLoaded", () => {
     </table>
   </div>
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const employeeSelect = document.getElementById("employeeSelect");
+  const paymentAmount = document.getElementById("paymentAmount");
+  const makePaymentBtn = document.getElementById("makePayment");
+  const paymentHistoryBody = document.querySelector("#paymentHistory tbody");
+
+  // 🔹 Load employee list from localStorage
+  function loadEmployees() {
+    const employees = JSON.parse(localStorage.getItem("employees")) || [];
+    employeeSelect.innerHTML = `<option value="">-- Select Employee --</option>`;
+
+    employees.forEach(emp => {
+      const opt = document.createElement("option");
+      opt.value = emp.fullName;
+      opt.textContent = emp.fullName;
+      employeeSelect.appendChild(opt);
+    });
+  }
+
+  // 🔹 Load payment history
+  function loadPaymentHistory() {
+    const payments = JSON.parse(localStorage.getItem("payroll")) || [];
+    paymentHistoryBody.innerHTML = "";
+
+    payments.forEach((p, i) => {
+      const row = `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${p.employee}</td>
+          <td>₦${p.amount.toLocaleString()}</td>
+          <td>${p.date}</td>
+        </tr>`;
+      paymentHistoryBody.innerHTML += row;
+    });
+  }
+
+  // 🔹 Record payment
+  makePaymentBtn.addEventListener("click", () => {
+    const name = employeeSelect.value;
+    const amount = parseFloat(paymentAmount.value);
+
+    if (!name || isNaN(amount) || amount <= 0) {
+      alert("⚠️ Please select an employee and enter a valid amount.");
+      return;
+    }
+
+    const payments = JSON.parse(localStorage.getItem("payroll")) || [];
+    const newPayment = {
+      employee: name,
+      amount,
+      date: new Date().toLocaleString(),
+    };
+
+    payments.push(newPayment);
+    localStorage.setItem("payroll", JSON.stringify(payments));
+    paymentAmount.value = "";
+
+    loadPaymentHistory();
+
+    // 🔄 Update Payroll Analytics
+    window.dispatchEvent(new Event("payrollUpdated"));
+
+    alert(`✅ Payment recorded for ${name}`);
+  });
+
+  // Initialize
+  loadEmployees();
+  loadPaymentHistory();
+
+  // Refresh employee list when new employees are added
+  window.addEventListener("storage", loadEmployees);
+});
+</script>
 
 </body>
 </html>
