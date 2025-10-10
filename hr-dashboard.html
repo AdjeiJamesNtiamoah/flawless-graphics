@@ -344,5 +344,52 @@
         </ul>`;
     }
   </script>
+  <script>
+  // === LINK EMPLOYEE REPORT TO PERFORMANCE OVERVIEW ===
+
+  // Listen for clicks on employee names inside Employee Report table
+  document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("employee-link")) {
+      e.preventDefault();
+      const employeeName = e.target.dataset.name;
+
+      // Open Performance Overview modal
+      openModal("performanceModal");
+
+      // Preselect that employee in dropdown
+      setTimeout(() => {
+        const select = document.getElementById("performanceEmployee");
+        if (select) {
+          select.value = employeeName;
+        }
+        loadPerformanceSummary();
+      }, 200);
+    }
+  });
+
+  // Modify Employee Report rendering so names become clickable
+  function renderEmployeeReport() {
+    const employees = JSON.parse(localStorage.getItem("employees")) || [];
+    const tbody = document.querySelector("#employeeReportTable tbody");
+    if (!tbody) return;
+
+    tbody.innerHTML = employees.map((emp, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td><a href="#" class="employee-link" data-name="${emp.fullName}">${emp.fullName}</a></td>
+        <td>${emp.department}</td>
+        <td>${emp.position}</td>
+        <td>${emp.email || '-'}</td>
+      </tr>
+    `).join("");
+  }
+
+  // Call renderEmployeeReport when the Employee Report modal opens
+  document.getElementById("employeeReportBtn").addEventListener("click", () => {
+    openModal("employeeReportModal");
+    renderEmployeeReport();
+  });
+</script>
+
 </body>
 </html>
