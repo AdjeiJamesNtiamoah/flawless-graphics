@@ -322,12 +322,13 @@ if (editIndex === "") {
 
     // === Delete Employee ===
     window.deleteEmployee = (index) => {
-      if (confirm("Are you sure you want to delete this employee?")) {
-        employees.splice(index, 1);
-        localStorage.setItem("employees", JSON.stringify(employees));
-        renderEmployees();
-      }
-    };
+    if (confirm("Are you sure you want to delete this employee?")) {
+  employees.splice(index, 1);
+  localStorage.setItem("employees", JSON.stringify(employees));
+  renderEmployees();
+  showToast("🗑️ Employee deleted successfully!", "delete");
+}
+
 
     // === Search Filter ===
     searchInput.addEventListener("input", (e) => {
@@ -803,6 +804,7 @@ function showToast(message, type = "success") {
 
 </body>
 </html>
+
 
 
 
