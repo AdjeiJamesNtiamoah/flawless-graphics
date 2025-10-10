@@ -562,6 +562,44 @@ document.getElementById("paymentForm").addEventListener("submit", e => {
   e.target.reset();
   renderPaymentHistory();
 });
+// === Animated Stats Section ===
+function animateCount(elementId, targetValue, isCurrency = false, suffix = "") {
+  const el = document.getElementById(elementId);
+  let start = 0;
+  const duration = 1500;
+  const increment = Math.ceil(targetValue / (duration / 30));
+
+  const counter = setInterval(() => {
+    start += increment;
+    if (start >= targetValue) {
+      start = targetValue;
+      clearInterval(counter);
+    }
+    el.textContent = isCurrency ? `$${start.toLocaleString()}` : `${start}${suffix}`;
+  }, 30);
+}
+
+// === Load and Calculate Stats ===
+function loadDashboardStats() {
+  const employees = JSON.parse(localStorage.getItem("employees")) || [];
+  const totalEmployees = employees.length;
+
+  const uniqueDepartments = new Set(employees.map(e => e.department));
+  const totalDepartments = uniqueDepartments.size;
+
+  // Fake attendance and payroll for now (we can link later)
+  const attendanceRate = Math.floor(Math.random() * (100 - 75 + 1)) + 75; // 75-100%
+  const totalPayroll = totalEmployees * 2500; // Assume avg $2500 salary
+
+  // Animate values
+  animateCount("totalEmployees", totalEmployees);
+  animateCount("departmentsCount", totalDepartments);
+  animateCount("attendanceRate", attendanceRate, false, "%");
+  animateCount("totalPayroll", totalPayroll, true);
+}
+
+// Trigger on page load
+window.addEventListener("load", loadDashboardStats);
 
   </script>
 </body>
