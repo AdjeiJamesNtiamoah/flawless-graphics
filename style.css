@@ -1999,6 +1999,24 @@ mark {
 }
 
 
+/* Fix dropdown visibility */
+#employeeSelect {
+  background-color: #fff;      /* Ensure white background */
+  color: #000;                 /* Black text for visibility */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
+  width: 100%;
+  margin-top: 5px;
+}
+
+/* Style dropdown options */
+#employeeSelect option {
+  background-color: #fff;
+  color: #000;
+  padding: 8px;
+}
+
 
 
 
