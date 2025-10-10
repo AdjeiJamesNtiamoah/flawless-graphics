@@ -759,7 +759,7 @@ if (confirm("Are you sure you want to delete this employee?")) {
 // === Toast Notification Function ===
 function showToast(message, type = "success") {
   const toast = document.getElementById("toast");
-  toast.textContent = message;
+  toast.innerHTML = message;
   toast.className = `toast ${type} show`;
   setTimeout(() => {
     toast.className = "toast";
@@ -785,6 +785,7 @@ function showToast(message, type = "success") {
 
 </body>
 </html>
+
 
 
 
