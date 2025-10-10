@@ -182,21 +182,30 @@
         margin-bottom: 10px;
       }
     }
-  /* Toast Notification (Animated) */
-.toast {
+/* Toast Container */
+#toast-container {
   position: fixed;
   bottom: 30px;
   right: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 2000;
+}
+
+/* Toast Notification (Stackable + Animated) */
+.toast {
   background: #333;
-  color: #fff;
+  color: white;
   padding: 15px 20px;
   border-radius: 8px;
+  font-weight: 500;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  min-width: 250px;
+  max-width: 320px;
   opacity: 0;
   transform: translateX(120%);
   transition: transform 0.5s ease, opacity 0.5s ease;
-  z-index: 2000;
-  font-weight: 500;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
   letter-spacing: 0.3px;
   display: flex;
   align-items: center;
@@ -208,11 +217,10 @@
   transform: translateX(0);
 }
 
-/* Toast Color Variants */
+/* Color Variants */
 .toast.success { background: linear-gradient(135deg, #28a745, #4CAF50); }
 .toast.edit { background: linear-gradient(135deg, #ff9800, #ffb74d); }
 .toast.delete { background: linear-gradient(135deg, #e53935, #ef5350); }
-
 /* Optional subtle fade-out effect */
 .toast.hide {
   opacity: 0;
@@ -407,25 +415,29 @@ toast.innerHTML = message;
     toast.className = "toast";
   }, 3000);
 }
-// === Toast Notification Function with Animation ===
+// === Stackable Toast Notifications ===
 function showToast(message, type = "success") {
-  const toast = document.getElementById("toast");
- toast.innerHTML = message;
-  toast.className = `toast ${type} show`;
+  const container = document.getElementById("toast-container");
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.innerHTML = message;
 
-  // Keep it visible for 3 seconds, then fade out
+  container.appendChild(toast);
+
+  // Trigger show animation
+  setTimeout(() => toast.classList.add("show"), 100);
+
+  // Auto remove after 3 seconds
   setTimeout(() => {
-    toast.classList.add("hide");
-    setTimeout(() => {
-      toast.className = "toast";
-    }, 500);
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 500);
   }, 3000);
 }
-
   </script>
   <div id="toast-container"></div>
 </body>
 </html>
+
 
 
 
