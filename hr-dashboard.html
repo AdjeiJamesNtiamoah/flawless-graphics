@@ -453,7 +453,56 @@
         }, 200);
       }
     });
-  </script>
 
+  // === Payment Portal Logic ===
+function populateEmployeeSelect() {
+  const employees = JSON.parse(localStorage.getItem("employees")) || [];
+  const select = document.getElementById("selectEmployee");
+  select.innerHTML = `<option value="">Select Employee</option>`;
+  employees.forEach(emp => {
+    select.innerHTML += `<option value="${emp.fullName}">${emp.fullName}</option>`;
+  });
+}
+
+function renderPaymentHistory() {
+  const payments = JSON.parse(localStorage.getItem("payments")) || [];
+  const tbody = document.querySelector("#paymentTable tbody");
+  if (!tbody) return;
+  if (payments.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4">No payments recorded yet.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = payments.map((p, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td>${p.employee}</td>
+      <td>$${parseFloat(p.amount).toFixed(2)}</td>
+      <td>${p.date}</td>
+    </tr>
+  `).join("");
+}
+
+document.getElementById("paymentForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const employee = document.getElementById("selectEmployee").value;
+  const amount = document.getElementById("paymentAmount").value;
+  const date = document.getElementById("paymentDate").value;
+
+  if (!employee || !amount || !date) {
+    alert("⚠️ Please fill in all payment details.");
+    return;
+  }
+
+  const payments = JSON.parse(localStorage.getItem("payments")) || [];
+  payments.push({ employee, amount, date });
+  localStorage.setItem("payments", JSON.stringify(payments));
+
+  alert("✅ Payment recorded successfully!");
+  e.target.reset();
+  renderPaymentHistory();
+});
+
+  </script>
 </body>
 </html>
