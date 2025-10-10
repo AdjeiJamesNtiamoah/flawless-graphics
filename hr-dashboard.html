@@ -599,7 +599,51 @@ function loadDashboardStats() {
 }
 
 // Trigger on page load
+// === Animated Stats Section ===
+function animateCount(elementId, targetValue, isCurrency = false, suffix = "") {
+  const el = document.getElementById(elementId);
+  let start = 0;
+  const duration = 1500;
+  const increment = Math.ceil(targetValue / (duration / 30));
+
+  const counter = setInterval(() => {
+    start += increment;
+    if (start >= targetValue) {
+      start = targetValue;
+      clearInterval(counter);
+    }
+    el.textContent = isCurrency ? `$${start.toLocaleString()}` : `${start}${suffix}`;
+  }, 30);
+}
+
+// === Load and Calculate Stats ===
+function loadDashboardStats() {
+  const employees = JSON.parse(localStorage.getItem("employees")) || [];
+  const totalEmployees = employees.length;
+
+  const uniqueDepartments = new Set(employees.map(e => e.department));
+  const totalDepartments = uniqueDepartments.size;
+
+  const attendanceRate = Math.floor(Math.random() * (100 - 75 + 1)) + 75; // 75-100%
+  const totalPayroll = totalEmployees * 2500;
+
+  // Animate updated values
+  animateCount("totalEmployees", totalEmployees);
+  animateCount("departmentsCount", totalDepartments);
+  animateCount("attendanceRate", attendanceRate, false, "%");
+  animateCount("totalPayroll", totalPayroll, true);
+}
+
+// === Listen for Employee Data Changes Across Tabs ===
+window.addEventListener("storage", (event) => {
+  if (event.key === "employees") {
+    loadDashboardStats(); // 🔁 Recalculate when employees are updated
+  }
+});
+
+// === Initial Load ===
 window.addEventListener("load", loadDashboardStats);
+
 
   </script>
 </body>
