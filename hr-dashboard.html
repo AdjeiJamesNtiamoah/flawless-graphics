@@ -389,6 +389,25 @@
     openModal("employeeReportModal");
     renderEmployeeReport();
   });
+    <div class="modal" id="employeeReportModal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal('employeeReportModal')">&times;</span>
+    <h2>Employee Report</h2>
+    <table id="employeeReportTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Full Name</th>
+          <th>Department</th>
+          <th>Position</th>
+          <th>Email</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
 </script>
 
 </body>
