@@ -382,10 +382,21 @@
     };
 
     renderEmployees();
+    // === Toast Notification Function ===
+function showToast(message, type = "success") {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.className = `toast ${type} show`;
+  setTimeout(() => {
+    toast.className = "toast";
+  }, 3000);
+}
+
   </script>
   <div id="toast" class="toast"></div>
 
 </body>
 </html>
+
 
 
