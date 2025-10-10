@@ -114,33 +114,22 @@
           <!-- Data loads dynamically -->
         </tbody>
       </table>
+     <button id="downloadEmployee">Download Employee Report (PDF)</button>
     </div>
   </div>
 </div>
 
-  <!-- Employee Report Modal -->
-<div class="modal" id="employeeModal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Employee Report</h2>
-    <table id="employeeTable">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Full Name</th>
-          <th>Position</th>
-          <th>Department</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th>Salary</th>
-          <th>Hire Date</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-    <button id="downloadEmployee">Download Employee Report (PDF)</button>
-  </div>
-</div>
+row.innerHTML = `
+  <td>${i + 1}</td>
+  <td>${emp.fullName}</td>
+  <td>${emp.position}</td>
+  <td>${emp.department}</td>
+  <td>${emp.email}</td>
+  <td>${emp.phone}</td>
+  <td>${emp.salary}</td>
+  <td>${emp.hireDate}</td>
+`;
+
 
 <!-- Attendance Modal -->
 <div class="modal" id="attendanceModal">
