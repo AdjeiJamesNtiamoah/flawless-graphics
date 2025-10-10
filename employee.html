@@ -236,134 +236,6 @@
       </form>
     </div>
   </div>
-
-  <script>
-    const employeeTableBody = document.querySelector("#employeeTable tbody");
-    const employeeCards = document.getElementById("employeeCards");
-    const searchInput = document.getElementById("searchInput");
-    const addEmployeeBtn = document.getElementById("addEmployeeBtn");
-    const toggleViewBtn = document.getElementById("toggleViewBtn");
-    const employeeModal = document.getElementById("employeeModal");
-    const closeModalBtn = document.getElementById("closeModalBtn");
-    const employeeForm = document.getElementById("employeeForm");
-    const modalTitle = document.getElementById("modalTitle");
-
-    let employees = JSON.parse(localStorage.getItem("employees")) || [];
-    let cardView = false;
-
-    // === Render Employee List ===
-    function renderEmployees(list = employees) {
-      employeeTableBody.innerHTML = "";
-      employeeCards.innerHTML = "";
-
-      list.forEach((emp, i) => {
-        employeeTableBody.innerHTML += `
-          <tr>
-            <td>${i + 1}</td>
-            <td>${emp.fullName}</td>
-            <td>${emp.department}</td>
-            <td>${emp.position}</td>
-            <td>${emp.email}</td>
-            <td class="actions">
-              <img src="https://img.icons8.com/ios-glyphs/30/edit--v1.png" title="Edit" onclick="editEmployee(${i})">
-              <img src="https://img.icons8.com/ios-glyphs/30/filled-trash.png" title="Delete" onclick="deleteEmployee(${i})">
-            </td>
-          </tr>`;
-
-        employeeCards.innerHTML += `
-          <div class="employee-card">
-            <h4>${emp.fullName}</h4>
-            <p><b>Department:</b> ${emp.department}</p>
-            <p><b>Position:</b> ${emp.position}</p>
-            <p><b>Email:</b> ${emp.email}</p>
-            <div style="margin-top:8px;">
-              <img src="https://img.icons8.com/ios-glyphs/30/edit--v1.png" title="Edit" onclick="editEmployee(${i})">
-              <img src="https://img.icons8.com/ios-glyphs/30/filled-trash.png" title="Delete" onclick="deleteEmployee(${i})">
-            </div>
-          </div>`;
-      });
-    }
-
-    // === Add or Edit Employee ===
-    employeeForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const fullName = document.getElementById("fullName").value;
-      const department = document.getElementById("department").value;
-      const position = document.getElementById("position").value;
-      const email = document.getElementById("email").value;
-      const editIndex = document.getElementById("editIndex").value;
-      
-if (editIndex === "") {
-  employees.push({ fullName, department, position, email });
-  showToast("✅ Employee added successfully!", "success");
-} else {
-  employees[editIndex] = { fullName, department, position, email };
-  showToast("✏️ Employee updated successfully!", "edit");
-}
-
-
-      localStorage.setItem("employees", JSON.stringify(employees));
-      employeeModal.style.display = "none";
-      employeeForm.reset();
-      renderEmployees();
-    });
-
-    // === Edit Employee ===
-    window.editEmployee = (index) => {
-      const emp = employees[index];
-      document.getElementById("fullName").value = emp.fullName;
-      document.getElementById("department").value = emp.department;
-      document.getElementById("position").value = emp.position;
-      document.getElementById("email").value = emp.email;
-      document.getElementById("editIndex").value = index;
-      modalTitle.textContent = "Edit Employee";
-      employeeModal.style.display = "flex";
-    };
-
-    // === Delete Employee ===
-    window.deleteEmployee = (index) => {
-    if (confirm("Are you sure you want to delete this employee?")) {
-  employees.splice(index, 1);
-  localStorage.setItem("employees", JSON.stringify(employees));
-  renderEmployees();
-  showToast("🗑️ Employee deleted successfully!", "delete");
-}
-
-
-    // === Search Filter ===
-    searchInput.addEventListener("input", (e) => {
-      const query = e.target.value.toLowerCase();
-      const filtered = employees.filter(emp =>
-        emp.fullName.toLowerCase().includes(query) ||
-        emp.department.toLowerCase().includes(query) ||
-        emp.position.toLowerCase().includes(query)
-      );
-      renderEmployees(filtered);
-    });
-
-    // === Toggle Views ===
-    toggleViewBtn.addEventListener("click", () => {
-      cardView = !cardView;
-      document.getElementById("employeeTable").style.display = cardView ? "none" : "table";
-      employeeCards.style.display = cardView ? "flex" : "none";
-      toggleViewBtn.textContent = cardView ? "Switch to Table View" : "Switch to Cards View";
-    });
-
-    // === Modal Controls ===
-    addEmployeeBtn.onclick = () => {
-      modalTitle.textContent = "Add New Employee";
-      document.getElementById("editIndex").value = "";
-      employeeForm.reset();
-      employeeModal.style.display = "flex";
-    };
-
-    closeModalBtn.onclick = () => employeeModal.style.display = "none";
-    window.onclick = (e) => {
-      if (e.target === employeeModal) employeeModal.style.display = "none";
-    };
-
-    renderEmployees();
-  </script>
 </body>
 </html>
 
@@ -785,6 +657,7 @@ function showToast(message, type = "success") {
 
 </body>
 </html>
+
 
 
 
