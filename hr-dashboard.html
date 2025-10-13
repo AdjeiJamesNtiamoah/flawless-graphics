@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   <style>
     * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
     body { margin: 0; background: #f4f7fb; }
@@ -68,9 +67,6 @@
     }
 
     .sidebar a:hover { background: #004aad; }
-<a href="#" data-modal="performanceTrendsModal">Performance Trends</a>
-    <a href="#" data-modal="ratePerformanceModal">Rate Employee</a>
-
 
     .main-content {
       margin-left: 240px;
@@ -163,7 +159,8 @@
     <a href="#" data-modal="paymentModal">Payment Portal</a>
     <a href="#" data-modal="attendanceModal">Attendance Summary</a>
     <a href="#" data-modal="payrollModal">Payroll Analytics</a>
-    <a href="#" data-modal="performanceModal">Performance Overview</a>
+    <a href="#" data-modal="performanceTrendsModal">Performance Trends</a>
+    <a href="#" data-modal="ratePerformanceModal">Rate Employee</a>
   </div>
 
   <div class="main-content">
@@ -172,14 +169,11 @@
       <div class="stat-card"><h2 id="totalDepartments">0</h2><p>Departments</p></div>
       <div class="stat-card"><h2 id="attendanceRate">0%</h2><p>Attendance Rate</p></div>
       <div class="stat-card"><h2 id="totalPayroll">$0</h2><p>Total Payroll</p></div>
+      <div class="stat-card"><h2 id="topDepartment">N/A</h2><p>Top Performing Department</p></div>
     </div>
   </div>
-<div class="stat-card">
-  <h2 id="topDepartment">N/A</h2>
-  <p>Top Performing Department</p>
-</div>
 
-  <!-- EMPLOYEE REPORT MODAL -->
+  <!-- EMPLOYEE REPORT -->
   <div id="employeeModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
@@ -198,7 +192,7 @@
     </div>
   </div>
 
-  <!-- ATTENDANCE MODAL -->
+  <!-- ATTENDANCE -->
   <div id="attendanceModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
@@ -207,7 +201,7 @@
     </div>
   </div>
 
-  <!-- PAYROLL ANALYTICS MODAL -->
+  <!-- PAYROLL -->
   <div id="payrollModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
@@ -215,83 +209,51 @@
       <canvas id="payrollChart"></canvas>
     </div>
   </div>
-  
-<!-- PERFORMANCE TRENDS MODAL -->
-<div id="performanceTrendsModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Employee Performance Trends</h2>
-    <canvas id="performanceChart"></canvas>
+
+  <!-- PERFORMANCE TRENDS -->
+  <div id="performanceTrendsModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Employee Performance Trends</h2>
+      <canvas id="performanceChart"></canvas>
+    </div>
   </div>
-</div>
-<!-- PERFORMANCE RATING MODAL -->
-<div id="ratePerformanceModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Rate Employee Performance</h2>
-    <form id="ratePerformanceForm">
-      <label>Select Employee:</label>
-      <select id="rateEmployeeSelect" required></select><br><br>
 
-      <label>Performance Score (0–100):</label>
-      <input type="number" id="performanceScore" min="0" max="100" required><br><br>
+  <!-- RATE EMPLOYEE PERFORMANCE -->
+  <div id="ratePerformanceModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Rate Employee Performance</h2>
+      <form id="ratePerformanceForm">
+        <label>Select Employee:</label>
+        <select id="rateEmployeeSelect" required></select><br><br>
 
-      <label>Month:</label>
-      <select id="performanceMonth" required>
-        <option value="Jan">January</option>
-        <option value="Feb">February</option>
-        <option value="Mar">March</option>
-        <option value="Apr">April</option>
-        <option value="May">May</option>
-        <option value="Jun">June</option>
-        <option value="Jul">July</option>
-        <option value="Aug">August</option>
-        <option value="Sep">September</option>
-        <option value="Oct">October</option>
-        <option value="Nov">November</option>
-        <option value="Dec">December</option>
-      </select><br><br>
+        <label>Performance Score (0–100):</label>
+        <input type="number" id="performanceScore" min="0" max="100" required><br><br>
 
-      <button class="btn" type="submit">Save Performance</button>
-    </form>
+        <label>Month:</label>
+        <select id="performanceMonth" required>
+          <option value="Jan">January</option><option value="Feb">February</option>
+          <option value="Mar">March</option><option value="Apr">April</option>
+          <option value="May">May</option><option value="Jun">June</option>
+          <option value="Jul">July</option><option value="Aug">August</option>
+          <option value="Sep">September</option><option value="Oct">October</option>
+          <option value="Nov">November</option><option value="Dec">December</option>
+        </select><br><br>
+
+        <button class="btn" type="submit">Save Performance</button>
+      </form>
+    </div>
   </div>
-</div>
-<!-- PERFORMANCE RATING MODAL -->
-<div id="ratePerformanceModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Rate Employee Performance</h2>
-    <form id="ratePerformanceForm">
-      <label>Select Employee:</label>
-      <select id="rateEmployeeSelect" required></select><br><br>
 
-      <label>Performance Score (0–100):</label>
-      <input type="number" id="performanceScore" min="0" max="100" required><br><br>
-
-      <label>Month:</label>
-      <select id="performanceMonth" required>
-        <option value="Jan">January</option>
-        <option value="Feb">February</option>
-        <option value="Mar">March</option>
-        <option value="Apr">April</option>
-        <option value="May">May</option>
-        <option value="Jun">June</option>
-        <option value="Jul">July</option>
-        <option value="Aug">August</option>
-        <option value="Sep">September</option>
-        <option value="Oct">October</option>
-        <option value="Nov">November</option>
-        <option value="Dec">December</option>
-      </select><br><br>
-
-      <button class="btn" type="submit">Save Performance</button>
-    </form>
+  <!-- PAYMENT -->
+  <div id="paymentModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Payment Portal</h2>
+      <p>Coming soon...</p>
+    </div>
   </div>
-</div>
-
-  <!-- OTHERS -->
-  <div id="paymentModal" class="modal"><div class="modal-content"><span class="close">&times;</span><h2>Payment Portal</h2></div></div>
-  <div id="performanceModal" class="modal"><div class="modal-content"><span class="close">&times;</span><h2>Performance Overview</h2></div></div>
 
   <script>
     // === Modal Controls ===
@@ -311,12 +273,10 @@
         if (modalId === "payrollModal") loadPayrollChart();
         if (modalId === "performanceTrendsModal") loadPerformanceChart();
         if (modalId === "ratePerformanceModal") populateRateEmployeeSelect();
-
-
       });
     });
 
-    closes.forEach(close => close.onclick = () => modals.forEach(m => m.style.display = "none"));
+    closes.forEach(c => c.onclick = () => modals.forEach(m => m.style.display = "none"));
     window.onclick = e => { if (e.target.classList.contains("modal")) e.target.style.display = "none"; };
 
     // === EMPLOYEE DATA ===
@@ -339,68 +299,62 @@
       });
     }
 
-    // === Dashboard Counters ===
+    // === Dashboard Stats ===
     function animateCounter(id, start, end, prefix = "", suffix = "", duration = 1000) {
       const el = document.getElementById(id);
       let startTime = null;
-      function step(currentTime) {
-        if (!startTime) startTime = currentTime;
-        const progress = Math.min((currentTime - startTime) / duration, 1);
-        const value = Math.floor(progress * (end - start) + start);
-        el.textContent = prefix + value + suffix;
+      function step(time) {
+        if (!startTime) startTime = time;
+        const progress = Math.min((time - startTime) / duration, 1);
+        const val = Math.floor(progress * (end - start) + start);
+        el.textContent = prefix + val + suffix;
         if (progress < 1) requestAnimationFrame(step);
       }
       requestAnimationFrame(step);
     }
 
     function loadDashboardStats() {
-  const employees = JSON.parse(localStorage.getItem("employees")) || [];
-  const performanceData = JSON.parse(localStorage.getItem("performanceData")) || {};
-  const totalEmployees = employees.length;
+      const employees = JSON.parse(localStorage.getItem("employees")) || [];
+      const performanceData = JSON.parse(localStorage.getItem("performanceData")) || {};
+      const totalEmployees = employees.length;
 
-  // === Departments ===
-  const departments = [...new Set(employees.map(e => e.department || ""))];
-  const totalDepartments = departments.length;
+      const departments = [...new Set(employees.map(e => e.department || ""))];
+      const totalDepartments = departments.length;
 
-  // === Payroll ===
-  const payrollData = JSON.parse(localStorage.getItem("payments")) || [];
-  const totalPayroll = payrollData.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+      const payrollData = JSON.parse(localStorage.getItem("payments")) || [];
+      const totalPayroll = payrollData.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
 
-  // === Attendance Rate (simulated) ===
-  const attendanceRate = totalEmployees ? Math.round((Math.random() * 30) + 70) : 0;
+      const attendanceRate = totalEmployees ? Math.round((Math.random() * 30) + 70) : 0;
 
-  // === Calculate Department Performance Averages ===
-  const deptPerformance = {};
-  for (const emp of employees) {
-    const dept = emp.department || "General";
-    const scores = performanceData[emp.fullName]
-      ? Object.values(performanceData[emp.fullName]).map(Number)
-      : [];
-    const avgScore = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+      const deptPerformance = {};
+      for (const emp of employees) {
+        const dept = emp.department || "General";
+        const scores = performanceData[emp.fullName]
+          ? Object.values(performanceData[emp.fullName]).map(Number)
+          : [];
+        const avgScore = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+        if (!deptPerformance[dept]) deptPerformance[dept] = [];
+        deptPerformance[dept].push(avgScore);
+      }
 
-    if (!deptPerformance[dept]) deptPerformance[dept] = [];
-    deptPerformance[dept].push(avgScore);
-  }
+      let topDept = "N/A";
+      let topScore = 0;
+      for (const [dept, scores] of Object.entries(deptPerformance)) {
+        const avg = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+        if (avg > topScore) {
+          topScore = avg;
+          topDept = `${dept} (${avg.toFixed(1)}%)`;
+        }
+      }
 
-  let topDept = "N/A";
-  let topScore = 0;
-  for (const [dept, scores] of Object.entries(deptPerformance)) {
-    const avg = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
-    if (avg > topScore) {
-      topScore = avg;
-      topDept = `${dept} (${avg.toFixed(1)}%)`;
+      animateCounter("totalEmployees", 0, totalEmployees);
+      animateCounter("totalDepartments", 0, totalDepartments);
+      animateCounter("attendanceRate", 0, attendanceRate, "", "%");
+      animateCounter("totalPayroll", 0, totalPayroll, "$");
+      document.getElementById("topDepartment").textContent = topDept;
     }
-  }
 
-  // === Animate Dashboard Stats ===
-  animateCounter("totalEmployees", 0, totalEmployees);
-  animateCounter("totalDepartments", 0, totalDepartments);
-  animateCounter("attendanceRate", 0, attendanceRate, "", "%");
-  animateCounter("totalPayroll", 0, totalPayroll, "$");
-
-  // === Update Top Department Card ===
-  document.getElementById("topDepartment").textContent = topDept;
-}
+    document.addEventListener("DOMContentLoaded", loadDashboardStats);
 
     // === Attendance Chart ===
     let attendanceChart;
@@ -412,14 +366,7 @@
       if (attendanceChart) attendanceChart.destroy();
       attendanceChart = new Chart(ctx, {
         type: "bar",
-        data: {
-          labels: days,
-          datasets: [{
-            label: "Attendance %",
-            data: attendance,
-            backgroundColor: "#007bff"
-          }]
-        },
+        data: { labels: days, datasets: [{ label: "Attendance %", data: attendance, backgroundColor: "#007bff" }] },
         options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
       });
     }
@@ -429,7 +376,7 @@
     function loadPayrollChart() {
       const employees = JSON.parse(localStorage.getItem("employees")) || [];
       const departments = [...new Set(employees.map(e => e.department || "Unknown"))];
-      const totalSalaryByDept = departments.map(d => 
+      const totalSalaryByDept = departments.map(d =>
         employees.filter(e => e.department === d)
                  .reduce((sum, e) => sum + (parseFloat(e.salary) || 0), 0)
       );
@@ -449,110 +396,65 @@
         options: { responsive: true }
       });
     }
-// === Performance Trends Chart ===
-let performanceChart;
-function loadPerformanceChart() {
-  const employees = JSON.parse(localStorage.getItem("employees")) || [];
-  const performanceData = JSON.parse(localStorage.getItem("performanceData")) || {};
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-  const datasets = employees.slice(0, 5).map(emp => ({
-    label: emp.fullName || "Employee",
-    data: months.map(m => performanceData[emp.fullName]?.[m] ?? null),
-    borderColor: `hsl(${Math.random() * 360}, 70%, 50%)`,
-    backgroundColor: "transparent",
-    tension: 0.3
-  }));
+    // === Performance Trends Chart ===
+    let performanceChart;
+    function loadPerformanceChart() {
+      const employees = JSON.parse(localStorage.getItem("employees")) || [];
+      const performanceData = JSON.parse(localStorage.getItem("performanceData")) || {};
+      const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
-  const ctx = document.getElementById("performanceChart").getContext("2d");
-  if (performanceChart) performanceChart.destroy();
-  performanceChart = new Chart(ctx, {
-    type: "line",
-    data: { labels: months, datasets },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: "bottom" },
-        title: { display: true, text: "Employee Performance Over Time" }
-      },
-      scales: {
-        y: { beginAtZero: true, max: 100, title: { display: true, text: "Performance Score" } }
-      }
+      const datasets = employees.slice(0, 5).map(emp => ({
+        label: emp.fullName || "Employee",
+        data: months.map(m => performanceData[emp.fullName]?.[m] ?? null),
+        borderColor: `hsl(${Math.random() * 360},70%,50%)`,
+        backgroundColor: "transparent",
+        tension: 0.3
+      }));
+
+      const ctx = document.getElementById("performanceChart").getContext("2d");
+      if (performanceChart) performanceChart.destroy();
+      performanceChart = new Chart(ctx, {
+        type: "line",
+        data: { labels: months, datasets },
+        options: { responsive: true, plugins: { legend: { position: "bottom" } }, scales: { y: { beginAtZero: true, max: 100 } } }
+      });
     }
-  });
-}
 
-<a href="#" data-modal="ratePerformanceModal">Rate Employee</a>
-// === Rate Employee Performance ===
-function populateRateEmployeeSelect() {
-  const employees = JSON.parse(localStorage.getItem("employees")) || [];
-  const select = document.getElementById("rateEmployeeSelect");
-  select.innerHTML = "";
-  employees.forEach(emp => {
-    const option = document.createElement("option");
-    option.value = emp.fullName;
-    option.textContent = emp.fullName;
-    select.appendChild(option);
-  });
-}
+    // === Performance Rating ===
+    function populateRateEmployeeSelect() {
+      const employees = JSON.parse(localStorage.getItem("employees")) || [];
+      const select = document.getElementById("rateEmployeeSelect");
+      select.innerHTML = "";
+      employees.forEach(emp => {
+        const opt = document.createElement("option");
+        opt.value = emp.fullName;
+        opt.textContent = emp.fullName;
+        select.appendChild(opt);
+      });
+    }
 
-document.getElementById("ratePerformanceForm").addEventListener("submit", e => {
-  e.preventDefault();
-  const employee = document.getElementById("rateEmployeeSelect").value;
-  const score = parseInt(document.getElementById("performanceScore").value);
-  const month = document.getElementById("performanceMonth").value;
+    document.getElementById("ratePerformanceForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const employee = document.getElementById("rateEmployeeSelect").value;
+      const score = parseInt(document.getElementById("performanceScore").value);
+      const month = document.getElementById("performanceMonth").value;
+      const performanceData = JSON.parse(localStorage.getItem("performanceData")) || {};
+      if (!performanceData[employee]) performanceData[employee] = {};
+      performanceData[employee][month] = score;
+      localStorage.setItem("performanceData", JSON.stringify(performanceData));
+      alert("Performance saved successfully!");
+      e.target.reset();
+      loadDashboardStats();
+    });
 
-  const performanceData = JSON.parse(localStorage.getItem("performanceData")) || {};
-
-  if (!performanceData[employee]) performanceData[employee] = {};
-  performanceData[employee][month] = score;
-
-  localStorage.setItem("performanceData", JSON.stringify(performanceData));
-
-  alert("Performance saved successfully!");
-  e.target.reset();
-  loadDashboardStats();
-});
-
-
-// === Rate Employee Performance ===
-function populateRateEmployeeSelect() {
-  const employees = JSON.parse(localStorage.getItem("employees")) || [];
-  const select = document.getElementById("rateEmployeeSelect");
-  select.innerHTML = "";
-  employees.forEach(emp => {
-    const option = document.createElement("option");
-    option.value = emp.fullName;
-    option.textContent = emp.fullName;
-    select.appendChild(option);
-  });
-}
-
-document.getElementById("ratePerformanceForm").addEventListener("submit", e => {
-  e.preventDefault();
-  const employee = document.getElementById("rateEmployeeSelect").value;
-  const score = parseInt(document.getElementById("performanceScore").value);
-  const month = document.getElementById("performanceMonth").value;
-
-  const performanceData = JSON.parse(localStorage.getItem("performanceData")) || {};
-
-  if (!performanceData[employee]) performanceData[employee] = {};
-  performanceData[employee][month] = score;
-
-  localStorage.setItem("performanceData", JSON.stringify(performanceData));
-
-  alert("Performance saved successfully!");
-  e.target.reset();
-  loadDashboardStats();
-});
-
-window.addEventListener("storage", e => {
-  if (["employees", "payments", "performanceData"].includes(e.key)) {
-    loadDashboardStats();
-    loadEmployees();
-  }
-});
-
+    // === Auto Sync ===
+    window.addEventListener("storage", e => {
+      if (["employees", "payments", "performanceData"].includes(e.key)) {
+        loadDashboardStats();
+        loadEmployees();
+      }
+    });
   </script>
 </body>
 </html>
