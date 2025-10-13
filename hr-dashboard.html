@@ -321,7 +321,16 @@
       animateCounter("totalPayroll", 0, totalPayroll, "$");
     }
 
+    // Load once on startup
     document.addEventListener("DOMContentLoaded", loadDashboardStats);
+
+    // === LIVE UPDATE via STORAGE EVENT ===
+    window.addEventListener("storage", (event) => {
+      if (["employees", "payments"].includes(event.key)) {
+        loadDashboardStats();
+        loadEmployees();
+      }
+    });
   </script>
 </body>
 </html>
