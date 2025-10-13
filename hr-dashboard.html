@@ -546,14 +546,13 @@ document.getElementById("ratePerformanceForm").addEventListener("submit", e => {
   loadDashboardStats();
 });
 
+window.addEventListener("storage", e => {
+  if (["employees", "payments", "performanceData"].includes(e.key)) {
+    loadDashboardStats();
+    loadEmployees();
+  }
+});
 
-    // === Auto Sync with Employee Portal ===
-    window.addEventListener("storage", e => {
-      if (["employees", "payments"].includes(e.key)) {
-        loadDashboardStats();
-        loadEmployees();
-      }
-    });
   </script>
 </body>
 </html>
