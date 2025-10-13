@@ -123,113 +123,121 @@
   </div>
 
   <script>
-    // === Load Stats ===
-    function animateCounter(id, start, end, prefix = "", suffix = "", duration = 1000) {
-      const el = document.getElementById(id);
-      let startTime = null;
-      function step(time) {
-        if (!startTime) startTime = time;
-        const progress = Math.min((time - startTime) / duration, 1);
-        const val = Math.floor(progress * (end - start) + start);
-        el.textContent = prefix + val + suffix;
-        if (progress < 1) requestAnimationFrame(step);
-      }
-      requestAnimationFrame(step);
+  // === Load Stats ===
+  function animateCounter(id, start, end, prefix = "", suffix = "", duration = 1000) {
+    const el = document.getElementById(id);
+    let startTime = null;
+    function step(time) {
+      if (!startTime) startTime = time;
+      const progress = Math.min((time - startTime) / duration, 1);
+      const val = Math.floor(progress * (end - start) + start);
+      el.textContent = prefix + val + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function loadDashboardStats() {
+    const employees = JSON.parse(localStorage.getItem("employees")) || [];
+    const performanceData = JSON.parse(localStorage.getItem("performanceData")) || {};
+    const totalEmployees = employees.length;
+    const departments = [...new Set(employees.map(e => e.department || ""))];
+    const totalDepartments = departments.length;
+    const attendanceRate = totalEmployees ? Math.round((Math.random() * 30) + 70) : 0;
+    const payrollData = JSON.parse(localStorage.getItem("payments")) || [];
+    const totalPayroll = payrollData.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+    const deptPerformance = {};
+
+    for (const emp of employees) {
+      const dept = emp.department || "General";
+      const scores = performanceData[emp.fullName]
+        ? Object.values(performanceData[emp.fullName]).map(Number)
+        : [];
+      const avgScore = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+      if (!deptPerformance[dept]) deptPerformance[dept] = [];
+      deptPerformance[dept].push(avgScore);
     }
 
-    function loadDashboardStats() {
-      const employees = JSON.parse(localStorage.getItem("employees")) || [];
-      const performanceData = JSON.parse(localStorage.getItem("performanceData")) || {};
-      const totalEmployees = employees.length;
-      const departments = [...new Set(employees.map(e => e.department || ""))];
-      const totalDepartments = departments.length;
-      const attendanceRate = totalEmployees ? Math.round((Math.random() * 30) + 70) : 0;
-      const payrollData = JSON.parse(localStorage.getItem("payments")) || [];
-      const totalPayroll = payrollData.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
-      const deptPerformance = {};
-
-      for (const emp of employees) {
-        const dept = emp.department || "General";
-        const scores = performanceData[emp.fullName]
-          ? Object.values(performanceData[emp.fullName]).map(Number)
-          : [];
-        const avgScore = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
-        if (!deptPerformance[dept]) deptPerformance[dept] = [];
-        deptPerformance[dept].push(avgScore);
-      }
-
-      let topDept = "N/A";
-      let topScore = 0;
-      for (const [dept, scores] of Object.entries(deptPerformance)) {
-        const avg = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
-        if (avg > topScore) { topScore = avg; topDept = `${dept} (${avg.toFixed(1)}%)`; }
-      }
-
-      animateCounter("totalEmployees", 0, totalEmployees);
-      animateCounter("totalDepartments", 0, totalDepartments);
-      animateCounter("attendanceRate", 0, attendanceRate, "", "%");
-      animateCounter("totalPayroll", 0, totalPayroll, "$");
-      document.getElementById("topDepartment").textContent = topDept;
-
-      // populate department dropdown
-      const deptSelect = document.getElementById("deptSelect");
-      deptSelect.innerHTML = "";
-      departments.forEach(d => {
-        const opt = document.createElement("option");
-        opt.value = d;
-        opt.textContent = d;
-        deptSelect.appendChild(opt);
-      });
+    let topDept = "N/A";
+    let topScore = 0;
+    for (const [dept, scores] of Object.entries(deptPerformance)) {
+      const avg = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+      if (avg > topScore) { topScore = avg; topDept = `${dept} (${avg.toFixed(1)}%)`; }
     }
 
-    document.addEventListener("DOMContentLoaded", loadDashboardStats);
+    animateCounter("totalEmployees", 0, totalEmployees);
+    animateCounter("totalDepartments", 0, totalDepartments);
+    animateCounter("attendanceRate", 0, attendanceRate, "", "%");
+    animateCounter("totalPayroll", 0, totalPayroll, "$");
+    document.getElementById("topDepartment").textContent = topDept;
 
-    // === Modal Logic ===
-    const modal = document.getElementById("departmentModal");
-    const topDeptCard = document.getElementById("topDeptCard");
-    const closeBtn = document.querySelector("#departmentModal .close");
-    topDeptCard.addEventListener("click", () => { modal.style.display = "block"; });
-    closeBtn.onclick = () => modal.style.display = "none";
-    window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
+    const deptSelect = document.getElementById("deptSelect");
+    deptSelect.innerHTML = "";
+    departments.forEach(d => {
+      const opt = document.createElement("option");
+      opt.value = d;
+      opt.textContent = d;
+      deptSelect.appendChild(opt);
+    });
+  }
 
-    // === Department Breakdown ===
-    document.getElementById("loadDeptPerformance").addEventListener("click", () => {
-      const dept = document.getElementById("deptSelect").value;
-      const employees = JSON.parse(localStorage.getItem("employees")) || [];
-      const performanceData = JSON.parse(localStorage.getItem("performanceData")) || {};
+  document.addEventListener("DOMContentLoaded", loadDashboardStats);
 
-      const deptEmployees = employees.filter(e => e.department === dept);
-      const tbody = document.querySelector("#deptTable tbody");
-      tbody.innerHTML = "";
+  // === Modal Logic ===
+  const modal = document.getElementById("departmentModal");
+  const topDeptCard = document.getElementById("topDeptCard");
+  const closeBtn = document.querySelector("#departmentModal .close");
+  topDeptCard.addEventListener("click", () => { modal.style.display = "block"; });
+  closeBtn.onclick = () => modal.style.display = "none";
+  window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
 
-      let total = 0;
-      deptEmployees.forEach((emp, i) => {
-        const scores = performanceData[emp.fullName]
-          ? Object.values(performanceData[emp.fullName]).map(Number)
-          : [];
-        const avgScore = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1) : "0";
-        total += parseFloat(avgScore);
-        tbody.innerHTML += `<tr><td>${i+1}</td><td>${emp.fullName}</td><td>${avgScore}%</td></tr>`;
-      });
+  // === Department Breakdown with Animation ===
+  document.getElementById("loadDeptPerformance").addEventListener("click", () => {
+    const dept = document.getElementById("deptSelect").value;
+    const employees = JSON.parse(localStorage.getItem("employees")) || [];
+    const performanceData = JSON.parse(localStorage.getItem("performanceData")) || {};
+    const deptEmployees = employees.filter(e => e.department === dept);
+    const tbody = document.querySelector("#deptTable tbody");
+    tbody.innerHTML = "";
 
-      const avgDept = deptEmployees.length ? (total / deptEmployees.length).toFixed(1) : 0;
-      document.getElementById("deptAverage").textContent = `Average Score: ${avgDept}%`;
+    let total = 0;
+    deptEmployees.forEach((emp, i) => {
+      const scores = performanceData[emp.fullName]
+        ? Object.values(performanceData[emp.fullName]).map(Number)
+        : [];
+      const avgScore = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1) : "0";
+      total += parseFloat(avgScore);
+      const row = document.createElement("tr");
+      row.innerHTML = `<td>${i+1}</td><td>${emp.fullName}</td><td>${avgScore}%</td>`;
+      tbody.appendChild(row);
+
+      // Highlight animation
+      row.style.backgroundColor = "#d1ffd1";
+      setTimeout(() => { row.style.transition = "background 1s"; row.style.backgroundColor = "white"; }, 300);
     });
 
-    // === PDF Export ===
-    document.getElementById("downloadDeptReport").addEventListener("click", () => {
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF();
-      pdf.text("Department Performance Report", 14, 15);
-      const table = document.getElementById("deptTable");
-      let y = 25;
-      for (let i = 0; i < table.rows.length; i++) {
-        const row = [...table.rows[i].cells].map(td => td.innerText).join("  |  ");
-        pdf.text(row, 14, y);
-        y += 8;
-      }
-      pdf.save("department_performance.pdf");
-    });
-  </script>
+    const avgDept = deptEmployees.length ? (total / deptEmployees.length).toFixed(1) : 0;
+    const avgEl = document.getElementById("deptAverage");
+    avgEl.textContent = `Average Score: ${avgDept}%`;
+    avgEl.style.opacity = 0;
+    avgEl.style.transition = "opacity 0.5s ease-in";
+    setTimeout(() => { avgEl.style.opacity = 1; }, 100);
+  });
+
+  // === PDF Export ===
+  document.getElementById("downloadDeptReport").addEventListener("click", () => {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
+    pdf.text("Department Performance Report", 14, 15);
+    const table = document.getElementById("deptTable");
+    let y = 25;
+    for (let i = 0; i < table.rows.length; i++) {
+      const row = [...table.rows[i].cells].map(td => td.innerText).join("  |  ");
+      pdf.text(row, 14, y);
+      y += 8;
+    }
+    pdf.save("department_performance.pdf");
+  });
+</script>
 </body>
 </html>
