@@ -630,6 +630,16 @@ window.addEventListener("storage", (event) => {
 
 // === Initial Load ===
 window.addEventListener("load", loadDashboardStats);
+// === Optional: Live Refresh Fallback (updates every 5 seconds) ===
+let lastEmployeeData = localStorage.getItem("employees");
+
+setInterval(() => {
+  const currentData = localStorage.getItem("employees");
+  if (currentData !== lastEmployeeData) {
+    lastEmployeeData = currentData;
+    loadDashboardStats(); // 🔁 update stats live even in same tab
+  }
+}, 5000);
 
   </script>
 </body>
