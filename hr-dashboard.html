@@ -383,16 +383,15 @@
 let performanceChart;
 function loadPerformanceChart() {
   const employees = JSON.parse(localStorage.getItem("employees")) || [];
-  if (employees.length === 0) return;
+  const performanceData = JSON.parse(localStorage.getItem("performanceData")) || {};
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-  // Generate random performance data (0–100) for each month
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
   const datasets = employees.slice(0, 5).map(emp => ({
     label: emp.fullName || "Employee",
-    data: months.map(() => Math.floor(Math.random() * 40) + 60), // random scores 60–100
+    data: months.map(m => performanceData[emp.fullName]?.[m] ?? null),
     borderColor: `hsl(${Math.random() * 360}, 70%, 50%)`,
     backgroundColor: "transparent",
-    tension: 0.4
+    tension: 0.3
   }));
 
   const ctx = document.getElementById("performanceChart").getContext("2d");
@@ -412,6 +411,7 @@ function loadPerformanceChart() {
     }
   });
 }
+
 
 // === Rate Employee Performance ===
 function populateRateEmployeeSelect() {
