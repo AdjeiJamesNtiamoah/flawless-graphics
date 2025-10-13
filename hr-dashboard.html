@@ -572,6 +572,60 @@ document.getElementById("paymentForm").addEventListener("submit", e => {
   e.target.reset();
   renderPaymentHistory();
 });
+
+<script>
+// === HR DASHBOARD DATA HANDLER ===
+
+// Load dashboard numbers (employees, departments, payroll, attendance)
+function loadDashboardStats() {
+  const employees = JSON.parse(localStorage.getItem("employees")) || [];
+  const attendanceData = JSON.parse(localStorage.getItem("attendance")) || [];
+  const payrollData = JSON.parse(localStorage.getItem("payments")) || [];
+
+  // Total Employees
+  const totalEmployees = employees.length;
+
+  // Unique Departments
+  const departments = [...new Set(employees.map(emp => emp.department || "Unassigned"))];
+  const totalDepartments = departments.length;
+
+  // Attendance Rate (based on attendanceData entries)
+  const totalAttendance = attendanceData.length;
+  const attendanceRate = totalEmployees
+    ? Math.round((totalAttendance / (totalEmployees * 30)) * 100)
+    : 0;
+
+  // Total Payroll
+  const totalPayroll = payrollData.reduce((sum, pay) => sum + (parseFloat(pay.amount) || 0), 0);
+
+  // Update UI elements
+  document.getElementById("totalEmployees").textContent = totalEmployees;
+  document.getElementById("totalDepartments").textContent = totalDepartments;
+  document.getElementById("attendanceRate").textContent = `${attendanceRate}%`;
+  document.getElementById("totalPayroll").textContent = `$${totalPayroll.toLocaleString()}`;
+}
+
+// Auto-load on page open
+document.addEventListener("DOMContentLoaded", loadDashboardStats);
+
+// Refresh if data changes in localStorage (cross-tab sync)
+window.addEventListener("storage", e => {
+  if (["employees", "attendance", "payments"].includes(e.key)) {
+    loadDashboardStats();
+  }
+});
+
+// Live polling fallback (updates every 5 seconds even in same tab)
+let lastEmployeeData = localStorage.getItem("employees");
+setInterval(() => {
+  const currentData = localStorage.getItem("employees");
+  if (currentData !== lastEmployeeData) {
+    lastEmployeeData = currentData;
+    loadDashboardStats();
+  }
+}, 5000);
+</script>
+
 // === Animated Stats Section ===
 function animateCount(elementId, targetValue, isCurrency = false, suffix = "") {
   const el = document.getElementById(elementId);
