@@ -354,21 +354,53 @@
     }
 
     function loadDashboardStats() {
-      const employees = JSON.parse(localStorage.getItem("employees")) || [];
-      const totalEmployees = employees.length;
-      const departments = [...new Set(employees.map(e => e.department || ""))];
-      const totalDepartments = departments.length;
-      const payrollData = JSON.parse(localStorage.getItem("payments")) || [];
-      const totalPayroll = payrollData.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
-      const attendanceRate = totalEmployees ? Math.round((Math.random() * 30) + 70) : 0;
+  const employees = JSON.parse(localStorage.getItem("employees")) || [];
+  const performanceData = JSON.parse(localStorage.getItem("performanceData")) || {};
+  const totalEmployees = employees.length;
 
-      animateCounter("totalEmployees", 0, totalEmployees);
-      animateCounter("totalDepartments", 0, totalDepartments);
-      animateCounter("attendanceRate", 0, attendanceRate, "", "%");
-      animateCounter("totalPayroll", 0, totalPayroll, "$");
+  // === Departments ===
+  const departments = [...new Set(employees.map(e => e.department || ""))];
+  const totalDepartments = departments.length;
+
+  // === Payroll ===
+  const payrollData = JSON.parse(localStorage.getItem("payments")) || [];
+  const totalPayroll = payrollData.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+
+  // === Attendance Rate (simulated) ===
+  const attendanceRate = totalEmployees ? Math.round((Math.random() * 30) + 70) : 0;
+
+  // === Calculate Department Performance Averages ===
+  const deptPerformance = {};
+  for (const emp of employees) {
+    const dept = emp.department || "General";
+    const scores = performanceData[emp.fullName]
+      ? Object.values(performanceData[emp.fullName]).map(Number)
+      : [];
+    const avgScore = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+
+    if (!deptPerformance[dept]) deptPerformance[dept] = [];
+    deptPerformance[dept].push(avgScore);
+  }
+
+  let topDept = "N/A";
+  let topScore = 0;
+  for (const [dept, scores] of Object.entries(deptPerformance)) {
+    const avg = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+    if (avg > topScore) {
+      topScore = avg;
+      topDept = `${dept} (${avg.toFixed(1)}%)`;
     }
+  }
 
-    document.addEventListener("DOMContentLoaded", loadDashboardStats);
+  // === Animate Dashboard Stats ===
+  animateCounter("totalEmployees", 0, totalEmployees);
+  animateCounter("totalDepartments", 0, totalDepartments);
+  animateCounter("attendanceRate", 0, attendanceRate, "", "%");
+  animateCounter("totalPayroll", 0, totalPayroll, "$");
+
+  // === Update Top Department Card ===
+  document.getElementById("topDepartment").textContent = topDept;
+}
 
     // === Attendance Chart ===
     let attendanceChart;
