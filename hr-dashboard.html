@@ -446,6 +446,36 @@ function loadPerformanceChart() {
   });
 }
 <a href="#" data-modal="ratePerformanceModal">Rate Employee</a>
+// === Rate Employee Performance ===
+function populateRateEmployeeSelect() {
+  const employees = JSON.parse(localStorage.getItem("employees")) || [];
+  const select = document.getElementById("rateEmployeeSelect");
+  select.innerHTML = "";
+  employees.forEach(emp => {
+    const option = document.createElement("option");
+    option.value = emp.fullName;
+    option.textContent = emp.fullName;
+    select.appendChild(option);
+  });
+}
+
+document.getElementById("ratePerformanceForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const employee = document.getElementById("rateEmployeeSelect").value;
+  const score = parseInt(document.getElementById("performanceScore").value);
+  const month = document.getElementById("performanceMonth").value;
+
+  const performanceData = JSON.parse(localStorage.getItem("performanceData")) || {};
+
+  if (!performanceData[employee]) performanceData[employee] = {};
+  performanceData[employee][month] = score;
+
+  localStorage.setItem("performanceData", JSON.stringify(performanceData));
+
+  alert("Performance saved successfully!");
+  e.target.reset();
+  loadDashboardStats();
+});
 
 
 // === Rate Employee Performance ===
