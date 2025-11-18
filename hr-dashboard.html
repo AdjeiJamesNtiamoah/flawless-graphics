@@ -1,268 +1,680 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FLAWLESS GRAPHICS | Employee Management System</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>HR Dashboard | Flawless Graphics</title>
+
+<!-- Fonts / Libraries -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+  :root{
+    --bg:#f5f8fb;
+    --nav:#04345f;         /* deep blue */
+    --card-from:#0b63a3;   /* gradient start */
+    --card-to:#00a6b6;     /* gradient end - tealish */
+    --accent:#007bff;
+    --muted:#6b7c93;
+  }
+  *{box-sizing:border-box}
+  body{font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; margin:0; background:var(--bg); color:#102330}
+
+  /* header */
+  header{
+    background:var(--nav); color:#fff; padding:18px 24px;
+    display:flex; align-items:center; gap:18px;
+  }
+  header .logo {
+    width:44px; height:44px; border-radius:8px;
+    background:linear-gradient(135deg,var(--card-from),var(--card-to));
+    display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700;
+  }
+  header h1{font-size:18px;margin:0;font-weight:600}
+
+  /* layout */
+  .sidebar{
+    position:fixed; left:0; top:0; bottom:0; width:220px;
+    background:var(--nav); padding-top:92px; color:#fff;
+  }
+  .sidebar a{display:block; padding:12px 20px; color:#dfeefb; text-decoration:none; font-weight:500}
+  .sidebar a:hover{background:rgba(255,255,255,0.03); color:#fff}
+
+  .content{margin-left:240px; padding:28px 36px 80px}
+
+  /* stats */
+  .stats{display:flex; gap:18px; flex-wrap:wrap}
+  .stat{
+    flex:1 1 220px; min-width:200px; background:linear-gradient(135deg,var(--card-from),var(--card-to));
+    color:#fff; border-radius:10px; padding:20px; box-shadow:0 8px 20px rgba(7,26,46,0.08);
+    transition:transform .18s ease; cursor:default; text-align:center;
+  }
+  .stat:hover{transform:translateY(-6px)}
+  .stat h2{font-size:28px; margin:0 0 6px; font-weight:700}
+  .stat p{margin:0; opacity:0.9}
+
+  .stat.clickable{cursor:pointer}
+
+  /* main cards area */
+  .main-grid{display:grid; grid-template-columns:1fr; gap:18px; margin-top:22px}
+
+  /* modal */
+  .modal{display:none; position:fixed; inset:0; background:rgba(6,12,24,0.55); z-index:1200; padding:48px 18px; overflow:auto}
+  .modal .box{max-width:1100px; margin:40px auto; background:#fff; border-radius:10px; padding:18px; box-shadow:0 20px 50px rgba(4,20,40,0.25)}
+  .modal .box header{display:flex; justify-content:space-between; align-items:center; gap:12px}
+  .modal .box header h3{margin:0}
+  .close{background:transparent;border:none;font-size:22px;cursor:pointer;color:#344e6a}
+
+  /* table */
+  table{width:100%; border-collapse:collapse; margin-top:14px}
+  thead th{background:linear-gradient(90deg,var(--accent),#0066cc); color:#fff; padding:10px; position:sticky; top:0}
+  th,td{padding:10px;border:1px solid #e6eef6; text-align:left; font-size:14px}
+  tbody tr:nth-child(odd){background:#fcfdff}
+  .small{font-size:13px;color:var(--muted)}
+
+  /* buttons */
+  .btn{display:inline-block;background:var(--accent);color:#fff;padding:8px 12px;border-radius:6px;border:none;cursor:pointer}
+  .btn.secondary{background:#f1f5f9;color:#0b2b45}
+
+  /* inputs */
+  select,input[type="text"],input[type="number"]{padding:8px;border-radius:6px;border:1px solid #cfe0f2; font-size:14px}
+
+  /* responsive */
+  @media (max-width:900px){
+    .stat{min-width:170px}
+    .sidebar{width:72px;padding-top:72px}
+    .content{margin-left:88px}
+  }
+
+  /* minor highlight animation for dept rows */
+  .row-highlight{animation: fadeGreen .9s ease}
+  @keyframes fadeGreen{
+    0%{background:#e6ffea}
+    100%{background:white}
+  }
+</style>
 </head>
-  <script src="theme.js"></script>
-</body>
-  <header>
-    <nav class="navbar">
-      <img src="logo.gif" alt="FLAWLESS GRAPHICS Logo" class="logo-img">
-      <h1>FLAWLESS GRAPHICS</h1>
-      <p class="tagline">TRUTH AND SERVICE</p>
-      </div>
-<ul>
-  <li><a href="index.html">Home</a></li>
-  <li><a href="employee.html">Employee Portal</a></li>
-  <li><a href="hr-dashboard.html"class="active">HR Dashboard</a></li>
-  <li><a href="services.html">Services</a></li>
-  <li><a href="contact.html">Contact</a></li>
-</ul>
-
-    </nav>
-  </header>
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HR Dashboard | Flawless Graphics</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <style>
-    * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-    body { margin: 0; background: #f4f7fb; }
-    header { background: #002b6b; color: white; padding: 15px 30px; text-align: center; font-size: 22px; font-weight: 600; }
-
-    .stats-container {
-      display: flex; justify-content: space-around; flex-wrap: wrap; margin: 20px;
-    }
-
-    .stat-card {
-      background: linear-gradient(135deg, #004aad, #007bff);
-      color: white; width: 22%; min-width: 220px;
-      border-radius: 10px; padding: 25px; text-align: center;
-      transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer;
-    }
-
-    .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
-    .stat-card h2 { font-size: 36px; margin: 10px 0; }
-
-    .sidebar {
-      width: 230px; background: #002b6b; color: white;
-      height: 100vh; position: fixed; top: 0; left: 0; padding-top: 100px;
-    }
-
-    .sidebar a {
-      display: block; color: white; text-decoration: none;
-      padding: 14px 25px; font-weight: 500; transition: background 0.3s;
-    }
-
-    .sidebar a:hover { background: #004aad; }
-
-    .main-content { margin-left: 240px; padding: 20px; }
-    .main-content h2 { font-weight: 600; color: #002b6b; }
-
-    .modal {
-      display: none; position: fixed; z-index: 999; padding-top: 80px;
-      left: 0; top: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6);
-    }
-
-    .modal-content {
-      background: white; margin: auto; padding: 20px; border-radius: 10px;
-      width: 90%; max-width: 900px; animation: fadeIn 0.4s ease; position: relative;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    .close { color: #333; font-size: 28px; font-weight: bold; position: absolute; right: 20px; top: 10px; cursor: pointer; }
-    .close:hover { color: #007bff; }
-
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    table th, table td { border: 1px solid #ccc; padding: 10px; text-align: left; }
-    table th { background: #007bff; color: white; position: sticky; top: 0; }
-
-    .btn {
-      background: #007bff; color: white; border: none; padding: 10px 15px;
-      border-radius: 5px; cursor: pointer; transition: 0.3s; margin-right: 10px;
-    }
-    .btn:hover { background: #0056b3; }
-
-    select, input {
-      padding: 8px; border: 1px solid #ccc; border-radius: 5px;
-      font-size: 14px; margin-top: 5px;
-    }
-
-  </style>
-</head>
-
 <body>
-  <header>Flawless Graphics HR Dashboard</header>
 
-  <div class="sidebar">
-    <a href="#" data-modal="employeeModal">Employee Report</a>
-    <a href="#" data-modal="paymentModal">Payment Portal</a>
-    <a href="#" data-modal="attendanceModal">Attendance Summary</a>
-    <a href="#" data-modal="payrollModal">Payroll Analytics</a>
-    <a href="#" data-modal="performanceTrendsModal">Performance Trends</a>
-    <a href="#" data-modal="ratePerformanceModal">Rate Employee</a>
+<header>
+  <div class="logo">FG</div>
+  <div>
+    <h1>Flawless Graphics — HR Dashboard</h1>
+    <div class="small">Truth & Service</div>
   </div>
+</header>
 
-  <div class="main-content">
-    <div class="stats-container">
-      <div class="stat-card"><h2 id="totalEmployees">0</h2><p>Total Employees</p></div>
-      <div class="stat-card"><h2 id="totalDepartments">0</h2><p>Departments</p></div>
-      <div class="stat-card"><h2 id="attendanceRate">0%</h2><p>Attendance Rate</p></div>
-      <div class="stat-card"><h2 id="totalPayroll">$0</h2><p>Total Payroll</p></div>
-      <div class="stat-card" id="topDeptCard"><h2 id="topDepartment">N/A</h2><p>Top Performing Department</p></div>
+<!-- Sidebar -->
+<nav class="sidebar" aria-label="Main">
+  <a href="#" data-modal="employeeModal">Employee Report</a>
+  <a href="#" data-modal="paymentModal">Payment Portal</a>
+  <a href="#" data-modal="attendanceModal">Attendance Summary</a>
+  <a href="#" data-modal="payrollModal">Payroll Analytics</a>
+  <a href="#" data-modal="performanceTrendsModal">Performance Trends</a>
+  <a href="#" data-modal="ratePerformanceModal">Rate Employee</a>
+</nav>
+
+<!-- Main content -->
+<main class="content">
+  <h2 style="margin:0 0 12px">HR Dashboard</h2>
+
+  <!-- Stats -->
+  <section class="stats" aria-hidden="false">
+    <div class="stat" id="cardEmployees">
+      <h2 id="totalEmployees">0</h2>
+      <p>Total Employees</p>
     </div>
+
+    <div class="stat" id="cardDepartments">
+      <h2 id="totalDepartments">0</h2>
+      <p>Departments</p>
+    </div>
+
+    <div class="stat" id="cardAttendance">
+      <h2 id="attendanceRate">0%</h2>
+      <p>Attendance Rate</p>
+    </div>
+
+    <div class="stat" id="cardPayroll">
+      <h2 id="totalPayroll">$0</h2>
+      <p>Total Payroll</p>
+    </div>
+
+    <div class="stat clickable" id="topDeptCard" title="Click to open department breakdown">
+      <h2 id="topDepartment">N/A</h2>
+      <p>Top Performing Department</p>
+    </div>
+  </section>
+
+  <div class="main-grid">
+    <!-- Quick actions / summary -->
+    <section style="display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap">
+      <button class="btn" data-modal-open="employeeModal" id="openEmployeeReport">Open Employee Report</button>
+      <button class="btn secondary" data-modal-open="paymentModal">Open Payment Portal</button>
+      <button class="btn" data-modal-open="ratePerformanceModal">Rate Employee</button>
+    </section>
+
+    <!-- placeholder lower content -->
+    <section style="min-height:260px; background:#fff; border-radius:8px; padding:18px; box-shadow:0 6px 18px rgba(12,20,40,0.04)">
+      <p class="small">Use the sidebar or the top cards to view reports, analytics and performance tools.</p>
+    </section>
   </div>
+</main>
 
-  <!-- Department Breakdown Modal -->
-  <div id="departmentModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2>Department Performance Breakdown</h2>
-      <label>Select Department:</label>
-      <select id="deptSelect"></select>
-      <button class="btn" id="loadDeptPerformance">Load</button>
-      <button class="btn" id="downloadDeptReport">Download as PDF</button>
+<!-- Employee Report Modal -->
+<div id="employeeModal" class="modal" aria-hidden="true">
+  <div class="box" role="dialog" aria-modal="true" aria-labelledby="empReportTitle">
+    <header>
+      <div>
+        <h3 id="empReportTitle">Employee Report</h3>
+        <div class="small">View and export employee data</div>
+      </div>
+      <div>
+        <button class="btn" id="refreshEmployees">Refresh</button>
+        <button class="btn" id="downloadEmployeesPdf">Download PDF</button>
+        <button class="close" data-modal-close>&times;</button>
+      </div>
+    </header>
 
-      <table id="deptTable">
+    <div style="margin-top:12px">
+      <table id="employeeTable" aria-describedby="empReportTitle">
         <thead>
           <tr>
-            <th>No.</th>
-            <th>Employee Name</th>
-            <th>Average Score</th>
+            <th>#</th><th>Full Name</th><th>Position</th><th>Department</th>
+            <th>Email</th><th>Phone</th><th>Salary</th><th>Hire Date</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
-      <h3 id="deptAverage">Average Score: 0%</h3>
     </div>
   </div>
+</div>
 
-  <script>
-  // === Load Stats ===
-  function animateCounter(id, start, end, prefix = "", suffix = "", duration = 1000) {
-    const el = document.getElementById(id);
-    let startTime = null;
-    function step(time) {
-      if (!startTime) startTime = time;
-      const progress = Math.min((time - startTime) / duration, 1);
-      const val = Math.floor(progress * (end - start) + start);
-      el.textContent = prefix + val + suffix;
-      if (progress < 1) requestAnimationFrame(step);
+<!-- Attendance Modal (chart) -->
+<div id="attendanceModal" class="modal"><div class="box">
+  <header><h3>Attendance Summary</h3><button class="close" data-modal-close>&times;</button></header>
+  <canvas id="attendanceChart" style="margin-top:14px"></canvas>
+</div></div>
+
+<!-- Payroll Modal (chart) -->
+<div id="payrollModal" class="modal"><div class="box">
+  <header><h3>Payroll Analytics</h3><button class="close" data-modal-close>&times;</button></header>
+  <canvas id="payrollChart" style="margin-top:14px"></canvas>
+</div></div>
+
+<!-- Performance Trends -->
+<div id="performanceTrendsModal" class="modal"><div class="box">
+  <header><h3>Performance Trends</h3><button class="close" data-modal-close>&times;</button></header>
+  <canvas id="performanceChart" style="margin-top:14px"></canvas>
+</div></div>
+
+<!-- Rate Employee Modal -->
+<div id="ratePerformanceModal" class="modal"><div class="box">
+  <header><h3>Rate Employee</h3><button class="close" data-modal-close>&times;</button></header>
+  <form id="ratePerformanceForm" style="margin-top:12px; display:flex; gap:12px; align-items:center; flex-wrap:wrap">
+    <label style="display:block"><small>Employee</small>
+      <select id="rateEmployeeSelect" required style="min-width:220px"></select>
+    </label>
+    <label><small>Month</small>
+      <select id="performanceMonth">
+        <option>Jan</option><option>Feb</option><option>Mar</option><option>Apr</option><option>May</option><option>Jun</option>
+        <option>Jul</option><option>Aug</option><option>Sep</option><option>Oct</option><option>Nov</option><option>Dec</option>
+      </select>
+    </label>
+    <label><small>Score (0-100)</small>
+      <input id="performanceScore" type="number" min="0" max="100" required>
+    </label>
+    <div style="margin-left:auto">
+      <button class="btn" type="submit">Save</button>
+    </div>
+  </form>
+</div></div>
+
+<!-- Department breakdown modal -->
+<div id="departmentModal" class="modal"><div class="box">
+  <header><h3>Department Performance Breakdown</h3><button class="close" data-modal-close>&times;</button></header>
+
+  <div style="display:flex; gap:10px; align-items:center; margin-top:12px">
+    <label><small>Select Department</small><br>
+      <select id="deptSelect" style="min-width:220px"></select>
+    </label>
+    <button class="btn" id="loadDeptPerformance">Load</button>
+    <button class="btn" id="downloadDeptReport">Download as PDF</button>
+  </div>
+
+  <table id="deptTable" style="margin-top:14px">
+    <thead><tr><th>#</th><th>Employee Name</th><th>Average Score</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <h3 id="deptAverage" style="margin-top:12px">Average Score: 0%</h3>
+</div></div>
+
+<!-- Payment portal placeholder -->
+<div id="paymentModal" class="modal"><div class="box">
+  <header><h3>Payment Portal</h3><button class="close" data-modal-close>&times;</button></header>
+  <div style="margin-top:12px"><p class="small">Payment features coming — this panel can be wired to your payroll system later.</p></div>
+</div></div>
+
+<script>
+/* ---------------------------
+ Robust field helpers
+ --------------------------- */
+// attempt to extract the best full name from an employee object
+function extractFullName(emp) {
+  if (!emp || typeof emp !== 'object') return 'N/A';
+  const tries = ['fullName','fullname','name','displayName','employeeName'];
+  for (const k of tries) if (emp[k] && String(emp[k]).trim()) return String(emp[k]).trim();
+
+  // firstName + lastName combos
+  const firstKeys = ['firstName','firstname','givenName','forename'];
+  const lastKeys = ['lastName','lastname','familyName','surname'];
+  let first = '', last = '';
+  for (const k of firstKeys) if (emp[k]) { first = String(emp[k]).trim(); break; }
+  for (const k of lastKeys) if (emp[k]) { last = String(emp[k]).trim(); break; }
+  if (first || last) return (first + ' ' + last).trim();
+
+  // fallback to email name
+  if (emp.email) return String(emp.email).split('@')[0];
+
+  // as last resort stringify object id or N/A
+  if (emp.id) return String(emp.id);
+  return 'N/A';
+}
+
+function extractDepartment(emp) {
+  if (!emp || typeof emp !== 'object') return '';
+  const tries = ['department','dept','departmentName','team'];
+  for (const k of tries) if (emp[k] && String(emp[k]).trim()) return String(emp[k]).trim();
+  return ''; // blank means unassigned
+}
+
+function extractPosition(emp) {
+  const tries = ['position','jobTitle','role','title'];
+  for (const k of tries) if (emp[k] && String(emp[k]).trim()) return String(emp[k]).trim();
+  return '';
+}
+
+function extractEmail(emp) {
+  const tries = ['email','Email','eMail','workEmail'];
+  for (const k of tries) if (emp[k] && String(emp[k]).trim()) return String(emp[k]).trim();
+  return '';
+}
+
+function extractPhone(emp) {
+  const tries = ['phone','phoneNumber','telephone','mobile'];
+  for (const k of tries) if (emp[k] && String(emp[k]).trim()) return String(emp[k]).trim();
+  return '';
+}
+
+function extractSalary(emp) {
+  if (!emp || typeof emp !== 'object') return 0;
+  const tries = ['salary','pay','monthlySalary','salaryAmount','wage'];
+  for (const k of tries) {
+    if (emp[k] !== undefined && emp[k] !== null && String(emp[k]).trim()!=='') {
+      const n = parseFloat(String(emp[k]).replace(/[^0-9.\-]/g,''));
+      if (!isNaN(n)) return n;
     }
-    requestAnimationFrame(step);
+  }
+  return 0;
+}
+
+function extractHireDate(emp) {
+  const tries = ['hireDate','startDate','joined','dateHired'];
+  for (const k of tries) if (emp[k] && String(emp[k]).trim()) return String(emp[k]).trim();
+  return '';
+}
+
+/* ---------------------------
+ Local storage reading + normalization
+ --------------------------- */
+function readEmployeesRaw() {
+  try {
+    const raw = localStorage.getItem('employees');
+    if (!raw) return [];
+    const data = JSON.parse(raw);
+    if (!Array.isArray(data)) return [];
+    return data;
+  } catch (e) {
+    console.warn('Failed to read employees:', e);
+    return [];
+  }
+}
+
+// convert raw employee objects into normalized shape for UI usage
+function normalizedEmployees() {
+  const raw = readEmployeesRaw();
+  return raw.map(emp => ({
+    _raw: emp,
+    fullName: extractFullName(emp),
+    department: extractDepartment(emp) || 'Unassigned',
+    position: extractPosition(emp) || '',
+    email: extractEmail(emp) || '',
+    phone: extractPhone(emp) || '',
+    salary: extractSalary(emp),
+    hireDate: extractHireDate(emp) || ''
+  }));
+}
+
+/* ---------------------------
+ Dashboard stats & UI
+ --------------------------- */
+function animateValue(id, start, end, suffix='') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  let startTime = null;
+  const duration = 900;
+  function step(now) {
+    if (!startTime) startTime = now;
+    const progress = Math.min((now - startTime) / duration, 1);
+    const val = Math.floor(progress * (end - start) + start);
+    el.textContent = (suffix === '%') ? (val + '%') : (suffix === '$' ? '$' + val.toLocaleString() : val + suffix);
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function computeAndRenderStats() {
+  const emps = normalizedEmployees();
+  const totalEmployees = emps.length;
+  const departmentsSet = new Set(emps.map(e => e.department || 'Unassigned'));
+  const totalDepartments = departmentsSet.size;
+  const totalPayroll = emps.reduce((s,e) => s + Number(e.salary || 0), 0);
+
+  // attendance: if you have attendance data in localStorage 'attendance' -> use it
+  let attendanceRate = 0;
+  try {
+    const att = JSON.parse(localStorage.getItem('attendance') || '[]');
+    // naive measure: attendance entries / (employees * 30) -> percent
+    if (Array.isArray(att) && totalEmployees > 0) {
+      const entries = att.length;
+      attendanceRate = Math.round(Math.min(100, (entries / (totalEmployees * 30)) * 100));
+    } else {
+      // fallback simulated value between 75-98
+      attendanceRate = Math.floor(Math.random() * 24) + 75;
+    }
+  } catch (e) {
+    attendanceRate = Math.floor(Math.random() * 24) + 75;
   }
 
-  function loadDashboardStats() {
-    const employees = JSON.parse(localStorage.getItem("employees")) || [];
-    const performanceData = JSON.parse(localStorage.getItem("performanceData")) || {};
-    const totalEmployees = employees.length;
-    const departments = [...new Set(employees.map(e => e.department || ""))];
-    const totalDepartments = departments.length;
-    const attendanceRate = totalEmployees ? Math.round((Math.random() * 30) + 70) : 0;
-    const payrollData = JSON.parse(localStorage.getItem("payments")) || [];
-    const totalPayroll = payrollData.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
-    const deptPerformance = {};
-
-    for (const emp of employees) {
-      const dept = emp.department || "General";
-      const scores = performanceData[emp.fullName]
-        ? Object.values(performanceData[emp.fullName]).map(Number)
-        : [];
-      const avgScore = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
-      if (!deptPerformance[dept]) deptPerformance[dept] = [];
-      deptPerformance[dept].push(avgScore);
-    }
-
-    let topDept = "N/A";
-    let topScore = 0;
-    for (const [dept, scores] of Object.entries(deptPerformance)) {
-      const avg = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
-      if (avg > topScore) { topScore = avg; topDept = `${dept} (${avg.toFixed(1)}%)`; }
-    }
-
-    animateCounter("totalEmployees", 0, totalEmployees);
-    animateCounter("totalDepartments", 0, totalDepartments);
-    animateCounter("attendanceRate", 0, attendanceRate, "", "%");
-    animateCounter("totalPayroll", 0, totalPayroll, "$");
-    document.getElementById("topDepartment").textContent = topDept;
-
-    const deptSelect = document.getElementById("deptSelect");
-    deptSelect.innerHTML = "";
-    departments.forEach(d => {
-      const opt = document.createElement("option");
-      opt.value = d;
-      opt.textContent = d;
-      deptSelect.appendChild(opt);
-    });
+  // performance top department computed from performanceData
+  const perfData = JSON.parse(localStorage.getItem('performanceData') || '{}');
+  const deptScores = {};
+  for (const e of emps) {
+    const scoresObj = perfData[e.fullName] || {};
+    const scores = Object.values(scoresObj).map(v => Number(v)).filter(v => !isNaN(v));
+    const avg = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : 0;
+    if (!deptScores[e.department]) deptScores[e.department] = [];
+    deptScores[e.department].push(avg);
+  }
+  let topDepartmentText = 'N/A';
+  let topScore = 0;
+  for (const [dept, arr] of Object.entries(deptScores)) {
+    const avgDept = arr.length ? (arr.reduce((a,b)=>a+b,0)/arr.length) : 0;
+    if (avgDept > topScore) { topScore = avgDept; topDepartmentText = `${dept} (${avgDept.toFixed(1)}%)`; }
   }
 
-  document.addEventListener("DOMContentLoaded", loadDashboardStats);
+  // render
+  animateValue('totalEmployees', 0, totalEmployees);
+  animateValue('totalDepartments', 0, totalDepartments);
+  animateValue('attendanceRate', 0, attendanceRate, '%');
+  animateValue('totalPayroll', 0, totalPayroll, '$');
+  document.getElementById('topDepartment').textContent = topDepartmentText;
 
-  // === Modal Logic ===
-  const modal = document.getElementById("departmentModal");
-  const topDeptCard = document.getElementById("topDeptCard");
-  const closeBtn = document.querySelector("#departmentModal .close");
-  topDeptCard.addEventListener("click", () => { modal.style.display = "block"; });
-  closeBtn.onclick = () => modal.style.display = "none";
-  window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
-
-  // === Department Breakdown with Animation ===
-  document.getElementById("loadDeptPerformance").addEventListener("click", () => {
-    const dept = document.getElementById("deptSelect").value;
-    const employees = JSON.parse(localStorage.getItem("employees")) || [];
-    const performanceData = JSON.parse(localStorage.getItem("performanceData")) || {};
-    const deptEmployees = employees.filter(e => e.department === dept);
-    const tbody = document.querySelector("#deptTable tbody");
-    tbody.innerHTML = "";
-
-    let total = 0;
-    deptEmployees.forEach((emp, i) => {
-      const scores = performanceData[emp.fullName]
-        ? Object.values(performanceData[emp.fullName]).map(Number)
-        : [];
-      const avgScore = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1) : "0";
-      total += parseFloat(avgScore);
-      const row = document.createElement("tr");
-      row.innerHTML = `<td>${i+1}</td><td>${emp.fullName}</td><td>${avgScore}%</td>`;
-      tbody.appendChild(row);
-
-      // Highlight animation
-      row.style.backgroundColor = "#d1ffd1";
-      setTimeout(() => { row.style.transition = "background 1s"; row.style.backgroundColor = "white"; }, 300);
+  // also populate deptSelect (for department modal) to all available departments
+  const deptSelect = document.getElementById('deptSelect');
+  if (deptSelect) {
+    const prev = deptSelect.value;
+    deptSelect.innerHTML = '';
+    Array.from(departmentsSet).sort().forEach(d => {
+      const opt = document.createElement('option'); opt.value = d; opt.textContent = d; deptSelect.appendChild(opt);
     });
+    if (prev && Array.from(departmentsSet).includes(prev)) deptSelect.value = prev;
+  }
+}
 
-    const avgDept = deptEmployees.length ? (total / deptEmployees.length).toFixed(1) : 0;
-    const avgEl = document.getElementById("deptAverage");
-    avgEl.textContent = `Average Score: ${avgDept}%`;
-    avgEl.style.opacity = 0;
-    avgEl.style.transition = "opacity 0.5s ease-in";
-    setTimeout(() => { avgEl.style.opacity = 1; }, 100);
+/* ---------------------------
+ Employee table modal
+ --------------------------- */
+function openModalById(id){
+  const m = document.getElementById(id);
+  if (!m) return;
+  m.style.display = 'block';
+  m.setAttribute('aria-hidden','false');
+}
+
+function closeModal(el){
+  el.style.display = 'none';
+  el.setAttribute('aria-hidden','true');
+}
+
+function fillEmployeeTable(){
+  const tbody = document.querySelector('#employeeTable tbody');
+  tbody.innerHTML = '';
+  const employees = normalizedEmployees();
+  employees.forEach((e,i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${i+1}</td>
+      <td>${escapeHtml(e.fullName)}</td>
+      <td>${escapeHtml(e.position || 'N/A')}</td>
+      <td>${escapeHtml(e.department)}</td>
+      <td>${escapeHtml(e.email || '')}</td>
+      <td>${escapeHtml(e.phone || '')}</td>
+      <td>${e.salary ? '$' + Number(e.salary).toLocaleString() : 'N/A'}</td>
+      <td>${escapeHtml(e.hireDate || '')}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ---------------------------
+ Charts
+ --------------------------- */
+let attendanceChart=null, payrollChart=null, performanceChart=null;
+
+function loadAttendanceChart(){
+  const ctx = document.getElementById('attendanceChart').getContext('2d');
+  // show last 5 business days
+  const days = ['Mon','Tue','Wed','Thu','Fri'];
+  const values = days.map(()=> Math.floor(Math.random()*30)+70); // simulated 70-100
+  if (attendanceChart) attendanceChart.destroy();
+  attendanceChart = new Chart(ctx, {
+    type:'bar',
+    data:{labels:days, datasets:[{label:'Attendance %', data:values, backgroundColor: '#0b63a3'}]},
+    options:{responsive:true, scales:{y:{beginAtZero:true, max:100}}}
+  });
+}
+
+function loadPayrollChart(){
+  const ctx = document.getElementById('payrollChart').getContext('2d');
+  const emps = normalizedEmployees();
+  const groups = {};
+  emps.forEach(e => {
+    const d = e.department || 'Unassigned';
+    groups[d] = (groups[d] || 0) + Number(e.salary || 0);
+  });
+  const labels = Object.keys(groups);
+  const data = labels.map(l => groups[l]);
+  if (payrollChart) payrollChart.destroy();
+  payrollChart = new Chart(ctx, {
+    type:'pie',
+    data:{labels, datasets:[{data, backgroundColor: labels.map((_,i)=>['#0b63a3','#00a6b6','#ffb670','#ff6b6b','#9b59b6'][i%5])}]},
+    options:{responsive:true}
+  });
+}
+
+function loadPerformanceTrends(){
+  const ctx = document.getElementById('performanceChart').getContext('2d');
+  const employees = normalizedEmployees().slice(0,6); // show up to 6 lines
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const perf = JSON.parse(localStorage.getItem('performanceData')||'{}');
+  const datasets = employees.map(e => {
+    const data = months.map(m => {
+      const val = perf[e.fullName] && perf[e.fullName][m] ? Number(perf[e.fullName][m]) : null;
+      return val === null ? null : val;
+    });
+    return {label:e.fullName, data, borderColor:randomHsl(), backgroundColor:'transparent', tension:0.3};
+  });
+  if (performanceChart) performanceChart.destroy();
+  performanceChart = new Chart(ctx, {type:'line', data:{labels:months, datasets}, options:{responsive:true, scales:{y:{min:0,max:100}}}});
+}
+
+function randomHsl(){ return `hsl(${Math.floor(Math.random()*360)} 70% 45%)` }
+
+/* ---------------------------
+ Department modal: load & pdf export + animation
+ --------------------------- */
+function loadDepartmentPerformance(){
+  const dept = document.getElementById('deptSelect').value;
+  const emps = normalizedEmployees().filter(e=> (e.department||'Unassigned') === dept);
+  const perf = JSON.parse(localStorage.getItem('performanceData')||'{}');
+  const tbody = document.querySelector('#deptTable tbody'); tbody.innerHTML='';
+  let total=0;
+  emps.forEach((e,i) => {
+    const scores = perf[e.fullName] ? Object.values(perf[e.fullName]).map(v=>Number(v)).filter(v=>!isNaN(v)) : [];
+    const avg = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
+    total += avg;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(e.fullName)}</td><td>${avg ? avg.toFixed(1)+'%' : '0%'}</td>`;
+    tr.classList.add('row-highlight');
+    tbody.appendChild(tr);
+    // remove highlight after animation
+    setTimeout(()=> tr.classList.remove('row-highlight'), 900);
+  });
+  const avgDept = emps.length ? (total/emps.length).toFixed(1) : 0;
+  const avgEl = document.getElementById('deptAverage'); avgEl.textContent = `Average Score: ${avgDept}%`;
+  avgEl.style.opacity=0; setTimeout(()=> avgEl.style.transition='opacity .45s', 20); setTimeout(()=> avgEl.style.opacity=1,70);
+}
+
+function downloadDepartmentPdf(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'pt', format:'a4'});
+  doc.setFontSize(14); doc.text('Department Performance Report', 40, 40);
+  const table = document.getElementById('deptTable');
+  let y=70;
+  for(let i=0;i<table.rows.length;i++){
+    const row = Array.from(table.rows[i].cells).map(c=>c.innerText).join('  |  ');
+    doc.setFontSize(11); doc.text(row, 40, y); y+=16;
+    if (y>720){doc.addPage(); y=40;}
+  }
+  doc.save('department_report.pdf');
+}
+
+/* ---------------------------
+ Helpers and small utilities
+ --------------------------- */
+function escapeHtml(s){ if (s===null || s===undefined) return ''; return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* ---------------------------
+ Wiring events + modal open/close
+ --------------------------- */
+document.addEventListener('DOMContentLoaded', () => {
+  computeAndRenderStats();
+
+  // wire sidebar links that open modals
+  document.querySelectorAll('[data-modal]').forEach(link=>{
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const id = link.getAttribute('data-modal');
+      openModalById(id);
+      if (id === 'employeeModal') fillEmployeeTable();
+      if (id === 'attendanceModal') loadAttendanceChart();
+      if (id === 'payrollModal') loadPayrollChart();
+      if (id === 'performanceTrendsModal') loadPerformanceTrends();
+      if (id === 'ratePerformanceModal') populateRateEmployeeSelect();
+    });
   });
 
-  // === PDF Export ===
-  document.getElementById("downloadDeptReport").addEventListener("click", () => {
+  // open buttons
+  document.querySelectorAll('[data-modal-open]').forEach(btn=>{
+    btn.addEventListener('click', e => { e.preventDefault(); openModalById(btn.getAttribute('data-modal-open') || 'employeeModal'); fillEmployeeTable(); });
+  });
+
+  // close handlers
+  document.querySelectorAll('[data-modal-close]').forEach(btn=>{
+    btn.addEventListener('click', e => { const modal = btn.closest('.modal'); if (modal) closeModal(modal); });
+  });
+  document.querySelectorAll('.modal').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) closeModal(m); });
+  });
+
+  // top department card click opens department modal
+  document.getElementById('topDeptCard').addEventListener('click', () => {
+    openModalById('departmentModal');
+  });
+
+  // refresh employees
+  document.getElementById('refreshEmployees').addEventListener('click', ()=> { fillEmployeeTable(); computeAndRenderStats(); });
+
+  // download employees pdf
+  document.getElementById('downloadEmployeesPdf').addEventListener('click', ()=> {
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF();
-    pdf.text("Department Performance Report", 14, 15);
-    const table = document.getElementById("deptTable");
-    let y = 25;
-    for (let i = 0; i < table.rows.length; i++) {
-      const row = [...table.rows[i].cells].map(td => td.innerText).join("  |  ");
-      pdf.text(row, 14, y);
-      y += 8;
-    }
-    pdf.save("department_performance.pdf");
+    const doc = new jsPDF(); let y=20; doc.setFontSize(14); doc.text('Employee Report', 14, 16); doc.setFontSize(10);
+    const rows = normalizedEmployees();
+    rows.forEach((r,i)=>{
+      const line = `${i+1}. ${r.fullName} — ${r.position || 'N/A'} — ${r.department} — ${r.email || ''}`;
+      doc.text(line, 14, y+10); y+=8; if (y>760){doc.addPage(); y=20;}
+    });
+    doc.save('employees.pdf');
   });
+
+  // department modal load/download
+  document.getElementById('loadDeptPerformance').addEventListener('click', loadDepartmentPerformance);
+  document.getElementById('downloadDeptReport').addEventListener('click', downloadDepartmentPdf);
+
+  // rate performance form
+  document.getElementById('ratePerformanceForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    const empName = document.getElementById('rateEmployeeSelect').value;
+    const month = document.getElementById('performanceMonth').value;
+    const score = Number(document.getElementById('performanceScore').value) || 0;
+    const perf = JSON.parse(localStorage.getItem('performanceData')||'{}');
+    if (!perf[empName]) perf[empName] = {};
+    perf[empName][month] = score;
+    localStorage.setItem('performanceData', JSON.stringify(perf));
+    alert('Performance saved');
+    computeAndRenderStats();
+  });
+
+  // download dept table initially - handled above
+
+  // populate rate employee select function defined below
+  populateRateEmployeeSelect();
+
+});
+
+// populate rate employee select
+function populateRateEmployeeSelect(){
+  const sel = document.getElementById('rateEmployeeSelect');
+  sel.innerHTML = '';
+  normalizedEmployees().forEach(e => {
+    const opt = document.createElement('option'); opt.value = e.fullName; opt.textContent = e.fullName; sel.appendChild(opt);
+  });
+}
+
+/* ---------------------------
+ Live sync: detect storage changes + polling fallback
+ --------------------------- */
+window.addEventListener('storage', (e) => {
+  if (['employees','performanceData','payments','attendance'].includes(e.key)) {
+    computeAndRenderStats();
+    fillEmployeeTable();
+  }
+});
+
+// Polling fallback to detect changes even in same tab (5s)
+let lastEmployeesSnapshot = localStorage.getItem('employees') || '';
+setInterval(()=>{
+  const curr = localStorage.getItem('employees') || '';
+  if (curr !== lastEmployeesSnapshot) {
+    lastEmployeesSnapshot = curr;
+    computeAndRenderStats();
+    fillEmployeeTable();
+    populateRateEmployeeSelect();
+  }
+}, 3000);
+
 </script>
 </body>
 </html>
