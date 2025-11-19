@@ -648,6 +648,12 @@ if (!localStorage.getItem("hr_logged_in")) {
     window.location.href = "login.html";
 }
 </script>
+<script>
+function logout() {
+    localStorage.removeItem("hr_logged_in");
+    window.location.href = "login.html";
+}
+</script>
 
 </body>
 </html>
