@@ -234,6 +234,72 @@ input[type="file"]{padding:6px}
 <div id="toast"></div>
 
 <script>
+  // Load existing HR accounts
+let hrAccounts = JSON.parse(localStorage.getItem("hrAccounts")) || [];
+
+// Save HR Account
+function saveHRAccount() {
+    const name = document.getElementById("hrName").value.trim();
+    const email = document.getElementById("hrEmail").value.trim();
+    const password = document.getElementById("hrPassword").value.trim();
+    const role = document.getElementById("hrRole").value;
+
+    if (!name || !email || !password) {
+        alert("Please fill all fields.");
+        return;
+    }
+
+    // Check if email already exists
+    const exists = hrAccounts.find(acc => acc.email === email);
+
+    if (exists) {
+        alert("This HR account already exists.");
+        return;
+    }
+
+    hrAccounts.push({ name, email, password, role });
+
+    localStorage.setItem("hrAccounts", JSON.stringify(hrAccounts));
+
+    alert("HR Account saved successfully!");
+
+    loadHRAccounts();
+    clearHRForm();
+}
+
+// Load list of existing HR accounts
+function loadHRAccounts() {
+    const table = document.getElementById("hrAccountsList");
+    table.innerHTML = "";
+
+    hrAccounts.forEach((acc, i) => {
+        table.innerHTML += `
+            <tr>
+                <td>${acc.name}</td>
+                <td>${acc.email}</td>
+                <td>${acc.role}</td>
+                <td><button onclick="deleteHRAccount(${i})">Delete</button></td>
+            </tr>
+        `;
+    });
+}
+
+// Delete HR account
+function deleteHRAccount(index) {
+    if (confirm("Are you sure you want to delete this HR account?")) {
+        hrAccounts.splice(index, 1);
+        localStorage.setItem("hrAccounts", JSON.stringify(hrAccounts));
+        loadHRAccounts();
+    }
+}
+
+function clearHRForm() {
+    document.getElementById("hrName").value = "";
+    document.getElementById("hrEmail").value = "";
+    document.getElementById("hrPassword").value = "";
+    document.getElementById("hrRole").value = "Admin";
+}
+
 /* ---------- Helpers ---------- */
 const safeParse = s => { try{ return JSON.parse(s); }catch(e){return null;} };
 const employeesKey = 'employees';
