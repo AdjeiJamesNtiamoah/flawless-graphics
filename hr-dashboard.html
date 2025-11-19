@@ -1,437 +1,793 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Flawless Graphics — HR Dashboard</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Flawless Graphics — HR Dashboard</title>
 
-<!-- Fonts + libs -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-<style>
-:root{
-  --nav:#073b66; --accent:#0b63a3; --muted:#64748b; --bg:#f5f8fb;
-  --card-from:#0b63a3; --card-to:#00a6b6;
-}
-*{box-sizing:border-box}
-body{font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);margin:0;color:#102330}
-header{background:var(--nav);color:#fff;padding:18px 22px;display:flex;align-items:center;gap:12px}
-.logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--card-from),var(--card-to));display:flex;align-items:center;justify-content:center;font-weight:700}
-header h1{font-size:18px;margin:0}
-.container{max-width:1200px;margin:24px auto;padding:18px;background:#fff;border-radius:10px;box-shadow:0 10px 30px rgba(10,20,40,0.06)}
+  <!-- Chart.js + jsPDF -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-.top-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.search input{padding:8px 12px;border-radius:8px;border:1px solid #e3eef9;min-width:260px}
-
-.btn{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600}
-.btn.ghost{background:transparent;border:1px solid #e3eef9;color:var(--accent)}
-.small{font-size:13px;color:var(--muted)}
-
-.stats{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
-.stat{flex:1 1 180px;background:linear-gradient(135deg,var(--card-from),var(--card-to));color:#fff;padding:16px;border-radius:10px;text-align:center;box-shadow:0 8px 22px rgba(8,20,40,0.08);transition:transform .15s}
-.stat:hover{transform:translateY(-6px)}
-.stat h2{margin:0;font-size:22px}
-.stat p{margin:6px 0 0;font-size:13px;opacity:.95}
-
-.main-grid{display:grid;grid-template-columns:1fr;gap:16px;margin-top:18px}
-
-/* Table */
-.table-wrap{overflow:auto;background:#fff;border-radius:8px;padding:12px;border:1px solid #eef6fb}
-table{width:100%;border-collapse:collapse}
-thead th{position:sticky;top:0;background:var(--nav);color:#fff;padding:10px;text-align:left;z-index:5}
-th,td{padding:10px;border-bottom:1px solid #eef4fb;vertical-align:middle}
-.avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 6px 12px rgba(6,20,40,0.08)}
-.badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:600;font-size:13px}
-.badge.it{background:linear-gradient(90deg,#e7f6ff,#e8fbfb);color:#0b63a3}
-.badge.finance{background:linear-gradient(90deg,#eaf9ee,#eefdf0);color:#1b8a2a}
-.badge.hr{background:linear-gradient(90deg,#f7eefc,#fbf0ff);color:#7b43c3}
-.badge.safety{background:linear-gradient(90deg,#fff7e6,#fff7ea);color:#a86f00}
-.badge.admin{background:#eef6fb;color:#0b63a3}
-
-/* Cards */
-.cards{display:none;gap:12px;margin-top:14px;flex-wrap:wrap}
-.card{background:#fff;padding:12px;border-radius:10px;border:1px solid #eef6fb;width:260px;box-shadow:0 10px 24px rgba(8,16,30,0.04)}
-.card img{width:72px;height:72px;border-radius:12px;object-fit:cover}
-
-/* modal */
-.modal{display:none;position:fixed;inset:0;background:rgba(6,12,24,0.55);z-index:1200;align-items:center;justify-content:center;padding:18px}
-.box{background:#fff;border-radius:10px;padding:18px;max-width:1100px;width:100%;position:relative;box-shadow:0 20px 60px rgba(4,20,40,0.2)}
-.close{position:absolute;right:14px;top:12px;border:none;background:transparent;font-size:20px;cursor:pointer;color:#6b7c93}
-.form-grid{display:grid;grid-template-columns:1fr 240px;gap:12px}
-.form-row{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}
-input[type="file"]{padding:6px}
-
-/* small responsive */
-@media (max-width:900px){.form-grid{grid-template-columns:1fr}.stats{flex-direction:column}.cards{justify-content:center}.search input{min-width:100%}}
-
-#toast {position:fixed;right:18px;bottom:18px;background:#111;color:#fff;padding:12px 14px;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.2);opacity:0;transform:translateX(120%);transition:0.45s}
-#toast.show{opacity:1;transform:translateX(0)}
-</style>
+  <style>
+    :root{ --nav:#06385f; --accent:#0b63a3; --bg:#f5f8fb }
+    *{box-sizing:border-box}
+    body{font-family:'Poppins',sans-serif;background:var(--bg);margin:0;color:#102330}
+    header{background:var(--nav);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+    header .brand{display:flex;align-items:center;gap:12px}
+    header h1{font-size:18px;margin:0}
+    .container-fluid{padding:24px}
+    .card-stat{border-radius:12px;padding:18px;color:#fff;background:linear-gradient(135deg,var(--accent),#00a6b6);box-shadow:0 12px 30px rgba(6,18,32,.08)}
+    .small-muted{color:#6b7a89;font-size:13px}
+    .table-wrap{background:#fff;border-radius:10px;padding:12px;border:1px solid #eef6fb}
+    thead th{background:var(--nav);color:#fff;position:sticky;top:0;z-index:3}
+    .avatar{width:40px;height:40px;border-radius:50%;object-fit:cover}
+    .modal-full{min-width:90%;max-width:1100px}
+    .left-nav{width:220px;background:#08376a;color:#fff;padding:20px;border-radius:10px}
+    .left-nav a{color:#fff;text-decoration:none;display:block;margin:10px 0;padding:8px;border-radius:6px}
+    .left-nav a.active{background:#044f86}
+    .action-btn{margin-right:6px}
+    .badge-dept{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef6fb;color:#0b63a3;font-weight:600}
+    .toast-fixed{position:fixed;right:20px;bottom:20px;z-index:2000;display:none}
+    .sticky-controls{position:sticky;top:70px;z-index:5}
+    @media(max-width:991px){ .left-nav{display:none} .modal-full{min-width:96%} thead th{font-size:13px} }
+    /* login overlay */
+    .overlay { position:fixed; inset:0; background:rgba(2,6,23,0.6); display:flex; align-items:center; justify-content:center; z-index:3000; }
+    .login-box { width:420px; background:#fff; padding:18px; border-radius:10px; box-shadow:0 18px 60px rgba(6,18,32,.3); }
+  </style>
 </head>
 <body>
-  <script>
-(function(){
-  function nowSecs(){ return Math.floor(Date.now()/1000); }
-  try{
-    const sess = JSON.parse(localStorage.getItem('hr_session') || 'null');
-    if(!sess || !sess.expires || nowSecs() > sess.expires){
-      // not logged in or expired
-      localStorage.removeItem('hr_session');
-      window.location.href = 'login.html';
-    }
-    // Make current session available to page scripts
-    window.__HR_SESSION = sess;
-  }catch(e){
-    localStorage.removeItem('hr_session');
-    window.location.href = 'login.html';
-  }
-})();
-</script>
 
 <header>
-  <div class="logo">FG</div>
+  <div class="brand">
+    <div style="width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#0b63a3,#00a6b6);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff">FG</div>
+    <div>
+      <h1>FLAWLESS GRAPHICS — HR Dashboard</h1>
+      <div class="small-muted">Employee management • Payroll • Attendance • Reports</div>
+    </div>
+  </div>
+
   <div>
-    <h1>FLAWLESS GRAPHICS — HR Dashboard</h1>
-    <div class="small">Employee management • Payroll • Attendance • Reports</div>
+    <button id="manageAccountsBtn" class="btn btn-outline-light btn-sm me-2" style="display:none">Manage HR Accounts</button>
+    <button id="logoutBtn" class="btn btn-light btn-sm" style="display:none">Logout</button>
   </div>
 </header>
 
-<div class="container">
-  <div class="top-bar">
-    <div>
-      <strong style="font-size:16px">HR Dashboard</strong>
-      <div class="small">Welcome, HR Manager</div>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-lg-3">
+      <div class="left-nav">
+        <h5>HR Tools</h5>
+        <a href="#" data-target="employee" class="nav-link active">Employee Report</a>
+        <a href="#" data-target="payment" class="nav-link">Payment Portal</a>
+        <a href="#" data-target="attendance" class="nav-link">Attendance Summary</a>
+        <a href="#" data-target="payroll" class="nav-link">Payroll Analytics</a>
+        <a href="#" data-target="performance" class="nav-link">Performance Trends</a>
+      </div>
     </div>
 
-    <div class="controls">
-      <div class="search"><input id="globalSearch" placeholder="Search employees, dept, phone, position..." /></div>
-      <button class="btn" id="openEmployeeReport">Employee Report</button>
-      <button class="btn ghost" id="openPaymentPortal">Payment Portal</button>
-      <button class="btn ghost" id="openAttendance">Attendance</button>
-      <button class="btn" id="refreshAll">Refresh</button>
+    <div class="col-lg-9">
+      <div class="mb-3 d-flex align-items-center justify-content-between">
+        <div>
+          <button id="openReport" class="btn btn-primary me-2">Employee Report</button>
+          <button id="openPayment" class="btn btn-outline-primary me-2">Payment Portal</button>
+          <button id="openAttendance" class="btn btn-outline-primary me-2">Attendance</button>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <input id="globalSearch" class="form-control form-control-sm" placeholder="Search name, dept, phone, position..." style="min-width:260px">
+          <button id="refreshBtn" class="btn btn-sm btn-secondary">Refresh</button>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-3">
+          <div class="card-stat text-center">
+            <h2 id="statEmployees">0</h2>
+            <div class="small-muted">Total Employees</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card-stat text-center" style="background:linear-gradient(135deg,#0b63a3,#4db6ac)">
+            <h2 id="statDepartments">0</h2>
+            <div class="small-muted">Departments</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card-stat text-center" style="background:linear-gradient(135deg,#0b63a3,#00a6b6)">
+            <h2 id="statAttendance">0%</h2>
+            <div class="small-muted">Attendance Rate</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card-stat text-center" style="background:linear-gradient(135deg,#0b63a3,#007bff)">
+            <h2 id="statPayroll">GHS 0</h2>
+            <div class="small-muted">Total Payroll</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h5 class="mb-0">Employees</h5>
+          <div>
+            <button id="addEmployeeBtn" class="btn btn-sm btn-success">+ Add Employee</button>
+            <button id="toggleViewBtn" class="btn btn-sm btn-outline-secondary">Cards View</button>
+          </div>
+        </div>
+
+        <div id="tableContainer" style="max-height:480px;overflow:auto">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Photo</th>
+                <th>Full Name</th>
+                <th>Department</th>
+                <th>Position</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Salary</th>
+                <th>Hire Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="employeeTbody"></tbody>
+          </table>
+        </div>
+
+        <div id="cardsContainer" class="d-flex flex-wrap gap-3 mt-3" style="display:none"></div>
+      </div>
     </div>
   </div>
+</div>
 
-  <div class="stats" aria-hidden="false">
-    <div class="stat"><h2 id="totalEmployees">0</h2><p>Total Employees</p></div>
-    <div class="stat"><h2 id="totalDepartments">0</h2><p>Departments</p></div>
-    <div class="stat"><h2 id="attendanceRate">0%</h2><p>Attendance Rate</p></div>
-    <div class="stat"><h2 id="totalPayroll">GHS 0</h2><p>Total Payroll</p></div>
-    <div class="stat" id="topDeptCard" style="cursor:pointer"><h2 id="topDepartment">N/A</h2><p>Top Performing Department</p></div>
-  </div>
+<!-- Employee Modal -->
+<div class="modal" tabindex="-1" id="employeeModal">
+  <div class="modal-dialog modal-full modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="empModalTitle">Add Employee</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="employeeForm">
+          <input type="hidden" id="empIndex" value="">
+          <div class="row">
+            <div class="col-md-8">
+              <div class="mb-2">
+                <label class="form-label">Full Name</label>
+                <input id="empFullName" class="form-control" required>
+              </div>
+              <div class="row">
+                <div class="col-sm-6 mb-2">
+                  <label class="form-label">Department</label>
+                  <select id="empDept" class="form-select">
+                    <option value="">-- Select --</option>
+                    <option>IT</option><option>Safety</option><option>HR</option><option>Finance</option><option>Administration</option>
+                  </select>
+                </div>
+                <div class="col-sm-6 mb-2">
+                  <label class="form-label">Position</label>
+                  <input id="empPosition" class="form-control">
+                </div>
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Email</label>
+                <input id="empEmail" class="form-control" type="email">
+              </div>
+              <div class="row">
+                <div class="col-sm-4 mb-2">
+                  <label class="form-label">Phone</label>
+                  <input id="empPhone" class="form-control" placeholder="233xxxxxxxxx">
+                </div>
+                <div class="col-sm-4 mb-2">
+                  <label class="form-label">Salary (monthly)</label>
+                  <input id="empSalary" class="form-control" type="number" min="0">
+                </div>
+                <div class="col-sm-4 mb-2">
+                  <label class="form-label">Hire Date</label>
+                  <input id="empHireDate" class="form-control" type="date">
+                </div>
+              </div>
+            </div>
 
-  <div class="main-grid">
-    <div class="table-wrap" id="tableWrap" style="margin-top:12px">
-      <table id="employeeTable">
-        <thead>
-          <tr>
-            <th>#</th><th>Photo</th><th>Full Name</th><th>Department</th><th>Position</th><th>Email</th><th>Phone</th><th>Salary</th><th>Hire Date</th><th>Actions</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+            <div class="col-md-4">
+              <label class="form-label">Photo</label>
+              <div class="mb-2">
+                <img id="empPhotoPreview" src="https://img.icons8.com/ios/100/000000/user--v1.png" alt="photo" style="width:120px;height:120px;border-radius:8px;object-fit:cover">
+              </div>
+              <div class="mb-2">
+                <input id="empPhotoInput" type="file" accept="image/*" class="form-control">
+              </div>
+              <div class="small-muted">Optional: add a photo or leave default.</div>
+            </div>
+          </div>
+
+          <div class="mt-3 text-end">
+            <button type="submit" class="btn btn-primary">Save Employee</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </form>
+      </div>
     </div>
-
-    <div class="cards" id="cardsContainer" style="display:none"></div>
   </div>
 </div>
 
 <!-- Employee Report Modal -->
-<div class="modal" id="reportModal" aria-hidden="true">
-  <div class="box">
-    <button class="close" data-close>&times;</button>
-    <header style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-      <div>
-        <h3>Employee Report</h3>
-        <div class="small">View and export employees</div>
+<div class="modal" id="reportModal" tabindex="-1">
+  <div class="modal-dialog modal-full modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Employee Report</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      <div style="display:flex;gap:8px">
-        <button class="btn" id="refreshReport">Refresh Data</button>
-        <button class="btn" id="downloadPdf">Download as PDF</button>
+      <div class="modal-body">
+        <div class="d-flex justify-content-between mb-3">
+          <div>
+            <button id="refreshReportBtn" class="btn btn-primary btn-sm">Refresh Data</button>
+            <button id="downloadPdfBtn" class="btn btn-outline-primary btn-sm">Download as PDF</button>
+          </div>
+        </div>
+
+        <div style="max-height:520px;overflow:auto">
+          <table class="table table-striped">
+            <thead>
+              <tr><th>#</th><th>Photo</th><th>Full Name</th><th>Department</th><th>Position</th><th>Email</th><th>Phone</th><th>Salary</th><th>Hire Date</th></tr>
+            </thead>
+            <tbody id="reportTbody"></tbody>
+          </table>
+        </div>
       </div>
-    </header>
-<button class="btn ghost" onclick="logout()">Logout</button>
-    <div style="margin-top:12px;max-height:520px;overflow:auto">
-      <table id="reportTable" style="width:100%;border-collapse:collapse">
-        <thead><tr><th>#</th><th>Photo</th><th>Full Name</th><th>Department</th><th>Position</th><th>Email</th><th>Phone</th><th>Salary</th><th>Hire Date</th></tr></thead>
-        <tbody></tbody>
-      </table>
     </div>
   </div>
 </div>
 
-<!-- Payment Portal Modal -->
-<div class="modal" id="paymentModal" aria-hidden="true">
-  <div class="box">
-    <button class="close" data-close>&times;</button>
-    <h3>Payment Portal</h3>
-    <div style="display:flex;gap:12px;align-items:flex-start">
-      <div style="flex:1">
-        <label>Employee</label><br>
-        <select id="paymentEmployee" style="width:100%;padding:8px;border-radius:6px;border:1px solid #e6f0fa"></select>
-
-        <label style="margin-top:8px">Amount (GHS)</label><br>
-        <input type="number" id="paymentAmount" style="width:100%;padding:8px;border-radius:6px;border:1px solid #e6f0fa" />
-
-        <label style="margin-top:8px">Payment Reason</label><br>
-        <input id="paymentNote" style="width:100%;padding:8px;border-radius:6px;border:1px solid #e6f0fa" placeholder="Salary / Bonus / Reimb." />
-
-        <div style="margin-top:12px"><button class="btn" id="submitPayment">Submit Payment</button></div>
+<!-- Payment Modal -->
+<div class="modal" id="paymentModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Payment Portal</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <label class="form-label">Employee</label>
+            <select id="paymentEmployee" class="form-select"></select>
 
-      <div style="width:320px;padding-left:12px;border-left:1px solid #eef6fb">
-        <h4>Recent Payments</h4>
-        <div id="recentPayments" style="max-height:300px;overflow:auto"></div>
+            <label class="form-label mt-2">Amount (GHS)</label>
+            <input id="paymentAmount" class="form-control" type="number" min="0">
+
+            <label class="form-label mt-2">Note</label>
+            <input id="paymentNote" class="form-control" placeholder="Salary/Bonus">
+
+            <div class="mt-3">
+              <button id="submitPaymentBtn" class="btn btn-primary">Submit Payment</button>
+              <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h6>Recent Payments</h6>
+            <div id="recentPayments" style="max-height:320px;overflow:auto"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <!-- Attendance modal -->
-<div class="modal" id="attendanceModal" aria-hidden="true">
-  <div class="box">
-    <button class="close" data-close>&times;</button>
-    <h3>Attendance Summary</h3>
-    <canvas id="attendanceChart" style="max-height:360px;margin-top:12px"></canvas>
-  </div>
-</div>
-
-<!-- Payroll analytics modal -->
-<div class="modal" id="payrollModal" aria-hidden="true">
-  <div class="box">
-    <button class="close" data-close>&times;</button>
-    <h3>Payroll Analytics</h3>
-    <div style="display:flex;gap:12px;align-items:flex-start">
-      <div style="flex:1"><canvas id="payrollDeptChart"></canvas></div>
-      <div style="flex:1"><canvas id="payrollTrendChart"></canvas></div>
+<div class="modal" id="attendanceModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Attendance Summary</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <canvas id="attendanceChart" style="max-height:360px"></canvas>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Department modal -->
-<div class="modal" id="departmentModal" aria-hidden="true">
-  <div class="box">
-    <button class="close" data-close>&times;</button>
-    <h3>Department Breakdown</h3>
-    <div style="display:flex;gap:10px;align-items:center;margin-top:8px">
-      <select id="deptSelect" style="padding:8px;border-radius:6px;border:1px solid #eef6fb"></select>
-      <button class="btn" id="loadDept">Load</button>
-      <button class="btn ghost" id="downloadDept">Download PDF</button>
+<!-- Payroll modal -->
+<div class="modal" id="payrollModal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Payroll Analytics</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6"><canvas id="payrollDeptChart" style="max-height:320px"></canvas></div>
+          <div class="col-md-6"><canvas id="payrollTrendChart" style="max-height:320px"></canvas></div>
+        </div>
+      </div>
     </div>
-    <div style="margin-top:12px;max-height:340px;overflow:auto">
-      <table id="deptTable" style="width:100%;border-collapse:collapse">
-        <thead><tr><th>#</th><th>Name</th><th>Avg Score</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-    <h4 id="deptAverage" style="margin-top:10px">Average Score: 0%</h4>
   </div>
 </div>
 
-<div id="toast"></div>
+<!-- Performance modal -->
+<div class="modal" id="performanceModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Performance Trends</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="performancePlaceholder">No performance data available. Add `performanceData` to localStorage if you want advanced metrics.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Manage HR Accounts Modal (Admin only) -->
+<div class="modal" id="hrAccountsModal" tabindex="-1">
+  <div class="modal-dialog modal-full modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Manage HR Accounts</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <form id="hrAccountForm">
+              <input type="hidden" id="acctIndex" value="">
+              <div class="mb-2">
+                <label>Full name</label>
+                <input id="acct_name" class="form-control">
+              </div>
+              <div class="mb-2">
+                <label>Email</label>
+                <input id="acct_email" class="form-control" type="email">
+              </div>
+              <div class="mb-2">
+                <label>Password (plain for new, leave blank to keep)</label>
+                <input id="acct_password" class="form-control" type="password">
+              </div>
+              <div class="mb-2">
+                <label>Role</label>
+                <select id="acct_role" class="form-select">
+                  <option>Admin</option><option>HR Manager</option><option>Payroll Officer</option><option>Supervisor</option>
+                </select>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-primary" type="submit">Save</button>
+                <button class="btn btn-outline-secondary" type="button" id="acctClearBtn">Clear</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="col-md-6">
+            <h6>Existing Accounts</h6>
+            <div style="max-height:320px;overflow:auto">
+              <table class="table">
+                <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Action</th></tr></thead>
+                <tbody id="acctList"></tbody>
+              </table>
+            </div>
+            <div class="small-muted">Admins can create, edit, and delete HR accounts. Passwords are stored hashed (SHA-256).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Embedded Login Overlay (used when not logged in) -->
+<div id="loginOverlay" class="overlay" style="display:none">
+  <div class="login-box">
+    <h4>HR Login</h4>
+    <div class="mb-2 small-muted">Sign in to access the HR dashboard.</div>
+    <div id="loginError" class="text-danger mb-2" style="display:none"></div>
+
+    <div class="mb-2">
+      <label class="form-label">Email</label>
+      <input id="login_email" class="form-control" type="email" placeholder="hr@yourdomain.com">
+    </div>
+    <div class="mb-2">
+      <label class="form-label">Password</label>
+      <input id="login_password" class="form-control" type="password" placeholder="Password">
+    </div>
+
+    <div class="d-flex gap-2">
+      <button id="loginSubmit" class="btn btn-primary">Login</button>
+      <button id="createAdminInline" class="btn btn-outline-primary">Create Admin</button>
+      <button id="forgotOpen" class="btn btn-outline-secondary">Forgot</button>
+    </div>
+
+    <div class="small-muted mt-2">If first-time: click Create Admin to create the initial Admin account (saved to localStorage).</div>
+
+    <!-- Forgot reset inline area -->
+    <div id="forgotArea" style="display:none;margin-top:12px">
+      <label>Reset email</label>
+      <input id="reset_email" class="form-control" type="email" placeholder="hr@yourdomain.com">
+      <div class="d-flex gap-2 mt-2">
+        <button id="generateReset" class="btn btn-primary">Generate Code</button>
+        <button id="closeForgot" class="btn btn-outline-secondary">Close</button>
+      </div>
+      <div id="resetResult" style="margin-top:10px;display:none">
+        <div class="small-muted">Reset code (copy & use to reset password):</div>
+        <div id="resetCodeBox" style="font-weight:700;color:#0b63a3"></div>
+        <div class="mt-2">
+          <label>Enter code</label>
+          <input id="enterResetCode" class="form-control" placeholder="000000">
+          <label class="mt-2">New Password</label>
+          <input id="newResetPassword" class="form-control" type="password">
+          <div class="d-flex gap-2 mt-2">
+            <button id="confirmResetBtn" class="btn btn-primary">Reset Password</button>
+            <button id="closeResetUI" class="btn btn-outline-secondary">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast-fixed alert alert-success" role="alert" style="display:none"></div>
 
 <script>
-  // Load existing HR accounts
-let hrAccounts = JSON.parse(localStorage.getItem("hrAccounts")) || [];
-
-// Save HR Account
-function saveHRAccount() {
-    const name = document.getElementById("hrName").value.trim();
-    const email = document.getElementById("hrEmail").value.trim();
-    const password = document.getElementById("hrPassword").value.trim();
-    const role = document.getElementById("hrRole").value;
-
-    if (!name || !email || !password) {
-        alert("Please fill all fields.");
-        return;
-    }
-
-    // Check if email already exists
-    const exists = hrAccounts.find(acc => acc.email === email);
-
-    if (exists) {
-        alert("This HR account already exists.");
-        return;
-    }
-
-    hrAccounts.push({ name, email, password, role });
-
-    localStorage.setItem("hrAccounts", JSON.stringify(hrAccounts));
-
-    alert("HR Account saved successfully!");
-
-    loadHRAccounts();
-    clearHRForm();
-}
-
-// Load list of existing HR accounts
-function loadHRAccounts() {
-    const table = document.getElementById("hrAccountsList");
-    table.innerHTML = "";
-
-    hrAccounts.forEach((acc, i) => {
-        table.innerHTML += `
-            <tr>
-                <td>${acc.name}</td>
-                <td>${acc.email}</td>
-                <td>${acc.role}</td>
-                <td><button onclick="deleteHRAccount(${i})">Delete</button></td>
-            </tr>
-        `;
-    });
-}
-
-// Delete HR account
-function deleteHRAccount(index) {
-    if (confirm("Are you sure you want to delete this HR account?")) {
-        hrAccounts.splice(index, 1);
-        localStorage.setItem("hrAccounts", JSON.stringify(hrAccounts));
-        loadHRAccounts();
-    }
-}
-
-function clearHRForm() {
-    document.getElementById("hrName").value = "";
-    document.getElementById("hrEmail").value = "";
-    document.getElementById("hrPassword").value = "";
-    document.getElementById("hrRole").value = "Admin";
-}
-
-/* ---------- Helpers ---------- */
-const safeParse = s => { try{ return JSON.parse(s); }catch(e){return null;} };
+/* -------------- Utilities -------------- */
 const employeesKey = 'employees';
+const hrAccountsKey = 'hr_accounts';
+const hrSessionKey = 'hr_session';
 const paymentsKey = 'payments';
 const performanceKey = 'performanceData';
 const attendanceKey = 'attendance';
 
+function safeParse(s){ try{ return JSON.parse(s); }catch(e){return null} }
+async function sha256Hex(str){ const enc=new TextEncoder(); const buf=enc.encode(str); const hash=await crypto.subtle.digest('SHA-256', buf); return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+function nowSecs(){ return Math.floor(Date.now()/1000); }
+function showToast(msg, type='success', ms=2000){ const t=document.getElementById('toast'); t.className='toast-fixed alert alert-'+(type==='success'?'success':'info'); t.textContent=msg; t.style.display='block'; setTimeout(()=> t.style.display='none', ms); }
+
+/* -------------- Session / Auth -------------- */
+function readAccounts(){ return safeParse(localStorage.getItem(hrAccountsKey)) || []; }
+function saveAccounts(arr){ localStorage.setItem(hrAccountsKey, JSON.stringify(arr)); }
 function readEmployees(){ return safeParse(localStorage.getItem(employeesKey)) || []; }
 function saveEmployees(arr){ localStorage.setItem(employeesKey, JSON.stringify(arr)); }
+function readPayments(){ return safeParse(localStorage.getItem(paymentsKey)) || []; }
+function savePayments(arr){ localStorage.setItem(paymentsKey, JSON.stringify(arr)); }
 
-function formatGHS(n){ return 'GHS ' + (Number(n)||0).toLocaleString(); }
-function escapeHtml(s){ if(s===null||s===undefined) return ''; return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function setSession(obj, remember=false){
+  const sess = {...obj, token: Math.random().toString(36).slice(2), expires: remember ? nowSecs()+60*60*24*30 : nowSecs()+60*60*8 };
+  localStorage.setItem(hrSessionKey, JSON.stringify(sess));
+  window.__HR_SESSION = sess;
+  updateAuthUI();
+}
+function clearSession(){ localStorage.removeItem(hrSessionKey); window.__HR_SESSION = null; updateAuthUI(); }
 
-function badgeHtml(dept){
-  if(!dept) return `<span class="badge admin">Unassigned</span>`;
-  const d = String(dept).toLowerCase();
-  if(d.includes('it')) return `<span class="badge it">IT</span>`;
-  if(d.includes('finance')) return `<span class="badge finance">Finance</span>`;
-  if(d.includes('hr')) return `<span class="badge hr">HR</span>`;
-  if(d.includes('safety')) return `<span class="badge safety">Safety</span>`;
-  return `<span class="badge admin">${escapeHtml(dept)}</span>`;
+function getSession(){
+  try{ const s = safeParse(localStorage.getItem(hrSessionKey)); if(s && s.expires && nowSecs() < s.expires) return s; localStorage.removeItem(hrSessionKey); return null; }catch(e){ return null; }
 }
 
-/* ---------- UI references ---------- */
-const tbody = document.querySelector('#employeeTable tbody');
-const cardsContainer = document.getElementById('cardsContainer');
-const totalEmployeesEl = document.getElementById('totalEmployees');
-const totalDepartmentsEl = document.getElementById('totalDepartments');
-const attendanceRateEl = document.getElementById('attendanceRate');
-const totalPayrollEl = document.getElementById('totalPayroll');
-const topDepartmentEl = document.getElementById('topDepartment');
-const topDeptCard = document.getElementById('topDeptCard');
+/* -------------- Auth UI and embedded login -------------- */
+const loginOverlay = document.getElementById('loginOverlay');
+const loginError = document.getElementById('loginError');
+const manageAccountsBtn = document.getElementById('manageAccountsBtn');
+const logoutBtn = document.getElementById('logoutBtn');
 
-const reportModal = document.getElementById('reportModal');
-const reportTableBody = document.querySelector('#reportTable tbody');
+function updateAuthUI(){
+  const session = getSession();
+  if(session){
+    loginOverlay.style.display='none';
+    logoutBtn.style.display='inline-block';
+    // show manage accounts only to Admins
+    manageAccountsBtn.style.display = session.role === 'Admin' ? 'inline-block' : 'none';
+  } else {
+    // show login overlay
+    loginOverlay.style.display='flex';
+    logoutBtn.style.display='none';
+    manageAccountsBtn.style.display='none';
+  }
+}
 
-const paymentModal = document.getElementById('paymentModal');
-const paymentEmployeeSelect = document.getElementById('paymentEmployee');
-const recentPaymentsEl = document.getElementById('recentPayments');
+// Login flow (embedded)
+document.getElementById('loginSubmit').addEventListener('click', async ()=>{
+  loginError.style.display='none';
+  const email = (document.getElementById('login_email').value||'').trim().toLowerCase();
+  const pw = (document.getElementById('login_password').value||'').trim();
+  if(!email || !pw){ loginError.textContent = 'Email & Password required'; loginError.style.display='block'; return; }
+  const accounts = readAccounts();
+  const acc = accounts.find(a => a.email === email);
+  if(!acc){ loginError.textContent = 'Account not found'; loginError.style.display='block'; return; }
+  const hash = await sha256Hex(pw);
+  if(hash !== acc.passwordHash){ loginError.textContent = 'Incorrect password'; loginError.style.display='block'; return; }
+  setSession({ email: acc.email, role: acc.role, name: acc.name }, true);
+  showToast('Logged in as ' + (acc.name || acc.email));
+  renderAll();
+});
 
-const attendanceModal = document.getElementById('attendanceModal');
-const payrollModal = document.getElementById('payrollModal');
-const departmentModal = document.getElementById('departmentModal');
+// Create initial Admin inline (works when no accounts)
+document.getElementById('createAdminInline').addEventListener('click', async ()=>{
+  const accounts = readAccounts();
+  if(accounts.length > 0){ alert('Admin(s) already exist. Use Manage HR Accounts.'); return; }
+  const email = prompt('Initial admin email', 'admin@flawlessgraphics.com');
+  if(!email) return;
+  const name = prompt('Full name', 'HR Admin') || 'HR Admin';
+  const pw = prompt('Password for admin', 'Flawless@123');
+  if(!pw) return;
+  const hash = await sha256Hex(pw);
+  const acct = { name, email: email.trim().toLowerCase(), role: 'Admin', passwordHash: hash };
+  saveAccounts([acct]);
+  alert('Admin created. Please login using the credentials you provided.');
+});
 
-/* ---------- Charts ---------- */
-let attendanceChart=null, payrollDeptChart=null, payrollTrendChart=null;
+// Forgot password inline
+document.getElementById('forgotOpen').addEventListener('click', ()=> {
+  document.getElementById('forgotArea').style.display='block';
+});
+document.getElementById('closeForgot').addEventListener('click', ()=> {
+  document.getElementById('forgotArea').style.display='none';
+});
+document.getElementById('generateReset').addEventListener('click', ()=>{
+  const email = (document.getElementById('reset_email').value||'').trim().toLowerCase();
+  const accounts = readAccounts();
+  const idx = accounts.findIndex(a=>a.email === email);
+  if(idx === -1){ alert('Account not found'); return; }
+  const code = Math.floor(100000 + Math.random()*900000).toString();
+  accounts[idx].resetCode = code;
+  accounts[idx].resetExpires = nowSecs()+600; // 10 min
+  saveAccounts(accounts);
+  document.getElementById('resetResult').style.display='block';
+  document.getElementById('resetCodeBox').textContent = code + ' (valid 10 minutes)';
+});
+document.getElementById('confirmResetBtn').addEventListener('click', async ()=>{
+  const entered = (document.getElementById('enterResetCode').value||'').trim();
+  const npw = (document.getElementById('newResetPassword').value||'').trim();
+  const accounts = readAccounts();
+  const idx = accounts.findIndex(a=> a.resetCode === entered && a.resetExpires && nowSecs() <= a.resetExpires);
+  if(idx === -1){ alert('Invalid or expired code'); return; }
+  const hash = await sha256Hex(npw);
+  accounts[idx].passwordHash = hash; delete accounts[idx].resetCode; delete accounts[idx].resetExpires;
+  saveAccounts(accounts);
+  alert('Password updated. You may now login.');
+});
 
-/* ---------- Render employees (table + cards) ---------- */
-function renderEmployees(filterList=null){
-  const employees = filterList || readEmployees();
-  tbody.innerHTML = '';
-  cardsContainer.innerHTML = '';
-  employees.forEach((e,i)=>{
-    const photo = e.photo ? `<img src="${e.photo}" class="avatar" alt="photo">` : `<div style="width:40px;height:40px;border-radius:50%;background:#eef6fb;display:inline-block"></div>`;
+/* Logout */
+logoutBtn.addEventListener('click', ()=>{ clearSession(); updateAuthUI(); });
+
+/* -------------- HR Account Management -------------- */
+const acctForm = document.getElementById('hrAccountForm');
+const acctList = document.getElementById('acctList');
+const acctClearBtn = document.getElementById('acctClearBtn');
+
+function refreshAcctList(){
+  const arr = readAccounts();
+  acctList.innerHTML = '';
+  arr.forEach((a,i) => {
     const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${i+1}</td>
-      <td>${photo}</td>
-      <td>${escapeHtml(e.fullName||'N/A')}</td>
-      <td>${badgeHtml(e.department)}</td>
-      <td>${escapeHtml(e.position||'')}</td>
-      <td><a href="mailto:${escapeHtml(e.email||'')}" class="small">${escapeHtml(e.email||'')}</a></td>
-      <td class="small">${escapeHtml(e.phone||'')}</td>
-      <td class="small">${e.salary ? Number(e.salary).toLocaleString() : '0'}</td>
-      <td class="small">${escapeHtml(e.hireDate||'')}</td>
-      <td class="actions">
-        <button class="btn ghost" onclick="openEdit(${i})">Edit</button>
-        <button class="btn" onclick="deleteEmployee(${i})">Delete</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
+    tr.innerHTML = `<td>${a.name||''}</td><td>${a.email||''}</td><td>${a.role||''}</td>
+      <td style="text-align:right">
+        <button class="btn btn-sm btn-outline-primary me-1" onclick="editAcct(${i})">Edit</button>
+        <button class="btn btn-sm btn-outline-danger" onclick="delAcct(${i})">Delete</button>
+      </td>`;
+    acctList.appendChild(tr);
+  });
+}
+async function delAcct(i){
+  if(!confirm('Delete account?')) return;
+  const arr = readAccounts(); arr.splice(i,1); saveAccounts(arr); refreshAcctList();
+}
+async function editAcct(i){
+  const arr = readAccounts(); const a = arr[i];
+  document.getElementById('acctIndex').value = i;
+  document.getElementById('acct_name').value = a.name;
+  document.getElementById('acct_email').value = a.email;
+  document.getElementById('acct_password').value = '';
+  document.getElementById('acct_role').value = a.role || 'HR Manager';
+}
 
-    // cards
-    const card = document.createElement('div'); card.className='card';
-    card.innerHTML = `
-      <img src="${e.photo||'https://img.icons8.com/ios/100/000000/user--v1.png'}" alt="photo">
-      <h4>${escapeHtml(e.fullName||'N/A')}</h4>
-      <div style="margin:6px 0">${badgeHtml(e.department)}</div>
-      <div class="small"><b>${escapeHtml(e.position||'')}</b></div>
-      <div class="small">${escapeHtml(e.email||'')}</div>
-      <div class="small">📞 ${escapeHtml(e.phone||'')}</div>
-      <div class="small">Salary: ${formatGHS(e.salary||0)}</div>
-      <div class="small">Hired: ${escapeHtml(e.hireDate||'')}</div>
-      <div style="margin-top:8px;display:flex;gap:8px">
-        <button class="btn ghost" onclick="openEdit(${i})">Edit</button>
-        <button class="btn" onclick="deleteEmployee(${i})">Delete</button>
-      </div>`;
+acctClearBtn.addEventListener('click', ()=>{
+  document.getElementById('acctIndex').value=''; document.getElementById('acct_name').value=''; document.getElementById('acct_email').value=''; document.getElementById('acct_password').value=''; document.getElementById('acct_role').value='HR Manager';
+});
+
+acctForm.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const idx = document.getElementById('acctIndex').value;
+  const name = (document.getElementById('acct_name').value||'').trim();
+  const email = (document.getElementById('acct_email').value||'').trim().toLowerCase();
+  const pw = (document.getElementById('acct_password').value||'').trim();
+  const role = document.getElementById('acct_role').value;
+
+  if(!name || !email){ alert('Name and email required'); return; }
+  let arr = readAccounts();
+  if(idx !== ''){
+    // update
+    const i = Number(idx);
+    arr[i].name = name; arr[i].email = email; arr[i].role = role;
+    if(pw){ arr[i].passwordHash = await sha256Hex(pw); }
+    saveAccounts(arr); refreshAcctList(); alert('Updated');
+  } else {
+    if(!pw){ alert('Password required for new account'); return; }
+    if(arr.some(a=>a.email === email)){ alert('Email already exists'); return; }
+    const hash = await sha256Hex(pw);
+    arr.push({ name, email, role, passwordHash: hash });
+    saveAccounts(arr); refreshAcctList(); alert('Account created');
+  }
+  acctClearBtn.click();
+});
+
+/* Manage button shows modal (only Admin) */
+manageAccountsBtn.addEventListener('click', ()=> { const sess = getSession(); if(sess && sess.role === 'Admin'){ const myModal = new bootstrap.Modal(document.getElementById('hrAccountsModal')); myModal.show(); refreshAcctList(); } else alert('Admin only'); });
+
+/* -------------- Employees Render & CRUD -------------- */
+const employeeTbody = document.getElementById('employeeTbody');
+const cardsContainer = document.getElementById('cardsContainer');
+const tableContainer = document.getElementById('tableContainer');
+
+function getEmployees(){ return readEmployees(); }
+function persistEmployees(arr){ saveEmployees(arr); window.dispatchEvent(new Event('storage')); }
+
+function renderEmployees(list = null){
+  const arr = list || getEmployees();
+  employeeTbody.innerHTML = '';
+  cardsContainer.innerHTML = '';
+
+  arr.forEach((emp,i)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${i+1}</td>
+      <td>${emp.photo? `<img src="${emp.photo}" class="avatar">` : '<div style="width:40px;height:40px;background:#eef6fb;border-radius:50%"></div>'}</td>
+      <td>${emp.fullName||''}</td>
+      <td><span class="badge-dept">${emp.department||'Unassigned'}</span></td>
+      <td>${emp.position||''}</td>
+      <td>${emp.email||''}</td>
+      <td>${emp.phone||''}</td>
+      <td>${emp.salary?Number(emp.salary).toLocaleString():0}</td>
+      <td>${emp.hireDate||''}</td>
+      <td>
+        <button class="btn btn-sm btn-outline-primary action-btn" onclick="openEditEmployee(${i})">Edit</button>
+        <button class="btn btn-sm btn-outline-danger" onclick="deleteEmployee(${i})">Delete</button>
+      </td>`;
+    employeeTbody.appendChild(tr);
+
+    // card
+    const card = document.createElement('div'); card.className='card p-3'; card.style.width='220px';
+    card.innerHTML = `${emp.photo? `<img src="${emp.photo}" style="width:72px;height:72px;border-radius:8px;object-fit:cover">` : '' }
+      <h6 class="mt-2">${emp.fullName||''}</h6>
+      <div class="small-muted">${emp.position||''} • ${emp.department||''}</div>
+      <div class="mt-2 small-muted">📧 ${emp.email||''}</div>
+      <div class="mt-1 small-muted">📞 ${emp.phone||''}</div>
+      <div class="mt-2"><button class="btn btn-sm btn-outline-primary" onclick="openEditEmployee(${i})">Edit</button></div>`;
     cardsContainer.appendChild(card);
   });
 
-  // update report modal body too
-  reportTableBody.innerHTML = '';
-  employees.forEach((e,i)=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td>
-      <td>${e.photo? `<img src="${e.photo}" class="avatar">` : ''}</td>
-      <td>${escapeHtml(e.fullName||'')}</td>
-      <td>${escapeHtml(e.department||'')}</td>
-      <td>${escapeHtml(e.position||'')}</td>
-      <td>${escapeHtml(e.email||'')}</td>
-      <td>${escapeHtml(e.phone||'')}</td>
-      <td>${e.salary?Number(e.salary).toLocaleString():0}</td>
-      <td>${escapeHtml(e.hireDate||'')}</td>`;
-    reportTableBody.appendChild(tr);
+  // update report table
+  const reportTbody = document.getElementById('reportTbody');
+  reportTbody.innerHTML = '';
+  arr.forEach((emp,i)=>{
+    const row = document.createElement('tr');
+    row.innerHTML = `<td>${i+1}</td><td>${emp.photo? `<img src="${emp.photo}" class="avatar">` : ''}</td><td>${emp.fullName||''}</td><td>${emp.department||''}</td><td>${emp.position||''}</td><td>${emp.email||''}</td><td>${emp.phone||''}</td><td>${emp.salary?Number(emp.salary).toLocaleString():0}</td><td>${emp.hireDate||''}</td>`;
+    reportTbody.appendChild(row);
   });
 
   populatePaymentSelect();
   updateStats();
 }
 
-/* ---------- Stats ---------- */
+function deleteEmployee(i){
+  if(!confirm('Delete this employee?')) return;
+  const arr = getEmployees(); arr.splice(i,1); persistEmployees(arr); renderEmployees();
+}
+
+function openEditEmployee(i){
+  const arr = getEmployees(); const e = arr[i];
+  document.getElementById('empIndex').value = i;
+  document.getElementById('empFullName').value = e.fullName || '';
+  document.getElementById('empDept').value = e.department || '';
+  document.getElementById('empPosition').value = e.position || '';
+  document.getElementById('empEmail').value = e.email || '';
+  document.getElementById('empPhone').value = e.phone || '';
+  document.getElementById('empSalary').value = e.salary || '';
+  document.getElementById('empHireDate').value = e.hireDate || '';
+  document.getElementById('empPhotoPreview').src = e.photo || 'https://img.icons8.com/ios/100/000000/user--v1.png';
+  const myModal = new bootstrap.Modal(document.getElementById('employeeModal')); myModal.show();
+}
+
+document.getElementById('addEmployeeBtn').addEventListener('click', ()=>{
+  document.getElementById('empIndex').value = '';
+  document.getElementById('employeeForm').reset();
+  document.getElementById('empPhotoPreview').src = 'https://img.icons8.com/ios/100/000000/user--v1.png';
+  const myModal = new bootstrap.Modal(document.getElementById('employeeModal')); myModal.show();
+});
+
+document.getElementById('empPhotoInput').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){ document.getElementById('empPhotoPreview').src = ev.target.result; };
+  reader.readAsDataURL(file);
+});
+
+// submit employee form
+document.getElementById('employeeForm').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const idx = document.getElementById('empIndex').value;
+  const obj = {
+    fullName: document.getElementById('empFullName').value.trim(),
+    department: document.getElementById('empDept').value,
+    position: document.getElementById('empPosition').value.trim(),
+    email: document.getElementById('empEmail').value.trim(),
+    phone: document.getElementById('empPhone').value.trim(),
+    salary: Number(document.getElementById('empSalary').value) || 0,
+    hireDate: document.getElementById('empHireDate').value,
+    photo: document.getElementById('empPhotoPreview').src
+  };
+  const arr = getEmployees();
+  if(idx === ''){
+    arr.push(obj);
+    persistEmployees(arr);
+    showToast('Employee added');
+  } else {
+    arr[Number(idx)] = Object.assign({}, arr[Number(idx)], obj);
+    persistEmployees(arr);
+    showToast('Employee updated');
+  }
+  renderEmployees();
+  bootstrap.Modal.getInstance(document.getElementById('employeeModal')).hide();
+});
+
+/* -------------- Payments -------------- */
+function populatePaymentSelect(){
+  const sel = document.getElementById('paymentEmployee'); sel.innerHTML = '<option value="">-- Choose employee --</option>';
+  getEmployees().forEach((e,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent = e.fullName || e.email || `Employee ${i+1}`; sel.appendChild(o); });
+  renderRecentPayments();
+}
+function renderRecentPayments(){
+  const container = document.getElementById('recentPayments'); container.innerHTML='';
+  const payments = readPayments();
+  if(!payments.length) container.innerHTML = '<div class="small-muted">No payments yet</div>';
+  else payments.slice().reverse().slice(0,10).forEach(p=>{
+    const div = document.createElement('div'); div.className='p-2 border-bottom'; div.innerHTML = `<div><strong>${p.name}</strong> - GHS ${Number(p.amount).toLocaleString()}</div><div class="small-muted">${new Date(p.date).toLocaleString()}</div>`;
+    container.appendChild(div);
+  });
+}
+document.getElementById('submitPaymentBtn').addEventListener('click', ()=>{
+  const idx = document.getElementById('paymentEmployee').value;
+  const amount = Number(document.getElementById('paymentAmount').value) || 0;
+  const note = document.getElementById('paymentNote').value || '';
+  if(idx === '' || amount <= 0){ alert('Choose employee and valid amount'); return; }
+  const employees = getEmployees(); const emp = employees[Number(idx)];
+  if(!emp){ alert('Employee not found'); return; }
+  const payments = readPayments();
+  payments.push({ name: emp.fullName, employeeIndex: Number(idx), amount, note, date: new Date().toISOString() });
+  savePayments(payments);
+  showToast('Payment recorded');
+  populatePaymentSelect();
+});
+
+/* -------------- Charts & Stats -------------- */
+let attendanceChart=null, payrollDeptChart=null, payrollTrendChart=null;
 function updateStats(){
-  const employees = readEmployees();
-  totalEmployeesEl.textContent = employees.length;
+  const employees = getEmployees();
+  document.getElementById('statEmployees').textContent = employees.length;
+  const depts = Array.from(new Set(employees.map(e=>e.department||'Unassigned')));
+  document.getElementById('statDepartments').textContent = depts.length;
 
-  const departments = Array.from(new Set(employees.map(e=>e.department||'Unassigned')));
-  totalDepartmentsEl.textContent = departments.length;
-
-  // attendance: try to read records
+  // attendance: read attendance array if present, else fallback
   const att = safeParse(localStorage.getItem(attendanceKey)) || [];
   let attendanceRate = 0;
   if(Array.isArray(att) && employees.length>0){
     attendanceRate = Math.round(Math.min(100, (att.length / (employees.length * 30)) * 100));
   } else {
-    attendanceRate = Math.floor(Math.random()*16)+80; // fallback
+    attendanceRate = Math.floor(Math.random()*16)+80;
   }
-  attendanceRateEl.textContent = attendanceRate + '%';
+  document.getElementById('statAttendance').textContent = attendanceRate + '%';
 
   const totalPayroll = employees.reduce((s,e)=> s + (Number(e.salary)||0), 0);
-  totalPayrollEl.textContent = 'GHS ' + totalPayroll.toLocaleString();
+  document.getElementById('statPayroll').textContent = 'GHS ' + totalPayroll.toLocaleString();
 
-  // top department: if performanceData exists use avg scores; else use count
+  // top dept by average performance if available, else by count
   const perf = safeParse(localStorage.getItem(performanceKey)) || {};
   const deptScores = {};
   for(const e of employees){
@@ -440,516 +796,155 @@ function updateStats(){
     if(!deptScores[e.department]) deptScores[e.department] = [];
     deptScores[e.department].push(avg);
   }
-  let topDept = 'N/A', best = -1;
+  let topDept='N/A', best=-1;
   for(const d in deptScores){
-    const arr = deptScores[d]; const avg = arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
-    if(avg > best){ best = avg; topDept = d; }
+    const arr = deptScores[d]; const avg = arr.length? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
+    if(avg > best){ best=avg; topDept=d; }
   }
-  if(topDept === 'N/A' || best === 0){
+  if(best <= 0){
     // fallback by count
     const counts = {};
-    for(const e of employees){ counts[e.department] = (counts[e.department]||0) + 1; }
-    let bestCount=0, bestDept='';
-    for(const d in counts) if(counts[d] > bestCount){ bestCount = counts[d]; bestDept = d; }
-    topDept = bestDept || 'N/A';
-    topDepartmentEl.textContent = topDept === 'N/A' ? 'N/A' : `${topDept} (${bestCount} people)`;
-  } else topDepartmentEl.textContent = `${topDept} (${best.toFixed(1)}%)`;
+    employees.forEach(e=> counts[e.department] = (counts[e.department]||0) + 1);
+    let bestCount=0, bDept='N/A';
+    for(const d in counts) if(counts[d] > bestCount){ bestCount = counts[d]; bDept = d; }
+    topDept = bDept || 'N/A';
+    // show count in a toast or small badge (we'll show in a console log)
+  }
+  // quick console (we can show top dept in a toast)
+  // showToast('Top Dept: ' + (topDept || 'N/A'));
 }
 
-/* ---------- Payment Portal ---------- */
-function populatePaymentSelect(){
-  const employees = readEmployees();
-  paymentEmployeeSelect.innerHTML = '';
-  const placeholder = document.createElement('option'); placeholder.value=''; placeholder.textContent='-- Select Employee --'; paymentEmployeeSelect.appendChild(placeholder);
-  employees.forEach((e,i)=>{
-    const opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = e.fullName || (e.email || `Employee ${i+1}`);
-    paymentEmployeeSelect.appendChild(opt);
-  });
-
-  // recent payments
-  const payments = safeParse(localStorage.getItem(paymentsKey)) || [];
-  recentPaymentsEl.innerHTML = '';
-  if(!payments.length) recentPaymentsEl.innerHTML = '<div class="small">No recent payments</div>';
-  else payments.slice().reverse().slice(0,10).forEach(p=>{
-    const div = document.createElement('div');
-    div.style.padding = '6px 6px'; div.style.borderBottom = '1px solid #eef6fb';
-    div.innerHTML = `<div class="small">${p.name||'Unknown'} — ${formatGHS(p.amount)} <span class="small" style="color:#64748b">(${p.note||''})</span></div><div class="small" style="color:#94a3b8">${new Date(p.date).toLocaleString()}</div>`;
-    recentPaymentsEl.appendChild(div);
-  });
-}
-
-document.getElementById('submitPayment').addEventListener('click', ()=>{
-  const idx = paymentEmployeeSelect.value;
-  const amount = Number(document.getElementById('paymentAmount').value) || 0;
-  const note = document.getElementById('paymentNote').value || '';
-  if(idx === '' || amount <= 0){ alert('Choose an employee and a valid amount'); return; }
-  const employees = readEmployees();
-  const emp = employees[Number(idx)];
-  if(!emp){ alert('Employee not found'); return; }
-  const payments = safeParse(localStorage.getItem(paymentsKey)) || [];
-  const rec = { name: emp.fullName, employeeIndex: Number(idx), amount, note, date: new Date().toISOString() };
-  payments.push(rec);
-  localStorage.setItem(paymentsKey, JSON.stringify(payments));
-  showToast('Payment recorded', 2500);
-  populatePaymentSelect();
-  updateStats();
-});
-
-/* ---------- Attendance chart ---------- */
-function drawAttendance(){
+function drawAttendanceChart(){
   const ctx = document.getElementById('attendanceChart').getContext('2d');
-  const att = safeParse(localStorage.getItem(attendanceKey)) || [];
-  // Simple simulated last 7 days percent:
-  const labels = [];
-  const data = [];
+  const labels=[], data=[];
   for(let i=6;i>=0;i--){
-    const d = new Date(); d.setDate(d.getDate()-i);
-    labels.push(d.toLocaleDateString());
-    // compute attendance of that day if attendance array stores checkins with date; otherwise random
-    const dayCount = (att.filter(a => a.date && new Date(a.date).toDateString() === d.toDateString()).length) || (Math.floor(Math.random()*20)+80);
-    data.push(Math.min(100, dayCount));
+    const d=new Date(); d.setDate(d.getDate()-i); labels.push(d.toLocaleDateString());
+    data.push(Math.floor(Math.random()*16)+80);
   }
   if(attendanceChart) attendanceChart.destroy();
-  attendanceChart = new Chart(ctx, { type:'line', data:{ labels, datasets:[{label:'Attendance %', data, borderColor:'#0b63a3', backgroundColor:'rgba(11,99,163,0.08)', fill:true, tension:0.3 }] }, options:{responsive:true, scales:{y:{min:0,max:100}}} });
+  attendanceChart = new Chart(ctx, { type:'line', data:{ labels, datasets:[{ label:'Attendance %', data, borderColor:'#0b63a3', backgroundColor:'rgba(11,99,163,0.08)', fill:true, tension:0.3 }] }, options:{ responsive:true, scales:{ y:{min:0,max:100}} } });
 }
 
-/* ---------- Payroll analytics ---------- */
-function drawPayrollDept(){
-  const ctx = document.getElementById('payrollDeptChart').getContext('2d');
-  const employees = readEmployees();
+function drawPayrollCharts(){
+  const deptCtx = document.getElementById('payrollDeptChart').getContext('2d');
+  const trendCtx = document.getElementById('payrollTrendChart').getContext('2d');
+  const employees = getEmployees();
   const map = {};
-  employees.forEach(e => { const d = e.department || 'Unassigned'; map[d] = (map[d]||0) + (Number(e.salary)||0); });
-  const labels = Object.keys(map);
-  const data = Object.values(map);
+  employees.forEach(e=>{ const d=e.department||'Unassigned'; map[d]=(map[d]||0)+(Number(e.salary)||0); });
+  const labels = Object.keys(map), data = Object.values(map);
   if(payrollDeptChart) payrollDeptChart.destroy();
-  payrollDeptChart = new Chart(ctx, { type:'pie', data:{labels, datasets:[{data, backgroundColor: labels.map((_,i)=>['#0b63a3','#00a6b6','#ffb74d','#ff7a7a','#9b59b6'][i%5])}]}, options:{responsive:true} });
-}
+  payrollDeptChart = new Chart(deptCtx, { type:'pie', data:{ labels, datasets:[{ data, backgroundColor: ['#0b63a3','#00a6b6','#ffb74d','#ff7a7a','#9b59b6'] }] }, options:{responsive:true} });
 
-function drawPayrollTrend(){
-  const ctx = document.getElementById('payrollTrendChart').getContext('2d');
-  // derive monthly payroll totals from payments stored (paymentsKey) or from static salary sums
-  const payments = safeParse(localStorage.getItem(paymentsKey)) || [];
-  const months = [];
-  const values = [];
+  const payments = readPayments();
+  const months = []; const sums=[];
   for(let m=0;m<12;m++){
-    months.push(new Date(2024, m, 1).toLocaleString(undefined, {month:'short'}));
-    const total = payments.filter(p => new Date(p.date).getMonth() === m).reduce((s,p)=>s+(Number(p.amount)||0),0);
-    values.push(total);
+    months.push(new Date(2024,m,1).toLocaleString(undefined,{month:'short'}));
+    sums.push(payments.filter(p=> new Date(p.date).getMonth()===m).reduce((s,p)=>s+(Number(p.amount)||0),0));
   }
   if(payrollTrendChart) payrollTrendChart.destroy();
-  payrollTrendChart = new Chart(ctx, { type:'bar', data:{labels:months, datasets:[{label:'Payments', data:values, backgroundColor:'#0b63a3'}]}, options:{responsive:true} });
+  payrollTrendChart = new Chart(trendCtx, { type:'bar', data:{ labels: months, datasets:[{ label:'Payments', data: sums, backgroundColor:'#0b63a3' }] }, options:{responsive:true} });
 }
 
-/* ---------- Department Breakdown ---------- */
-function populateDeptSelect(){
-  const employees = readEmployees();
-  const depts = Array.from(new Set(employees.map(e=>e.department||'Unassigned'))).sort();
-  const sel = document.getElementById('deptSelect');
-  sel.innerHTML = '';
-  depts.forEach(d => { const opt = document.createElement('option'); opt.value = d; opt.textContent = d; sel.appendChild(opt); });
-}
-document.getElementById('loadDept').addEventListener('click', ()=>{
-  const dept = document.getElementById('deptSelect').value;
-  const perf = safeParse(localStorage.getItem(performanceKey)) || {};
-  const employees = readEmployees().filter(e => (e.department||'Unassigned') === dept);
-  const tbodyDept = document.querySelector('#deptTable tbody'); tbodyDept.innerHTML = '';
-  let total=0;
-  employees.forEach((e,i)=>{
-    const scores = perf[e.fullName] ? Object.values(perf[e.fullName]).map(Number).filter(n=>!isNaN(n)) : [];
-    const avg = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : 0;
-    total += avg;
-    const tr = document.createElement('tr'); tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(e.fullName)}</td><td>${avg?avg.toFixed(1)+'%':'0%'}</td>`; tbodyDept.appendChild(tr);
-  });
-  const avg = employees.length ? (total/employees.length).toFixed(1) : 0;
-  document.getElementById('deptAverage').textContent = `Average Score: ${avg}%`;
-});
-document.getElementById('downloadDept').addEventListener('click', ()=>{
-  const { jsPDF } = window.jspdf; const doc = new jsPDF();
-  doc.text('Department Report',14,18);
-  const rows = Array.from(document.querySelectorAll('#deptTable tbody tr'));
-  let y=38;
-  rows.forEach(r=>{ doc.text(Array.from(r.cells).map(c=>c.innerText).join('  |  '),14,y); y+=8; if(y>760){doc.addPage();y=20;} });
-  doc.save('department_report.pdf');
-});
-
-/* ---------- Report modal controls ---------- */
-document.getElementById('openEmployeeReport').addEventListener('click', ()=>{
-  reportModal.style.display='flex'; reportModal.setAttribute('aria-hidden','false');
-});
-document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click', (e)=>{ e.target.closest('.modal').style.display='none'; e.target.closest('.modal').setAttribute('aria-hidden','true'); }));
-
-document.getElementById('downloadPdf').addEventListener('click', ()=>{
-  const { jsPDF } = window.jspdf; const doc = new jsPDF('l','pt','a4'); doc.setFontSize(14); doc.text('Employee Report',14,20);
-  const rows = Array.from(document.querySelectorAll('#reportTable tbody tr'));
+/* -------------- Employee Report PDF -------------- */
+document.getElementById('downloadPdfBtn').addEventListener('click', ()=>{
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('l','pt','a4');
+  doc.setFontSize(14);
+  doc.text('Employee Report',14,20);
+  const rows = Array.from(document.querySelectorAll('#reportTbody tr'));
   let y = 40;
-  rows.forEach(r => { const line = Array.from(r.cells).map(c=>c.innerText).join('  |  '); doc.text(line,14,y); y+=10; if(y>520){doc.addPage(); y=20;} });
-  doc.save('employees_report.pdf');
+  rows.forEach(r=>{
+    const line = Array.from(r.cells).map(c=>c.innerText).join(' | ');
+    doc.text(line, 14, y); y+=10;
+    if(y > 520){ doc.addPage(); y=20; }
+  });
+  doc.save('employee_report.pdf');
 });
-document.getElementById('refreshReport').addEventListener('click', ()=> { renderEmployees(); showToast('Data refreshed'); });
 
-/* ---------- Payment modal controls ---------- */
-document.getElementById('openPaymentPortal').addEventListener('click', ()=> { paymentModal.style.display='flex'; paymentModal.setAttribute('aria-hidden','false'); populatePaymentSelect(); });
-function populatePaymentSelect(){ const employees = readEmployees(); paymentEmployeeSelect.innerHTML = '<option value="">-- Select Employee --</option>'; employees.forEach((e,i)=>{ const o = document.createElement('option'); o.value = i; o.textContent = e.fullName || e.email || `Employee ${i+1}`; paymentEmployeeSelect.appendChild(o); }); const payments = safeParse(localStorage.getItem(paymentsKey)) || []; recentPaymentsEl.innerHTML=''; if(!payments.length) recentPaymentsEl.innerHTML='<div class="small">No payments recorded</div>'; else payments.slice().reverse().slice(0,10).forEach(p=>{ const div=document.createElement('div'); div.style.padding='8px'; div.style.borderBottom='1px solid #eef6fb'; div.innerHTML = `<div class="small">${escapeHtml(p.name)} — ${formatGHS(p.amount)}</div><div class="small" style="color:#64748b">${new Date(p.date).toLocaleString()}</div>`; recentPaymentsEl.appendChild(div); }); }
+/* -------------- Search, View Toggle -------------- */
+document.getElementById('globalSearch').addEventListener('input', (e)=>{
+  const q = (e.target.value||'').toLowerCase();
+  if(!q){ renderEmployees(); return; }
+  const filtered = getEmployees().filter(emp => (emp.fullName||'').toLowerCase().includes(q) || (emp.department||'').toLowerCase().includes(q) || (emp.position||'').toLowerCase().includes(q) || (emp.phone||'').toLowerCase().includes(q));
+  renderEmployees(filtered);
+});
 
-document.getElementById('submitPayment').addEventListener('click', ()=>{
-  const idx = paymentEmployeeSelect.value;
-  const amount = Number(document.getElementById('paymentAmount').value) || 0;
-  const note = document.getElementById('paymentNote').value || '';
-  if(idx === '' || amount <= 0){ alert('Select employee and valid amount'); return; }
-  const employees = readEmployees(); const emp = employees[Number(idx)];
-  if(!emp){ alert('Employee not found'); return; }
-  const payments = safeParse(localStorage.getItem(paymentsKey)) || [];
-  payments.push({ name: emp.fullName, employeeIndex: Number(idx), amount, note, date: new Date().toISOString() });
-  localStorage.setItem(paymentsKey, JSON.stringify(payments));
-  showToast('Payment saved');
+let cardView = false;
+document.getElementById('toggleViewBtn').addEventListener('click', ()=>{
+  cardView = !cardView;
+  document.getElementById('tableContainer').style.display = cardView ? 'none' : 'block';
+  cardsContainer.style.display = cardView ? 'flex' : 'none';
+  document.getElementById('toggleViewBtn').textContent = cardView ? 'Table View' : 'Cards View';
+});
+
+/* -------------- Open modals -------------- */
+document.getElementById('openReport').addEventListener('click', ()=> new bootstrap.Modal(document.getElementById('reportModal')).show());
+document.getElementById('openPayment').addEventListener('click', ()=> { populatePaymentSelect(); new bootstrap.Modal(document.getElementById('paymentModal')).show(); });
+document.getElementById('openAttendance').addEventListener('click', ()=> { drawAttendanceChart(); new bootstrap.Modal(document.getElementById('attendanceModal')).show(); });
+document.querySelectorAll('.left-nav a').forEach(a=> a.addEventListener('click', (ev)=>{ ev.preventDefault(); document.querySelectorAll('.left-nav a').forEach(x=>x.classList.remove('active')); a.classList.add('active'); const t = a.getAttribute('data-target'); if(t==='employee') new bootstrap.Modal(document.getElementById('reportModal')).show(); if(t==='payment') document.getElementById('openPayment').click(); if(t==='attendance') document.getElementById('openAttendance').click(); if(t==='payroll') { drawPayrollCharts(); new bootstrap.Modal(document.getElementById('payrollModal')).show(); } if(t==='performance') new bootstrap.Modal(document.getElementById('performanceModal')).show(); }));
+
+/* -------------- Refresh and initial render -------------- */
+document.getElementById('refreshBtn').addEventListener('click', ()=> { renderAll(); showToast('Refreshed'); });
+
+function renderAll(){
+  renderEmployees();
   populatePaymentSelect();
+  drawAttendanceChart();
+  drawPayrollCharts();
   updateStats();
-});
-
-/* ---------- Attendance & Payroll analytics open ---------- */
-document.getElementById('openAttendance').addEventListener('click', ()=> { attendanceModal.style.display='flex'; attendanceModal.setAttribute('aria-hidden','false'); drawAttendance(); });
-document.getElementById('refreshAll').addEventListener('click', ()=> { renderEmployees(); drawAttendance(); drawPayrollDept(); drawPayrollTrend(); showToast('Refreshed'); });
-document.getElementById('topDeptCard').addEventListener('click', ()=> { departmentModal.style.display='flex'; departmentModal.setAttribute('aria-hidden','false'); populateDeptSelect(); });
-
-document.getElementById('openPaymentPortal').addEventListener('click', () => { populatePaymentSelect(); });
-
-document.getElementById('openAttendance')?.addEventListener('click', () => drawAttendance());
-document.getElementById('openPaymentPortal')?.addEventListener('click', () => populatePaymentSelect());
-document.getElementById('openEmployeeReport')?.addEventListener('click', () => renderEmployees());
-
-/* ---------- Payroll modals ---------- */
-document.getElementById('payrollModal')?.addEventListener('show', ()=>{ drawPayrollDept(); drawPayrollTrend(); });
-
-document.getElementById('exportPdfButton')?.addEventListener('click', ()=>{}); // placeholder
-
-/* ---------- Utilities & sync ---------- */
-function showToast(msg, ms=1800){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), ms); }
-
-// delete
-function deleteEmployee(i){
-  if(!confirm('Delete employee?')) return;
-  const arr = readEmployees(); arr.splice(i,1); saveEmployees(arr); renderEmployees(); showToast('Deleted');
+  refreshAcctList();
 }
+function refreshAcctList(){ refreshAcctListLocal(); } // forward
+function refreshAcctListLocal(){ refreshAcctList = refreshAcctListLocalImpl; refreshAcctListLocalImpl(); } // placeholder
 
-// open edit (re-use employee add modal)
-function openEdit(i){
-  const arr = readEmployees(); const e = arr[i];
-  if(!e) return;
-  // open the modal we used for adding employees earlier (we have employee.html as separate)
-  // We'll create a simple edit form overlay here:
-  openEditOverlay(i,e);
-}
+// We need to declare refreshAcctListLocalImpl after its definition below
+let refreshAcctListLocalImpl = function(){ const arr = readAccounts(); acctList.innerHTML=''; arr.forEach((a,i)=>{ const tr = document.createElement('tr'); tr.innerHTML = `<td>${a.name}</td><td>${a.email}</td><td>${a.role}</td><td style="text-align:right"><button class="btn btn-sm btn-outline-primary me-1" onclick="editAcct(${i})">Edit</button><button class="btn btn-sm btn-outline-danger" onclick="delAcct(${i})">Delete</button></td>`; acctList.appendChild(tr); }); };
 
-/* ---------- Simple edit overlay (re-using add form behavior) ---------- */
-function openEditOverlay(index, emp){
-  // Create overlay form programmatically (small modal) to edit
-  const overlay = document.createElement('div'); overlay.style.position='fixed'; overlay.style.inset=0; overlay.style.background='rgba(0,0,0,0.6)'; overlay.style.display='flex'; overlay.style.alignItems='center'; overlay.style.justifyContent='center'; overlay.style.zIndex=1400;
-  const box = document.createElement('div'); box.style.background='#fff'; box.style.borderRadius='8px'; box.style.padding='18px'; box.style.width='520px'; box.style.maxHeight='90vh'; box.style.overflow='auto';
-  box.innerHTML = `<h3>Edit Employee</h3>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <label>Full Name<input value="${escapeHtml(emp.fullName||'')}" id="edit_fullName"></label>
-      <label>Department<input value="${escapeHtml(emp.department||'')}" id="edit_department"></label>
-      <label>Position<input value="${escapeHtml(emp.position||'')}" id="edit_position"></label>
-      <label>Email<input value="${escapeHtml(emp.email||'')}" id="edit_email"></label>
-      <label>Phone<input value="${escapeHtml(emp.phone||'')}" id="edit_phone"></label>
-      <label>Salary<input value="${escapeHtml(emp.salary||'')}" id="edit_salary" type="number"></label>
-      <label>Hire Date<input value="${escapeHtml(emp.hireDate||'')}" id="edit_hireDate" type="date"></label>
-    </div>
-    <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn ghost" id="cancelEdit">Cancel</button>
-      <button class="btn" id="saveEdit">Save</button>
-    </div>`;
-  overlay.appendChild(box); document.body.appendChild(overlay);
-  document.getElementById('cancelEdit').addEventListener('click', ()=> overlay.remove());
-  document.getElementById('saveEdit').addEventListener('click', ()=>{
-    const updated = {
-      fullName: document.getElementById('edit_fullName').value,
-      department: document.getElementById('edit_department').value,
-      position: document.getElementById('edit_position').value,
-      email: document.getElementById('edit_email').value,
-      phone: document.getElementById('edit_phone').value,
-      salary: Number(document.getElementById('edit_salary').value) || 0,
-      hireDate: document.getElementById('edit_hireDate').value || ''
-    };
-    const arr = readEmployees(); arr[index] = Object.assign({}, arr[index], updated); saveEmployees(arr);
-    overlay.remove();
-    renderEmployees();
-    showToast('Employee updated');
-  });
-}
+// necessary because above function references it
+function refreshAcctList(){ refreshAcctListLocalImpl(); }
 
-/* ---------- Populate and draw payroll charts ---------- */
-function populateDeptSelect(){
-  const employees = readEmployees(); const depts = Array.from(new Set(employees.map(e=> e.department || 'Unassigned'))).sort();
-  const s = document.getElementById('deptSelect'); s.innerHTML=''; depts.forEach(d=>{ const o=document.createElement('option'); o.value=d; o.textContent=d; s.appendChild(o); });
-}
-function drawPayrollDeptChart(){
-  const ctx = document.getElementById('payrollDeptChart'); if(!ctx) return;
-  const c = ctx.getContext('2d');
-  const employees = readEmployees();
-  const sums = {};
-  employees.forEach(e=>{ const d = e.department || 'Unassigned'; sums[d] = (sums[d]||0) + (Number(e.salary)||0); });
-  const labels = Object.keys(sums); const data = Object.values(sums);
-  if(payrollDeptChart) payrollDeptChart.destroy();
-  payrollDeptChart = new Chart(c, { type:'pie', data:{labels, datasets:[{data, backgroundColor: labels.map((_,i)=>['#0b63a3','#00a6b6','#ffb74d','#ff7a7a','#9b59b6'][i%5])}]}, options:{responsive:true} });
-}
-function drawPayrollTrendChart(){
-  const ctx = document.getElementById('payrollTrendChart'); if(!ctx) return;
-  const c = ctx.getContext('2d');
-  const payments = safeParse(localStorage.getItem(paymentsKey)) || [];
-  const labels = []; const data = [];
-  for(let m=0;m<12;m++){
-    labels.push(new Date(2024,m,1).toLocaleString(undefined,{month:'short'}));
-    const sum = payments.filter(p=> new Date(p.date).getMonth()===m).reduce((s,p)=>s+(Number(p.amount)||0),0);
-    data.push(sum);
-  }
-  if(payrollTrendChart) payrollTrendChart.destroy();
-  payrollTrendChart = new Chart(c, { type:'bar', data:{labels, datasets:[{label:'Payments', data, backgroundColor:'#0b63a3'}]}, options:{responsive:true} });
-}
+/* -------------- Storage sync -------------- */
+window.addEventListener('storage', (e)=> { /* update on external changes */ renderAll(); });
 
-/* ---------- Initial load ---------- */
-renderEmployees();
-drawAttendance();
-drawPayrollDeptChart();
-drawPayrollTrendChart();
-populateDeptSelect();
-
-/* ---------- Live sync ---------- */
-window.addEventListener('storage', (e)=>{ if(['employees','payments','performanceData','attendance'].includes(e.key)){ renderEmployees(); drawAttendance(); drawPayrollDeptChart(); drawPayrollTrendChart(); populateDeptSelect(); } });
-// polling fallback (same-tab updates)
+/* Poll fallback */
 let lastEmployeesSnapshot = localStorage.getItem(employeesKey) || '';
-setInterval(()=>{ const curr = localStorage.getItem(employeesKey)||''; if(curr !== lastEmployeesSnapshot){ lastEmployeesSnapshot = curr; renderEmployees(); drawAttendance(); drawPayrollDeptChart(); drawPayrollTrendChart(); populateDeptSelect(); } }, 3000);
+setInterval(()=>{ const curr = localStorage.getItem(employeesKey)||''; if(curr !== lastEmployeesSnapshot){ lastEmployeesSnapshot = curr; renderAll(); } }, 3000);
 
-/* ---------- small utility: open new employee add page if you have employee.html hosted separately ---------- */
-/* If you use the employee.html to add employees, it writes to localStorage.employees — this dashboard will pick them up automatically. */
-
-</script>
-  <script>
-// PROTECT HR DASHBOARD
-if (!localStorage.getItem("hr_logged_in")) {
-    window.location.href = "login.html";
-}
-</script>
-<script>
-function logout() {
-    localStorage.removeItem("hr_logged_in");
-    window.location.href = "login.html";
-}
-  
-// HR Accounts management (requires window.__HR_SESSION set by auth check)
-(async function(){
-  if(!window.__HR_SESSION) return;
-  // show manage button only for Admins
-  if(window.__HR_SESSION.role !== 'Admin') return;
-
-  // create a small Manage Accounts button in header
-  const hdr = document.querySelector('header');
-  if(hdr){
-    const btn = document.createElement('button');
-    btn.className='btn ghost';
-    btn.style.marginLeft='12px';
-    btn.textContent = 'Manage HR Accounts';
-    btn.onclick = ()=> document.getElementById('hrAccountsModal').style.display='flex';
-    hdr.appendChild(btn);
+/* -------------- Init -------------- */
+window.addEventListener('load', async ()=>{
+  // ensure helper exists
+  window.__HR_SESSION = getSession();
+  updateAuthUI();
+  // If not logged in and no accounts exist, show embedded login overlay (Create Admin to bootstrap)
+  if(!getSession() && (readAccounts().length === 0)){
+    // show overlay so user can create initial admin
+    loginOverlay.style.display='flex';
+  } else if(!getSession()){
+    // show overlay for login
+    loginOverlay.style.display='flex';
+  } else {
+    // logged-in
+    renderAll();
   }
-
-  // utility hash
-  async function sha256Hex(str){
-    const enc = new TextEncoder(), buf = enc.encode(str);
-    const h = await crypto.subtle.digest('SHA-256', buf);
-    return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2,'0')).join('');
-  }
-
-  // elements
-  const modal = document.getElementById('hrAccountsModal');
-  const closeBtns = modal.querySelectorAll('[data-close-hr]');
-  closeBtns.forEach(b=> b.addEventListener('click', ()=> modal.style.display='none'));
-
-  const nameEl = document.getElementById('acct_name');
-  const emailEl = document.getElementById('acct_email');
-  const passEl = document.getElementById('acct_password');
-  const roleEl = document.getElementById('acct_role');
-  const saveBtn = document.getElementById('acctSaveBtn');
-  const clearBtn = document.getElementById('acctClearBtn');
-  const listBody = document.getElementById('acctList');
-
-  let editingIndex = -1;
-
-  function readAccounts(){ try{ return JSON.parse(localStorage.getItem('hr_accounts'))||[] }catch(e){ return [] } }
-  function saveAccounts(a){ localStorage.setItem('hr_accounts', JSON.stringify(a)); }
-
-  function refreshList(){
-    const arr = readAccounts();
-    listBody.innerHTML = '';
-    arr.forEach((a,i)=>{
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${a.name||''}</td><td>${a.email||''}</td><td>${a.role||''}</td><td style="text-align:right">
-        <button class="btn ghost" data-edit="${i}">Edit</button>
-        <button class="btn" data-del="${i}">Delete</button></td>`;
-      listBody.appendChild(tr);
-    });
-    // wire buttons
-    listBody.querySelectorAll('[data-edit]').forEach(b=> b.addEventListener('click', e=>{
-      const idx = Number(e.currentTarget.getAttribute('data-edit'));
-      const a = readAccounts()[idx];
-      editingIndex = idx;
-      nameEl.value = a.name || '';
-      emailEl.value = a.email || '';
-      passEl.value = ''; // do not prefill hash
-      roleEl.value = a.role || 'HR Manager';
-    }));
-    listBody.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', e=>{
-      const idx = Number(e.currentTarget.getAttribute('data-del'));
-      if(!confirm('Delete this HR account?')) return;
-      const arr = readAccounts(); arr.splice(idx,1); saveAccounts(arr); refreshList();
-      alert('Account deleted.');
-    }));
-  }
-
-  clearBtn.addEventListener('click', ()=>{ editingIndex = -1; nameEl.value=''; emailEl.value=''; passEl.value=''; roleEl.value='HR Manager'; });
-
-  saveBtn.addEventListener('click', async ()=>{
-    const name = nameEl.value.trim(); const email = emailEl.value.trim().toLowerCase();
-    const pw = passEl.value; const role = roleEl.value;
-    if(!name || !email){ alert('Name and email required'); return; }
-    let arr = readAccounts();
-    if(editingIndex >= 0){
-      // update
-      arr[editingIndex].name = name;
-      arr[editingIndex].email = email;
-      arr[editingIndex].role = role;
-      if(pw) arr[editingIndex].passwordHash = await sha256Hex(pw);
-      saveAccounts(arr);
-      alert('Account updated.');
-    } else {
-      if(!pw){ alert('Password required for new accounts'); return; }
-      // ensure unique email
-      if(arr.some(a=>a.email === email)){ alert('Email already used'); return; }
-      const hash = await sha256Hex(pw);
-      arr.push({ name, email, role, passwordHash: hash });
-      saveAccounts(arr);
-      alert('Account created.');
-    }
-    editingIndex = -1; nameEl.value=''; emailEl.value=''; passEl.value=''; roleEl.value='HR Manager';
-    refreshList();
-  });
-
-  refreshList();
-})();
-
-</script>
-  <button class="btn ghost" onclick="logoutHR()">Logout</button>
-<script>
-function logoutHR(){
-  localStorage.removeItem('hr_session');
-  window.location.href = 'login.html';
-}
-  let hrAccounts = JSON.parse(localStorage.getItem("hrAccounts")) || [];
-
-document.getElementById("hrAccountForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-
-    const name = document.getElementById("hrName").value.trim();
-    const email = document.getElementById("hrEmail").value.trim();
-    const password = document.getElementById("hrPassword").value.trim();
-    const role = document.getElementById("hrRole").value;
-
-    if (!name || !email || !password) {
-        alert("Please fill all fields.");
-        return;
-    }
-
-    // Check if email already exists
-    const exists = hrAccounts.some(acc => acc.email === email);
-    if (exists) {
-        alert("This email already exists!");
-        return;
-    }
-
-    hrAccounts.push({ name, email, password, role });
-    localStorage.setItem("hrAccounts", JSON.stringify(hrAccounts));
-
-    alert("HR Account saved successfully!");
-
-    loadHRAccounts();
-    e.target.reset();
 });
 
-// Load accounts
-function loadHRAccounts() {
-    const table = document.getElementById("hrAccountsList");
-    table.innerHTML = "";
+// small helper to show HR accounts management for Admin on page load
+manageAccountsBtn.addEventListener('click', ()=> { refreshAcctList(); new bootstrap.Modal(document.getElementById('hrAccountsModal')).show(); });
 
-    hrAccounts.forEach((acc, index) => {
-        table.innerHTML += `
-            <tr>
-                <td>${acc.name}</td>
-                <td>${acc.email}</td>
-                <td>${acc.role}</td>
-                <td><button onclick="deleteHRAccount(${index})">Delete</button></td>
-            </tr>
-        `;
-    });
-}
+/* fix: expose functions used by inline button attributes */
+window.openEditEmployee = openEditEmployee;
+window.deleteEmployee = deleteEmployee;
+window.editAcct = editAcct;
+window.delAcct = delAcct;
+window.refreshAcctList = refreshAcctList;
 
-// Delete account
-function deleteHRAccount(i) {
-    if (confirm("Delete this HR Account?")) {
-        hrAccounts.splice(i, 1);
-        localStorage.setItem("hrAccounts", JSON.stringify(hrAccounts));
-        loadHRAccounts();
-    }
-}
+/* ensure initial rendering when user logs in */
+const loginObserver = new MutationObserver(()=>{ if(getSession()) renderAll(); });
+loginObserver.observe(document.body, { attributes: true, childList: true, subtree: true });
 
 </script>
 
-<!-- Manage HR Accounts (Admin only) -->
-<div id="hrAccountsModal" class="modal" style="display:none">
-  <div class="box" style="max-width:760px">
-    <button class="close" data-close-hr>&times;</button>
-    <h3>Manage HR Accounts</h3>
-    <div style="display:flex;gap:12px;margin-top:12px">
-      <div style="flex:1">
-        <div style="margin-bottom:8px">
-          <label>Full name</label>
-          <input id="acct_name" type="text" style="width:100%;padding:8px;border-radius:6px;border:1px solid #e6f2fa">
-        </div>
-        <div style="margin-bottom:8px">
-          <label>Email</label>
-          <input id="acct_email" type="email" style="width:100%;padding:8px;border-radius:6px;border:1px solid #e6f2fa">
-        </div>
-        <div style="margin-bottom:8px">
-          <label>Password</label>
-          <input id="acct_password" type="password" style="width:100%;padding:8px;border-radius:6px;border:1px solid #e6f2fa">
-        </div>
-        <div style="margin-bottom:8px">
-          <label>Role</label>
-          <select id="acct_role" style="width:100%;padding:8px;border-radius:6px;border:1px solid #e6f2fa">
-            <option>Admin</option>
-            <option>HR Manager</option>
-            <option>Payroll Officer</option>
-            <option>Supervisor</option>
-          </select>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button id="acctSaveBtn" class="btn">Save</button>
-          <button id="acctClearBtn" class="btn ghost">Clear</button>
-        </div>
-      </div>
-
-      <div style="width:40%;max-height:360px;overflow:auto;border-left:1px solid #eef6fb;padding-left:12px">
-        <h4>Existing Accounts</h4>
-        <table style="width:100%;border-collapse:collapse">
-          <thead><tr><th style="text-align:left">Name</th><th style="text-align:left">Email</th><th style="text-align:left">Role</th><th></th></tr></thead>
-          <tbody id="acctList"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-<button class="btn btn-primary" onclick="saveHRAccount()">Save</button>
-
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
