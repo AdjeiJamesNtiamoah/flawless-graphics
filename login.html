@@ -3,42 +3,49 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Multi-Org HR — Login</title>
+  <title>Multi-Org HR — Login & Org Creation</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-    body{font-family:'Poppins',sans-serif;background:#f3f7fb;margin:0;display:flex;align-items:center;justify-content:center;height:100vh}
-    .card{width:420px;background:#fff;padding:20px;border-radius:12px;box-shadow:0 8px 28px rgba(6,18,40,0.08)}
-    h2{margin:0 0 8px}
-    .muted{color:#64748b;font-size:13px}
+    :root{--accent:#0b63a3;--muted:#6b7a89}
+    body{font-family:'Poppins',sans-serif;margin:0;background:#f3f7fb;display:flex;align-items:center;justify-content:center;height:100vh}
+    .card{width:520px;background:#fff;padding:20px;border-radius:12px;box-shadow:0 10px 40px rgba(2,6,23,.08)}
+    h2{margin:0 0 6px}
+    .muted{color:var(--muted);font-size:13px}
     label{font-weight:600;margin-top:12px;display:block}
-    input,select{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef9;margin-top:6px}
+    input, select, textarea { width:100%; padding:10px; margin-top:6px; border-radius:8px; border:1px solid #e6eef9 }
     .row{display:flex;gap:8px;margin-top:12px}
-    button{padding:10px 12px;border-radius:8px;border:none;background:#0b63a3;color:#fff;font-weight:600;cursor:pointer}
-    button.ghost{background:transparent;border:1px solid #e6eef9;color:#0b63a3}
-    .link{background:none;border:none;color:#0b63a3;cursor:pointer;padding:6px;font-size:13px}
+    button{padding:10px 12px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
+    button.ghost{background:transparent;border:1px solid #e6eef9;color:var(--accent)}
+    .link{background:none;border:none;color:var(--accent);cursor:pointer;padding:6px;font-size:13px}
     .error{color:#b91c1c;margin-top:8px;display:none}
-    .notice{background:#f1f8ff;color:#0b63a3;padding:8px;border-radius:8px;margin-top:12px;display:none}
-    .small{font-size:13px;color:#64748b}
-    .org-actions{display:flex;gap:8px;margin-top:12px}
+    .notice{background:#f1f8ff;color:var(--accent);padding:8px;border-radius:8px;margin-top:12px;display:none}
+    .small{font-size:13px;color:var(--muted)}
+    .two{display:flex;gap:8px}
+    .center{display:flex;justify-content:center}
+    .hidden{display:none}
+    .org-list{max-height:120px;overflow:auto;border:1px dashed #e6eef9;padding:6px;border-radius:6px;margin-top:8px}
+    .org-item{padding:6px;border-radius:6px;cursor:pointer}
+    .org-item:hover{background:#f1f8ff}
   </style>
 </head>
 <body>
   <div class="card" role="main" aria-labelledby="title">
-    <h2 id="title">Flawless Graphics — HR Login</h2>
-    <div class="muted">Sign in to your organization's HR dashboard</div>
+    <h2 id="title">Multi-Organization HR — Login</h2>
+    <div class="muted">Select an organization or create a new one. This system stores data locally in your browser (demo/internal use).</div>
 
-    <label>Organization</label>
+    <label style="margin-top:14px">Organization</label>
     <select id="orgSelect"></select>
 
-    <div class="org-actions">
-      <button id="createOrgBtn" class="ghost">+ New Org</button>
-      <button id="refreshOrgs" class="ghost">Refresh</button>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button id="createOrgBtn" class="ghost">+ Create New Org</button>
+      <button id="refreshOrgs" class="ghost">Refresh Orgs</button>
+      <button id="manageLocalBtn" class="ghost">Manage Local</button>
     </div>
 
-    <label>Email</label>
+    <label style="margin-top:12px">Email</label>
     <input id="email" type="email" placeholder="hr@org.com">
 
-    <label>Password</label>
+    <label style="margin-top:8px">Password</label>
     <div style="display:flex;gap:8px;align-items:center">
       <input id="password" type="password" placeholder="Password" style="flex:1">
       <button id="togglePass" class="link">Show</button>
@@ -46,218 +53,363 @@
 
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px">
       <label style="display:flex;align-items:center;gap:6px"><input id="remember" type="checkbox"> Remember me</label>
-      <button id="forgotBtn" class="link">Forgot?</button>
+      <div>
+        <button id="forgotBtn" class="link">Forgot?</button>
+      </div>
     </div>
 
     <div class="row" style="margin-top:16px">
       <button id="loginBtn" style="flex:1">Login</button>
-      <button id="createAdminBtn" class="ghost" style="width:140px">Create Admin</button>
+      <button id="createAdminBtn" class="ghost" style="width:170px">Register HR (New Org)</button>
     </div>
 
     <div id="errorBox" class="error"></div>
     <div id="infoBox" class="notice"></div>
 
-    <div class="small" style="margin-top:12px">If the organization has no HR accounts yet, click <strong>Create Admin</strong> to create the first Admin for the selected org.</div>
+    <div class="muted" style="margin-top:12px">If this is a new organization: click <b>Create New Org</b>, type the organization name, then fill the Enterprise HR Registration form that appears.<br><small>Passwords are stored hashed (SHA-256) when the browser supports it.</small></div>
   </div>
 
-  <!-- Forgot / Reset modal (inline) -->
-  <div id="forgotModal" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,0.55);z-index:2000;align-items:center;justify-content:center">
-    <div style="background:#fff;padding:16px;border-radius:10px;max-width:420px;width:95%">
-      <h3 style="margin:0 0 8px">Reset Password (offline)</h3>
-      <div class="muted">This system has no email backend. The reset code will be displayed here so an Admin can set a new password offline.</div>
-
-      <label style="margin-top:10px">Organization</label>
-      <select id="resetOrg"></select>
-
-      <label style="margin-top:8px">Email</label>
-      <input id="resetEmail" type="email" placeholder="hr@org.com">
-
-      <div style="display:flex;gap:8px;margin-top:12px">
-        <button id="generateReset" class="btn">Generate Reset Code</button>
-        <button id="closeForgot" class="ghost">Close</button>
+  <!-- CREATE ORG + HR REGISTRATION MODAL (inline div overlay) -->
+  <div id="orgModal" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,0.6);z-index:2000;align-items:center;justify-content:center">
+    <div style="background:#fff;padding:18px;border-radius:10px;max-width:760px;width:96%;max-height:90vh;overflow:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 style="margin:0">Create Organization & Register First HR (Enterprise)</h3>
+        <button id="closeOrgModal" class="link">Close</button>
       </div>
 
-      <div id="resetResult" style="display:none;margin-top:12px">
-        <div class="muted">Reset code (copy and give to user):</div>
-        <div id="resetCodeBox" style="font-weight:700;color:#0b63a3;margin-top:8px"></div>
+      <div style="margin-top:12px" class="muted">Enter the organization name below (no duplicates). Then fill the Enterprise HR Registration form to create the first Admin for this organization.</div>
+
+      <label style="margin-top:12px">Organization Name</label>
+      <input id="newOrgName" placeholder="e.g. FlawlessGraphics">
+
+      <hr style="margin:12px 0">
+
+      <h5 style="margin:6px 0">Enterprise HR Registration (first HR for this org)</h5>
+      <div class="muted">Full HR profile is required. This HR will be created as <strong>Admin</strong> for the org unless you choose otherwise.</div>
+
+      <form id="hrRegForm" style="margin-top:10px">
+        <label>Full Name</label>
+        <input id="reg_fullName" required>
+
+        <label>Email</label>
+        <input id="reg_email" type="email" required>
+
+        <label>Password</label>
+        <input id="reg_password" type="password" required>
+
+        <label>Phone</label>
+        <input id="reg_phone" placeholder="233xxxxxxxxx">
+
+        <label>Role</label>
+        <select id="reg_role"><option>Admin</option><option>HR Manager</option><option>Payroll Officer</option><option>Supervisor</option></select>
+
+        <label>2FA PIN (4-6 digits)</label>
+        <input id="reg_pin" placeholder="e.g. 1234">
+
+        <label>Security Question</label>
+        <input id="reg_secq" placeholder="e.g. What is your favourite color?">
+
+        <label>Security Answer</label>
+        <input id="reg_seca" placeholder="Answer">
+
+        <label>Profile Photo (optional)</label>
+        <input id="reg_photo" type="file" accept="image/*">
+
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button type="submit">Create Organization & Register HR</button>
+          <button type="button" id="resetReg" class="ghost">Reset</button>
+        </div>
+      </form>
+
+      <div id="orgRegMsg" class="muted" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div id="forgotModal" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,0.6);z-index:2001;align-items:center;justify-content:center">
+    <div style="background:#fff;padding:16px;border-radius:10px;max-width:520px;width:96%">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h4 style="margin:0">Forgot Password (Offline Reset)</h4>
+        <button id="closeForgot" class="link">Close</button>
+      </div>
+      <div class="muted" style="margin-top:8px">This system doesn't send emails. The reset code will be shown on-screen and can be used to reset the password.</div>
+
+      <label style="margin-top:12px">Organization</label>
+      <select id="forgot_org"></select>
+
+      <label style="margin-top:8px">Email</label>
+      <input id="forgot_email" type="email">
+
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button id="generateReset" class="ghost">Generate Reset Code</button>
+        <button id="applyReset" class="ghost">Apply Reset (enter code & new password)</button>
+      </div>
+
+      <div id="resetArea" style="display:none;margin-top:12px">
+        <div class="muted">Reset Code (copy this):</div>
+        <div id="resetCodeBox" style="font-weight:700;color:var(--accent);margin-top:8px"></div>
 
         <hr style="margin:12px 0">
 
-        <label>Enter code</label>
-        <input id="enterResetCode" placeholder="123456">
+        <label>Enter Reset Code</label>
+        <input id="enterResetCode">
 
-        <label style="margin-top:8px">New password</label>
-        <input id="newPassword" type="password">
+        <label style="margin-top:8px">New Password</label>
+        <input id="enterNewPassword" type="password">
 
         <div style="display:flex;gap:8px;margin-top:10px">
-          <button id="confirmReset" class="btn">Reset Password</button>
-          <button id="closeReset" class="ghost">Close</button>
+          <button id="confirmReset" class="ghost">Confirm Reset</button>
         </div>
-        <div id="resetMsg" style="margin-top:8px"></div>
+
+        <div id="resetMsg" class="muted" style="margin-top:8px"></div>
       </div>
     </div>
   </div>
 
 <script>
-/* Login page for multiple organizations + multi-user roles
-   - org list stored in localStorage under 'org_list' (array of org names)
-   - HR accounts per org stored under key: <org>_hrAccounts
-   - first Admin for org can be created via "Create Admin"
-   - passwords stored as SHA-256 hash (passwordHash) where possible
-   - on login, set:
+/* login.html: multi-org + enterprise HR registration
+   - org list stored at 'org_list' (array)
+   - hr accounts for org stored at `${org}_hrAccounts` as array of accounts
+     account shape: { name, email, role, phone, pin, securityQuestion, securityAnswerHash, photo (dataURL), passwordHash, createdAt }
+   - on successful login set:
        localStorage.setItem('activeOrg', org)
-       localStorage.setItem('activeHR', JSON.stringify({ email, role, name }))
+       localStorage.setItem('activeHR', JSON.stringify({ email, role, name, org }))
 */
 
-const orgSelect = document.getElementById('orgSelect');
-const resetOrg = document.getElementById('resetOrg');
-const errorBox = document.getElementById('errorBox');
-const infoBox = document.getElementById('infoBox');
+function safeParse(s){ try{ return JSON.parse(s);}catch(e){ return null } }
+function saveOrgList(list){ localStorage.setItem('org_list', JSON.stringify(list)); }
+function getOrgList(){ return safeParse(localStorage.getItem('org_list')) || []; }
 
-function safeParse(s){ try{ return JSON.parse(s); }catch(e){return null} }
-function loadOrgs(){
-  const list = safeParse(localStorage.getItem('org_list')) || [];
-  // ensure default example
-  if(!list.length){
-    list.push('FlawlessGraphics');
-    list.push('GoldenMedia');
-    localStorage.setItem('org_list', JSON.stringify(list));
-  }
-  orgSelect.innerHTML = '<option value="">-- Select Organization --</option>';
-  resetOrg.innerHTML = '<option value="">-- Select Organization --</option>';
-  list.forEach(o=>{
-    const opt = document.createElement('option'); opt.value = o; opt.textContent = o; orgSelect.appendChild(opt);
-    const opt2 = document.createElement('option'); opt2.value = o; opt2.textContent = o; resetOrg.appendChild(opt2);
-  });
-}
-loadOrgs();
-
-document.getElementById('refreshOrgs').addEventListener('click', loadOrgs);
-
-// Utility: SHA-256 -> hex
 async function sha256Hex(str){
   try{
     const enc = new TextEncoder();
     const buf = enc.encode(str);
     const hash = await crypto.subtle.digest('SHA-256', buf);
     return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  }catch(e){ return str; }
+  }catch(e){
+    // fallback (not secure)
+    return str;
+  }
 }
 
-// Read accounts for org
-function hrAccountsKey(org){ return `${org}_hrAccounts`; }
-function readHRAccounts(org){ return safeParse(localStorage.getItem(hrAccountsKey(org))) || []; }
-function saveHRAccounts(org, arr){ localStorage.setItem(hrAccountsKey(org), JSON.stringify(arr)); }
+function hrKey(org){ return `${org}_hrAccounts`; }
+function initOrgKeys(org){
+  // ensure the organization's keys exist and are arrays/objects
+  if(!org) return;
+  if(!localStorage.getItem('org_list')) saveOrgList([org]);
+  const list = getOrgList();
+  if(!list.includes(org)){ list.push(org); saveOrgList(list); }
+  if(!localStorage.getItem(hrKey(org))) localStorage.setItem(hrKey(org), JSON.stringify([]));
+  if(!localStorage.getItem(`${org}_employees`)) localStorage.setItem(`${org}_employees`, JSON.stringify([]));
+  if(!localStorage.getItem(`${org}_payments`)) localStorage.setItem(`${org}_payments`, JSON.stringify([]));
+  if(!localStorage.getItem(`${org}_attendance`)) localStorage.setItem(`${org}_attendance`, JSON.stringify([]));
+  if(!localStorage.getItem(`${org}_performanceData`)) localStorage.setItem(`${org}_performanceData`, JSON.stringify({}));
+}
 
-// Login
-document.getElementById('loginBtn').addEventListener('click', async ()=>{
-  errorBox.style.display='none'; infoBox.style.display='none';
-  const org = orgSelect.value;
-  const email = (document.getElementById('email').value || '').trim().toLowerCase();
-  const pw = (document.getElementById('password').value || '').trim();
-  const remember = document.getElementById('remember').checked;
-  if(!org || !email || !pw){ errorBox.style.display='block'; errorBox.textContent = 'Organization, email and password are required.'; return; }
+function loadOrgsToSelect(){
+  const sel = document.getElementById('orgSelect');
+  sel.innerHTML = '<option value="">-- Select Organization --</option>';
+  const list = getOrgList();
+  list.forEach(o=> {
+    const opt = document.createElement('option'); opt.value = o; opt.textContent = o; sel.appendChild(opt);
+  });
 
-  let accounts = readHRAccounts(org);
-  // If no accounts exist for org -> tell user to create admin
-  if(!accounts.length){
-    errorBox.style.display='block'; errorBox.textContent = `No HR accounts for "${org}". Click Create Admin to create the first Admin.`;
-    return;
+  // forgot modal org select
+  const forgotSel = document.getElementById('forgot_org'); forgotSel.innerHTML = '<option value="">-- Select Org --</option>';
+  list.forEach(o=> { const opt = document.createElement('option'); opt.value = o; opt.textContent = o; forgotSel.appendChild(opt); });
+}
+
+// initial bootstrap: ensure there's at least one sample org
+if(!localStorage.getItem('org_list')){
+  saveOrgList(['FlawlessGraphics']);
+  initOrgKeys('FlawlessGraphics');
+}
+
+// UI elements
+const orgSelect = document.getElementById('orgSelect');
+const createOrgBtn = document.getElementById('createOrgBtn');
+const refreshOrgsBtn = document.getElementById('refreshOrgs');
+const createAdminBtn = document.getElementById('createAdminBtn');
+const loginBtn = document.getElementById('loginBtn');
+const errorBox = document.getElementById('errorBox');
+const infoBox = document.getElementById('infoBox');
+const togglePass = document.getElementById('togglePass');
+const rememberCb = document.getElementById('remember');
+
+loadOrgsToSelect();
+orgSelect.value = getOrgList()[0] || '';
+
+// toggle password visibility
+togglePass.addEventListener('click', ()=> {
+  const p = document.getElementById('password');
+  p.type = p.type === 'password' ? 'text' : 'password';
+  togglePass.textContent = p.type === 'password' ? 'Show' : 'Hide';
+});
+
+// refresh orgs
+refreshOrgsBtn.addEventListener('click', ()=> { loadOrgsToSelect(); showInfo('Organizations refreshed'); });
+
+// Create Org flow -> opens modal with Enterprise HR registration
+createOrgBtn.addEventListener('click', ()=> {
+  document.getElementById('orgModal').style.display = 'flex';
+  document.getElementById('newOrgName').value = '';
+  document.getElementById('orgRegMsg').textContent = '';
+});
+
+// close org modal
+document.getElementById('closeOrgModal').addEventListener('click', ()=> { document.getElementById('orgModal').style.display='none'; });
+
+// HR registration submit (for new org)
+document.getElementById('hrRegForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const org = (document.getElementById('newOrgName').value || '').trim();
+  const name = (document.getElementById('reg_fullName').value || '').trim();
+  const email = (document.getElementById('reg_email').value || '').trim().toLowerCase();
+  const pw = (document.getElementById('reg_password').value || '').trim();
+  const phone = (document.getElementById('reg_phone').value || '').trim();
+  const role = (document.getElementById('reg_role').value || 'Admin');
+  const pin = (document.getElementById('reg_pin').value || '').trim();
+  const secq = (document.getElementById('reg_secq').value || '').trim();
+  const seca = (document.getElementById('reg_seca').value || '').trim();
+  const photoInput = document.getElementById('reg_photo');
+
+  if(!org){ alert('Organization name required'); return; }
+  if(!name || !email || !pw){ alert('Name, email, and password required'); return; }
+
+  // read file if provided (photo)
+  let photoData = '';
+  if(photoInput.files && photoInput.files[0]){
+    const f = photoInput.files[0];
+    const reader = new FileReader();
+    reader.onload = async function(evt){
+      photoData = evt.target.result;
+      await finalizeOrgCreation();
+    };
+    reader.readAsDataURL(f);
+  } else {
+    await finalizeOrgCreation();
   }
 
-  // check hashed and plain compatibility
-  const hashed = await sha256Hex(pw);
-  const acc = accounts.find(a => (a.email === email) && ( (a.passwordHash && a.passwordHash === hashed) || (a.password && a.password === pw) ));
-  if(!acc){ errorBox.style.display='block'; errorBox.textContent = 'Incorrect email or password.'; return; }
+  async function finalizeOrgCreation(){
+    initOrgKeys(org); // create keys
+    // load existing accounts to ensure unique email
+    const accounts = safeParse(localStorage.getItem(hrKey(org))) || [];
+    if(accounts.some(a=>a.email === email)){ document.getElementById('orgRegMsg').textContent = 'An account with that email already exists for this org'; return; }
 
-  // set session
-  const session = { email: acc.email, role: acc.role || 'HR Manager', name: acc.name || acc.email, created: Date.now() };
+    const pwHash = await sha256Hex(pw);
+    const secHash = seca ? await sha256Hex(seca) : '';
+    const account = {
+      name, email, role, phone, pin, securityQuestion: secq, securityAnswerHash: secHash,
+      photo: photoData || '', passwordHash: pwHash, createdAt: Date.now()
+    };
+    accounts.push(account);
+    localStorage.setItem(hrKey(org), JSON.stringify(accounts));
+
+    // ensure org listed
+    const list = getOrgList();
+    if(!list.includes(org)){ list.push(org); saveOrgList(list); }
+
+    document.getElementById('orgRegMsg').textContent = `Organization "${org}" created and HR "${email}" registered as ${role}. You can now login.`;
+    loadOrgsToSelect();
+    // auto-select new org
+    orgSelect.value = org;
+    // hide modal after a moment
+    setTimeout(()=> document.getElementById('orgModal').style.display='none', 900);
+  }
+});
+
+// reset reg form
+document.getElementById('resetReg').addEventListener('click', ()=> {
+  document.getElementById('hrRegForm').reset();
+  document.getElementById('orgRegMsg').textContent = '';
+});
+
+// Create Admin (alias for registration flow for selected org) - opens org modal pre-filled with org selection
+createAdminBtn.addEventListener('click', ()=> {
+  const selOrg = orgSelect.value || '';
+  document.getElementById('orgModal').style.display='flex';
+  if(selOrg) document.getElementById('newOrgName').value = selOrg;
+});
+
+// LOGIN behavior
+loginBtn.addEventListener('click', async ()=> {
+  errorBox.style.display='none'; infoBox.style.display='none';
+  const org = (document.getElementById('orgSelect').value || '').trim();
+  const email = (document.getElementById('email').value || '').trim().toLowerCase();
+  const pw = (document.getElementById('password').value || '').trim();
+  const remember = rememberCb.checked;
+
+  if(!org || !email || !pw){ errorBox.style.display='block'; errorBox.textContent = 'Organization, email and password are required'; return; }
+
+  initOrgKeys(org); // ensure keys exist even if org was just typed
+  const accounts = safeParse(localStorage.getItem(hrKey(org))) || [];
+  if(accounts.length === 0){ errorBox.style.display='block'; errorBox.textContent = `No HR accounts for "${org}". Use Create New Org to register the first HR.`; return; }
+
+  const hash = await sha256Hex(pw);
+  const acc = accounts.find(a => a.email === email && ((a.passwordHash && a.passwordHash === hash) || (a.password && a.password === pw)));
+  if(!acc){ errorBox.style.display='block'; errorBox.textContent = 'Incorrect email or password'; return; }
+
+  // session
+  const session = { org, email: acc.email, name: acc.name || acc.email, role: acc.role || 'HR Manager', createdAt: Date.now() };
   localStorage.setItem('activeOrg', org);
   localStorage.setItem('activeHR', JSON.stringify(session));
   if(remember) localStorage.setItem('rememberHR', JSON.stringify(session));
+
+  // redirect to dashboard
   window.location.href = 'hr-dashboard.html';
 });
 
-// Toggle password visibility
-document.getElementById('togglePass').addEventListener('click', ()=>{
-  const p = document.getElementById('password');
-  p.type = p.type === 'password' ? 'text' : 'password';
-  document.getElementById('togglePass').textContent = p.type === 'password' ? 'Show' : 'Hide';
+// FORGOT password flow
+document.getElementById('forgotBtn').addEventListener('click', ()=> {
+  document.getElementById('forgotModal').style.display = 'flex';
+  // populate forgot org list
+  const list = getOrgList();
+  const sel = document.getElementById('forgot_org'); sel.innerHTML = '<option value="">-- Select Org --</option>';
+  list.forEach(o=> sel.appendChild(Object.assign(document.createElement('option'), { value:o, textContent:o })));
 });
-
-// Create Admin: creates first admin account for selected org (or prompts for new org)
-document.getElementById('createAdminBtn').addEventListener('click', async ()=>{
-  const org = orgSelect.value || prompt('Organization name to create admin for (e.g. FlawlessGraphics):');
-  if(!org) return;
-  let accounts = readHRAccounts(org);
-  if(accounts.length > 0){ alert('This organization already has HR accounts. Use Manage HR Accounts in dashboard.'); return; }
-  const email = prompt('Admin email', `admin@${org.toLowerCase()}.com`);
-  if(!email) return;
-  const name = prompt('Full name', 'HR Admin') || 'HR Admin';
-  const pw = prompt('Set admin password', 'Flawless@123');
-  if(!pw) return;
-  const hash = await sha256Hex(pw);
-  const acct = { name, email: (email||'').trim().toLowerCase(), role: 'Admin', passwordHash: hash };
-  saveHRAccounts(org, [acct]);
-
-  // ensure org in org_list
-  const all = safeParse(localStorage.getItem('org_list')) || [];
-  if(!all.includes(org)) { all.push(org); localStorage.setItem('org_list', JSON.stringify(all)); loadOrgs(); }
-  infoBox.style.display='block';
-  infoBox.textContent = `Admin created for "${org}". Now login with ${acct.email}`;
-});
-
-// Create org button (simple): prompts for org name and optionally creates admin
-document.getElementById('createOrgBtn').addEventListener('click', ()=>{
-  const name = prompt('Organization name (no spaces recommended)', 'NewOrganization');
-  if(!name) return;
-  const list = safeParse(localStorage.getItem('org_list')) || [];
-  if(!list.includes(name)) { list.push(name); localStorage.setItem('org_list', JSON.stringify(list)); loadOrgs(); }
-  alert(`Organization "${name}" added. Use Create Admin to create first Admin.`);
-});
-
-// Create initial Admin (alias of Create Admin)
-document.getElementById('createAdminBtn').addEventListener('click', ()=>{/* handled above */});
-
-// Forgot password modal flows
-document.getElementById('forgotBtn').addEventListener('click', ()=>{ document.getElementById('forgotModal').style.display='flex'; document.getElementById('resetResult').style.display='none'; });
-document.getElementById('closeForgot').addEventListener('click', ()=>{ document.getElementById('forgotModal').style.display='none'; });
-document.getElementById('generateReset').addEventListener('click', ()=>{
-  const org = document.getElementById('resetOrg').value;
-  const email = (document.getElementById('resetEmail').value||'').trim().toLowerCase();
-  if(!org || !email){ alert('Choose organization and enter email'); return; }
-  const accounts = readHRAccounts(org);
+document.getElementById('closeForgot').addEventListener('click', ()=> { document.getElementById('forgotModal').style.display='none'; });
+document.getElementById('generateReset').addEventListener('click', ()=> {
+  const org = (document.getElementById('forgot_org').value || '').trim();
+  const email = (document.getElementById('forgot_email').value || '').trim().toLowerCase();
+  if(!org || !email){ alert('Select org and enter email'); return; }
+  const accounts = safeParse(localStorage.getItem(hrKey(org))) || [];
   const idx = accounts.findIndex(a=>a.email === email);
   if(idx === -1){ alert('Account not found'); return; }
   const code = Math.floor(100000 + Math.random()*900000).toString();
   accounts[idx].resetCode = code;
-  accounts[idx].resetExpires = Date.now() + (10 * 60 * 1000); // 10 min
-  saveHRAccounts(org, accounts);
-  document.getElementById('resetResult').style.display='block';
+  accounts[idx].resetExpires = Date.now() + (10 * 60 * 1000);
+  localStorage.setItem(hrKey(org), JSON.stringify(accounts));
+  document.getElementById('resetArea').style.display='block';
   document.getElementById('resetCodeBox').textContent = code + ' (valid 10 min)';
 });
-document.getElementById('confirmReset').addEventListener('click', async ()=>{
-  const org = document.getElementById('resetOrg').value;
-  const code = (document.getElementById('enterResetCode').value||'').trim();
-  const npw = (document.getElementById('newPassword').value||'').trim();
+document.getElementById('confirmReset').addEventListener('click', async ()=> {
+  const org = (document.getElementById('forgot_org').value || '').trim();
+  const code = (document.getElementById('enterResetCode').value || '').trim();
+  const npw = (document.getElementById('enterNewPassword').value || '').trim();
   if(!org || !code || !npw){ document.getElementById('resetMsg').textContent = 'Enter code and new password'; return; }
-  const accounts = readHRAccounts(org);
-  const idx = accounts.findIndex(a => a.resetCode === code && a.resetExpires && Date.now() <= a.resetExpires);
+  const accounts = safeParse(localStorage.getItem(hrKey(org))) || [];
+  const idx = accounts.findIndex(a=> a.resetCode === code && a.resetExpires && Date.now() <= a.resetExpires);
   if(idx === -1){ document.getElementById('resetMsg').textContent = 'Invalid or expired code'; return; }
   accounts[idx].passwordHash = await sha256Hex(npw);
   delete accounts[idx].resetCode; delete accounts[idx].resetExpires;
-  saveHRAccounts(org, accounts);
-  document.getElementById('resetMsg').textContent = 'Password reset. You can now login.';
+  localStorage.setItem(hrKey(org), JSON.stringify(accounts));
+  document.getElementById('resetMsg').textContent = 'Password updated. You can now login.';
 });
-document.getElementById('closeReset').addEventListener('click', ()=>{ document.getElementById('forgotModal').style.display='none'; });
 
-// On load: ensure org list exists and select the first org
+// small helpers
+function showInfo(msg){ infoBox.style.display='block'; infoBox.textContent = msg; setTimeout(()=> infoBox.style.display='none', 3000); }
+function showError(msg){ errorBox.style.display='block'; errorBox.textContent = msg; }
+
+// Manage local storage (debug) - clears rememberHR
+document.getElementById('manageLocalBtn').addEventListener('click', ()=> {
+  if(confirm('Clear "rememberHR" and return to login?')){ localStorage.removeItem('rememberHR'); alert('Cleared'); }
+});
+
+// on load set selects
 window.addEventListener('load', ()=> {
-  loadOrgs();
-  const list = safeParse(localStorage.getItem('org_list')) || [];
+  loadOrgsToSelect();
+  const list = getOrgList();
   if(list.length) orgSelect.value = list[0];
-  // also set resetOrg select
-  if(resetOrg.options.length) resetOrg.value = orgSelect.value;
 });
 </script>
 </body>
