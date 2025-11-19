@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Flawless Graphics — Sign in</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--accent:#0b63a3;--bg:#f6fbff;--muted:#6b7a89}
+    body{margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(180deg,var(--bg),#eef6fb);display:flex;align-items:center;justify-content:center;height:100vh;padding:20px}
+    .box{width:100%;max-width:460px;background:#fff;border-radius:12px;padding:20px;box-shadow:0 12px 40px rgba(8,26,48,0.06)}
+    h2{margin:0 0 8px}
+    label{font-weight:600;color:var(--muted);font-size:13px}
+    input{width:100%;padding:10px;margin-top:6px;border-radius:8px;border:1px solid #e7f0f6;background:#fbfeff}
+    .row{display:flex;gap:8px;margin-top:12px}
+    .primary{background:var(--accent);color:white;padding:10px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
+    .ghost{background:transparent;border:1px solid #e6eef9;padding:10px;border-radius:8px;cursor:pointer}
+    .muted{color:var(--muted);font-size:13px}
+    .error{color:#b91c1c;display:none;margin-top:8px;font-weight:700}
+    .link{background:none;border:none;color:var(--accent);cursor:pointer;padding:6px}
+  </style>
+</head>
+<body>
+  <div class="box" role="main" aria-labelledby="signin">
+    <h2 id="signin">Sign in to Flawless Graphics</h2>
+    <div class="muted">Sign in as a Website User. HR and Employees use the HR portal.</div>
+
+    <label style="margin-top:12px">Email</label>
+    <input id="email" type="email" placeholder="you@example.com">
+
+    <label style="margin-top:8px">Password</label>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input id="password" type="password" placeholder="Password" style="flex:1">
+      <button id="toggle" class="link">Show</button>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+      <label style="display:flex;align-items:center;gap:8px"><input id="remember" type="checkbox"> Remember me</label>
+      <button id="forgotBtn" class="link">Forgot?</button>
+    </div>
+
+    <div class="row" style="margin-top:14px">
+      <button id="loginBtn" class="primary" style="flex:1">Sign in</button>
+      <button id="registerBtn" class="ghost">Register</button>
+    </div>
+
+    <div id="err" class="error" role="alert"></div>
+    <div style="margin-top:12px" class="muted">Or sign in with your organization HR sign-in at <a href="login.html">HR Login</a></div>
+  </div>
+
+<script>
+  // helpers
+  function safeParse(s){ try{ return JSON.parse(s); }catch(e){ return null; } }
+  async function sha256Hex(str){
+    try{
+      const enc = new TextEncoder();
+      const buf = enc.encode(str);
+      const h = await crypto.subtle.digest('SHA-256', buf);
+      return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }catch(e){ return str; }
+  }
+
+  const USERS_KEY = 'flawless_site_users';
+  function readUsers(){ return safeParse(localStorage.getItem(USERS_KEY)) || []; }
+
+  // UI
+  const toggle = document.getElementById('toggle');
+  toggle.addEventListener('click', ()=> {
+    const p = document.getElementById('password');
+    p.type = p.type === 'password' ? 'text' : 'password';
+    toggle.textContent = p.type === 'password' ? 'Show' : 'Hide';
+  });
+
+  document.getElementById('registerBtn').addEventListener('click', ()=> {
+    window.location.href = 'site-register.html';
+  });
+
+  document.getElementById('loginBtn').addEventListener('click', async ()=> {
+    const email = (document.getElementById('email').value || '').trim().toLowerCase();
+    const pw = (document.getElementById('password').value || '').trim();
+    const remember = document.getElementById('remember').checked;
+    const err = document.getElementById('err'); err.style.display='none';
+
+    if(!email || !pw){ err.textContent = 'Please enter email and password.'; err.style.display='block'; return; }
+
+    const users = readUsers();
+    if(!users.length){ err.textContent = 'No website users found. Please register.'; err.style.display='block'; return; }
+
+    const h = await sha256Hex(pw);
+    const user = users.find(u => u.email === email && (u.passwordHash === h || u.password === pw));
+    if(!user){ err.textContent = 'Invalid email or password.'; err.style.display='block'; return; }
+
+    // create a session for website users
+    const session = { id: user.id, email: user.email, name: (user.firstName||'') + ' ' + (user.lastName||''), role: user.role || 'WebsiteUser', createdAt: Date.now() };
+    localStorage.setItem('site_active_user', JSON.stringify(session));
+    if(remember) localStorage.setItem('site_remember_user', JSON.stringify(session));
+
+    // redirect to index.html (as you requested)
+    window.location.href = 'index.html';
+  });
+
+  // Forgot flow: show basic inline prompt
+  document.getElementById('forgotBtn').addEventListener('click', ()=> {
+    const email = prompt('Enter your registration email for reset code:');
+    if(!email) return;
+    const users = readUsers();
+    const idx = users.findIndex(u => u.email === email.toLowerCase().trim());
+    if(idx === -1){ alert('Email not found.'); return; }
+    const code = Math.floor(100000 + Math.random()*900000).toString();
+    users[idx].resetCode = code;
+    users[idx].resetExpires = Date.now() + (10 * 60 * 1000);
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    alert('Reset code (copy and use below):\n\n' + code + '\n\nOpen this page again, click "Forgot?" and use "Confirm Reset" option to set a new password.');
+    // Now allow confirm flow:
+    const entered = prompt('Enter the reset code you got (or Cancel):');
+    if(!entered) return;
+    if(entered !== code){ alert('Invalid code'); return; }
+    const npw = prompt('Enter your new password (min 8 chars):');
+    if(!npw || npw.length < 8){ alert('Invalid password'); return; }
+    const h = await sha256Hex(npw);
+    const users2 = readUsers();
+    users2[idx].passwordHash = h;
+    delete users2[idx].resetCode; delete users2[idx].resetExpires;
+    localStorage.setItem(USERS_KEY, JSON.stringify(users2));
+    alert('Password reset successful — you can now login with new password.');
+  });
+</script>
+</body>
+</html>
