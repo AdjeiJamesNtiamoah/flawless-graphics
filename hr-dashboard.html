@@ -774,6 +774,14 @@ function logout() {
 })();
 
 </script>
+  <button class="btn ghost" onclick="logoutHR()">Logout</button>
+<script>
+function logoutHR(){
+  localStorage.removeItem('hr_session');
+  window.location.href = 'login.html';
+}
+</script>
+
 <!-- Manage HR Accounts (Admin only) -->
 <div id="hrAccountsModal" class="modal" style="display:none">
   <div class="box" style="max-width:760px">
