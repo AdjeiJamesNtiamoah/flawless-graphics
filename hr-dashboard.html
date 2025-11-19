@@ -239,6 +239,22 @@
 <div id="toast" style="position:fixed;right:18px;bottom:18px;display:none;z-index:3000"></div>
 
 <script>
+  const activeOrg = localStorage.getItem("active_org");
+if (!activeOrg) {
+    window.location.href = "site-login.html";
+}
+
+// Each organization has its OWN employees list!
+const EMP_KEY = "employees_" + activeOrg;
+
+function loadEmployees() {
+    return JSON.parse(localStorage.getItem(EMP_KEY) || "[]");
+}
+
+function saveEmployees(list) {
+    localStorage.setItem(EMP_KEY, JSON.stringify(list));
+}
+
 /* hr-dashboard.html - per-organization dashboard
    - expects localStorage.activeOrg and localStorage.activeHR
    - ensures all keys for the org are initialized
