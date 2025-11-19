@@ -1,142 +1,264 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Flawless Graphics – Multi-Org Login</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-body {
-    margin: 0;
-    font-family: Poppins, sans-serif;
-    background: #f0f4f7;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
-.login-box {
-    background: #fff;
-    padding: 30px;
-    width: 100%;
-    max-width: 420px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 16px rgba(0,0,0,0.15);
-}
-
-h2 {
-    text-align: center;
-    color: #003366;
-    margin-bottom: 20px;
-    font-weight: 600;
-}
-
-label {
-    font-size: 0.9em;
-    font-weight: 600;
-}
-
-input, select {
-    width: 100%;
-    padding: 12px;
-    margin-top: 6px;
-    margin-bottom: 18px;
-    border-radius: 8px;
-    border: 1px solid #bbb;
-}
-
-button {
-    width: 100%;
-    padding: 12px;
-    background: #003366;
-    color: white;
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-button:hover {
-    background: #002244;
-}
-
-.error {
-    color: red;
-    text-align: center;
-    margin-bottom: 10px;
-    font-weight: 500;
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Multi-Org HR — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:'Poppins',sans-serif;background:#f3f7fb;margin:0;display:flex;align-items:center;justify-content:center;height:100vh}
+    .card{width:420px;background:#fff;padding:20px;border-radius:12px;box-shadow:0 8px 28px rgba(6,18,40,0.08)}
+    h2{margin:0 0 8px}
+    .muted{color:#64748b;font-size:13px}
+    label{font-weight:600;margin-top:12px;display:block}
+    input,select{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef9;margin-top:6px}
+    .row{display:flex;gap:8px;margin-top:12px}
+    button{padding:10px 12px;border-radius:8px;border:none;background:#0b63a3;color:#fff;font-weight:600;cursor:pointer}
+    button.ghost{background:transparent;border:1px solid #e6eef9;color:#0b63a3}
+    .link{background:none;border:none;color:#0b63a3;cursor:pointer;padding:6px;font-size:13px}
+    .error{color:#b91c1c;margin-top:8px;display:none}
+    .notice{background:#f1f8ff;color:#0b63a3;padding:8px;border-radius:8px;margin-top:12px;display:none}
+    .small{font-size:13px;color:#64748b}
+    .org-actions{display:flex;gap:8px;margin-top:12px}
+  </style>
 </head>
-
 <body>
-
-<div class="login-box">
-    <h2>HR Login</h2>
-
-    <div id="errorMsg" class="error"></div>
+  <div class="card" role="main" aria-labelledby="title">
+    <h2 id="title">Flawless Graphics — HR Login</h2>
+    <div class="muted">Sign in to your organization's HR dashboard</div>
 
     <label>Organization</label>
-    <select id="orgSelect" required>
-        <option value="">-- Select Organization --</option>
-        <option value="FlawlessGraphics">Flawless Graphics</option>
-        <option value="TruthAndService">Truth & Service</option>
-        <option value="GoldenMedia">Golden Media</option>
-    </select>
+    <select id="orgSelect"></select>
+
+    <div class="org-actions">
+      <button id="createOrgBtn" class="ghost">+ New Org</button>
+      <button id="refreshOrgs" class="ghost">Refresh</button>
+    </div>
 
     <label>Email</label>
-    <input type="email" id="email" placeholder="example@mail.com" required>
+    <input id="email" type="email" placeholder="hr@org.com">
 
     <label>Password</label>
-    <input type="password" id="password" placeholder="Enter Password" required>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input id="password" type="password" placeholder="Password" style="flex:1">
+      <button id="togglePass" class="link">Show</button>
+    </div>
 
-    <button onclick="login()">Login</button>
-</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px">
+      <label style="display:flex;align-items:center;gap:6px"><input id="remember" type="checkbox"> Remember me</label>
+      <button id="forgotBtn" class="link">Forgot?</button>
+    </div>
+
+    <div class="row" style="margin-top:16px">
+      <button id="loginBtn" style="flex:1">Login</button>
+      <button id="createAdminBtn" class="ghost" style="width:140px">Create Admin</button>
+    </div>
+
+    <div id="errorBox" class="error"></div>
+    <div id="infoBox" class="notice"></div>
+
+    <div class="small" style="margin-top:12px">If the organization has no HR accounts yet, click <strong>Create Admin</strong> to create the first Admin for the selected org.</div>
+  </div>
+
+  <!-- Forgot / Reset modal (inline) -->
+  <div id="forgotModal" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,0.55);z-index:2000;align-items:center;justify-content:center">
+    <div style="background:#fff;padding:16px;border-radius:10px;max-width:420px;width:95%">
+      <h3 style="margin:0 0 8px">Reset Password (offline)</h3>
+      <div class="muted">This system has no email backend. The reset code will be displayed here so an Admin can set a new password offline.</div>
+
+      <label style="margin-top:10px">Organization</label>
+      <select id="resetOrg"></select>
+
+      <label style="margin-top:8px">Email</label>
+      <input id="resetEmail" type="email" placeholder="hr@org.com">
+
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button id="generateReset" class="btn">Generate Reset Code</button>
+        <button id="closeForgot" class="ghost">Close</button>
+      </div>
+
+      <div id="resetResult" style="display:none;margin-top:12px">
+        <div class="muted">Reset code (copy and give to user):</div>
+        <div id="resetCodeBox" style="font-weight:700;color:#0b63a3;margin-top:8px"></div>
+
+        <hr style="margin:12px 0">
+
+        <label>Enter code</label>
+        <input id="enterResetCode" placeholder="123456">
+
+        <label style="margin-top:8px">New password</label>
+        <input id="newPassword" type="password">
+
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button id="confirmReset" class="btn">Reset Password</button>
+          <button id="closeReset" class="ghost">Close</button>
+        </div>
+        <div id="resetMsg" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </div>
 
 <script>
-function login() {
-    const org = document.getElementById('orgSelect').value;
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-    const errorMsg = document.getElementById('errorMsg');
+/* Login page for multiple organizations + multi-user roles
+   - org list stored in localStorage under 'org_list' (array of org names)
+   - HR accounts per org stored under key: <org>_hrAccounts
+   - first Admin for org can be created via "Create Admin"
+   - passwords stored as SHA-256 hash (passwordHash) where possible
+   - on login, set:
+       localStorage.setItem('activeOrg', org)
+       localStorage.setItem('activeHR', JSON.stringify({ email, role, name }))
+*/
 
-    if (!org || !email || !password) {
-        errorMsg.textContent = "Please fill all fields.";
-        return;
-    }
+const orgSelect = document.getElementById('orgSelect');
+const resetOrg = document.getElementById('resetOrg');
+const errorBox = document.getElementById('errorBox');
+const infoBox = document.getElementById('infoBox');
 
-    // Each org gets its own HR accounts storage
-    const hrKey = org + "_hrAccounts";
-    let hrAccounts = JSON.parse(localStorage.getItem(hrKey)) || [];
-
-    // If no account exists, create a default SUPER ADMIN
-    if (hrAccounts.length === 0) {
-        hrAccounts.push({
-            fullName: "Super Admin",
-            email: "admin@" + org.toLowerCase() + ".com",
-            password: "admin123",
-            role: "Admin"
-        });
-
-        localStorage.setItem(hrKey, JSON.stringify(hrAccounts));
-    }
-
-    // Match account
-    const user = hrAccounts.find(u => u.email === email && u.password === password);
-
-    if (!user) {
-        errorMsg.textContent = "Invalid login details.";
-        return;
-    }
-
-    // Save active session
-    localStorage.setItem("activeOrg", org);
-    localStorage.setItem("activeHR", JSON.stringify(user));
-
-    // Redirect to HR Dashboard
-    window.location.href = "hr-dashboard.html";
+function safeParse(s){ try{ return JSON.parse(s); }catch(e){return null} }
+function loadOrgs(){
+  const list = safeParse(localStorage.getItem('org_list')) || [];
+  // ensure default example
+  if(!list.length){
+    list.push('FlawlessGraphics');
+    list.push('GoldenMedia');
+    localStorage.setItem('org_list', JSON.stringify(list));
+  }
+  orgSelect.innerHTML = '<option value="">-- Select Organization --</option>';
+  resetOrg.innerHTML = '<option value="">-- Select Organization --</option>';
+  list.forEach(o=>{
+    const opt = document.createElement('option'); opt.value = o; opt.textContent = o; orgSelect.appendChild(opt);
+    const opt2 = document.createElement('option'); opt2.value = o; opt2.textContent = o; resetOrg.appendChild(opt2);
+  });
 }
-</script>
+loadOrgs();
 
+document.getElementById('refreshOrgs').addEventListener('click', loadOrgs);
+
+// Utility: SHA-256 -> hex
+async function sha256Hex(str){
+  try{
+    const enc = new TextEncoder();
+    const buf = enc.encode(str);
+    const hash = await crypto.subtle.digest('SHA-256', buf);
+    return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }catch(e){ return str; }
+}
+
+// Read accounts for org
+function hrAccountsKey(org){ return `${org}_hrAccounts`; }
+function readHRAccounts(org){ return safeParse(localStorage.getItem(hrAccountsKey(org))) || []; }
+function saveHRAccounts(org, arr){ localStorage.setItem(hrAccountsKey(org), JSON.stringify(arr)); }
+
+// Login
+document.getElementById('loginBtn').addEventListener('click', async ()=>{
+  errorBox.style.display='none'; infoBox.style.display='none';
+  const org = orgSelect.value;
+  const email = (document.getElementById('email').value || '').trim().toLowerCase();
+  const pw = (document.getElementById('password').value || '').trim();
+  const remember = document.getElementById('remember').checked;
+  if(!org || !email || !pw){ errorBox.style.display='block'; errorBox.textContent = 'Organization, email and password are required.'; return; }
+
+  let accounts = readHRAccounts(org);
+  // If no accounts exist for org -> tell user to create admin
+  if(!accounts.length){
+    errorBox.style.display='block'; errorBox.textContent = `No HR accounts for "${org}". Click Create Admin to create the first Admin.`;
+    return;
+  }
+
+  // check hashed and plain compatibility
+  const hashed = await sha256Hex(pw);
+  const acc = accounts.find(a => (a.email === email) && ( (a.passwordHash && a.passwordHash === hashed) || (a.password && a.password === pw) ));
+  if(!acc){ errorBox.style.display='block'; errorBox.textContent = 'Incorrect email or password.'; return; }
+
+  // set session
+  const session = { email: acc.email, role: acc.role || 'HR Manager', name: acc.name || acc.email, created: Date.now() };
+  localStorage.setItem('activeOrg', org);
+  localStorage.setItem('activeHR', JSON.stringify(session));
+  if(remember) localStorage.setItem('rememberHR', JSON.stringify(session));
+  window.location.href = 'hr-dashboard.html';
+});
+
+// Toggle password visibility
+document.getElementById('togglePass').addEventListener('click', ()=>{
+  const p = document.getElementById('password');
+  p.type = p.type === 'password' ? 'text' : 'password';
+  document.getElementById('togglePass').textContent = p.type === 'password' ? 'Show' : 'Hide';
+});
+
+// Create Admin: creates first admin account for selected org (or prompts for new org)
+document.getElementById('createAdminBtn').addEventListener('click', async ()=>{
+  const org = orgSelect.value || prompt('Organization name to create admin for (e.g. FlawlessGraphics):');
+  if(!org) return;
+  let accounts = readHRAccounts(org);
+  if(accounts.length > 0){ alert('This organization already has HR accounts. Use Manage HR Accounts in dashboard.'); return; }
+  const email = prompt('Admin email', `admin@${org.toLowerCase()}.com`);
+  if(!email) return;
+  const name = prompt('Full name', 'HR Admin') || 'HR Admin';
+  const pw = prompt('Set admin password', 'Flawless@123');
+  if(!pw) return;
+  const hash = await sha256Hex(pw);
+  const acct = { name, email: (email||'').trim().toLowerCase(), role: 'Admin', passwordHash: hash };
+  saveHRAccounts(org, [acct]);
+
+  // ensure org in org_list
+  const all = safeParse(localStorage.getItem('org_list')) || [];
+  if(!all.includes(org)) { all.push(org); localStorage.setItem('org_list', JSON.stringify(all)); loadOrgs(); }
+  infoBox.style.display='block';
+  infoBox.textContent = `Admin created for "${org}". Now login with ${acct.email}`;
+});
+
+// Create org button (simple): prompts for org name and optionally creates admin
+document.getElementById('createOrgBtn').addEventListener('click', ()=>{
+  const name = prompt('Organization name (no spaces recommended)', 'NewOrganization');
+  if(!name) return;
+  const list = safeParse(localStorage.getItem('org_list')) || [];
+  if(!list.includes(name)) { list.push(name); localStorage.setItem('org_list', JSON.stringify(list)); loadOrgs(); }
+  alert(`Organization "${name}" added. Use Create Admin to create first Admin.`);
+});
+
+// Create initial Admin (alias of Create Admin)
+document.getElementById('createAdminBtn').addEventListener('click', ()=>{/* handled above */});
+
+// Forgot password modal flows
+document.getElementById('forgotBtn').addEventListener('click', ()=>{ document.getElementById('forgotModal').style.display='flex'; document.getElementById('resetResult').style.display='none'; });
+document.getElementById('closeForgot').addEventListener('click', ()=>{ document.getElementById('forgotModal').style.display='none'; });
+document.getElementById('generateReset').addEventListener('click', ()=>{
+  const org = document.getElementById('resetOrg').value;
+  const email = (document.getElementById('resetEmail').value||'').trim().toLowerCase();
+  if(!org || !email){ alert('Choose organization and enter email'); return; }
+  const accounts = readHRAccounts(org);
+  const idx = accounts.findIndex(a=>a.email === email);
+  if(idx === -1){ alert('Account not found'); return; }
+  const code = Math.floor(100000 + Math.random()*900000).toString();
+  accounts[idx].resetCode = code;
+  accounts[idx].resetExpires = Date.now() + (10 * 60 * 1000); // 10 min
+  saveHRAccounts(org, accounts);
+  document.getElementById('resetResult').style.display='block';
+  document.getElementById('resetCodeBox').textContent = code + ' (valid 10 min)';
+});
+document.getElementById('confirmReset').addEventListener('click', async ()=>{
+  const org = document.getElementById('resetOrg').value;
+  const code = (document.getElementById('enterResetCode').value||'').trim();
+  const npw = (document.getElementById('newPassword').value||'').trim();
+  if(!org || !code || !npw){ document.getElementById('resetMsg').textContent = 'Enter code and new password'; return; }
+  const accounts = readHRAccounts(org);
+  const idx = accounts.findIndex(a => a.resetCode === code && a.resetExpires && Date.now() <= a.resetExpires);
+  if(idx === -1){ document.getElementById('resetMsg').textContent = 'Invalid or expired code'; return; }
+  accounts[idx].passwordHash = await sha256Hex(npw);
+  delete accounts[idx].resetCode; delete accounts[idx].resetExpires;
+  saveHRAccounts(org, accounts);
+  document.getElementById('resetMsg').textContent = 'Password reset. You can now login.';
+});
+document.getElementById('closeReset').addEventListener('click', ()=>{ document.getElementById('forgotModal').style.display='none'; });
+
+// On load: ensure org list exists and select the first org
+window.addEventListener('load', ()=> {
+  loadOrgs();
+  const list = safeParse(localStorage.getItem('org_list')) || [];
+  if(list.length) orgSelect.value = list[0];
+  // also set resetOrg select
+  if(resetOrg.options.length) resetOrg.value = orgSelect.value;
+});
+</script>
 </body>
 </html>
