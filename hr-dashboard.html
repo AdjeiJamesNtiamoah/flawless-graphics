@@ -672,6 +672,50 @@ function logout() {
     window.location.href = "login.html";
 }
 </script>
+<!-- Manage HR Accounts (Admin only) -->
+<div id="hrAccountsModal" class="modal" style="display:none">
+  <div class="box" style="max-width:760px">
+    <button class="close" data-close-hr>&times;</button>
+    <h3>Manage HR Accounts</h3>
+    <div style="display:flex;gap:12px;margin-top:12px">
+      <div style="flex:1">
+        <div style="margin-bottom:8px">
+          <label>Full name</label>
+          <input id="acct_name" type="text" style="width:100%;padding:8px;border-radius:6px;border:1px solid #e6f2fa">
+        </div>
+        <div style="margin-bottom:8px">
+          <label>Email</label>
+          <input id="acct_email" type="email" style="width:100%;padding:8px;border-radius:6px;border:1px solid #e6f2fa">
+        </div>
+        <div style="margin-bottom:8px">
+          <label>Password</label>
+          <input id="acct_password" type="password" style="width:100%;padding:8px;border-radius:6px;border:1px solid #e6f2fa">
+        </div>
+        <div style="margin-bottom:8px">
+          <label>Role</label>
+          <select id="acct_role" style="width:100%;padding:8px;border-radius:6px;border:1px solid #e6f2fa">
+            <option>Admin</option>
+            <option>HR Manager</option>
+            <option>Payroll Officer</option>
+            <option>Supervisor</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button id="acctSaveBtn" class="btn">Save</button>
+          <button id="acctClearBtn" class="btn ghost">Clear</button>
+        </div>
+      </div>
+
+      <div style="width:40%;max-height:360px;overflow:auto;border-left:1px solid #eef6fb;padding-left:12px">
+        <h4>Existing Accounts</h4>
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr><th style="text-align:left">Name</th><th style="text-align:left">Email</th><th style="text-align:left">Role</th><th></th></tr></thead>
+          <tbody id="acctList"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
