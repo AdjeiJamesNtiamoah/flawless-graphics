@@ -846,6 +846,63 @@ function logoutHR(){
   localStorage.removeItem('hr_session');
   window.location.href = 'login.html';
 }
+  let hrAccounts = JSON.parse(localStorage.getItem("hrAccounts")) || [];
+
+document.getElementById("hrAccountForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById("hrName").value.trim();
+    const email = document.getElementById("hrEmail").value.trim();
+    const password = document.getElementById("hrPassword").value.trim();
+    const role = document.getElementById("hrRole").value;
+
+    if (!name || !email || !password) {
+        alert("Please fill all fields.");
+        return;
+    }
+
+    // Check if email already exists
+    const exists = hrAccounts.some(acc => acc.email === email);
+    if (exists) {
+        alert("This email already exists!");
+        return;
+    }
+
+    hrAccounts.push({ name, email, password, role });
+    localStorage.setItem("hrAccounts", JSON.stringify(hrAccounts));
+
+    alert("HR Account saved successfully!");
+
+    loadHRAccounts();
+    e.target.reset();
+});
+
+// Load accounts
+function loadHRAccounts() {
+    const table = document.getElementById("hrAccountsList");
+    table.innerHTML = "";
+
+    hrAccounts.forEach((acc, index) => {
+        table.innerHTML += `
+            <tr>
+                <td>${acc.name}</td>
+                <td>${acc.email}</td>
+                <td>${acc.role}</td>
+                <td><button onclick="deleteHRAccount(${index})">Delete</button></td>
+            </tr>
+        `;
+    });
+}
+
+// Delete account
+function deleteHRAccount(i) {
+    if (confirm("Delete this HR Account?")) {
+        hrAccounts.splice(i, 1);
+        localStorage.setItem("hrAccounts", JSON.stringify(hrAccounts));
+        loadHRAccounts();
+    }
+}
+
 </script>
 
 <!-- Manage HR Accounts (Admin only) -->
@@ -892,6 +949,7 @@ function logoutHR(){
     </div>
   </div>
 </div>
+<button class="btn btn-primary" onclick="saveHRAccount()">Save</button>
 
 </body>
 </html>
