@@ -1,176 +1,231 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>HR Login — Flawless Graphics</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
 <style>
-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #073b66, #0b63a3);
-    margin: 0;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.login-box {
-    background: #fff;
-    width: 360px;
-    padding: 28px;
-    border-radius: 14px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-    animation: fadeIn .6s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-h2 {
-    text-align: center;
-    margin-bottom: 6px;
-    font-weight: 600;
-}
-
-.small {
-    text-align: center;
-    font-size: 13px;
-    color: #64748b;
-    margin-bottom: 18px;
-}
-
-label { font-size: 14px; font-weight: 500; }
-
-input {
-    width: 100%;
-    padding: 10px;
-    margin-top: 6px;
-    border-radius: 8px;
-    border: 1px solid #d7e2ee;
-    font-size: 14px;
-}
-
-.password-wrap {
-    position: relative;
-}
-
-.toggle-pass {
-    position: absolute;
-    right: 12px;
-    top: 58%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    font-size: 14px;
-    color: #0b63a3;
-}
-
-.btn {
-    width: 100%;
-    padding: 12px;
-    margin-top: 18px;
-    background: #0b63a3;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.25s;
-}
-.btn:hover { background: #094f82; }
-
-.error {
-    background: #ffebee;
-    color: #d32f2f;
-    padding: 8px;
-    border-radius: 6px;
-    font-size: 13px;
-    margin-top: 10px;
-    display: none;
-}
-
-.remember {
-    display: flex;
-    align-items: center;
-    margin-top: 10px;
-    font-size: 13px;
-}
-.remember input { width: auto; margin-right: 6px; }
-
+  body{font-family:'Poppins',sans-serif;margin:0;background:linear-gradient(135deg,#073b66,#0b63a3);height:100vh;display:flex;align-items:center;justify-content:center;color:#102330}
+  .box{background:#fff;padding:22px;border-radius:12px;width:360px;box-shadow:0 20px 50px rgba(0,0,0,0.18)}
+  h2{margin:0 0 6px;font-weight:600}
+  .small{font-size:13px;color:#64748b}
+  label{display:block;margin-top:12px;font-weight:500}
+  input[type="email"],input[type="password"],input[type="text"]{width:100%;padding:10px;border-radius:8px;border:1px solid #dbeaf7;margin-top:6px}
+  .row{display:flex;gap:8px;align-items:center;margin-top:12px}
+  .btn{background:#0b63a3;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:600}
+  .btn.ghost{background:transparent;border:1px solid #dbeaf7;color:#0b63a3}
+  .link{background:none;border:none;color:#0b63a3;cursor:pointer;padding:6px;font-size:13px}
+  .error{background:#ffecec;color:#b71c1c;padding:8px;border-radius:6px;margin-top:10px;display:none}
+  .notice{background:#f1f8ff;color:#0b63a3;padding:8px;border-radius:6px;margin-top:10px;display:none}
+  .small-muted{font-size:13px;color:#64748b;margin-top:8px}
+  .form-row{margin-top:10px}
+  .toggle{cursor:pointer;color:#0b63a3;margin-left:8px}
 </style>
 </head>
-
 <body>
+<div class="box" role="main">
+  <h2>HR Login</h2>
+  <div class="small">Sign in to access the HR Dashboard</div>
 
-<div class="login-box">
-    <h2>HR Login</h2>
-    <p class="small">Access the HR Dashboard securely</p>
-
+  <div class="form-row">
     <label>Email</label>
-    <input type="email" id="email" placeholder="hr@flawlessgraphics.com">
+    <input id="email" type="email" placeholder="hr@flawlessgraphics.com">
+  </div>
 
-    <label style="margin-top: 10px;">Password</label>
-    <div class="password-wrap">
-        <input type="password" id="password" placeholder="Enter Password">
-        <span class="toggle-pass" onclick="togglePass()">Show</span>
+  <div class="form-row">
+    <label>Password</label>
+    <div style="display:flex;align-items:center;gap:8px">
+      <input id="password" type="password" placeholder="Enter password" style="flex:1">
+      <button id="togglePass" class="link" aria-label="Show password">Show</button>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+    <label style="display:flex;align-items:center;gap:6px"><input id="remember" type="checkbox"> Remember me</label>
+    <button id="forgotBtn" class="link">Forgot password?</button>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-top:14px">
+    <button id="loginBtn" class="btn">Login</button>
+    <button id="createInitialBtn" class="btn ghost">Create Admin</button>
+  </div>
+
+  <div id="errorBox" class="error" role="alert"></div>
+  <div id="infoBox" class="notice" role="status"></div>
+
+  <div class="small-muted">
+    If this is first time, click <b>Create Admin</b> to make an initial Admin account. After Admin exists, the Admin can add more HR accounts inside the dashboard.
+  </div>
+</div>
+
+<!-- Forgot / Reset UI (hidden until needed) -->
+<div id="forgotModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1200;align-items:center;justify-content:center">
+  <div style="background:#fff;padding:16px;border-radius:10px;max-width:420px;margin:24px auto">
+    <h3 style="margin:0 0 8px">Reset Password</h3>
+    <div class="small">Enter your HR email to request a reset code (no email backend — code will display here for offline reset).</div>
+    <label style="display:block;margin-top:10px">Email</label>
+    <input id="resetEmail" type="email" placeholder="hr@flawlessgraphics.com">
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button id="sendReset" class="btn">Generate Reset Code</button>
+      <button id="cancelReset" class="btn ghost">Cancel</button>
     </div>
 
-    <div class="remember">
-        <input type="checkbox" id="rememberMe"> Remember me
+    <div id="resetResult" style="margin-top:12px;display:none">
+      <div class="small-muted">Reset code (copy this and use it on the Reset tab):</div>
+      <div id="resetCodeBox" style="margin-top:8px;padding:10px;background:#f1f8ff;border-radius:6px;color:#0b63a3;font-weight:700"></div>
+
+      <hr style="margin:12px 0">
+
+      <h4 style="margin:6px 0">Enter Code & New Password</h4>
+      <label>Reset Code</label>
+      <input id="enterResetCode" type="text" placeholder="eg: 834709">
+      <label style="margin-top:8px">New Password</label>
+      <input id="newPassword" type="password" placeholder="New password">
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button id="confirmReset" class="btn">Reset Password</button>
+        <button id="closeReset" class="btn ghost">Close</button>
+      </div>
+      <div id="resetMsg" style="margin-top:8px"></div>
     </div>
-
-    <button class="btn" onclick="login()">Login</button>
-
-    <div id="errorBox" class="error"></div>
+  </div>
 </div>
 
 <script>
-// PRESET HR LOGIN
-const HR_EMAIL = "hr@flawlessgraphics.com";
-const HR_PASSWORD = "Flawless@123";  // You can change this
+/* Multi-account auth (localStorage) with roles + forgot-password offline
+   - hr_accounts key: array of accounts:
+     { email, name, role, passwordHash (hex), resetCode, resetExpires }
+   - hr_session: { email, role, expiry }
+*/
 
-function togglePass() {
-    const pass = document.getElementById("password");
-    const toggle = document.querySelector(".toggle-pass");
-    pass.type = pass.type === "password" ? "text" : "password";
-    toggle.textContent = pass.type === "password" ? "Show" : "Hide";
+/* ---------------- utilities ---------------- */
+async function sha256Hex(str){
+  const enc = new TextEncoder();
+  const data = enc.encode(str);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
-
-function showError(msg) {
-    const box = document.getElementById("errorBox");
-    box.textContent = msg;
-    box.style.display = "block";
+function nowSecs(){ return Math.floor(Date.now()/1000); }
+function readAccounts(){ try{ return JSON.parse(localStorage.getItem('hr_accounts'))||[] }catch(e){ return [] } }
+function saveAccounts(a){ localStorage.setItem('hr_accounts', JSON.stringify(a)); }
+function setSession(obj, remember=false){
+  const sess = { ...obj, token: Math.random().toString(36).slice(2), expires: remember ? (nowSecs()+60*60*24*30) : (nowSecs()+60*60*8) };
+  localStorage.setItem('hr_session', JSON.stringify(sess));
 }
+function clearSession(){ localStorage.removeItem('hr_session'); }
 
-function login() {
-    const email = document.getElementById("email").value.trim();
-    const pass = document.getElementById("password").value.trim();
-    const remember = document.getElementById("rememberMe").checked;
+/* ---------------- UI elements ---------------- */
+const emailEl = document.getElementById('email');
+const passEl  = document.getElementById('password');
+const rememberEl = document.getElementById('remember');
+const loginBtn = document.getElementById('loginBtn');
+const createAdminBtn = document.getElementById('createInitialBtn');
+const errorBox = document.getElementById('errorBox');
+const infoBox = document.getElementById('infoBox');
+const togglePassBtn = document.getElementById('togglePass');
 
-    if (!email || !pass) return showError("Email & Password are required.");
+togglePassBtn.onclick = ()=> {
+  if(passEl.type==='password'){ passEl.type='text'; togglePassBtn.textContent='Hide' } else { passEl.type='password'; togglePassBtn.textContent='Show' }
+};
 
-    if (email !== HR_EMAIL || pass !== HR_PASSWORD) {
-        return showError("Incorrect email or password.");
+/* ---------------- Create initial admin (only when no accounts exist) ---------------- */
+createAdminBtn.addEventListener('click', async ()=>{
+  const accounts = readAccounts();
+  if(accounts.length > 0){
+    infoBox.style.display='block'; infoBox.textContent = 'Admin accounts already exist. Use existing Admin or add accounts inside dashboard.';
+    return;
+  }
+  const email = prompt('Enter initial admin email', 'admin@flawlessgraphics.com');
+  if(!email) return;
+  const name = prompt('Full name for admin', 'HR Admin') || 'HR Admin';
+  const pw = prompt('Enter password for admin (will be hashed locally)', 'Flawless@123');
+  if(!pw){ alert('Password required'); return; }
+  const role = 'Admin';
+  const hash = await sha256Hex(pw);
+  const account = { email: email.trim().toLowerCase(), name, role, passwordHash: hash };
+  saveAccounts([account]);
+  alert('Initial Admin created. Now login with the new credentials.');
+});
+
+/* ---------------- Login ---------------- */
+loginBtn.addEventListener('click', async ()=>{
+  errorBox.style.display='none';
+  const email = (emailEl.value||'').trim().toLowerCase();
+  const pw = passEl.value || '';
+  if(!email || !pw){ errorBox.style.display='block'; errorBox.textContent = 'Email and password are required.'; return; }
+  const accounts = readAccounts();
+  const acc = accounts.find(a=>a.email === email);
+  if(!acc){ errorBox.style.display='block'; errorBox.textContent = 'Account not found.'; return; }
+  const hash = await sha256Hex(pw);
+  if(hash !== acc.passwordHash){ errorBox.style.display='block'; errorBox.textContent = 'Incorrect password.'; return; }
+  // Success
+  setSession({ email: acc.email, role: acc.role, name: acc.name }, rememberEl.checked);
+  window.location.href = 'hr-dashboard.html';
+});
+
+/* ---------------- Forgot / Reset flow (offline) ---------------- */
+const forgotBtn = document.getElementById('forgotBtn');
+const forgotModal = document.getElementById('forgotModal');
+const resetEmail = document.getElementById('resetEmail');
+const sendResetBtn = document.getElementById('sendReset');
+const cancelResetBtn = document.getElementById('cancelReset');
+const resetResult = document.getElementById('resetResult');
+const resetCodeBox = document.getElementById('resetCodeBox');
+const enterResetCode = document.getElementById('enterResetCode');
+const newPassword = document.getElementById('newPassword');
+const confirmResetBtn = document.getElementById('confirmReset');
+const closeResetBtn = document.getElementById('closeReset');
+const resetMsg = document.getElementById('resetMsg');
+
+forgotBtn.addEventListener('click', ()=> { forgotModal.style.display='flex'; resetResult.style.display='none'; resetCodeBox.textContent=''; resetEmail.value=''; resetMsg.textContent=''; });
+cancelResetBtn.addEventListener('click', ()=> { forgotModal.style.display='none'; });
+closeResetBtn.addEventListener('click', ()=> { forgotModal.style.display='none'; });
+
+sendResetBtn.addEventListener('click', ()=> {
+  const email = (resetEmail.value||'').trim().toLowerCase();
+  const accounts = readAccounts();
+  const accIndex = accounts.findIndex(a=>a.email === email);
+  if(accIndex === -1){ resetMsg.style.color='red'; resetMsg.textContent = 'Account not found.'; return; }
+  // generate 6-digit code
+  const code = Math.floor(100000 + Math.random()*900000).toString();
+  const expires = nowSecs() + 60*10; // 10 minutes
+  accounts[accIndex].resetCode = code;
+  accounts[accIndex].resetExpires = expires;
+  saveAccounts(accounts);
+  resetResult.style.display='block';
+  resetCodeBox.textContent = code + ' (valid 10 minutes)';
+  resetMsg.style.color='green';
+  resetMsg.textContent = 'Reset code generated. Use the code below to set a new password.';
+});
+
+confirmResetBtn.addEventListener('click', async ()=> {
+  const code = (enterResetCode.value||'').trim();
+  const npw = newPassword.value||'';
+  if(!code || !npw){ resetMsg.style.color='red'; resetMsg.textContent = 'Enter code and new password.'; return; }
+  const accounts = readAccounts();
+  const accIndex = accounts.findIndex(a=> a.resetCode === code && a.resetExpires && (nowSecs() <= a.resetExpires));
+  if(accIndex === -1){ resetMsg.style.color='red'; resetMsg.textContent = 'Invalid or expired code.'; return; }
+  const hash = await sha256Hex(npw);
+  accounts[accIndex].passwordHash = hash;
+  delete accounts[accIndex].resetCode;
+  delete accounts[accIndex].resetExpires;
+  saveAccounts(accounts);
+  resetMsg.style.color='green'; resetMsg.textContent = 'Password updated. You can now login.';
+});
+
+/* Allow pressing Enter to login */
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ loginBtn.click(); } });
+
+/* If a valid session exists, redirect to dashboard */
+(function tryAutoRedirect(){
+  try{
+    const sess = JSON.parse(localStorage.getItem('hr_session')||'null');
+    if(sess && sess.expires && nowSecs() < sess.expires){
+      // valid session
+      window.location.href = 'hr-dashboard.html';
     }
-
-    // Save session
-    localStorage.setItem("hr_logged_in", "yes");
-
-    if (remember) {
-        localStorage.setItem("hr_remember", "yes");
-    } else {
-        localStorage.removeItem("hr_remember");
-    }
-
-    // Redirect to dashboard
-    window.location.href = "hr-dashboard.html";
-}
+  }catch(e){}
+})();
 </script>
-
 </body>
 </html>
