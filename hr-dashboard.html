@@ -72,6 +72,25 @@ input[type="file"]{padding:6px}
 </style>
 </head>
 <body>
+  <script>
+(function(){
+  function nowSecs(){ return Math.floor(Date.now()/1000); }
+  try{
+    const sess = JSON.parse(localStorage.getItem('hr_session') || 'null');
+    if(!sess || !sess.expires || nowSecs() > sess.expires){
+      // not logged in or expired
+      localStorage.removeItem('hr_session');
+      window.location.href = 'login.html';
+    }
+    // Make current session available to page scripts
+    window.__HR_SESSION = sess;
+  }catch(e){
+    localStorage.removeItem('hr_session');
+    window.location.href = 'login.html';
+  }
+})();
+</script>
+
 <header>
   <div class="logo">FG</div>
   <div>
