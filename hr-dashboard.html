@@ -641,5 +641,12 @@ setInterval(()=>{ const curr = localStorage.getItem(employeesKey)||''; if(curr !
 /* If you use the employee.html to add employees, it writes to localStorage.employees — this dashboard will pick them up automatically. */
 
 </script>
+  <script>
+// PROTECT HR DASHBOARD
+if (!localStorage.getItem("hr_logged_in")) {
+    window.location.href = "login.html";
+}
+</script>
+
 </body>
 </html>
