@@ -671,6 +671,108 @@ function logout() {
     localStorage.removeItem("hr_logged_in");
     window.location.href = "login.html";
 }
+  
+// HR Accounts management (requires window.__HR_SESSION set by auth check)
+(async function(){
+  if(!window.__HR_SESSION) return;
+  // show manage button only for Admins
+  if(window.__HR_SESSION.role !== 'Admin') return;
+
+  // create a small Manage Accounts button in header
+  const hdr = document.querySelector('header');
+  if(hdr){
+    const btn = document.createElement('button');
+    btn.className='btn ghost';
+    btn.style.marginLeft='12px';
+    btn.textContent = 'Manage HR Accounts';
+    btn.onclick = ()=> document.getElementById('hrAccountsModal').style.display='flex';
+    hdr.appendChild(btn);
+  }
+
+  // utility hash
+  async function sha256Hex(str){
+    const enc = new TextEncoder(), buf = enc.encode(str);
+    const h = await crypto.subtle.digest('SHA-256', buf);
+    return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  // elements
+  const modal = document.getElementById('hrAccountsModal');
+  const closeBtns = modal.querySelectorAll('[data-close-hr]');
+  closeBtns.forEach(b=> b.addEventListener('click', ()=> modal.style.display='none'));
+
+  const nameEl = document.getElementById('acct_name');
+  const emailEl = document.getElementById('acct_email');
+  const passEl = document.getElementById('acct_password');
+  const roleEl = document.getElementById('acct_role');
+  const saveBtn = document.getElementById('acctSaveBtn');
+  const clearBtn = document.getElementById('acctClearBtn');
+  const listBody = document.getElementById('acctList');
+
+  let editingIndex = -1;
+
+  function readAccounts(){ try{ return JSON.parse(localStorage.getItem('hr_accounts'))||[] }catch(e){ return [] } }
+  function saveAccounts(a){ localStorage.setItem('hr_accounts', JSON.stringify(a)); }
+
+  function refreshList(){
+    const arr = readAccounts();
+    listBody.innerHTML = '';
+    arr.forEach((a,i)=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${a.name||''}</td><td>${a.email||''}</td><td>${a.role||''}</td><td style="text-align:right">
+        <button class="btn ghost" data-edit="${i}">Edit</button>
+        <button class="btn" data-del="${i}">Delete</button></td>`;
+      listBody.appendChild(tr);
+    });
+    // wire buttons
+    listBody.querySelectorAll('[data-edit]').forEach(b=> b.addEventListener('click', e=>{
+      const idx = Number(e.currentTarget.getAttribute('data-edit'));
+      const a = readAccounts()[idx];
+      editingIndex = idx;
+      nameEl.value = a.name || '';
+      emailEl.value = a.email || '';
+      passEl.value = ''; // do not prefill hash
+      roleEl.value = a.role || 'HR Manager';
+    }));
+    listBody.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', e=>{
+      const idx = Number(e.currentTarget.getAttribute('data-del'));
+      if(!confirm('Delete this HR account?')) return;
+      const arr = readAccounts(); arr.splice(idx,1); saveAccounts(arr); refreshList();
+      alert('Account deleted.');
+    }));
+  }
+
+  clearBtn.addEventListener('click', ()=>{ editingIndex = -1; nameEl.value=''; emailEl.value=''; passEl.value=''; roleEl.value='HR Manager'; });
+
+  saveBtn.addEventListener('click', async ()=>{
+    const name = nameEl.value.trim(); const email = emailEl.value.trim().toLowerCase();
+    const pw = passEl.value; const role = roleEl.value;
+    if(!name || !email){ alert('Name and email required'); return; }
+    let arr = readAccounts();
+    if(editingIndex >= 0){
+      // update
+      arr[editingIndex].name = name;
+      arr[editingIndex].email = email;
+      arr[editingIndex].role = role;
+      if(pw) arr[editingIndex].passwordHash = await sha256Hex(pw);
+      saveAccounts(arr);
+      alert('Account updated.');
+    } else {
+      if(!pw){ alert('Password required for new accounts'); return; }
+      // ensure unique email
+      if(arr.some(a=>a.email === email)){ alert('Email already used'); return; }
+      const hash = await sha256Hex(pw);
+      arr.push({ name, email, role, passwordHash: hash });
+      saveAccounts(arr);
+      alert('Account created.');
+    }
+    editingIndex = -1; nameEl.value=''; emailEl.value=''; passEl.value=''; roleEl.value='HR Manager';
+    refreshList();
+  });
+
+  refreshList();
+})();
+
 </script>
 <!-- Manage HR Accounts (Admin only) -->
 <div id="hrAccountsModal" class="modal" style="display:none">
