@@ -2,86 +2,70 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Organization Login</title>
+<title>HR Login</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
     body {
-        font-family: Arial, sans-serif;
-        background: #0a1a3c;
-        color: #fff;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
+        background:#071833;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        height:100vh;
+        margin:0;
+        font-family:Arial;
+        color:white;
     }
-    .login-box {
-        width: 350px;
-        padding: 30px;
-        background: #112255;
-        border-radius: 10px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    .box {
+        width:340px;
+        background:#102a57;
+        padding:30px;
+        border-radius:10px;
+        box-shadow:0 0 20px rgba(0,0,0,0.5);
     }
-    h2 {
-        text-align: center;
-        margin-bottom: 20px;
-    }
-    label {
-        font-size: 14px;
-        margin-top: 10px;
-        display: block;
-    }
+    h2 { text-align:center; margin-bottom:20px; }
     input {
-        width: 100%;
-        padding: 10px;
-        margin-top: 5px;
-        border: none;
-        border-radius: 6px;
+        width:100%;
+        padding:12px;
+        border-radius:6px;
+        border:none;
+        margin-top:6px;
+        margin-bottom:12px;
     }
     button {
-        margin-top: 15px;
-        width: 100%;
-        padding: 10px;
-        background: #00b3ff;
-        border: none;
-        border-radius: 6px;
-        color: white;
-        font-size: 16px;
-        cursor: pointer;
+        width:100%;
+        padding:12px;
+        border:none;
+        background:#00a8ff;
+        color:white;
+        font-size:16px;
+        border-radius:6px;
+        cursor:pointer;
     }
-    button:hover {
-        background: #008bcc;
-    }
-    .link {
-        text-align: center;
-        margin-top: 15px;
-    }
-    .link a {
-        color: #4ac3ff;
-    }
+    button:hover { background:#0089d6; }
+    a { color:#4ac3ff; }
+    .center { text-align:center; margin-top:10px; }
 </style>
 </head>
 <body>
 
-<div class="login-box">
+<div class="box">
     <h2>HR Login</h2>
 
-    <label>Organization Email</label>
-    <input type="email" id="email" placeholder="example@org.com">
+    <label>Email</label>
+    <input type="email" id="email" placeholder="admin@company.com">
 
     <label>Password</label>
     <input type="password" id="password" placeholder="Enter password">
 
     <button onclick="login()">Login</button>
 
-    <div class="link">
-        <a href="site-register.html">Create Organization Account</a><br>
-        <a href="#" onclick="forgot()">Forgot Password?</a>
+    <div class="center">
+        <a href="site-register.html">Create Organization</a>
     </div>
 </div>
 
 <script>
-const USERS_KEY = "org_users";
+const USERS_KEY = "organizations";
 
 function loadUsers() {
     return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
@@ -90,32 +74,27 @@ function loadUsers() {
 async function sha256(text) {
     const buf = new TextEncoder().encode(text);
     const hash = await crypto.subtle.digest("SHA-256", buf);
-    return [...new Uint8Array(hash)].map(x => x.toString(16).padStart(2,"0")).join("");
+    return [...new Uint8Array(hash)].map(x => x.toString(16,"0")).join("");
 }
 
 async function login() {
     const email = document.getElementById("email").value.trim().toLowerCase();
     const pw = document.getElementById("password").value;
 
-    if (!email || !pw) return alert("Please enter all fields.");
+    if (!email || !pw) return alert("Fill all fields.");
 
     const users = loadUsers();
     const user = users.find(u => u.email === email);
-
     if (!user) return alert("Account not found.");
 
     const hashed = await sha256(pw);
-
     if (hashed !== user.passwordHash)
-        return alert("Incorrect password.");
+        return alert("Wrong password.");
 
-    localStorage.setItem("current_org", user.email);
+    // Store active org
+    localStorage.setItem("active_org", email);
 
     window.location.href = "hr-dashboard.html";
-}
-
-function forgot() {
-    alert("Password reset coming soon.");
 }
 </script>
 
