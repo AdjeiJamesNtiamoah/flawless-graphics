@@ -26,9 +26,11 @@
     .left-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .right-controls{display:flex;gap:10px;align-items:center}
     .search-bar input{padding:8px 12px;border-radius:8px;border:1px solid #d8e6f1;min-width:260px}
-    .btn{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600}
-    .btn.ghost{background:transparent;color:var(--accent);border:1px solid #d8e6f1}
+    .btn{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.2s}
+    .btn:hover{background:#095285;transform:translateY(-1px)}
     .btn:active{transform:translateY(1px)}
+    .btn.ghost{background:transparent;color:var(--accent);border:1px solid #d8e6f1}
+    .btn.ghost:hover{background:#f0f7fd}
     .controls {display:flex; gap:8px; align-items:center; flex-wrap:wrap}
 
     .stats-row{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
@@ -52,16 +54,20 @@
     .student-card:hover{transform:translateY(-6px)}
     .student-card img{width:64px;height:64px;border-radius:50%;object-fit:cover;display:block;margin-bottom:8px}
 
-    .actions img{width:20px;cursor:pointer;margin-right:8px;opacity:0.92}
+    .actions img{width:20px;cursor:pointer;margin-right:8px;opacity:0.92;transition:transform 0.2s}
     .actions img:hover{transform:scale(1.08)}
 
     /* modal */
     .modal{display:none;position:fixed;inset:0;background:rgba(5,10,20,0.55);z-index:1200;align-items:center;justify-content:center;padding:18px}
-    .modal .box{background:#fff;border-radius:10px;padding:18px;max-width:680px;width:100%;position:relative;box-shadow:0 20px 60px rgba(7,20,40,0.3)}
-    .close{position:absolute;right:14px;top:12px;border:none;background:transparent;font-size:20px;cursor:pointer;color:#465d6f}
+    .modal.active{display:flex}
+    .modal .box{background:#fff;border-radius:10px;padding:18px;max-width:680px;width:100%;position:relative;box-shadow:0 20px 60px rgba(7,20,40,0.3);max-height:90vh;overflow-y:auto}
+    .close{position:absolute;right:14px;top:12px;border:none;background:transparent;font-size:24px;cursor:pointer;color:#465d6f;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background 0.2s}
+    .close:hover{background:#f0f3f6}
     .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .form-grid.full{grid-template-columns:1fr}
     .form-row{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+    .form-row label{font-weight:500;color:#333}
+    .form-row input,.form-row select{padding:8px 12px;border:1px solid #d8e6f1;border-radius:6px;font-family:inherit}
     input[type="file"]{padding:6px}
 
     /* file preview */
@@ -74,6 +80,9 @@
     #toast-container{position:fixed;bottom:22px;right:22px;z-index:1600;display:flex;flex-direction:column;gap:8px}
     .toast{background:#111;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:0 10px 30px rgba(10,20,30,0.2);transform:translateX(120%);opacity:0;transition:0.45s}
     .toast.show{transform:translateX(0);opacity:1}
+    .toast.success{background:#2e7d32}
+    .toast.error{background:#c62828}
+    .toast.warning{background:#f57c00}
 
     /* debug panel */
     .debug-panel{position:fixed;top:10px;right:10px;background:rgba(0,0,0,0.8);color:white;padding:10px;border-radius:5px;font-family:monospace;font-size:12px;z-index:2000;max-width:300px}
@@ -99,6 +108,7 @@
     <div>Students Count: <span id="studentsCount">0</span></div>
     <button onclick="clearStorage()">Clear Storage</button>
     <button onclick="testStorage()">Test Storage</button>
+    <button onclick="testAddButton()">Test Add Button</button>
     <button onclick="toggleDebug()">Hide Debug</button>
   </div>
 
@@ -292,7 +302,7 @@
       students = [];
       render();
       updateDebugInfo();
-      showToast('Storage cleared', 'info');
+      showToast('Storage cleared', 'success');
     }
   }
 
@@ -313,6 +323,20 @@
       showToast('LocalStorage error: ' + e.message, 'error');
     }
     updateDebugInfo();
+  }
+
+  function testAddButton() {
+    const btn = document.getElementById('addStudentBtn');
+    if(btn) {
+      console.log('[DEBUG] Add button found:', btn);
+      console.log('[DEBUG] Add button has click listener:', btn.onclick !== null || btn.addEventListener !== undefined);
+      showToast('Add button found in DOM', 'success');
+      // Trigger click programmatically
+      btn.click();
+    } else {
+      console.error('[DEBUG] Add button NOT found!');
+      showToast('Add button NOT found in DOM', 'error');
+    }
   }
 
   // Enhanced safe parse with detailed logging
@@ -392,33 +416,39 @@
   // Initialize students with enhanced loading
   let students = loadStudents();
 
-  // DOM
-  const tbody = document.querySelector('#studentTable tbody');
-  const cards = document.getElementById('studentCards');
-  const addBtn = document.getElementById('addStudentBtn');
-  const modal = document.getElementById('studentModal');
-  const closeModal = document.getElementById('closeModalBtn');
-  const form = document.getElementById('studentForm');
-  const avatarInput = document.getElementById('photoInput');
-  const avatarPreviewImg = document.getElementById('avatarPreviewImg');
-  const avatarPlaceholder = document.getElementById('avatarPlaceholder');
-  const statStudents = document.getElementById('statStudents');
-  const statClasses = document.getElementById('statClasses');
-  const statAttendance = document.getElementById('statAttendance');
-  const statAvgGrade = document.getElementById('statAvgGrade');
-  const statTopClass = document.getElementById('statTopClass');
-  const topClassCard = document.getElementById('topClassCard');
-  const toggleViewBtn = document.getElementById('toggleViewBtn');
-  const searchInput = document.getElementById('searchInput');
-  const sortSelect = document.getElementById('sortSelect');
-  const exportCsvBtn = document.getElementById('exportCsvBtn');
-  const exportXlsxBtn = document.getElementById('exportXlsxBtn');
-  const exportPdfBtn = document.getElementById('exportPdfBtn');
+  // DOM elements - ensure they exist before using
+  function getDOMElements() {
+    return {
+      tbody: document.querySelector('#studentTable tbody'),
+      cards: document.getElementById('studentCards'),
+      addBtn: document.getElementById('addStudentBtn'),
+      modal: document.getElementById('studentModal'),
+      closeModal: document.getElementById('closeModalBtn'),
+      form: document.getElementById('studentForm'),
+      avatarInput: document.getElementById('photoInput'),
+      avatarPreviewImg: document.getElementById('avatarPreviewImg'),
+      avatarPlaceholder: document.getElementById('avatarPlaceholder'),
+      statStudents: document.getElementById('statStudents'),
+      statClasses: document.getElementById('statClasses'),
+      statAttendance: document.getElementById('statAttendance'),
+      statAvgGrade: document.getElementById('statAvgGrade'),
+      statTopClass: document.getElementById('statTopClass'),
+      topClassCard: document.getElementById('topClassCard'),
+      toggleViewBtn: document.getElementById('toggleViewBtn'),
+      searchInput: document.getElementById('searchInput'),
+      sortSelect: document.getElementById('sortSelect'),
+      exportCsvBtn: document.getElementById('exportCsvBtn'),
+      exportXlsxBtn: document.getElementById('exportXlsxBtn'),
+      exportPdfBtn: document.getElementById('exportPdfBtn'),
+      classModal: document.getElementById('classModal'),
+      classSelect: document.getElementById('classSelect'),
+      loadClassBtn: document.getElementById('loadClassBtn'),
+      downloadClassPdf: document.getElementById('downloadClassPdf')
+    };
+  }
 
-  const classModal = document.getElementById('classModal');
-  const classSelect = document.getElementById('classSelect');
-  const loadClassBtn = document.getElementById('loadClassBtn');
-  const downloadClassPdf = document.getElementById('downloadClassPdf');
+  // Get DOM elements
+  const dom = getDOMElements();
 
   // mapping class badge class
   function classBadge(cls){
@@ -439,7 +469,7 @@
     console.log('[DEBUG] Rendering students:', list);
     
     // apply sorting based on sortSelect
-    const sort = sortSelect.value;
+    const sort = dom.sortSelect.value;
     let arr = Array.from(list);
     if(sort==='name') arr.sort((a,b)=> (a.fullName||'').localeCompare(b.fullName||''));
     else if(sort==='class') arr.sort((a,b)=> (a.studentClass||'').localeCompare(b.studentClass||''));
@@ -447,7 +477,7 @@
     else if(sort==='admissionDate') arr.sort((a,b)=> new Date(a.admissionDate||0) - new Date(b.admissionDate||0));
 
     // table
-    tbody.innerHTML = '';
+    dom.tbody.innerHTML = '';
     arr.forEach((e,i)=>{
       const photoHtml = e.photo ? `<img src="${e.photo}" class="avatar" alt="photo">` : `<div style="width:46px;height:46px;border-radius:50%;background:#f0f6fb;display:inline-block"></div>`;
       const tr = document.createElement('tr');
@@ -465,11 +495,11 @@
           <img src="https://img.icons8.com/ios-glyphs/30/edit--v1.png" title="Edit" onclick="editStudent(${i})">
           <img src="https://img.icons8.com/ios-glyphs/30/filled-trash.png" title="Delete" onclick="deleteStudent(${i})">
         </td>`;
-      tbody.appendChild(tr);
+      dom.tbody.appendChild(tr);
     });
 
     // cards
-    cards.innerHTML = '';
+    dom.cards.innerHTML = '';
     arr.forEach((e,i)=>{
       const card = document.createElement('div');
       card.className='student-card';
@@ -486,7 +516,7 @@
           <img src="https://img.icons8.com/ios-glyphs/30/edit--v1.png" title="Edit" onclick="editStudent(${i})">
           <img src="https://img.icons8.com/ios-glyphs/30/filled-trash.png" title="Delete" onclick="deleteStudent(${i})">
         </div>`;
-      cards.appendChild(card);
+      dom.cards.appendChild(card);
     });
 
     updateStats();
@@ -496,10 +526,10 @@
   // update stats (students, classes, attendance, avg grade, top class)
   function updateStats(){
     const total = students.length;
-    document.getElementById('statStudents').innerText = total;
+    dom.statStudents.innerText = total;
 
     const classes = Array.from(new Set(students.map(e=>e.studentClass||'Unassigned')));
-    document.getElementById('statClasses').innerText = classes.length;
+    dom.statClasses.innerText = classes.length;
 
     // attendance fallback / attempt to read attendance localStorage if exists
     let attendanceRate = 0;
@@ -510,11 +540,11 @@
         attendanceRate = Math.min(100, Math.round((entries/(total*30))*100));
       } else attendanceRate = Math.floor(Math.random()*18)+80;
     } catch(e){ attendanceRate = Math.floor(Math.random()*18)+80; }
-    document.getElementById('statAttendance').innerText = attendanceRate+'%';
+    dom.statAttendance.innerText = attendanceRate+'%';
 
     const validGrades = students.map(e=>Number(e.grade||0)).filter(g=>g>0);
     const avgGrade = validGrades.length ? (validGrades.reduce((a,b)=>a+b,0) / validGrades.length).toFixed(1) : 0;
-    document.getElementById('statAvgGrade').innerText = avgGrade;
+    dom.statAvgGrade.innerText = avgGrade;
 
     // top class by average performance if performance data exists, else by count
     const perfData = safeParse(localStorage.getItem('performanceData')) || {};
@@ -538,85 +568,167 @@
       let bestClass='',bestCount=0;
       for(const c in counts) if(counts[c]>bestCount){bestCount=counts[c]; bestClass=c;}
       top = bestClass || 'N/A';
-      document.getElementById('statTopClass').innerText = top === 'N/A' ? 'N/A' : `${top} (${bestCount} students)`;
+      dom.statTopClass.innerText = top === 'N/A' ? 'N/A' : `${top} (${bestCount} students)`;
     } else {
-      document.getElementById('statTopClass').innerText = `${top} (${topVal.toFixed(1)}%)`;
+      dom.statTopClass.innerText = `${top} (${topVal.toFixed(1)}%)`;
     }
 
     // populate class select for breakdown modal
-    const select = classSelect;
-    if(select){
-      const prev = select.value;
-      select.innerHTML='';
+    if(dom.classSelect){
+      const prev = dom.classSelect.value;
+      dom.classSelect.innerHTML='';
       Array.from(new Set(students.map(e=>e.studentClass||'Unassigned'))).sort().forEach(c=>{
-        const opt = document.createElement('option'); opt.value=c; opt.textContent=c; select.appendChild(opt);
+        const opt = document.createElement('option'); opt.value=c; opt.textContent=c; dom.classSelect.appendChild(opt);
       });
-      if(prev) select.value = prev;
+      if(prev) dom.classSelect.value = prev;
     }
   }
 
-  // open modal add
-  addBtn.addEventListener('click', ()=> {
-    form.reset(); document.getElementById('editIndex').value='';
-    avatarPreviewImg.src=''; avatarPreviewImg.style.display='none'; avatarPlaceholder.style.display='block';
-    document.getElementById('modalTitle').innerText='Add Student';
-    modal.style.display='flex'; modal.setAttribute('aria-hidden','false');
-  });
-  closeModal.addEventListener('click', ()=> { modal.style.display='none'; modal.setAttribute('aria-hidden','true'); });
+  // Modal functions with enhanced debugging
+  function openModal(title = 'Add Student') {
+    console.log('[DEBUG] Opening modal with title:', title);
+    document.getElementById('modalTitle').innerText = title;
+    dom.modal.classList.add('active');
+    dom.modal.setAttribute('aria-hidden', 'false');
+    console.log('[DEBUG] Modal should now be visible');
+  }
 
-  window.addEventListener('click', (e)=> { if(e.target === modal){ modal.style.display='none'; modal.setAttribute('aria-hidden','true'); } });
+  function closeModalFunc() {
+    console.log('[DEBUG] Closing modal');
+    dom.modal.classList.remove('active');
+    dom.modal.setAttribute('aria-hidden', 'true');
+  }
 
-  // handle photo input preview and base64 read
-  avatarInput.addEventListener('change', (ev)=>{
-    const f = ev.target.files[0];
-    if(!f) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      avatarPreviewImg.src = reader.result;
-      avatarPreviewImg.style.display='block';
-      avatarPlaceholder.style.display='none';
-      avatarPreviewImg.dataset.dataurl = reader.result; // store temporarily
-    };
-    reader.readAsDataURL(f);
-  });
-
-  // submit form (add or edit) with enhanced logging
-  form.addEventListener('submit', (e)=>{
-    e.preventDefault();
-    console.log('[DEBUG] Form submitted');
+  // Event listeners with enhanced error handling
+  function initializeEventListeners() {
+    console.log('[DEBUG] Initializing event listeners...');
     
-    const data = {
-      fullName: document.getElementById('fullName').value.trim(),
-      studentClass: document.getElementById('studentClass').value.trim(),
-      position: document.getElementById('position').value.trim(), // Used for Student ID
-      email: document.getElementById('email').value.trim(),
-      phone: document.getElementById('phone').value.trim(),
-      grade: document.getElementById('grade').value ? Number(document.getElementById('grade').value) : null,
-      admissionDate: document.getElementById('admissionDate').value || ''
-    };
-    // photo from preview
-    if(avatarPreviewImg && avatarPreviewImg.src) data.photo = avatarPreviewImg.src;
-
-    console.log('[DEBUG] Student data:', data);
-
-    const editIndex = document.getElementById('editIndex').value;
-    if(editIndex===''){
-      students.push(data);
-      console.log('[DEBUG] Added new student, total:', students.length);
-      showToast('Student added', 'success');
+    // Add Student button
+    if(dom.addBtn) {
+      console.log('[DEBUG] Adding click listener to Add Student button');
+      dom.addBtn.addEventListener('click', function(e) {
+        console.log('[DEBUG] Add Student button clicked!', e);
+        try {
+          dom.form.reset(); 
+          document.getElementById('editIndex').value='';
+          dom.avatarPreviewImg.src=''; 
+          dom.avatarPreviewImg.style.display='none'; 
+          dom.avatarPlaceholder.style.display='block';
+          openModal('Add Student');
+        } catch(error) {
+          console.error('[DEBUG] Error in add button click handler:', error);
+          showToast('Error opening add form: ' + error.message, 'error');
+        }
+      });
     } else {
-      students[Number(editIndex)] = data;
-      console.log('[DEBUG] Updated student at index:', editIndex);
-      showToast('Student updated', 'success');
+      console.error('[DEBUG] Add Student button not found!');
     }
-    
-    if(saveStudents()) {
-      modal.style.display='none'; modal.setAttribute('aria-hidden','true');
-      render();
-    }
-  });
 
-  // edit function (global)
+    // Close modal button
+    if(dom.closeModal) {
+      dom.closeModal.addEventListener('click', closeModalFunc);
+    }
+
+    // Close modal on background click
+    dom.modal.addEventListener('click', function(e) {
+      if(e.target === dom.modal) {
+        closeModalFunc();
+      }
+    });
+
+    // Form submission
+    if(dom.form) {
+      dom.form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        console.log('[DEBUG] Form submitted');
+        
+        try {
+          const data = {
+            fullName: document.getElementById('fullName').value.trim(),
+            studentClass: document.getElementById('studentClass').value.trim(),
+            position: document.getElementById('position').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            phone: document.getElementById('phone').value.trim(),
+            grade: document.getElementById('grade').value ? Number(document.getElementById('grade').value) : null,
+            admissionDate: document.getElementById('admissionDate').value || ''
+          };
+          
+          // photo from preview
+          if(dom.avatarPreviewImg && dom.avatarPreviewImg.src && dom.avatarPreviewImg.src !== window.location.href) {
+            data.photo = dom.avatarPreviewImg.src;
+          }
+
+          console.log('[DEBUG] Student data:', data);
+
+          const editIndex = document.getElementById('editIndex').value;
+          if(editIndex===''){
+            students.push(data);
+            console.log('[DEBUG] Added new student, total:', students.length);
+            showToast('Student added successfully', 'success');
+          } else {
+            students[Number(editIndex)] = data;
+            console.log('[DEBUG] Updated student at index:', editIndex);
+            showToast('Student updated successfully', 'success');
+          }
+          
+          if(saveStudents()) {
+            closeModalFunc();
+            render();
+          }
+        } catch(error) {
+          console.error('[DEBUG] Error in form submission:', error);
+          showToast('Error saving student: ' + error.message, 'error');
+        }
+      });
+    }
+
+    // Photo input
+    if(dom.avatarInput) {
+      dom.avatarInput.addEventListener('change', function(ev) {
+        const f = ev.target.files[0];
+        if(!f) return;
+        const reader = new FileReader();
+        reader.onload = function() {
+          dom.avatarPreviewImg.src = reader.result;
+          dom.avatarPreviewImg.style.display='block';
+          dom.avatarPlaceholder.style.display='none';
+        };
+        reader.readAsDataURL(f);
+      });
+    }
+
+    // Other event listeners
+    if(dom.toggleViewBtn) {
+      dom.toggleViewBtn.addEventListener('click', function() {
+        const isCard = dom.cards.style.display === 'flex';
+        document.getElementById('studentTable').style.display = isCard ? 'table' : 'none';
+        dom.cards.style.display = isCard ? 'none' : 'flex';
+        dom.toggleViewBtn.textContent = isCard ? 'Switch to Cards View' : 'Switch to Table View';
+      });
+    }
+
+    if(dom.searchInput) {
+      dom.searchInput.addEventListener('input', function() {
+        const q = dom.searchInput.value.trim().toLowerCase();
+        const filtered = students.filter(e=>{
+          return (e.fullName||'').toLowerCase().includes(q) ||
+                 (e.studentClass||'').toLowerCase().includes(q) ||
+                 (e.position||'').toLowerCase().includes(q) ||
+                 (e.phone||'').toString().toLowerCase().includes(q) ||
+                 (''+ (e.grade||'')).toLowerCase().includes(q);
+        });
+        render(filtered);
+      });
+    }
+
+    if(dom.sortSelect) {
+      dom.sortSelect.addEventListener('change', render);
+    }
+
+    console.log('[DEBUG] Event listeners initialized');
+  }
+
+  // Global functions
   window.editStudent = function(index){
     const e = students[index];
     if(!e) return;
@@ -629,88 +741,86 @@
     document.getElementById('admissionDate').value = e.admissionDate||'';
     document.getElementById('editIndex').value = index;
 
-    if(e.photo){ avatarPreviewImg.src = e.photo; avatarPreviewImg.style.display='block'; avatarPlaceholder.style.display='none'; }
-    else { avatarPreviewImg.src=''; avatarPreviewImg.style.display='none'; avatarPlaceholder.style.display='block'; }
+    if(e.photo){ 
+      dom.avatarPreviewImg.src = e.photo; 
+      dom.avatarPreviewImg.style.display='block'; 
+      dom.avatarPlaceholder.style.display='none'; 
+    } else { 
+      dom.avatarPreviewImg.src=''; 
+      dom.avatarPreviewImg.style.display='none'; 
+      dom.avatarPlaceholder.style.display='block'; 
+    }
 
-    document.getElementById('modalTitle').innerText='Edit Student';
-    modal.style.display='flex'; modal.setAttribute('aria-hidden','false');
+    openModal('Edit Student');
   };
 
-  // delete
   window.deleteStudent = function(index){
     if(!confirm('Delete student?')) return;
     students.splice(index,1);
     saveStudents();
-    showToast('Student deleted', 'delete');
+    showToast('Student deleted', 'success');
     render();
   };
 
-  // search
-  searchInput.addEventListener('input', ()=>{
-    const q = searchInput.value.trim().toLowerCase();
-    const filtered = students.filter(e=>{
-      return (e.fullName||'').toLowerCase().includes(q) ||
-             (e.studentClass||'').toLowerCase().includes(q) ||
-             (e.position||'').toLowerCase().includes(q) ||
-             (e.phone||'').toString().toLowerCase().includes(q) ||
-             (''+ (e.grade||'')).toLowerCase().includes(q);
+  // Toast notification
+  function showToast(msg, type = 'success') {
+    const t = document.createElement('div'); 
+    t.className = `toast ${type}`;
+    t.innerText = msg; 
+    document.getElementById('toast-container').appendChild(t);
+    setTimeout(() => t.classList.add('show'), 50);
+    setTimeout(() => { 
+      t.classList.remove('show'); 
+      setTimeout(() => t.remove(), 400); 
+    }, 3000);
+  }
+
+  // Export functions
+  if(dom.exportCsvBtn) {
+    dom.exportCsvBtn.addEventListener('click', function() {
+      const rows = students.map(e=>({
+        fullName: e.fullName||'',
+        class: e.studentClass||'',
+        studentId: e.position||'',
+        email: e.email||'',
+        phone: e.phone||'',
+        grade: e.grade||'',
+        admissionDate: e.admissionDate||''
+      }));
+      const csv = toCsv(rows);
+      downloadText(csv, 'students.csv', 'text/csv;charset=utf-8;');
     });
-    render(filtered);
-  });
+  }
 
-  // toggle view
-  let isCard = false;
-  toggleViewBtn.addEventListener('click', ()=>{
-    isCard = !isCard;
-    document.getElementById('studentTable').style.display = isCard ? 'none' : 'table';
-    cards.style.display = isCard ? 'flex' : 'none';
-    toggleViewBtn.textContent = isCard ? 'Switch to Table View' : 'Switch to Cards View';
-  });
-
-  // sorting
-  sortSelect.addEventListener('change', ()=> render());
-
-  // export CSV
-  exportCsvBtn.addEventListener('click', ()=>{
-    const rows = students.map(e=>({
-      fullName: e.fullName||'',
-      class: e.studentClass||'',
-      studentId: e.position||'',
-      email: e.email||'',
-      phone: e.phone||'',
-      grade: e.grade||'',
-      admissionDate: e.admissionDate||''
-    }));
-    const csv = toCsv(rows);
-    downloadText(csv, 'students.csv', 'text/csv;charset=utf-8;');
-  });
-
-  // export XLSX (SheetJS)
-  exportXlsxBtn.addEventListener('click', ()=>{
-    const rows = students.map(e=>([e.fullName||'', e.studentClass||'', e.position||'', e.email||'', e.phone||'', e.grade||'', e.admissionDate||'']));
-    const ws = XLSX.utils.aoa_to_sheet([['Full Name','Class','Student ID','Email','Phone','Grade','Admission Date'], ...rows]);
-    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Students');
-    XLSX.writeFile(wb, 'students.xlsx');
-  });
-
-  // export PDF using jsPDF (simple text table)
-  exportPdfBtn.addEventListener('click', ()=>{
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('l','pt','a4');
-    doc.setFontSize(14); doc.text('Student Report', 40, 40);
-    const header = ['#','Full Name','Class','Student ID','Email','Phone','Grade','Admission Date'];
-    let y = 70;
-    doc.setFontSize(10);
-    doc.text(header.join('  |  '), 40, y); y+=14;
-    students.forEach((e,i)=>{
-      const line = [i+1, e.fullName||'', e.studentClass||'', e.position||'', e.email||'', e.phone||'', e.grade||'', e.admissionDate||''].join('  |  ');
-      doc.text(line, 40, y); y+=12;
-      if(y>540){doc.addPage(); y=40;}
+  if(dom.exportXlsxBtn) {
+    dom.exportXlsxBtn.addEventListener('click', function() {
+      const rows = students.map(e=>([e.fullName||'', e.studentClass||'', e.position||'', e.email||'', e.phone||'', e.grade||'', e.admissionDate||'']));
+      const ws = XLSX.utils.aoa_to_sheet([['Full Name','Class','Student ID','Email','Phone','Grade','Admission Date'], ...rows]);
+      const wb = XLSX.utils.book_new(); 
+      XLSX.utils.book_append_sheet(wb, ws, 'Students');
+      XLSX.writeFile(wb, 'students.xlsx');
     });
-    doc.save('students.pdf');
-  });
+  }
 
-  // csv helper
+  if(dom.exportPdfBtn) {
+    dom.exportPdfBtn.addEventListener('click', function() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('l','pt','a4');
+      doc.setFontSize(14); doc.text('Student Report', 40, 40);
+      const header = ['#','Full Name','Class','Student ID','Email','Phone','Grade','Admission Date'];
+      let y = 70;
+      doc.setFontSize(10);
+      doc.text(header.join('  |  '), 40, y); y+=14;
+      students.forEach((e,i)=>{
+        const line = [i+1, e.fullName||'', e.studentClass||'', e.position||'', e.email||'', e.phone||'', e.grade||'', e.admissionDate||''].join('  |  ');
+        doc.text(line, 40, y); y+=12;
+        if(y>540){doc.addPage(); y=40;}
+      });
+      doc.save('students.pdf');
+    });
+  }
+
+  // Helper functions
   function toCsv(rows){
     if(!rows || !rows.length) return '';
     const keys = Object.keys(rows[0]);
@@ -720,66 +830,74 @@
     }
     return lines.join('\n');
   }
+
   function downloadText(text, filename, mime){
     const blob = new Blob([text], {type: mime||'text/plain'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    a.download = filename; 
+    document.body.appendChild(a); 
+    a.click(); 
+    a.remove();
   }
 
-  // class modal open
-  topClassCard.addEventListener('click', ()=> {
-    classModal.style.display='flex';
-    classModal.setAttribute('aria-hidden','false');
-  });
-  document.querySelectorAll('[data-close-class]').forEach(b=>b.addEventListener('click', ()=>{ classModal.style.display='none'; classModal.setAttribute('aria-hidden','true'); }));
-
-  function loadClassPerformance(){
-    const cls = classSelect.value;
-    const perf = safeParse(localStorage.getItem('performanceData')) || {};
-    const studentsInClass = students.filter(e=> (e.studentClass||'Unassigned') === cls);
-    const tbody = document.querySelector('#classTable tbody'); tbody.innerHTML='';
-    let total = 0;
-    studentsInClass.forEach((e,i)=>{
-      const scores = perf[e.fullName] ? Object.values(perfData[e.fullName]).map(Number).filter(n=>!isNaN(n)) : [];
-      const avg = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
-      total += avg;
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(e.fullName)}</td><td>${avg?avg.toFixed(1)+'%':'0%'}</td>`;
-      tr.classList.add('row-highlight');
-      tbody.appendChild(tr);
-      setTimeout(()=>tr.classList.remove('row-highlight'),900);
+  // Class modal functionality
+  if(dom.topClassCard) {
+    dom.topClassCard.addEventListener('click', function() {
+      dom.classModal.style.display='flex';
+      dom.classModal.setAttribute('aria-hidden','false');
     });
-    const avgClass = studentsInClass.length ? (total / studentsInClass.length).toFixed(1) : 0;
-    document.getElementById('classAvg').innerText = `Average Score: ${avgClass}%`;
   }
 
-  loadClassBtn.addEventListener('click', loadClassPerformance);
-  downloadClassPdf.addEventListener('click', ()=>{
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.text('Class Report',14,20);
-    const rows = Array.from(document.querySelectorAll('#classTable tbody tr'));
-    let y=40;
-    rows.forEach(r=>{
-      const line = Array.from(r.cells).map(c=>c.innerText).join('  |  ');
-      doc.text(line, 14, y); y += 12;
-      if(y>780){doc.addPage(); y=20;}
+  document.querySelectorAll('[data-close-class]').forEach(b=> {
+    b.addEventListener('click', function() {
+      dom.classModal.style.display='none';
+      dom.classModal.setAttribute('aria-hidden','true');
     });
-    doc.save('class_report.pdf');
   });
 
-  // simple toast
-  function showToast(msg, type='success'){
-    const t = document.createElement('div'); t.className='toast show';
-    t.innerText = msg; document.getElementById('toast-container').appendChild(t);
-    setTimeout(()=> t.classList.add('show'),50);
-    setTimeout(()=> { t.classList.remove('show'); setTimeout(()=>t.remove(),400); }, 3000);
+  if(dom.loadClassBtn) {
+    dom.loadClassBtn.addEventListener('click', function() {
+      const cls = dom.classSelect.value;
+      const perf = safeParse(localStorage.getItem('performanceData')) || {};
+      const studentsInClass = students.filter(e=> (e.studentClass||'Unassigned') === cls);
+      const tbody = document.querySelector('#classTable tbody'); 
+      tbody.innerHTML='';
+      let total = 0;
+      studentsInClass.forEach((e,i)=>{
+        const scores = perf[e.fullName] ? Object.values(perf[e.fullName]).map(Number).filter(n=>!isNaN(n)) : [];
+        const avg = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
+        total += avg;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(e.fullName)}</td><td>${avg?avg.toFixed(1)+'%':'0%'}</td>`;
+        tr.classList.add('row-highlight');
+        tbody.appendChild(tr);
+        setTimeout(()=>tr.classList.remove('row-highlight'),900);
+      });
+      const avgClass = studentsInClass.length ? (total / studentsInClass.length).toFixed(1) : 0;
+      document.getElementById('classAvg').innerText = `Average Score: ${avgClass}%`;
+    });
   }
 
-  // Initial setup
+  if(dom.downloadClassPdf) {
+    dom.downloadClassPdf.addEventListener('click', function() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text('Class Report',14,20);
+      const rows = Array.from(document.querySelectorAll('#classTable tbody tr'));
+      let y=40;
+      rows.forEach(r=>{
+        const line = Array.from(r.cells).map(c=>c.innerText).join('  |  ');
+        doc.text(line, 14, y); y += 12;
+        if(y>780){doc.addPage(); y=20;}
+      });
+      doc.save('class_report.pdf');
+    });
+  }
+
+  // Initialize everything when DOM is ready
   document.addEventListener('DOMContentLoaded', function() {
-    console.log('[DEBUG] Page loaded, initializing...');
+    console.log('[DEBUG] DOM loaded, initializing...');
     
     // Check if running from file:// protocol
     if(window.location.protocol === 'file:') {
@@ -789,6 +907,9 @@
     
     // Initialize debug info
     updateDebugInfo();
+    
+    // Initialize event listeners
+    initializeEventListeners();
     
     // Initial render
     render();
