@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Classroom Module — Flawless Graphics</title>
+  <link href="teacher-dashboard.css" rel="stylesheet">
+</head>
+<body>
+  <header class="header">
+    <div class="brand">
+      <div class="logo">FG</div>
+      <div><h1>Classroom Module</h1><div class="small">Manage classes & timetable</div></div>
+    </div>
+    <div class="controls">
+      <button class="btn" onclick="window.location.href='teacher-dashboard.html'">Back</button>
+    </div>
+  </header>
+
+  <div class="container" id="classesRoot">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div>
+          <strong>Views</strong>
+          <div class="tabs" style="margin-top:8px">
+            <div class="tab view-tab active" data-view="tableView">Table</div>
+            <div class="tab view-tab" data-view="cardView">Cards</div>
+            <div class="tab view-tab" data-view="timetableView">Timetable</div>
+          </div>
+        </div>
+        <div>
+          <input id="searchClass" class="search" placeholder="Search class...">
+        </div>
+      </div>
+
+      <div id="tableView" class="view-pane">
+        <div style="margin-top:12px">
+          <table class="table"><thead><tr><th>#</th><th>Class</th><th>Subject</th><th>Teacher</th><th>Students</th><th>Action</th></tr></thead><tbody id="classesTableBody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="cardView" class="view-pane" style="display:none;margin-top:12px">
+        <div id="classesCards" style="display:flex;flex-wrap:wrap;gap:10px"></div>
+      </div>
+
+      <div id="timetableView" class="view-pane" style="display:none;margin-top:12px">
+        <div style="display:flex;gap:12px;margin-bottom:12px">
+          <input id="newClassName" class="input" placeholder="Class name">
+          <input id="newClassSubject" class="input" placeholder="Subject">
+          <input id="newClassTeacher" class="input" placeholder="Teacher name">
+          <button id="addClassBtn" class="btn primary">Add Class</button>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap">
+          <select id="schedDay" class="input"><option value="">Day</option><option value="1">Mon</option><option value="2">Tue</option><option value="3">Wed</option><option value="4">Thu</option><option value="5">Fri</option></select>
+          <select id="schedTime" class="input"><option value="">Time</option><option>08:00</option><option>10:00</option><option>12:00</option><option>14:00</option></select>
+          <input id="schedClassName" class="input" placeholder="Class name">
+          <input id="schedTeacher" class="input" placeholder="Teacher">
+          <button id="addScheduleBtn" class="btn primary">Add Slot</button>
+        </div>
+
+        <div id="timetableEditorGrid" class="timetable"></div>
+
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button id="exportClassesBtn" class="btn">Export</button>
+          <button id="importClassesBtn" class="btn">Import</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="teacher-classes.js"></script>
+</body>
+</html>
