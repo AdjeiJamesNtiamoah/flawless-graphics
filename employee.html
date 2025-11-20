@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Flawless Graphics — Students Portal</title>
+  <title>Flawless Graphics — Employee Portal</title>
 
   <!-- Fonts + Libraries -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -89,30 +89,31 @@
   <header>
     <div class="logo">FG</div>
     <div>
-      <h1>FLAWLESS GRAPHICS · Students Portal</h1>
-      <div class="small">Manage Students profiles, attendance and payroll-ready data</div>
+      <h1>FLAWLESS GRAPHICS · Employee Portal</h1>
+      <div class="small">Manage employee profiles, attendance and payroll-ready data</div>
     </div>
   </header>
 
   <div class="container">
     <div class="top-bar">
       <div class="left-controls">
-        <button class="btn" id="addStudentsBtn">+ Add Student</button>
+        <button class="btn" id="addEmployeeBtn">+ Add Employee</button>
         <button class="btn ghost" id="toggleViewBtn">Switch to Cards View</button>
 
         <div style="margin-left:8px">
           <select id="sortSelect" class="small" title="Sort">
             <option value="default">Sort: Default</option>
             <option value="name">Name A → Z</option>
-            <option value="Class">Class</option>
-            <option value="reportingDate">Date Reported (old → new)</option>
+            <option value="department">Department</option>
+            <option value="salary">Salary (low → high)</option>
+            <option value="hireDate">Date Hired (old → new)</option>
           </select>
         </div>
       </div>
 
       <div class="right-controls">
         <div class="search-bar">
-          <input id="searchInput" placeholder="Search by name, phone, salary, class or position...">
+          <input id="searchInput" placeholder="Search by name, phone, salary, department or position...">
         </div>
 
         <div style="display:flex; gap:8px; align-items:center; margin-left:6px">
@@ -124,26 +125,26 @@
     </div>
 
     <div class="stats-row" style="margin-top:18px">
-      <div class="stat"><h3 id="statStudents">0</h3><p>Total Students</p></div>
-      <div class="stat"><h3 id="statClass">0</h3><p>Class</p></div>
+      <div class="stat"><h3 id="statEmployees">0</h3><p>Total Employees</p></div>
+      <div class="stat"><h3 id="statDepartments">0</h3><p>Departments</p></div>
       <div class="stat"><h3 id="statAttendance">0%</h3><p>Attendance Rate</p></div>
       <div class="stat"><h3 id="statPayroll">$0</h3><p>Total Payroll</p></div>
       <div class="stat clickable" id="topDeptCard" style="cursor:pointer"><h3 id="statTopDept">N/A</h3><p>Top Performing Dept</p></div>
     </div>
 
     <!-- Table -->
-    <table id="StudentsTable" style="margin-top:18px">
+    <table id="employeeTable" style="margin-top:18px">
       <thead>
         <tr>
           <th>#</th>
           <th>Photo</th>
           <th>Full Name</th>
-          <th>Class</th>
-          <th>Guardian</th>
-          <th>Relationship</th>
+          <th>Department</th>
+          <th>Position</th>
+          <th>Email</th>
           <th>Phone</th>
-          <th>Date of Birth</th>
-          <th>Date Reported</th>
+          <th>Salary (GHS)</th>
+          <th>Date Hired</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -151,16 +152,16 @@
     </table>
 
     <!-- Cards view -->
-    <div id="StudentsCards" class="cards-view"></div>
+    <div id="employeeCards" class="cards-view"></div>
   </div>
 
   <!-- Modal: Add / Edit -->
-  <div class="modal" id="StudentsModal" aria-hidden="true">
+  <div class="modal" id="employeeModal" aria-hidden="true">
     <div class="box">
       <button class="close" id="closeModalBtn" aria-label="Close">&times;</button>
-      <h3 id="modalTitle">Add Student</h3>
+      <h3 id="modalTitle">Add Employee</h3>
 
-      <form id="StudentsForm" style="margin-top:12px">
+      <form id="employeeForm" style="margin-top:12px">
         <input type="hidden" id="editIndex" value="">
 
         <div style="display:flex;gap:12px;align-items:flex-start">
@@ -171,34 +172,25 @@
             </div>
 
             <div class="form-row">
-              <label>Cass</label>
-              <select id="Class" required>
-                <option value="">-- Select Class --</option>
-                <option value="Nursary">Nursary</option>
-                <option value="KG">KG</option>
-                <option value="Class One">Class One</option>
-                <option value="Class Two">Class Two</option>
-                <option value="Class Three">Class Three</option>
-                <option value="Class Four">Class Four</option>
-                <option value="Class Five">Class Five</option>
-                <option value="Class Six">Class Six</option>
-                <option value="Form One">Form One</option>
-                <option value="Form Two">Form Two</option>
-                <option value="Form Three">Form Three</option>
-                <option value="SHS One">SHS One</option>
-                <option value="SHS Two">SHS Two</option>
-                <option value="SHS Three">SHS Three</option>
+              <label>Department</label>
+              <select id="department" required>
+                <option value="">-- Select Department --</option>
+                <option value="IT">IT</option>
+                <option value="Safety">Safety</option>
+                <option value="HR">HR</option>
+                <option value="Finance">Finance</option>
+                <option value="Administration">Administration</option>
               </select>
             </div>
 
             <div class="form-row">
               <label>Position</label>
-              <input type="text" id="position">
+              <input type="text" id="position" required>
             </div>
 
             <div class="form-row">
-              <label>Guardian</label>
-              <input type="text" id="email">
+              <label>Email</label>
+              <input type="email" id="email">
             </div>
 
             <div class="form-row">
@@ -207,18 +199,13 @@
             </div>
 
             <div class="form-row">
-              <label>Relationship</label>
-              <input type="text" id="salary">
+              <label>Salary (GHS)</label>
+              <input type="number" id="salary">
             </div>
 
             <div class="form-row">
-              <label>Date Of Birth</label>
-              <input type="date" id="DOB">
-            </div>
-
-            <div class="form-row">
-              <label>Date Reported</label>
-              <input type="date" id="ReportedDate">
+              <label>Date Hired</label>
+              <input type="date" id="hireDate">
             </div>
           </div>
 
@@ -230,7 +217,7 @@
             <input type="file" id="photoInput" accept="image/*">
             <div class="small">Profile photo (optional). Images are stored locally.</div>
             <div style="margin-top:auto">
-              <button class="btn" type="submit">Save Student</button>
+              <button class="btn" type="submit">Save Employee</button>
             </div>
           </div>
         </div>
@@ -238,27 +225,27 @@
     </div>
   </div>
 
-  <!-- Class Modal (Top Class -> breakdown) -->
-  <div class="modal" id="ClassModal" aria-hidden="true">
+  <!-- Department Modal (Top Dept -> breakdown) -->
+  <div class="modal" id="departmentModal" aria-hidden="true">
     <div class="box">
-      <button class="close" data-close-Class>&times;</button>
-      <h3>Class Performance / Breakdown</h3>
+      <button class="close" data-close-dept>&times;</button>
+      <h3>Department Performance / Breakdown</h3>
 
       <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
         <label style="display:block">
-          <small>Select Class</small><br>
-          <select id="ClassSelect"></select>
+          <small>Select Dept</small><br>
+          <select id="deptSelect"></select>
         </label>
-        <button class="btn" id="loadClassBtn">Load</button>
-        <button class="btn" id="downloadClassPdf">Download PDF</button>
+        <button class="btn" id="loadDeptBtn">Load</button>
+        <button class="btn" id="downloadDeptPdf">Download PDF</button>
       </div>
 
       <table id="deptTable" style="margin-top:10px">
-        <thead><tr><th>#</th><th>Students</th><th>Avg Score</th></tr></thead>
+        <thead><tr><th>#</th><th>Employee</th><th>Avg Score</th></tr></thead>
         <tbody></tbody>
       </table>
 
-      <h4 id="ClassAvg" style="margin-top:12px">Average Score: 0%</h4>
+      <h4 id="deptAvg" style="margin-top:12px">Average Score: 0%</h4>
     </div>
   </div>
 
@@ -266,33 +253,33 @@
 
   <script>
   /************************************************************************
-   * Students Portal: FULL-featured script
-   * - Profile pics stored as data URLs in localStorage.Students[].photo
+   * Employee Portal: FULL-featured script
+   * - Profile pics stored as data URLs in localStorage.employees[].photo
    * - Sorting / search / view toggle / export CSV/XLSX/PDF / badges / animations
    ************************************************************************/
 
   // Helper: safe parse
   const safeParse = s => { try { return JSON.parse(s); } catch(e){ return null; } };
 
-  // initial Students (read from localStorage)
-  let Students = safeParse(localStorage.getItem('Students')) || [];
+  // initial employees (read from localStorage)
+  let employees = safeParse(localStorage.getItem('employees')) || [];
 
   // DOM
-  const tbody = document.querySelector('#StudentsTable tbody');
-  const cards = document.getElementById('StudentsCards');
-  const addBtn = document.getElementById('addStudentsBtn');
-  const modal = document.getElementById('StudentsModal');
+  const tbody = document.querySelector('#employeeTable tbody');
+  const cards = document.getElementById('employeeCards');
+  const addBtn = document.getElementById('addEmployeeBtn');
+  const modal = document.getElementById('employeeModal');
   const closeModal = document.getElementById('closeModalBtn');
-  const form = document.getElementById('StudentsForm');
+  const form = document.getElementById('employeeForm');
   const avatarInput = document.getElementById('photoInput');
   const avatarPreviewImg = document.getElementById('avatarPreviewImg');
   const avatarPlaceholder = document.getElementById('avatarPlaceholder');
-  const statStudents = document.getElementById('statStudents');
-  const statClass = document.getElementById('statClass');
+  const statEmployees = document.getElementById('statEmployees');
+  const statDepartments = document.getElementById('statDepartments');
   const statAttendance = document.getElementById('statAttendance');
   const statPayroll = document.getElementById('statPayroll');
-  const statTopClass = document.getElementById('statTopClass');
-  const topClassCard = document.getElementById('topClassCard');
+  const statTopDept = document.getElementById('statTopDept');
+  const topDeptCard = document.getElementById('topDeptCard');
   const toggleViewBtn = document.getElementById('toggleViewBtn');
   const searchInput = document.getElementById('searchInput');
   const sortSelect = document.getElementById('sortSelect');
@@ -300,12 +287,12 @@
   const exportXlsxBtn = document.getElementById('exportXlsxBtn');
   const exportPdfBtn = document.getElementById('exportPdfBtn');
 
-  const ClassModal = document.getElementById('ClassModal');
-  const ClassSelect = document.getElementById('ClassSelect');
-  const loadClassBtn = document.getElementById('loadClassBtn');
-  const downloadClassPdf = document.getElementById('downloadCClassPdf');
+  const deptModal = document.getElementById('departmentModal');
+  const deptSelect = document.getElementById('deptSelect');
+  const loadDeptBtn = document.getElementById('loadDeptBtn');
+  const downloadDeptPdf = document.getElementById('downloadDeptPdf');
 
-  // mapping Class badge class
+  // mapping department badge class
   function deptBadge(dept){
     if(!dept) return `<span class="badge admin">Unassigned</span>`;
     const d = dept.toLowerCase();
@@ -320,14 +307,14 @@
   function escapeHtml(s){ if(s===null||s===undefined) return ''; return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
   // render list (table + cards)
-  function render(list = Students){
+  function render(list = employees){
     // apply sorting based on sortSelect
     const sort = sortSelect.value;
     let arr = Array.from(list);
     if(sort==='name') arr.sort((a,b)=> (a.fullName||'').localeCompare(b.fullName||''));
-    else if(sort==='Class') arr.sort((a,b)=> (a.Class||'').localeCompare(b.Class||''));
+    else if(sort==='department') arr.sort((a,b)=> (a.department||'').localeCompare(b.department||''));
     else if(sort==='salary') arr.sort((a,b)=> (Number(a.salary||0) - Number(b.salary||0)));
-    else if(sort==='ReportedDate') arr.sort((a,b)=> new Date(a.ReportedDate||0) - new Date(b.ReportedDate||0));
+    else if(sort==='hireDate') arr.sort((a,b)=> new Date(a.hireDate||0) - new Date(b.hireDate||0));
 
     // table
     tbody.innerHTML = '';
@@ -338,15 +325,15 @@
         <td>${i+1}</td>
         <td>${photoHtml}</td>
         <td>${escapeHtml(e.fullName||'N/A')}</td>
-        <td>${ClassBadge(e.Class)}</td>
-        <td>${escapeHtml(e.Guardian||'')}</td>
-        <td>${escapeHtml(e.Relationship||'')}</td>
+        <td>${deptBadge(e.department)}</td>
+        <td>${escapeHtml(e.position||'')}</td>
+        <td><a href="mailto:${escapeHtml(e.email||'')}" class="small">${escapeHtml(e.email||'')}</a></td>
         <td class="small">${escapeHtml(e.phone||'')}</td>
-        <td class="small">${escapeHtml(e.DOBDate||'')}</td>
+        <td class="small">${e.salary ? Number(e.salary).toLocaleString() : '0'}</td>
         <td class="small">${escapeHtml(e.hireDate||'')}</td>
         <td class="actions">
-          <img src="https://img.icons8.com/ios-glyphs/30/edit--v1.png" title="Edit" onclick="editStudent(${i})">
-          <img src="https://img.icons8.com/ios-glyphs/30/filled-trash.png" title="Delete" onclick="deleteStudent(${i})">
+          <img src="https://img.icons8.com/ios-glyphs/30/edit--v1.png" title="Edit" onclick="editEmployee(${i})">
+          <img src="https://img.icons8.com/ios-glyphs/30/filled-trash.png" title="Delete" onclick="deleteEmployee(${i})">
         </td>`;
       tbody.appendChild(tr);
     });
@@ -355,19 +342,19 @@
     cards.innerHTML = '';
     arr.forEach((e,i)=>{
       const card = document.createElement('div');
-      card.className='Students-card';
+      card.className='employee-card';
       card.innerHTML = `
         <img src="${e.photo||'https://img.icons8.com/ios/100/000000/user--v1.png'}" alt="photo">
         <h4>${escapeHtml(e.fullName||'N/A')}</h4>
-        <div style="margin-top:6px">${ClassBadge(e.Class)}</div>
-        <p class="small"><b>${escapeHtml(e.Guardian||'')}</b></p>
-        <p class="small">${escapeHtml(e.Relationship||'')}</p>
+        <div style="margin-top:6px">${deptBadge(e.department)}</div>
+        <p class="small"><b>${escapeHtml(e.position||'')}</b></p>
+        <p class="small">${escapeHtml(e.email||'')}</p>
         <p class="small">📞 ${escapeHtml(e.phone||'')}</p>
-        <p class="small">Date of Birth: ${escapeHtml(e.DOBDate||'')}</p>
-        <p class="small">Reported: ${escapeHtml(e.ReportedDate||'')}</p>
+        <p class="small">GHS ${e.salary ? Number(e.salary).toLocaleString() : '0'}</p>
+        <p class="small">Hired: ${escapeHtml(e.hireDate||'')}</p>
         <div style="margin-top:8px">
-          <img src="https://img.icons8.com/ios-glyphs/30/edit--v1.png" title="Edit" onclick="editStudent(${i})">
-          <img src="https://img.icons8.com/ios-glyphs/30/filled-trash.png" title="Delete" onclick="deleteStudent(${i})">
+          <img src="https://img.icons8.com/ios-glyphs/30/edit--v1.png" title="Edit" onclick="editEmployee(${i})">
+          <img src="https://img.icons8.com/ios-glyphs/30/filled-trash.png" title="Delete" onclick="deleteEmployee(${i})">
         </div>`;
       cards.appendChild(card);
     });
@@ -375,13 +362,13 @@
     updateStats();
   }
 
-  // update stats (Students, Class, attendance, payroll, top dept)
+  // update stats (employees, departments, attendance, payroll, top dept)
   function updateStats(){
-    const total = Students.length;
-    document.getElementById('statStudents').innerText = total;
+    const total = employees.length;
+    document.getElementById('statEmployees').innerText = total;
 
-    const departments = Array.from(new Set(Students.map(e=>e.Class||'Unassigned')));
-    document.getElementById('statClass').innerText = Class.length;
+    const departments = Array.from(new Set(employees.map(e=>e.department||'Unassigned')));
+    document.getElementById('statDepartments').innerText = departments.length;
 
     // attendance fallback / attempt to read attendance localStorage if exists
     let attendanceRate = 0;
@@ -394,27 +381,30 @@
     } catch(e){ attendanceRate = Math.floor(Math.random()*18)+80; }
     document.getElementById('statAttendance').innerText = attendanceRate+'%';
 
+    const payroll = employees.reduce((s,e)=> s + Number(e.salary||0), 0);
+    document.getElementById('statPayroll').innerText = 'GHS ' + payroll.toLocaleString();
+
     // top department by average performance if performance data exists, else by count
     const perfData = safeParse(localStorage.getItem('performanceData')) || {};
     const deptScores = {};
     for(const e of employees){
       const scores = perfData[e.fullName] ? Object.values(perfData[e.fullName]).map(Number).filter(n=>!isNaN(n)) : [];
       const avg = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
-      if(!ClassScores[e.Class]) ClassScores[e.Class] = [];
-      ClassScores[e.Class].push(avg);
+      if(!deptScores[e.department]) deptScores[e.department] = [];
+      deptScores[e.department].push(avg);
     }
     let top = 'N/A', topVal = 0;
-    for(const d in ClassScores){
-      const arr = ClassScores[d];
+    for(const d in deptScores){
+      const arr = deptScores[d];
       const avg = arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
       if(avg>topVal){ topVal=avg; top=d; }
     }
     if(top==='N/A' || topVal===0){
       // fallback: top by count
       const counts = {};
-      for(const e of Students) counts[e.Class] = (counts[e.Class]||0)+1;
+      for(const e of employees) counts[e.department] = (counts[e.department]||0)+1;
       let bestDept='',bestCount=0;
-      for(const d in counts) if(counts[d]>bestCount){bestCount=counts[d]; bestClass=d;}
+      for(const d in counts) if(counts[d]>bestCount){bestCount=counts[d]; bestDept=d;}
       top = bestDept || 'N/A';
       document.getElementById('statTopDept').innerText = top === 'N/A' ? 'N/A' : `${top} (${bestCount} people)`;
     } else {
@@ -422,11 +412,11 @@
     }
 
     // populate dept select for breakdown modal
-    const select = ClassSelect;
+    const select = deptSelect;
     if(select){
       const prev = select.value;
       select.innerHTML='';
-      Array.from(new Set(Students.map(e=>e.Students||'Unassigned'))).sort().forEach(d=>{
+      Array.from(new Set(employees.map(e=>e.department||'Unassigned'))).sort().forEach(d=>{
         const opt = document.createElement('option'); opt.value=d; opt.textContent=d; select.appendChild(opt);
       });
       if(prev) select.value = prev;
@@ -437,7 +427,7 @@
   addBtn.addEventListener('click', ()=> {
     form.reset(); document.getElementById('editIndex').value='';
     avatarPreviewImg.src=''; avatarPreviewImg.style.display='none'; avatarPlaceholder.style.display='block';
-    document.getElementById('modalTitle').innerText='Add Student';
+    document.getElementById('modalTitle').innerText='Add Employee';
     modal.style.display='flex'; modal.setAttribute('aria-hidden','false');
   });
   closeModal.addEventListener('click', ()=> { modal.style.display='none'; modal.setAttribute('aria-hidden','true'); });
@@ -463,67 +453,67 @@
     e.preventDefault();
     const data = {
       fullName: document.getElementById('fullName').value.trim(),
-      Class: document.getElementById('Students').value.trim(),
-      Guardian: document.getElementById('Guardian').value.trim(),
-      Relationship: document.getElementById('Guardian').value.trim(),
+      department: document.getElementById('department').value.trim(),
+      position: document.getElementById('position').value.trim(),
+      email: document.getElementById('email').value.trim(),
       phone: document.getElementById('phone').value.trim(),
-      DOBDate: document.getElementById('DOBDate').value,
-      ReportedDate: document.getElementById('ReportedDate').value || ''
+      salary: document.getElementById('salary').value ? Number(document.getElementById('salary').value) : 0,
+      hireDate: document.getElementById('hireDate').value || ''
     };
     // photo from preview
     if(avatarPreviewImg && avatarPreviewImg.src) data.photo = avatarPreviewImg.src;
 
     const editIndex = document.getElementById('editIndex').value;
     if(editIndex===''){
-      Students.push(data);
-      showToast('Student added', 'success');
+      employees.push(data);
+      showToast('Employee added', 'success');
     } else {
-      Student[Number(editIndex)] = data;
-      showToast('Student updated', 'success');
+      employees[Number(editIndex)] = data;
+      showToast('Employee updated', 'success');
     }
-    localStorage.setItem('Students', JSON.stringify(Students));
+    localStorage.setItem('employees', JSON.stringify(employees));
     modal.style.display='none'; modal.setAttribute('aria-hidden','true');
     render();
   });
 
   // edit function (global)
-  window.editStudents = function(index){
-    const e = Students[index];
+  window.editEmployee = function(index){
+    const e = employees[index];
     if(!e) return;
     document.getElementById('fullName').value = e.fullName||'';
-    document.getElementById('Class').value = e.Class||'';
-    document.getElementById('Guardian').value = e.Guardian||'';
-    document.getElementById('Relationship').value = e.Relationship||'';
+    document.getElementById('department').value = e.department||'';
+    document.getElementById('position').value = e.position||'';
+    document.getElementById('email').value = e.email||'';
     document.getElementById('phone').value = e.phone||'';
-    document.getElementById('DOBDate').value = e.DOBDate||'';
-    document.getElementById('ReportedDate').value = e.ReportedDate||'';
+    document.getElementById('salary').value = e.salary||'';
+    document.getElementById('hireDate').value = e.hireDate||'';
     document.getElementById('editIndex').value = index;
 
     if(e.photo){ avatarPreviewImg.src = e.photo; avatarPreviewImg.style.display='block'; avatarPlaceholder.style.display='none'; }
     else { avatarPreviewImg.src=''; avatarPreviewImg.style.display='none'; avatarPlaceholder.style.display='block'; }
 
-    document.getElementById('modalTitle').innerText='Edit Student';
+    document.getElementById('modalTitle').innerText='Edit Employee';
     modal.style.display='flex'; modal.setAttribute('aria-hidden','false');
   };
 
   // delete
-  window.deleteStudent = function(index){
-    if(!confirm('Delete Student?')) return;
-    Student.splice(index,1);
-    localStorage.setItem('Students', JSON.stringify(Students));
-    showToast('Student deleted', 'delete');
+  window.deleteEmployee = function(index){
+    if(!confirm('Delete employee?')) return;
+    employees.splice(index,1);
+    localStorage.setItem('employees', JSON.stringify(employees));
+    showToast('Employee deleted', 'delete');
     render();
   };
 
   // search
   searchInput.addEventListener('input', ()=>{
     const q = searchInput.value.trim().toLowerCase();
-    const filtered = Students.filter(e=>{
+    const filtered = employees.filter(e=>{
       return (e.fullName||'').toLowerCase().includes(q) ||
-             (e.Class||'').toLowerCase().includes(q) ||
-             (e.Guardian||'').toLowerCase().includes(q) ||
+             (e.department||'').toLowerCase().includes(q) ||
+             (e.position||'').toLowerCase().includes(q) ||
              (e.phone||'').toString().toLowerCase().includes(q) ||
-            
+             (''+ (e.salary||'')).toLowerCase().includes(q);
     });
     render(filtered);
   });
@@ -532,7 +522,7 @@
   let isCard = false;
   toggleViewBtn.addEventListener('click', ()=>{
     isCard = !isCard;
-    document.getElementById('StudentsTable').style.display = isCard ? 'none' : 'table';
+    document.getElementById('employeeTable').style.display = isCard ? 'none' : 'table';
     cards.style.display = isCard ? 'flex' : 'none';
     toggleViewBtn.textContent = isCard ? 'Switch to Table View' : 'Switch to Cards View';
   });
@@ -542,42 +532,42 @@
 
   // export CSV
   exportCsvBtn.addEventListener('click', ()=>{
-    const rows = Students.map(e=>({
+    const rows = employees.map(e=>({
       fullName: e.fullName||'',
-      Class: e.Class||'',
-      Guardian: e.Guardian||'',
-      Relationship: e.Relationship||'',
+      department: e.department||'',
+      position: e.position||'',
+      email: e.email||'',
       phone: e.phone||'',
-      DOBDate: e.DOBDate||'',
-      ReportedDate: e.ReportedDate||''
+      salary: e.salary||'',
+      hireDate: e.hireDate||''
     }));
     const csv = toCsv(rows);
-    downloadText(csv, 'Student.csv', 'text/csv;charset=utf-8;');
+    downloadText(csv, 'employees.csv', 'text/csv;charset=utf-8;');
   });
 
   // export XLSX (SheetJS)
   exportXlsxBtn.addEventListener('click', ()=>{
-    const rows = Students.map(e=>([e.fullName||'', e.Class||'', e.Guardian||'', e.Relationship||'', e.phone||'', e.DOBDate||'', e.ReportedDate||'']));
-    const ws = XLSX.utils.aoa_to_sheet([['Full Name','Class','Guardian','Relationship','Phone','Date of Birth','Hire Date'], ...rows]);
-    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Students');
-    XLSX.writeFile(wb, 'Students.xlsx');
+    const rows = employees.map(e=>([e.fullName||'', e.department||'', e.position||'', e.email||'', e.phone||'', e.salary||'', e.hireDate||'']));
+    const ws = XLSX.utils.aoa_to_sheet([['Full Name','Department','Position','Email','Phone','Salary','Hire Date'], ...rows]);
+    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Employees');
+    XLSX.writeFile(wb, 'employees.xlsx');
   });
 
   // export PDF using jsPDF (simple text table)
   exportPdfBtn.addEventListener('click', ()=>{
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('l','pt','a4');
-    doc.setFontSize(14); doc.text('Students Report', 40, 40);
-    const header = ['#','Full Name','Class','Guardian','Relationship','Phone','DOBDate','Reported Date'];
+    doc.setFontSize(14); doc.text('Employee Report', 40, 40);
+    const header = ['#','Full Name','Department','Position','Email','Phone','Salary','Hire Date'];
     let y = 70;
     doc.setFontSize(10);
     doc.text(header.join('  |  '), 40, y); y+=14;
     employees.forEach((e,i)=>{
-      const line = [i+1, e.fullName||'', e.Class||'', e.Guardian||'', e.Relationship||'', e.phone||'', e.DOBDate||'', e.ReportedDate||''].join('  |  ');
+      const line = [i+1, e.fullName||'', e.department||'', e.position||'', e.email||'', e.phone||'', e.salary||'', e.hireDate||''].join('  |  ');
       doc.text(line, 40, y); y+=12;
       if(y>540){doc.addPage(); y=40;}
     });
-    doc.save('Students.pdf');
+    doc.save('employees.pdf');
   });
 
   // csv helper
@@ -597,20 +587,20 @@
     a.download = filename; document.body.appendChild(a); a.click(); a.remove();
   }
 
-  // Class modal open
-  topClassCard.addEventListener('click', ()=> {
-    ClassModal.style.display='flex';
-    ClassModal.setAttribute('aria-hidden','false');
+  // department modal open
+  topDeptCard.addEventListener('click', ()=> {
+    deptModal.style.display='flex';
+    deptModal.setAttribute('aria-hidden','false');
   });
-  document.querySelectorAll('[data-close-Class]').forEach(b=>b.addEventListener('click', ()=>{ ClassModal.style.display='none'; ClassModal.setAttribute('aria-hidden','true'); }));
+  document.querySelectorAll('[data-close-dept]').forEach(b=>b.addEventListener('click', ()=>{ deptModal.style.display='none'; deptModal.setAttribute('aria-hidden','true'); }));
 
-  function loadClassPerformance(){
-    const Class = ClassSelect.value;
+  function loadDeptPerformance(){
+    const dept = deptSelect.value;
     const perf = safeParse(localStorage.getItem('performanceData')) || {};
-    const StudentsInClass = Students.filter(e=> (e.Class||'Unassigned') === Class);
+    const employeesInDept = employees.filter(e=> (e.department||'Unassigned') === dept);
     const tbody = document.querySelector('#deptTable tbody'); tbody.innerHTML='';
     let total = 0;
-    StudentsInClass.forEach((e,i)=>{
+    employeesInDept.forEach((e,i)=>{
       const scores = perf[e.fullName] ? Object.values(perf[e.fullName]).map(Number).filter(n=>!isNaN(n)) : [];
       const avg = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
       total += avg;
@@ -620,23 +610,23 @@
       tbody.appendChild(tr);
       setTimeout(()=>tr.classList.remove('row-highlight'),900);
     });
-    const avgClass = StudentsInClass.length ? (total / StudentsInClass.length).toFixed(1) : 0;
-    document.getElementById('ClassAvg').innerText = `Average Score: ${avgDept}%`;
+    const avgDept = employeesInDept.length ? (total / employeesInDept.length).toFixed(1) : 0;
+    document.getElementById('deptAvg').innerText = `Average Score: ${avgDept}%`;
   }
 
-  loadClassBtn.addEventListener('click', loadClassPerformance);
-  downloadClassPdf.addEventListener('click', ()=>{
+  loadDeptBtn.addEventListener('click', loadDeptPerformance);
+  downloadDeptPdf.addEventListener('click', ()=>{
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    doc.text('Class Report',14,20);
-    const rows = Array.from(document.querySelectorAll('#ClassTable tbody tr'));
+    doc.text('Department Report',14,20);
+    const rows = Array.from(document.querySelectorAll('#deptTable tbody tr'));
     let y=40;
     rows.forEach(r=>{
       const line = Array.from(r.cells).map(c=>c.innerText).join('  |  ');
       doc.text(line, 14, y); y += 12;
       if(y>780){doc.addPage(); y=20;}
     });
-    doc.save('Class_report.pdf');
+    doc.save('dept_report.pdf');
   });
 
   // simple toast
@@ -651,13 +641,13 @@
   render();
   // monitor localStorage changes (other tabs)
   window.addEventListener('storage', (e)=>{
-    if(['Students','performanceData','payments'].includes(e.key)){
-      Students = safeParse(localStorage.getItem('Students')) || [];
+    if(['employees','performanceData','payments'].includes(e.key)){
+      employees = safeParse(localStorage.getItem('employees')) || [];
       render();
     }
   });
 
-  // small CSS animation class for Class table rows
+  // small CSS animation class for department table rows
   const style = document.createElement('style');
   style.innerHTML = `.row-highlight{animation:fadeGreen .9s ease}@keyframes fadeGreen{0%{background:#e6ffeb}100%{background:white}}`;
   document.head.appendChild(style);
