@@ -9,7 +9,7 @@
     body {
         margin: 0;
         font-family: "Poppins", sans-serif;
-        background: linear-gradient(135deg, #003366, #0066cc);
+        background: linear-gradient(135deg, #00264d, #0059b3);
         height: 100vh;
         display: flex;
         justify-content: center;
@@ -18,40 +18,82 @@
         overflow: hidden;
     }
 
+    /* Splash / Logo Animation */
+    .logo-splash {
+        position: absolute;
+        top: 20px;
+        animation: fadeIn 1.5s ease-out forwards;
+        text-align: center;
+    }
+
+    .logo-splash img {
+        width: 100px;
+        filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));
+        animation: float 3s infinite ease-in-out;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+
+    /* Main Welcome Box */
     .welcome-box {
         text-align: center;
-        background: rgba(255,255,255,0.15);
-        padding: 40px;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 50px 35px;
         border-radius: 15px;
         backdrop-filter: blur(12px);
         box-shadow: 0 8px 25px rgba(0,0,0,0.3);
         width: 90%;
         max-width: 420px;
-        animation: fadeIn 1.2s ease;
+        animation: fadeUp 1.4s ease forwards;
+        margin-top: 90px;
+        opacity: 0;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(40px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     h1 {
-        font-size: 1.9em;
+        font-size: 2em;
         margin-bottom: 8px;
     }
 
-    p {
-        opacity: 0.9;
+    #greeting {
         font-size: 1.1em;
+        opacity: 0.9;
+        margin-bottom: 10px;
     }
 
+    /* Progress Bar */
+    .progress-container {
+        width: 100%;
+        background: rgba(255,255,255,0.2);
+        height: 10px;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 20px 0;
+    }
+
+    .progress-bar {
+        width: 0%;
+        height: 100%;
+        background: #00e6e6;
+        border-radius: 10px;
+        transition: width 0.2s ease;
+    }
+
+    /* Buttons */
     .btn {
         display: block;
-        margin-top: 25px;
+        margin-top: 15px;
         padding: 12px;
-        background: #00ccff;
-        color: #003355;
-        font-size: 1.1em;
+        background: white;
+        color: #003366;
         border-radius: 8px;
         text-decoration: none;
         font-weight: 600;
@@ -59,29 +101,82 @@
     }
 
     .btn:hover {
-        background: white;
-        color: #003366;
+        background: #00ccff;
+        color: #003355;
+    }
+
+    .countdown {
+        font-size: 0.95em;
+        opacity: 0.8;
+        margin-top: 5px;
     }
 </style>
 </head>
 
 <body>
 
+<!-- Animated Logo -->
+<div class="logo-splash">
+    <img src="logo.gif" alt="Logo">
+</div>
+
 <div class="welcome-box">
     <h1 id="orgName">Welcome</h1>
-    <p id="hrName">Loading your dashboard...</p>
 
-    <a href="home.html" class="btn">Continue</a>
+    <p id="greeting"></p>
+    <p id="hrInfo">Loading your dashboard...</p>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <p class="countdown">Redirecting in <span id="timer">5</span> seconds...</p>
+
+    <!-- Buttons -->
+    <a href="home.html" class="btn">Go to Home Page</a>
+    <a href="hr-dashboard.html" class="btn">Open HR Dashboard</a>
+    <a href="employee.html" class="btn">Employee Portal</a>
 </div>
 
 <script>
-    // Load HR & organization info
-    let activeOrg = localStorage.getItem("active_org") || "Your Organization";
+    // Load active org + HR user
+    let org = localStorage.getItem("active_org") || "Your Organization";
     let hr = JSON.parse(localStorage.getItem("activeHR") || "{}");
 
-    document.getElementById("orgName").innerText = "Welcome to " + activeOrg;
-    document.getElementById("hrName").innerText =
-        hr.name ? ("Logged in as: " + hr.name) : "Welcome, HR Manager!";
+    document.getElementById("orgName").innerText = "Welcome to " + org;
+
+    // Personalized greeting
+    function getGreeting() {
+        let hour = new Date().getHours();
+        if (hour < 12) return "Good morning";
+        if (hour < 18) return "Good afternoon";
+        return "Good evening";
+    }
+
+    document.getElementById("greeting").innerText =
+        getGreeting() + (hr.name ? ", " + hr.name + "!" : "!");
+
+    document.getElementById("hrInfo").innerText =
+        hr.email ? "Logged in as: " + hr.email : "HR Access Granted";
+
+    // Progress bar animation + countdown
+    let progress = 0;
+    let timer = 5;
+
+    let interval = setInterval(() => {
+        progress += 20;
+        document.getElementById("progressBar").style.width = progress + "%";
+
+        timer--;
+        document.getElementById("timer").innerText = timer;
+
+        if (timer === 0) {
+            clearInterval(interval);
+            window.location.href = "home.html"; // Auto redirect
+        }
+
+    }, 1000);
 </script>
 
 </body>
