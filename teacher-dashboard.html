@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Teacher Dashboard — Flawless Graphics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="teacher-dashboard.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="header">
+    <div class="brand">
+      <div class="logo">FG</div>
+      <div>
+        <h1>Teacher Dashboard</h1>
+        <div class="small">Flawless Graphics</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="small" id="orgName">Org</div>
+      <div style="width:12px"></div>
+      <div style="text-align:right">
+        <div id="teacherName" style="font-weight:700"></div>
+        <div id="teacherRole" class="small"></div>
+      </div>
+      <button class="btn ghost" id="logoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <div class="container" id="teacherDashboardRoot">
+
+    <div class="grid">
+      <div>
+        <div class="card">
+          <div class="row" style="justify-content:space-between;align-items:center">
+            <div>
+              <h2 style="margin:0">Welcome back</h2>
+              <div class="small">Personalized teacher dashboard</div>
+            </div>
+            <div class="row">
+              <button class="btn primary" id="myClockIn">Clock In</button>
+              <button class="btn" id="myClockOut">Clock Out</button>
+            </div>
+          </div>
+
+          <div class="kpi-grid">
+            <div class="kpi"><div class="label">Total Teachers</div><div class="value" id="k_total_teachers">0</div></div>
+            <div class="kpi"><div class="label">Attendance Rate</div><div class="value" id="k_attendance_rate">0%</div></div>
+            <div class="kpi"><div class="label">My Payments</div><div class="value" id="k_payments_count">0</div></div>
+            <div class="kpi"><div class="label">Total Paid</div><div class="value" id="k_total_paid">GHS 0</div></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="section-title"><strong>My Attendance</strong><div class="small">Recent</div></div>
+          <div id="myAttendanceList" class="teacher-list"></div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="section-title"><strong>Performance</strong><div class="small">Your evaluations</div></div>
+          <div style="display:flex;gap:12px">
+            <div style="flex:1">
+              <div id="myEvalList" style="max-height:180px;overflow:auto"></div>
+            </div>
+            <div style="width:320px">
+              <canvas id="myPerfChart" height="150"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="section-title"><strong>Payroll</strong><div class="small">Payslips & history</div></div>
+          <div id="myPaymentsList" style="max-height:220px;overflow:auto"></div>
+        </div>
+
+      </div>
+
+      <aside>
+        <div class="card">
+          <div class="section-title"><strong>My Classes</strong><div class="small">Assigned</div></div>
+          <div id="myClassesList"></div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="section-title"><strong>Timetable</strong><div class="small">Weekly view</div></div>
+          <div id="timetableGrid" class="timetable"></div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="section-title"><strong>Announcements</strong><div class="small">From HR</div></div>
+          <div id="announcements" style="max-height:160px;overflow:auto"></div>
+        </div>
+      </aside>
+    </div>
+
+    <div style="margin-top:18px" class="card">
+      <div class="section-title"><strong>Quick Actions</strong><div class="small">Shortcuts</div></div>
+      <div class="row">
+        <button class="btn primary" onclick="window.location.href='teacher-classes.html'">Open Classroom Module</button>
+        <button class="btn" onclick="window.location.href='teacher-profile.html'">Edit Profile</button>
+      </div>
+    </div>
+
+    <div class="footer">© <span id="yr"></span> Flawless Graphics — Teacher Portal</div>
+  </div>
+
+  <script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+  <script src="teacher-dashboard.js"></script>
+</body>
+</html>
