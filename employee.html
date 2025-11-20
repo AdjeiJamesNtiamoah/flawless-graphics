@@ -284,6 +284,9 @@
    * - Sorting / search / view toggle / export CSV/XLSX/PDF / badges / animations
    ************************************************************************/
 
+  // Declare students as an empty array first to avoid initialization errors
+  let students = [];
+
   // Debug functions
   function updateDebugInfo() {
     document.getElementById('protocolInfo').textContent = window.location.protocol;
@@ -390,31 +393,27 @@
     }
   }
 
+  // FIXED: Restructured to avoid circular reference
   function loadStudents() {
     try {
       const stored = localStorage.getItem('students');
       console.log('[DEBUG] Loading students from storage:', stored);
       
-      students = safeParse(stored, 'students');
+      // Parse and return the data instead of trying to modify the global students variable
+      const loadedStudents = safeParse(stored, 'students');
       
-      if(!Array.isArray(students)) {
-        console.warn('[DEBUG] Students is not an array, resetting');
-        students = [];
+      if(!Array.isArray(loadedStudents)) {
+        console.warn('[DEBUG] Loaded data is not an array, using empty array');
+        return [];
       }
       
-      console.log('[DEBUG] Final students array:', students);
-      updateDebugInfo();
-      return students;
+      console.log('[DEBUG] Final students array:', loadedStudents);
+      return loadedStudents;
     } catch(e) {
       console.error('[DEBUG] Error loading students:', e);
-      students = [];
-      updateDebugInfo();
-      return students;
+      return [];
     }
   }
-
-  // Initialize students with enhanced loading
-  let students = loadStudents();
 
   // DOM elements - ensure they exist before using
   function getDOMElements() {
@@ -898,6 +897,10 @@
   // Initialize everything when DOM is ready
   document.addEventListener('DOMContentLoaded', function() {
     console.log('[DEBUG] DOM loaded, initializing...');
+    
+    // FIXED: Load students after declaring the variable
+    students = loadStudents();
+    console.log('[DEBUG] Students loaded:', students);
     
     // Check if running from file:// protocol
     if(window.location.protocol === 'file:') {
