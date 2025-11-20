@@ -25,18 +25,18 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
         // Save logged-in user
         localStorage.setItem("active_user", JSON.stringify(user));
 
-        // ROLE-BASED REDIRECTS
+        // 🔥 ROLE-BASED REDIRECTS (THIS WAS MISSING)
         if (user.role === "hr") {
             window.location.href = "hr-dashboard.html";
         }
         else if (user.role === "teacher") {
-            window.location.href = "teacher-dashboard.html"; // FIXED REDIRECT
+            window.location.href = "teacher-dashboard.html";  // FIXED
         }
         else if (user.role === "employee") {
-            window.location.href = "employee.html";
+            window.location.href = "employee-portal.html";
         }
         else {
-            alert("Unknown user role!");
+            alert("Unknown role. Cannot continue.");
         }
     });
 });
