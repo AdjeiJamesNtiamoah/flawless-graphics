@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Flawless Graphics — Student Portal</title>
+  <title>Flawless Graphics — Employee Portal</title>
 
   <!-- Fonts + Libraries -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -26,11 +26,9 @@
     .left-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .right-controls{display:flex;gap:10px;align-items:center}
     .search-bar input{padding:8px 12px;border-radius:8px;border:1px solid #d8e6f1;min-width:260px}
-    .btn{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.2s}
-    .btn:hover{background:#095285;transform:translateY(-1px)}
-    .btn:active{transform:translateY(1px)}
+    .btn{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600}
     .btn.ghost{background:transparent;color:var(--accent);border:1px solid #d8e6f1}
-    .btn.ghost:hover{background:#f0f7fd}
+    .btn:active{transform:translateY(1px)}
     .controls {display:flex; gap:8px; align-items:center; flex-wrap:wrap}
 
     .stats-row{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
@@ -43,31 +41,27 @@
     th, td{padding:10px;border-bottom:1px solid #eef4fb;vertical-align:middle}
     td img.avatar{width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 6px 16px rgba(12,24,48,0.08)}
     .badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#e8f1fb;color:var(--nav);font-weight:600;font-size:13px}
-    .badge.science{background:linear-gradient(90deg,#d9eefc,#d6f5f8);color:#0b63a3}
-    .badge.arts{background:linear-gradient(90deg,#e8f7ec,#e6fbe6);color:#1b8a2a}
-    .badge.commerce{background:linear-gradient(90deg,#f0e8fb,#f6ecfb);color:#7b43c3}
-    .badge.technical{background:linear-gradient(90deg,#fff4e6,#fff6ea);color:#a86f00}
-    .badge.general{background:linear-gradient(90deg,#f0f2f4,#f8fafc);color:#546069}
+    .badge.it{background:linear-gradient(90deg,#d9eefc,#d6f5f8);color:#0b63a3}
+    .badge.finance{background:linear-gradient(90deg,#e8f7ec,#e6fbe6);color:#1b8a2a}
+    .badge.hr{background:linear-gradient(90deg,#f0e8fb,#f6ecfb);color:#7b43c3}
+    .badge.safety{background:linear-gradient(90deg,#fff4e6,#fff6ea);color:#a86f00}
+    .badge.admin{background:linear-gradient(90deg,#f0f2f4,#f8fafc);color:#546069}
 
     .cards-view{display:none;margin-top:18px;gap:18px;flex-wrap:wrap;display:flex}
-    .student-card{width:260px;padding:14px;border-radius:10px;background:#fff;border:1px solid #eef5fb;box-shadow:0 10px 26px rgba(7,22,40,0.04);transition:transform .18s}
-    .student-card:hover{transform:translateY(-6px)}
-    .student-card img{width:64px;height:64px;border-radius:50%;object-fit:cover;display:block;margin-bottom:8px}
+    .employee-card{width:260px;padding:14px;border-radius:10px;background:#fff;border:1px solid #eef5fb;box-shadow:0 10px 26px rgba(7,22,40,0.04);transition:transform .18s}
+    .employee-card:hover{transform:translateY(-6px)}
+    .employee-card img{width:64px;height:64px;border-radius:50%;object-fit:cover;display:block;margin-bottom:8px}
 
-    .actions img{width:20px;cursor:pointer;margin-right:8px;opacity:0.92;transition:transform 0.2s}
+    .actions img{width:20px;cursor:pointer;margin-right:8px;opacity:0.92}
     .actions img:hover{transform:scale(1.08)}
 
     /* modal */
     .modal{display:none;position:fixed;inset:0;background:rgba(5,10,20,0.55);z-index:1200;align-items:center;justify-content:center;padding:18px}
-    .modal.active{display:flex}
-    .modal .box{background:#fff;border-radius:10px;padding:18px;max-width:680px;width:100%;position:relative;box-shadow:0 20px 60px rgba(7,20,40,0.3);max-height:90vh;overflow-y:auto}
-    .close{position:absolute;right:14px;top:12px;border:none;background:transparent;font-size:24px;cursor:pointer;color:#465d6f;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background 0.2s}
-    .close:hover{background:#f0f3f6}
+    .modal .box{background:#fff;border-radius:10px;padding:18px;max-width:680px;width:100%;position:relative;box-shadow:0 20px 60px rgba(7,20,40,0.3)}
+    .close{position:absolute;right:14px;top:12px;border:none;background:transparent;font-size:20px;cursor:pointer;color:#465d6f}
     .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .form-grid.full{grid-template-columns:1fr}
     .form-row{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
-    .form-row label{font-weight:500;color:#333}
-    .form-row input,.form-row select{padding:8px 12px;border:1px solid #d8e6f1;border-radius:6px;font-family:inherit}
     input[type="file"]{padding:6px}
 
     /* file preview */
@@ -80,14 +74,6 @@
     #toast-container{position:fixed;bottom:22px;right:22px;z-index:1600;display:flex;flex-direction:column;gap:8px}
     .toast{background:#111;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:0 10px 30px rgba(10,20,30,0.2);transform:translateX(120%);opacity:0;transition:0.45s}
     .toast.show{transform:translateX(0);opacity:1}
-    .toast.success{background:#2e7d32}
-    .toast.error{background:#c62828}
-    .toast.warning{background:#f57c00}
-
-    /* debug panel */
-    .debug-panel{position:fixed;top:10px;right:10px;background:rgba(0,0,0,0.8);color:white;padding:10px;border-radius:5px;font-family:monospace;font-size:12px;z-index:2000;max-width:300px}
-    .debug-panel button{background:#333;color:white;border:none;padding:2px 5px;margin:2px;border-radius:3px;cursor:pointer}
-    .debug-panel button:hover{background:#555}
 
     /* small screens */
     @media (max-width:900px){
@@ -95,51 +81,39 @@
       .stats-row{flex-direction:column}
       .search-bar input{min-width:120px;width:100%}
       header h1{font-size:16px}
-      .student-card{width:100%}
+      .employee-card{width:100%}
     }
   </style>
 </head>
 <body>
-  <!-- Debug Panel -->
-  <div class="debug-panel" id="debugPanel">
-    <div>Debug Info:</div>
-    <div>Protocol: <span id="protocolInfo"></span></div>
-    <div>LocalStorage: <span id="storageInfo"></span></div>
-    <div>Students Count: <span id="studentsCount">0</span></div>
-    <button onclick="clearStorage()">Clear Storage</button>
-    <button onclick="testStorage()">Test Storage</button>
-    <button onclick="testAddButton()">Test Add Button</button>
-    <button onclick="toggleDebug()">Hide Debug</button>
-  </div>
-
   <header>
     <div class="logo">FG</div>
     <div>
-      <h1>FLAWLESS GRAPHICS · Student Portal</h1>
-      <div class="small">Manage student profiles, attendance and performance data</div>
+      <h1>FLAWLESS GRAPHICS · Employee Portal</h1>
+      <div class="small">Manage employee profiles, attendance and payroll-ready data</div>
     </div>
   </header>
 
   <div class="container">
     <div class="top-bar">
       <div class="left-controls">
-        <button class="btn" id="addStudentBtn">+ Add Student</button>
+        <button class="btn" id="addEmployeeBtn">+ Add Employee</button>
         <button class="btn ghost" id="toggleViewBtn">Switch to Cards View</button>
 
         <div style="margin-left:8px">
           <select id="sortSelect" class="small" title="Sort">
             <option value="default">Sort: Default</option>
             <option value="name">Name A → Z</option>
-            <option value="class">Class</option>
-            <option value="grade">Grade (low → high)</option>
-            <option value="admissionDate">Admission Date (old → new)</option>
+            <option value="department">Department</option>
+            <option value="salary">Salary (low → high)</option>
+            <option value="hireDate">Date Hired (old → new)</option>
           </select>
         </div>
       </div>
 
       <div class="right-controls">
         <div class="search-bar">
-          <input id="searchInput" placeholder="Search by name, phone, grade, class or ID...">
+          <input id="searchInput" placeholder="Search by name, phone, salary, department or position...">
         </div>
 
         <div style="display:flex; gap:8px; align-items:center; margin-left:6px">
@@ -151,26 +125,26 @@
     </div>
 
     <div class="stats-row" style="margin-top:18px">
-      <div class="stat"><h3 id="statStudents">0</h3><p>Total Students</p></div>
-      <div class="stat"><h3 id="statClasses">0</h3><p>Classes</p></div>
+      <div class="stat"><h3 id="statEmployees">0</h3><p>Total Employees</p></div>
+      <div class="stat"><h3 id="statDepartments">0</h3><p>Departments</p></div>
       <div class="stat"><h3 id="statAttendance">0%</h3><p>Attendance Rate</p></div>
-      <div class="stat"><h3 id="statAvgGrade">0</h3><p>Average Grade</p></div>
-      <div class="stat clickable" id="topClassCard" style="cursor:pointer"><h3 id="statTopClass">N/A</h3><p>Top Performing Class</p></div>
+      <div class="stat"><h3 id="statPayroll">$0</h3><p>Total Payroll</p></div>
+      <div class="stat clickable" id="topDeptCard" style="cursor:pointer"><h3 id="statTopDept">N/A</h3><p>Top Performing Dept</p></div>
     </div>
 
     <!-- Table -->
-    <table id="studentTable" style="margin-top:18px">
+    <table id="employeeTable" style="margin-top:18px">
       <thead>
         <tr>
           <th>#</th>
           <th>Photo</th>
           <th>Full Name</th>
-          <th>Class</th>
-          <th>Student ID</th>
+          <th>Department</th>
+          <th>Position</th>
           <th>Email</th>
           <th>Phone</th>
-          <th>Grade (%)</th>
-          <th>Admission Date</th>
+          <th>Salary (GHS)</th>
+          <th>Date Hired</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -178,16 +152,16 @@
     </table>
 
     <!-- Cards view -->
-    <div id="studentCards" class="cards-view"></div>
+    <div id="employeeCards" class="cards-view"></div>
   </div>
 
   <!-- Modal: Add / Edit -->
-  <div class="modal" id="studentModal" aria-hidden="true">
+  <div class="modal" id="employeeModal" aria-hidden="true">
     <div class="box">
       <button class="close" id="closeModalBtn" aria-label="Close">&times;</button>
-      <h3 id="modalTitle">Add Student</h3>
+      <h3 id="modalTitle">Add Employee</h3>
 
-      <form id="studentForm" style="margin-top:12px">
+      <form id="employeeForm" style="margin-top:12px">
         <input type="hidden" id="editIndex" value="">
 
         <div style="display:flex;gap:12px;align-items:flex-start">
@@ -198,19 +172,19 @@
             </div>
 
             <div class="form-row">
-              <label>Class</label>
-              <select id="studentClass" required>
-                <option value="">-- Select Class --</option>
-                <option value="Science">Science</option>
-                <option value="Arts">Arts</option>
-                <option value="Commerce">Commerce</option>
-                <option value="Technical">Technical</option>
-                <option value="General Studies">General Studies</option>
+              <label>Department</label>
+              <select id="department" required>
+                <option value="">-- Select Department --</option>
+                <option value="IT">IT</option>
+                <option value="Safety">Safety</option>
+                <option value="HR">HR</option>
+                <option value="Finance">Finance</option>
+                <option value="Administration">Administration</option>
               </select>
             </div>
 
             <div class="form-row">
-              <label>Student ID</label>
+              <label>Position</label>
               <input type="text" id="position" required>
             </div>
 
@@ -225,13 +199,13 @@
             </div>
 
             <div class="form-row">
-              <label>Grade (%)</label>
-              <input type="number" id="grade" min="0" max="100">
+              <label>Salary (GHS)</label>
+              <input type="number" id="salary">
             </div>
 
             <div class="form-row">
-              <label>Admission Date</label>
-              <input type="date" id="admissionDate">
+              <label>Date Hired</label>
+              <input type="date" id="hireDate">
             </div>
           </div>
 
@@ -243,7 +217,7 @@
             <input type="file" id="photoInput" accept="image/*">
             <div class="small">Profile photo (optional). Images are stored locally.</div>
             <div style="margin-top:auto">
-              <button class="btn" type="submit">Save Student</button>
+              <button class="btn" type="submit">Save Employee</button>
             </div>
           </div>
         </div>
@@ -251,27 +225,27 @@
     </div>
   </div>
 
-  <!-- Class Modal (Top Class -> breakdown) -->
-  <div class="modal" id="classModal" aria-hidden="true">
+  <!-- Department Modal (Top Dept -> breakdown) -->
+  <div class="modal" id="departmentModal" aria-hidden="true">
     <div class="box">
-      <button class="close" data-close-class>&times;</button>
-      <h3>Class Performance / Breakdown</h3>
+      <button class="close" data-close-dept>&times;</button>
+      <h3>Department Performance / Breakdown</h3>
 
       <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
         <label style="display:block">
-          <small>Select Class</small><br>
-          <select id="classSelect"></select>
+          <small>Select Dept</small><br>
+          <select id="deptSelect"></select>
         </label>
-        <button class="btn" id="loadClassBtn">Load</button>
-        <button class="btn" id="downloadClassPdf">Download PDF</button>
+        <button class="btn" id="loadDeptBtn">Load</button>
+        <button class="btn" id="downloadDeptPdf">Download PDF</button>
       </div>
 
-      <table id="classTable" style="margin-top:10px">
-        <thead><tr><th>#</th><th>Student</th><th>Avg Score</th></tr></thead>
+      <table id="deptTable" style="margin-top:10px">
+        <thead><tr><th>#</th><th>Employee</th><th>Avg Score</th></tr></thead>
         <tbody></tbody>
       </table>
 
-      <h4 id="classAvg" style="margin-top:12px">Average Score: 0%</h4>
+      <h4 id="deptAvg" style="margin-top:12px">Average Score: 0%</h4>
     </div>
   </div>
 
@@ -279,204 +253,71 @@
 
   <script>
   /************************************************************************
-   * Student Portal: FULL-featured script with enhanced debugging
-   * - Profile pics stored as data URLs in localStorage.students[].photo
+   * Employee Portal: FULL-featured script
+   * - Profile pics stored as data URLs in localStorage.employees[].photo
    * - Sorting / search / view toggle / export CSV/XLSX/PDF / badges / animations
    ************************************************************************/
 
-  // Declare students as an empty array first to avoid initialization errors
-  let students = [];
+  // Helper: safe parse
+  const safeParse = s => { try { return JSON.parse(s); } catch(e){ return null; } };
 
-  // Debug functions
-  function updateDebugInfo() {
-    document.getElementById('protocolInfo').textContent = window.location.protocol;
-    document.getElementById('storageInfo').textContent = typeof(Storage) !== "undefined" ? "Available" : "Not Available";
-    document.getElementById('studentsCount').textContent = students.length;
-  }
+  // initial employees (read from localStorage)
+  let employees = safeParse(localStorage.getItem('employees')) || [];
 
-  function toggleDebug() {
-    const panel = document.getElementById('debugPanel');
-    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-  }
+  // DOM
+  const tbody = document.querySelector('#employeeTable tbody');
+  const cards = document.getElementById('employeeCards');
+  const addBtn = document.getElementById('addEmployeeBtn');
+  const modal = document.getElementById('employeeModal');
+  const closeModal = document.getElementById('closeModalBtn');
+  const form = document.getElementById('employeeForm');
+  const avatarInput = document.getElementById('photoInput');
+  const avatarPreviewImg = document.getElementById('avatarPreviewImg');
+  const avatarPlaceholder = document.getElementById('avatarPlaceholder');
+  const statEmployees = document.getElementById('statEmployees');
+  const statDepartments = document.getElementById('statDepartments');
+  const statAttendance = document.getElementById('statAttendance');
+  const statPayroll = document.getElementById('statPayroll');
+  const statTopDept = document.getElementById('statTopDept');
+  const topDeptCard = document.getElementById('topDeptCard');
+  const toggleViewBtn = document.getElementById('toggleViewBtn');
+  const searchInput = document.getElementById('searchInput');
+  const sortSelect = document.getElementById('sortSelect');
+  const exportCsvBtn = document.getElementById('exportCsvBtn');
+  const exportXlsxBtn = document.getElementById('exportXlsxBtn');
+  const exportPdfBtn = document.getElementById('exportPdfBtn');
 
-  function clearStorage() {
-    if(confirm('Clear all stored data?')) {
-      localStorage.clear();
-      students = [];
-      render();
-      updateDebugInfo();
-      showToast('Storage cleared', 'success');
-    }
-  }
+  const deptModal = document.getElementById('departmentModal');
+  const deptSelect = document.getElementById('deptSelect');
+  const loadDeptBtn = document.getElementById('loadDeptBtn');
+  const downloadDeptPdf = document.getElementById('downloadDeptPdf');
 
-  function testStorage() {
-    try {
-      const testKey = 'test_' + Date.now();
-      const testValue = 'test_value';
-      localStorage.setItem(testKey, testValue);
-      const retrieved = localStorage.getItem(testKey);
-      localStorage.removeItem(testKey);
-      
-      if(retrieved === testValue) {
-        showToast('LocalStorage working correctly', 'success');
-      } else {
-        showToast('LocalStorage test failed', 'error');
-      }
-    } catch(e) {
-      showToast('LocalStorage error: ' + e.message, 'error');
-    }
-    updateDebugInfo();
-  }
-
-  function testAddButton() {
-    const btn = document.getElementById('addStudentBtn');
-    if(btn) {
-      console.log('[DEBUG] Add button found:', btn);
-      console.log('[DEBUG] Add button has click listener:', btn.onclick !== null || btn.addEventListener !== undefined);
-      showToast('Add button found in DOM', 'success');
-      // Trigger click programmatically
-      btn.click();
-    } else {
-      console.error('[DEBUG] Add button NOT found!');
-      showToast('Add button NOT found in DOM', 'error');
-    }
-  }
-
-  // Enhanced safe parse with detailed logging
-  const safeParse = (s, key = 'unknown') => { 
-    try { 
-      if(s === null || s === undefined || s === '') {
-        console.log(`[DEBUG] ${key}: Empty value, returning empty array`);
-        return [];
-      }
-      
-      const parsed = JSON.parse(s); 
-      console.log(`[DEBUG] ${key}: Successfully parsed`, parsed);
-      
-      if(Array.isArray(parsed)) {
-        console.log(`[DEBUG] ${key}: Is array with ${parsed.length} items`);
-        return parsed;
-      } else {
-        console.warn(`[DEBUG] ${key}: Not an array, converting to array`);
-        return [parsed];
-      }
-    } catch(e){ 
-      console.error(`[DEBUG] ${key}: Parse error`, e);
-      console.error(`[DEBUG] ${key}: Raw value was:`, s);
-      return []; 
-    } 
-  };
-
-  // Enhanced storage functions with logging
-  function saveStudents() {
-    try {
-      const dataStr = JSON.stringify(students);
-      console.log('[DEBUG] Saving students:', dataStr);
-      localStorage.setItem('students', dataStr);
-      
-      // Verify it was saved
-      const saved = localStorage.getItem('students');
-      console.log('[DEBUG] Verification - saved data:', saved);
-      
-      if(saved !== dataStr) {
-        console.error('[DEBUG] Storage verification failed!');
-        showToast('Error saving data', 'error');
-        return false;
-      }
-      
-      console.log('[DEBUG] Students saved successfully');
-      return true;
-    } catch(e) {
-      console.error('[DEBUG] Error saving students:', e);
-      showToast('Error saving data: ' + e.message, 'error');
-      return false;
-    }
-  }
-
-  // FIXED: Restructured to avoid circular reference
-  function loadStudents() {
-    try {
-      const stored = localStorage.getItem('students');
-      console.log('[DEBUG] Loading students from storage:', stored);
-      
-      // Parse and return the data instead of trying to modify the global students variable
-      const loadedStudents = safeParse(stored, 'students');
-      
-      if(!Array.isArray(loadedStudents)) {
-        console.warn('[DEBUG] Loaded data is not an array, using empty array');
-        return [];
-      }
-      
-      console.log('[DEBUG] Final students array:', loadedStudents);
-      return loadedStudents;
-    } catch(e) {
-      console.error('[DEBUG] Error loading students:', e);
-      return [];
-    }
-  }
-
-  // DOM elements - ensure they exist before using
-  function getDOMElements() {
-    return {
-      tbody: document.querySelector('#studentTable tbody'),
-      cards: document.getElementById('studentCards'),
-      addBtn: document.getElementById('addStudentBtn'),
-      modal: document.getElementById('studentModal'),
-      closeModal: document.getElementById('closeModalBtn'),
-      form: document.getElementById('studentForm'),
-      avatarInput: document.getElementById('photoInput'),
-      avatarPreviewImg: document.getElementById('avatarPreviewImg'),
-      avatarPlaceholder: document.getElementById('avatarPlaceholder'),
-      statStudents: document.getElementById('statStudents'),
-      statClasses: document.getElementById('statClasses'),
-      statAttendance: document.getElementById('statAttendance'),
-      statAvgGrade: document.getElementById('statAvgGrade'),
-      statTopClass: document.getElementById('statTopClass'),
-      topClassCard: document.getElementById('topClassCard'),
-      toggleViewBtn: document.getElementById('toggleViewBtn'),
-      searchInput: document.getElementById('searchInput'),
-      sortSelect: document.getElementById('sortSelect'),
-      exportCsvBtn: document.getElementById('exportCsvBtn'),
-      exportXlsxBtn: document.getElementById('exportXlsxBtn'),
-      exportPdfBtn: document.getElementById('exportPdfBtn'),
-      classModal: document.getElementById('classModal'),
-      classSelect: document.getElementById('classSelect'),
-      loadClassBtn: document.getElementById('loadClassBtn'),
-      downloadClassPdf: document.getElementById('downloadClassPdf')
-    };
-  }
-
-  // Get DOM elements
-  const dom = getDOMElements();
-
-  // mapping class badge class
-  function classBadge(cls){
-    if(!cls) return `<span class="badge general">Unassigned</span>`;
-    const c = cls.toLowerCase();
-    if(c.includes('science')) return `<span class="badge science">Science</span>`;
-    if(c.includes('commerce')) return `<span class="badge commerce">Commerce</span>`;
-    if(c.includes('arts')) return `<span class="badge arts">Arts</span>`;
-    if(c.includes('technical')) return `<span class="badge technical">Technical</span>`;
-    return `<span class="badge general">${escapeHtml(cls)}</span>`;
+  // mapping department badge class
+  function deptBadge(dept){
+    if(!dept) return `<span class="badge admin">Unassigned</span>`;
+    const d = dept.toLowerCase();
+    if(d.includes('it')) return `<span class="badge it">IT</span>`;
+    if(d.includes('finance')) return `<span class="badge finance">Finance</span>`;
+    if(d.includes('hr')) return `<span class="badge hr">HR</span>`;
+    if(d.includes('safety')) return `<span class="badge safety">Safety</span>`;
+    return `<span class="badge admin">${escapeHtml(dept)}</span>`;
   }
 
   // escape
   function escapeHtml(s){ if(s===null||s===undefined) return ''; return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
-  // render list (table + cards) with debugging
-  function render(list = students){
-    console.log('[DEBUG] Rendering students:', list);
-    
+  // render list (table + cards)
+  function render(list = employees){
     // apply sorting based on sortSelect
-    const sort = dom.sortSelect.value;
+    const sort = sortSelect.value;
     let arr = Array.from(list);
     if(sort==='name') arr.sort((a,b)=> (a.fullName||'').localeCompare(b.fullName||''));
-    else if(sort==='class') arr.sort((a,b)=> (a.studentClass||'').localeCompare(b.studentClass||''));
-    else if(sort==='grade') arr.sort((a,b)=> (Number(a.grade||0) - Number(b.grade||0)));
-    else if(sort==='admissionDate') arr.sort((a,b)=> new Date(a.admissionDate||0) - new Date(b.admissionDate||0));
+    else if(sort==='department') arr.sort((a,b)=> (a.department||'').localeCompare(b.department||''));
+    else if(sort==='salary') arr.sort((a,b)=> (Number(a.salary||0) - Number(b.salary||0)));
+    else if(sort==='hireDate') arr.sort((a,b)=> new Date(a.hireDate||0) - new Date(b.hireDate||0));
 
     // table
-    dom.tbody.innerHTML = '';
+    tbody.innerHTML = '';
     arr.forEach((e,i)=>{
       const photoHtml = e.photo ? `<img src="${e.photo}" class="avatar" alt="photo">` : `<div style="width:46px;height:46px;border-radius:50%;background:#f0f6fb;display:inline-block"></div>`;
       const tr = document.createElement('tr');
@@ -484,51 +325,50 @@
         <td>${i+1}</td>
         <td>${photoHtml}</td>
         <td>${escapeHtml(e.fullName||'N/A')}</td>
-        <td>${classBadge(e.studentClass)}</td>
+        <td>${deptBadge(e.department)}</td>
         <td>${escapeHtml(e.position||'')}</td>
         <td><a href="mailto:${escapeHtml(e.email||'')}" class="small">${escapeHtml(e.email||'')}</a></td>
         <td class="small">${escapeHtml(e.phone||'')}</td>
-        <td class="small">${e.grade ? Number(e.grade).toLocaleString() : 'N/A'}</td>
-        <td class="small">${escapeHtml(e.admissionDate||'')}</td>
+        <td class="small">${e.salary ? Number(e.salary).toLocaleString() : '0'}</td>
+        <td class="small">${escapeHtml(e.hireDate||'')}</td>
         <td class="actions">
-          <img src="https://img.icons8.com/ios-glyphs/30/edit--v1.png" title="Edit" onclick="editStudent(${i})">
-          <img src="https://img.icons8.com/ios-glyphs/30/filled-trash.png" title="Delete" onclick="deleteStudent(${i})">
+          <img src="https://img.icons8.com/ios-glyphs/30/edit--v1.png" title="Edit" onclick="editEmployee(${i})">
+          <img src="https://img.icons8.com/ios-glyphs/30/filled-trash.png" title="Delete" onclick="deleteEmployee(${i})">
         </td>`;
-      dom.tbody.appendChild(tr);
+      tbody.appendChild(tr);
     });
 
     // cards
-    dom.cards.innerHTML = '';
+    cards.innerHTML = '';
     arr.forEach((e,i)=>{
       const card = document.createElement('div');
-      card.className='student-card';
+      card.className='employee-card';
       card.innerHTML = `
         <img src="${e.photo||'https://img.icons8.com/ios/100/000000/user--v1.png'}" alt="photo">
         <h4>${escapeHtml(e.fullName||'N/A')}</h4>
-        <div style="margin-top:6px">${classBadge(e.studentClass)}</div>
-        <p class="small"><b>ID: ${escapeHtml(e.position||'')}</b></p>
+        <div style="margin-top:6px">${deptBadge(e.department)}</div>
+        <p class="small"><b>${escapeHtml(e.position||'')}</b></p>
         <p class="small">${escapeHtml(e.email||'')}</p>
         <p class="small">📞 ${escapeHtml(e.phone||'')}</p>
-        <p class="small">Grade: ${e.grade ? Number(e.grade).toLocaleString() : 'N/A'}%</p>
-        <p class="small">Admitted: ${escapeHtml(e.admissionDate||'')}</p>
+        <p class="small">GHS ${e.salary ? Number(e.salary).toLocaleString() : '0'}</p>
+        <p class="small">Hired: ${escapeHtml(e.hireDate||'')}</p>
         <div style="margin-top:8px">
-          <img src="https://img.icons8.com/ios-glyphs/30/edit--v1.png" title="Edit" onclick="editStudent(${i})">
-          <img src="https://img.icons8.com/ios-glyphs/30/filled-trash.png" title="Delete" onclick="deleteStudent(${i})">
+          <img src="https://img.icons8.com/ios-glyphs/30/edit--v1.png" title="Edit" onclick="editEmployee(${i})">
+          <img src="https://img.icons8.com/ios-glyphs/30/filled-trash.png" title="Delete" onclick="deleteEmployee(${i})">
         </div>`;
-      dom.cards.appendChild(card);
+      cards.appendChild(card);
     });
 
     updateStats();
-    updateDebugInfo();
   }
 
-  // update stats (students, classes, attendance, avg grade, top class)
+  // update stats (employees, departments, attendance, payroll, top dept)
   function updateStats(){
-    const total = students.length;
-    dom.statStudents.innerText = total;
+    const total = employees.length;
+    document.getElementById('statEmployees').innerText = total;
 
-    const classes = Array.from(new Set(students.map(e=>e.studentClass||'Unassigned')));
-    dom.statClasses.innerText = classes.length;
+    const departments = Array.from(new Set(employees.map(e=>e.department||'Unassigned')));
+    document.getElementById('statDepartments').innerText = departments.length;
 
     // attendance fallback / attempt to read attendance localStorage if exists
     let attendanceRate = 0;
@@ -539,287 +379,198 @@
         attendanceRate = Math.min(100, Math.round((entries/(total*30))*100));
       } else attendanceRate = Math.floor(Math.random()*18)+80;
     } catch(e){ attendanceRate = Math.floor(Math.random()*18)+80; }
-    dom.statAttendance.innerText = attendanceRate+'%';
+    document.getElementById('statAttendance').innerText = attendanceRate+'%';
 
-    const validGrades = students.map(e=>Number(e.grade||0)).filter(g=>g>0);
-    const avgGrade = validGrades.length ? (validGrades.reduce((a,b)=>a+b,0) / validGrades.length).toFixed(1) : 0;
-    dom.statAvgGrade.innerText = avgGrade;
+    const payroll = employees.reduce((s,e)=> s + Number(e.salary||0), 0);
+    document.getElementById('statPayroll').innerText = 'GHS ' + payroll.toLocaleString();
 
-    // top class by average performance if performance data exists, else by count
+    // top department by average performance if performance data exists, else by count
     const perfData = safeParse(localStorage.getItem('performanceData')) || {};
-    const classScores = {};
-    for(const e of students){
+    const deptScores = {};
+    for(const e of employees){
       const scores = perfData[e.fullName] ? Object.values(perfData[e.fullName]).map(Number).filter(n=>!isNaN(n)) : [];
       const avg = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
-      if(!classScores[e.studentClass]) classScores[e.studentClass] = [];
-      classScores[e.studentClass].push(avg);
+      if(!deptScores[e.department]) deptScores[e.department] = [];
+      deptScores[e.department].push(avg);
     }
     let top = 'N/A', topVal = 0;
-    for(const c in classScores){
-      const arr = classScores[c];
+    for(const d in deptScores){
+      const arr = deptScores[d];
       const avg = arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
-      if(avg>topVal){ topVal=avg; top=c; }
+      if(avg>topVal){ topVal=avg; top=d; }
     }
     if(top==='N/A' || topVal===0){
       // fallback: top by count
       const counts = {};
-      for(const e of students) counts[e.studentClass] = (counts[e.studentClass]||0)+1;
-      let bestClass='',bestCount=0;
-      for(const c in counts) if(counts[c]>bestCount){bestCount=counts[c]; bestClass=c;}
-      top = bestClass || 'N/A';
-      dom.statTopClass.innerText = top === 'N/A' ? 'N/A' : `${top} (${bestCount} students)`;
+      for(const e of employees) counts[e.department] = (counts[e.department]||0)+1;
+      let bestDept='',bestCount=0;
+      for(const d in counts) if(counts[d]>bestCount){bestCount=counts[d]; bestDept=d;}
+      top = bestDept || 'N/A';
+      document.getElementById('statTopDept').innerText = top === 'N/A' ? 'N/A' : `${top} (${bestCount} people)`;
     } else {
-      dom.statTopClass.innerText = `${top} (${topVal.toFixed(1)}%)`;
+      document.getElementById('statTopDept').innerText = `${top} (${topVal.toFixed(1)}%)`;
     }
 
-    // populate class select for breakdown modal
-    if(dom.classSelect){
-      const prev = dom.classSelect.value;
-      dom.classSelect.innerHTML='';
-      Array.from(new Set(students.map(e=>e.studentClass||'Unassigned'))).sort().forEach(c=>{
-        const opt = document.createElement('option'); opt.value=c; opt.textContent=c; dom.classSelect.appendChild(opt);
+    // populate dept select for breakdown modal
+    const select = deptSelect;
+    if(select){
+      const prev = select.value;
+      select.innerHTML='';
+      Array.from(new Set(employees.map(e=>e.department||'Unassigned'))).sort().forEach(d=>{
+        const opt = document.createElement('option'); opt.value=d; opt.textContent=d; select.appendChild(opt);
       });
-      if(prev) dom.classSelect.value = prev;
+      if(prev) select.value = prev;
     }
   }
 
-  // Modal functions with enhanced debugging
-  function openModal(title = 'Add Student') {
-    console.log('[DEBUG] Opening modal with title:', title);
-    document.getElementById('modalTitle').innerText = title;
-    dom.modal.classList.add('active');
-    dom.modal.setAttribute('aria-hidden', 'false');
-    console.log('[DEBUG] Modal should now be visible');
-  }
+  // open modal add
+  addBtn.addEventListener('click', ()=> {
+    form.reset(); document.getElementById('editIndex').value='';
+    avatarPreviewImg.src=''; avatarPreviewImg.style.display='none'; avatarPlaceholder.style.display='block';
+    document.getElementById('modalTitle').innerText='Add Employee';
+    modal.style.display='flex'; modal.setAttribute('aria-hidden','false');
+  });
+  closeModal.addEventListener('click', ()=> { modal.style.display='none'; modal.setAttribute('aria-hidden','true'); });
 
-  function closeModalFunc() {
-    console.log('[DEBUG] Closing modal');
-    dom.modal.classList.remove('active');
-    dom.modal.setAttribute('aria-hidden', 'true');
-  }
+  window.addEventListener('click', (e)=> { if(e.target === modal){ modal.style.display='none'; modal.setAttribute('aria-hidden','true'); } });
 
-  // Event listeners with enhanced error handling
-  function initializeEventListeners() {
-    console.log('[DEBUG] Initializing event listeners...');
-    
-    // Add Student button
-    if(dom.addBtn) {
-      console.log('[DEBUG] Adding click listener to Add Student button');
-      dom.addBtn.addEventListener('click', function(e) {
-        console.log('[DEBUG] Add Student button clicked!', e);
-        try {
-          dom.form.reset(); 
-          document.getElementById('editIndex').value='';
-          dom.avatarPreviewImg.src=''; 
-          dom.avatarPreviewImg.style.display='none'; 
-          dom.avatarPlaceholder.style.display='block';
-          openModal('Add Student');
-        } catch(error) {
-          console.error('[DEBUG] Error in add button click handler:', error);
-          showToast('Error opening add form: ' + error.message, 'error');
-        }
-      });
+  // handle photo input preview and base64 read
+  avatarInput.addEventListener('change', (ev)=>{
+    const f = ev.target.files[0];
+    if(!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      avatarPreviewImg.src = reader.result;
+      avatarPreviewImg.style.display='block';
+      avatarPlaceholder.style.display='none';
+      avatarPreviewImg.dataset.dataurl = reader.result; // store temporarily
+    };
+    reader.readAsDataURL(f);
+  });
+
+  // submit form (add or edit)
+  form.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const data = {
+      fullName: document.getElementById('fullName').value.trim(),
+      department: document.getElementById('department').value.trim(),
+      position: document.getElementById('position').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      salary: document.getElementById('salary').value ? Number(document.getElementById('salary').value) : 0,
+      hireDate: document.getElementById('hireDate').value || ''
+    };
+    // photo from preview
+    if(avatarPreviewImg && avatarPreviewImg.src) data.photo = avatarPreviewImg.src;
+
+    const editIndex = document.getElementById('editIndex').value;
+    if(editIndex===''){
+      employees.push(data);
+      showToast('Employee added', 'success');
     } else {
-      console.error('[DEBUG] Add Student button not found!');
+      employees[Number(editIndex)] = data;
+      showToast('Employee updated', 'success');
     }
+    localStorage.setItem('employees', JSON.stringify(employees));
+    modal.style.display='none'; modal.setAttribute('aria-hidden','true');
+    render();
+  });
 
-    // Close modal button
-    if(dom.closeModal) {
-      dom.closeModal.addEventListener('click', closeModalFunc);
-    }
-
-    // Close modal on background click
-    dom.modal.addEventListener('click', function(e) {
-      if(e.target === dom.modal) {
-        closeModalFunc();
-      }
-    });
-
-    // Form submission
-    if(dom.form) {
-      dom.form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        console.log('[DEBUG] Form submitted');
-        
-        try {
-          const data = {
-            fullName: document.getElementById('fullName').value.trim(),
-            studentClass: document.getElementById('studentClass').value.trim(),
-            position: document.getElementById('position').value.trim(),
-            email: document.getElementById('email').value.trim(),
-            phone: document.getElementById('phone').value.trim(),
-            grade: document.getElementById('grade').value ? Number(document.getElementById('grade').value) : null,
-            admissionDate: document.getElementById('admissionDate').value || ''
-          };
-          
-          // photo from preview
-          if(dom.avatarPreviewImg && dom.avatarPreviewImg.src && dom.avatarPreviewImg.src !== window.location.href) {
-            data.photo = dom.avatarPreviewImg.src;
-          }
-
-          console.log('[DEBUG] Student data:', data);
-
-          const editIndex = document.getElementById('editIndex').value;
-          if(editIndex===''){
-            students.push(data);
-            console.log('[DEBUG] Added new student, total:', students.length);
-            showToast('Student added successfully', 'success');
-          } else {
-            students[Number(editIndex)] = data;
-            console.log('[DEBUG] Updated student at index:', editIndex);
-            showToast('Student updated successfully', 'success');
-          }
-          
-          if(saveStudents()) {
-            closeModalFunc();
-            render();
-          }
-        } catch(error) {
-          console.error('[DEBUG] Error in form submission:', error);
-          showToast('Error saving student: ' + error.message, 'error');
-        }
-      });
-    }
-
-    // Photo input
-    if(dom.avatarInput) {
-      dom.avatarInput.addEventListener('change', function(ev) {
-        const f = ev.target.files[0];
-        if(!f) return;
-        const reader = new FileReader();
-        reader.onload = function() {
-          dom.avatarPreviewImg.src = reader.result;
-          dom.avatarPreviewImg.style.display='block';
-          dom.avatarPlaceholder.style.display='none';
-        };
-        reader.readAsDataURL(f);
-      });
-    }
-
-    // Other event listeners
-    if(dom.toggleViewBtn) {
-      dom.toggleViewBtn.addEventListener('click', function() {
-        const isCard = dom.cards.style.display === 'flex';
-        document.getElementById('studentTable').style.display = isCard ? 'table' : 'none';
-        dom.cards.style.display = isCard ? 'none' : 'flex';
-        dom.toggleViewBtn.textContent = isCard ? 'Switch to Cards View' : 'Switch to Table View';
-      });
-    }
-
-    if(dom.searchInput) {
-      dom.searchInput.addEventListener('input', function() {
-        const q = dom.searchInput.value.trim().toLowerCase();
-        const filtered = students.filter(e=>{
-          return (e.fullName||'').toLowerCase().includes(q) ||
-                 (e.studentClass||'').toLowerCase().includes(q) ||
-                 (e.position||'').toLowerCase().includes(q) ||
-                 (e.phone||'').toString().toLowerCase().includes(q) ||
-                 (''+ (e.grade||'')).toLowerCase().includes(q);
-        });
-        render(filtered);
-      });
-    }
-
-    if(dom.sortSelect) {
-      dom.sortSelect.addEventListener('change', render);
-    }
-
-    console.log('[DEBUG] Event listeners initialized');
-  }
-
-  // Global functions
-  window.editStudent = function(index){
-    const e = students[index];
+  // edit function (global)
+  window.editEmployee = function(index){
+    const e = employees[index];
     if(!e) return;
     document.getElementById('fullName').value = e.fullName||'';
-    document.getElementById('studentClass').value = e.studentClass||'';
+    document.getElementById('department').value = e.department||'';
     document.getElementById('position').value = e.position||'';
     document.getElementById('email').value = e.email||'';
     document.getElementById('phone').value = e.phone||'';
-    document.getElementById('grade').value = e.grade||'';
-    document.getElementById('admissionDate').value = e.admissionDate||'';
+    document.getElementById('salary').value = e.salary||'';
+    document.getElementById('hireDate').value = e.hireDate||'';
     document.getElementById('editIndex').value = index;
 
-    if(e.photo){ 
-      dom.avatarPreviewImg.src = e.photo; 
-      dom.avatarPreviewImg.style.display='block'; 
-      dom.avatarPlaceholder.style.display='none'; 
-    } else { 
-      dom.avatarPreviewImg.src=''; 
-      dom.avatarPreviewImg.style.display='none'; 
-      dom.avatarPlaceholder.style.display='block'; 
-    }
+    if(e.photo){ avatarPreviewImg.src = e.photo; avatarPreviewImg.style.display='block'; avatarPlaceholder.style.display='none'; }
+    else { avatarPreviewImg.src=''; avatarPreviewImg.style.display='none'; avatarPlaceholder.style.display='block'; }
 
-    openModal('Edit Student');
+    document.getElementById('modalTitle').innerText='Edit Employee';
+    modal.style.display='flex'; modal.setAttribute('aria-hidden','false');
   };
 
-  window.deleteStudent = function(index){
-    if(!confirm('Delete student?')) return;
-    students.splice(index,1);
-    saveStudents();
-    showToast('Student deleted', 'success');
+  // delete
+  window.deleteEmployee = function(index){
+    if(!confirm('Delete employee?')) return;
+    employees.splice(index,1);
+    localStorage.setItem('employees', JSON.stringify(employees));
+    showToast('Employee deleted', 'delete');
     render();
   };
 
-  // Toast notification
-  function showToast(msg, type = 'success') {
-    const t = document.createElement('div'); 
-    t.className = `toast ${type}`;
-    t.innerText = msg; 
-    document.getElementById('toast-container').appendChild(t);
-    setTimeout(() => t.classList.add('show'), 50);
-    setTimeout(() => { 
-      t.classList.remove('show'); 
-      setTimeout(() => t.remove(), 400); 
-    }, 3000);
-  }
-
-  // Export functions
-  if(dom.exportCsvBtn) {
-    dom.exportCsvBtn.addEventListener('click', function() {
-      const rows = students.map(e=>({
-        fullName: e.fullName||'',
-        class: e.studentClass||'',
-        studentId: e.position||'',
-        email: e.email||'',
-        phone: e.phone||'',
-        grade: e.grade||'',
-        admissionDate: e.admissionDate||''
-      }));
-      const csv = toCsv(rows);
-      downloadText(csv, 'students.csv', 'text/csv;charset=utf-8;');
+  // search
+  searchInput.addEventListener('input', ()=>{
+    const q = searchInput.value.trim().toLowerCase();
+    const filtered = employees.filter(e=>{
+      return (e.fullName||'').toLowerCase().includes(q) ||
+             (e.department||'').toLowerCase().includes(q) ||
+             (e.position||'').toLowerCase().includes(q) ||
+             (e.phone||'').toString().toLowerCase().includes(q) ||
+             (''+ (e.salary||'')).toLowerCase().includes(q);
     });
-  }
+    render(filtered);
+  });
 
-  if(dom.exportXlsxBtn) {
-    dom.exportXlsxBtn.addEventListener('click', function() {
-      const rows = students.map(e=>([e.fullName||'', e.studentClass||'', e.position||'', e.email||'', e.phone||'', e.grade||'', e.admissionDate||'']));
-      const ws = XLSX.utils.aoa_to_sheet([['Full Name','Class','Student ID','Email','Phone','Grade','Admission Date'], ...rows]);
-      const wb = XLSX.utils.book_new(); 
-      XLSX.utils.book_append_sheet(wb, ws, 'Students');
-      XLSX.writeFile(wb, 'students.xlsx');
+  // toggle view
+  let isCard = false;
+  toggleViewBtn.addEventListener('click', ()=>{
+    isCard = !isCard;
+    document.getElementById('employeeTable').style.display = isCard ? 'none' : 'table';
+    cards.style.display = isCard ? 'flex' : 'none';
+    toggleViewBtn.textContent = isCard ? 'Switch to Table View' : 'Switch to Cards View';
+  });
+
+  // sorting
+  sortSelect.addEventListener('change', ()=> render());
+
+  // export CSV
+  exportCsvBtn.addEventListener('click', ()=>{
+    const rows = employees.map(e=>({
+      fullName: e.fullName||'',
+      department: e.department||'',
+      position: e.position||'',
+      email: e.email||'',
+      phone: e.phone||'',
+      salary: e.salary||'',
+      hireDate: e.hireDate||''
+    }));
+    const csv = toCsv(rows);
+    downloadText(csv, 'employees.csv', 'text/csv;charset=utf-8;');
+  });
+
+  // export XLSX (SheetJS)
+  exportXlsxBtn.addEventListener('click', ()=>{
+    const rows = employees.map(e=>([e.fullName||'', e.department||'', e.position||'', e.email||'', e.phone||'', e.salary||'', e.hireDate||'']));
+    const ws = XLSX.utils.aoa_to_sheet([['Full Name','Department','Position','Email','Phone','Salary','Hire Date'], ...rows]);
+    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Employees');
+    XLSX.writeFile(wb, 'employees.xlsx');
+  });
+
+  // export PDF using jsPDF (simple text table)
+  exportPdfBtn.addEventListener('click', ()=>{
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('l','pt','a4');
+    doc.setFontSize(14); doc.text('Employee Report', 40, 40);
+    const header = ['#','Full Name','Department','Position','Email','Phone','Salary','Hire Date'];
+    let y = 70;
+    doc.setFontSize(10);
+    doc.text(header.join('  |  '), 40, y); y+=14;
+    employees.forEach((e,i)=>{
+      const line = [i+1, e.fullName||'', e.department||'', e.position||'', e.email||'', e.phone||'', e.salary||'', e.hireDate||''].join('  |  ');
+      doc.text(line, 40, y); y+=12;
+      if(y>540){doc.addPage(); y=40;}
     });
-  }
+    doc.save('employees.pdf');
+  });
 
-  if(dom.exportPdfBtn) {
-    dom.exportPdfBtn.addEventListener('click', function() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF('l','pt','a4');
-      doc.setFontSize(14); doc.text('Student Report', 40, 40);
-      const header = ['#','Full Name','Class','Student ID','Email','Phone','Grade','Admission Date'];
-      let y = 70;
-      doc.setFontSize(10);
-      doc.text(header.join('  |  '), 40, y); y+=14;
-      students.forEach((e,i)=>{
-        const line = [i+1, e.fullName||'', e.studentClass||'', e.position||'', e.email||'', e.phone||'', e.grade||'', e.admissionDate||''].join('  |  ');
-        doc.text(line, 40, y); y+=12;
-        if(y>540){doc.addPage(); y=40;}
-      });
-      doc.save('students.pdf');
-    });
-  }
-
-  // Helper functions
+  // csv helper
   function toCsv(rows){
     if(!rows || !rows.length) return '';
     const keys = Object.keys(rows[0]);
@@ -829,113 +580,78 @@
     }
     return lines.join('\n');
   }
-
   function downloadText(text, filename, mime){
     const blob = new Blob([text], {type: mime||'text/plain'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = filename; 
-    document.body.appendChild(a); 
-    a.click(); 
-    a.remove();
+    a.download = filename; document.body.appendChild(a); a.click(); a.remove();
   }
 
-  // Class modal functionality
-  if(dom.topClassCard) {
-    dom.topClassCard.addEventListener('click', function() {
-      dom.classModal.style.display='flex';
-      dom.classModal.setAttribute('aria-hidden','false');
+  // department modal open
+  topDeptCard.addEventListener('click', ()=> {
+    deptModal.style.display='flex';
+    deptModal.setAttribute('aria-hidden','false');
+  });
+  document.querySelectorAll('[data-close-dept]').forEach(b=>b.addEventListener('click', ()=>{ deptModal.style.display='none'; deptModal.setAttribute('aria-hidden','true'); }));
+
+  function loadDeptPerformance(){
+    const dept = deptSelect.value;
+    const perf = safeParse(localStorage.getItem('performanceData')) || {};
+    const employeesInDept = employees.filter(e=> (e.department||'Unassigned') === dept);
+    const tbody = document.querySelector('#deptTable tbody'); tbody.innerHTML='';
+    let total = 0;
+    employeesInDept.forEach((e,i)=>{
+      const scores = perf[e.fullName] ? Object.values(perf[e.fullName]).map(Number).filter(n=>!isNaN(n)) : [];
+      const avg = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
+      total += avg;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(e.fullName)}</td><td>${avg?avg.toFixed(1)+'%':'0%'}</td>`;
+      tr.classList.add('row-highlight');
+      tbody.appendChild(tr);
+      setTimeout(()=>tr.classList.remove('row-highlight'),900);
     });
+    const avgDept = employeesInDept.length ? (total / employeesInDept.length).toFixed(1) : 0;
+    document.getElementById('deptAvg').innerText = `Average Score: ${avgDept}%`;
   }
 
-  document.querySelectorAll('[data-close-class]').forEach(b=> {
-    b.addEventListener('click', function() {
-      dom.classModal.style.display='none';
-      dom.classModal.setAttribute('aria-hidden','true');
+  loadDeptBtn.addEventListener('click', loadDeptPerformance);
+  downloadDeptPdf.addEventListener('click', ()=>{
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text('Department Report',14,20);
+    const rows = Array.from(document.querySelectorAll('#deptTable tbody tr'));
+    let y=40;
+    rows.forEach(r=>{
+      const line = Array.from(r.cells).map(c=>c.innerText).join('  |  ');
+      doc.text(line, 14, y); y += 12;
+      if(y>780){doc.addPage(); y=20;}
     });
+    doc.save('dept_report.pdf');
   });
 
-  if(dom.loadClassBtn) {
-    dom.loadClassBtn.addEventListener('click', function() {
-      const cls = dom.classSelect.value;
-      const perf = safeParse(localStorage.getItem('performanceData')) || {};
-      const studentsInClass = students.filter(e=> (e.studentClass||'Unassigned') === cls);
-      const tbody = document.querySelector('#classTable tbody'); 
-      tbody.innerHTML='';
-      let total = 0;
-      studentsInClass.forEach((e,i)=>{
-        const scores = perf[e.fullName] ? Object.values(perf[e.fullName]).map(Number).filter(n=>!isNaN(n)) : [];
-        const avg = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
-        total += avg;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(e.fullName)}</td><td>${avg?avg.toFixed(1)+'%':'0%'}</td>`;
-        tr.classList.add('row-highlight');
-        tbody.appendChild(tr);
-        setTimeout(()=>tr.classList.remove('row-highlight'),900);
-      });
-      const avgClass = studentsInClass.length ? (total / studentsInClass.length).toFixed(1) : 0;
-      document.getElementById('classAvg').innerText = `Average Score: ${avgClass}%`;
-    });
+  // simple toast
+  function showToast(msg, type='success'){
+    const t = document.createElement('div'); t.className='toast show';
+    t.innerText = msg; document.getElementById('toast-container').appendChild(t);
+    setTimeout(()=> t.classList.add('show'),50);
+    setTimeout(()=> { t.classList.remove('show'); setTimeout(()=>t.remove(),400); }, 3000);
   }
 
-  if(dom.downloadClassPdf) {
-    dom.downloadClassPdf.addEventListener('click', function() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.text('Class Report',14,20);
-      const rows = Array.from(document.querySelectorAll('#classTable tbody tr'));
-      let y=40;
-      rows.forEach(r=>{
-        const line = Array.from(r.cells).map(c=>c.innerText).join('  |  ');
-        doc.text(line, 14, y); y += 12;
-        if(y>780){doc.addPage(); y=20;}
-      });
-      doc.save('class_report.pdf');
-    });
-  }
-
-  // Initialize everything when DOM is ready
-  document.addEventListener('DOMContentLoaded', function() {
-    console.log('[DEBUG] DOM loaded, initializing...');
-    
-    // FIXED: Load students after declaring the variable
-    students = loadStudents();
-    console.log('[DEBUG] Students loaded:', students);
-    
-    // Check if running from file:// protocol
-    if(window.location.protocol === 'file:') {
-      console.warn('[DEBUG] Running from file:// protocol - localStorage may not work reliably');
-      showToast('Warning: Running from file:// may cause data persistence issues', 'warning');
-    }
-    
-    // Initialize debug info
-    updateDebugInfo();
-    
-    // Initialize event listeners
-    initializeEventListeners();
-    
-    // Initial render
-    render();
-    
-    // Test localStorage on load
-    testStorage();
-    
-    console.log('[DEBUG] Initialization complete');
-  });
-
+  // initial render and live sync
+  render();
   // monitor localStorage changes (other tabs)
   window.addEventListener('storage', (e)=>{
-    if(['students','performanceData','payments'].includes(e.key)){
-      console.log('[DEBUG] Storage changed:', e.key);
-      students = loadStudents();
+    if(['employees','performanceData','payments'].includes(e.key)){
+      employees = safeParse(localStorage.getItem('employees')) || [];
       render();
     }
   });
 
-  // small CSS animation class for class table rows
+  // small CSS animation class for department table rows
   const style = document.createElement('style');
   style.innerHTML = `.row-highlight{animation:fadeGreen .9s ease}@keyframes fadeGreen{0%{background:#e6ffeb}100%{background:white}}`;
   document.head.appendChild(style);
   </script>
 </body>
 </html>
+
