@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Teacher Login — Flawless Graphics</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Poppins',sans-serif;background:#f4f7fb;display:flex;align-items:center;justify-content:center;height:100vh}
+.box{width:360px;background:#fff;padding:22px;border-radius:12px;box-shadow:0 12px 40px rgba(2,6,23,0.06)}
+h2{margin:0 0 8px}
+.input{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef9;margin-top:8px}
+.btn{padding:10px 12px;border-radius:8px;border:0;background:#0b63a3;color:#fff;margin-top:12px;cursor:pointer}
+.link{background:none;border:none;color:#0b63a3;margin-top:10px;cursor:pointer}
+.small{font-size:13px;color:#6b7a89;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="box">
+  <h2>Teacher Login</h2>
+  <input id="email" class="input" placeholder="teacher@example.com" />
+  <input id="password" class="input" type="password" placeholder="Password" />
+  <div>
+    <button class="btn" id="loginBtn">Sign in</button>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+    <button class="link" id="backBtn">Back</button>
+    <button class="link" id="forgotBtn">Forgot?</button>
+  </div>
+  <div class="small">Teacher accounts are created when adding a teacher and setting a password in the teacher form.</div>
+</div>
+
+<script>
+function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
+const ACTIVE_ORG = (localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || 'default_org').trim();
+const TEACH_ACCTS = `${ACTIVE_ORG}_teacher_accounts`;
+function read(k){ return safeParse(localStorage.getItem(k)) || [] }
+
+async function verify(email, password){
+  const accts = read(TEACH_ACCTS);
+  const user = accts.find(a=>a.email === email.toLowerCase());
+  if(!user) return { ok:false, msg:'Account not found' };
+  // hash password and compare
+  const hashed = await (async (t)=>{ try{ const enc=new TextEncoder(); const buf=enc.encode(t); const h=await crypto.subtle.digest('SHA-256',buf); return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join(''); }catch(e){ return t; } })(password);
+  if(user.passwordHash !== hashed) return { ok:false, msg:'Incorrect password' };
+  return { ok:true, user };
+}
+
+document.getElementById('loginBtn').addEventListener('click', async ()=>{
+  const email = document.getElementById('email').value.trim().toLowerCase();
+  const pw = document.getElementById('password').value;
+  if(!email || !pw){ alert('Enter email & password'); return; }
+  const res = await verify(email,pw);
+  if(!res.ok){ alert(res.msg); return; }
+  // set teacher active session
+  localStorage.setItem('teacher_active_user', JSON.stringify({ email:res.user.email, name:res.user.name || res.user.email, org: ACTIVE_ORG, loggedAt: Date.now() }));
+  // redirect to teacher dashboard page (teacher.html)
+  window.location.href = 'teacher.html';
+});
+
+document.getElementById('backBtn').addEventListener('click', ()=> { window.location.href = 'index.html'; });
+document.getElementById('forgotBtn').addEventListener('click', ()=> {
+  const email = prompt('Enter your registered teacher email:');
+  if(!email) return;
+  const accts = read(TEACH_ACCTS); const idx = accts.findIndex(a=>a.email === email.toLowerCase());
+  if(idx === -1) return alert('Account not found');
+  // generate code and show (offline flow)
+  const code = (Math.floor(100000 + Math.random()*900000)).toString();
+  accts[idx].resetCode = code; accts[idx].resetExpires = Date.now() + 600000; localStorage.setItem(TEACH_ACCTS, JSON.stringify(accts));
+  alert('Reset code: ' + code + '\nUse it to reset your password.');
+  const entered = prompt('Enter code:');
+  if(entered !== code) return alert('Invalid code');
+  const npw = prompt('Enter new password (min 6 chars):');
+  if(!npw || npw.length < 6) return alert('Invalid password');
+  (async ()=>{ const enc=new TextEncoder(); const buf=enc.encode(npw); const h=await crypto.subtle.digest('SHA-256',buf); accts[idx].passwordHash = Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join(''); delete accts[idx].resetCode; delete accts[idx].resetExpires; localStorage.setItem(TEACH_ACCTS, JSON.stringify(accts)); alert('Password reset'); })();
+});
+</script>
+</body>
+</html>
