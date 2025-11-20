@@ -258,11 +258,22 @@
    * - Sorting / search / view toggle / export CSV/XLSX/PDF / badges / animations
    ************************************************************************/
 
-  // Helper: safe parse
-  const safeParse = s => { try { return JSON.parse(s); } catch(e){ return null; } };
+  // Helper: safe parse - FIXED VERSION
+  const safeParse = s => { 
+    try { 
+      const parsed = JSON.parse(s); 
+      return Array.isArray(parsed) ? parsed : [];
+    } catch(e){ 
+      console.error('Error parsing students data:', e);
+      return []; 
+    } 
+  };
 
-  // initial students (read from localStorage)
-  let students = safeParse(localStorage.getItem('students')) || [];
+  // initial students (read from localStorage) - FIXED VERSION
+  let students = safeParse(localStorage.getItem('students'));
+  if (!Array.isArray(students)) {
+    students = [];
+  }
 
   // DOM
   const tbody = document.querySelector('#studentTable tbody');
