@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teacher Management | Flawless Graphics</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg-light:#f5f8ff;
+      --card:#ffffff;
+      --nav-blue:#003366;
+      --accent:#0b63a3;
+      --accent-2:#00a6b6;
+      --muted:#70839c;
+      --shadow:0 8px 25px rgba(0,0,30,0.07);
+    }
+    .dark{
+      --bg-light:#041026;
+      --card:rgba(255,255,255,0.06);
+      --nav-blue:#021a3b;
+      --accent:#00d1ff;
+      --accent-2:#7a00ff;
+      --muted:#9fb4c9;
+      --shadow:0 8px 40px rgba(0,0,0,0.45);
+      color:#e7f3ff;
+    }
+    body{
+      margin:0;
+      font-family:"Poppins",sans-serif;
+      background:var(--bg-light);
+      transition:350ms;
+    }
+    header{
+      background:linear-gradient(90deg,var(--nav-blue),#0a4f80);
+      padding:14px 24px;
+      color:white;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    header h1{margin:0;}
+    .theme-toggle button{
+      border:0;
+      padding:7px 14px;
+      border-radius:8px;
+      cursor:pointer;
+      background:rgba(255,255,255,0.1);
+      color:white;
+    }
+    main{max-width:1100px;margin:20px auto;padding:16px;}
+    .card{
+      background:var(--card);
+      padding:20px;
+      border-radius:12px;
+      box-shadow:var(--shadow);
+      margin-bottom:18px;
+    }
+    .card h2{margin-top:0;}
+    input,select{
+      width:100%;
+      padding:10px;
+      margin-bottom:12px;
+      border-radius:8px;
+      border:1px solid #d3d7e0;
+      font-size:15px;
+    }
+    .btn{
+      padding:10px 14px;
+      border-radius:8px;
+      border:0;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .btn.primary{
+      background:linear-gradient(90deg,var(--accent),var(--accent-2));
+      color:white;
+    }
+    .btn.danger{
+      background:#d63535;
+      color:white;
+    }
+    .teacher-table{
+      width:100%;
+      border-collapse:collapse;
+    }
+    .teacher-table th, .teacher-table td{
+      padding:10px;
+      border-bottom:1px solid #dce1eb;
+      font-size:14px;
+    }
+    .teacher-photo{
+      width:60px;
+      height:60px;
+      border-radius:8px;
+      object-fit:cover;
+      border:2px solid #eee;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Teacher Management</h1>
+  <div class="theme-toggle">
+    <button id="themeBtn">Theme</button>
+  </div>
+</header>
+
+<main>
+  <!-- Add Teacher -->
+  <div class="card">
+    <h2>Add Teacher</h2>
+
+    <input type="file" id="photo" accept="image/*">
+    <input type="text" id="name" placeholder="Full Name">
+    <input type="email" id="email" placeholder="Email">
+    <input type="text" id="subject" placeholder="Subject / Department">
+    <input type="text" id="phone" placeholder="Phone Number">
+    <input type="number" id="salary" placeholder="Salary">
+    <input type="date" id="hireDate" placeholder="Hire Date">
+
+    <button class="btn primary" id="saveBtn">Save Teacher</button>
+  </div>
+
+  <!-- List -->
+  <div class="card">
+    <h2>Teachers</h2>
+
+    <table class="teacher-table" id="teacherTable">
+      <thead>
+        <tr>
+          <th>Photo</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Subject</th>
+          <th>Phone</th>
+          <th>Salary</th>
+          <th>Hire Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="teacherBody"></tbody>
+    </table>
+  </div>
+
+</main>
+
+<script>
+  // ---------- THEME ----------
+  const html = document.documentElement;
+  const savedTheme = localStorage.getItem("fg_theme_dark");
+
+  if(savedTheme === "true") html.classList.add("dark");
+
+  document.getElementById("themeBtn").onclick = () => {
+    html.classList.toggle("dark");
+    localStorage.setItem("fg_theme_dark",
+      html.classList.contains("dark")
+    );
+  };
+
+  // ---------- STORAGE KEYS ----------
+  const activeOrg = localStorage.getItem("active_org") || "default_school";
+  const TEACHER_KEY = `${activeOrg}_teachers`;
+
+  function loadTeachers(){
+    return JSON.parse(localStorage.getItem(TEACHER_KEY) || "[]");
+  }
+  function saveTeachers(list){
+    localStorage.setItem(TEACHER_KEY, JSON.stringify(list));
+  }
+
+  // ---------- UI ----------
+  function render(){
+    const list = loadTeachers();
+    const body = document.getElementById("teacherBody");
+    body.innerHTML = "";
+
+    list.forEach((t,i)=>{
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td><img src="${t.photo}" class="teacher-photo"></td>
+        <td>${t.name}</td>
+        <td>${t.email}</td>
+        <td>${t.subject}</td>
+        <td>${t.phone}</td>
+        <td>GHS ${t.salary}</td>
+        <td>${t.hireDate}</td>
+        <td>
+          <button class="btn danger" onclick="deleteTeacher(${i})">Delete</button>
+        </td>
+      `;
+      body.appendChild(row);
+    });
+  }
+
+  // ---------- SAVE ----------
+  document.getElementById("saveBtn").onclick = async () => {
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const subject = document.getElementById("subject").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const salary = document.getElementById("salary").value;
+    const hireDate = document.getElementById("hireDate").value;
+    const file = document.getElementById("photo").files[0];
+
+    if(!name || !email || !subject){
+      alert("Please fill required fields.");
+      return;
+    }
+
+    let photoBase64 = "";
+    if(file){
+      photoBase64 = await toBase64(file);
+    }
+
+    const list = loadTeachers();
+    list.push({
+      name, email, subject,
+      phone, salary, hireDate,
+      photo: photoBase64 || "assets/teacher-default.png"
+    });
+    saveTeachers(list);
+    render();
+
+    alert("Teacher saved!");
+  };
+
+  function toBase64(file){
+    return new Promise((resolve,reject)=>{
+      const reader = new FileReader();
+      reader.onload = ()=>resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ---------- DELETE ----------
+  function deleteTeacher(i){
+    const list = loadTeachers();
+    if(confirm("Delete this teacher?")){
+      list.splice(i,1);
+      saveTeachers(list);
+      render();
+    }
+  }
+
+  // initial
+  render();
+</script>
+
+</body>
+</html>
