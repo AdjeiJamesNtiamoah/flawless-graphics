@@ -27,14 +27,13 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
 
         // 🔥 ROLE-BASED REDIRECTS (THIS WAS MISSING)
         if (user.role === "hr") {
-            window.location.href = "hr-dashboard.html";
-        }
-        else if (user.role === "teacher") {
-            window.location.href = "teacher-dashboard.html";  // FIXED
-        }
-        else if (user.role === "employee") {
-            window.location.href = "employee-portal.html";
-        }
+    window.location.href = "hr-dashboard.html";
+} else if (user.role === "teacher") {
+    window.location.href = "teacher-dashboard.html";
+} else {
+    window.location.href = "welcome.html";   // optional
+}
+
         else {
             alert("Unknown role. Cannot continue.");
         }
