@@ -1,257 +1,575 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Teacher Management | Flawless Graphics</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Teacher Management — Flawless Graphics</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <style>
-    :root{
-      --bg-light:#f5f8ff;
-      --card:#ffffff;
-      --nav-blue:#003366;
-      --accent:#0b63a3;
-      --accent-2:#00a6b6;
-      --muted:#70839c;
-      --shadow:0 8px 25px rgba(0,0,30,0.07);
-    }
-    .dark{
-      --bg-light:#041026;
-      --card:rgba(255,255,255,0.06);
-      --nav-blue:#021a3b;
-      --accent:#00d1ff;
-      --accent-2:#7a00ff;
-      --muted:#9fb4c9;
-      --shadow:0 8px 40px rgba(0,0,0,0.45);
-      color:#e7f3ff;
-    }
-    body{
-      margin:0;
-      font-family:"Poppins",sans-serif;
-      background:var(--bg-light);
-      transition:350ms;
-    }
-    header{
-      background:linear-gradient(90deg,var(--nav-blue),#0a4f80);
-      padding:14px 24px;
-      color:white;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-    }
-    header h1{margin:0;}
-    .theme-toggle button{
-      border:0;
-      padding:7px 14px;
-      border-radius:8px;
-      cursor:pointer;
-      background:rgba(255,255,255,0.1);
-      color:white;
-    }
-    main{max-width:1100px;margin:20px auto;padding:16px;}
-    .card{
-      background:var(--card);
-      padding:20px;
-      border-radius:12px;
-      box-shadow:var(--shadow);
-      margin-bottom:18px;
-    }
-    .card h2{margin-top:0;}
-    input,select{
-      width:100%;
-      padding:10px;
-      margin-bottom:12px;
-      border-radius:8px;
-      border:1px solid #d3d7e0;
-      font-size:15px;
-    }
-    .btn{
-      padding:10px 14px;
-      border-radius:8px;
-      border:0;
-      cursor:pointer;
-      font-weight:600;
-    }
-    .btn.primary{
-      background:linear-gradient(90deg,var(--accent),var(--accent-2));
-      color:white;
-    }
-    .btn.danger{
-      background:#d63535;
-      color:white;
-    }
-    .teacher-table{
-      width:100%;
-      border-collapse:collapse;
-    }
-    .teacher-table th, .teacher-table td{
-      padding:10px;
-      border-bottom:1px solid #dce1eb;
-      font-size:14px;
-    }
-    .teacher-photo{
-      width:60px;
-      height:60px;
-      border-radius:8px;
-      object-fit:cover;
-      border:2px solid #eee;
-    }
-  </style>
+<style>
+:root{
+  --bg:#f5f8fb; --card:#fff; --muted:#6b7a89; --accent:#0b63a3; --accent2:#00a6b6; --shadow:0 8px 30px rgba(2,10,30,0.06);
+}
+.dark{ --bg:#041026; --card:rgba(255,255,255,0.03); --muted:#9fb4c9; --accent:#00d1ff; --accent2:#7a00ff; --shadow:0 12px 40px rgba(0,0,0,0.6); color:#e8f5ff; }
+*{box-sizing:border-box}
+body{margin:0;font-family:'Poppins',sans-serif;background:var(--bg);transition:background .25s,color .25s}
+.container{max-width:1200px;margin:24px auto;padding:18px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:46px;height:46px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+.h1{font-size:18px;margin:0}
+.controls{display:flex;gap:8px;align-items:center}
+.btn{padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:600}
+.btn.prim{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff}
+.btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06)}
+.card{background:var(--card);padding:16px;border-radius:12px;box-shadow:var(--shadow);margin-bottom:12px}
+.form-grid{display:grid;grid-template-columns:1fr 320px;gap:12px}
+.input{width:100%;padding:8px;border-radius:8px;border:1px solid #e6eef9}
+.file-preview{width:160px;height:160px;border-radius:8px;object-fit:cover;border:1px solid #e6eef9}
+.table{width:100%;border-collapse:collapse;margin-top:10px}
+.table th,.table td{padding:10px;border-bottom:1px solid #eef3f7;text-align:left}
+.avatar{width:48px;height:48px;border-radius:8px;object-fit:cover}
+.tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.tab{padding:8px 12px;border-radius:8px;cursor:pointer;background:transparent;border:1px solid rgba(0,0,0,0.05)}
+.tab.active{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff}
+.small{font-size:13px;color:var(--muted)}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.badge{padding:6px 8px;border-radius:999px;background:rgba(0,0,0,0.05)}
+@media(max-width:900px){ .form-grid{grid-template-columns:1fr} .controls{flex-wrap:wrap} }
+</style>
 </head>
-
 <body>
 
-<header>
-  <h1>Teacher Management</h1>
-  <div class="theme-toggle">
-    <button id="themeBtn">Theme</button>
-  </div>
-</header>
+<div class="container">
+  <div class="header">
+    <div class="brand">
+      <div class="logo">FG</div>
+      <div>
+        <div class="h1">Teacher Management</div>
+        <div class="small" id="orgInfoSmall">Loading organization...</div>
+      </div>
+    </div>
 
-<main>
-  <!-- Add Teacher -->
-  <div class="card">
-    <h2>Add Teacher</h2>
-
-    <input type="file" id="photo" accept="image/*">
-    <input type="text" id="name" placeholder="Full Name">
-    <input type="email" id="email" placeholder="Email">
-    <input type="text" id="subject" placeholder="Subject / Department">
-    <input type="text" id="phone" placeholder="Phone Number">
-    <input type="number" id="salary" placeholder="Salary">
-    <input type="date" id="hireDate" placeholder="Hire Date">
-
-    <button class="btn primary" id="saveBtn">Save Teacher</button>
+    <div class="controls">
+      <button class="btn" id="themeBtn">Theme</button>
+      <button class="btn" id="toDashboardBtn">HR Dashboard</button>
+      <button class="btn prim" id="loginAsTeacherBtn">Teacher Login</button>
+    </div>
   </div>
 
-  <!-- List -->
-  <div class="card">
-    <h2>Teachers</h2>
-
-    <table class="teacher-table" id="teacherTable">
-      <thead>
-        <tr>
-          <th>Photo</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Subject</th>
-          <th>Phone</th>
-          <th>Salary</th>
-          <th>Hire Date</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="teacherBody"></tbody>
-    </table>
+  <!-- TABS -->
+  <div class="tabs card" role="navigation" aria-label="Teacher tabs">
+    <div class="tab active" data-tab="manageTab">Manage Teachers</div>
+    <div class="tab" data-tab="attendanceTab">Attendance</div>
+    <div class="tab" data-tab="performanceTab">Performance</div>
+    <div class="tab" data-tab="payrollTab">Payroll</div>
+    <div class="tab" data-tab="exportTab">Export / Reports</div>
   </div>
 
-</main>
+  <!-- Manage Teachers -->
+  <div id="manageTab" class="card">
+    <div class="form-grid">
+      <div>
+        <h3 style="margin-top:0">Add / Edit Teacher</h3>
+        <input class="input" id="t_fullName" placeholder="Full name" />
+        <div style="display:flex;gap:8px">
+          <input class="input" id="t_email" placeholder="Email"/>
+          <input class="input" id="t_phone" placeholder="Phone"/>
+        </div>
+        <div style="display:flex;gap:8px">
+          <input class="input" id="t_subject" placeholder="Subject / Department"/>
+          <input class="input" id="t_salary" type="number" placeholder="Salary (GHS)"/>
+        </div>
+        <input class="input" id="t_hireDate" type="date" />
+        <input class="input" id="t_classes" placeholder="Classes (comma separated) e.g. JSS1,Maths"/>
+        <label class="small">(Optional) Create teacher login password</label>
+        <input class="input" id="t_password" type="password" placeholder="Password for teacher login (optional)"/>
+        <div style="margin-top:8px;display:flex;gap:8px">
+          <button class="btn prim" id="saveTeacherBtn">Save Teacher</button>
+          <button class="btn" id="resetTeacherBtn">Reset</button>
+        </div>
+      </div>
+
+      <div>
+        <h3 style="margin-top:0">Photo</h3>
+        <img id="photoPreview" class="file-preview" src="assets/teacher-default.png" alt="preview">
+        <input id="photoInput" type="file" accept="image/*" style="margin-top:8px">
+        <div class="small" style="margin-top:10px">Tip: Click a teacher's row to edit. Photos are saved as base64 in localStorage.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong>Teacher List</strong> <span class="small">({<span id="teacherCount">0</span>})</span></div>
+        <div style="display:flex;gap:8px">
+          <input id="searchTeacher" class="input" placeholder="Search name, subject, phone" style="width:260px"/>
+          <button class="btn" id="addSampleBtn">+ Sample</button>
+        </div>
+      </div>
+
+      <div style="max-height:380px;overflow:auto;margin-top:8px">
+        <table class="table" id="teacherTable" aria-live="polite">
+          <thead><tr><th>#</th><th>Photo</th><th>Name</th><th>Subject</th><th>Email</th><th>Phone</th><th>Salary</th><th>Classes</th><th>Actions</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Attendance -->
+  <div id="attendanceTab" class="card" style="display:none">
+    <h3 style="margin-top:0">Attendance</h3>
+    <div style="display:flex;gap:12px;align-items:center">
+      <select id="att_teacher_select" class="input" style="width:360px"></select>
+      <button class="btn prim" id="att_in">Clock In</button>
+      <button class="btn" id="att_out">Clock Out</button>
+      <button class="btn" id="att_today">Today Summary</button>
+    </div>
+
+    <div style="margin-top:12px;display:flex;gap:12px">
+      <div style="flex:1">
+        <h4>Recent Attendance</h4>
+        <div id="att_list" style="max-height:300px;overflow:auto"></div>
+      </div>
+      <div style="width:360px">
+        <h4>Attendance Stats</h4>
+        <div id="att_stats" class="small"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Performance -->
+  <div id="performanceTab" class="card" style="display:none">
+    <h3 style="margin-top:0">Performance Evaluations</h3>
+
+    <div style="display:flex;gap:12px;align-items:center">
+      <select id="perf_teacher" class="input" style="width:340px"></select>
+      <input id="perf_score" class="input" placeholder="Score (0-100)" style="width:100px"/>
+      <input id="perf_comment" class="input" placeholder="Comment" />
+      <button class="btn prim" id="perf_save">Save Evaluation</button>
+    </div>
+
+    <div style="margin-top:12px;display:flex;gap:12px">
+      <div style="flex:1">
+        <h4>Evaluations</h4>
+        <div id="perf_list" style="max-height:360px;overflow:auto"></div>
+      </div>
+      <div style="width:420px">
+        <h4>Performance Chart</h4>
+        <canvas id="perfChart" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payroll -->
+  <div id="payrollTab" class="card" style="display:none">
+    <h3 style="margin-top:0">Payroll</h3>
+    <div style="display:flex;gap:12px;align-items:center">
+      <select id="pay_teacher" class="input" style="width:360px"></select>
+      <input id="pay_amount" class="input" type="number" placeholder="Amount (GHS)" style="width:140px"/>
+      <input id="pay_note" class="input" placeholder="Note"/>
+      <button class="btn prim" id="pay_submit">Record Payment</button>
+    </div>
+
+    <div style="display:flex;gap:12px;margin-top:12px">
+      <div style="flex:1">
+        <h4>Recent Payments</h4>
+        <div id="payments_list" style="max-height:320px;overflow:auto"></div>
+      </div>
+      <div style="width:420px">
+        <h4>Payslip</h4>
+        <div id="payslip_area" class="small card"></div>
+        <div style="margin-top:8px"><button class="btn" id="downloadPayslip">Download Payslip (PDF)</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export -->
+  <div id="exportTab" class="card" style="display:none">
+    <h3 style="margin-top:0">Export & Reports</h3>
+    <div style="display:flex;gap:8px">
+      <button class="btn prim" id="exportCSV">Export Teachers CSV</button>
+      <button class="btn" id="exportPDF">Export Teachers PDF</button>
+      <button class="btn" id="exportFullJSON">Export Org JSON</button>
+      <button class="btn" id="importJSON">Import JSON</button>
+    </div>
+    <div style="margin-top:12px" class="small">Use import to restore from a backup JSON file (must match the expected shape).</div>
+  </div>
+
+</div>
 
 <script>
-  // ---------- THEME ----------
-  const html = document.documentElement;
-  const savedTheme = localStorage.getItem("fg_theme_dark");
+/* ---------- Utilities & Keys ---------- */
+function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
+const ACTIVE_ORG = (localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || 'default_org').trim();
+const TEACH_KEY = `${ACTIVE_ORG}_teachers`;
+const ATT_KEY = `${ACTIVE_ORG}_teacher_attendance`;
+const PERF_KEY = `${ACTIVE_ORG}_teacher_performance`;
+const PAY_KEY = `${ACTIVE_ORG}_teacher_payments`;
+const TEACH_ACCTS = `${ACTIVE_ORG}_teacher_accounts`; // teacher login accounts (if created)
 
-  if(savedTheme === "true") html.classList.add("dark");
+function read(k){ return safeParse(localStorage.getItem(k)) || [] }
+function save(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
 
-  document.getElementById("themeBtn").onclick = () => {
-    html.classList.toggle("dark");
-    localStorage.setItem("fg_theme_dark",
-      html.classList.contains("dark")
-    );
-  };
+/* ---------- Theme ---------- */
+const docEl = document.documentElement;
+const savedTheme = localStorage.getItem('fg_theme_dark');
+if(savedTheme === 'true') docEl.classList.add('dark');
+document.getElementById('themeBtn').addEventListener('click', ()=> {
+  const now = docEl.classList.toggle('dark');
+  localStorage.setItem('fg_theme_dark', now ? 'true' : 'false');
+});
 
-  // ---------- STORAGE KEYS ----------
-  const activeOrg = localStorage.getItem("active_org") || "default_school";
-  const TEACHER_KEY = `${activeOrg}_teachers`;
+/* ---------- Basic UI elements ---------- */
+const photoInput = document.getElementById('photoInput');
+const photoPreview = document.getElementById('photoPreview');
 
-  function loadTeachers(){
-    return JSON.parse(localStorage.getItem(TEACHER_KEY) || "[]");
-  }
-  function saveTeachers(list){
-    localStorage.setItem(TEACHER_KEY, JSON.stringify(list));
-  }
+photoInput.addEventListener('change', (e)=>{
+  const f = e.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = ()=> photoPreview.src = reader.result;
+  reader.readAsDataURL(f);
+});
 
-  // ---------- UI ----------
-  function render(){
-    const list = loadTeachers();
-    const body = document.getElementById("teacherBody");
-    body.innerHTML = "";
+/* ---------- Render teacher table ---------- */
+function getTeachers(){ return read(TEACH_KEY) }
+function saveTeachers(arr){ save(TEACH_KEY, arr) }
 
-    list.forEach((t,i)=>{
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td><img src="${t.photo}" class="teacher-photo"></td>
-        <td>${t.name}</td>
-        <td>${t.email}</td>
-        <td>${t.subject}</td>
-        <td>${t.phone}</td>
-        <td>GHS ${t.salary}</td>
-        <td>${t.hireDate}</td>
-        <td>
-          <button class="btn danger" onclick="deleteTeacher(${i})">Delete</button>
-        </td>
-      `;
-      body.appendChild(row);
-    });
-  }
+function renderTeacherTable(filter=''){
+  const tbody = document.querySelector('#teacherTable tbody');
+  const data = getTeachers();
+  document.getElementById('teacherCount').textContent = data.length;
+  tbody.innerHTML = '';
+  data.forEach((t,i)=>{
+    if(filter && !(t.fullName||'').toLowerCase().includes(filter) && !(t.subject||'').toLowerCase().includes(filter) && !(t.phone||'').includes(filter)) return;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${i+1}</td>
+      <td>${t.photo? `<img src="${t.photo}" class="avatar">` : ''}</td>
+      <td>${t.fullName||''}</td>
+      <td>${t.subject||''}</td>
+      <td>${t.email||''}</td>
+      <td>${t.phone||''}</td>
+      <td>GHS ${Number(t.salary||0).toLocaleString()}</td>
+      <td>${(t.classes||[]).join(', ')}</td>
+      <td>
+        <button class="btn" onclick="editTeacher(${i})">Edit</button>
+        <button class="btn" onclick="deleteTeacher(${i})">Delete</button>
+      </td>`;
+    tbody.appendChild(tr);
+    // click row to edit
+    tr.addEventListener('click', ()=> editTeacher(i));
+  });
+  populateSelects();
+}
 
-  // ---------- SAVE ----------
-  document.getElementById("saveBtn").onclick = async () => {
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const subject = document.getElementById("subject").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const salary = document.getElementById("salary").value;
-    const hireDate = document.getElementById("hireDate").value;
-    const file = document.getElementById("photo").files[0];
+/* ---------- Search ---------- */
+document.getElementById('searchTeacher').addEventListener('input',(e)=> renderTeacherTable(e.target.value.trim().toLowerCase()));
 
-    if(!name || !email || !subject){
-      alert("Please fill required fields.");
-      return;
+/* ---------- Add / Save teacher ---------- */
+document.getElementById('saveTeacherBtn').addEventListener('click', async ()=>{
+  const fullName = document.getElementById('t_fullName').value.trim();
+  const email = document.getElementById('t_email').value.trim().toLowerCase();
+  const phone = document.getElementById('t_phone').value.trim();
+  const subject = document.getElementById('t_subject').value.trim();
+  const salary = Number(document.getElementById('t_salary').value) || 0;
+  const hireDate = document.getElementById('t_hireDate').value || '';
+  const classes = (document.getElementById('t_classes').value || '').split(',').map(s=>s.trim()).filter(Boolean);
+  const password = document.getElementById('t_password').value || '';
+  const photo = photoPreview.src && !photoPreview.src.includes('teacher-default.png') ? photoPreview.src : '';
+
+  if(!fullName || !email){ alert('Name and email required'); return; }
+
+  const arr = getTeachers();
+  // check if editing (we use an editing index stored in dataset)
+  const idx = document.getElementById('saveTeacherBtn').dataset.editIndex;
+  if(idx !== undefined && idx !== ''){
+    arr[Number(idx)] = { ...arr[Number(idx)], fullName, email, phone, subject, salary, hireDate, classes, photo };
+    saveTeachers(arr);
+    // also update account password if provided
+    if(password) {
+      const accts = read(TEACH_ACCTS);
+      const accountIndex = accts.findIndex(a=>a.email === email);
+      if(accountIndex >= 0){
+        accts[accountIndex].passwordHash = await hash(password);
+        save(TEACH_ACCTS, accts);
+      }
     }
-
-    let photoBase64 = "";
-    if(file){
-      photoBase64 = await toBase64(file);
+    delete document.getElementById('saveTeacherBtn').dataset.editIndex;
+    alert('Teacher updated');
+  } else {
+    // new teacher
+    const obj = { fullName, email, phone, subject, salary, hireDate, classes, photo };
+    arr.push(obj);
+    saveTeachers(arr);
+    // create teacher account if password provided
+    if(password){
+      const accts = read(TEACH_ACCTS);
+      accts.push({ email, passwordHash: await hash(password), name: fullName, createdAt: Date.now()});
+      save(TEACH_ACCTS, accts);
     }
-
-    const list = loadTeachers();
-    list.push({
-      name, email, subject,
-      phone, salary, hireDate,
-      photo: photoBase64 || "assets/teacher-default.png"
-    });
-    saveTeachers(list);
-    render();
-
-    alert("Teacher saved!");
-  };
-
-  function toBase64(file){
-    return new Promise((resolve,reject)=>{
-      const reader = new FileReader();
-      reader.onload = ()=>resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
+    alert('Teacher added');
   }
+  resetTeacherForm();
+  renderTeacherTable();
+});
 
-  // ---------- DELETE ----------
-  function deleteTeacher(i){
-    const list = loadTeachers();
-    if(confirm("Delete this teacher?")){
-      list.splice(i,1);
-      saveTeachers(list);
-      render();
-    }
-  }
+/* reset button */
+document.getElementById('resetTeacherBtn').addEventListener('click', resetTeacherForm);
+function resetTeacherForm(){
+  document.getElementById('t_fullName').value=''; document.getElementById('t_email').value=''; document.getElementById('t_phone').value='';
+  document.getElementById('t_subject').value=''; document.getElementById('t_salary').value=''; document.getElementById('t_hireDate').value=''; document.getElementById('t_classes').value='';
+  document.getElementById('t_password').value=''; photoPreview.src = 'assets/teacher-default.png'; delete document.getElementById('saveTeacherBtn').dataset.editIndex;
+}
 
-  // initial
-  render();
+/* edit & delete */
+window.editTeacher = function(i){
+  const arr = getTeachers(); const t = arr[i];
+  document.getElementById('t_fullName').value = t.fullName || '';
+  document.getElementById('t_email').value = t.email || '';
+  document.getElementById('t_phone').value = t.phone || '';
+  document.getElementById('t_subject').value = t.subject || '';
+  document.getElementById('t_salary').value = t.salary || '';
+  document.getElementById('t_hireDate').value = t.hireDate || '';
+  document.getElementById('t_classes').value = (t.classes||[]).join(', ');
+  document.getElementById('photoPreview').src = t.photo || 'assets/teacher-default.png';
+  document.getElementById('saveTeacherBtn').dataset.editIndex = i;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+window.deleteTeacher = function(i){
+  if(!confirm('Delete teacher?')) return;
+  const arr = getTeachers(); arr.splice(i,1); saveTeachers(arr); renderTeacherTable();
+}
+
+/* ---------- Sample data ---------- */
+document.getElementById('addSampleBtn').addEventListener('click', ()=>{
+  const arr = getTeachers();
+  arr.push({ fullName:'Ama Serwaa', email:'ama@school.com', phone:'0240000000', subject:'Mathematics', salary:1200, hireDate:'2022-01-12', classes:['JSS1','JSS2'], photo:'assets/teacher-default.png' });
+  saveTeachers(arr); renderTeacherTable();
+});
+
+/* ---------- Selects population ---------- */
+function populateSelects(){
+  const arr = getTeachers();
+  const selIds = ['att_teacher_select','perf_teacher','pay_teacher'];
+  selIds.forEach(id=>{
+    const sel = document.getElementById(id);
+    if(!sel) return;
+    sel.innerHTML = '<option value="">-- select teacher --</option>';
+    arr.forEach((t,i)=> sel.appendChild(Object.assign(document.createElement('option'), { value:i, textContent: t.fullName || t.email })));
+  });
+}
+
+/* ---------- Attendance logic ---------- */
+function getAttendance(){ return read(ATT_KEY) }
+function saveAttendance(arr){ save(ATT_KEY, arr) }
+
+document.getElementById('att_in').addEventListener('click', ()=>{
+  const idx = document.getElementById('att_teacher_select').value;
+  if(idx === '') { alert('Select teacher'); return; }
+  const arr = getAttendance();
+  arr.push({ employeeIndex: Number(idx), action:'in', date: new Date().toISOString() });
+  saveAttendance(arr); renderAttendanceList(); updateAttendanceStats(); alert('Clocked in');
+});
+document.getElementById('att_out').addEventListener('click', ()=>{
+  const idx = document.getElementById('att_teacher_select').value;
+  if(idx === '') { alert('Select teacher'); return; }
+  const arr = getAttendance();
+  arr.push({ employeeIndex: Number(idx), action:'out', date: new Date().toISOString() });
+  saveAttendance(arr); renderAttendanceList(); updateAttendanceStats(); alert('Clocked out');
+});
+document.getElementById('att_today').addEventListener('click', updateAttendanceStats);
+
+function renderAttendanceList(){
+  const list = getAttendance().slice().reverse();
+  const out = document.getElementById('att_list');
+  out.innerHTML = '';
+  const teachers = getTeachers();
+  if(!list.length) { out.innerHTML = '<div class="small">No attendance recorded</div>'; return; }
+  list.slice(0,120).forEach(a=>{
+    const t = teachers[a.employeeIndex] || {};
+    const div = document.createElement('div');
+    div.style.padding='8px 0'; div.innerHTML = `<strong>${t.fullName||'Teacher'}</strong> — ${a.action.toUpperCase()} <div class="small">${new Date(a.date).toLocaleString()}</div>`;
+    out.appendChild(div);
+  });
+}
+
+function updateAttendanceStats(){
+  const list = getAttendance();
+  const today = new Date().toISOString().split('T')[0];
+  const present = new Set(list.filter(a=>a.action==='in' && a.date.split('T')[0]===today).map(a=>a.employeeIndex));
+  const total = getTeachers().length || 0;
+  const rate = total ? Math.round(present.size / total * 100) : 0;
+  document.getElementById('att_stats').textContent = `Present today: ${present.size} / ${total} (${rate}%)`;
+}
+
+/* ---------- Performance ---------- */
+function getPerformance(){ return read(PERF_KEY) }
+function savePerformance(p){ save(PERF_KEY, p) }
+
+document.getElementById('perf_save').addEventListener('click', ()=>{
+  const idx = document.getElementById('perf_teacher').value;
+  const score = Number(document.getElementById('perf_score').value);
+  const comment = document.getElementById('perf_comment').value.trim();
+  if(idx === '' || isNaN(score)) { alert('Select teacher and provide score'); return; }
+  const arr = getPerformance();
+  arr.push({ teacherIndex: Number(idx), score, comment, date: new Date().toISOString() });
+  savePerformance(arr);
+  renderPerformanceList(); drawPerfChart();
+  alert('Evaluation saved');
+});
+
+function renderPerformanceList(){
+  const arr = getPerformance().slice().reverse();
+  const out = document.getElementById('perf_list'); out.innerHTML = '';
+  const teachers = getTeachers();
+  if(!arr.length) out.innerHTML = '<div class="small">No evaluations yet</div>';
+  arr.forEach(p=>{
+    const t = teachers[p.teacherIndex] || {}; const div = document.createElement('div');
+    div.style.padding='8px 0'; div.innerHTML = `<strong>${t.fullName||'Teacher'}</strong> — Score: ${p.score} <div class="small">${p.comment || ''} • ${new Date(p.date).toLocaleString()}</div>`;
+    out.appendChild(div);
+  });
+}
+
+/* performance chart */
+let perfChart = null;
+function drawPerfChart(){
+  const ctx = document.getElementById('perfChart').getContext('2d');
+  const perf = getPerformance();
+  // compute average per month for simplicity
+  if(perfChart) perfChart.destroy();
+  const labels = perf.slice(-12).map(p=> new Date(p.date).toLocaleDateString());
+  const data = perf.slice(-12).map(p=>p.score);
+  perfChart = new Chart(ctx, { type:'line', data:{ labels, datasets:[{ label:'Score', data, borderColor:'#0b63a3', backgroundColor:'rgba(11,99,163,0.12)', fill:true }] }, options:{responsive:true, plugins:{legend:{display:false}}} });
+}
+
+/* ---------- Payroll ---------- */
+function getPayments(){ return read(PAY_KEY) }
+function savePayments(a){ save(PAY_KEY, a) }
+
+document.getElementById('pay_submit').addEventListener('click', ()=>{
+  const idx = document.getElementById('pay_teacher').value;
+  const amount = Number(document.getElementById('pay_amount').value) || 0;
+  const note = document.getElementById('pay_note').value.trim();
+  if(idx === '' || amount <= 0) { alert('Select teacher & amount'); return; }
+  const arr = getPayments();
+  const teachers = getTeachers(); const t = teachers[Number(idx)];
+  arr.push({ teacherIndex: Number(idx), amount, note, date: new Date().toISOString(), name: t.fullName || t.email });
+  savePayments(arr); renderPayments(); alert('Payment recorded');
+});
+
+function renderPayments(){
+  const arr = getPayments().slice().reverse();
+  const out = document.getElementById('payments_list'); out.innerHTML = '';
+  if(!arr.length) out.innerHTML = '<div class="small">No payments yet</div>';
+  arr.forEach(p=>{
+    const div = document.createElement('div'); div.style.padding='8px 0';
+    div.innerHTML = `<strong>${p.name}</strong> — GHS ${Number(p.amount).toLocaleString()} <div class="small">${p.note || ''} • ${new Date(p.date).toLocaleString()}</div>
+      <div style="margin-top:6px"><button class="btn" onclick='showPayslip("${encodeURIComponent(JSON.stringify(p))}")'>View Payslip</button></div>`;
+    out.appendChild(div);
+  });
+}
+
+/* payslip view & download */
+function showPayslip(encoded){
+  const p = JSON.parse(decodeURIComponent(encoded));
+  const html = `<div><strong>Payslip</strong><div class="small">Name: ${p.name}</div><div class="small">Amount: GHS ${p.amount}</div><div class="small">Date: ${new Date(p.date).toLocaleString()}</div><div class="small">Note: ${p.note||''}</div></div>`;
+  document.getElementById('payslip_area').innerHTML = html;
+  // save last payslip for download
+  window._lastPayslip = p;
+}
+
+/* download payslip PDF */
+document.getElementById('downloadPayslip').addEventListener('click', ()=>{
+  const p = window._lastPayslip;
+  if(!p){ alert('No payslip to download. Select a payment and click "View Payslip" first.'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p','pt','a4');
+  doc.setFontSize(16); doc.text('Flawless Graphics — Payslip', 40, 40);
+  doc.setFontSize(12); doc.text(`Name: ${p.name}`,40,80); doc.text(`Amount: GHS ${p.amount}`,40,100); doc.text(`Date: ${new Date(p.date).toLocaleString()}`,40,120);
+  if(p.note) doc.text(`Note: ${p.note}`,40,140);
+  doc.save(`payslip_${p.name.replace(/\s+/g,'_')}.pdf`);
+});
+
+/* ---------- Export / Import ---------- */
+document.getElementById('exportCSV').addEventListener('click', ()=>{
+  const rows = getTeachers().map(t=>({ fullName:t.fullName, email:t.email, phone:t.phone, subject:t.subject, salary:t.salary, hireDate:t.hireDate, classes:(t.classes||[]).join('|') }));
+  const csv = toCsv(rows);
+  downloadText(csv, `${ACTIVE_ORG}_teachers.csv`, 'text/csv');
+});
+document.getElementById('exportPDF').addEventListener('click', ()=>{
+  const { jsPDF } = window.jspdf; const doc = new jsPDF('l','pt','a4'); doc.setFontSize(14); doc.text(`${ACTIVE_ORG} — Teachers`,40,40);
+  const rows = getTeachers(); let y=70; rows.forEach((r,i)=>{ doc.text(`${i+1}. ${r.fullName} | ${r.subject} | ${r.email} | ${r.phone} | GHS ${r.salary}`,40,y); y+=12; if(y>540){ doc.addPage(); y=40 }});
+  doc.save(`${ACTIVE_ORG}_teachers.pdf`);
+});
+document.getElementById('exportFullJSON').addEventListener('click', ()=>{
+  const data = { teachers:getTeachers(), attendance:getAttendance(), performance:getPerformance(), payments:getPayments() };
+  downloadText(JSON.stringify(data,null,2), `${ACTIVE_ORG}_teacher_export.json`, 'application/json');
+});
+document.getElementById('importJSON').addEventListener('click', ()=>{
+  const input = document.createElement('input'); input.type='file'; input.accept='application/json'; input.onchange = e=>{
+    const f = e.target.files[0]; if(!f) return;
+    const r = new FileReader(); r.onload = ()=> {
+      try{
+        const data = JSON.parse(r.result);
+        if(data.teachers) { saveTeachers(data.teachers); }
+        if(data.attendance) saveAttendance(data.attendance);
+        if(data.performance) savePerformance(data.performance);
+        if(data.payments) savePayments(data.payments);
+        alert('Import complete'); renderTeacherTable(); renderAttendanceList(); renderPerformanceList(); renderPayments();
+      }catch(err){ alert('Invalid JSON'); }
+    }; r.readAsText(f);
+  }; input.click();
+});
+
+/* helper toCsv & download */
+function toCsv(rows){
+  if(!rows.length) return '';
+  const keys = Object.keys(rows[0]); const lines = [keys.join(',')];
+  rows.forEach(r => lines.push(keys.map(k=>`"${String(r[k]||'').replace(/"/g,'""')}"`).join(',')));
+  return lines.join('\n');
+}
+function downloadText(text, filename, type='text/plain'){
+  const blob = new Blob([text], { type }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* ---------- Helper: hash (SHA-256) ---------- */
+async function hash(text){
+  try{
+    const enc = new TextEncoder(); const data = enc.encode(text);
+    const res = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(res)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }catch(e){ return text; }
+}
+
+/* ---------- Navigation / Tabs ---------- */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    const target = t.dataset.tab;
+    document.querySelectorAll('#manageTab,#attendanceTab,#performanceTab,#payrollTab,#exportTab').forEach(el=>el.style.display='none');
+    document.getElementById(target).style.display = 'block';
+  });
+});
+
+/* ---------- Teacher login redirect & small UI ---------- */
+document.getElementById('loginAsTeacherBtn').addEventListener('click', ()=> window.location.href = 'teacher-login.html');
+document.getElementById('toDashboardBtn').addEventListener('click', ()=> window.location.href = 'hr-dashboard.html');
+document.getElementById('orgInfoSmall').textContent = ACTIVE_ORG;
+
+/* ---------- Initial rendering ---------- */
+renderTeacherTable(); renderAttendanceList(); renderPerformanceList(); renderPayments(); drawPerfChart();
+
+/* repopulate selects when data changes in other tabs */
+function populateSelectsDelayed(){ setTimeout(()=> populateSelects(), 60) }
+window.addEventListener('storage', ()=> { renderTeacherTable(); renderAttendanceList(); renderPerformanceList(); renderPayments(); drawPerfChart(); });
+
 </script>
-
 </body>
 </html>
