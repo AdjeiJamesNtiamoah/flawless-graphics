@@ -75,6 +75,11 @@
     .toast{background:#111;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:0 10px 30px rgba(10,20,30,0.2);transform:translateX(120%);opacity:0;transition:0.45s}
     .toast.show{transform:translateX(0);opacity:1}
 
+    /* debug panel */
+    .debug-panel{position:fixed;top:10px;right:10px;background:rgba(0,0,0,0.8);color:white;padding:10px;border-radius:5px;font-family:monospace;font-size:12px;z-index:2000;max-width:300px}
+    .debug-panel button{background:#333;color:white;border:none;padding:2px 5px;margin:2px;border-radius:3px;cursor:pointer}
+    .debug-panel button:hover{background:#555}
+
     /* small screens */
     @media (max-width:900px){
       .form-grid{grid-template-columns:1fr}
@@ -86,6 +91,17 @@
   </style>
 </head>
 <body>
+  <!-- Debug Panel -->
+  <div class="debug-panel" id="debugPanel">
+    <div>Debug Info:</div>
+    <div>Protocol: <span id="protocolInfo"></span></div>
+    <div>LocalStorage: <span id="storageInfo"></span></div>
+    <div>Students Count: <span id="studentsCount">0</span></div>
+    <button onclick="clearStorage()">Clear Storage</button>
+    <button onclick="testStorage()">Test Storage</button>
+    <button onclick="toggleDebug()">Hide Debug</button>
+  </div>
+
   <header>
     <div class="logo">FG</div>
     <div>
@@ -253,27 +269,128 @@
 
   <script>
   /************************************************************************
-   * Student Portal: FULL-featured script
+   * Student Portal: FULL-featured script with enhanced debugging
    * - Profile pics stored as data URLs in localStorage.students[].photo
    * - Sorting / search / view toggle / export CSV/XLSX/PDF / badges / animations
    ************************************************************************/
 
-  // Helper: safe parse - FIXED VERSION
-  const safeParse = s => { 
+  // Debug functions
+  function updateDebugInfo() {
+    document.getElementById('protocolInfo').textContent = window.location.protocol;
+    document.getElementById('storageInfo').textContent = typeof(Storage) !== "undefined" ? "Available" : "Not Available";
+    document.getElementById('studentsCount').textContent = students.length;
+  }
+
+  function toggleDebug() {
+    const panel = document.getElementById('debugPanel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function clearStorage() {
+    if(confirm('Clear all stored data?')) {
+      localStorage.clear();
+      students = [];
+      render();
+      updateDebugInfo();
+      showToast('Storage cleared', 'info');
+    }
+  }
+
+  function testStorage() {
+    try {
+      const testKey = 'test_' + Date.now();
+      const testValue = 'test_value';
+      localStorage.setItem(testKey, testValue);
+      const retrieved = localStorage.getItem(testKey);
+      localStorage.removeItem(testKey);
+      
+      if(retrieved === testValue) {
+        showToast('LocalStorage working correctly', 'success');
+      } else {
+        showToast('LocalStorage test failed', 'error');
+      }
+    } catch(e) {
+      showToast('LocalStorage error: ' + e.message, 'error');
+    }
+    updateDebugInfo();
+  }
+
+  // Enhanced safe parse with detailed logging
+  const safeParse = (s, key = 'unknown') => { 
     try { 
+      if(s === null || s === undefined || s === '') {
+        console.log(`[DEBUG] ${key}: Empty value, returning empty array`);
+        return [];
+      }
+      
       const parsed = JSON.parse(s); 
-      return Array.isArray(parsed) ? parsed : [];
+      console.log(`[DEBUG] ${key}: Successfully parsed`, parsed);
+      
+      if(Array.isArray(parsed)) {
+        console.log(`[DEBUG] ${key}: Is array with ${parsed.length} items`);
+        return parsed;
+      } else {
+        console.warn(`[DEBUG] ${key}: Not an array, converting to array`);
+        return [parsed];
+      }
     } catch(e){ 
-      console.error('Error parsing students data:', e);
+      console.error(`[DEBUG] ${key}: Parse error`, e);
+      console.error(`[DEBUG] ${key}: Raw value was:`, s);
       return []; 
     } 
   };
 
-  // initial students (read from localStorage) - FIXED VERSION
-  let students = safeParse(localStorage.getItem('students'));
-  if (!Array.isArray(students)) {
-    students = [];
+  // Enhanced storage functions with logging
+  function saveStudents() {
+    try {
+      const dataStr = JSON.stringify(students);
+      console.log('[DEBUG] Saving students:', dataStr);
+      localStorage.setItem('students', dataStr);
+      
+      // Verify it was saved
+      const saved = localStorage.getItem('students');
+      console.log('[DEBUG] Verification - saved data:', saved);
+      
+      if(saved !== dataStr) {
+        console.error('[DEBUG] Storage verification failed!');
+        showToast('Error saving data', 'error');
+        return false;
+      }
+      
+      console.log('[DEBUG] Students saved successfully');
+      return true;
+    } catch(e) {
+      console.error('[DEBUG] Error saving students:', e);
+      showToast('Error saving data: ' + e.message, 'error');
+      return false;
+    }
   }
+
+  function loadStudents() {
+    try {
+      const stored = localStorage.getItem('students');
+      console.log('[DEBUG] Loading students from storage:', stored);
+      
+      students = safeParse(stored, 'students');
+      
+      if(!Array.isArray(students)) {
+        console.warn('[DEBUG] Students is not an array, resetting');
+        students = [];
+      }
+      
+      console.log('[DEBUG] Final students array:', students);
+      updateDebugInfo();
+      return students;
+    } catch(e) {
+      console.error('[DEBUG] Error loading students:', e);
+      students = [];
+      updateDebugInfo();
+      return students;
+    }
+  }
+
+  // Initialize students with enhanced loading
+  let students = loadStudents();
 
   // DOM
   const tbody = document.querySelector('#studentTable tbody');
@@ -317,8 +434,10 @@
   // escape
   function escapeHtml(s){ if(s===null||s===undefined) return ''; return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
-  // render list (table + cards)
+  // render list (table + cards) with debugging
   function render(list = students){
+    console.log('[DEBUG] Rendering students:', list);
+    
     // apply sorting based on sortSelect
     const sort = sortSelect.value;
     let arr = Array.from(list);
@@ -371,6 +490,7 @@
     });
 
     updateStats();
+    updateDebugInfo();
   }
 
   // update stats (students, classes, attendance, avg grade, top class)
@@ -460,9 +580,11 @@
     reader.readAsDataURL(f);
   });
 
-  // submit form (add or edit)
+  // submit form (add or edit) with enhanced logging
   form.addEventListener('submit', (e)=>{
     e.preventDefault();
+    console.log('[DEBUG] Form submitted');
+    
     const data = {
       fullName: document.getElementById('fullName').value.trim(),
       studentClass: document.getElementById('studentClass').value.trim(),
@@ -475,17 +597,23 @@
     // photo from preview
     if(avatarPreviewImg && avatarPreviewImg.src) data.photo = avatarPreviewImg.src;
 
+    console.log('[DEBUG] Student data:', data);
+
     const editIndex = document.getElementById('editIndex').value;
     if(editIndex===''){
       students.push(data);
+      console.log('[DEBUG] Added new student, total:', students.length);
       showToast('Student added', 'success');
     } else {
       students[Number(editIndex)] = data;
+      console.log('[DEBUG] Updated student at index:', editIndex);
       showToast('Student updated', 'success');
     }
-    localStorage.setItem('students', JSON.stringify(students));
-    modal.style.display='none'; modal.setAttribute('aria-hidden','true');
-    render();
+    
+    if(saveStudents()) {
+      modal.style.display='none'; modal.setAttribute('aria-hidden','true');
+      render();
+    }
   });
 
   // edit function (global)
@@ -512,7 +640,7 @@
   window.deleteStudent = function(index){
     if(!confirm('Delete student?')) return;
     students.splice(index,1);
-    localStorage.setItem('students', JSON.stringify(students));
+    saveStudents();
     showToast('Student deleted', 'delete');
     render();
   };
@@ -613,7 +741,7 @@
     const tbody = document.querySelector('#classTable tbody'); tbody.innerHTML='';
     let total = 0;
     studentsInClass.forEach((e,i)=>{
-      const scores = perf[e.fullName] ? Object.values(perf[e.fullName]).map(Number).filter(n=>!isNaN(n)) : [];
+      const scores = perf[e.fullName] ? Object.values(perfData[e.fullName]).map(Number).filter(n=>!isNaN(n)) : [];
       const avg = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
       total += avg;
       const tr = document.createElement('tr');
@@ -649,12 +777,33 @@
     setTimeout(()=> { t.classList.remove('show'); setTimeout(()=>t.remove(),400); }, 3000);
   }
 
-  // initial render and live sync
-  render();
+  // Initial setup
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('[DEBUG] Page loaded, initializing...');
+    
+    // Check if running from file:// protocol
+    if(window.location.protocol === 'file:') {
+      console.warn('[DEBUG] Running from file:// protocol - localStorage may not work reliably');
+      showToast('Warning: Running from file:// may cause data persistence issues', 'warning');
+    }
+    
+    // Initialize debug info
+    updateDebugInfo();
+    
+    // Initial render
+    render();
+    
+    // Test localStorage on load
+    testStorage();
+    
+    console.log('[DEBUG] Initialization complete');
+  });
+
   // monitor localStorage changes (other tabs)
   window.addEventListener('storage', (e)=>{
     if(['students','performanceData','payments'].includes(e.key)){
-      students = safeParse(localStorage.getItem('students')) || [];
+      console.log('[DEBUG] Storage changed:', e.key);
+      students = loadStudents();
       render();
     }
   });
