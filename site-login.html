@@ -1,111 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<title>Login | HR Portal</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body {
-    background:#071833;
-    font-family:Arial;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    margin:0;
-    color:white;
-}
-.box {
-    width:360px;
-    background:#102a57;
-    padding:30px;
-    border-radius:10px;
-}
-input {
-    width:100%;
-    padding:12px;
-    margin-top:8px;
-    border:none;
-    border-radius:6px;
-}
-button {
-    width:100%;
-    padding:12px;
-    margin-top:10px;
-    border:none;
-    border-radius:6px;
-    background:#00a8ff;
-    font-size:16px;
-    color:white;
-    cursor:pointer;
-}
-button:hover { background:#0084cc; }
-</style>
-</head>
-
-<body>
-
-<div class="box">
-    <h2>HR Login</h2>
-
-    <label>Email</label>
-    <input type="email" id="email" placeholder="Enter your email">
-
-    <label>Password</label>
-    <input type="password" id="password" placeholder="Enter password">
-
-    <button id="loginBtn">Login</button>
-
-    <p style="text-align:center; margin-top:10px;">
-        No account? <a href="site-register.html" style="color:#4ac3ff;">Register</a>
-    </p>
-</div>
-
 <script>
-// -----------------------------
-// HASH FUNCTION (REQUIRED)
-// -----------------------------
-async function sha256(text) {
-    const buf = new TextEncoder().encode(text);
-    const hash = await crypto.subtle.digest("SHA-256", buf);
-    return [...new Uint8Array(hash)].map(x=>x.toString(16).padStart(2,"0")).join("");
+const USERS_KEY = "organizations_users";
+
+// Read stored users
+function readUsers() {
+  return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
 }
 
-// -----------------------------
-// LOGIN FUNCTION
-// -----------------------------
-document.getElementById("loginBtn").addEventListener("click", async () => {
-    const email = document.getElementById("email").value.trim().toLowerCase();
-    const pw = document.getElementById("password").value;
+// Hash function
+async function sha256(text) {
+  const data = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest("SHA-256", data);
+  return [...new Uint8Array(hash)]
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("");
+}
 
-    if (!email || !pw) {
-        alert("Please enter email and password.");
-        return;
-    }
+// LOGIN function (fully fixed)
+async function login() {
+  const email = document.getElementById("email").value.trim().toLowerCase();
+  const pw = document.getElementById("password").value;
 
-    const users = JSON.parse(localStorage.getItem("organizations_users") || "[]");
+  if (!email || !pw) {
+    alert("Enter email and password");
+    return;
+  }
 
-    const hashed = await sha256(pw);
+  const users = readUsers();
+  const hashedPw = await sha256(pw);
 
-    const user = users.find(u => u.email === email && u.passwordHash === hashed);
+  // Look for matching user
+  const user = users.find(u => 
+    u.email === email && 
+    u.pass === hashedPw
+  );
 
-    if (!user) {
-        alert("Incorrect email or password.");
-        return;
-    }
+  if (!user) {
+    alert("Incorrect email or password");
+    return;
+  }
 
-    // Save active user session
-    localStorage.setItem("active_user", JSON.stringify({
-        email: user.email,
-        fullName: user.fullName,
-        orgName: user.orgName,
-        role: "hr"
-    }));
+  // Save active user session
+  localStorage.setItem("active_org_user", JSON.stringify(user));
 
-    alert("Login successful!");
-    window.location.href = "welcome.html";
-});
+  alert("Login successful!");
+
+  // Redirect to dashboard
+  window.location.href = "hr-dashboard.html";
+}
 </script>
-
-</body>
-</html>
