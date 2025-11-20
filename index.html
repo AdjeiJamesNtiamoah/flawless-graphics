@@ -1,167 +1,383 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flawless Graphics – HR Portal Login</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FLAWLESS GRAPHICS — Employee Management</title>
 
-<style>
-    body {
-        margin:0;
-        font-family: Arial, sans-serif;
-        background:#f4f7fa;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        height:100vh;
+  <!-- Chart.js for small charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg-light: #f6f9fc;
+      --card-light: #ffffff;
+      --nav-blue: #003366;
+      --accent: #0b63a3;
+      --accent-2: #00a6b6;
+      --muted: #6b7a89;
+      --glass: rgba(255,255,255,0.65);
+      --success: #16a34a;
+      --danger: #ef4444;
+      --shadow: 0 8px 30px rgba(2,10,23,0.06);
     }
-    .box {
-        width:350px;
-        padding:25px;
-        background:white;
-        border-radius:10px;
-        box-shadow:0 8px 25px rgba(0,0,0,0.1);
+    /* Dark / Neon variables (toggle) */
+    .dark {
+      --bg: #041026;
+      --card: rgba(6,12,30,0.23);
+      --nav-blue: #021a3b;
+      --accent: #00d1ff;
+      --accent-2: #7a00ff;
+      --muted: #9fb4c9;
+      --glass: rgba(2,8,22,0.55);
+      --text: #e6f4ff;
+      --shadow: 0 16px 60px rgba(1,8,30,0.5);
     }
-    h2 { text-align:center; margin-bottom:15px; color:#0b63a3; }
-    input, select {
-        width:100%; padding:10px;
-        margin-top:8px; border:1px solid #dbe3ea;
-        border-radius:6px;
+
+    /* Base styles */
+    html,body{height:100%;margin:0;font-family:"Poppins",sans-serif;background:var(--bg-light);color:#102330;transition:background 350ms ease,color 350ms ease}
+    .dark body{background:var(--bg);color:var(--text)}
+    header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:linear-gradient(90deg,var(--nav-blue),#0c4f80);color:#fff}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo-circle{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff}
+    header h1{font-size:16px;margin:0;letter-spacing:0.2px}
+    nav ul{list-style:none;margin:0;padding:0;display:flex;gap:8px;align-items:center}
+    nav a{color:rgba(255,255,255,0.92);text-decoration:none;padding:8px 12px;border-radius:8px;font-weight:600}
+    nav a:hover{background:rgba(255,255,255,0.06)}
+
+    main{max-width:1200px;margin:26px auto;padding:0 18px}
+
+    /* Hero + dashboard */
+    .hero{display:grid;grid-template-columns:1fr 420px;gap:18px;align-items:center;margin-bottom:18px}
+    .hero-card{background:var(--card-light);padding:26px;border-radius:12px;box-shadow:var(--shadow)}
+    .dark .hero-card{background:var(--card);backdrop-filter: blur(8px)}
+    .hero h2{margin:0 0 8px;font-size:28px;color:var(--nav-blue)}
+    .dark .hero h2{color:var(--text)}
+    .hero p{margin:0 0 16px;color:var(--muted)}
+    .cta-row{display:flex;gap:12px;flex-wrap:wrap}
+    .btn{padding:10px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:600}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 8px 20px rgba(11,99,163,0.12)}
+    .btn.ghost{background:transparent;border:1px solid rgba(10,30,60,0.06);color:var(--nav-blue)}
+    .dark .btn.ghost{border-color:rgba(255,255,255,0.08);color:var(--text)}
+
+    /* quick metrics */
+    .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:12px}
+    .metric{background:linear-gradient(180deg,#ffffff,#fbfeff);padding:12px;border-radius:10px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px}
+    .dark .metric{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01))}
+    .metric .label{font-size:13px;color:var(--muted)}
+    .metric .value{font-size:20px;font-weight:700;color:var(--nav-blue)}
+    .dark .metric .value{color:var(--text)}
+
+    /* right column small dashboard */
+    .mini-dashboard{background:var(--card-light);padding:16px;border-radius:12px;box-shadow:var(--shadow)}
+    .dark .mini-dashboard{background:var(--card);backdrop-filter: blur(8px)}
+
+    /* services */
+    .services{margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+    .service{background:var(--card-light);padding:18px;border-radius:10px;box-shadow:var(--shadow);text-align:center}
+    .dark .service{background:var(--card);backdrop-filter: blur(6px)}
+    .service img{width:70px;height:70px;object-fit:cover;border-radius:8px}
+    .service h3{margin:10px 0 6px}
+    .service p{color:var(--muted);margin:0;font-size:14px}
+
+    /* shortcut grid */
+    .shortcuts{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+    .shortcut{flex:1;min-width:200px;background:linear-gradient(90deg,rgba(11,99,163,0.08),rgba(0,166,182,0.04));padding:12px;border-radius:10px;border:1px solid rgba(11,99,163,0.04);display:flex;align-items:center;gap:12px}
+    .dark .shortcut{background:linear-gradient(90deg,rgba(0,209,255,0.06),rgba(122,0,255,0.03));border:1px solid rgba(255,255,255,0.04)}
+
+    /* contact section */
+    .contact{margin-top:22px;background:var(--card-light);padding:18px;border-radius:10px;box-shadow:var(--shadow)}
+    .dark .contact{background:var(--card);backdrop-filter: blur(8px)}
+
+    footer{margin-top:28px;padding:20px;text-align:center;color:var(--muted);font-size:13px}
+
+    /* small screens */
+    @media (max-width:980px){
+      .hero{grid-template-columns:1fr;gap:14px}
+      nav ul{display:none}
     }
-    button {
-        width:100%; margin-top:12px; padding:10px;
-        background:#0b63a3; border:0; color:#fff;
-        border-radius:6px; cursor:pointer;
-    }
-    .link { text-align:center; margin-top:12px; cursor:pointer; color:#0b63a3; }
-</style>
+
+    /* theme toggle */
+    .theme-toggle{display:flex;gap:6px;align-items:center;background:rgba(255,255,255,0.06);padding:6px;border-radius:999px}
+    .theme-toggle button{border-radius:999px;padding:8px 10px;border:0;background:transparent;color:#fff;cursor:pointer}
+
+    /* animated numbers */
+    .count {display:inline-block;transition:all 400ms ease}
+  </style>
 </head>
 <body>
+  <header>
+    <div class="brand">
+      <div class="logo-circle">FG</div>
+      <div>
+        <h1>FLAWLESS GRAPHICS</h1>
+        <div style="font-size:12px;color:rgba(255,255,255,0.9)">Truth and Service</div>
+      </div>
+    </div>
 
-<div class="box" id="loginBox">
-    <h2>Login</h2>
-    <input id="loginEmail" type="email" placeholder="Email">
-    <input id="loginPassword" type="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <div class="link" onclick="showRegister()">Create Account</div>
-    <div class="link" onclick="forgotPass()">Forgot Password?</div>
-</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <nav>
+        <ul>
+          <li style="display:inline"><a href="index.html">Home</a></li>
+          <li style="display:inline"><a href="employee.html">Employee Portal</a></li>
+          <li style="display:inline"><a href="hr-dashboard.html">HR Dashboard</a></li>
+          <li style="display:inline"><a href="services.html">Services</a></li>
+          <li style="display:inline"><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
 
-<div class="box" id="registerBox" style="display:none">
-    <h2>Create Organization</h2>
+      <div class="theme-toggle" title="Toggle theme">
+        <button id="themeBtn">Auto</button>
+      </div>
+    </div>
+  </header>
 
-    <input id="regOrg" placeholder="Organization Name">
-    <input id="regName" placeholder="Full Name">
-    <input id="regEmail" type="email" placeholder="Email">
-    <input id="regPassword" type="password" placeholder="Password">
+  <main>
+    <!-- HERO + dashboard metrics -->
+    <section class="hero">
+      <div class="hero-card">
+        <h2>Employee Management Tool — Simplified</h2>
+        <p>FLAWLESS GRAPHICS provides an integrated system to manage employee profiles, attendance, payroll, and HR workflows — secure, fast, and easy to use.</p>
 
-    <button onclick="register()">Register</button>
-    <div class="link" onclick="showLogin()">Already have an account?</div>
-</div>
+        <div class="cta-row">
+          <button class="btn primary" id="openDashboardBtn">Open Dashboard</button>
+          <button class="btn" id="openEmployeeBtn">Employee Portal</button>
+        </div>
 
-<script>
-function showRegister(){
-    loginBox.style.display="none";
-    registerBox.style.display="block";
-}
-function showLogin(){
-    loginBox.style.display="block";
-    registerBox.style.display="none";
-}
+        <div class="metrics">
+          <div class="metric">
+            <div class="label">Total Employees</div>
+            <div class="value"><span id="cntEmployees" class="count">0</span></div>
+          </div>
 
-// SHA-256 hashing
-async function sha256(msg){
-    const buf = new TextEncoder().encode(msg);
-    const hash = await crypto.subtle.digest("SHA-256", buf);
-    return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,"0")).join("");
-}
+          <div class="metric">
+            <div class="label">Departments</div>
+            <div class="value"><span id="cntDepartments" class="count">0</span></div>
+          </div>
 
-// Registration
-async function register(){
-    let org = regOrg.value.trim();
-    let name = regName.value.trim();
-    let email = regEmail.value.trim().toLowerCase();
-    let pass = regPassword.value.trim();
+          <div class="metric">
+            <div class="label">Attendance Rate</div>
+            <div class="value"><span id="cntAttendance" class="count">0</span>%</div>
+          </div>
 
-    if(!org || !name || !email || !pass){
-        alert("All fields required");
-        return;
+          <div class="metric">
+            <div class="label">Monthly Payroll</div>
+            <div class="value">GHS <span id="cntPayroll" class="count">0</span></div>
+          </div>
+        </div>
+
+        <!-- shortcuts -->
+        <div class="shortcuts" style="margin-top:12px">
+          <div class="shortcut"><div style="font-weight:700">⚡</div><div><div style="font-weight:700">Quick Add</div><div class="small-muted">Add employee, attendance, or payroll</div></div></div>
+          <div class="shortcut"><div style="font-weight:700">📊</div><div><div style="font-weight:700">Analytics</div><div class="small-muted">Payroll & performance at a glance</div></div></div>
+          <div class="shortcut"><div style="font-weight:700">🔒</div><div><div style="font-weight:700">Secure</div><div class="small-muted">Role-based HR access</div></div></div>
+        </div>
+      </div>
+
+      <aside class="mini-dashboard">
+        <h3 style="margin:0 0 8px">Organization Snapshot</h3>
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+          <div style="width:56px;height:56px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:white;font-weight:700">FG</div>
+          <div>
+            <div id="orgNameSmall" style="font-weight:700">FLAWLESS GRAPHICS</div>
+            <div class="small-muted" id="orgRole">HR Admin</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:10px"><canvas id="deptChart" width="300" height="180"></canvas></div>
+
+        <div style="display:flex;gap:8px">
+          <button class="btn primary" style="flex:1" id="addEmpShortcut">+ Employee</button>
+          <button class="btn" style="flex:1" id="reportShortcut">Report</button>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Services -->
+    <section>
+      <h2 style="margin-bottom:8px">Key Services</h2>
+      <div class="services">
+        <div class="service">
+          <img src="assets/attendance-photo.jpg" alt="Attendance">
+          <h3>Attendance Tracking</h3>
+          <p>Monitor attendance and work hours with quick check-in/out and compact analytics.</p>
+        </div>
+
+        <div class="service">
+          <img src="assets/payroll-photo.jpg" alt="Payroll">
+          <h3>Payroll Automation</h3>
+          <p>Automate salary calculations and generate downloadable payslips for employees.</p>
+        </div>
+
+        <div class="service">
+          <img src="assets/employee-icon.png" alt="Records">
+          <h3>Employee Records</h3>
+          <p>Store secure employee profiles with photo thumbnails and exportable reports.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dashboard style analytics -->
+    <section style="margin-top:18px">
+      <h2 style="margin-bottom:8px">Payroll by Department</h2>
+      <div style="background:var(--card-light);padding:16px;border-radius:12px;box-shadow:var(--shadow)">
+        <canvas id="payrollByDept" height="120"></canvas>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="contact">
+      <h3>Contact</h3>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <p><strong>Email</strong><br><a href="mailto:hr@flawlessgraphics.com">hr@flawlessgraphics.com</a></p>
+          <p><strong>Phone</strong><br>+233 555 123 456</p>
+        </div>
+        <div style="flex:1;min-width:200px">
+          <p><strong>Address</strong><br>Accra, Ghana</p>
+          <p><strong>Support</strong><br><a href="contact.html">Open support form</a></p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      © <span id="year"></span> Flawless Graphics — Employee Management System
+    </footer>
+  </main>
+
+  <script>
+    // ---------- THEME HANDLING ----------
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const el = document.documentElement;
+
+    function applyDark(enable){
+      if(enable) el.classList.add('dark'); else el.classList.remove('dark');
+      localStorage.setItem('fg_theme_dark', !!enable);
     }
 
-    let ORGS = JSON.parse(localStorage.getItem("Organizations") || "[]");
+    // initialize theme: saved preference > system preference
+    const saved = localStorage.getItem('fg_theme_dark');
+    if(saved === null) applyDark(prefersDark);
+    else applyDark(saved === 'true');
 
-    if(ORGS.find(x => x.email === email)){
-        alert("Email already exists!");
-        return;
-    }
-
-    let hashed = await sha256(pass);
-
-    ORGS.push({
-        org,
-        name,
-        email,
-        pass: hashed,
-        createdAt: Date.now()
+    document.getElementById('themeBtn').addEventListener('click', ()=>{
+      const now = el.classList.contains('dark');
+      applyDark(!now);
+      document.getElementById('themeBtn').textContent = !now ? 'Dark' : 'Light';
     });
 
-    localStorage.setItem("Organizations", JSON.stringify(ORGS));
+    // set button label initial
+    document.getElementById('themeBtn').textContent = el.classList.contains('dark') ? 'Dark' : 'Light';
 
-    alert("Account created! You can now login.");
-    showLogin();
-}
-
-// Login
-async function login(){
-    let email = loginEmail.value.trim().toLowerCase();
-    let pass = loginPassword.value.trim();
-
-    let ORGS = JSON.parse(localStorage.getItem("Organizations") || "[]");
-    let user = ORGS.find(x => x.email === email);
-
-    if(!user){ alert("User not found."); return; }
-
-    let hashed = await sha256(pass);
-
-    if(hashed !== user.pass){
-        alert("Incorrect password");
-        return;
+    // ---------- UTILITIES ----------
+    function safeParse(s){ try{ return JSON.parse(s); }catch(e){ return null; } }
+    function readKey(k){ return safeParse(localStorage.getItem(k)) || []; }
+    function formatNumber(n){ return Number(n).toLocaleString(); }
+    function animateCount(el, to, duration=900){
+      const start = 0; const range = to - start; const startTime = performance.now();
+      function tick(t){
+        const elapsed = t - startTime; const progress = Math.min(elapsed/duration, 1);
+        const value = Math.round(start + range * progress);
+        el.textContent = formatNumber(value);
+        if(progress < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
     }
 
-    // Set active organization + HR
-    localStorage.setItem("active_org", user.org.replace(/\s+/g,''));
-    localStorage.setItem("activeHR", JSON.stringify({ name: user.name, role: "Admin" }));
+    // ---------- Data keys (per org) ----------
+    // We'll look for either active_org (HR) or site_active_user (website user)
+    const activeOrg = localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || '';
+    const EMP_KEY = activeOrg ? `${activeOrg}_employees` : 'flawless_employees'; // fallback
+    const PAY_KEY = activeOrg ? `${activeOrg}_payments` : 'flawless_payments';
 
-    window.location.href = "welcome.html";
+    // ---------- populate metrics ----------
+    function updateMetrics(){
+      const emps = readKey(EMP_KEY);
+      const payments = readKey(PAY_KEY);
+      const departments = [...new Set(emps.map(e => (e.department||'').trim()).filter(Boolean))];
+      const totalPayroll = emps.reduce((s,e)=>s + (Number(e.salary)||0), 0);
+      const today = new Date().toISOString().split('T')[0];
+      const attendance = readKey(activeOrg ? `${activeOrg}_attendance` : 'flawless_attendance');
+      const presentToday = new Set(attendance.filter(a => a.date && a.date.split('T')[0] === today && a.action === 'in').map(a=>a.employeeIndex));
+      const attendanceRate = emps.length ? Math.round((presentToday.size / emps.length)*100) : 0;
 
-}
+      animateCount(document.getElementById('cntEmployees'), emps.length);
+      animateCount(document.getElementById('cntDepartments'), departments.length);
+      animateCount(document.getElementById('cntAttendance'), attendanceRate);
+      animateCount(document.getElementById('cntPayroll'), Math.round(totalPayroll));
+    }
 
-// Forgot password
-async function forgotPass(){
-    let email = prompt("Enter your email:");
-    if(!email) return;
+    // initial update
+    updateMetrics();
 
-    let ORGS = JSON.parse(localStorage.getItem("Organizations") || "[]");
-    let user = ORGS.find(x => x.email === email.toLowerCase());
+    // ---------- small payroll-by-department chart ----------
+    function drawPayrollChart(){
+      const ctx = document.getElementById('payrollByDept').getContext('2d');
+      const emps = readKey(EMP_KEY);
+      const sums = {};
+      emps.forEach(e => { const d = e.department || 'Unassigned'; sums[d] = (sums[d]||0) + (Number(e.salary)||0); });
+      const labels = Object.keys(sums); const data = Object.values(sums);
+      new Chart(ctx, {
+        type: 'bar',
+        data: { labels, datasets: [{ label: 'Payroll (GHS)', data, backgroundColor: ['#0b63a3','#00a6b6','#ff9a76','#9b59b6','#ff7a7a'] }] },
+        options: { responsive:true, plugins:{legend:{display:false}} }
+      });
+    }
+    drawPayrollChart();
 
-    if(!user){ alert("Email not found"); return; }
+    // small mini dept donut (right column)
+    function drawDeptMini(){
+      const ctx = document.getElementById('deptChart').getContext('2d');
+      const emps = readKey(EMP_KEY);
+      const sums = {};
+      emps.forEach(e => { const d = e.department || 'Unassigned'; sums[d] = (sums[d]||0) + (Number(e.salary)||0); });
+      const labels = Object.keys(sums); const data = Object.values(sums);
+      new Chart(ctx, { type:'doughnut', data:{ labels, datasets:[{ data, backgroundColor:['#0b63a3','#00a6b6','#ff9a76','#9b59b6'] }] }, options:{plugins:{legend:{position:'bottom'}}} );
+    }
+    drawDeptMini();
 
-    let code = Math.floor(100000 + Math.random()*900000);
-    alert("Your reset code: " + code);
+    // ---------- buttons: navigation & dynamic behavior ----------
+    document.getElementById('openDashboardBtn').addEventListener('click', ()=> {
+      // Prefer HR dashboard if logged in as HR
+      if(localStorage.getItem('active_org')) window.location.href = 'hr-dashboard.html';
+      else window.location.href = 'login.html';
+    });
+    document.getElementById('openEmployeeBtn').addEventListener('click', ()=> {
+      // go to employee portal (public)
+      window.location.href = 'employee.html';
+    });
+    document.getElementById('addEmpShortcut').addEventListener('click', ()=> {
+      // If HR, open hr dashboard add UI; otherwise prompt to login
+      if(localStorage.getItem('active_org')) window.location.href = 'hr-dashboard.html';
+      else alert('Please sign in as HR to add employees.');
+    });
+    document.getElementById('reportShortcut').addEventListener('click', ()=> {
+      if(localStorage.getItem('active_org')) window.location.href = 'hr-dashboard.html';
+      else alert('Please sign in to view reports.');
+    });
 
-    let enter = prompt("Enter the reset code:");
-    if(enter != code) return alert("Incorrect code");
+    // update small org name
+    const activeHR = safeParse(localStorage.getItem('activeHR')) || {};
+    if(activeOrg) document.getElementById('orgNameSmall').textContent = activeOrg;
+    if(activeHR.name) document.getElementById('orgRole').textContent = `${activeHR.name} • ${activeHR.role || 'Admin'}`;
 
-    let newPass = prompt("Enter new password:");
-    if(!newPass || newPass.length < 5) return alert("Invalid password");
+    // footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
 
-    user.pass = await sha256(newPass);
-    localStorage.setItem("Organizations", JSON.stringify(ORGS));
+    // refresh charts & metrics when storage changes
+    window.addEventListener('storage', ()=>{
+      updateMetrics();
+      drawPayrollChart();
+      drawDeptMini();
+    });
 
-    alert("Password reset successful");
-}
-</script>
+    // poll fallback
+    setInterval(()=> {
+      updateMetrics();
+    }, 3000);
 
+  </script>
 </body>
 </html>
-
