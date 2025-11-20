@@ -89,6 +89,7 @@ async function register() {
     const name = document.getElementById("fullName").value.trim();
     const email = document.getElementById("email").value.trim().toLowerCase();
     const pw = document.getElementById("password").value;
+    const role = "teacher"; // default role for teacher registration (You can change this later)
 
     if (!org || !name || !email || !pw)
         return alert("Please complete all fields.");
@@ -96,17 +97,21 @@ async function register() {
     if (pw.length < 8)
         return alert("Password too short (min 8 chars).");
 
-    const users = readUsers();
+    let users = readUsers();
+
     if (users.some(u => u.email === email))
         return alert("Email already registered.");
 
     const hashed = await sha256(pw);
 
+    // STORE IN FORMAT THAT LOGIN EXPECTS
     users.push({
-        orgName: org,
-        fullName: name,
+        org: org,
+        name: name,
         email: email,
-        passwordHash: hashed
+        pass: hashed,
+        role: role,
+        createdAt: Date.now()
     });
 
     localStorage.setItem(USERS_KEY, JSON.stringify(users));
@@ -115,6 +120,7 @@ async function register() {
     window.location.href = "site-login.html";
 }
 </script>
+
 
 </body>
 </html>
