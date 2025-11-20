@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome | Flawless Graphics</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #003366, #0066cc);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        overflow: hidden;
+    }
+
+    .welcome-box {
+        text-align: center;
+        background: rgba(255,255,255,0.15);
+        padding: 40px;
+        border-radius: 15px;
+        backdrop-filter: blur(12px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        width: 90%;
+        max-width: 420px;
+        animation: fadeIn 1.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+        font-size: 1.9em;
+        margin-bottom: 8px;
+    }
+
+    p {
+        opacity: 0.9;
+        font-size: 1.1em;
+    }
+
+    .btn {
+        display: block;
+        margin-top: 25px;
+        padding: 12px;
+        background: #00ccff;
+        color: #003355;
+        font-size: 1.1em;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+    .btn:hover {
+        background: white;
+        color: #003366;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="welcome-box">
+    <h1 id="orgName">Welcome</h1>
+    <p id="hrName">Loading your dashboard...</p>
+
+    <a href="home.html" class="btn">Continue</a>
+</div>
+
+<script>
+    // Load HR & organization info
+    let activeOrg = localStorage.getItem("active_org") || "Your Organization";
+    let hr = JSON.parse(localStorage.getItem("activeHR") || "{}");
+
+    document.getElementById("orgName").innerText = "Welcome to " + activeOrg;
+    document.getElementById("hrName").innerText =
+        hr.name ? ("Logged in as: " + hr.name) : "Welcome, HR Manager!";
+</script>
+
+</body>
+</html>
