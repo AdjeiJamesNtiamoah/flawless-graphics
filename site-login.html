@@ -1,98 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>HR Login</title>
+<meta charset="UTF-8" />
+<title>Login | HR Portal</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-    body {
-        background:#071833;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        height:100vh;
-        margin:0;
-        font-family:Arial;
-        color:white;
-    }
-    .box {
-        width:340px;
-        background:#102a57;
-        padding:30px;
-        border-radius:10px;
-        box-shadow:0 0 20px rgba(0,0,0,0.5);
-    }
-    h2 { text-align:center; margin-bottom:20px; }
-    input {
-        width:100%;
-        padding:12px;
-        border-radius:6px;
-        border:none;
-        margin-top:6px;
-        margin-bottom:12px;
-    }
-    button {
-        width:100%;
-        padding:12px;
-        border:none;
-        background:#00a8ff;
-        color:white;
-        font-size:16px;
-        border-radius:6px;
-        cursor:pointer;
-    }
-    button:hover { background:#0089d6; }
-    a { color:#4ac3ff; }
-    .center { text-align:center; margin-top:10px; }
+body {
+    background:#071833;
+    font-family:Arial;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    margin:0;
+    color:white;
+}
+.box {
+    width:360px;
+    background:#102a57;
+    padding:30px;
+    border-radius:10px;
+}
+input {
+    width:100%;
+    padding:12px;
+    margin-top:8px;
+    border:none;
+    border-radius:6px;
+}
+button {
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:6px;
+    background:#00a8ff;
+    font-size:16px;
+    color:white;
+    cursor:pointer;
+}
+button:hover { background:#0084cc; }
 </style>
 </head>
+
 <body>
 
 <div class="box">
     <h2>HR Login</h2>
 
     <label>Email</label>
-    <input type="email" id="email" placeholder="admin@company.com">
+    <input type="email" id="email" placeholder="Enter your email">
 
     <label>Password</label>
     <input type="password" id="password" placeholder="Enter password">
 
-    <button onclick="login()">Login</button>
+    <button id="loginBtn">Login</button>
 
-    <div class="center">
-        <a href="site-register.html">Create Organization</a>
-    </div>
+    <p style="text-align:center; margin-top:10px;">
+        No account? <a href="site-register.html" style="color:#4ac3ff;">Register</a>
+    </p>
 </div>
 
 <script>
-async function login() {
+// -----------------------------
+// HASH FUNCTION (REQUIRED)
+// -----------------------------
+async function sha256(text) {
+    const buf = new TextEncoder().encode(text);
+    const hash = await crypto.subtle.digest("SHA-256", buf);
+    return [...new Uint8Array(hash)].map(x=>x.toString(16).padStart(2,"0")).join("");
+}
+
+// -----------------------------
+// LOGIN FUNCTION
+// -----------------------------
+document.getElementById("loginBtn").addEventListener("click", async () => {
     const email = document.getElementById("email").value.trim().toLowerCase();
     const pw = document.getElementById("password").value;
 
-    const users = JSON.parse(localStorage.getItem("organizations_users") || "[]");
-
-    const hash = await sha256(pw);
-
-    const user = users.find(u => u.email === email && u.passwordHash === hash);
-
-    if (!user) {
-        alert("Invalid email or password.");
+    if (!email || !pw) {
+        alert("Please enter email and password.");
         return;
     }
 
-    // Store active user
+    const users = JSON.parse(localStorage.getItem("organizations_users") || "[]");
+
+    const hashed = await sha256(pw);
+
+    const user = users.find(u => u.email === email && u.passwordHash === hashed);
+
+    if (!user) {
+        alert("Incorrect email or password.");
+        return;
+    }
+
+    // Save active user session
     localStorage.setItem("active_user", JSON.stringify({
         email: user.email,
         fullName: user.fullName,
-        role: "hr",     // <-- HR ROLE AUTOMATIC
-        orgName: user.orgName
+        orgName: user.orgName,
+        role: "hr"
     }));
 
     alert("Login successful!");
-    window.location.href = "welcome.html"; // NOT hr-dashboard.html
-}
+    window.location.href = "welcome.html";
+});
 </script>
-
 
 </body>
 </html>
