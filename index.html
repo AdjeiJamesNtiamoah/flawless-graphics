@@ -1,84 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FLAWLESS GRAPHICS | Employee Management System</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flawless Graphics – HR Portal Login</title>
+
+<style>
+    body {
+        margin:0;
+        font-family: Arial, sans-serif;
+        background:#f4f7fa;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        height:100vh;
+    }
+    .box {
+        width:350px;
+        padding:25px;
+        background:white;
+        border-radius:10px;
+        box-shadow:0 8px 25px rgba(0,0,0,0.1);
+    }
+    h2 { text-align:center; margin-bottom:15px; color:#0b63a3; }
+    input, select {
+        width:100%; padding:10px;
+        margin-top:8px; border:1px solid #dbe3ea;
+        border-radius:6px;
+    }
+    button {
+        width:100%; margin-top:12px; padding:10px;
+        background:#0b63a3; border:0; color:#fff;
+        border-radius:6px; cursor:pointer;
+    }
+    .link { text-align:center; margin-top:12px; cursor:pointer; color:#0b63a3; }
+</style>
 </head>
-  <script src="theme.js"></script>
+<body>
+
+<div class="box" id="loginBox">
+    <h2>Login</h2>
+    <input id="loginEmail" type="email" placeholder="Email">
+    <input id="loginPassword" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <div class="link" onclick="showRegister()">Create Account</div>
+    <div class="link" onclick="forgotPass()">Forgot Password?</div>
+</div>
+
+<div class="box" id="registerBox" style="display:none">
+    <h2>Create Organization</h2>
+
+    <input id="regOrg" placeholder="Organization Name">
+    <input id="regName" placeholder="Full Name">
+    <input id="regEmail" type="email" placeholder="Email">
+    <input id="regPassword" type="password" placeholder="Password">
+
+    <button onclick="register()">Register</button>
+    <div class="link" onclick="showLogin()">Already have an account?</div>
+</div>
+
+<script>
+function showRegister(){
+    loginBox.style.display="none";
+    registerBox.style.display="block";
+}
+function showLogin(){
+    loginBox.style.display="block";
+    registerBox.style.display="none";
+}
+
+// SHA-256 hashing
+async function sha256(msg){
+    const buf = new TextEncoder().encode(msg);
+    const hash = await crypto.subtle.digest("SHA-256", buf);
+    return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+// Registration
+async function register(){
+    let org = regOrg.value.trim();
+    let name = regName.value.trim();
+    let email = regEmail.value.trim().toLowerCase();
+    let pass = regPassword.value.trim();
+
+    if(!org || !name || !email || !pass){
+        alert("All fields required");
+        return;
+    }
+
+    let ORGS = JSON.parse(localStorage.getItem("Organizations") || "[]");
+
+    if(ORGS.find(x => x.email === email)){
+        alert("Email already exists!");
+        return;
+    }
+
+    let hashed = await sha256(pass);
+
+    ORGS.push({
+        org,
+        name,
+        email,
+        pass: hashed,
+        createdAt: Date.now()
+    });
+
+    localStorage.setItem("Organizations", JSON.stringify(ORGS));
+
+    alert("Account created! You can now login.");
+    showLogin();
+}
+
+// Login
+async function login(){
+    let email = loginEmail.value.trim().toLowerCase();
+    let pass = loginPassword.value.trim();
+
+    let ORGS = JSON.parse(localStorage.getItem("Organizations") || "[]");
+    let user = ORGS.find(x => x.email === email);
+
+    if(!user){ alert("User not found."); return; }
+
+    let hashed = await sha256(pass);
+
+    if(hashed !== user.pass){
+        alert("Incorrect password");
+        return;
+    }
+
+    // Set active organization + HR
+    localStorage.setItem("active_org", user.org.replace(/\s+/g,''));
+    localStorage.setItem("activeHR", JSON.stringify({ name: user.name, role: "Admin" }));
+
+    window.location.href = "hr-dashboard.html";
+}
+
+// Forgot password
+async function forgotPass(){
+    let email = prompt("Enter your email:");
+    if(!email) return;
+
+    let ORGS = JSON.parse(localStorage.getItem("Organizations") || "[]");
+    let user = ORGS.find(x => x.email === email.toLowerCase());
+
+    if(!user){ alert("Email not found"); return; }
+
+    let code = Math.floor(100000 + Math.random()*900000);
+    alert("Your reset code: " + code);
+
+    let enter = prompt("Enter the reset code:");
+    if(enter != code) return alert("Incorrect code");
+
+    let newPass = prompt("Enter new password:");
+    if(!newPass || newPass.length < 5) return alert("Invalid password");
+
+    user.pass = await sha256(newPass);
+    localStorage.setItem("Organizations", JSON.stringify(ORGS));
+
+    alert("Password reset successful");
+}
+</script>
+
 </body>
-  <header>
-    <nav class="navbar">
-      <img src="logo.gif" alt="FLAWLESS GRAPHICS Logo" class="logo-img">
-      <h1>FLAWLESS GRAPHICS</h1>
-      <p class="tagline">TRUTH AND SERVICE</p>
-      </div>
-<ul>
-  <li><a href="index.html" class="active">Home</a></li>
-  <li><a href="employee.html">Employee Portal</a></li>
-  <li><a href="hr-dashboard.html">HR Dashboard</a></li>
-  <li><a href="services.html">Services</a></li>
-  <li><a href="contact.html">Contact</a></li>
-</ul>
-
-    </nav>
-  </header>
-
-<section class="hero">
-  <h1>Employee Management Simplified</h1>
-  <p>FLAWLESS GRAPHICS provides modern HR tools to manage employees, payroll, and attendance all in one place.</p>
-  <a href="employee.html" class="hero-btn">Go to Employee Portal</a>
-</section>
-
-<section class="services">
-  <h2>Our Key Services</h2>
-  <div class="service-grid">
-    <div class="service-card">
-      <img src="assets/attendance-photo.jpg" alt="Attendance Tracking">
-      <h3>Attendance Tracking</h3>
-      <p>Monitor attendance and work hours automatically with real-time insights.</p>
-    </div>
-    <div class="service-card">
-      <img src="assets/payroll-photo.jpg" alt="Payroll Management">
-      <h3>Payroll Management</h3>
-      <p>Automate salary computation and generate digital payslips seamlessly.</p>
-    </div>
-    <div class="service-card">
-      <img src="assets/employee-icon.png" alt="Employee Records">
-      <h3>Employee Records</h3>
-      <p>Keep detailed employee data with secure access for HR and management.</p>
-    </div>
-  </div>
-</section>
-
-<section class="contact-section">
-  <h2>Contact Us</h2>
-  <div class="contact-info">
-    <p>Email: <a href="mailto:hr@flawlessgraphics.com">hr@flawlessgraphics.com</a></p>
-    <p>Phone: +233 555 123 456</p>
-    <p>Address: Accra, Ghana</p>
-  </div>
-</section>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+</html>
