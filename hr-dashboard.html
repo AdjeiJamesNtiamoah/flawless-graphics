@@ -66,6 +66,23 @@
   </style>
 </head>
 <body>
+  <script>
+// Check if user is logged in
+const activeUser = JSON.parse(localStorage.getItem("active_user") || "null");
+
+// If NOT logged in → block access
+if (!activeUser) {
+    alert("Please login to continue.");
+    window.location.href = "site-login.html";
+}
+
+// If user is NOT HR → block access
+if (activeUser.role !== "hr") {
+    alert("Access denied. HR only.");
+    window.location.href = "index.html";
+}
+</script>
+
   <header>
     <div style="display:flex;gap:12px;align-items:center">
       <div style="width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">FG</div>
