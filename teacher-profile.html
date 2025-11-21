@@ -419,7 +419,7 @@ function deleteStudent(classId, studentId){
 /* -------------------------
   Attendance
 ------------------------- */
-    const TEACH_KEY = "teachers_list"; // or whatever key your teacher-login uses
+   
 function recordAttendance(classId, dateStr, attendanceMap){
   // attendanceMap: { studentId: 'present'|'absent' }
   const arr = read(ATT_KEY);
