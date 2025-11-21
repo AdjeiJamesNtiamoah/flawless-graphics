@@ -266,12 +266,12 @@ if(!teacher){
   window.location.href = 'teacher.html';
   throw new Error('No teacher session');
 }
-const ACTIVE_ORG = teacher.org || localStorage.getItem('active_org') || 'default_org';
+const ORG = teacher.org || localStorage.getItem('active_org') || 'default_org';
 const emailSafe = (teacher.email || teacher.name || 'unknown').replace(/[@\.\s]/g,'_');
-const CLASSES_KEY = `${ACTIVE_ORG}_teacher_classes_${emailSafe}`;
-const ATT_KEY = `${ACTIVE_ORG}_student_attendance_${emailSafe}`;
-const ASSIGN_KEY = `${ACTIVE_ORG}_teacher_assignments_${emailSafe}`;
-const MSG_KEY = `${ACTIVE_ORG}_teacher_messages_${emailSafe}`;
+const CLASSES_KEY = `${ORG}_teacher_classes_${emailSafe}`;
+const ATT_KEY = `${ORG}_student_attendance_${emailSafe}`;
+const ASSIGN_KEY = `${ORG}_teacher_assignments_${emailSafe}`;
+const MSG_KEY = `${ORG}_teacher_messages_${emailSafe}`;
 
 /* localStorage helpers */
 function read(k){ return safeParse(localStorage.getItem(k)) || [] }
