@@ -54,8 +54,8 @@ document.getElementById('loginBtn').addEventListener('click', async ()=>{
   if(!res.ok){ alert(res.msg); return; }
   // set teacher active session
   localStorage.setItem('teacher_active_user', JSON.stringify({ email:res.user.email, name:res.user.name || res.user.email, org: ACTIVE_ORG, loggedAt: Date.now() }));
-  // redirect to teacher dashboard page (teacher.html)
-  window.location.href = 'teacher.html';
+  // redirect to teacher profile page (teacher-profile.html)
+  window.location.href = 'teacher-profile.html';
 });
 
 document.getElementById('backBtn').addEventListener('click', ()=> { window.location.href = 'index.html'; });
