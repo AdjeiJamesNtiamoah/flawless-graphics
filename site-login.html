@@ -1,3 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login | Organization Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+    body {
+        background:#071833;
+        height:100vh;
+        margin:0;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        font-family:Arial;
+        color:white;
+    }
+
+    .box {
+        width:360px;
+        background:#102a57;
+        padding:30px;
+        border-radius:10px;
+        box-shadow:0 0 20px rgba(0,0,0,0.4);
+    }
+
+    h2 { text-align:center; margin-bottom:20px; }
+
+    input {
+        width:100%;
+        padding:12px;
+        border-radius:6px;
+        border:none;
+        margin-top:6px;
+        margin-bottom:12px;
+    }
+
+    button {
+        width:100%;
+        padding:12px;
+        border:none;
+        border-radius:6px;
+        background:#00a8ff;
+        color:white;
+        font-size:16px;
+        cursor:pointer;
+    }
+
+    button:hover { background:#0089d6; }
+
+    a { color:#4ac3ff; }
+
+    .center { text-align:center; margin-top:10px; }
+</style>
+</head>
+
+<body>
+
+<div class="box">
+    <h2>Organization Login</h2>
+
+    <label>Email</label>
+    <input type="email" id="email" placeholder="admin@company.com">
+
+    <label>Password</label>
+    <input type="password" id="password" placeholder="Enter password">
+
+    <button onclick="login()">Login</button>
+
+    <div class="center">
+        No account? <a href="site-register.html">Register</a>
+    </div>
+</div>
+
 <script>
 const USERS_KEY = "organizations_users";
 
@@ -28,9 +103,11 @@ async function login() {
   const users = readUsers();
   const hashedPw = await sha256(pw);
 
+  console.log("LOGIN TEST:", users);
+  
   // Look for matching user
-  const user = users.find(u => 
-    u.email === email && 
+  const user = users.find(u =>
+    u.email === email &&
     u.pass === hashedPw
   );
 
@@ -44,7 +121,10 @@ async function login() {
 
   alert("Login successful!");
 
-  // Redirect to dashboard
-  window.location.href = "hr-dashboard.html";
+  // Redirect to welcome page or dashboard
+  window.location.href = "welcome.html";
 }
 </script>
+
+</body>
+</html>
