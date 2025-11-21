@@ -340,7 +340,6 @@ function loadRecentAttendance() {
   recentAtt.innerHTML = html;
 }
 
-
 /* --- CLOCK IN --- */
 btnIn.addEventListener("click", () => {
   const arr = read(ATT_KEY);
@@ -371,81 +370,7 @@ btnOut.addEventListener("click", () => {
   alert("Clock-out successful!");
 });
 
-  /* ------------------------------
-   TEACHER ATTENDANCE LOGIC
---------------------------------*/
-
-function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
-
-const ACTIVE_ORG = (localStorage.getItem('active_org') || 'default_org').trim();
-const ATT_KEY = `${ACTIVE_ORG}_teacher_attendance`;
-const TEACH_KEY = `${ACTIVE_ORG}_teachers`;
-
-function read(k){ return safeParse(localStorage.getItem(k)) || [] }
-function save(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
-
-/* Get active teacher from login */
-const activeTeacher = safeParse(localStorage.getItem('teacher_active_user'));
-
-if (!activeTeacher) {
-  alert("Session expired. Please log in again.");
-  window.location.href = "teacher-login.html";
-}
-
-const teacherEmail = activeTeacher.email;
-
-/* Find teacher index inside teacher list */
-function getTeacherIndexByEmail(email) {
-  const list = read(TEACH_KEY);
-  return list.findIndex(t => t.email === email);
-}
-
-const teacherIndex = getTeacherIndexByEmail(teacherEmail);
-
-/* If somehow not found */
-if (teacherIndex === -1) {
-  alert("Teacher account not found in database.");
-}
-
-/* Load attendance list */
-function loadRecentAttendance() {
-  const arr = read(ATT_KEY).reverse();
-  const recentDiv = document.getElementById("recentAtt");
-
-  const myRecords = arr.filter(a => a.employeeIndex === teacherIndex);
-
-  if (!myRecords.length) {
-    recentDiv.innerHTML = "No attendance records yet.";
-    return;
-  }
-
-  let out = "";
-  myRecords.slice(0, 20).forEach(rec => {
-    out += `<div><strong>${rec.action.toUpperCase()}</strong> — ${new Date(rec.date).toLocaleString()}</div>`;
-  });
-
-  recentDiv.innerHTML = out;
-}
-
-/* Update status text */
-function updateStatus() {
-  const arr = read(ATT_KEY);
-  const today = new Date().toISOString().split("T")[0];
-  const todays = arr.filter(a => a.date.startsWith(today) && a.employeeIndex === teacherIndex);
-
-  const last = todays[todays.length - 1];
-
-  if (!last) {
-    document.getElementById("attStatus").textContent = "You have not clocked in today.";
-    return;
-  }
-
-  document.getElementById("attStatus").textContent =
-    last.action === "in"
-      ? `Clocked IN at ${new Date(last.date).toLocaleTimeString()}`
-      : `Clocked OUT at ${new Date(last.date).toLocaleTimeString()}`;
-}
-/* Run on page load */
+/* Run on load */
 updateStatus();
 loadRecentAttendance();
 
