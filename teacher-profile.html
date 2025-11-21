@@ -1,105 +1,186 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Edit Profile — Teacher</title>
-  <link href="teacher-dashboard.css" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Profile — Flawless Graphics</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+body{
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background:#f5f7fb;
+}
+.topbar{
+    background:#0b63a3;
+    color:#fff;
+    padding:14px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+.topbar h2{ margin:0; font-size:20px; font-weight:600 }
+.container{
+    max-width:900px;
+    margin:20px auto;
+    padding:12px;
+}
+.card{
+    background:#fff;
+    padding:20px;
+    border-radius:14px;
+    margin-bottom:20px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.08);
+}
+h3{ margin-top:0; font-weight:600 }
+.row{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+}
+.info-box{
+    flex:1;
+    min-width:260px;
+    background:#eef5ff;
+    padding:16px;
+    border-radius:12px;
+}
+.label{ font-size:13px; color:#666 }
+.value{ font-size:16px; font-weight:600; margin-top:3px }
+.btn{
+    padding:10px 14px;
+    background:#0b63a3;
+    color:#fff;
+    border:0;
+    border-radius:8px;
+    cursor:pointer;
+}
+.btn.red{ background:#c62828 }
+.center{ text-align:center }
+.small{ font-size:13px; color:#666; margin-top:6px }
+</style>
 </head>
+
 <body>
-  <header class="header">
-    <div class="brand"><div class="logo">FG</div><div><h1>Profile</h1><div class="small">Edit your info</div></div></div>
-    <div class="controls"><button class="btn" onclick="window.location.href='teacher-dashboard.html'">Back</button></div>
-  </header>
 
-  <div class="container">
-    <div class="card">
-      <h3>Profile</h3>
-      <div style="display:flex;gap:12px;align-items:center">
-        <img id="pfPhoto" src="assets/teacher-default.png" class="file-preview" alt="photo">
-        <div style="flex:1">
-          <input id="pfName" class="input" placeholder="Full name">
-          <input id="pfEmail" class="input" placeholder="Email">
-          <input id="pfPhone" class="input" placeholder="Phone">
-          <input id="pfSubject" class="input" placeholder="Subject">
-          <input id="pfPhotoFile" type="file" accept="image/*">
-          <div style="margin-top:8px">
-            <button id="saveProfile" class="btn primary">Save</button>
-            <button id="changePw" class="btn">Change Password</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>Security</h3>
-      <p class="small">Change password (teacher account)</p>
-      <input id="oldPw" class="input" type="password" placeholder="Old password">
-      <input id="newPw" class="input" type="password" placeholder="New password">
-      <button id="doChangePw" class="btn primary">Update Password</button>
-    </div>
-  </div>
 <script>
-const teacher = JSON.parse(localStorage.getItem("active_teacher"));
+// ---------------- SESSION PROTECTION ----------------
+const teacher = JSON.parse(localStorage.getItem("teacher_active_user"));
 if (!teacher) {
-    window.location.href = "teacher.html";
+    window.location.href = "teacher-login.html";
 }
 </script>
 
-  <script>
-    // simple profile logic (uses same org teacher list and teacher_accounts)
-    function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
-    function read(k){ return safeParse(localStorage.getItem(k)) || [] }
-    function save(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
+<div class="topbar">
+    <h2>Teacher Dashboard</h2>
+    <button class="btn red" onclick="logout()">Logout</button>
+</div>
 
-    const ACTIVE_ORG = (localStorage.getItem('active_org') || '').trim();
-    if(!ACTIVE_ORG) { window.location.href='index.html'; }
-    const TEACH_KEY = `${ACTIVE_ORG}_teachers`;
-    const ACC_KEY = `${ACTIVE_ORG}_teacher_accounts`;
-    const session = safeParse(localStorage.getItem('teacher_active_user') || '{}');
-    if(!session || !session.email) window.location.href='teacher-login.html';
+<div class="container">
 
-    // load profile
+    <!-- PROFILE CARD -->
+    <div class="card">
+        <h3>Your Profile</h3>
+        <div class="row">
+            <div class="info-box">
+                <div class="label">Full Name</div>
+                <div class="value" id="nameBox">Loading...</div>
+            </div>
+
+            <div class="info-box">
+                <div class="label">Email</div>
+                <div class="value" id="emailBox">Loading...</div>
+            </div>
+
+            <div class="info-box">
+                <div class="label">Organization</div>
+                <div class="value" id="orgBox">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLASSES CARD -->
+    <div class="card">
+        <h3>Your Assigned Classes</h3>
+        <div id="classesList" class="small">Loading...</div>
+    </div>
+
+    <!-- ATTENDANCE SUMMARY -->
+    <div class="card">
+        <h3>Attendance Summary</h3>
+        <div id="attendanceSummary" class="small">Loading...</div>
+    </div>
+
+    <!-- BACK TO TEACHER MENU -->
+    <div class="center">
+        <button class="btn" onclick="window.location.href='teacher.html'">Return to Teacher Management</button>
+    </div>
+
+</div>
+
+<script>
+/* UTILS */
+function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
+function read(k){ return safeParse(localStorage.getItem(k)) || [] }
+
+const ACTIVE_ORG = teacher.org || localStorage.getItem("active_org") || "default_org";
+const TEACH_KEY  = `${ACTIVE_ORG}_teachers`;
+const ATT_KEY    = `${ACTIVE_ORG}_teacher_attendance`;
+
+/* LOAD PROFILE DATA */
+document.getElementById("nameBox").textContent  = teacher.name;
+document.getElementById("emailBox").textContent = teacher.email;
+document.getElementById("orgBox").textContent   = ACTIVE_ORG;
+
+/* LOAD CLASSES */
+function loadClasses(){
     const teachers = read(TEACH_KEY);
-    const idx = teachers.findIndex(t=> t.email === session.email);
-    const teacher = teachers[idx] || {};
+    const obj = teachers.find(t => t.email === teacher.email);
 
-    document.getElementById('pfName').value = teacher.fullName || '';
-    document.getElementById('pfEmail').value = teacher.email || '';
-    document.getElementById('pfPhone').value = teacher.phone || '';
-    document.getElementById('pfSubject').value = teacher.subject || '';
-    document.getElementById('pfPhoto').src = teacher.photo || 'assets/teacher-default.png';
+    if (!obj){
+        document.getElementById("classesList").textContent = "No class data found.";
+        return;
+    }
 
-    document.getElementById('pfPhotoFile').addEventListener('change', (e)=>{
-      const f = e.target.files[0]; if(!f) return;
-      const r = new FileReader(); r.onload = ()=> document.getElementById('pfPhoto').src = r.result; r.readAsDataURL(f);
-    });
+    const classes = obj.classes || [];
+    document.getElementById("classesList").innerHTML =
+        classes.length ? classes.join(", ") : "No assigned classes.";
+}
 
-    document.getElementById('saveProfile').addEventListener('click', ()=>{
-      const name = document.getElementById('pfName').value.trim();
-      const email = document.getElementById('pfEmail').value.trim().toLowerCase();
-      const phone = document.getElementById('pfPhone').value.trim();
-      const subject = document.getElementById('pfSubject').value.trim();
-      const photo = document.getElementById('pfPhoto').src;
-      if(idx >= 0){ teachers[idx] = { ...teachers[idx], fullName:name, email, phone, subject, photo }; save(TEACH_KEY, teachers); alert('Saved'); localStorage.setItem('teacher_active_user', JSON.stringify({ email, name })); }
-      else alert('Profile not found');
-    });
+/* LOAD ATTENDANCE SUMMARY */
+function loadAttendance(){
+    const list = read(ATT_KEY);
+    const teacherIndex = read(TEACH_KEY).findIndex(t => t.email === teacher.email);
+    if (teacherIndex === -1){
+        document.getElementById("attendanceSummary").textContent = "Attendance not available.";
+        return;
+    }
 
-    document.getElementById('doChangePw').addEventListener('click', async ()=>{
-      const oldPw = document.getElementById('oldPw').value;
-      const newPw = document.getElementById('newPw').value;
-      if(!oldPw || !newPw) return alert('Fill fields');
-      // find account
-      const accts = read(ACC_KEY);
-      const accIdx = accts.findIndex(a=> a.email === session.email);
-      if(accIdx === -1) return alert('Account missing');
-      // hash compare
-      async function sha(t){ try{ const enc = new TextEncoder(); const buf = enc.encode(t); const h = await crypto.subtle.digest('SHA-256', buf); return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join(''); }catch(e){return t;} }
-      const oldHash = await sha(oldPw);
-      if(oldHash !== accts[accIdx].passwordHash) return alert('Old password incorrect');
-      accts[accIdx].passwordHash = await sha(newPw);
-      save(ACC_KEY, accts); alert('Password changed');
-    });
-  </script>
+    const entries = list.filter(a => a.employeeIndex === teacherIndex);
+    if (!entries.length){
+        document.getElementById("attendanceSummary").textContent = "No attendance recorded.";
+        return;
+    }
+
+    let days = new Set(entries.map(e => e.date.split("T")[0]));
+    document.getElementById("attendanceSummary").innerHTML = `
+        Total recorded days: <strong>${days.size}</strong><br>
+        Total actions (in/out): <strong>${entries.length}</strong>
+    `;
+}
+
+/* LOGOUT FUNCTION */
+function logout(){
+    localStorage.removeItem("teacher_active_user");
+    window.location.href = "teacher-login.html";
+}
+
+/* INITIAL LOAD */
+loadClasses();
+loadAttendance();
+</script>
+
 </body>
 </html>
