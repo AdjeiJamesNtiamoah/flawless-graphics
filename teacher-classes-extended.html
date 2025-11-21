@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Classes & Students — Flawless Graphics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:Poppins,Arial;background:#f2f6fb;margin:0;padding:18px}
+    .card{background:#fff;padding:16px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.06);margin-bottom:12px}
+    .row{display:flex;gap:10px;align-items:center}
+    .input{padding:8px;border-radius:8px;border:1px solid #e8eef8}
+    button{padding:8px 12px;border-radius:8px;border:0;background:#0b63a3;color:#fff;cursor:pointer}
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h3>Add Student</h3>
+  <div class="row">
+    <input id="s_first" class="input" placeholder="First name">
+    <input id="s_last" class="input" placeholder="Last name">
+    <input id="s_class" class="input" placeholder="Class e.g. JSS1">
+    <input id="s_roll" class="input" placeholder="Roll #">
+    <button id="saveStudentBtn">Save</button>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Students</h3>
+  <div id="studentsContainer"></div>
+  <div style="margin-top:8px"><button id="exportCsvBtn">Export CSV</button></div>
+</div>
+
+<div class="card">
+  <h3>Quick Attendance</h3>
+  <select id="attClassSelect" class="input"></select>
+  <div id="classStudentsList" style="margin-top:8px"></div>
+</div>
+
+<script src="teacher-extended.js"></script>
+<script>
+  // require session
+  const teacher = JSON.parse(localStorage.getItem('teacher_active_user')||'{}');
+  if(!teacher || !teacher.email) location.href='teacher-login.html';
+
+  function refreshStudents(){
+    renderStudentsTable('studentsContainer');
+    // populate class select
+    const classes = getClasses();
+    const sel = document.getElementById('attClassSelect'); sel.innerHTML = '<option value="">-- select class --</option>';
+    classes.forEach(c=> sel.appendChild(Object.assign(document.createElement('option'), { value:c.id, textContent:c.name||c.label||c.className })));
+  }
+
+  document.getElementById('saveStudentBtn').addEventListener('click', ()=>{
+    const s = { firstName: document.getElementById('s_first').value.trim(), lastName: document.getElementById('s_last').value.trim(), class: document.getElementById('s_class').value.trim(), roll: document.getElementById('s_roll').value.trim()};
+    if(!s.firstName) return alert('Provide name');
+    addStudent(s); refreshStudents();
+    document.getElementById('s_first').value=''; document.getElementById('s_last').value=''; document.getElementById('s_class').value=''; document.getElementById('s_roll').value='';
+  });
+
+  document.getElementById('exportCsvBtn').addEventListener('click', ()=> exportStudentsCSV());
+
+  document.getElementById('attClassSelect').addEventListener('change', (e)=>{
+    const classId = e.target.value;
+    const students = getStudents().filter(s => s.class === (document.getElementById('s_class').value || '') || !classId ? getStudents() : getStudents().filter(st=>st.class==document.getElementById('s_class').value) );
+    // simpler: we will list all students for now for demonstration
+    const list = getStudents().filter(s => !classId || s.class === (document.querySelector('#attClassSelect option:checked')?.textContent || ''));
+    const wrap = document.getElementById('classStudentsList');
+    wrap.innerHTML = list.map(st => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><strong>${st.firstName} ${st.lastName}</strong><button onclick='record("${st.id}")'>Present</button></div>`).join('');
+  });
+
+  window.record = function(id){
+    // simple record present for demonstration: classId empty
+    recordStudentAttendance({ studentId: Number(id), classId: null, status:'present' });
+    alert('Recorded present');
+  };
+
+  // edit handler: listen to global event
+  window.addEventListener('teacher-extended-edit-student', (ev)=>{
+    const s = ev.detail;
+    const first = prompt('First name', s.firstName);
+    if(first === null) return;
+    updateStudent(s.id, { firstName: first });
+    refreshStudents();
+  });
+
+  // initial render
+  refreshStudents();
+</script>
+
+</body>
+</html>
