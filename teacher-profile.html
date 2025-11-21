@@ -220,14 +220,21 @@ function showSection(id) {
 }
 
 /* LOAD PROFILE DATA */
+<script>
 window.onload = function () {
   const data = JSON.parse(localStorage.getItem("active_teacher"));
-  if (!data) return window.location.href = "teacher.html";
+
+  // If no login session → redirect
+  if (!data || !data.email) {
+    return window.location.href = "teacher.html";
+  }
 
   document.getElementById("tName").textContent = data.name;
   document.getElementById("tEmail").textContent = data.email;
   document.getElementById("tOrg").textContent = data.org;
 };
+</script>
+
 
 /* MODULE FUNCTIONS */
 function refreshStudents() {
