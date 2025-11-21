@@ -250,7 +250,7 @@
 
 <!-- tiny toast -->
 <div id="toast" class="toast"></div>
-
+<script>
 /* ------------------------------
    SAFE TEACHER ATTENDANCE SYSTEM
 --------------------------------*/
@@ -341,11 +341,41 @@ function loadRecentAttendance() {
 }
 
 
+/* --- CLOCK IN --- */
+btnIn.addEventListener("click", () => {
+  const arr = read(ATT_KEY);
+  arr.push({
+    employeeIndex: teacherIndex,
+    action: "in",
+    date: new Date().toISOString()
+  });
+  save(ATT_KEY, arr);
+
+  updateStatus();
+  loadRecentAttendance();
+  alert("Clock-in successful!");
+});
+
+/* --- CLOCK OUT --- */
+btnOut.addEventListener("click", () => {
+  const arr = read(ATT_KEY);
+  arr.push({
+    employeeIndex: teacherIndex,
+    action: "out",
+    date: new Date().toISOString()
+  });
+  save(ATT_KEY, arr);
+
+  updateStatus();
+  loadRecentAttendance();
+  alert("Clock-out successful!");
+});
+
 /* Run on load */
 updateStatus();
 loadRecentAttendance();
 
-<script>
+
   /* ------------------------------
    TEACHER ATTENDANCE LOGIC
 --------------------------------*/
