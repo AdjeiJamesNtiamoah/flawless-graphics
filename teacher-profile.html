@@ -1,274 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Teacher Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
+<meta charset="UTF-8">
+<title>Teacher Profile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f6fb;
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
+        margin:0;
+        background:#eef2f7;
+        font-family:Poppins, sans-serif;
     }
-
-    /* SIDEBAR */
-    .sidebar {
-      width: 260px;
-      background: #071833;
-      color: white;
-      padding-top: 20px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    .topbar {
+        background:#003366;
+        color:white;
+        padding:18px;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
     }
-
-    .sidebar h2 {
-      text-align: center;
-      margin-bottom: 30px;
-      font-size: 22px;
-      font-weight: bold;
+    .container {
+        padding:25px;
     }
-
-    .sidebar a {
-      display: block;
-      padding: 14px 22px;
-      color: white;
-      text-decoration: none;
-      font-size: 15px;
-      border-left: 4px solid transparent;
-      transition: 0.3s;
-    }
-
-    .sidebar a:hover, .sidebar a.active {
-      background: #0d2b5c;
-      border-left: 4px solid #00a8ff;
-    }
-
-    /* MAIN CONTENT */
-    .main {
-      flex: 1;
-      padding: 25px;
-      overflow-y: auto;
-    }
-
-    .section {
-      display: none;
-      animation: fadeIn 0.4s ease;
-    }
-
-    .section.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
     .card {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
+        background:white;
+        padding:18px;
+        border-radius:10px;
+        box-shadow:0 0 10px rgba(0,0,0,0.1);
+        margin-bottom:20px;
     }
-
-    .title {
-      font-size: 22px;
-      font-weight: bold;
-      margin-bottom: 15px;
-      color: #071833;
+    h2 { margin:0 0 10px 0; }
+    button {
+        padding:10px 16px;
+        background:#d9534f;
+        border:none;
+        color:white;
+        border-radius:6px;
+        cursor:pointer;
     }
-
-    .btn {
-      padding: 10px 18px;
-      background: #00a8ff;
-      border: none;
-      color: white;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-top: 8px;
-    }
-
-    .btn:hover {
-      background: #0089d6;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-
-    th, td {
-      padding: 12px;
-      border-bottom: 1px solid #ddd;
-      text-align: left;
-    }
-
-    th {
-      background: #071833;
-      color: white;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-  </style>
+    button:hover { background:#c9302c; }
+</style>
 </head>
-
 <body>
 
-<!-- Sidebar -->
-<div class="sidebar">
-  <h2>Teacher Panel</h2>
-  <a href="#" class="active" onclick="showSection('profile')">👤 Profile</a>
-  <a href="#" onclick="showSection('students')">📚 Students</a>
-  <a href="#" onclick="showSection('classes')">🏫 Classes</a>
-  <a href="#" onclick="showSection('attendance')">📝 Attendance</a>
-  <a href="#" onclick="showSection('messages')">💬 Messages</a>
-  <a href="#" onclick="showSection('leave')">📝 Leave Requests</a>
-  <a href="#" onclick="showSection('timetable')">📅 Timetable</a>
-  <a href="site-login.html">🚪 Logout</a>
+<div class="topbar">
+    <div>
+        <h2 id="teacherName">Teacher Dashboard</h2>
+        <p id="teacherEmail"></p>
+    </div>
+    <button onclick="logout()">Logout</button>
 </div>
 
-<!-- Main Content -->
-<div class="main">
+<div class="container">
 
-  <!-- PROFILE -->
-  <div id="profile" class="section active">
     <div class="card">
-      <div class="title">My Profile</div>
-      <p><strong>Name:</strong> <span id="tName"></span></p>
-      <p><strong>Email:</strong> <span id="tEmail"></span></p>
-      <p><strong>Organization:</strong> <span id="tOrg"></span></p>
+        <h3>Welcome <span id="tName"></span> 👋</h3>
+        <p>Email: <span id="tEmail"></span></p>
+        <p>Account Created: <span id="tDate"></span></p>
     </div>
-  </div>
 
-  <!-- STUDENTS -->
-  <div id="students" class="section">
     <div class="card">
-      <div class="title">Student List</div>
-      <button class="btn" onclick="refreshStudents()">Reload Students</button>
-      <table id="studentTable">
-        <thead>
-          <tr><th>Name</th><th>Class</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+        <h3>Your Classrooms</h3>
+        <p>(Classroom module can be added here later.)</p>
     </div>
-  </div>
-
-  <!-- CLASSES -->
-  <div id="classes" class="section">
-    <div class="card">
-      <div class="title">My Classes</div>
-      <button class="btn" onclick="refreshClasses()">Reload Classes</button>
-      <div id="classList"></div>
-    </div>
-  </div>
-
-  <!-- ATTENDANCE -->
-  <div id="attendance" class="section">
-    <div class="card">
-      <div class="title">Quick Attendance</div>
-      <button class="btn" onclick="takeAttendance()">Start Attendance</button>
-      <div id="attendanceResult"></div>
-    </div>
-  </div>
-
-  <!-- MESSAGES -->
-  <div id="messages" class="section">
-    <div class="card">
-      <div class="title">Messages</div>
-      <textarea id="msgText" placeholder="Type message..." style="width:100%;height:100px;"></textarea>
-      <button class="btn" onclick="sendMessage()">Send</button>
-    </div>
-  </div>
-
-  <!-- LEAVE -->
-  <div id="leave" class="section">
-    <div class="card">
-      <div class="title">Leave Requests</div>
-      <button class="btn" onclick="requestLeave()">Request Leave</button>
-      <div id="leaveList"></div>
-    </div>
-  </div>
-
-  <!-- TIMETABLE -->
-  <div id="timetable" class="section">
-    <div class="card">
-      <div class="title">My Timetable</div>
-      <button class="btn" onclick="loadTimetable()">Reload Timetable</button>
-      <div id="timetableBox"></div>
-    </div>
-  </div>
 
 </div>
 
-<script src="teacher-extended.js"></script>
-
 <script>
-/* SECTION SWITCHER */
-function showSection(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+window.onload = () => {
+    const t = JSON.parse(localStorage.getItem("active_teacher"));
 
-  document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-  event.target.classList.add('active');
-}
+    if (!t || !t.email) {
+        return window.location.href = "teacher-login.html";
+    }
 
-/* LOAD PROFILE DATA */
-<script>
-window.onload = function () {
-  const data = JSON.parse(localStorage.getItem("active_teacher"));
+    document.getElementById("teacherName").textContent = t.name;
+    document.getElementById("teacherEmail").textContent = t.email;
 
-  // If no login session → redirect
-  if (!data || !data.email) {
-    return window.location.href = "teacher.html";
-  }
-
-  document.getElementById("tName").textContent = data.name;
-  document.getElementById("tEmail").textContent = data.email;
-  document.getElementById("tOrg").textContent = data.org;
+    document.getElementById("tName").textContent = t.name;
+    document.getElementById("tEmail").textContent = t.email;
+    document.getElementById("tDate").textContent = new Date(t.createdAt).toLocaleString();
 };
-</script>
 
-
-/* MODULE FUNCTIONS */
-function refreshStudents() {
-  const list = getStudents();
-  const tbody = document.querySelector("#studentTable tbody");
-  tbody.innerHTML = "";
-
-  list.forEach(s => {
-    tbody.innerHTML += `<tr><td>${s.name}</td><td>${s.class}</td></tr>`;
-  });
-}
-
-function refreshClasses() {
-  const classes = getClasses();
-  document.getElementById("classList").innerHTML =
-    classes.map(c => `<p>${c}</p>`).join("");
-}
-
-function takeAttendance() {
-  document.getElementById("attendanceResult").innerHTML =
-    "<p>Attendance saved ✔</p>";
-}
-
-function sendMessage() {
-  alert("Message sent!");
-}
-
-function requestLeave() {
-  alert("Leave request submitted!");
-}
-
-function loadTimetable() {
-  document.getElementById("timetableBox").innerHTML =
-    "<p>Monday - Math<br>Tuesday - Science<br>Wednesday - English</p>";
+function logout() {
+    localStorage.removeItem("active_teacher");
+    window.location.href = "teacher-login.html";
 }
 </script>
 
