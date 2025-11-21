@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>Teacher Registration</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
     body {
         margin:0;
@@ -21,14 +22,17 @@
         background:#102a57;
         border-radius:12px;
         box-shadow:0 0 20px rgba(0,0,0,0.4);
+        animation:slideIn .5s ease-out;
     }
+    @keyframes slideIn { from{opacity:0; transform:translateY(25px)} to{opacity:1} }
+
     h2 { text-align:center; margin-bottom:15px; }
+    label { font-size:14px; }
     input {
         width:100%;
         padding:12px;
         border-radius:6px;
         border:none;
-        margin-top:6px;
         margin-bottom:12px;
     }
     button {
@@ -39,13 +43,21 @@
         background:#0095ff;
         color:white;
         font-size:16px;
-        margin-top:5px;
         cursor:pointer;
     }
     button:hover { background:#007cd4; }
     .center { text-align:center; margin-top:10px; }
     a { color:#4ac3ff; }
+    .show-pass{
+        display:block;
+        margin-top:-8px;
+        margin-bottom:10px;
+        cursor:pointer;
+        font-size:13px;
+        color:#cde8ff;
+    }
 </style>
+
 </head>
 <body>
 
@@ -60,6 +72,7 @@
 
     <label>Password</label>
     <input type="password" id="password">
+    <span class="show-pass" onclick="togglePass()">Show Password</span>
 
     <button onclick="registerTeacher()">Register</button>
 
@@ -69,22 +82,36 @@
 <script>
 const TEACHERS_KEY = "teachers";
 
+/* Read list */
 function getTeachers() {
     return JSON.parse(localStorage.getItem(TEACHERS_KEY) || "[]");
 }
 
+/* Hash password */
 async function sha256(txt) {
     const buf = new TextEncoder().encode(txt);
     const hash = await crypto.subtle.digest("SHA-256", buf);
     return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2,"0")).join("");
 }
 
+/* Show/hide password */
+function togglePass(){
+    const p = document.getElementById("password");
+    p.type = p.type === "password" ? "text" : "password";
+}
+
+/* Register teacher */
 async function registerTeacher() {
     const name = document.getElementById("fullName").value.trim();
     const email = document.getElementById("email").value.trim().toLowerCase();
     const pass = document.getElementById("password").value;
 
     if (!name || !email || !pass) return alert("All fields required.");
+
+    if (!email.includes("@") || !email.includes(".")) {
+        return alert("Enter a valid email address.");
+    }
+
     if (pass.length < 6) return alert("Password must be at least 6 characters.");
 
     const list = getTeachers();
@@ -95,18 +122,25 @@ async function registerTeacher() {
 
     const hashed = await sha256(pass);
 
-    list.push({
+    const newTeacher = {
         name,
         email,
         pass: hashed,
         role: "teacher",
         createdAt: Date.now()
-    });
+    };
+
+    list.push(newTeacher);
 
     localStorage.setItem(TEACHERS_KEY, JSON.stringify(list));
 
     alert("Registration successful!");
-    window.location.href = "teacher-login.html";
+
+    // Optional auto-login:
+    localStorage.setItem("active_teacher", JSON.stringify(newTeacher));
+    localStorage.setItem("teacher_active_user", JSON.stringify(newTeacher)); // attendance fix
+
+    window.location.href = "teacher-profile.html";
 }
 </script>
 
