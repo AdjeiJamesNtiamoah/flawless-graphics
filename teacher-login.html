@@ -1,69 +1,96 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Teacher Login — Flawless Graphics</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<title>Teacher Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body{margin:0;font-family:'Poppins',sans-serif;background:#f4f7fb;display:flex;align-items:center;justify-content:center;height:100vh}
-.box{width:360px;background:#fff;padding:22px;border-radius:12px;box-shadow:0 12px 40px rgba(2,6,23,0.06)}
-h2{margin:0 0 8px}
-.input{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef9;margin-top:8px}
-.btn{padding:10px 12px;border-radius:8px;border:0;background:#0b63a3;color:#fff;margin-top:12px;cursor:pointer}
-.link{background:none;border:none;color:#0b63a3;margin-top:10px;cursor:pointer}
-.small{font-size:13px;color:#6b7a89;margin-top:10px}
+    body {
+        margin:0;
+        background:#081a33;
+        font-family:Poppins, sans-serif;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        height:100vh;
+        color:white;
+    }
+    .box {
+        width:360px;
+        padding:25px;
+        background:#102a57;
+        border-radius:12px;
+        box-shadow:0 0 20px rgba(0,0,0,0.4);
+    }
+    h2 { text-align:center; margin-bottom:15px; }
+    input {
+        width:100%;
+        padding:12px;
+        border-radius:6px;
+        border:none;
+        margin-bottom:12px;
+    }
+    button {
+        width:100%;
+        padding:12px;
+        background:#00a8ff;
+        border:none;
+        border-radius:6px;
+        color:white;
+        font-size:16px;
+        cursor:pointer;
+    }
+    button:hover { background:#008dd8; }
+    .center { text-align:center; margin-top:10px; }
+    a { color:#4ac3ff; }
 </style>
 </head>
 <body>
+
 <div class="box">
-  <h2>Teacher Login</h2>
-  <input id="email" class="input" placeholder="teacher@example.com" />
-  <input id="password" class="input" type="password" placeholder="Password" />
-  <div>
-    <button class="btn" id="loginBtn">Sign in</button>
-  </div>
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-    <button class="link" id="backBtn">Back</button>
-    <button class="link" id="forgotBtn">Forgot?</button>
-  </div>
-  <div class="small">Teacher accounts are created when adding a teacher and setting a password in the teacher form.</div>
+    <h2>Teacher Login</h2>
+
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+
+    <button onclick="teacherLogin()">Login</button>
+
+    <div class="center">No account? <a href="teacher.html">Register</a></div>
 </div>
 
 <script>
-const TEACHER_KEY = "teachers";
+const TEACHERS_KEY = "teachers";
 
-function readTeachers() {
-  return JSON.parse(localStorage.getItem(TEACHER_KEY) || "[]");
+function getTeachers() {
+    return JSON.parse(localStorage.getItem(TEACHERS_KEY) || "[]");
 }
 
-async function sha256(text) {
-  const data = new TextEncoder().encode(text);
-  const hash = await crypto.subtle.digest("SHA-256", data);
-  return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,"0")).join("");
+async function sha256(txt) {
+    const buf = new TextEncoder().encode(txt);
+    const hash = await crypto.subtle.digest("SHA-256", buf);
+    return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2,"0")).join("");
 }
 
 async function teacherLogin() {
-  const email = document.getElementById("email").value.trim().toLowerCase();
-  const pw = document.getElementById("password").value;
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    const pass = document.getElementById("password").value;
 
-  if (!email || !pw) return alert("Enter login details");
+    if (!email || !pass) return alert("Enter login details");
 
-  const teachers = readTeachers();
-  const hashed = await sha256(pw);
+    const list = getTeachers();
+    const hashed = await sha256(pass);
 
-  const teacher = teachers.find(t =>
-    t.email === email &&
-    t.pass === hashed &&
-    t.role === "teacher"
-  );
+    const teacher = list.find(t =>
+        t.email === email &&
+        t.pass === hashed &&
+        t.role === "teacher"
+    );
 
-  if (!teacher) return alert("Incorrect email or password");
+    if (!teacher) return alert("Incorrect email or password");
 
-  // SAVE CORRECT SESSION KEY
-  localStorage.setItem("active_teacher", JSON.stringify(teacher));
+    localStorage.setItem("active_teacher", JSON.stringify(teacher));
 
-  window.location.href = "teacher-profile.html";
+    window.location.href = "teacher-profile.html";
 }
 </script>
 
