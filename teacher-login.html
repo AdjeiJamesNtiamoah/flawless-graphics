@@ -31,49 +31,41 @@ h2{margin:0 0 8px}
 </div>
 
 <script>
-function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
-const ACTIVE_ORG = (localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || 'default_org').trim();
-const TEACH_ACCTS = `${ACTIVE_ORG}_teacher_accounts`;
-function read(k){ return safeParse(localStorage.getItem(k)) || [] }
+const TEACHER_KEY = "teachers";
 
-async function verify(email, password){
-  const accts = read(TEACH_ACCTS);
-  const user = accts.find(a=>a.email === email.toLowerCase());
-  if(!user) return { ok:false, msg:'Account not found' };
-  // hash password and compare
-  const hashed = await (async (t)=>{ try{ const enc=new TextEncoder(); const buf=enc.encode(t); const h=await crypto.subtle.digest('SHA-256',buf); return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join(''); }catch(e){ return t; } })(password);
-  if(user.passwordHash !== hashed) return { ok:false, msg:'Incorrect password' };
-  return { ok:true, user };
+function readTeachers() {
+  return JSON.parse(localStorage.getItem(TEACHER_KEY) || "[]");
 }
 
-document.getElementById('loginBtn').addEventListener('click', async ()=>{
-  const email = document.getElementById('email').value.trim().toLowerCase();
-  const pw = document.getElementById('password').value;
-  if(!email || !pw){ alert('Enter email & password'); return; }
-  const res = await verify(email,pw);
-  if(!res.ok){ alert(res.msg); return; }
-  // set teacher active session
-  localStorage.setItem('teacher_active_user', JSON.stringify({ email:res.user.email, name:res.user.name || res.user.email, org: ACTIVE_ORG, loggedAt: Date.now() }));
-  // redirect to teacher profile page (teacher-profile.html)
-  window.location.href = 'teacher-profile.html';
-});
+async function sha256(text) {
+  const data = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest("SHA-256", data);
+  return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,"0")).join("");
+}
 
-document.getElementById('backBtn').addEventListener('click', ()=> { window.location.href = 'index.html'; });
-document.getElementById('forgotBtn').addEventListener('click', ()=> {
-  const email = prompt('Enter your registered teacher email:');
-  if(!email) return;
-  const accts = read(TEACH_ACCTS); const idx = accts.findIndex(a=>a.email === email.toLowerCase());
-  if(idx === -1) return alert('Account not found');
-  // generate code and show (offline flow)
-  const code = (Math.floor(100000 + Math.random()*900000)).toString();
-  accts[idx].resetCode = code; accts[idx].resetExpires = Date.now() + 600000; localStorage.setItem(TEACH_ACCTS, JSON.stringify(accts));
-  alert('Reset code: ' + code + '\nUse it to reset your password.');
-  const entered = prompt('Enter code:');
-  if(entered !== code) return alert('Invalid code');
-  const npw = prompt('Enter new password (min 6 chars):');
-  if(!npw || npw.length < 6) return alert('Invalid password');
-  (async ()=>{ const enc=new TextEncoder(); const buf=enc.encode(npw); const h=await crypto.subtle.digest('SHA-256',buf); accts[idx].passwordHash = Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join(''); delete accts[idx].resetCode; delete accts[idx].resetExpires; localStorage.setItem(TEACH_ACCTS, JSON.stringify(accts)); alert('Password reset'); })();
-});
+async function teacherLogin() {
+  const email = document.getElementById("email").value.trim().toLowerCase();
+  const pw = document.getElementById("password").value;
+
+  if (!email || !pw) return alert("Enter login details");
+
+  const teachers = readTeachers();
+  const hashed = await sha256(pw);
+
+  const teacher = teachers.find(t =>
+    t.email === email &&
+    t.pass === hashed &&
+    t.role === "teacher"
+  );
+
+  if (!teacher) return alert("Incorrect email or password");
+
+  // SAVE CORRECT SESSION KEY
+  localStorage.setItem("active_teacher", JSON.stringify(teacher));
+
+  window.location.href = "teacher-profile.html";
+}
 </script>
+
 </body>
 </html>
