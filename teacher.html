@@ -204,6 +204,50 @@ body{margin:0;font-family:'Poppins',sans-serif;background:var(--bg);transition:b
 </div>
 
 <script>
+
+const USERS_KEY = "organizations_users";
+
+function readUsers() {
+  return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+}
+
+async function sha256(text) {
+  const buf = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest("SHA-256", buf);
+  return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2,"0")).join("");
+}
+
+async function teacherLogin() {
+  const email = document.getElementById("email").value.trim().toLowerCase();
+  const pw = document.getElementById("password").value;
+
+  if (!email || !pw) {
+    alert("Enter email and password");
+    return;
+  }
+
+  const users = readUsers();
+  const hashedPw = await sha256(pw);
+
+  // only match teachers
+  const teacher = users.find(u =>
+    u.email === email &&
+    u.pass === hashedPw &&
+    u.role === "teacher"
+  );
+
+  if (!teacher) {
+    alert("Incorrect teacher email or password");
+    return;
+  }
+
+  // SAVE teacher session
+  localStorage.setItem("active_teacher", JSON.stringify(teacher));
+
+  alert("Login successful!");
+  window.location.href = "teacher-profile.html";
+}
+
 /* ---------- Utilities & Keys ---------- */
 function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
 const ACTIVE_ORG = (localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || 'default_org').trim();
