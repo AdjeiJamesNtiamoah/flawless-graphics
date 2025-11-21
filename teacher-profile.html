@@ -620,8 +620,6 @@ window.addEventListener('storage', ()=> { renderClasses(); populateClassSelects(
    SAFE TEACHER ATTENDANCE SYSTEM
 --------------------------------*/
 
-function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
-
 
 /* --- Get Active Teacher --- */
 const activeTeacher = safeParse(localStorage.getItem('teacher_active_user'));
