@@ -21,7 +21,10 @@
         background:#102a57;
         border-radius:12px;
         box-shadow:0 0 20px rgba(0,0,0,0.4);
+        animation:fadeIn .5s ease-out;
     }
+    @keyframes fadeIn { from{opacity:0; transform:translateY(20px)} to{opacity:1} }
+
     h2 { text-align:center; margin-bottom:15px; }
     input {
         width:100%;
@@ -41,8 +44,18 @@
         cursor:pointer;
     }
     button:hover { background:#008dd8; }
+
     .center { text-align:center; margin-top:10px; }
     a { color:#4ac3ff; }
+
+    .show-pass {
+        cursor:pointer;
+        font-size:13px;
+        color:#cde8ff;
+        margin-top:-8px;
+        margin-bottom:10px;
+        display:block;
+    }
 </style>
 </head>
 <body>
@@ -51,7 +64,13 @@
     <h2>Teacher Login</h2>
 
     <input type="email" id="email" placeholder="Email">
+
     <input type="password" id="password" placeholder="Password">
+    <span class="show-pass" onclick="togglePass()">Show Password</span>
+
+    <label style="font-size:13px">
+        <input type="checkbox" id="rememberMe"> Remember me
+    </label>
 
     <button onclick="teacherLogin()">Login</button>
 
@@ -61,16 +80,25 @@
 <script>
 const TEACHERS_KEY = "teachers";
 
+/* Load teachers list */
 function getTeachers() {
     return JSON.parse(localStorage.getItem(TEACHERS_KEY) || "[]");
 }
 
+/* Hash password */
 async function sha256(txt) {
     const buf = new TextEncoder().encode(txt);
     const hash = await crypto.subtle.digest("SHA-256", buf);
     return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2,"0")).join("");
 }
 
+/* Show/hide password */
+function togglePass() {
+    const p = document.getElementById("password");
+    p.type = p.type === "password" ? "text" : "password";
+}
+
+/* Login */
 async function teacherLogin() {
     const email = document.getElementById("email").value.trim().toLowerCase();
     const pass = document.getElementById("password").value;
@@ -88,10 +116,24 @@ async function teacherLogin() {
 
     if (!teacher) return alert("Incorrect email or password");
 
+    /* THE CORRECTION — SAVE BOTH KEYS */
     localStorage.setItem("active_teacher", JSON.stringify(teacher));
+    localStorage.setItem("teacher_active_user", JSON.stringify(teacher)); // <— Attendance fix
+
+    if (document.getElementById("rememberMe").checked) {
+        localStorage.setItem("remember_teacher_email", email);
+    } else {
+        localStorage.removeItem("remember_teacher_email");
+    }
 
     window.location.href = "teacher-profile.html";
 }
+
+/* Pre-fill remembered email */
+window.onload = () => {
+    const saved = localStorage.getItem("remember_teacher_email");
+    if (saved) document.getElementById("email").value = saved;
+};
 </script>
 
 </body>
