@@ -39,6 +39,12 @@
       <button id="doChangePw" class="btn primary">Update Password</button>
     </div>
   </div>
+<script>
+const teacher = JSON.parse(localStorage.getItem("active_teacher"));
+if (!teacher) {
+    window.location.href = "teacher.html";
+}
+</script>
 
   <script>
     // simple profile logic (uses same org teacher list and teacher_accounts)
