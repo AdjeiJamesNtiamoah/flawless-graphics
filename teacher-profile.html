@@ -419,6 +419,7 @@ function deleteStudent(classId, studentId){
 /* -------------------------
   Attendance
 ------------------------- */
+    const TEACH_KEY = "teachers_list"; // or whatever key your teacher-login uses
 function recordAttendance(classId, dateStr, attendanceMap){
   // attendanceMap: { studentId: 'present'|'absent' }
   const arr = read(ATT_KEY);
@@ -622,11 +623,23 @@ window.addEventListener('storage', ()=> { renderClasses(); populateClassSelects(
 
 
 /* --- Get Active Teacher --- */
-const activeTeacher = safeParse(localStorage.getItem('teacher_active_user'));
+/* FIXED — unified login storage */
+const activeTeacher =
+  safeParse(localStorage.getItem('active_teacher')) ||
+  safeParse(localStorage.getItem('teacher_active_user')) ||
+  safeParse(localStorage.getItem('active_user')) ||
+  teacher; // fallback from earlier session loader
 
-if (!activeTeacher) {
+if (!activeTeacher || !activeTeacher.email) {
   alert("Session expired. Please log in again.");
   window.location.href = "teacher-login.html";
+  throw new Error("Teacher session missing");
+}
+
+// use the SAME teacher object for whole page
+teacher = activeTeacher;
+const teacherEmail = teacher.email;
+
 }
 
 const teacherEmail = activeTeacher.email;
