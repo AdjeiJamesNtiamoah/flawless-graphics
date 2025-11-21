@@ -96,6 +96,19 @@
   <!-- MAIN -->
   <main class="main">
     <div class="top">
+      <!-- Attendance Box -->
+<div class="card" style="margin-top:20px">
+  <h3>Attendance</h3>
+  <p id="attStatus" class="small">Loading attendance...</p>
+
+  <button class="btn prim" id="clockInBtn">Clock In</button>
+  <button class="btn" id="clockOutBtn">Clock Out</button>
+
+  <div id="recentAtt" class="small" style="margin-top:10px; max-height:160px; overflow:auto;">
+    Loading recent records...
+  </div>
+</div>
+
       <div>
         <h1 id="pageTitle" style="margin:0">Overview</h1>
         <div class="tiny">Welcome back</div>
