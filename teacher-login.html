@@ -24,7 +24,6 @@
         animation:fadeIn .5s ease-out;
     }
     @keyframes fadeIn { from{opacity:0; transform:translateY(20px)} to{opacity:1} }
-
     h2 { text-align:center; margin-bottom:15px; }
     input {
         width:100%;
@@ -44,10 +43,8 @@
         cursor:pointer;
     }
     button:hover { background:#008dd8; }
-
     .center { text-align:center; margin-top:10px; }
     a { color:#4ac3ff; }
-
     .show-pass {
         cursor:pointer;
         font-size:13px;
@@ -80,33 +77,29 @@
 <script>
 const TEACHERS_KEY = "teachers";
 
-/* Load teachers list */
 function getTeachers() {
     return JSON.parse(localStorage.getItem(TEACHERS_KEY) || "[]");
 }
 
-/* Hash password */
-async function sha256(txt) {
-    const buf = new TextEncoder().encode(txt);
-    const hash = await crypto.subtle.digest("SHA-256", buf);
-    return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2,"0")).join("");
+async function sha256(text) {
+    const data = new TextEncoder().encode(text);
+    const hash = await crypto.subtle.digest("SHA-256", data);
+    return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
-/* Show/hide password */
 function togglePass() {
     const p = document.getElementById("password");
     p.type = p.type === "password" ? "text" : "password";
 }
 
-/* Login */
 async function teacherLogin() {
     const email = document.getElementById("email").value.trim().toLowerCase();
-    const pass = document.getElementById("password").value;
+    const pw = document.getElementById("password").value;
 
-    if (!email || !pass) return alert("Enter login details");
+    if (!email || !pw) return alert("Enter login details");
 
     const list = getTeachers();
-    const hashed = await sha256(pass);
+    const hashed = await sha256(pw);
 
     const teacher = list.find(t =>
         t.email === email &&
@@ -116,20 +109,17 @@ async function teacherLogin() {
 
     if (!teacher) return alert("Incorrect email or password");
 
-    /* THE CORRECTION — SAVE BOTH KEYS */
+    // unified session key
     localStorage.setItem("active_teacher", JSON.stringify(teacher));
-    localStorage.setItem("teacher_active_user", JSON.stringify(teacher)); // <— Attendance fix
 
-    if (document.getElementById("rememberMe").checked) {
+    if (document.getElementById("rememberMe").checked)
         localStorage.setItem("remember_teacher_email", email);
-    } else {
+    else
         localStorage.removeItem("remember_teacher_email");
-    }
 
     window.location.href = "teacher-profile.html";
 }
 
-/* Pre-fill remembered email */
 window.onload = () => {
     const saved = localStorage.getItem("remember_teacher_email");
     if (saved) document.getElementById("email").value = saved;
