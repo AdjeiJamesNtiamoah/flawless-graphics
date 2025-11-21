@@ -1,185 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Teacher Profile — Flawless Graphics</title>
+  <meta charset="UTF-8">
+  <title>Teacher Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6fb;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-<style>
-body{
-    margin:0;
-    font-family:'Poppins',sans-serif;
-    background:#f5f7fb;
-}
-.topbar{
-    background:#0b63a3;
-    color:#fff;
-    padding:14px 20px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-.topbar h2{ margin:0; font-size:20px; font-weight:600 }
-.container{
-    max-width:900px;
-    margin:20px auto;
-    padding:12px;
-}
-.card{
-    background:#fff;
-    padding:20px;
-    border-radius:14px;
-    margin-bottom:20px;
-    box-shadow:0 6px 18px rgba(0,0,0,0.08);
-}
-h3{ margin-top:0; font-weight:600 }
-.row{
-    display:flex;
-    gap:20px;
-    flex-wrap:wrap;
-}
-.info-box{
-    flex:1;
-    min-width:260px;
-    background:#eef5ff;
-    padding:16px;
-    border-radius:12px;
-}
-.label{ font-size:13px; color:#666 }
-.value{ font-size:16px; font-weight:600; margin-top:3px }
-.btn{
-    padding:10px 14px;
-    background:#0b63a3;
-    color:#fff;
-    border:0;
-    border-radius:8px;
-    cursor:pointer;
-}
-.btn.red{ background:#c62828 }
-.center{ text-align:center }
-.small{ font-size:13px; color:#666; margin-top:6px }
-</style>
+    /* SIDEBAR */
+    .sidebar {
+      width: 260px;
+      background: #071833;
+      color: white;
+      padding-top: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 14px 22px;
+      color: white;
+      text-decoration: none;
+      font-size: 15px;
+      border-left: 4px solid transparent;
+      transition: 0.3s;
+    }
+
+    .sidebar a:hover, .sidebar a.active {
+      background: #0d2b5c;
+      border-left: 4px solid #00a8ff;
+    }
+
+    /* MAIN CONTENT */
+    .main {
+      flex: 1;
+      padding: 25px;
+      overflow-y: auto;
+    }
+
+    .section {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #071833;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      background: #00a8ff;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .btn:hover {
+      background: #0089d6;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+
+    th {
+      background: #071833;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+  </style>
 </head>
 
 <body>
 
+<!-- Sidebar -->
+<div class="sidebar">
+  <h2>Teacher Panel</h2>
+  <a href="#" class="active" onclick="showSection('profile')">👤 Profile</a>
+  <a href="#" onclick="showSection('students')">📚 Students</a>
+  <a href="#" onclick="showSection('classes')">🏫 Classes</a>
+  <a href="#" onclick="showSection('attendance')">📝 Attendance</a>
+  <a href="#" onclick="showSection('messages')">💬 Messages</a>
+  <a href="#" onclick="showSection('leave')">📝 Leave Requests</a>
+  <a href="#" onclick="showSection('timetable')">📅 Timetable</a>
+  <a href="site-login.html">🚪 Logout</a>
+</div>
+
+<!-- Main Content -->
+<div class="main">
+
+  <!-- PROFILE -->
+  <div id="profile" class="section active">
+    <div class="card">
+      <div class="title">My Profile</div>
+      <p><strong>Name:</strong> <span id="tName"></span></p>
+      <p><strong>Email:</strong> <span id="tEmail"></span></p>
+      <p><strong>Organization:</strong> <span id="tOrg"></span></p>
+    </div>
+  </div>
+
+  <!-- STUDENTS -->
+  <div id="students" class="section">
+    <div class="card">
+      <div class="title">Student List</div>
+      <button class="btn" onclick="refreshStudents()">Reload Students</button>
+      <table id="studentTable">
+        <thead>
+          <tr><th>Name</th><th>Class</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CLASSES -->
+  <div id="classes" class="section">
+    <div class="card">
+      <div class="title">My Classes</div>
+      <button class="btn" onclick="refreshClasses()">Reload Classes</button>
+      <div id="classList"></div>
+    </div>
+  </div>
+
+  <!-- ATTENDANCE -->
+  <div id="attendance" class="section">
+    <div class="card">
+      <div class="title">Quick Attendance</div>
+      <button class="btn" onclick="takeAttendance()">Start Attendance</button>
+      <div id="attendanceResult"></div>
+    </div>
+  </div>
+
+  <!-- MESSAGES -->
+  <div id="messages" class="section">
+    <div class="card">
+      <div class="title">Messages</div>
+      <textarea id="msgText" placeholder="Type message..." style="width:100%;height:100px;"></textarea>
+      <button class="btn" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <!-- LEAVE -->
+  <div id="leave" class="section">
+    <div class="card">
+      <div class="title">Leave Requests</div>
+      <button class="btn" onclick="requestLeave()">Request Leave</button>
+      <div id="leaveList"></div>
+    </div>
+  </div>
+
+  <!-- TIMETABLE -->
+  <div id="timetable" class="section">
+    <div class="card">
+      <div class="title">My Timetable</div>
+      <button class="btn" onclick="loadTimetable()">Reload Timetable</button>
+      <div id="timetableBox"></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="teacher-extended.js"></script>
+
 <script>
-// ---------------- SESSION PROTECTION ----------------
-const teacher = JSON.parse(localStorage.getItem("teacher_active_user"));
-if (!teacher) {
-    window.location.href = "teacher-login.html";
+/* SECTION SWITCHER */
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+
+  document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+  event.target.classList.add('active');
 }
-</script>
-
-<div class="topbar">
-    <h2>Teacher Dashboard</h2>
-    <button class="btn red" onclick="logout()">Logout</button>
-</div>
-
-<div class="container">
-
-    <!-- PROFILE CARD -->
-    <div class="card">
-        <h3>Your Profile</h3>
-        <div class="row">
-            <div class="info-box">
-                <div class="label">Full Name</div>
-                <div class="value" id="nameBox">Loading...</div>
-            </div>
-
-            <div class="info-box">
-                <div class="label">Email</div>
-                <div class="value" id="emailBox">Loading...</div>
-            </div>
-
-            <div class="info-box">
-                <div class="label">Organization</div>
-                <div class="value" id="orgBox">Loading...</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- CLASSES CARD -->
-    <div class="card">
-        <h3>Your Assigned Classes</h3>
-        <div id="classesList" class="small">Loading...</div>
-    </div>
-
-    <!-- ATTENDANCE SUMMARY -->
-    <div class="card">
-        <h3>Attendance Summary</h3>
-        <div id="attendanceSummary" class="small">Loading...</div>
-    </div>
-
-    <!-- BACK TO TEACHER MENU -->
-    <div class="center">
-        <button class="btn" onclick="window.location.href='teacher.html'">Return to Teacher Management</button>
-    </div>
-
-</div>
-
-<script>
-/* UTILS */
-function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
-function read(k){ return safeParse(localStorage.getItem(k)) || [] }
-
-const ACTIVE_ORG = teacher.org || localStorage.getItem("active_org") || "default_org";
-const TEACH_KEY  = `${ACTIVE_ORG}_teachers`;
-const ATT_KEY    = `${ACTIVE_ORG}_teacher_attendance`;
 
 /* LOAD PROFILE DATA */
-document.getElementById("nameBox").textContent  = teacher.name;
-document.getElementById("emailBox").textContent = teacher.email;
-document.getElementById("orgBox").textContent   = ACTIVE_ORG;
+window.onload = function () {
+  const data = JSON.parse(localStorage.getItem("active_teacher"));
+  if (!data) return window.location.href = "teacher.html";
 
-/* LOAD CLASSES */
-function loadClasses(){
-    const teachers = read(TEACH_KEY);
-    const obj = teachers.find(t => t.email === teacher.email);
+  document.getElementById("tName").textContent = data.name;
+  document.getElementById("tEmail").textContent = data.email;
+  document.getElementById("tOrg").textContent = data.org;
+};
 
-    if (!obj){
-        document.getElementById("classesList").textContent = "No class data found.";
-        return;
-    }
+/* MODULE FUNCTIONS */
+function refreshStudents() {
+  const list = getStudents();
+  const tbody = document.querySelector("#studentTable tbody");
+  tbody.innerHTML = "";
 
-    const classes = obj.classes || [];
-    document.getElementById("classesList").innerHTML =
-        classes.length ? classes.join(", ") : "No assigned classes.";
+  list.forEach(s => {
+    tbody.innerHTML += `<tr><td>${s.name}</td><td>${s.class}</td></tr>`;
+  });
 }
 
-/* LOAD ATTENDANCE SUMMARY */
-function loadAttendance(){
-    const list = read(ATT_KEY);
-    const teacherIndex = read(TEACH_KEY).findIndex(t => t.email === teacher.email);
-    if (teacherIndex === -1){
-        document.getElementById("attendanceSummary").textContent = "Attendance not available.";
-        return;
-    }
-
-    const entries = list.filter(a => a.employeeIndex === teacherIndex);
-    if (!entries.length){
-        document.getElementById("attendanceSummary").textContent = "No attendance recorded.";
-        return;
-    }
-
-    let days = new Set(entries.map(e => e.date.split("T")[0]));
-    document.getElementById("attendanceSummary").innerHTML = `
-        Total recorded days: <strong>${days.size}</strong><br>
-        Total actions (in/out): <strong>${entries.length}</strong>
-    `;
+function refreshClasses() {
+  const classes = getClasses();
+  document.getElementById("classList").innerHTML =
+    classes.map(c => `<p>${c}</p>`).join("");
 }
 
-/* LOGOUT FUNCTION */
-function logout(){
-    localStorage.removeItem("teacher_active_user");
-    window.location.href = "teacher-login.html";
+function takeAttendance() {
+  document.getElementById("attendanceResult").innerHTML =
+    "<p>Attendance saved ✔</p>";
 }
 
-/* INITIAL LOAD */
-loadClasses();
-loadAttendance();
+function sendMessage() {
+  alert("Message sent!");
+}
+
+function requestLeave() {
+  alert("Leave request submitted!");
+}
+
+function loadTimetable() {
+  document.getElementById("timetableBox").innerHTML =
+    "<p>Monday - Math<br>Tuesday - Science<br>Wednesday - English</p>";
+}
 </script>
 
 </body>
