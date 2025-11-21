@@ -616,20 +616,12 @@ function newClass(name,subject=''){ const arr=getClasses(); arr.push({ id:'c_'+D
 /* small helper to update KPIs on storage change */
 window.addEventListener('storage', ()=> { renderClasses(); populateClassSelects(); renderStudentsForClass(document.getElementById('selectClassForStudents').value); renderAssignments(); renderMessages(); updateKPIs(); });
 
-</script>
-<script>
 /* ------------------------------
    SAFE TEACHER ATTENDANCE SYSTEM
 --------------------------------*/
 
 function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
 
-const ACTIVE_ORG = (localStorage.getItem('active_org') || 'default_org').trim();
-const ATT_KEY = `${ACTIVE_ORG}_teacher_attendance`;
-const TEACH_KEY = `${ACTIVE_ORG}_teachers`;
-
-function read(k){ return safeParse(localStorage.getItem(k)) || [] }
-function save(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
 
 /* --- Get Active Teacher --- */
 const activeTeacher = safeParse(localStorage.getItem('teacher_active_user'));
