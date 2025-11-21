@@ -1,0 +1,70 @@
+<!doctype html><html><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Messages & Leave</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>body{font-family:Poppins,Arial;background:#f7fafc;padding:18px} .card{background:#fff;padding:12px;border-radius:10px;margin-bottom:10px;box-shadow:0 6px 20px rgba(0,0,0,0.06)} button{padding:8px 12px;border-radius:8px;border:0;background:#0b63a3;color:#fff}</style>
+</head><body>
+<div class="card"><h3>Send Message to HR</h3>
+  <input id="msgSubject" placeholder="Subject" style="width:100%;padding:8px;margin-bottom:8px">
+  <textarea id="msgBody" placeholder="Message body" style="width:100%;height:100px;padding:8px"></textarea>
+  <div style="margin-top:8px"><button id="sendMsg">Send</button></div>
+</div>
+
+<div class="card">
+  <h3>Request Leave</h3>
+  <input id="fromDate" type="date">
+  <input id="toDate" type="date">
+  <input id="leaveReason" placeholder="Reason" style="width:100%;padding:8px;margin-top:8px">
+  <div style="margin-top:8px"><button id="reqLeave">Request Leave</button></div>
+</div>
+
+<div class="card">
+  <h3>Your Messages</h3>
+  <div id="msgList"></div>
+</div>
+
+<div class="card">
+  <h3>Your Leave Requests</h3>
+  <div id="leaveList"></div>
+</div>
+
+<script src="teacher-extended.js"></script>
+<script>
+  const teacher = JSON.parse(localStorage.getItem('teacher_active_user')||'{}');
+  if(!teacher || !teacher.email) location.href='teacher-login.html';
+
+  function renderMessages(){
+    const arr = getMessages().filter(m => m.fromEmail === teacher.email || m.toEmail === teacher.email).slice().reverse();
+    const out = document.getElementById('msgList');
+    out.innerHTML = arr.length ? arr.map(m=>`<div style="padding:8px;border-bottom:1px solid #eee"><strong>${m.subject}</strong><div class="small">${m.body}</div><div class="small">${new Date(m.createdAt).toLocaleString()}</div></div>`).join('') : '<div class="small">No messages</div>';
+  }
+  function renderLeaves(){
+    const arr = getLeaves().filter(l=> l.teacherEmail === teacher.email).slice().reverse();
+    const out = document.getElementById('leaveList');
+    out.innerHTML = arr.length ? arr.map(l=>`<div style="padding:8px;border-bottom:1px solid #eee"><strong>${l.fromDate} → ${l.toDate}</strong><div class="small">${l.reason}</div><div class="small">Status: ${l.status}</div></div>`).join('') : '<div class="small">No leave requests</div>';
+  }
+
+  document.getElementById('sendMsg').addEventListener('click', ()=>{
+    const subj = document.getElementById('msgSubject').value.trim();
+    const body = document.getElementById('msgBody').value.trim();
+    if(!subj || !body) return alert('Fill both');
+    // toEmail: hr (we assume hr email stored somewhere, fallback to org admin later)
+    const hrEmail = localStorage.getItem('org_hr_email')||'hr@'+(ACTIVE_ORG||'org')+'.local';
+    sendMessage({ fromEmail: teacher.email, toEmail: hrEmail, subject: subj, body });
+    alert('Message queued');
+    renderMessages();
+  });
+
+  document.getElementById('reqLeave').addEventListener('click', ()=>{
+    const fromDate = document.getElementById('fromDate').value;
+    const toDate = document.getElementById('toDate').value;
+    const reason = document.getElementById('leaveReason').value.trim();
+    if(!fromDate || !toDate || !reason) return alert('Fill fields');
+    requestLeave({ teacherEmail: teacher.email, fromDate, toDate, reason });
+    alert('Leave request submitted');
+    renderLeaves();
+  });
+
+  renderMessages(); renderLeaves();
+</script>
+</body></html>
