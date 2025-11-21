@@ -1,749 +1,232 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Teacher Dashboard — Animated</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<title>Teacher Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
-  :root{
-    --bg:#071027; --card:#0f1b2b; --glass: rgba(255,255,255,0.04);
-    --accent1:#00d1ff; --accent2:#7a00ff; --muted:#9fb4c9; --success:#16a34a;
-    --radius:14px; --glass-2: rgba(255,255,255,0.02);
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;font-family:"Poppins",system-ui,Arial;background:linear-gradient(180deg,#021127 0%,var(--bg) 100%);color:#e8f6ff}
-  .app{display:flex;height:100vh;overflow:hidden}
-  /* SIDEBAR */
-  .sidebar{width:260px;padding:22px; background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); border-right:1px solid var(--glass-2); display:flex;flex-direction:column;align-items:flex-start; gap:12px}
-  .logo{width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#021;background:linear-gradient(90deg,var(--accent1),var(--accent2)); box-shadow:0 8px 26px rgba(0,0,0,0.6)}
-  .brand {display:flex;gap:12px;align-items:center;margin-bottom:6px}
-  .org-name{font-weight:700;color:#e8f6ff}
-  .small{font-size:12px;color:var(--muted)}
-  .nav{width:100%;margin-top:14px;display:flex;flex-direction:column;gap:6px}
-  .nav button{background:transparent;border:0;color:var(--muted);text-align:left;padding:10px;border-radius:10px;cursor:pointer;font-weight:600}
-  .nav button.active{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#021}
-  .sidebar .meta{margin-top:auto;width:100%}
-  .profile-thumb{width:56px;height:56px;border-radius:10px;object-fit:cover;border:2px solid rgba(255,255,255,0.06)}
-  /* MAIN */
-  .main{flex:1;overflow:auto;padding:28px}
-  .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
-  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
-  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:16px;border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,0.6);border:1px solid var(--glass)}
-  .card h4{margin:0 0 8px 0;font-size:14px;color:var(--muted)}
-  .card .big{font-size:22px;font-weight:700}
-  /* responsive */
-  @media(max-width:1100px){ .cards{grid-template-columns:repeat(2,1fr)} .sidebar{display:none} .app{flex-direction:column}}
-  @media(max-width:700px){ .cards{grid-template-columns:1fr} .top{flex-direction:column;align-items:flex-start} }
-  /* panels */
-  .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:18px;border-radius:12px;border:1px solid var(--glass-2); margin-bottom:14px; animation:slideUp .35s ease both}
-  @keyframes slideUp{ from{ opacity:0; transform:translateY(8px)} to{opacity:1;transform:none} }
-  .flex{display:flex;gap:12px;align-items:center}
-  .btn{padding:8px 12px;border-radius:10px;border:0;cursor:pointer;font-weight:700;color:#021}
-  .btn.primary{background:linear-gradient(90deg,var(--accent1),var(--accent2));}
-  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
-  input,select,textarea{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit;width:100%}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.03);text-align:left}
-  th{background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent);position:sticky;top:0}
-  .tiny{font-size:12px;color:var(--muted)}
-  .avatar-lg{width:84px;height:84px;border-radius:12px;object-fit:cover}
-  .fade-in{animation:fadeIn .4s ease both}
-  @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
-  .chip{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03);font-weight:600}
-  .toast{position:fixed;right:20px;bottom:24px;background:#021124;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,0.6);opacity:0;transform:translateY(12px);transition:all .35s}
-  .toast.show{opacity:1;transform:none}
+    body {
+        margin:0;
+        font-family:Poppins, sans-serif;
+        background:#f3f7ff;
+        display:flex;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+        width:250px;
+        background:#061a3a;
+        height:100vh;
+        color:white;
+        padding:20px;
+        position:fixed;
+        left:0;
+        top:0;
+        box-shadow:4px 0 12px rgba(0,0,0,0.2);
+    }
+
+    .sidebar h2 {
+        font-size:20px;
+        margin-bottom:15px;
+        text-align:center;
+    }
+
+    .sidebar a {
+        display:block;
+        padding:12px;
+        margin-bottom:8px;
+        background:#0e2f62;
+        color:white;
+        text-decoration:none;
+        border-radius:8px;
+        transition:0.3s;
+    }
+
+    .sidebar a:hover {
+        background:#13498f;
+    }
+
+    /* MAIN CONTENT */
+    .main {
+        margin-left:260px;
+        padding:20px;
+        width:calc(100% - 260px);
+    }
+
+    .card {
+        background:white;
+        padding:20px;
+        border-radius:10px;
+        box-shadow:0 4px 10px rgba(0,0,0,0.1);
+        margin-bottom:20px;
+    }
+
+    /* CLOCK-IN CARD */
+    .attendance-box {
+        background:#0d2970;
+        color:white;
+        padding:20px;
+        border-radius:10px;
+        text-align:center;
+        margin-top:20px;
+    }
+
+    .attendance-box button {
+        padding:12px 20px;
+        background:#00cc66;
+        border:none;
+        color:white;
+        border-radius:6px;
+        font-size:16px;
+        cursor:pointer;
+        margin-top:10px;
+    }
+
+    .attendance-box button:hover {
+        background:#00a855;
+    }
+
+    .logout-btn {
+        background:#d9534f !important;
+        margin-top:20px;
+    }
 </style>
 </head>
 <body>
-<div class="app">
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="brand">
-      <div class="logo">FG</div>
-      <div>
-        <div class="org-name" id="orgName">Loading...</div>
-        <div class="small" id="teacherRole">Teacher</div>
-      </div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2 id="teacherName">Teacher</h2>
+
+    <a href="#" onclick="showSection('overview')">Dashboard Overview</a>
+    <a href="#" onclick="showSection('classes')">My Classes</a>
+    <a href="#" onclick="showSection('profile')">My Profile</a>
+
+    <!-- CLOCK-IN SIDEBAR PANEL -->
+    <div class="attendance-box">
+        <h3>Attendance</h3>
+        <p id="clockStatus">Not clocked in</p>
+        <button id="clockBtn" onclick="toggleClock()">Clock In</button>
     </div>
 
-    <div style="display:flex;gap:12px;align-items:center">
-      <img id="profilePhoto" class="profile-thumb" src="" alt="photo">
-      <div>
-        <div id="teacherNameSmall" style="font-weight:700">—</div>
-        <div class="tiny" id="teacherEmailSmall">—</div>
-      </div>
-    </div>
-
-    <nav class="nav" id="nav">
-      <button class="active" data-section="overview">Overview</button>
-      <button data-section="classes">Classes</button>
-      <button data-section="students">Students</button>
-      <button data-section="attendance">Attendance</button>
-      <button data-section="assignments">Assignments</button>
-      <button data-section="messages">Messages</button>
-      <button data-section="settings">Settings</button>
-    </nav>
-     <!-- Attendance Box -->
-<div class="card" style="margin-top:20px">
-  <h3>Attendance</h3>
-  <p id="attStatus" class="small">Loading attendance...</p>
-
-  <button class="btn prim" id="clockInBtn">Clock In</button>
-  <button class="btn" id="clockOutBtn">Clock Out</button>
-
-  <div id="recentAtt" class="small" style="margin-top:10px; max-height:160px; overflow:auto;">
-    Loading recent records...
-  </div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
 </div>
-  </aside>
 
-  <!-- MAIN -->
-  <main class="main">
-    <div class="top">
-      <div>
-        <h1 id="pageTitle" style="margin:0">Overview</h1>
-        <div class="tiny">Welcome back</div>
-      </div>
-      <div class="flex">
-        <button class="btn ghost" id="toggleTheme">Toggle Dark</button>
-        <button class="btn primary" id="newClassBtn">+ New Class</button>
-      </div>
-    </div>
-  <div class="meta">
-      <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
-        <div class="tiny">Auto-logout: <span id="idleTime">10m</span></div>
-        <button class="btn ghost" id="logoutBtn">Logout</button>
-      </div>
-    </div>
-    <!-- Overview Cards -->
-    <div id="overviewSection" class="fade-in">
-      <div class="cards" id="kpis">
-        <div class="card">
-          <h4>Classes</h4>
-          <div class="big" id="k_classes">0</div>
-          <div class="tiny">Active classes</div>
-        </div>
-        <div class="card">
-          <h4>Students</h4>
-          <div class="big" id="k_students">0</div>
-          <div class="tiny">Total students</div>
-        </div>
-        <div class="card">
-          <h4>Attendance Rate</h4>
-          <div class="big" id="k_att">0%</div>
-          <div class="tiny">Last 30 days</div>
-        </div>
-        <div class="card">
-          <h4>Assignments</h4>
-          <div class="big" id="k_assign">0</div>
-          <div class="tiny">Open / Completed</div>
-        </div>
-      </div>
+<!-- MAIN CONTENT -->
+<div class="main">
 
-      <div class="panel">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <h3 style="margin:0">Recent Activity</h3>
-          <div class="tiny" id="lastUpdated">—</div>
-        </div>
-        <div id="activityFeed" style="margin-top:12px"></div>
-      </div>
+    <!-- Overview -->
+    <div id="overview" class="card">
+        <h2>Welcome back, <span id="nameTitle"></span> 👋</h2>
+        <p>This is your Teacher Dashboard.</p>
     </div>
 
-    <!-- CLASSES -->
-    <section id="classesSection" class="panel" style="display:none">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <h3 style="margin:0">Classes</h3>
-        <div>
-          <input id="filterClass" placeholder="Search classes..." style="width:220px;margin-right:8px">
-          <button class="btn" id="exportClassesBtn">Export</button>
-        </div>
-      </div>
+    <!-- Classes -->
+    <div id="classes" class="card" style="display:none;">
+        <h2>Your Classes</h2>
+        <p>Coming soon — subjects, timetables, assessments.</p>
+    </div>
 
-      <div style="margin-top:12px">
-        <table id="classesTable">
-          <thead><tr><th>#</th><th>Name</th><th>Subject</th><th>Students</th><th>Actions</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
+    <!-- Profile -->
+    <div id="profile" class="card" style="display:none;">
+        <h2>My Profile</h2>
+        <p><b>Name:</b> <span id="p_name"></span></p>
+        <p><b>Email:</b> <span id="p_email"></span></p>
+        <p><b>Organization:</b> <span id="p_org"></span></p>
+    </div>
 
-    <!-- STUDENTS -->
-    <section id="studentsSection" class="panel" style="display:none">
-      <div style="display:flex;gap:12px;align-items:center;justify-content:space-between">
-        <h3 style="margin:0">Students</h3>
-        <div>
-          <select id="selectClassForStudents"><option value="">-- select class --</option></select>
-          <button class="btn" id="newStudentBtn">+ Add Student</button>
-        </div>
-      </div>
-
-      <div style="margin-top:12px">
-        <table id="studentsTable">
-          <thead><tr><th>#</th><th>Name</th><th>Roll</th><th>Phone</th><th>Actions</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- ATTENDANCE -->
-    <section id="attendanceSection" class="panel" style="display:none">
-      <div style="display:flex;gap:12px;align-items:center;justify-content:space-between">
-        <h3 style="margin:0">Attendance</h3>
-        <div>
-          <select id="attClassSelect"><option value="">-- select class --</option></select>
-          <input type="date" id="attDate" value="">
-          <button class="btn" id="openMarkBtn">Mark</button>
-        </div>
-      </div>
-
-      <div id="attendanceMarkArea" style="margin-top:12px"></div>
-      <div id="attendanceHistory" style="margin-top:12px"></div>
-    </section>
-
-    <!-- ASSIGNMENTS -->
-    <section id="assignmentsSection" class="panel" style="display:none">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <h3 style="margin:0">Assignments</h3>
-        <div>
-          <select id="assignClassSelect"></select>
-          <button class="btn" id="newAssignBtn">New Assignment</button>
-        </div>
-      </div>
-      <div id="assignmentList" style="margin-top:12px"></div>
-    </section>
-
-    <!-- MESSAGES -->
-    <section id="messagesSection" class="panel" style="display:none">
-      <h3 style="margin:0 0 12px 0">Messages (Teacher ↔ HR)</h3>
-      <div style="display:flex;gap:12px">
-        <input id="msgSubject" placeholder="Subject">
-        <input id="msgTo" placeholder="To (hr email)">
-      </div>
-      <textarea id="msgBody" rows="5" style="margin-top:8px"></textarea>
-      <div style="margin-top:8px">
-        <button class="btn primary" id="sendMsgBtn">Send</button>
-      </div>
-      <div id="msgList" style="margin-top:14px"></div>
-    </section>
-
-    <!-- SETTINGS -->
-    <section id="settingsSection" class="panel" style="display:none">
-      <h3 style="margin:0 0 12px 0">Settings</h3>
-      <div style="display:flex;gap:12px">
-        <div style="flex:1">
-          <label class="tiny">Upload Profile Photo</label>
-          <input type="file" id="photoUpload">
-        </div>
-        <div style="width:220px">
-          <label class="tiny">Auto logout (minutes)</label>
-          <input type="number" id="idleMinutes" min="1" value="10">
-        </div>
-      </div>
-      <div style="margin-top:12px">
-        <button class="btn" id="saveSettings">Save Settings</button>
-      </div>
-    </section>
-
-  </main>
 </div>
-<!-- tiny toast -->
-<div id="toast" class="toast"></div>
-  
-  <script>
-    /* -------------------------
-  Session & storage helpers
-------------------------- */
-function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
-const sessionKeyCandidates = ['active_teacher','teacher_active_user','active_org_user','active_user'];
-let teacher = null;
-for(const k of sessionKeyCandidates){
-  const v = safeParse(localStorage.getItem(k));
-  if(v && (v.email || v.name)) { teacher = v; break; }
-}
-if(!teacher){
-  // no teacher session — redirect to login (teacher.html)
-  window.location.href = 'teacher.html';
-  throw new Error('No teacher session');
-}
-const ORG = teacher.org || localStorage.getItem('active_org') || 'default_org';
-const emailSafe = (teacher.email || teacher.name || 'unknown').replace(/[@\.\s]/g,'_');
-const CLASSES_KEY = `${ORG}_teacher_classes_${emailSafe}`;
-const ATT_KEY = `${ORG}_student_attendance_${emailSafe}`;
-const ASSIGN_KEY = `${ORG}_teacher_assignments_${emailSafe}`;
-const MSG_KEY = `${ORG}_teacher_messages_${emailSafe}`;
 
-/* localStorage helpers */
-function read(k){ return safeParse(localStorage.getItem(k)) || [] }
-function save(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
+<script>
+// CONSTANT STORAGE KEYS
+const TEACHERS_KEY = "teachers";
+const ACTIVE_TEACHER_KEY = "active_teacher";
+const ATTENDANCE_KEY = "teacher_attendance";
 
-/* quick toast */
-function toast(msg, t=2500){
-  const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('show');
-  setTimeout(()=> el.classList.remove('show'), t);
+/* LOAD SESSION */
+const activeTeacher = JSON.parse(localStorage.getItem(ACTIVE_TEACHER_KEY) || "null");
+
+if (!activeTeacher) {
+    alert("Session expired, login again.");
+    window.location.href = "teacher-login.html";
 }
 
-/* initialize default keys */
-if(!localStorage.getItem(CLASSES_KEY)) save(CLASSES_KEY, []);
-if(!localStorage.getItem(ATT_KEY)) save(ATT_KEY, []);
-if(!localStorage.getItem(ASSIGN_KEY)) save(ASSIGN_KEY, []);
-if(!localStorage.getItem(MSG_KEY)) save(MSG_KEY, []);
+/* Populate UI */
+document.getElementById("teacherName").textContent = activeTeacher.name;
+document.getElementById("nameTitle").textContent = activeTeacher.name;
+document.getElementById("p_name").textContent = activeTeacher.name;
+document.getElementById("p_email").textContent = activeTeacher.email;
+document.getElementById("p_org").textContent = activeTeacher.org;
 
-/* -------------------------
-  UI boot
-------------------------- */
-document.getElementById('orgName').textContent = ORG;
-document.getElementById('teacherNameSmall').textContent = teacher.name || teacher.email;
-document.getElementById('teacherEmailSmall').textContent = teacher.email || '';
-document.getElementById('profilePhoto').src = teacher.photoBase64 || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="84" height="84"><rect width="100%" height="100%" fill="%230b1b2b"/></svg>';
-document.getElementById('idleTime').textContent = (localStorage.getItem('idle_minutes') || 10) + 'm';
-
-/* Navigation */
-document.querySelectorAll('.nav button').forEach(btn=>{
-  btn.addEventListener('click', (e)=>{
-    document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    const sec = btn.dataset.section;
-    document.querySelectorAll('main .panel, main section').forEach(s=> s.style.display='none');
-    if(sec === 'overview'){ document.getElementById('overviewSection').style.display='block' }
-    if(sec === 'classes'){ document.getElementById('classesSection').style.display='block' }
-    if(sec === 'students'){ document.getElementById('studentsSection').style.display='block' }
-    if(sec === 'attendance'){ document.getElementById('attendanceSection').style.display='block' }
-    if(sec === 'assignments'){ document.getElementById('assignmentsSection').style.display='block' }
-    if(sec === 'messages'){ document.getElementById('messagesSection').style.display='block' }
-    if(sec === 'settings'){ document.getElementById('settingsSection').style.display='block' }
-    document.getElementById('pageTitle').textContent = btn.textContent.replace(/[^A-Za-z\s]/g,'').trim();
-  });
-});
-
-/* -------------------------
-  Classes CRUD
-------------------------- */
-function getClasses(){ return read(CLASSES_KEY) }
-function setClasses(arr){ save(CLASSES_KEY, arr) }
-
-function renderClasses(filter=''){
-  const tb = document.querySelector('#classesTable tbody');
-  const arr = getClasses();
-  tb.innerHTML = '';
-  arr.filter(c => !filter || c.name.toLowerCase().includes(filter.toLowerCase())).forEach((c,i)=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(c.name)}</td><td>${escapeHtml(c.subject||'')}</td><td>${(c.students||[]).length}</td>
-    <td>
-      <button onclick="editClass('${c.id}')">Edit</button>
-      <button onclick="manageStudents('${c.id}')">Students</button>
-      <button onclick="deleteClass('${c.id}')">Delete</button>
-    </td>`;
-    tb.appendChild(tr);
-  });
-  updateKPIs();
-  populateClassSelects();
+/* SECTION SWITCHER */
+function showSection(id) {
+    document.querySelectorAll(".card").forEach(c => c.style.display = "none");
+    document.getElementById(id).style.display = "block";
 }
 
-function newClass(name,subject=''){
-  const arr = getClasses();
-  arr.push({ id: 'c_'+Date.now(), name, subject, students:[] });
-  setClasses(arr);
-  renderClasses();
-  toast('Class created');
+/* READ / WRITE Attendance Data */
+function getAttendance() {
+    return JSON.parse(localStorage.getItem(ATTENDANCE_KEY) || "[]");
 }
 
-function editClass(id){
-  const arr = getClasses(); const c = arr.find(x=>x.id===id);
-  if(!c) return alert('Not found');
-  const newName = prompt('Class name', c.name); if(newName === null) return;
-  const newSub = prompt('Subject', c.subject || '') || '';
-  c.name = newName; c.subject = newSub;
-  setClasses(arr); renderClasses(); toast('Class updated');
+function saveAttendance(list) {
+    localStorage.setItem(ATTENDANCE_KEY, JSON.stringify(list));
 }
 
-function deleteClass(id){
-  if(!confirm('Delete class?')) return;
-  const arr = getClasses().filter(x=>x.id !== id); setClasses(arr); renderClasses(); toast('Deleted');
+/* LOAD CLOCK STATUS */
+let attendanceData = getAttendance();
+
+// Find this teacher's record
+let record = attendanceData.find(r => r.email === activeTeacher.email);
+
+/* Create if not exist */
+if (!record) {
+    record = { email: activeTeacher.email, log: [] };
+    attendanceData.push(record);
+    saveAttendance(attendanceData);
 }
 
-/* manage students part opens students view and selects class */
-function manageStudents(classId){
-  document.querySelector('[data-section="students"]').click();
-  document.getElementById('selectClassForStudents').value = classId;
-  renderStudentsForClass(classId);
+/* UPDATE UI STATUS */
+function updateClockUI() {
+    const last = record.log[record.log.length - 1];
+
+    if (!last || last.out) {
+        document.getElementById("clockStatus").textContent = "Not clocked in";
+        document.getElementById("clockBtn").textContent = "Clock In";
+    } else {
+        document.getElementById("clockStatus").textContent = "Clocked in at " + last.in;
+        document.getElementById("clockBtn").textContent = "Clock Out";
+    }
 }
 
-/* -------------------------
-  Students
-------------------------- */
-function populateClassSelects(){
-  const selIds = ['selectClassForStudents','attClassSelect','assignClassSelect','assignClassSelect','selectClassForStudents','attClassSelect'];
-  const classes = getClasses();
-  selIds.forEach(id => {
-    const el = document.getElementById(id);
-    if(!el) return;
-    el.innerHTML = '<option value="">-- select class --</option>';
-    classes.forEach(c => el.appendChild(Object.assign(document.createElement('option'), { value:c.id, textContent:c.name })));
-  });
+updateClockUI();
+
+/* CLOCK BUTTON FUNCTION */
+function toggleClock() {
+    const now = new Date().toLocaleString();
+    const last = record.log[record.log.length - 1];
+
+    if (!last || last.out) {
+        // CLOCK IN
+        record.log.push({ in: now, out: null });
+    } else {
+        // CLOCK OUT
+        last.out = now;
+    }
+
+    saveAttendance(attendanceData);
+    updateClockUI();
+    alert("Attendance updated!");
 }
 
-function renderStudentsForClass(classId){
-  const arr = getClasses();
-  const cls = arr.find(c=>c.id === classId);
-  const tbody = document.querySelector('#studentsTable tbody');
-  tbody.innerHTML = '';
-  if(!cls) { tbody.innerHTML = '<tr><td colspan="5">Select a class</td></tr>'; return; }
-  (cls.students||[]).forEach((s,i)=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(s.firstName + ' ' + (s.lastName||''))}</td><td>${escapeHtml(s.roll||'')}</td><td>${escapeHtml(s.phone||'')}</td>
-      <td><button onclick="editStudent('${classId}','${s.id}')">Edit</button> <button onclick="deleteStudent('${classId}','${s.id}')">Delete</button></td>`;
-    tbody.appendChild(tr);
-  });
+/* LOGOUT */
+function logout() {
+    localStorage.removeItem(ACTIVE_TEACHER_KEY);
+    window.location.href = "teacher-login.html";
 }
-
-/* Student CRUD */
-function addStudentToClass(classId, student){
-  const arr = getClasses(); const c = arr.find(x=>x.id===classId);
-  if(!c) return alert('Class not found');
-  student.id = 's_'+Date.now();
-  c.students = c.students || []; c.students.push(student); setClasses(arr); renderStudentsForClass(classId); updateKPIs(); toast('Student added');
-}
-function editStudent(classId, studentId){
-  const arr = getClasses(); const c = arr.find(x=>x.id===classId); if(!c) return;
-  const s = c.students.find(x=>x.id===studentId); if(!s) return;
-  const fn = prompt('First name', s.firstName); if(fn===null) return;
-  s.firstName = fn; s.lastName = prompt('Last name', s.lastName||'') || ''; s.roll = prompt('Roll', s.roll||'') || ''; s.phone = prompt('Phone', s.phone||'') || '';
-  setClasses(arr); renderStudentsForClass(classId); toast('Student edited');
-}
-function deleteStudent(classId, studentId){
-  if(!confirm('Delete student?')) return;
-  const arr = getClasses(); const c = arr.find(x=>x.id===classId); c.students = c.students.filter(s=>s.id!==studentId); setClasses(arr); renderStudentsForClass(classId); updateKPIs(); toast('Deleted');
-}
-
-/* -------------------------
-  Attendance
-------------------------- */
-   
-function recordAttendance(classId, dateStr, attendanceMap){
-  // attendanceMap: { studentId: 'present'|'absent' }
-  const arr = read(ATT_KEY);
-  arr.push({ id:'att_'+Date.now(), classId, date:dateStr, by: teacher.email, attendance:attendanceMap });
-  save(ATT_KEY, arr); toast('Attendance saved');
-  renderAttendanceHistory(classId);
-}
-
-function renderAttendanceMarkArea(){
-  const classId = document.getElementById('attClassSelect').value;
-  const date = document.getElementById('attDate').value;
-  if(!classId) return alert('Select class');
-  if(!date) return alert('Select date');
-  const cls = getClasses().find(c=>c.id===classId);
-  const area = document.getElementById('attendanceMarkArea');
-  area.innerHTML = '';
-  if(!cls || !(cls.students||[]).length){ area.innerHTML = '<div class="tiny">No students</div>'; return; }
-  const table = document.createElement('table'); const tbody = document.createElement('tbody');
-  cls.students.forEach(s=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${s.firstName} ${s.lastName||''}</td><td><select id="att_${s.id}"><option value="present">Present</option><option value="absent">Absent</option></select></td>`;
-    tbody.appendChild(tr);
-  });
-  table.appendChild(tbody); area.appendChild(table);
-  const saveBtn = document.createElement('button'); saveBtn.className='btn primary'; saveBtn.textContent='Save Attendance';
-  saveBtn.onclick = ()=>{
-    const map = {};
-    cls.students.forEach(s => { map[s.id] = document.getElementById('att_'+s.id).value });
-    recordAttendance(classId, date, map);
-  };
-  area.appendChild(saveBtn);
-}
-
-function renderAttendanceHistory(classId){
-  const arr = read(ATT_KEY).filter(a=>a.classId === classId).slice().reverse();
-  const out = document.getElementById('attendanceHistory'); out.innerHTML = '<h4>History</h4>';
-  if(!arr.length) { out.innerHTML += '<div class="tiny">No records</div>'; return; }
-  arr.forEach(r=>{
-    const d = document.createElement('div'); d.innerHTML = `<strong>${r.date}</strong> — ${Object.keys(r.attendance).length} students`;
-    out.appendChild(d);
-  });
-}
-
-/* -------------------------
-  Assignments
-------------------------- */
-function createAssignment(classId, title, due){
-  const arr = read(ASSIGN_KEY);
-  arr.push({ id:'a_'+Date.now(), classId, title, due, createdAt: new Date().toISOString(), completed: false });
-  save(ASSIGN_KEY, arr); renderAssignments(); toast('Assignment created');
-}
-function renderAssignments(){
-  const arr = read(ASSIGN_KEY).slice().reverse();
-  const out = document.getElementById('assignmentList'); out.innerHTML = '';
-  if(!arr.length) { out.innerHTML = '<div class="tiny">No assignments</div>'; return; }
-  arr.forEach(a=>{
-    const div = document.createElement('div'); div.style.padding='8px 0';
-    div.innerHTML = `<strong>${a.title}</strong> • ${a.due || 'No due date'} • <span class="tiny">class: ${a.classId}</span> <button onclick="toggleAssignment('${a.id}')">${a.completed ? 'Reopen' : 'Complete'}</button>`;
-    out.appendChild(div);
-  });
-}
-function toggleAssignment(id){
-  const arr = read(ASSIGN_KEY).map(x=> x.id === id ? Object.assign({}, x, { completed: !x.completed }) : x);
-  save(ASSIGN_KEY, arr);
-  renderAssignments(); toast('Assignment updated');
-}
-
-/* -------------------------
-  Messages
-------------------------- */
-function sendMessage(){
-  const subj = document.getElementById('msgSubject').value.trim();
-  const to = document.getElementById('msgTo').value.trim() || (localStorage.getItem('org_hr_email') || '');
-  const body = document.getElementById('msgBody').value.trim();
-  if(!subj || !body) return alert('Complete subject & message');
-  const arr = read(MSG_KEY);
-  arr.push({ id:'m_'+Date.now(), from: teacher.email, to, subject:subj, body, date:new Date().toISOString() });
-  save(MSG_KEY, arr); document.getElementById('msgSubject').value = ''; document.getElementById('msgBody').value = '';
-  renderMessages(); toast('Message sent');
-}
-function renderMessages(){
-  const arr = read(MSG_KEY).slice().reverse();
-  const out = document.getElementById('msgList'); out.innerHTML = '';
-  if(!arr.length) return out.innerHTML = '<div class="tiny">No messages</div>';
-  arr.forEach(m=>{ const d=document.createElement('div'); d.style.padding='8px 0'; d.innerHTML = `<strong>${escapeHtml(m.subject)}</strong> • <span class="tiny">${m.date}</span><div class="tiny">${escapeHtml(m.body)}</div>`; out.appendChild(d); });
-}
-
-/* -------------------------
-  Settings & photo upload
-------------------------- */
-document.getElementById('photoUpload').addEventListener('change', (e)=>{
-  const f = e.target.files[0]; if(!f) return;
-  const r = new FileReader(); r.onload = ()=>{
-    teacher.photoBase64 = r.result; localStorage.setItem('active_teacher', JSON.stringify(teacher));
-    document.getElementById('profilePhoto').src = r.result; toast('Photo updated');
-  }; r.readAsDataURL(f);
-});
-
-document.getElementById('saveSettings').addEventListener('click', ()=>{
-  const mins = Number(document.getElementById('idleMinutes').value) || 10;
-  localStorage.setItem('idle_minutes', String(mins));
-  document.getElementById('idleTime').textContent = mins + 'm';
-  toast('Settings saved');
-});
-
-/* -------------------------
-  KPIs & activity feed
-------------------------- */
-function updateKPIs(){
-  const classes = getClasses();
-  const students = classes.reduce((s,c)=> s + (c.students?c.students.length:0),0);
-  document.getElementById('k_classes').textContent = classes.length;
-  document.getElementById('k_students').textContent = students;
-  const attArr = read(ATT_KEY);
-  const last30 = attArr.filter(a => {
-    const d = new Date(a.date); return (Date.now() - d.getTime()) < (30*24*3600*1000);
-  });
-  // rough attendance rate = present entries / total entries (approx)
-  let presentCount = 0, totalCount = 0;
-  last30.forEach(r => { Object.values(r.attendance||{}).forEach(v => { totalCount++; if(v==='present') presentCount++; })});
-  const rate = totalCount ? Math.round(presentCount/totalCount*100) : 100;
-  document.getElementById('k_att').textContent = rate + '%';
-  const assignArr = read(ASSIGN_KEY); document.getElementById('k_assign').textContent = assignArr.filter(a=>!a.completed).length + ' / ' + assignArr.length;
-  document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
-  // activity feed (recent actions)
-  const feed = [];
-  read(MSG_KEY).slice(-5).forEach(m => feed.push(`${m.date} • Msg: ${m.subject}`));
-  read(ASSIGN_KEY).slice(-5).forEach(a => feed.push(`${a.createdAt || a.date || ''} • Assignment: ${a.title}`));
-  const act = document.getElementById('activityFeed'); act.innerHTML = feed.length ? feed.slice().reverse().map(x=>`<div class="tiny">${escapeHtml(x)}</div>`).join('') : '<div class="tiny">No activity yet</div>';
-}
-
-/* -------------------------
-  Utility & helpers
-------------------------- */
-function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-/* -------------------------
-  Event wiring
-------------------------- */
-document.getElementById('newClassBtn').addEventListener('click', ()=>{
-  const name = prompt('Class name'); if(!name) return;
-  const subj = prompt('Subject','');
-  newClass(name, subj);
-});
-document.getElementById('filterClass').addEventListener('input', (e) => renderClasses(e.target.value));
-document.getElementById('selectClassForStudents').addEventListener('change', (e)=> renderStudentsForClass(e.target.value));
-document.getElementById('newStudentBtn').addEventListener('click', ()=>{
-  const classId = document.getElementById('selectClassForStudents').value;
-  if(!classId) return alert('Select class');
-  const fn = prompt('First name'); if(!fn) return; const ln = prompt('Last name','')||''; const roll = prompt('Roll','')||''; const phone = prompt('Phone','')||'';
-  addStudentToClass(classId, { firstName:fn, lastName:ln, roll, phone });
-});
-document.getElementById('openMarkBtn').addEventListener('click', renderAttendanceMarkArea);
-document.getElementById('attClassSelect').addEventListener('change', ()=> renderAttendanceHistory(document.getElementById('attClassSelect').value));
-document.getElementById('newAssignBtn').addEventListener('click', ()=>{
-  const classId = document.getElementById('assignClassSelect').value; if(!classId) return alert('Select class');
-  const title = prompt('Assignment title'); if(!title) return; const due = prompt('Due date (yyyy-mm-dd)','')||'';
-  createAssignment(classId, title, due);
-});
-document.getElementById('sendMsgBtn').addEventListener('click', sendMessage);
-document.getElementById('logoutBtn').addEventListener('click', ()=>{ localStorage.removeItem('active_teacher'); localStorage.removeItem('teacher_active_user'); window.location.href='teacher.html' });
-document.getElementById('exportClassesBtn').addEventListener('click', ()=> {
-  const data = getClasses(); const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`${ORG}_classes_${emailSafe}.json`; a.click();
-});
-
-/* theme toggle */
-document.getElementById('toggleTheme').addEventListener('click', ()=> {
-  document.body.classList.toggle('light');
-  toast('Theme toggled');
-});
-
-/* initial render */
-renderClasses(); populateClassSelects(); renderAssignments(); renderMessages(); updateKPIs();
-
-/* -------------------------
-  Idle auto-logout
-------------------------- */
-let idleMinutes = Number(localStorage.getItem('idle_minutes') || 10);
-document.getElementById('idleMinutes').value = idleMinutes;
-let idleTimer;
-function resetIdleTimer(){
-  clearTimeout(idleTimer);
-  idleTimer = setTimeout(()=> {
-    toast('Logged out due to inactivity');
-    localStorage.removeItem('active_teacher'); localStorage.removeItem('teacher_active_user');
-    setTimeout(()=> window.location.href = 'teacher.html', 900);
-  }, idleMinutes * 60 * 1000);
-}
-['mousemove','keydown','click','touchstart'].forEach(ev => window.addEventListener(ev, resetIdleTimer));
-resetIdleTimer();
-
-/* small helper for class id generation */
-function newClass(name,subject=''){ const arr=getClasses(); arr.push({ id:'c_'+Date.now(), name, subject, students:[] }); setClasses(arr); renderClasses(); }
-
-/* small helper to update KPIs on storage change */
-window.addEventListener('storage', ()=> { renderClasses(); populateClassSelects(); renderStudentsForClass(document.getElementById('selectClassForStudents').value); renderAssignments(); renderMessages(); updateKPIs(); });
-
-/* ------------------------------
-   SAFE TEACHER ATTENDANCE SYSTEM
---------------------------------*/
-
-
-/* --- Get Active Teacher --- */
-/* FIXED — unified login storage */
-const activeTeacher =
-  safeParse(localStorage.getItem('active_teacher')) ||
-  safeParse(localStorage.getItem('teacher_active_user')) ||
-  safeParse(localStorage.getItem('active_user')) ||
-  teacher; // fallback from earlier session loader
-
-if (!activeTeacher || !activeTeacher.email) {
-  alert("Session expired. Please log in again.");
-  window.location.href = "teacher-login.html";
-  throw new Error("Teacher session missing");
-}
-
-// use the SAME teacher object for whole page
-teacher = activeTeacher;
-const teacherEmail = teacher.email;
-
-}
-
-const teacherEmail = activeTeacher.email;
-
-/* --- Get teacher index --- */
-function getTeacherIndexByEmail(email) {
-  const list = read(TEACH_KEY);
-  return list.findIndex(t => (t.email || '').toLowerCase() === email.toLowerCase());
-}
-
-let teacherIndex = getTeacherIndexByEmail(teacherEmail);
-
-/* If not found, DO NOT BREAK the page */
-if (teacherIndex === -1) {
-  console.warn("Teacher not found in TEACH_KEY. Using fallback index 0.");
-  teacherIndex = 0; // fallback to allow clock-in to work
-}
-
-/* ELEMENTS */
-const attStatus = document.getElementById("attStatus");
-const recentAtt = document.getElementById("recentAtt");
-const btnIn = document.getElementById("clockInBtn");
-const btnOut = document.getElementById("clockOutBtn");
-
-/* Prevent JS crash if elements missing */
-if (!attStatus || !recentAtt || !btnIn || !btnOut) {
-  console.error("ATTENDANCE ELEMENTS NOT FOUND IN HTML!");
-}
-
-/* --- Load Status --- */
-function updateStatus() {
-  const arr = read(ATT_KEY);
-  const today = new Date().toISOString().split("T")[0];
-
-  const todays = arr.filter(a =>
-    a.employeeIndex === teacherIndex &&
-    a.date.startsWith(today)
-  );
-
-  if (!todays.length) {
-    attStatus.textContent = "You have not clocked in today.";
-    return;
-  }
-
-  const last = todays[todays.length - 1];
-
-  attStatus.textContent =
-    last.action === "in"
-      ? `Clocked IN at ${new Date(last.date).toLocaleTimeString()}`
-      : `Clocked OUT at ${new Date(last.date).toLocaleTimeString()}`;
-}
-
-/* --- Load recent history --- */
-function loadRecentAttendance() {
-  const arr = read(ATT_KEY).reverse();
-  const mine = arr.filter(a => a.employeeIndex === teacherIndex);
-
-  if (!mine.length) {
-    recentAtt.innerHTML = "No attendance records yet.";
-    return;
-  }
-
-  let html = "";
-  mine.slice(0, 25).forEach(rec => {
-    html += `<div><strong>${rec.action.toUpperCase()}</strong> — ${new Date(rec.date).toLocaleString()}</div>`;
-  });
-
-  recentAtt.innerHTML = html;
-}
-
-/* --- CLOCK IN --- */
-btnIn.addEventListener("click", () => {
-  const arr = read(ATT_KEY);
-  arr.push({
-    employeeIndex: teacherIndex,
-    action: "in",
-    date: new Date().toISOString()
-  });
-  save(ATT_KEY, arr);
-
-  updateStatus();
-  loadRecentAttendance();
-  alert("Clock-in successful!");
-});
-
-/* --- CLOCK OUT --- */
-btnOut.addEventListener("click", () => {
-  const arr = read(ATT_KEY);
-  arr.push({
-    employeeIndex: teacherIndex,
-    action: "out",
-    date: new Date().toISOString()
-  });
-  save(ATT_KEY, arr);
-
-  updateStatus();
-  loadRecentAttendance();
-  alert("Clock-out successful!");
-});
-
-/* Run on load */
-updateStatus();
-loadRecentAttendance();
 
 </script>
+
 </body>
 </html>
