@@ -1,727 +1,629 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Flawless Graphics — HR Dashboard (Advanced)</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HR Dashboard — Professional Edition</title>
 
-<!-- Fonts & icons -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<!-- Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<!-- jsPDF (export PDF) -->
+<!-- jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-  :root{
-    --bg:#f6f8fb; --card:#ffffff; --muted:#6b7a89; --accent:#0b63a3; --accent2:#00a6b6;
-    --success:#16a34a; --danger:#e02424; --glass: rgba(2,10,30,0.03);
-  }
-  .dark{ --bg:#071027; --card:#0f1b2b; --muted:#9fb4c9; --accent:#00d1ff; --accent2:#7a00ff; color:#e8f6ff;}
-  *{box-sizing:border-box}
-  body{margin:0;font-family:'Poppins',sans-serif;background:var(--bg);color:inherit;transition:background .25s}
-  header{display:flex;align-items:center;gap:12px;padding:14px 20px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff}
-  header .brand{font-weight:700;font-size:18px}
-  .wrap{max-width:1200px;margin:20px auto;padding:0 16px}
-  .topbar{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:16px}
-  .controls{display:flex;gap:8px;align-items:center}
-  .btn{background:transparent;border:1px solid rgba(0,0,0,0.08);padding:8px 10px;border-radius:8px;cursor:pointer;font-weight:600}
-  .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;border:0}
-  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
-  .card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 6px 20px var(--glass);border:1px solid rgba(0,0,0,0.04)}
-  .col-3{grid-column:span 3}
-  .col-4{grid-column:span 4}
-  .col-6{grid-column:span 6}
-  .col-12{grid-column:span 12}
-  h3{margin:0 0 8px 0}
-  .kpi{display:flex;flex-direction:column;gap:6px}
-  .kpi .value{font-size:22px;font-weight:700}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:10px;border-bottom:1px solid rgba(0,0,0,0.06);text-align:left;font-size:14px}
-  th{background:linear-gradient(90deg,rgba(0,0,0,0.02),transparent);position:sticky;top:0}
-  .scroll{max-height:320px;overflow:auto}
-  .small{font-size:13px;color:var(--muted)}
-  /* Toast */
-  #toast{position:fixed;right:20px;bottom:20px;padding:12px 16px;border-radius:10px;background:#022;color:#fff;display:none;z-index:9999}
-  #toast.show{display:block;animation:toastIn .35s ease}
-  @keyframes toastIn{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
-  /* draggable placeholder */
-  .widget{cursor:grab}
-  .dragging{opacity:0.6}
-  /* responsive */
-  @media(max-width:960px){ .col-3,.col-4{grid-column:span 6} .col-6{grid-column:span 12} }
+/* ----------------- COLORS ----------------- */
+:root {
+  --primary:#0057b8;
+  --primary-light:#3b82f6;
+  --accent:#10b981;
+  --danger:#ef4444;
+  --bg:#f6f9fc;
+  --sidebar-bg:#0c1427;
+  --sidebar-hover:#162544;
+  --text-dark:#1e293b;
+  --text-muted:#6b7280;
+  --card-bg:#ffffff;
+  --radius:14px;
+}
+
+/* Dark Mode */
+.dark {
+  --bg:#0d1117;
+  --card-bg:#161b22;
+  --sidebar-bg:#0b0f14;
+  --sidebar-hover:#1c2533;
+  --text-dark:#e5e7eb;
+  --text-muted:#94a3b8;
+  --primary:#3b82f6;
+}
+
+/* ----------------- BASE ----------------- */
+body {
+  margin:0; background:var(--bg); font-family:Inter,Roboto,Arial; color:var(--text-dark);
+  display:flex; height:100vh; overflow:hidden;
+}
+
+/* ----------------- SIDEBAR ----------------- */
+.sidebar {
+  width:250px; background:var(--sidebar-bg); color:white;
+  display:flex; flex-direction:column; padding:20px 0;
+  position:sticky; top:0; height:100vh;
+  box-shadow:4px 0 18px rgba(0,0,0,.15);
+}
+
+.sidebar h2 {
+  margin:0; text-align:center; font-size:20px; margin-bottom:25px;
+  letter-spacing:1px; font-weight:700;
+}
+
+.nav-item {
+  padding:14px 22px; cursor:pointer;
+  display:flex; align-items:center; gap:12px; color:#cbd5e1;
+  transition:.2s;
+}
+
+.nav-item:hover { background:var(--sidebar-hover); color:white; }
+
+.nav-item i { width:22px; }
+
+/* ---------------- CONTENT ---------------- */
+.content {
+  flex:1; overflow:auto; padding:25px;
+}
+
+/* ---------------- HEADER ---------------- */
+.header {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:22px;
+}
+
+.header .title { font-size:26px; font-weight:700; }
+
+.header-right {
+  display:flex; align-items:center; gap:12px;
+}
+
+.select {
+  padding:8px 10px; border-radius:var(--radius); border:1px solid #d1d5db; background:white;
+}
+
+.btn {
+  padding:8px 14px; border-radius:var(--radius); cursor:pointer;
+  border:none; background:var(--primary); color:white; font-weight:600;
+  transition:.2s;
+}
+.btn:hover { opacity:.85; }
+
+.btn.light { background:#e5e7eb; color:#1e293b; }
+.btn.danger { background:var(--danger); }
+
+/* ---------------- CARDS ---------------- */
+.grid { display:grid; gap:18px; }
+
+.kpi {
+  background:var(--card-bg); padding:20px; border-radius:var(--radius);
+  display:flex; align-items:center; gap:18px;
+  box-shadow:0 4px 14px rgba(0,0,0,.08);
+}
+
+.kpi i {
+  font-size:28px; padding:18px; border-radius:50%;
+  background:rgba(59,130,246,.12); color:var(--primary);
+}
+
+.kpi .value { font-size:26px; font-weight:700; }
+.kpi .label { font-size:14px; color:var(--text-muted); }
+
+/* ------------ SECTION CARD ------------- */
+.card {
+  background:var(--card-bg); padding:22px; border-radius:var(--radius);
+  box-shadow:0 6px 18px rgba(0,0,0,.06);
+}
+
+.card-title { font-size:20px; font-weight:700; margin-bottom:10px; }
+
+/* Tables */
+table { width:100%; border-collapse:collapse; }
+th,td { padding:10px; text-align:left; border-bottom:1px solid #e5e7eb; font-size:14px; }
+
+/* Toast */
+#toast {
+  position:fixed; right:30px; bottom:30px; padding:14px 18px;
+  background:#1e293b; color:white; border-radius:var(--radius);
+  opacity:0; transform:translateY(20px); transition:.3s;
+}
+#toast.show { opacity:1; transform:none; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width:8px; }
+::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:8px; }
+
 </style>
 </head>
+
 <body>
-<header>
-  <div style="display:flex;align-items:center;gap:12px">
-    <img src="logo.gif" alt="logo" width="36" style="border-radius:8px">
-    <div class="brand">FLAWLESS GRAPHICS — HR Dashboard</div>
+
+<!-- ------------------ SIDEBAR ------------------ -->
+<div class="sidebar">
+  <h2>HR PANEL</h2>
+
+  <div class="nav-item"><i class="fa fa-home"></i> Dashboard</div>
+  <div class="nav-item"><i class="fa fa-users"></i> Employees</div>
+  <div class="nav-item"><i class="fa fa-calendar-check"></i> Attendance</div>
+  <div class="nav-item"><i class="fa fa-sack-dollar"></i> Payroll</div>
+  <div class="nav-item"><i class="fa fa-chart-pie"></i> Analytics</div>
+  <div class="nav-item"><i class="fa fa-bullhorn"></i> Announcements</div>
+  <div class="nav-item"><i class="fa fa-envelope"></i> Messages</div>
+  <div class="nav-item"><i class="fa fa-cog"></i> Settings</div>
+</div>
+
+<!-- ------------------ MAIN CONTENT ------------------ -->
+<div class="content">
+
+<div class="header">
+  <div class="title">HR Dashboard — <span id="orgNameDisplay">FLAWLESS</span></div>
+
+  <div class="header-right">
+    <select id="orgSwitcher" class="select"></select>
+    <button class="btn light" id="toggleTheme"><i class="fa fa-moon"></i></button>
+    <button class="btn" id="exportPDF">Export PDF</button>
+    <button class="btn danger" id="clearData">Reset</button>
   </div>
-  <div style="margin-left:auto" class="small">Advanced HR Console</div>
-</header>
+</div>
+<!-- ==================== DASHBOARD KPI CARDS ==================== -->
+<div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-bottom:22px;">
 
-<div class="wrap">
-  <div class="topbar">
-    <div style="display:flex;gap:10px;align-items:center">
-      <label class="small">Organization</label>
-      <select id="orgSelect" class="btn"></select>
-
-      <label class="small">View</label>
-      <select id="viewMode" class="btn">
-        <option value="overview">Overview</option>
-        <option value="analytics">Analytics</option>
-        <option value="payroll">Payroll</option>
-        <option value="attendance">Attendance</option>
-        <option value="messages">Messages</option>
-      </select>
-
-      <button class="btn" id="refreshBtn" title="Refresh data">Refresh</button>
-    </div>
-
-    <div class="controls">
-      <button class="btn" id="exportPdfBtn">Export PDF</button>
-      <button class="btn" id="exportDataBtn">Export JSON</button>
-      <button class="btn" id="toggleThemeBtn">Dark / Light</button>
-      <button class="btn primary" id="newEmployeeBtn">+ New Employee</button>
+  <div class="kpi">
+    <i class="fa fa-users"></i>
+    <div>
+      <div class="value" id="totalEmployees">0</div>
+      <div class="label">Total Employees</div>
     </div>
   </div>
 
-  <!-- draggable grid -->
-  <div id="dashboardGrid" class="grid" style="align-items:start">
-    <!-- KPIs -->
-    <div id="widgetKpis" class="card col-3 widget" data-widget="kpis">
-      <h3>Key Metrics</h3>
-      <div class="kpi">
-        <div class="small">Employees</div><div class="value" id="k_employees">0</div>
-      </div>
-      <div class="kpi">
-        <div class="small">Departments</div><div class="value" id="k_departments">0</div>
-      </div>
-      <div class="kpi">
-        <div class="small">Attendance Rate (30d)</div><div class="value" id="k_attendance">0%</div>
-      </div>
-      <div class="kpi">
-        <div class="small">Projected Payroll (Monthly)</div><div class="value" id="k_payroll">GHS 0</div>
-      </div>
+  <div class="kpi">
+    <i class="fa fa-user-check"></i>
+    <div>
+      <div class="value" id="presentToday">0</div>
+      <div class="label">Present Today</div>
     </div>
+  </div>
 
-    <!-- Live Attendance -->
-    <div id="widgetLive" class="card col-4 widget" data-widget="live">
-      <h3>Live Attendance Board</h3>
-      <div class="small">Recent clock-ins / outs (real-time)</div>
-      <div id="liveList" class="scroll" style="margin-top:8px"></div>
-      <div style="margin-top:8px">
-        <button class="btn" id="clearLiveBtn">Clear</button>
-      </div>
+  <div class="kpi">
+    <i class="fa fa-user-xmark"></i>
+    <div>
+      <div class="value" id="absentToday">0</div>
+      <div class="label">Absent Today</div>
     </div>
+  </div>
 
-    <!-- Attendance Chart -->
-    <div id="widgetAttendanceChart" class="card col-5 widget" data-widget="attchart">
-      <h3>Attendance Analytics</h3>
-      <canvas id="attChart" height="160"></canvas>
+  <div class="kpi">
+    <i class="fa fa-sack-dollar"></i>
+    <div>
+      <div class="value" id="payrollTotal">₵0</div>
+      <div class="label">Monthly Payroll</div>
     </div>
+  </div>
 
-    <!-- Department Productivity -->
-    <div id="widgetDeptProd" class="card col-6 widget" data-widget="deptprod">
-      <h3>Department Productivity</h3>
-      <canvas id="deptChart" height="160"></canvas>
-    </div>
+</div>
 
-    <!-- Payroll Summary -->
-    <div id="widgetPayroll" class="card col-6 widget" data-widget="payroll">
-      <h3>Payroll Summary</h3>
-      <div class="small">Total payroll, breakdown & quick payslip generator</div>
-      <div style="margin-top:8px" id="payrollSummary"></div>
-      <div style="margin-top:10px;display:flex;gap:8px">
-        <select id="payEmployee" class="btn"></select>
-        <input id="payAmount" type="number" placeholder="Amount" style="padding:8px;border-radius:8px;border:1px solid #ddd" />
-        <button class="btn primary" id="recordPaymentBtn">Record Payment</button>
-        <button class="btn" id="downloadPayslipBtn">Payslip PDF</button>
-      </div>
-    </div>
 
-    <!-- Messages / Announcements -->
-    <div id="widgetMessages" class="card col-6 widget" data-widget="messages">
-      <h3>Announcements & Messages</h3>
-      <div style="display:flex;gap:8px">
-        <input id="annTitle" placeholder="Announcement title" style="flex:1;padding:8px;border-radius:8px;border:1px solid #ddd">
-        <button class="btn primary" id="postAnnBtn">Post</button>
-      </div>
-      <textarea id="annBody" placeholder="Write announcement..." style="width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1px solid #ddd"></textarea>
+<!-- ===================== EMPLOYEE LIST ===================== -->
+<div class="card" style="margin-bottom:22px;">
+  <div class="card-title">Employees</div>
+  <button class="btn" id="addEmployeeBtn"><i class="fa fa-plus"></i> Add Employee</button>
+  <br><br>
 
-      <div style="margin-top:10px">
-        <strong>Inbox</strong>
-        <div id="inboxList" class="scroll" style="margin-top:8px;max-height:160px"></div>
-      </div>
-    </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Email</th>
+        <th>Salary</th>
+        <th>Attendance</th>
+      </tr>
+    </thead>
+    <tbody id="employeeTable"></tbody>
+  </table>
+</div>
 
-    <!-- Activity Log -->
-    <div id="widgetLog" class="card col-12 widget" data-widget="log">
-      <h3>Activity / Audit Log</h3>
-      <div class="small">Track HR actions (edits, payroll, deletes)</div>
-      <div style="margin-top:8px;display:flex;gap:8px">
-        <button class="btn" id="downloadLogBtn">Export Log</button>
-        <button class="btn" id="clearLogBtn">Clear Log</button>
-      </div>
-      <div id="logList" class="scroll" style="margin-top:8px;max-height:180px"></div>
-    </div>
 
-  </div> <!-- grid end -->
+<!-- ===================== ATTENDANCE OVERVIEW ===================== -->
+<div class="card" style="margin-bottom:22px;">
+  <div class="card-title">Attendance Overview</div>
+  <canvas id="attendanceChart" height="120"></canvas>
+</div>
 
-</div> <!-- wrap end -->
 
-<!-- Toast -->
+<!-- ===================== ANNOUNCEMENTS ===================== -->
+<div class="card" style="margin-bottom:22px;">
+  <div class="card-title">Announcements</div>
+
+  <div style="display:flex; gap:10px;">
+    <input id="announcementInput" placeholder="Write announcement..." style="
+      flex:1; padding:10px; border-radius:var(--radius); border:1px solid #d1d5db;">
+    <button class="btn" id="postAnnouncement">Post</button>
+  </div>
+
+  <ul id="announcementList" style="margin-top:15px; padding-left:20px;"></ul>
+</div>
+
+
+<!-- ===================== PAYROLL SUMMARY ===================== -->
+<div class="card" style="margin-bottom:22px;">
+  <div class="card-title">Payroll Summary</div>
+  <canvas id="payrollChart" height="120"></canvas>
+</div>
+
+
+<!-- ===================== ACTIVITY LOG ===================== -->
+<div class="card" style="margin-bottom:22px;">
+  <div class="card-title">Activity Log</div>
+  <ul id="activityLog" style="padding-left:20px;"></ul>
+</div>
+
+
+<!-- ===================== TOAST MESSAGE ===================== -->
 <div id="toast"></div>
 
-<script>
-/* ----------------------------
-  Utilities & Keys
----------------------------- */
-function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
-const DEFAULT_ORG = localStorage.getItem('active_org') || 'Flawless_Graphics';
-let ACTIVE_ORG = localStorage.getItem('active_org') || DEFAULT_ORG;
-
-function orgKey(s){ return `${ACTIVE_ORG}_${s}`; }
-
-/* Keys used (per-org)
-   employees -> employees
-   attendance -> attendance
-   payments -> payments
-   announcements -> announcements
-   messages -> messages (employee->hr)
-   activity_log -> activity_log
-*/
-function read(k){ return safeParse(localStorage.getItem(orgKey(k))) || [] }
-function save(k,v){ localStorage.setItem(orgKey(k), JSON.stringify(v)); }
-function pushLog(action, meta = {}) {
-  const log = read('activity_log');
-  log.unshift({ ts: Date.now(), action, meta });
-  save('activity_log', log);
-  renderLog();
-}
-
-/* Toast helper */
-function showToast(msg, t=2600){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'), t); }
-
-/* init org list from stored orgs */
-function getKnownOrgs(){ return safeParse(localStorage.getItem('org_list')) || [DEFAULT_ORG]; }
-function saveKnownOrgs(arr){ localStorage.setItem('org_list', JSON.stringify(arr)); }
-
-/* ----------------------------
-  Theme & UI + Animated counters
----------------------------- */
-const body = document.body;
-const themeBtn = document.getElementById('toggleThemeBtn');
-themeBtn.addEventListener('click', ()=> {
-  body.classList.toggle('dark');
-  localStorage.setItem('fg_dark_mode', body.classList.contains('dark') ? '1' : '0');
-});
-if(localStorage.getItem('fg_dark_mode') === '1') body.classList.add('dark');
-
-/* Simple counter animation */
-function animateCount(el, to, prefix='') {
-  const from = Number(el.dataset.from || 0);
-  const duration = 800;
-  const start = performance.now();
-  function frame(now){
-    const p = Math.min(1, (now - start)/duration);
-    const val = Math.round(from + (to - from) * p);
-    el.textContent = prefix + val;
-    if(p < 1) requestAnimationFrame(frame);
-    else el.dataset.from = to;
-  }
-  requestAnimationFrame(frame);
-}
-
-/* ----------------------------
-  Organization Switcher
----------------------------- */
-const orgSelect = document.getElementById('orgSelect');
-function populateOrgs(){
-  const known = getKnownOrgs();
-  orgSelect.innerHTML = '';
-  known.forEach(o => {
-    const opt = document.createElement('option'); opt.value = o; opt.textContent = o.replace(/_/g,' ');
-    if(o === ACTIVE_ORG) opt.selected = true;
-    orgSelect.appendChild(opt);
-  });
-  const addOpt = document.createElement('option'); addOpt.value = '__add__'; addOpt.textContent = '+ Add organization'; orgSelect.appendChild(addOpt);
-}
-orgSelect.addEventListener('change', ()=>{
-  const v = orgSelect.value;
-  if(v === '__add__'){
-    const name = prompt('New organization name (short, no spaces)').trim().replace(/\s+/g,'_');
-    if(!name) { populateOrgs(); return; }
-    const known = getKnownOrgs(); if(!known.includes(name)) known.push(name); saveKnownOrgs(known);
-    localStorage.setItem('active_org', name); ACTIVE_ORG = name;
-    populateOrgs(); loadAll();
-  } else {
-    ACTIVE_ORG = v; localStorage.setItem('active_org', v); loadAll();
-  }
-});
-
-/* ----------------------------
-  Data loaders / renders
----------------------------- */
-
-const k_employees = document.getElementById('k_employees');
-const k_departments = document.getElementById('k_departments');
-const k_attendance = document.getElementById('k_attendance');
-const k_payroll = document.getElementById('k_payroll');
-
-function computeKPIs(){
-  const employees = read('employees');
-  animateCount(k_employees, employees.length);
-  const departments = [...new Set(employees.map(e=>e.department||'Unassigned'))].length;
-  animateCount(k_departments, departments);
-  // attendance rate last 30 days
-  const attendance = read('attendance');
-  const cutoff = Date.now() - 30*24*3600*1000;
-  const last30 = attendance.filter(a => new Date(a.date).getTime() >= cutoff);
-  const present = last30.filter(a => a.action === 'in').length;
-  const total = Math.max(1, last30.length);
-  const rate = Math.round((present / total) * 100);
-  animateCount(k_attendance, rate, '');
-  // payroll projected = sum of salaries
-  const payroll = employees.reduce((s,e)=> s + Number(e.salary||0), 0);
-  k_payroll.textContent = `GHS ${payroll.toLocaleString()}`;
-  k_payroll.dataset.from = payroll;
-}
-
-/* render live attendance list */
-const liveList = document.getElementById('liveList');
-function renderLive(){
-  const attendance = read('attendance').slice().reverse().slice(0,60);
-  liveList.innerHTML = attendance.map(a => {
-    const who = a.name || a.fullName || a.email || 'Unknown';
-    const time = new Date(a.date).toLocaleString();
-    return `<div style="padding:6px 0;border-bottom:1px dashed rgba(0,0,0,0.04)"><strong>${who}</strong> — ${a.action.toUpperCase()} <span class="small">(${time})</span></div>`;
-  }).join('') || '<div class="small">No records</div>';
-}
-
-/* Attendance analytics chart */
-let attChart = null;
-function renderAttendanceChart(){
-  const attendance = read('attendance');
-  const last30days = Array.from({length:30}).map((_,i) => {
-    const d = new Date(); d.setDate(d.getDate() - (29 - i));
-    const key = d.toISOString().split('T')[0];
-    const countIn = attendance.filter(a => a.action === 'in' && a.date.startsWith(key)).length;
-    return { day: key, in: countIn };
-  });
-  const labels = last30days.map(r=>r.day.substr(5));
-  const data = last30days.map(r=>r.in);
-  const ctx = document.getElementById('attChart').getContext('2d');
-  if(attChart) attChart.destroy();
-  attChart = new Chart(ctx, {
-    type: 'line',
-    data: { labels, datasets: [{ label:'Clock-ins (30d)', data, borderColor:'#0b63a3', backgroundColor:'rgba(11,99,163,0.12)', fill:true }]},
-    options: {responsive:true, plugins:{legend:{display:false}}}
-  });
-}
-
-/* Department productivity chart */
-let deptChart = null;
-function renderDeptChart(){
-  const employees = read('employees');
-  const attendance = read('attendance');
-  const depts = {};
-  employees.forEach(e => {
-    const d = e.department || 'Unassigned';
-    depts[d] = depts[d] || { employees:0, clockins:0, payroll:0 };
-    depts[d].employees++;
-    depts[d].payroll += Number(e.salary||0);
-    const hits = attendance.filter(a => (a.email || a.fullName) && ((a.email && a.email === e.email) || (a.fullName && a.fullName === e.fullName)) && a.action === 'in').length;
-    depts[d].clockins += hits;
-  });
-  const labels = Object.keys(depts);
-  const data = labels.map(l => depts[l].clockins);
-  const ctx = document.getElementById('deptChart').getContext('2d');
-  if(deptChart) deptChart.destroy();
-  deptChart = new Chart(ctx, {
-    type:'bar',
-    data:{ labels, datasets:[{ label:'Clockins', data, backgroundColor: labels.map((_,i)=> `hsl(${i*60 % 360} 65% 55% / 0.9)` ) }]},
-    options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
-  });
-}
-
-/* Payroll summary render */
-function renderPayrollSummary(){
-  const employees = read('employees');
-  const payments = read('payments');
-  const totalPayroll = employees.reduce((s,e)=> s + Number(e.salary||0), 0);
-  const paid = payments.reduce((s,p)=> s + Number(p.amount||0), 0);
-  const due = totalPayroll - paid;
-  document.getElementById('payrollSummary').innerHTML = `
-    <div class="small">Total monthly payroll: <strong>GHS ${totalPayroll.toLocaleString()}</strong></div>
-    <div class="small">Paid (this period): <strong>GHS ${paid.toLocaleString()}</strong></div>
-    <div class="small">Outstanding: <strong>GHS ${due.toLocaleString()}</strong></div>
-  `;
-  // populate payEmployee select
-  const sel = document.getElementById('payEmployee'); sel.innerHTML = '<option value="">-- select --</option>';
-  read('employees').forEach((e,i) => {
-    const opt = document.createElement('option'); opt.value = i; opt.textContent = `${e.fullName || e.email} — GHS ${Number(e.salary||0)}`;
-    sel.appendChild(opt);
-  });
-}
-
-/* render inbox */
-function renderInbox(){
-  const msgs = read('messages').slice().reverse();
-  const out = document.getElementById('inboxList');
-  out.innerHTML = msgs.map(m => `<div style="padding:8px;border-bottom:1px dashed rgba(0,0,0,0.04)"><strong>${m.subject||'Message'}</strong> • <span class="small">${new Date(m.date).toLocaleString()}</span><div class="small">${m.body}</div></div>`).join('') || '<div class="small">No messages</div>';
-}
-
-/* render log */
-function renderLog(){
-  const log = read('activity_log').slice(0,200);
-  const out = document.getElementById('logList');
-  out.innerHTML = log.map(l => `<div style="padding:6px;border-bottom:1px dashed rgba(0,0,0,0.05)"><strong>${l.action}</strong> <span class="small">• ${new Date(l.ts).toLocaleString()}</span><div class="small">${JSON.stringify(l.meta)}</div></div>`).join('') || '<div class="small">No actions yet</div>';
-}
-
-/* render everything */
-function loadAll(){
-  computeKPIs();
-  renderLive();
-  renderAttendanceChart();
-  renderDeptChart();
-  renderPayrollSummary();
-  renderInbox();
-  renderLog();
-  populateEmployeeSelector();
-}
-window.addEventListener('storage', (e) => {
-  // if other tabs create attendance or payments we respond
-  if(e.key && (e.key.endsWith('_attendance') || e.key.endsWith('_employees') || e.key.endsWith('_payments') || e.key.endsWith('_messages'))) {
-    // slight delay to allow consistent read
-    setTimeout(()=> loadAll(), 60);
-    // show notification when teacher clocks in/out
-    if(e.key && e.key.includes('_attendance')) {
-      const arr = safeParse(e.newValue) || [];
-      const last = arr[arr.length - 1];
-      if(last) showLiveNotification(last);
-    }
-  }
-});
-
-/* ----------------------------
-  Actions (payments, announcements, messages)
----------------------------- */
-
-/* New employee modal (simple prompt flow) */
-document.getElementById('newEmployeeBtn').addEventListener('click', ()=>{
-  const fullName = prompt('Full name'); if(!fullName) return;
-  const email = prompt('Email') || '';
-  const department = prompt('Department') || 'General';
-  const position = prompt('Position') || '';
-  const phone = prompt('Phone') || '';
-  const salary = Number(prompt('Monthly salary (number)') || 0);
-  const hireDate = prompt('Hire date (yyyy-mm-dd)') || new Date().toISOString().split('T')[0];
-  const employees = read('employees');
-  employees.push({ fullName, email, department, position, phone, salary, hireDate });
-  save('employees', employees);
-  pushLog('employee.add', { fullName, email, department });
-  showToast('Employee added');
-  loadAll();
-});
-
-/* Record payment */
-document.getElementById('recordPaymentBtn').addEventListener('click', ()=>{
-  const sel = document.getElementById('payEmployee');
-  if(!sel.value) return alert('Select employee');
-  const idx = Number(sel.value);
-  const employees = read('employees');
-  const emp = employees[idx];
-  const amount = Number(document.getElementById('payAmount').value) || 0;
-  if(amount <= 0) return alert('Enter amount');
-  const payments = read('payments');
-  payments.push({ date: new Date().toISOString(), name: emp.fullName, email: emp.email, amount, by: 'HR' });
-  save('payments', payments);
-  pushLog('payment.record', { name: emp.fullName, amount });
-  showToast('Payment recorded');
-  renderPayrollSummary();
-});
-
-/* download payslip for last payment of selected employee */
-document.getElementById('downloadPayslipBtn').addEventListener('click', ()=>{
-  const sel = document.getElementById('payEmployee');
-  if(!sel.value) return alert('Select employee');
-  const idx = Number(sel.value);
-  const emp = read('employees')[idx];
-  const payments = read('payments').filter(p => p.email === emp.email);
-  if(!payments.length) return alert('No payments for employee');
-  const p = payments[payments.length - 1];
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  doc.setFontSize(14); doc.text('Flawless Graphics — Payslip', 20, 30);
-  doc.setFontSize(12); doc.text(`Name: ${p.name}`, 20, 50); doc.text(`Email: ${p.email}`, 20, 60); doc.text(`Amount: GHS ${p.amount}`, 20, 70); doc.text(`Date: ${new Date(p.date).toLocaleString()}`, 20, 80);
-  doc.save(`payslip_${p.name.replace(/\s+/g,'_')}.pdf`);
-});
-
-/* Post announcement */
-document.getElementById('postAnnBtn').addEventListener('click', ()=>{
-  const title = document.getElementById('annTitle').value.trim();
-  const body = document.getElementById('annBody').value.trim();
-  if(!title || !body) return alert('Complete announcement');
-  const anns = read('announcements');
-  anns.unshift({ title, body, ts: Date.now(), by: 'HR' });
-  save('announcements', anns);
-  pushLog('announcement.post', { title });
-  showToast('Announcement posted');
-  document.getElementById('annTitle').value=''; document.getElementById('annBody').value='';
-});
-
-/* ----------------------------
-  Live notification when teacher clocks in/out
----------------------------- */
-function showLiveNotification(record){
-  // simple notification + push to inbox for HR
-  showToast(`${record.name || record.fullName || record.email} ${record.action.toUpperCase()}`);
-  // push into messages/notifications
-  const notes = read('notifications');
-  notes.unshift({ ts: Date.now(), type:'attendance', record });
-  save('notifications', notes);
-  // Also add to activity log
-  pushLog('attendance.event', { name: record.name, action: record.action });
-}
-
-/* ----------------------------
-  Simple anomaly detector & AI-like insights
----------------------------- */
-function detectAnomalies(){
-  const attendance = read('attendance');
-  const employees = read('employees');
-  const anomalies = [];
-
-  // detect employees with many late/out patterns
-  const byEmail = {};
-  attendance.forEach(a => {
-    const idKey = a.email || a.fullName || (a.name || 'unknown');
-    byEmail[idKey] = byEmail[idKey] || { in:0, out:0, lastDates:[] };
-    if(a.action === 'in') byEmail[idKey].in++;
-    if(a.action === 'out') byEmail[idKey].out++;
-    byEmail[idKey].lastDates.push(a.date);
-  });
-
-  Object.entries(byEmail).forEach(([k,v])=>{
-    if(v.in > 0 && v.lastDates.length >= 8) {
-      // heuristic: if >50% of last entries are after 10:30 (late) -> flag
-      const lateCount = v.lastDates.filter(d => {
-        try {
-          const t = new Date(d).toLocaleTimeString();
-          const hh = Number(t.split(':')[0]);
-          const mm = Number(t.split(':')[1]);
-          if(hh > 10) return true;
-          if(hh === 10 && mm > 30) return true;
-          return false;
-        } catch(e){ return false }
-      }).length;
-      if(lateCount / v.lastDates.length > 0.5) anomalies.push({ who: k, reason: 'Frequent Lateness', score: Math.round((lateCount/v.lastDates.length)*100) });
-    }
-    // sudden drop in attendance
-    if(v.in > 0 && v.in < 2) anomalies.push({ who: k, reason: 'Low activity', score: 60 });
-  });
-
-  // simple performance summary (highest clockins)
-  const perf = Object.entries(byEmail).map(([k,v]) => ({ who:k, clockins:v.in }));
-  perf.sort((a,b)=>b.clockins - a.clockins);
-  const top = perf.slice(0,3);
-
-  return { anomalies, top };
-}
-
-function renderAIInsights(){
-  const { anomalies, top } = detectAnomalies();
-  const el = document.createElement('div');
-  el.innerHTML = `<h4>Smart Insights</h4>
-    <div class="small"><strong>Top performers (by clock-ins):</strong> ${top.map(t=>`${t.who} (${t.clockins})`).join(', ') || 'N/A'}</div>
-    <div style="margin-top:8px"><strong>Anomalies:</strong></div>
-    <div class="small">${anomalies.length ? anomalies.map(a=>`${a.who}: ${a.reason} (${a.score}%)`).join('; ') : 'No anomalies detected'}</div>
-  `;
-  // inject into log widget top
-  const logWidget = document.getElementById('widgetLog');
-  if(logWidget) logWidget.insertBefore(el, logWidget.firstChild.nextSibling);
-}
-
-/* ----------------------------
-  Exports
----------------------------- */
-document.getElementById('exportDataBtn').addEventListener('click', ()=>{
-  const data = {
-    employees: read('employees'),
-    attendance: read('attendance'),
-    payments: read('payments'),
-    announcements: read('announcements'),
-    messages: read('messages'),
-    activity_log: read('activity_log')
-  };
-  const blob = new Blob([JSON.stringify(data,null,2)], { type: 'application/json' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${ACTIVE_ORG}_export.json`; a.click();
-});
-
-/* Export PDF (simple snapshot) */
-document.getElementById('exportPdfBtn').addEventListener('click', async ()=>{
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF('p','pt','a4');
-  doc.setFontSize(14); doc.text(`${ACTIVE_ORG} — HR Dashboard Snapshot`, 40, 40);
-  doc.setFontSize(10); doc.text(`Employees: ${read('employees').length}`, 40, 70);
-  doc.text(`Departments: ${[...new Set(read('employees').map(e=>e.department||''))].length}`, 40, 86);
-  doc.text(`Generated: ${new Date().toLocaleString()}`, 40, 102);
-  doc.save(`${ACTIVE_ORG}_dashboard_snapshot.pdf`);
-});
-
-/* Download log */
-document.getElementById('downloadLogBtn').addEventListener('click', ()=>{
-  const blob = new Blob([JSON.stringify(read('activity_log'),null,2)], { type:'application/json' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${ACTIVE_ORG}_activity_log.json`; a.click();
-});
-
-/* Clear log */
-document.getElementById('clearLogBtn').addEventListener('click', ()=>{
-  if(!confirm('Clear activity log?')) return;
-  save('activity_log', []); renderLog(); showToast('Activity log cleared');
-});
-
-/* Clear live */
-document.getElementById('clearLiveBtn').addEventListener('click', ()=>{
-  if(!confirm('Clear attendance records?')) return;
-  save('attendance', []); renderLive(); showToast('Attendance cleared'); pushLog('attendance.clear');
-});
-
-/* download payments and payroll export */
-document.getElementById('downloadPayslipBtn').addEventListener('click', ()=>{/* handled above */});
-
-/* clear all convenience */
-document.getElementById('refreshBtn').addEventListener('click', ()=> loadAll());
-
-/* ----------------------------
-  Employee selector populate
----------------------------- */
-function populateEmployeeSelector(){
-  const sel = document.getElementById('payEmployee');
-  sel.innerHTML = '<option value="">-- select --</option>';
-  read('employees').forEach((e,i)=> {
-    const opt = document.createElement('option'); opt.value = i; opt.textContent = `${e.fullName || e.email} — ${e.department || 'General'}`;
-    sel.appendChild(opt);
-  });
-}
-
-/* ----------------------------
-  Activity listener for UI actions
----------------------------- */
-function recordAction(action, meta){
-  pushLog(action, meta);
-}
-
-/* ----------------------------
-  Drag & drop widgets (reorder)
----------------------------- */
-(function makeDraggable(){
-  const grid = document.getElementById('dashboardGrid');
-  let dragged = null;
-  grid.addEventListener('dragstart', (e)=> {
-    dragged = e.target;
-    e.target.classList.add('dragging');
-    e.dataTransfer.effectAllowed = 'move';
-  });
-  grid.addEventListener('dragend', (e)=> {
-    if(dragged) dragged.classList.remove('dragging');
-    dragged = null;
-  });
-  grid.addEventListener('dragover', (e)=> {
-    e.preventDefault();
-    const after = getDragAfterElement(grid, e.clientY);
-    if(!dragged) return;
-    if(after == null) grid.appendChild(dragged);
-    else grid.insertBefore(dragged, after);
-  });
-  function getDragAfterElement(container, y){
-    const draggableElements = [...container.querySelectorAll('.widget:not(.dragging)')];
-    return draggableElements.reduce((closest, child) => {
-      const box = child.getBoundingClientRect();
-      const offset = y - box.top - box.height/2;
-      if(offset < 0 && offset > closest.offset) return { offset, element: child };
-      else return closest;
-    }, { offset: Number.NEGATIVE_INFINITY }).element;
-  }
-  // enable drag attribute
-  document.querySelectorAll('.widget').forEach(w => w.setAttribute('draggable', 'true'));
-})();
-
-/* ----------------------------
-  Init known orgs & first load
----------------------------- */
-(function init(){
-  const known = getKnownOrgs();
-  if(!known.includes(ACTIVE_ORG)) {
-    known.push(ACTIVE_ORG); saveKnownOrgs(known);
-  }
-  populateOrgs();
-  // seed empty arrays if missing
-  ['employees','attendance','payments','announcements','messages','activity_log','notifications'].forEach(k=> {
-    if(!localStorage.getItem(orgKey(k))) localStorage.setItem(orgKey(k), JSON.stringify([]));
-  });
-  loadAll();
-  renderAIInsights();
-})();
-
-/* ----------------------------
-  Utility: showLiveNotification toasts on page load (if any new)
----------------------------- */
-function showLiveNotificationIfAny(){
-  const notes = read('notifications');
-  if(notes && notes.length){
-    const latest = notes[0];
-    showToast(`Notification: ${latest.record && (latest.record.name || latest.record.fullName || latest.record.email)} ${latest.record.action}`);
-  }
-}
-showLiveNotificationIfAny();
-
-/* ----------------------------
-  Extra: download activity/pinned actions
----------------------------- */
-document.getElementById('clearLogBtn').addEventListener('click', ()=> {
-  save('activity_log', []);
-  renderLog();
-});
-
-/* ----------------------------
-  Additional helpers: export & download
----------------------------- */
-document.getElementById('exportPdfBtn').addEventListener('click', ()=> {
-  showToast('Exporting PDF...');
-});
-
-/* ----------------------------
-  Buttons for pay / messages were initialized above. Now load,
-  and ensure pushLog called for key actions.
----------------------------- */
-
-/* Hook into storage event for teacher attendance writes from teacher-profile: show notification */
-window.addEventListener('storage', (e) => {
-  // if attendance changed we will already re-run loadAll via previous listener
-  if(!e.key) return;
-  if(e.key.endsWith('_attendance') || e.key.endsWith('_attendance')) {
-    const arr = safeParse(e.newValue) || [];
-    const last = arr[arr.length - 1];
-    if(last) showLiveNotification(last);
-  }
-});
-
-/* Small helpers for buttons we didn't wire earlier */
-document.getElementById('clearLogBtn').addEventListener('click', ()=> {
-  if(confirm('Clear activity log?')) { save('activity_log', []); renderLog(); showToast('Log cleared') }
-});
-
-document.getElementById('downloadLogBtn').addEventListener('click', ()=> {
-  const blob = new Blob([JSON.stringify(read('activity_log'), null, 2)], { type: 'application/json' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${ACTIVE_ORG}_activity_log.json`; a.click();
-});
-
-/* initial render call (one more time) */
-loadAll();
-</script>
+</div> <!-- END CONTENT -->
 </body>
+
+<!-- ===================== JAVASCRIPT (CONTINUES IN PART 3) ===================== -->
+<script>
+console.log("HR Dashboard Loaded — Ready for JS Logic…");
+/* ---------------------------
+   PART 3 — HR DASHBOARD JS
+   --------------------------- */
+
+/* --- Utility helpers --- */
+function safeParse(s){ try{return JSON.parse(s);}catch(e){return null;} }
+function read(key){ return safeParse(localStorage.getItem(key)) || []; }
+function save(key,val){ localStorage.setItem(key, JSON.stringify(val)); }
+function now(){ return Date.now(); }
+
+function showToast(msg, ms=2500){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=> el.classList.remove('show'), ms);
+}
+
+/* --- Organization / Keys --- */
+const ACTIVE_ORG = (localStorage.getItem('active_org') || 'FLAWLESS').trim();
+const ORG_LIST_KEY = 'organizations_list'; // optional list of orgs
+const EMP_KEY = `${ACTIVE_ORG}_employees`;
+const ATT_KEY = `${ACTIVE_ORG}_attendance`;
+const PAY_KEY = `${ACTIVE_ORG}_payments`;
+const ANN_KEY = `${ACTIVE_ORG}_announcements`;
+const ACT_KEY = `${ACTIVE_ORG}_activity`;
+
+/* Populate org display & switcher */
+document.getElementById('orgNameDisplay').textContent = ACTIVE_ORG;
+const orgSwitcher = document.getElementById('orgSwitcher');
+(function populateOrgs(){
+  let orgs = read(ORG_LIST_KEY);
+  if(!orgs.length){
+    orgs = [ACTIVE_ORG];
+    save(ORG_LIST_KEY, orgs);
+  }
+  orgSwitcher.innerHTML = '';
+  orgs.forEach(o => {
+    const opt = document.createElement('option'); opt.value = o; opt.textContent = o;
+    if(o === ACTIVE_ORG) opt.selected = true;
+    orgSwitcher.appendChild(opt);
+  });
+})();
+orgSwitcher.addEventListener('change', (e)=>{
+  const val = e.target.value;
+  localStorage.setItem('active_org', val);
+  showToast(`Switched to ${val}`);
+  setTimeout(()=> location.reload(), 600);
+});
+
+/* --- Data initializers --- */
+if(!localStorage.getItem(EMP_KEY)) save(EMP_KEY, []);
+if(!localStorage.getItem(ATT_KEY)) save(ATT_KEY, []);
+if(!localStorage.getItem(PAY_KEY)) save(PAY_KEY, []);
+if(!localStorage.getItem(ANN_KEY)) save(ANN_KEY, []);
+if(!localStorage.getItem(ACT_KEY)) save(ACT_KEY, []);
+
+/* --- Activity log helper --- */
+function pushActivity(text){
+  const arr = read(ACT_KEY);
+  arr.push({ text, time: new Date().toISOString() });
+  save(ACT_KEY, arr);
+  renderActivity();
+}
+
+/* --- Employees render / CRUD --- */
+const employeeTableEl = document.getElementById('employeeTable');
+
+function renderEmployees(){
+  const employees = read(EMP_KEY);
+  employeeTableEl.innerHTML = '';
+  employees.forEach((emp, idx) => {
+    // compute today's attendance for quick badge
+    const todays = read(ATT_KEY).filter(a => a.employeeId === emp.id && a.date.startsWith(new Date().toISOString().split('T')[0]));
+    const last = todays[todays.length-1];
+    const attText = last ? (last.action === 'in' ? 'IN' : 'OUT') : '—';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${emp.name || emp.fullName || 'No name'}</td>
+      <td>${emp.role || emp.department || 'Staff'}</td>
+      <td>${emp.email || '-'}</td>
+      <td>₵ ${Number(emp.salary||0).toLocaleString()}</td>
+      <td>${attText}</td>
+    `;
+    // click to edit (simple inline)
+    tr.addEventListener('dblclick', ()=> editEmployeePrompt(idx));
+    employeeTableEl.appendChild(tr);
+  });
+}
+
+/* Add employee via prompt (keeps the markup minimal) */
+document.getElementById('addEmployeeBtn').addEventListener('click', ()=>{
+  const name = prompt('Full name');
+  if(!name) return showToast('Cancelled');
+  const role = prompt('Role / Department','Staff') || 'Staff';
+  const email = prompt('Email','') || '';
+  const salaryStr = prompt('Salary (monthly)','0') || '0';
+  const salary = Number(salaryStr) || 0;
+  const id = 'e_' + Date.now();
+  const employees = read(EMP_KEY);
+  employees.push({ id, name, role, email, salary });
+  save(EMP_KEY, employees);
+  pushActivity(`Added employee ${name}`);
+  renderEmployees(); updateKPIs(); updateCharts();
+  showToast('Employee added');
+});
+
+/* Edit employee */
+function editEmployeePrompt(index){
+  const employees = read(EMP_KEY);
+  const emp = employees[index];
+  if(!emp) return;
+  const name = prompt('Full name', emp.name || emp.fullName) || emp.name;
+  const role = prompt('Role / Department', emp.role || emp.department) || emp.role;
+  const email = prompt('Email', emp.email || '') || emp.email;
+  const salary = Number(prompt('Salary', emp.salary || 0) || emp.salary);
+  employees[index] = {...emp, name, role, email, salary};
+  save(EMP_KEY, employees);
+  pushActivity(`Updated employee ${name}`);
+  renderEmployees(); updateKPIs(); updateCharts();
+  showToast('Employee updated');
+}
+
+/* Delete employee helper (not exposed in table to keep UI clean) */
+function deleteEmployeeById(id){
+  let arr = read(EMP_KEY);
+  const found = arr.find(a=>a.id===id);
+  if(!found) return;
+  if(!confirm(`Delete ${found.name || found.fullName}?`)) return;
+  arr = arr.filter(a=>a.id!==id);
+  save(EMP_KEY, arr);
+  pushActivity(`Deleted employee ${found.name || found.fullName}`);
+  renderEmployees(); updateKPIs(); updateCharts();
+  showToast('Deleted');
+}
+
+/* --- Attendance helpers --- */
+/* Attendance data shape: { employeeId, action: 'in'|'out', date: ISO } */
+
+function recordAttendance(employeeId, action){
+  const arr = read(ATT_KEY);
+  arr.push({ employeeId, action, date: new Date().toISOString() });
+  save(ATT_KEY, arr);
+  pushActivity(`Attendance ${action.toUpperCase()} - ${employeeId}`);
+  updateKPIs(); updateCharts(); renderEmployees();
+}
+
+/* Provide a quick UI accessible from console: HR can call recordAttendance(id,'in') */
+
+/* --- KPIs --- */
+function updateKPIs(){
+  const employees = read(EMP_KEY);
+  const attendance = read(ATT_KEY);
+  const payments = read(PAY_KEY);
+
+  document.getElementById('totalEmployees').textContent = employees.length;
+
+  // Present / Absent today
+  const today = new Date().toISOString().split('T')[0];
+  const actionsToday = attendance.filter(a => a.date.startsWith(today));
+  const presentSet = new Set(actionsToday.filter(a=>a.action==='in').map(a=>a.employeeId));
+  const absentSet = new Set(actionsToday.filter(a=>a.action==='out').map(a=>a.employeeId)); // rough
+
+  document.getElementById('presentToday').textContent = presentSet.size;
+  // Absent = total - present (approx)
+  const absentCount = Math.max(0, employees.length - presentSet.size);
+  document.getElementById('absentToday').textContent = absentCount;
+
+  // payroll total monthly (sum salaries)
+  const totalPayroll = employees.reduce((s,e)=> s + Number(e.salary || 0), 0);
+  document.getElementById('payrollTotal').textContent = '₵' + totalPayroll.toLocaleString();
+}
+
+/* --- Charts --- */
+let attendanceChart = null;
+let payrollChart = null;
+
+function updateCharts(){
+  // Attendance chart - last 7 days present count
+  const attendance = read(ATT_KEY);
+  const days = [];
+  for(let i=6;i>=0;i--){
+    const d = new Date(); d.setDate(d.getDate() - i);
+    days.push(d.toISOString().split('T')[0]);
+  }
+  const presentCounts = days.map(day => {
+    const set = new Set(attendance.filter(a=>a.date.startsWith(day) && a.action==='in').map(a=>a.employeeId));
+    return set.size;
+  });
+
+  const ac = document.getElementById('attendanceChart').getContext('2d');
+  if(attendanceChart) attendanceChart.destroy();
+  attendanceChart = new Chart(ac, {
+    type: 'bar',
+    data: { labels: days.map(d=>d.slice(5)), datasets: [{ label:'Present', data: presentCounts, backgroundColor: '#3b82f6' }] },
+    options: { plugins:{ legend:{ display:false }}, scales:{ y:{ beginAtZero:true } } }
+  });
+
+  // Payroll chart - last 6 months total payroll (static from salaries)
+  const months = [];
+  const monthLabels = [];
+  const nowDate = new Date();
+  for(let m=5;m>=0; m--){
+    const dt = new Date(nowDate.getFullYear(), nowDate.getMonth()-m, 1);
+    const key = dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0');
+    months.push(key);
+    monthLabels.push(dt.toLocaleString('default',{month:'short'}));
+  }
+  const employees = read(EMP_KEY);
+  const payrollValues = months.map(()=> employees.reduce((s,e)=> s + Number(e.salary||0), 0));
+
+  const pc = document.getElementById('payrollChart').getContext('2d');
+  if(payrollChart) payrollChart.destroy();
+  payrollChart = new Chart(pc, {
+    type: 'line',
+    data: { labels: monthLabels, datasets: [{ label:'Payroll (₵)', data: payrollValues, borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.12)', fill:true }] },
+    options: { plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true } } }
+  });
+}
+
+/* --- Announcements --- */
+function renderAnnouncements(){
+  const list = read(ANN_KEY);
+  const ul = document.getElementById('announcementList');
+  ul.innerHTML = '';
+  list.slice().reverse().forEach(a=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<strong>${a.title||'Announcement'}</strong> — <span style="color:var(--text-muted)">${new Date(a.time).toLocaleString()}</span><div>${a.body||''}</div>`;
+    ul.appendChild(li);
+  });
+}
+
+document.getElementById('postAnnouncement').addEventListener('click', ()=>{
+  const text = document.getElementById('announcementInput').value.trim();
+  if(!text) return showToast('Enter an announcement');
+  const list = read(ANN_KEY);
+  list.push({ title: text.split('\n')[0], body: text, time: new Date().toISOString() });
+  save(ANN_KEY, list);
+  document.getElementById('announcementInput').value = '';
+  pushActivity('Posted announcement');
+  renderAnnouncements();
+  showToast('Announcement posted');
+});
+
+/* --- Activity log render --- */
+function renderActivity(){
+  const arr = read(ACT_KEY).slice().reverse();
+  const el = document.getElementById('activityLog');
+  el.innerHTML = '';
+  arr.slice(0,50).forEach(a=>{
+    const li = document.createElement('li');
+    li.innerHTML = `${a.text} — <span style="color:var(--text-muted)">${new Date(a.time).toLocaleString()}</span>`;
+    el.appendChild(li);
+  });
+}
+
+/* --- Export PDF --- */
+document.getElementById('exportPDF').addEventListener('click', ()=>{
+  const doc = new jsPDF('p','pt','a4');
+  doc.setFontSize(16);
+  doc.text(`${ACTIVE_ORG} — HR Report`, 40, 40);
+  doc.setFontSize(11);
+  doc.text(`Total employees: ${read(EMP_KEY).length}`, 40, 70);
+  doc.text(`Present today: ${document.getElementById('presentToday').textContent}`, 40, 86);
+  doc.text(`Payroll total: ${document.getElementById('payrollTotal').textContent}`, 40, 102);
+
+  // List first 20 employees
+  const emps = read(EMP_KEY).slice(0,20);
+  let y = 140;
+  emps.forEach((e,i)=>{
+    doc.text(`${i+1}. ${e.name} — ${e.role} — ${e.email} — ₵ ${Number(e.salary||0).toLocaleString()}`, 40, y);
+    y += 14;
+    if(y > 740){ doc.addPage(); y = 40; }
+  });
+
+  doc.save(`${ACTIVE_ORG}_hr_report.pdf`);
+});
+
+/* --- Reset / Clear data --- */
+document.getElementById('clearData').addEventListener('click', ()=>{
+  if(!confirm('Reset all HR data for this organization? This cannot be undone.')) return;
+  localStorage.removeItem(EMP_KEY);
+  localStorage.removeItem(ATT_KEY);
+  localStorage.removeItem(PAY_KEY);
+  localStorage.removeItem(ANN_KEY);
+  localStorage.removeItem(ACT_KEY);
+  // recreate empty arrays to avoid errors
+  save(EMP_KEY, []); save(ATT_KEY, []); save(PAY_KEY, []); save(ANN_KEY, []); save(ACT_KEY, []);
+  renderAll();
+  showToast('Reset complete');
+});
+
+/* --- Dark theme toggle --- */
+document.getElementById('toggleTheme').addEventListener('click', ()=>{
+  document.documentElement.classList.toggle('dark');
+  const isDark = document.documentElement.classList.contains('dark');
+  localStorage.setItem('hr_theme_dark', isDark ? '1' : '0');
+});
+
+/* Apply saved theme */
+if(localStorage.getItem('hr_theme_dark') === '1') document.documentElement.classList.add('dark');
+
+/* --- Teacher sync hint --- */
+/* 
+  Teacher attendance UI (teacher-profile) records teacher attendance under keys like:
+  `${ORG}_teacher_attendance` or `${ORG}_attendance`. To keep HR dashboard in sync,
+  you can push teacher attendance into this org attendance key from teacher pages:
+
+  Example (run in teacher page):
+   const arr = read(`${ACTIVE_ORG}_attendance`);
+   arr.push({ employeeId: 'e_12345', action:'in', date: new Date().toISOString() });
+   save(`${ACTIVE_ORG}_attendance`, arr);
+   // the HR dashboard listens to 'storage' and will update when opened in another tab
+*/
+
+/* --- Storage event: update across tabs --- */
+window.addEventListener('storage', (e)=>{
+  const keys = [EMP_KEY, ATT_KEY, PAY_KEY, ANN_KEY, ACT_KEY];
+  if(keys.includes(e.key)){
+    renderAll();
+  }
+});
+
+/* --- Render everything --- */
+function renderAll(){
+  renderEmployees();
+  updateKPIs();
+  updateCharts();
+  renderAnnouncements();
+  renderActivity();
+}
+renderAll();
+
+/* --- Initial demo data (only if empty) --- */
+(function seedDemo(){
+  const emps = read(EMP_KEY);
+  if(emps.length === 0){
+    const demo = [
+      { id:'e_1', name:'Adjei James', role:'Manager', email:'james@example.com', salary:3500 },
+      { id:'e_2', name:'Emmanuel Ofori', role:'Data Analyst', email:'emmanuel@example.com', salary:2500 },
+      { id:'e_3', name:'Ama Serwaa', role:'HR', email:'ama@example.com', salary:2200 }
+    ];
+    save(EMP_KEY, demo);
+    pushActivity('Seeded demo employees');
+    renderAll();
+  }
+})();
+
+/* Final ready message */
+console.log('HR Dashboard JS ready — All features wired.');
+</script>
 </html>
