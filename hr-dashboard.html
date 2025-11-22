@@ -410,6 +410,31 @@ document.getElementById('toggleTheme').addEventListener('click', ()=>{
 
 /* quick auto-update on page */
 setInterval(()=>{ employees = read(EMP_KEY); renderEmployees(); renderActivity(); drawAttChart(); }, 30000);
+
+  function loadTeacherAttendance() {
+    const data = JSON.parse(localStorage.getItem("teacher_attendance") || "[]");
+
+    const table = document.getElementById("teacherAttendanceTableBody");
+    if (!table) return;
+
+    table.innerHTML = "";
+
+    data.forEach(r => {
+        table.innerHTML += `
+            <tr>
+                <td>${r.name}</td>
+                <td>${r.email}</td>
+                <td>${r.date}</td>
+                <td>${r.clockIn || "-"}</td>
+                <td>${r.clockOut || "-"}</td>
+                <td>${r.status}</td>
+            </tr>
+        `;
+    });
+}
+
+loadTeacherAttendance();
+
 </script>
 </body>
 </html>
