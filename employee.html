@@ -1,657 +1,182 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Flawless Graphics — Employee Portal</title>
-
-  <!-- Fonts + Libraries -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-  <style>
-    :root{
-      --nav:#003366; --accent:#0b63a3; --muted:#6b7c93; --bg:#f5f8fb;
-      --card-from:#0b63a3; --card-to:#00a6b6;
-    }
-    *{box-sizing:border-box}
-    body{font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto; margin:0; background:var(--bg); color:#102730}
-    header{background:var(--nav); color:#fff; padding:18px 20px; display:flex; gap:12px; align-items:center}
-    header .logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--card-from),var(--card-to));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
-    header h1{font-size:18px;margin:0}
-
-    .container{max-width:1200px;margin:28px auto;padding:18px;background:#fff;border-radius:10px;box-shadow:0 6px 20px rgba(10,20,40,0.06)}
-    .top-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-    .left-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .right-controls{display:flex;gap:10px;align-items:center}
-    .search-bar input{padding:8px 12px;border-radius:8px;border:1px solid #d8e6f1;min-width:260px}
-    .btn{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600}
-    .btn.ghost{background:transparent;color:var(--accent);border:1px solid #d8e6f1}
-    .btn:active{transform:translateY(1px)}
-    .controls {display:flex; gap:8px; align-items:center; flex-wrap:wrap}
-
-    .stats-row{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
-    .stat{background:linear-gradient(135deg,var(--card-from),var(--card-to));color:#fff;padding:14px;border-radius:10px;min-width:160px;text-align:center;box-shadow:0 10px 22px rgba(10,20,40,0.06)}
-    .stat h3{margin:0;font-size:22px}
-    .stat p{margin:4px 0 0;font-size:13px;opacity:0.95}
-
-    table{width:100%;border-collapse:collapse;margin-top:18px;background:#fff}
-    thead th{position:sticky;top:0;background:var(--nav);color:#fff;padding:12px;text-align:left;z-index:4}
-    th, td{padding:10px;border-bottom:1px solid #eef4fb;vertical-align:middle}
-    td img.avatar{width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 6px 16px rgba(12,24,48,0.08)}
-    .badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#e8f1fb;color:var(--nav);font-weight:600;font-size:13px}
-    .badge.it{background:linear-gradient(90deg,#d9eefc,#d6f5f8);color:#0b63a3}
-    .badge.finance{background:linear-gradient(90deg,#e8f7ec,#e6fbe6);color:#1b8a2a}
-    .badge.hr{background:linear-gradient(90deg,#f0e8fb,#f6ecfb);color:#7b43c3}
-    .badge.safety{background:linear-gradient(90deg,#fff4e6,#fff6ea);color:#a86f00}
-    .badge.admin{background:linear-gradient(90deg,#f0f2f4,#f8fafc);color:#546069}
-
-    .cards-view{display:none;margin-top:18px;gap:18px;flex-wrap:wrap;display:flex}
-    .employee-card{width:260px;padding:14px;border-radius:10px;background:#fff;border:1px solid #eef5fb;box-shadow:0 10px 26px rgba(7,22,40,0.04);transition:transform .18s}
-    .employee-card:hover{transform:translateY(-6px)}
-    .employee-card img{width:64px;height:64px;border-radius:50%;object-fit:cover;display:block;margin-bottom:8px}
-
-    .actions img{width:20px;cursor:pointer;margin-right:8px;opacity:0.92}
-    .actions img:hover{transform:scale(1.08)}
-
-    /* modal */
-    .modal{display:none;position:fixed;inset:0;background:rgba(5,10,20,0.55);z-index:1200;align-items:center;justify-content:center;padding:18px}
-    .modal .box{background:#fff;border-radius:10px;padding:18px;max-width:680px;width:100%;position:relative;box-shadow:0 20px 60px rgba(7,20,40,0.3)}
-    .close{position:absolute;right:14px;top:12px;border:none;background:transparent;font-size:20px;cursor:pointer;color:#465d6f}
-    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .form-grid.full{grid-template-columns:1fr}
-    .form-row{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
-    input[type="file"]{padding:6px}
-
-    /* file preview */
-    .avatar-preview{width:86px;height:86px;border-radius:12px;background:#f1f6fa;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px dashed #dbeaf7}
-
-    /* small */
-    .small{font-size:13px;color:var(--muted)}
-
-    /* toast */
-    #toast-container{position:fixed;bottom:22px;right:22px;z-index:1600;display:flex;flex-direction:column;gap:8px}
-    .toast{background:#111;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:0 10px 30px rgba(10,20,30,0.2);transform:translateX(120%);opacity:0;transition:0.45s}
-    .toast.show{transform:translateX(0);opacity:1}
-
-    /* small screens */
-    @media (max-width:900px){
-      .form-grid{grid-template-columns:1fr}
-      .stats-row{flex-direction:column}
-      .search-bar input{min-width:120px;width:100%}
-      header h1{font-size:16px}
-      .employee-card{width:100%}
-    }
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Flawless Graphics — Employee Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f8fafc;--card:#fff;--accent:#003366;--muted:#333}
+  *{box-sizing:border-box;font-family:Poppins,system-ui,Arial}
+  body{margin:0;background:var(--bg);color:var(--muted)}
+  header{background:linear-gradient(90deg,var(--accent),#0056b3);color:#fff;padding:14px;text-align:center}
+  .wrap{max-width:1000px;margin:18px auto;padding:12px}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .card{background:var(--card);padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.05)}
+  table{width:100%;border-collapse:collapse;margin-top:12px}
+  th,td{padding:10px;border-bottom:1px solid #eee;text-align:left}
+  .actions img{width:20px;cursor:pointer}
+  input,select{padding:8px;border-radius:8px;border:1px solid #ddd}
+  .btn{padding:8px 12px;border-radius:8px;border:0;background:var(--accent);color:#fff;cursor:pointer}
+  .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);justify-content:center;align-items:center}
+  .box{width:100%;max-width:520px;background:#fff;padding:16px;border-radius:10px}
+  .toast{position:fixed;right:20px;bottom:20px;background:#222;color:#fff;padding:10px;border-radius:8px;opacity:0;transform:translateY(10px);transition:all .28s}
+  .toast.show{opacity:1;transform:none}
+</style>
 </head>
 <body>
-  <header>
-    <div class="logo">FG</div>
+<header><h1>Flawless Graphics — Employee Portal</h1></header>
+<div class="wrap">
+  <div class="top">
     <div>
-      <h1>FLAWLESS GRAPHICS · Employee Portal</h1>
-      <div class="small">Manage employee profiles, attendance and payroll-ready data</div>
+      <button class="btn" id="addBtn">+ Add Employee</button>
+      <button class="btn" id="toggleView">Cards</button>
     </div>
-  </header>
-
-  <div class="container">
-    <div class="top-bar">
-      <div class="left-controls">
-        <button class="btn" id="addEmployeeBtn">+ Add Employee</button>
-        <button class="btn ghost" id="toggleViewBtn">Switch to Cards View</button>
-
-        <div style="margin-left:8px">
-          <select id="sortSelect" class="small" title="Sort">
-            <option value="default">Sort: Default</option>
-            <option value="name">Name A → Z</option>
-            <option value="department">Department</option>
-            <option value="salary">Salary (low → high)</option>
-            <option value="hireDate">Date Hired (old → new)</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="right-controls">
-        <div class="search-bar">
-          <input id="searchInput" placeholder="Search by name, phone, salary, department or position...">
-        </div>
-
-        <div style="display:flex; gap:8px; align-items:center; margin-left:6px">
-          <button class="btn" id="exportCsvBtn">Export CSV</button>
-          <button class="btn" id="exportXlsxBtn">Export XLSX</button>
-          <button class="btn" id="exportPdfBtn">Export PDF</button>
-        </div>
-      </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input id="search" placeholder="Search by name, phone, dept or position">
+      <select id="viewDept"><option value="">All depts</option></select>
     </div>
+  </div>
 
-    <div class="stats-row" style="margin-top:18px">
-      <div class="stat"><h3 id="statEmployees">0</h3><p>Total Employees</p></div>
-      <div class="stat"><h3 id="statDepartments">0</h3><p>Departments</p></div>
-      <div class="stat"><h3 id="statAttendance">0%</h3><p>Attendance Rate</p></div>
-      <div class="stat"><h3 id="statPayroll">$0</h3><p>Total Payroll</p></div>
-      <div class="stat clickable" id="topDeptCard" style="cursor:pointer"><h3 id="statTopDept">N/A</h3><p>Top Performing Dept</p></div>
-    </div>
-
-    <!-- Table -->
-    <table id="employeeTable" style="margin-top:18px">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Photo</th>
-          <th>Full Name</th>
-          <th>Department</th>
-          <th>Position</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th>Salary (GHS)</th>
-          <th>Date Hired</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
+  <div class="card" id="tableCard" style="margin-top:12px">
+    <table id="empTable">
+      <thead><tr><th>#</th><th>Photo</th><th>Full name</th><th>Dept</th><th>Position</th><th>Email</th><th>Phone</th><th>Salary</th><th>Hired</th><th>Actions</th></tr></thead>
       <tbody></tbody>
     </table>
-
-    <!-- Cards view -->
-    <div id="employeeCards" class="cards-view"></div>
   </div>
 
-  <!-- Modal: Add / Edit -->
-  <div class="modal" id="employeeModal" aria-hidden="true">
-    <div class="box">
-      <button class="close" id="closeModalBtn" aria-label="Close">&times;</button>
-      <h3 id="modalTitle">Add Employee</h3>
+  <div class="card" id="cardsView" style="display:none;margin-top:12px"></div>
+</div>
 
-      <form id="employeeForm" style="margin-top:12px">
-        <input type="hidden" id="editIndex" value="">
-
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="flex:1">
-            <div class="form-row">
-              <label>Full Name</label>
-              <input type="text" id="fullName" required>
-            </div>
-
-            <div class="form-row">
-              <label>Department</label>
-              <select id="department" required>
-                <option value="">-- Select Department --</option>
-                <option value="IT">IT</option>
-                <option value="Safety">Safety</option>
-                <option value="HR">HR</option>
-                <option value="Finance">Finance</option>
-                <option value="Administration">Administration</option>
-              </select>
-            </div>
-
-            <div class="form-row">
-              <label>Position</label>
-              <input type="text" id="position" required>
-            </div>
-
-            <div class="form-row">
-              <label>Email</label>
-              <input type="email" id="email">
-            </div>
-
-            <div class="form-row">
-              <label>Phone</label>
-              <input type="tel" id="phone">
-            </div>
-
-            <div class="form-row">
-              <label>Salary (GHS)</label>
-              <input type="number" id="salary">
-            </div>
-
-            <div class="form-row">
-              <label>Date Hired</label>
-              <input type="date" id="hireDate">
-            </div>
-          </div>
-
-          <div style="width:140px;display:flex;flex-direction:column;gap:10px;align-items:center">
-            <div class="avatar-preview" id="avatarPreview">
-              <img id="avatarPreviewImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover">
-              <div id="avatarPlaceholder" style="font-size:12px;color:#6b7c93">No Photo</div>
-            </div>
-            <input type="file" id="photoInput" accept="image/*">
-            <div class="small">Profile photo (optional). Images are stored locally.</div>
-            <div style="margin-top:auto">
-              <button class="btn" type="submit">Save Employee</button>
-            </div>
-          </div>
-        </div>
-      </form>
+<!-- Modal -->
+<div class="modal" id="modal"><div class="box">
+  <h3 id="mTitle">Add Employee</h3>
+  <form id="form">
+    <input id="fullName" placeholder="Full name" required style="width:100%;margin-top:8px">
+    <input id="email" placeholder="Email" type="email" style="width:100%;margin-top:8px">
+    <input id="phone" placeholder="Phone" style="width:100%;margin-top:8px">
+    <input id="department" placeholder="Department" style="width:100%;margin-top:8px">
+    <input id="position" placeholder="Position" style="width:100%;margin-top:8px">
+    <input id="salary" type="number" placeholder="Salary" style="width:100%;margin-top:8px">
+    <input id="hireDate" type="date" style="width:100%;margin-top:8px">
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn" type="submit">Save</button>
+      <button class="btn" type="button" id="cancel">Cancel</button>
     </div>
-  </div>
+    <input type="hidden" id="idx">
+  </form>
+</div></div>
 
-  <!-- Department Modal (Top Dept -> breakdown) -->
-  <div class="modal" id="departmentModal" aria-hidden="true">
-    <div class="box">
-      <button class="close" data-close-dept>&times;</button>
-      <h3>Department Performance / Breakdown</h3>
+<div id="toast" class="toast"></div>
 
-      <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
-        <label style="display:block">
-          <small>Select Dept</small><br>
-          <select id="deptSelect"></select>
-        </label>
-        <button class="btn" id="loadDeptBtn">Load</button>
-        <button class="btn" id="downloadDeptPdf">Download PDF</button>
-      </div>
+<script>
+const ORG = localStorage.getItem('active_org') || 'FLAWLESS_GRAPHICS';
+const EMP_KEY = `${ORG}_employees`;
+function read(k){ try{return JSON.parse(localStorage.getItem(k))||[] }catch(e){return []} }
+function save(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
+function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2000) }
 
-      <table id="deptTable" style="margin-top:10px">
-        <thead><tr><th>#</th><th>Employee</th><th>Avg Score</th></tr></thead>
-        <tbody></tbody>
-      </table>
+let employees = read(EMP_KEY);
 
-      <h4 id="deptAvg" style="margin-top:12px">Average Score: 0%</h4>
-    </div>
-  </div>
-
-  <div id="toast-container"></div>
-
-  <script>
-  /************************************************************************
-   * Employee Portal: FULL-featured script
-   * - Profile pics stored as data URLs in localStorage.employees[].photo
-   * - Sorting / search / view toggle / export CSV/XLSX/PDF / badges / animations
-   ************************************************************************/
-
-  // Helper: safe parse
-  const safeParse = s => { try { return JSON.parse(s); } catch(e){ return null; } };
-
-  // initial employees (read from localStorage)
-  let employees = safeParse(localStorage.getItem('employees')) || [];
-
-  // DOM
-  const tbody = document.querySelector('#employeeTable tbody');
-  const cards = document.getElementById('employeeCards');
-  const addBtn = document.getElementById('addEmployeeBtn');
-  const modal = document.getElementById('employeeModal');
-  const closeModal = document.getElementById('closeModalBtn');
-  const form = document.getElementById('employeeForm');
-  const avatarInput = document.getElementById('photoInput');
-  const avatarPreviewImg = document.getElementById('avatarPreviewImg');
-  const avatarPlaceholder = document.getElementById('avatarPlaceholder');
-  const statEmployees = document.getElementById('statEmployees');
-  const statDepartments = document.getElementById('statDepartments');
-  const statAttendance = document.getElementById('statAttendance');
-  const statPayroll = document.getElementById('statPayroll');
-  const statTopDept = document.getElementById('statTopDept');
-  const topDeptCard = document.getElementById('topDeptCard');
-  const toggleViewBtn = document.getElementById('toggleViewBtn');
-  const searchInput = document.getElementById('searchInput');
-  const sortSelect = document.getElementById('sortSelect');
-  const exportCsvBtn = document.getElementById('exportCsvBtn');
-  const exportXlsxBtn = document.getElementById('exportXlsxBtn');
-  const exportPdfBtn = document.getElementById('exportPdfBtn');
-
-  const deptModal = document.getElementById('departmentModal');
-  const deptSelect = document.getElementById('deptSelect');
-  const loadDeptBtn = document.getElementById('loadDeptBtn');
-  const downloadDeptPdf = document.getElementById('downloadDeptPdf');
-
-  // mapping department badge class
-  function deptBadge(dept){
-    if(!dept) return `<span class="badge admin">Unassigned</span>`;
-    const d = dept.toLowerCase();
-    if(d.includes('it')) return `<span class="badge it">IT</span>`;
-    if(d.includes('finance')) return `<span class="badge finance">Finance</span>`;
-    if(d.includes('hr')) return `<span class="badge hr">HR</span>`;
-    if(d.includes('safety')) return `<span class="badge safety">Safety</span>`;
-    return `<span class="badge admin">${escapeHtml(dept)}</span>`;
-  }
-
-  // escape
-  function escapeHtml(s){ if(s===null||s===undefined) return ''; return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-
-  // render list (table + cards)
-  function render(list = employees){
-    // apply sorting based on sortSelect
-    const sort = sortSelect.value;
-    let arr = Array.from(list);
-    if(sort==='name') arr.sort((a,b)=> (a.fullName||'').localeCompare(b.fullName||''));
-    else if(sort==='department') arr.sort((a,b)=> (a.department||'').localeCompare(b.department||''));
-    else if(sort==='salary') arr.sort((a,b)=> (Number(a.salary||0) - Number(b.salary||0)));
-    else if(sort==='hireDate') arr.sort((a,b)=> new Date(a.hireDate||0) - new Date(b.hireDate||0));
-
-    // table
-    tbody.innerHTML = '';
-    arr.forEach((e,i)=>{
-      const photoHtml = e.photo ? `<img src="${e.photo}" class="avatar" alt="photo">` : `<div style="width:46px;height:46px;border-radius:50%;background:#f0f6fb;display:inline-block"></div>`;
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${i+1}</td>
-        <td>${photoHtml}</td>
-        <td>${escapeHtml(e.fullName||'N/A')}</td>
-        <td>${deptBadge(e.department)}</td>
-        <td>${escapeHtml(e.position||'')}</td>
-        <td><a href="mailto:${escapeHtml(e.email||'')}" class="small">${escapeHtml(e.email||'')}</a></td>
-        <td class="small">${escapeHtml(e.phone||'')}</td>
-        <td class="small">${e.salary ? Number(e.salary).toLocaleString() : '0'}</td>
-        <td class="small">${escapeHtml(e.hireDate||'')}</td>
-        <td class="actions">
-          <img src="https://img.icons8.com/ios-glyphs/30/edit--v1.png" title="Edit" onclick="editEmployee(${i})">
-          <img src="https://img.icons8.com/ios-glyphs/30/filled-trash.png" title="Delete" onclick="deleteEmployee(${i})">
-        </td>`;
-      tbody.appendChild(tr);
-    });
-
-    // cards
-    cards.innerHTML = '';
-    arr.forEach((e,i)=>{
-      const card = document.createElement('div');
-      card.className='employee-card';
-      card.innerHTML = `
-        <img src="${e.photo||'https://img.icons8.com/ios/100/000000/user--v1.png'}" alt="photo">
-        <h4>${escapeHtml(e.fullName||'N/A')}</h4>
-        <div style="margin-top:6px">${deptBadge(e.department)}</div>
-        <p class="small"><b>${escapeHtml(e.position||'')}</b></p>
-        <p class="small">${escapeHtml(e.email||'')}</p>
-        <p class="small">📞 ${escapeHtml(e.phone||'')}</p>
-        <p class="small">GHS ${e.salary ? Number(e.salary).toLocaleString() : '0'}</p>
-        <p class="small">Hired: ${escapeHtml(e.hireDate||'')}</p>
-        <div style="margin-top:8px">
-          <img src="https://img.icons8.com/ios-glyphs/30/edit--v1.png" title="Edit" onclick="editEmployee(${i})">
-          <img src="https://img.icons8.com/ios-glyphs/30/filled-trash.png" title="Delete" onclick="deleteEmployee(${i})">
-        </div>`;
-      cards.appendChild(card);
-    });
-
-    updateStats();
-  }
-
-  // update stats (employees, departments, attendance, payroll, top dept)
-  function updateStats(){
-    const total = employees.length;
-    document.getElementById('statEmployees').innerText = total;
-
-    const departments = Array.from(new Set(employees.map(e=>e.department||'Unassigned')));
-    document.getElementById('statDepartments').innerText = departments.length;
-
-    // attendance fallback / attempt to read attendance localStorage if exists
-    let attendanceRate = 0;
-    try {
-      const att = safeParse(localStorage.getItem('attendance')) || [];
-      if(Array.isArray(att) && total>0){
-        const entries = att.length;
-        attendanceRate = Math.min(100, Math.round((entries/(total*30))*100));
-      } else attendanceRate = Math.floor(Math.random()*18)+80;
-    } catch(e){ attendanceRate = Math.floor(Math.random()*18)+80; }
-    document.getElementById('statAttendance').innerText = attendanceRate+'%';
-
-    const payroll = employees.reduce((s,e)=> s + Number(e.salary||0), 0);
-    document.getElementById('statPayroll').innerText = 'GHS ' + payroll.toLocaleString();
-
-    // top department by average performance if performance data exists, else by count
-    const perfData = safeParse(localStorage.getItem('performanceData')) || {};
-    const deptScores = {};
-    for(const e of employees){
-      const scores = perfData[e.fullName] ? Object.values(perfData[e.fullName]).map(Number).filter(n=>!isNaN(n)) : [];
-      const avg = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
-      if(!deptScores[e.department]) deptScores[e.department] = [];
-      deptScores[e.department].push(avg);
-    }
-    let top = 'N/A', topVal = 0;
-    for(const d in deptScores){
-      const arr = deptScores[d];
-      const avg = arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
-      if(avg>topVal){ topVal=avg; top=d; }
-    }
-    if(top==='N/A' || topVal===0){
-      // fallback: top by count
-      const counts = {};
-      for(const e of employees) counts[e.department] = (counts[e.department]||0)+1;
-      let bestDept='',bestCount=0;
-      for(const d in counts) if(counts[d]>bestCount){bestCount=counts[d]; bestDept=d;}
-      top = bestDept || 'N/A';
-      document.getElementById('statTopDept').innerText = top === 'N/A' ? 'N/A' : `${top} (${bestCount} people)`;
-    } else {
-      document.getElementById('statTopDept').innerText = `${top} (${topVal.toFixed(1)}%)`;
-    }
-
-    // populate dept select for breakdown modal
-    const select = deptSelect;
-    if(select){
-      const prev = select.value;
-      select.innerHTML='';
-      Array.from(new Set(employees.map(e=>e.department||'Unassigned'))).sort().forEach(d=>{
-        const opt = document.createElement('option'); opt.value=d; opt.textContent=d; select.appendChild(opt);
-      });
-      if(prev) select.value = prev;
-    }
-  }
-
-  // open modal add
-  addBtn.addEventListener('click', ()=> {
-    form.reset(); document.getElementById('editIndex').value='';
-    avatarPreviewImg.src=''; avatarPreviewImg.style.display='none'; avatarPlaceholder.style.display='block';
-    document.getElementById('modalTitle').innerText='Add Employee';
-    modal.style.display='flex'; modal.setAttribute('aria-hidden','false');
+function renderTable(list = employees){
+  const tbody = document.querySelector('#empTable tbody'); tbody.innerHTML='';
+  list.forEach((e,i)=> {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${i+1}</td><td><img src="${e.photo||'https://img.icons8.com/ios-filled/50/user.png'}" style="width:36px;border-radius:6px"></td>
+      <td>${e.fullName}</td><td>${e.department||''}</td><td>${e.position||''}</td><td>${e.email||''}</td><td>${e.phone||''}</td><td>GHS ${Number(e.salary||0).toLocaleString()}</td><td>${e.hireDate||''}</td>
+      <td><button onclick="edit(${i})">Edit</button> <button onclick="del(${i})">Delete</button></td>`;
+    tbody.appendChild(tr);
   });
-  closeModal.addEventListener('click', ()=> { modal.style.display='none'; modal.setAttribute('aria-hidden','true'); });
+  populateDept();
+}
 
-  window.addEventListener('click', (e)=> { if(e.target === modal){ modal.style.display='none'; modal.setAttribute('aria-hidden','true'); } });
-
-  // handle photo input preview and base64 read
-  avatarInput.addEventListener('change', (ev)=>{
-    const f = ev.target.files[0];
-    if(!f) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      avatarPreviewImg.src = reader.result;
-      avatarPreviewImg.style.display='block';
-      avatarPlaceholder.style.display='none';
-      avatarPreviewImg.dataset.dataurl = reader.result; // store temporarily
-    };
-    reader.readAsDataURL(f);
+function renderCards(list = employees){
+  const wrap = document.getElementById('cardsView'); wrap.innerHTML='';
+  list.forEach((e,i)=>{
+    const div = document.createElement('div'); div.className='card'; div.style.marginBottom='8px';
+    div.innerHTML = `<div style="display:flex;gap:12px;align-items:center"><img src="${e.photo||'https://img.icons8.com/ios-filled/50/user.png'}" style="width:64px;border-radius:8px"><div><div style="font-weight:700">${e.fullName}</div><div class="small">${e.position} — ${e.department}</div><div class="small">${e.email}</div></div></div>`;
+    wrap.appendChild(div);
   });
+}
 
-  // submit form (add or edit)
-  form.addEventListener('submit', (e)=>{
-    e.preventDefault();
-    const data = {
-      fullName: document.getElementById('fullName').value.trim(),
-      department: document.getElementById('department').value.trim(),
-      position: document.getElementById('position').value.trim(),
-      email: document.getElementById('email').value.trim(),
-      phone: document.getElementById('phone').value.trim(),
-      salary: document.getElementById('salary').value ? Number(document.getElementById('salary').value) : 0,
-      hireDate: document.getElementById('hireDate').value || ''
-    };
-    // photo from preview
-    if(avatarPreviewImg && avatarPreviewImg.src) data.photo = avatarPreviewImg.src;
+function populateDept(){
+  const sel = document.getElementById('viewDept');
+  const depts = [...new Set(employees.map(e=>e.department).filter(Boolean))];
+  sel.innerHTML = '<option value="">All depts</option>'+depts.map(d=>`<option value="${d}">${d}</option>`).join('');
+}
 
-    const editIndex = document.getElementById('editIndex').value;
-    if(editIndex===''){
-      employees.push(data);
-      showToast('Employee added', 'success');
-    } else {
-      employees[Number(editIndex)] = data;
-      showToast('Employee updated', 'success');
-    }
-    localStorage.setItem('employees', JSON.stringify(employees));
-    modal.style.display='none'; modal.setAttribute('aria-hidden','true');
-    render();
-  });
+document.getElementById('addBtn').addEventListener('click', ()=>{
+  document.getElementById('mTitle').textContent='Add Employee';
+  document.getElementById('form').reset();
+  document.getElementById('idx').value='';
+  document.getElementById('modal').style.display='flex';
+});
+document.getElementById('cancel').addEventListener('click', ()=> document.getElementById('modal').style.display='none');
 
-  // edit function (global)
-  window.editEmployee = function(index){
-    const e = employees[index];
-    if(!e) return;
-    document.getElementById('fullName').value = e.fullName||'';
-    document.getElementById('department').value = e.department||'';
-    document.getElementById('position').value = e.position||'';
-    document.getElementById('email').value = e.email||'';
-    document.getElementById('phone').value = e.phone||'';
-    document.getElementById('salary').value = e.salary||'';
-    document.getElementById('hireDate').value = e.hireDate||'';
-    document.getElementById('editIndex').value = index;
-
-    if(e.photo){ avatarPreviewImg.src = e.photo; avatarPreviewImg.style.display='block'; avatarPlaceholder.style.display='none'; }
-    else { avatarPreviewImg.src=''; avatarPreviewImg.style.display='none'; avatarPlaceholder.style.display='block'; }
-
-    document.getElementById('modalTitle').innerText='Edit Employee';
-    modal.style.display='flex'; modal.setAttribute('aria-hidden','false');
+document.getElementById('form').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const obj = {
+    fullName: document.getElementById('fullName').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
+    department: document.getElementById('department').value.trim(),
+    position: document.getElementById('position').value.trim(),
+    salary: Number(document.getElementById('salary').value) || 0,
+    hireDate: document.getElementById('hireDate').value || ''
   };
+  const idx = document.getElementById('idx').value;
+  if(idx===''){ employees.push(obj); toast('Employee saved'); }
+  else { employees[Number(idx)] = obj; toast('Employee updated'); }
+  save(EMP_KEY, employees);
+  document.getElementById('modal').style.display='none';
+  renderTable();
+  renderCards();
+});
 
-  // delete
-  window.deleteEmployee = function(index){
-    if(!confirm('Delete employee?')) return;
-    employees.splice(index,1);
-    localStorage.setItem('employees', JSON.stringify(employees));
-    showToast('Employee deleted', 'delete');
-    render();
-  };
+window.edit = function(i){
+  const e = employees[i];
+  document.getElementById('mTitle').textContent='Edit Employee';
+  document.getElementById('fullName').value = e.fullName || '';
+  document.getElementById('email').value = e.email || '';
+  document.getElementById('phone').value = e.phone || '';
+  document.getElementById('department').value = e.department || '';
+  document.getElementById('position').value = e.position || '';
+  document.getElementById('salary').value = e.salary || '';
+  document.getElementById('hireDate').value = e.hireDate || '';
+  document.getElementById('idx').value = i;
+  document.getElementById('modal').style.display='flex';
+};
 
-  // search
-  searchInput.addEventListener('input', ()=>{
-    const q = searchInput.value.trim().toLowerCase();
-    const filtered = employees.filter(e=>{
-      return (e.fullName||'').toLowerCase().includes(q) ||
-             (e.department||'').toLowerCase().includes(q) ||
-             (e.position||'').toLowerCase().includes(q) ||
-             (e.phone||'').toString().toLowerCase().includes(q) ||
-             (''+ (e.salary||'')).toLowerCase().includes(q);
-    });
-    render(filtered);
-  });
+window.del = function(i){
+  if(!confirm('Delete?')) return;
+  employees.splice(i,1);
+  save(EMP_KEY, employees);
+  renderTable();
+  renderCards();
+  toast('Deleted');
+};
 
-  // toggle view
-  let isCard = false;
-  toggleViewBtn.addEventListener('click', ()=>{
-    isCard = !isCard;
-    document.getElementById('employeeTable').style.display = isCard ? 'none' : 'table';
-    cards.style.display = isCard ? 'flex' : 'none';
-    toggleViewBtn.textContent = isCard ? 'Switch to Table View' : 'Switch to Cards View';
-  });
+document.getElementById('search').addEventListener('input',(e)=>{
+  const q = e.target.value.toLowerCase();
+  renderTable(employees.filter(emp => (emp.fullName||'').toLowerCase().includes(q) || (emp.department||'').toLowerCase().includes(q) || (emp.position||'').toLowerCase().includes(q) || (emp.phone||'').includes(q)));
+  renderCards(employees.filter(emp => (emp.fullName||'').toLowerCase().includes(q) || (emp.department||'').toLowerCase().includes(q)));
+});
 
-  // sorting
-  sortSelect.addEventListener('change', ()=> render());
+document.getElementById('viewDept').addEventListener('change',(e)=>{
+  const v=e.target.value; renderTable(v ? employees.filter(emp=>emp.department===v): employees); renderCards(v ? employees.filter(emp=>emp.department===v): employees);
+});
 
-  // export CSV
-  exportCsvBtn.addEventListener('click', ()=>{
-    const rows = employees.map(e=>({
-      fullName: e.fullName||'',
-      department: e.department||'',
-      position: e.position||'',
-      email: e.email||'',
-      phone: e.phone||'',
-      salary: e.salary||'',
-      hireDate: e.hireDate||''
-    }));
-    const csv = toCsv(rows);
-    downloadText(csv, 'employees.csv', 'text/csv;charset=utf-8;');
-  });
+document.getElementById('toggleView').addEventListener('click', ()=>{
+  const t = document.getElementById('tableCard'); const c = document.getElementById('cardsView');
+  if(t.style.display==='none'){ t.style.display='block'; c.style.display='none'; } else { t.style.display='none'; c.style.display='block'; }
+});
 
-  // export XLSX (SheetJS)
-  exportXlsxBtn.addEventListener('click', ()=>{
-    const rows = employees.map(e=>([e.fullName||'', e.department||'', e.position||'', e.email||'', e.phone||'', e.salary||'', e.hireDate||'']));
-    const ws = XLSX.utils.aoa_to_sheet([['Full Name','Department','Position','Email','Phone','Salary','Hire Date'], ...rows]);
-    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Employees');
-    XLSX.writeFile(wb, 'employees.xlsx');
-  });
+/* storage sync */
+window.addEventListener('storage',(e)=>{ if(e.key===EMP_KEY){ employees=read(EMP_KEY); renderTable(); renderCards(); } });
 
-  // export PDF using jsPDF (simple text table)
-  exportPdfBtn.addEventListener('click', ()=>{
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('l','pt','a4');
-    doc.setFontSize(14); doc.text('Employee Report', 40, 40);
-    const header = ['#','Full Name','Department','Position','Email','Phone','Salary','Hire Date'];
-    let y = 70;
-    doc.setFontSize(10);
-    doc.text(header.join('  |  '), 40, y); y+=14;
-    employees.forEach((e,i)=>{
-      const line = [i+1, e.fullName||'', e.department||'', e.position||'', e.email||'', e.phone||'', e.salary||'', e.hireDate||''].join('  |  ');
-      doc.text(line, 40, y); y+=12;
-      if(y>540){doc.addPage(); y=40;}
-    });
-    doc.save('employees.pdf');
-  });
-
-  // csv helper
-  function toCsv(rows){
-    if(!rows || !rows.length) return '';
-    const keys = Object.keys(rows[0]);
-    const lines = [keys.join(',')];
-    for(const r of rows){
-      lines.push(keys.map(k=>`"${String(r[k]||'').replace(/"/g,'""')}"`).join(','));
-    }
-    return lines.join('\n');
-  }
-  function downloadText(text, filename, mime){
-    const blob = new Blob([text], {type: mime||'text/plain'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = filename; document.body.appendChild(a); a.click(); a.remove();
-  }
-
-  // department modal open
-  topDeptCard.addEventListener('click', ()=> {
-    deptModal.style.display='flex';
-    deptModal.setAttribute('aria-hidden','false');
-  });
-  document.querySelectorAll('[data-close-dept]').forEach(b=>b.addEventListener('click', ()=>{ deptModal.style.display='none'; deptModal.setAttribute('aria-hidden','true'); }));
-
-  function loadDeptPerformance(){
-    const dept = deptSelect.value;
-    const perf = safeParse(localStorage.getItem('performanceData')) || {};
-    const employeesInDept = employees.filter(e=> (e.department||'Unassigned') === dept);
-    const tbody = document.querySelector('#deptTable tbody'); tbody.innerHTML='';
-    let total = 0;
-    employeesInDept.forEach((e,i)=>{
-      const scores = perf[e.fullName] ? Object.values(perf[e.fullName]).map(Number).filter(n=>!isNaN(n)) : [];
-      const avg = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
-      total += avg;
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(e.fullName)}</td><td>${avg?avg.toFixed(1)+'%':'0%'}</td>`;
-      tr.classList.add('row-highlight');
-      tbody.appendChild(tr);
-      setTimeout(()=>tr.classList.remove('row-highlight'),900);
-    });
-    const avgDept = employeesInDept.length ? (total / employeesInDept.length).toFixed(1) : 0;
-    document.getElementById('deptAvg').innerText = `Average Score: ${avgDept}%`;
-  }
-
-  loadDeptBtn.addEventListener('click', loadDeptPerformance);
-  downloadDeptPdf.addEventListener('click', ()=>{
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.text('Department Report',14,20);
-    const rows = Array.from(document.querySelectorAll('#deptTable tbody tr'));
-    let y=40;
-    rows.forEach(r=>{
-      const line = Array.from(r.cells).map(c=>c.innerText).join('  |  ');
-      doc.text(line, 14, y); y += 12;
-      if(y>780){doc.addPage(); y=20;}
-    });
-    doc.save('dept_report.pdf');
-  });
-
-  // simple toast
-  function showToast(msg, type='success'){
-    const t = document.createElement('div'); t.className='toast show';
-    t.innerText = msg; document.getElementById('toast-container').appendChild(t);
-    setTimeout(()=> t.classList.add('show'),50);
-    setTimeout(()=> { t.classList.remove('show'); setTimeout(()=>t.remove(),400); }, 3000);
-  }
-
-  // initial render and live sync
-  render();
-  // monitor localStorage changes (other tabs)
-  window.addEventListener('storage', (e)=>{
-    if(['employees','performanceData','payments'].includes(e.key)){
-      employees = safeParse(localStorage.getItem('employees')) || [];
-      render();
-    }
-  });
-
-  // small CSS animation class for department table rows
-  const style = document.createElement('style');
-  style.innerHTML = `.row-highlight{animation:fadeGreen .9s ease}@keyframes fadeGreen{0%{background:#e6ffeb}100%{background:white}}`;
-  document.head.appendChild(style);
-  </script>
+renderTable();
+renderCards();
+populateDept();
+</script>
 </body>
 </html>
-
