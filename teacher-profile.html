@@ -287,6 +287,43 @@
 <!-- tiny toast -->
 <div id="toast" class="toast"></div>
 
+  <script>
+function saveTeacherAttendance(status) {
+    const activeTeacher = JSON.parse(localStorage.getItem("active_teacher"));
+    if (!activeTeacher) return alert("Teacher session missing.");
+
+    const today = new Date().toLocaleDateString();
+    const key = "teacher_attendance";
+
+    let data = JSON.parse(localStorage.getItem(key) || "[]");
+
+    let record = data.find(r => r.date === today && r.email === activeTeacher.email);
+
+    if (!record) {
+        record = {
+            name: activeTeacher.name,
+            email: activeTeacher.email,
+            date: today,
+            clockIn: null,
+            clockOut: null,
+            status: ""
+        };
+        data.push(record);
+    }
+
+    if (status === "IN") {
+        record.clockIn = new Date().toLocaleTimeString();
+        record.status = "Present";
+    } else {
+        record.clockOut = new Date().toLocaleTimeString();
+    }
+
+    localStorage.setItem(key, JSON.stringify(data));
+    alert("Attendance saved!");
+}
+</script>
+
+
 <script>
 /* -------------------------
   Utilities & Keys
