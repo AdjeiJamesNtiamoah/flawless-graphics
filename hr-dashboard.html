@@ -1,441 +1,727 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Flawless Graphics — HR Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Flawless Graphics — HR Dashboard (Advanced)</title>
+
+<!-- Fonts & icons -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- jsPDF (export PDF) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
-  :root{--bg:#f4f7fb;--card:#fff;--accent:#003366;--accent2:#0077cc;--muted:#6b7a89}
-  .dark{--bg:#071027;--card:#0f1b2b;--accent:#00d1ff;--accent2:#7a00ff;--muted:#9fb4c9;color:#e8f6ff}
-  *{box-sizing:border-box;font-family:Poppins,system-ui,Arial}
-  body{margin:0;background:var(--bg);color:var(--muted);transition:background .2s,color .2s}
-  header{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;padding:16px;display:flex;align-items:center;justify-content:space-between}
-  header h1{margin:0;font-size:18px}
-  .wrap{max-width:1200px;margin:18px auto;padding:12px}
-  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
-  .card{background:var(--card);padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
-  .card h3{margin:0 0 8px 0;color:var(--accent)}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:10px;border-bottom:1px solid #eee;text-align:left}
-  thead th{position:sticky;top:0;background:var(--accent);color:#fff}
+  :root{
+    --bg:#f6f8fb; --card:#ffffff; --muted:#6b7a89; --accent:#0b63a3; --accent2:#00a6b6;
+    --success:#16a34a; --danger:#e02424; --glass: rgba(2,10,30,0.03);
+  }
+  .dark{ --bg:#071027; --card:#0f1b2b; --muted:#9fb4c9; --accent:#00d1ff; --accent2:#7a00ff; color:#e8f6ff;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Poppins',sans-serif;background:var(--bg);color:inherit;transition:background .25s}
+  header{display:flex;align-items:center;gap:12px;padding:14px 20px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff}
+  header .brand{font-weight:700;font-size:18px}
+  .wrap{max-width:1200px;margin:20px auto;padding:0 16px}
+  .topbar{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:16px}
   .controls{display:flex;gap:8px;align-items:center}
-  .btn{padding:8px 12px;border-radius:8px;border:0;background:var(--accent);color:#fff;cursor:pointer}
-  .btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--muted)}
-  .flex{display:flex;gap:12px;align-items:center}
-  #activityFeed{max-height:180px;overflow:auto}
-  .right-col{width:350px}
-  .layout{display:flex;gap:12px}
-  .left{flex:1}
-  .notif-bell{position:relative;cursor:pointer}
-  .notif-count{position:absolute;top:-6px;right:-6px;background:#e53935;color:#fff;border-radius:999px;padding:3px 7px;font-size:12px}
-  .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;z-index:2000}
-  .modal .box{width:100%;max-width:640px;background:var(--card);padding:16px;border-radius:10px}
-  .toast{position:fixed;right:20px;bottom:24px;background:#222;color:#fff;padding:10px 14px;border-radius:8px;opacity:0;transform:translateY(10px);transition:all .28s}
-  .toast.show{opacity:1;transform:none}
-  @media(max-width:900px){ .kpis{grid-template-columns:repeat(2,1fr)} .layout{flex-direction:column} .right-col{width:100%} }
+  .btn{background:transparent;border:1px solid rgba(0,0,0,0.08);padding:8px 10px;border-radius:8px;cursor:pointer;font-weight:600}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;border:0}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+  .card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 6px 20px var(--glass);border:1px solid rgba(0,0,0,0.04)}
+  .col-3{grid-column:span 3}
+  .col-4{grid-column:span 4}
+  .col-6{grid-column:span 6}
+  .col-12{grid-column:span 12}
+  h3{margin:0 0 8px 0}
+  .kpi{display:flex;flex-direction:column;gap:6px}
+  .kpi .value{font-size:22px;font-weight:700}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:10px;border-bottom:1px solid rgba(0,0,0,0.06);text-align:left;font-size:14px}
+  th{background:linear-gradient(90deg,rgba(0,0,0,0.02),transparent);position:sticky;top:0}
+  .scroll{max-height:320px;overflow:auto}
+  .small{font-size:13px;color:var(--muted)}
+  /* Toast */
+  #toast{position:fixed;right:20px;bottom:20px;padding:12px 16px;border-radius:10px;background:#022;color:#fff;display:none;z-index:9999}
+  #toast.show{display:block;animation:toastIn .35s ease}
+  @keyframes toastIn{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+  /* draggable placeholder */
+  .widget{cursor:grab}
+  .dragging{opacity:0.6}
+  /* responsive */
+  @media(max-width:960px){ .col-3,.col-4{grid-column:span 6} .col-6{grid-column:span 12} }
 </style>
 </head>
 <body>
 <header>
-  <h1>FLAWLESS GRAPHICS — HR Dashboard</h1>
-  <div class="flex">
-    <div class="notif-bell" id="notifBell" title="Notifications">
-      🔔 <span id="notifCount" class="notif-count" style="display:none">0</span>
-    </div>
-    <a href="welcome.html">Home</a></li>
-    <button class="btn" id="addEmpBtn">+ Add Employee</button>
-    <button class="btn" id="exportBtn">Export Org</button>
-    <button class="btn ghost" id="toggleTheme">Theme</button>
+  <div style="display:flex;align-items:center;gap:12px">
+    <img src="logo.gif" alt="logo" width="36" style="border-radius:8px">
+    <div class="brand">FLAWLESS GRAPHICS — HR Dashboard</div>
   </div>
+  <div style="margin-left:auto" class="small">Advanced HR Console</div>
 </header>
 
 <div class="wrap">
-  <div class="kpis">
-    <div class="card"><h3>Employees</h3><div id="k_employees" style="font-size:22px;font-weight:700">0</div></div>
-    <div class="card"><h3>Departments</h3><div id="k_departments" style="font-size:22px;font-weight:700">0</div></div>
-    <div class="card"><h3>Attendance Rate</h3><div id="k_attendance" style="font-size:22px;font-weight:700">0%</div></div>
-    <div class="card"><h3>Total Payroll (GHS)</h3><div id="k_payroll" style="font-size:22px;font-weight:700">0</div></div>
-  </div>
+  <div class="topbar">
+    <div style="display:flex;gap:10px;align-items:center">
+      <label class="small">Organization</label>
+      <select id="orgSelect" class="btn"></select>
 
-  <div class="layout">
-    <div class="left">
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <h3>Employee Directory</h3>
-          <div class="controls">
-            <input id="searchEmp" placeholder="Search name/department/position" style="padding:8px;border-radius:8px;border:1px solid #ddd">
-            <select id="deptFilter" style="padding:8px;border-radius:8px;border:1px solid #ddd">
-              <option value="">All Depts</option>
-            </select>
-            <button class="btn ghost" id="toggleView">Cards</button>
-          </div>
-        </div>
+      <label class="small">View</label>
+      <select id="viewMode" class="btn">
+        <option value="overview">Overview</option>
+        <option value="analytics">Analytics</option>
+        <option value="payroll">Payroll</option>
+        <option value="attendance">Attendance</option>
+        <option value="messages">Messages</option>
+      </select>
 
-        <div id="tableWrap" style="margin-top:12px">
-          <table id="empTable" style="background:white">
-            <thead>
-              <tr><th>#</th><th>Full Name</th><th>Dept</th><th>Pos</th><th>Email</th><th>Phone</th><th>Salary</th><th>Hired</th><th>Actions</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div style="margin-top:12px" class="card">
-        <h3>Activity Feed</h3>
-        <div id="activityFeed"></div>
-      </div>
+      <button class="btn" id="refreshBtn" title="Refresh data">Refresh</button>
     </div>
 
-    <div class="right-col">
-      <div class="card">
-        <h3>Payroll / Payslip</h3>
-        <div>
-          <select id="paySelect" style="width:100%;padding:8px;border-radius:8px;border:1px solid #ddd">
-            <option value="">-- Select employee --</option>
-          </select>
-          <input id="payAmount" type="number" placeholder="Amount (GHS)" style="width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1px solid #ddd">
-          <input id="payNote" placeholder="Note (optional)" style="width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1px solid #ddd">
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button class="btn" id="recordPay">Record Payment</button>
-            <button class="btn ghost" id="downloadPay">Download Last Payslip</button>
-          </div>
-        </div>
-      </div>
-
-      <div style="margin-top:12px" class="card">
-        <h3>Notifications</h3>
-        <div id="notifList" style="max-height:200px;overflow:auto"></div>
-        <div style="margin-top:8px;display:flex;gap:8px"><button class="btn ghost" id="clearNotifs">Clear</button></div>
-      </div>
-
-      <div style="margin-top:12px" class="card">
-        <h3>Attendance Chart (30 days)</h3>
-        <canvas id="attChart" height="140"></canvas>
-      </div>
+    <div class="controls">
+      <button class="btn" id="exportPdfBtn">Export PDF</button>
+      <button class="btn" id="exportDataBtn">Export JSON</button>
+      <button class="btn" id="toggleThemeBtn">Dark / Light</button>
+      <button class="btn primary" id="newEmployeeBtn">+ New Employee</button>
     </div>
   </div>
-</div>
 
-<!-- Add/Edit Employee Modal -->
-<div class="modal" id="empModal"><div class="box card">
-  <h3 id="empModalTitle">Add Employee</h3>
-  <form id="empForm">
-    <input id="e_fullName" placeholder="Full name" required style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:1px solid #ddd">
-    <input id="e_email" type="email" placeholder="Email" style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:1px solid #ddd">
-    <input id="e_phone" placeholder="Phone" style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:1px solid #ddd">
-    <input id="e_department" placeholder="Department" style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:1px solid #ddd">
-    <input id="e_position" placeholder="Position" style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:1px solid #ddd">
-    <input id="e_salary" type="number" placeholder="Salary (monthly)" style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:1px solid #ddd">
-    <input id="e_hireDate" type="date" style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:1px solid #ddd">
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <button class="btn" type="submit">Save</button>
-      <button class="btn ghost" type="button" id="cancelEmp">Cancel</button>
+  <!-- draggable grid -->
+  <div id="dashboardGrid" class="grid" style="align-items:start">
+    <!-- KPIs -->
+    <div id="widgetKpis" class="card col-3 widget" data-widget="kpis">
+      <h3>Key Metrics</h3>
+      <div class="kpi">
+        <div class="small">Employees</div><div class="value" id="k_employees">0</div>
+      </div>
+      <div class="kpi">
+        <div class="small">Departments</div><div class="value" id="k_departments">0</div>
+      </div>
+      <div class="kpi">
+        <div class="small">Attendance Rate (30d)</div><div class="value" id="k_attendance">0%</div>
+      </div>
+      <div class="kpi">
+        <div class="small">Projected Payroll (Monthly)</div><div class="value" id="k_payroll">GHS 0</div>
+      </div>
     </div>
-    <input type="hidden" id="editIndex">
-  </form>
-</div></div>
 
-<div id="toast" class="toast"></div>
+    <!-- Live Attendance -->
+    <div id="widgetLive" class="card col-4 widget" data-widget="live">
+      <h3>Live Attendance Board</h3>
+      <div class="small">Recent clock-ins / outs (real-time)</div>
+      <div id="liveList" class="scroll" style="margin-top:8px"></div>
+      <div style="margin-top:8px">
+        <button class="btn" id="clearLiveBtn">Clear</button>
+      </div>
+    </div>
+
+    <!-- Attendance Chart -->
+    <div id="widgetAttendanceChart" class="card col-5 widget" data-widget="attchart">
+      <h3>Attendance Analytics</h3>
+      <canvas id="attChart" height="160"></canvas>
+    </div>
+
+    <!-- Department Productivity -->
+    <div id="widgetDeptProd" class="card col-6 widget" data-widget="deptprod">
+      <h3>Department Productivity</h3>
+      <canvas id="deptChart" height="160"></canvas>
+    </div>
+
+    <!-- Payroll Summary -->
+    <div id="widgetPayroll" class="card col-6 widget" data-widget="payroll">
+      <h3>Payroll Summary</h3>
+      <div class="small">Total payroll, breakdown & quick payslip generator</div>
+      <div style="margin-top:8px" id="payrollSummary"></div>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <select id="payEmployee" class="btn"></select>
+        <input id="payAmount" type="number" placeholder="Amount" style="padding:8px;border-radius:8px;border:1px solid #ddd" />
+        <button class="btn primary" id="recordPaymentBtn">Record Payment</button>
+        <button class="btn" id="downloadPayslipBtn">Payslip PDF</button>
+      </div>
+    </div>
+
+    <!-- Messages / Announcements -->
+    <div id="widgetMessages" class="card col-6 widget" data-widget="messages">
+      <h3>Announcements & Messages</h3>
+      <div style="display:flex;gap:8px">
+        <input id="annTitle" placeholder="Announcement title" style="flex:1;padding:8px;border-radius:8px;border:1px solid #ddd">
+        <button class="btn primary" id="postAnnBtn">Post</button>
+      </div>
+      <textarea id="annBody" placeholder="Write announcement..." style="width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1px solid #ddd"></textarea>
+
+      <div style="margin-top:10px">
+        <strong>Inbox</strong>
+        <div id="inboxList" class="scroll" style="margin-top:8px;max-height:160px"></div>
+      </div>
+    </div>
+
+    <!-- Activity Log -->
+    <div id="widgetLog" class="card col-12 widget" data-widget="log">
+      <h3>Activity / Audit Log</h3>
+      <div class="small">Track HR actions (edits, payroll, deletes)</div>
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <button class="btn" id="downloadLogBtn">Export Log</button>
+        <button class="btn" id="clearLogBtn">Clear Log</button>
+      </div>
+      <div id="logList" class="scroll" style="margin-top:8px;max-height:180px"></div>
+    </div>
+
+  </div> <!-- grid end -->
+
+</div> <!-- wrap end -->
+
+<!-- Toast -->
+<div id="toast"></div>
 
 <script>
-/* ---------- Storage Keys ---------- */
-const ORG = localStorage.getItem('active_org') || 'FLAWLESS_GRAPHICS';
-const EMP_KEY = `${ORG}_employees`;
-const PAY_KEY = `${ORG}_payments`;
-const ATT_KEY = `${ORG}_teacher_attendance`;
-const NOTIF_KEY = `${ORG}_notifications`;
+/* ----------------------------
+  Utilities & Keys
+---------------------------- */
+function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
+const DEFAULT_ORG = localStorage.getItem('active_org') || 'Flawless_Graphics';
+let ACTIVE_ORG = localStorage.getItem('active_org') || DEFAULT_ORG;
 
-/* ---------- Utilities ---------- */
-function read(k){ try{ return JSON.parse(localStorage.getItem(k))||[] }catch(e){return []} }
-function save(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
-function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2600) }
+function orgKey(s){ return `${ACTIVE_ORG}_${s}`; }
 
-/* ---------- Init ---------- */
-let employees = read(EMP_KEY);
-let payments = read(PAY_KEY);
-let notifications = read(NOTIF_KEY);
-let attData = read(ATT_KEY);
-const empTbody = document.querySelector('#empTable tbody');
-const paySelect = document.getElementById('paySelect');
-
-function pushNotif(text){
-  const n = { id:Date.now(), text, date: new Date().toISOString() };
-  notifications.unshift(n);
-  save(NOTIF_KEY, notifications);
-  renderNotifs();
-  updateNotifCount();
+/* Keys used (per-org)
+   employees -> employees
+   attendance -> attendance
+   payments -> payments
+   announcements -> announcements
+   messages -> messages (employee->hr)
+   activity_log -> activity_log
+*/
+function read(k){ return safeParse(localStorage.getItem(orgKey(k))) || [] }
+function save(k,v){ localStorage.setItem(orgKey(k), JSON.stringify(v)); }
+function pushLog(action, meta = {}) {
+  const log = read('activity_log');
+  log.unshift({ ts: Date.now(), action, meta });
+  save('activity_log', log);
+  renderLog();
 }
 
-/* ---------- Render ---------- */
-function renderEmployees(list = employees){
-  empTbody.innerHTML = '';
-  employees = list;
-  employees.forEach((e,i) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td><td>${e.fullName}</td><td>${e.department||''}</td><td>${e.position||''}</td>
-      <td>${e.email||''}</td><td>${e.phone||''}</td><td>GHS ${Number(e.salary||0).toLocaleString()}</td><td>${e.hireDate||''}</td>
-      <td>
-        <button class="btn" onclick="editEmployee(${i})">Edit</button>
-        <button class="btn ghost" onclick="deleteEmployee(${i})">Delete</button>
-      </td>`;
-    empTbody.appendChild(tr);
-  });
-  populateDeptFilter();
-  populatePaySelect();
-  updateKPIs();
-}
+/* Toast helper */
+function showToast(msg, t=2600){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'), t); }
 
-function populateDeptFilter(){
-  const sel = document.getElementById('deptFilter');
-  const depts = [...new Set(employees.map(e=>e.department).filter(Boolean))];
-  sel.innerHTML = '<option value="">All Depts</option>'+depts.map(d=>`<option value="${d}">${d}</option>`).join('');
-}
+/* init org list from stored orgs */
+function getKnownOrgs(){ return safeParse(localStorage.getItem('org_list')) || [DEFAULT_ORG]; }
+function saveKnownOrgs(arr){ localStorage.setItem('org_list', JSON.stringify(arr)); }
 
-function populatePaySelect(){
-  paySelect.innerHTML = '<option value="">-- Select employee --</option>';
-  employees.forEach((e,i)=> paySelect.innerHTML += `<option value="${i}">${e.fullName} — GHS ${Number(e.salary||0).toLocaleString()}</option>`);
-}
-
-/* ---------- KPIs ---------- */
-function updateKPIs(){
-  document.getElementById('k_employees').textContent = employees.length;
-  document.getElementById('k_departments').textContent = [...new Set(employees.map(e=>e.department).filter(Boolean))].length;
-  // attendance rate: percent of days with any "in" records over recent 30 days vs employees count (simplified)
-  const last30 = attData.filter(a => (Date.now() - new Date(a.date).getTime()) < 30*24*3600*1000 && a.action === 'in');
-  const presentUnique = new Set(last30.map(a=>a.employeeIndex));
-  const rate = employees.length ? Math.round((presentUnique.size / employees.length)*100) : 0;
-  document.getElementById('k_attendance').textContent = rate + '%';
-  const totalPayroll = employees.reduce((s,e)=>s + Number(e.salary||0),0);
-  document.getElementById('k_payroll').textContent = 'GHS ' + totalPayroll.toLocaleString();
-}
-
-/* ---------- Activity feed ---------- */
-function renderActivity(){
-  const feed = document.getElementById('activityFeed');
-  const recent = [...(read(ATT_KEY) || [])].slice().reverse().slice(0,50);
-  const pay = read(PAY_KEY).slice().reverse().slice(0,20);
-  let items = [];
-  recent.forEach(r => {
-    const name = (employees[r.employeeIndex]||{}).fullName || `Employee #${r.employeeIndex}`;
-    items.push(`${new Date(r.date).toLocaleString()} • ${name} • ${r.action.toUpperCase()}`);
-  });
-  pay.forEach(p => items.push(`${new Date(p.date).toLocaleString()} • Payment: ${p.name} • GHS ${p.amount}`));
-  if(!items.length) feed.innerHTML = '<div style="color:var(--muted)">No activity yet</div>';
-  else feed.innerHTML = items.map(i=>`<div style="padding:6px 0;border-bottom:1px dashed #eee">${i}</div>`).join('');
-}
-
-/* ---------- Notifications ---------- */
-function renderNotifs(){
-  const wrap = document.getElementById('notifList');
-  wrap.innerHTML = notifications.length ? notifications.map(n=>`<div style="padding:8px 0;border-bottom:1px solid #eee">${n.text}<div style="font-size:12px;color:#888">${new Date(n.date).toLocaleString()}</div></div>`).join('') : '<div style="color:var(--muted)">No notifications</div>';
-}
-function updateNotifCount(){
-  const el = document.getElementById('notifCount');
-  if(notifications.length){ el.style.display='inline-block'; el.textContent = notifications.length } else el.style.display='none';
-}
-
-/* ---------- CRUD ---------- */
-document.getElementById('addEmpBtn').addEventListener('click', ()=> {
-  document.getElementById('empModalTitle').textContent = 'Add Employee';
-  document.getElementById('editIndex').value = '';
-  document.getElementById('empForm').reset();
-  document.getElementById('empModal').style.display = 'flex';
+/* ----------------------------
+  Theme & UI + Animated counters
+---------------------------- */
+const body = document.body;
+const themeBtn = document.getElementById('toggleThemeBtn');
+themeBtn.addEventListener('click', ()=> {
+  body.classList.toggle('dark');
+  localStorage.setItem('fg_dark_mode', body.classList.contains('dark') ? '1' : '0');
 });
+if(localStorage.getItem('fg_dark_mode') === '1') body.classList.add('dark');
 
-document.getElementById('cancelEmp').addEventListener('click', ()=> document.getElementById('empModal').style.display='none');
+/* Simple counter animation */
+function animateCount(el, to, prefix='') {
+  const from = Number(el.dataset.from || 0);
+  const duration = 800;
+  const start = performance.now();
+  function frame(now){
+    const p = Math.min(1, (now - start)/duration);
+    const val = Math.round(from + (to - from) * p);
+    el.textContent = prefix + val;
+    if(p < 1) requestAnimationFrame(frame);
+    else el.dataset.from = to;
+  }
+  requestAnimationFrame(frame);
+}
 
-document.getElementById('empForm').addEventListener('submit', (e)=>{
-  e.preventDefault();
-  const idx = document.getElementById('editIndex').value;
-  const obj = {
-    fullName:document.getElementById('e_fullName').value.trim(),
-    email:document.getElementById('e_email').value.trim(),
-    phone:document.getElementById('e_phone').value.trim(),
-    department:document.getElementById('e_department').value.trim(),
-    position:document.getElementById('e_position').value.trim(),
-    salary: Number(document.getElementById('e_salary').value) || 0,
-    hireDate: document.getElementById('e_hireDate').value || ''
-  };
-  if(idx===''){
-    employees.push(obj);
-    pushNotif(`New employee added: ${obj.fullName}`);
-    toast('Employee added');
+/* ----------------------------
+  Organization Switcher
+---------------------------- */
+const orgSelect = document.getElementById('orgSelect');
+function populateOrgs(){
+  const known = getKnownOrgs();
+  orgSelect.innerHTML = '';
+  known.forEach(o => {
+    const opt = document.createElement('option'); opt.value = o; opt.textContent = o.replace(/_/g,' ');
+    if(o === ACTIVE_ORG) opt.selected = true;
+    orgSelect.appendChild(opt);
+  });
+  const addOpt = document.createElement('option'); addOpt.value = '__add__'; addOpt.textContent = '+ Add organization'; orgSelect.appendChild(addOpt);
+}
+orgSelect.addEventListener('change', ()=>{
+  const v = orgSelect.value;
+  if(v === '__add__'){
+    const name = prompt('New organization name (short, no spaces)').trim().replace(/\s+/g,'_');
+    if(!name) { populateOrgs(); return; }
+    const known = getKnownOrgs(); if(!known.includes(name)) known.push(name); saveKnownOrgs(known);
+    localStorage.setItem('active_org', name); ACTIVE_ORG = name;
+    populateOrgs(); loadAll();
   } else {
-    employees[Number(idx)] = obj;
-    pushNotif(`Employee updated: ${obj.fullName}`);
-    toast('Employee updated');
+    ACTIVE_ORG = v; localStorage.setItem('active_org', v); loadAll();
   }
-  save(EMP_KEY, employees);
-  renderEmployees();
-  document.getElementById('empModal').style.display='none';
 });
 
-/* expose edit/delete for in-row buttons */
-window.editEmployee = function(i){
-  const e = employees[i];
-  document.getElementById('empModalTitle').textContent = 'Edit Employee';
-  document.getElementById('e_fullName').value = e.fullName || '';
-  document.getElementById('e_email').value = e.email || '';
-  document.getElementById('e_phone').value = e.phone||'';
-  document.getElementById('e_department').value = e.department||'';
-  document.getElementById('e_position').value = e.position||'';
-  document.getElementById('e_salary').value = e.salary||'';
-  document.getElementById('e_hireDate').value = e.hireDate||'';
-  document.getElementById('editIndex').value = i;
-  document.getElementById('empModal').style.display='flex';
-};
+/* ----------------------------
+  Data loaders / renders
+---------------------------- */
 
-window.deleteEmployee = function(i){
-  if(!confirm('Delete employee?')) return;
-  const removed = employees.splice(i,1)[0];
-  save(EMP_KEY, employees);
-  pushNotif(`Employee removed: ${removed.fullName}`);
-  renderEmployees();
-};
+const k_employees = document.getElementById('k_employees');
+const k_departments = document.getElementById('k_departments');
+const k_attendance = document.getElementById('k_attendance');
+const k_payroll = document.getElementById('k_payroll');
 
-/* ---------- Search / Filter ---------- */
-document.getElementById('searchEmp').addEventListener('input',(e)=>{
-  const q = e.target.value.toLowerCase();
-  renderEmployees(read(EMP_KEY).filter(emp => (emp.fullName||'').toLowerCase().includes(q) || (emp.department||'').toLowerCase().includes(q) || (emp.position||'').toLowerCase().includes(q)));
-});
-document.getElementById('deptFilter').addEventListener('change',(e)=>{
-  const v = e.target.value;
-  renderEmployees(v ? read(EMP_KEY).filter(emp => emp.department === v) : read(EMP_KEY));
-});
+function computeKPIs(){
+  const employees = read('employees');
+  animateCount(k_employees, employees.length);
+  const departments = [...new Set(employees.map(e=>e.department||'Unassigned'))].length;
+  animateCount(k_departments, departments);
+  // attendance rate last 30 days
+  const attendance = read('attendance');
+  const cutoff = Date.now() - 30*24*3600*1000;
+  const last30 = attendance.filter(a => new Date(a.date).getTime() >= cutoff);
+  const present = last30.filter(a => a.action === 'in').length;
+  const total = Math.max(1, last30.length);
+  const rate = Math.round((present / total) * 100);
+  animateCount(k_attendance, rate, '');
+  // payroll projected = sum of salaries
+  const payroll = employees.reduce((s,e)=> s + Number(e.salary||0), 0);
+  k_payroll.textContent = `GHS ${payroll.toLocaleString()}`;
+  k_payroll.dataset.from = payroll;
+}
 
-/* ---------- Payroll ---------- */
-document.getElementById('recordPay').addEventListener('click', ()=>{
-  const idx = paySelect.value;
-  if(idx==='') return alert('Select employee');
-  const amount = Number(document.getElementById('payAmount').value) || 0;
-  const note = document.getElementById('payNote').value.trim();
-  if(amount<=0) return alert('Enter amount');
-  const emp = employees[Number(idx)];
-  const p = { id:Date.now(), name: emp.fullName, employeeIndex: Number(idx), amount, note, date: new Date().toISOString() };
-  payments.unshift(p);
-  save(PAY_KEY, payments);
-  localStorage.setItem(`${ORG}_last_payslip`, JSON.stringify(p));
-  pushNotif(`Payroll recorded: ${emp.fullName} — GHS ${amount}`);
-  toast('Payment recorded');
-  document.getElementById('payAmount').value='';
-  document.getElementById('payNote').value='';
-  renderActivity();
-});
+/* render live attendance list */
+const liveList = document.getElementById('liveList');
+function renderLive(){
+  const attendance = read('attendance').slice().reverse().slice(0,60);
+  liveList.innerHTML = attendance.map(a => {
+    const who = a.name || a.fullName || a.email || 'Unknown';
+    const time = new Date(a.date).toLocaleString();
+    return `<div style="padding:6px 0;border-bottom:1px dashed rgba(0,0,0,0.04)"><strong>${who}</strong> — ${a.action.toUpperCase()} <span class="small">(${time})</span></div>`;
+  }).join('') || '<div class="small">No records</div>';
+}
 
-document.getElementById('downloadPay').addEventListener('click', ()=>{
-  const last = JSON.parse(localStorage.getItem(`${ORG}_last_payslip`) || 'null');
-  if(!last) return alert('No payslip available');
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  doc.setFontSize(16); doc.text('Flawless Graphics — Payslip',20,20);
-  doc.setFontSize(12); doc.text(`Name: ${last.name}`,20,40); doc.text(`Amount: GHS ${last.amount}`,20,55);
-  doc.text(`Date: ${new Date(last.date).toLocaleString()}`,20,70); if(last.note) doc.text(`Note: ${last.note}`,20,85);
-  doc.save(`payslip_${last.name.replace(/\s+/g,'_')}.pdf`);
-});
-
-/* ---------- Exports ---------- */
-document.getElementById('exportBtn').addEventListener('click', ()=>{
-  const data = { employees: read(EMP_KEY), payments: read(PAY_KEY), attendance: read(ATT_KEY), notifications: read(NOTIF_KEY) };
-  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${ORG}_export_${Date.now()}.json`; a.click();
-  toast('Export saved');
-});
-
-/* ---------- Notification UI ---------- */
-document.getElementById('notifBell').addEventListener('click', ()=> {
-  const modal = document.getElementById('empModal');
-  // quick notifications drawer: use alert style for simplicity
-  const list = read(NOTIF_KEY);
-  alert((list.length ? list.map(n=>`${new Date(n.date).toLocaleString()} — ${n.text}`).join('\n\n') : 'No notifications'));
-});
-
-/* ---------- Attendance Chart ---------- */
+/* Attendance analytics chart */
 let attChart = null;
-function drawAttChart(){
-  const counts = {};
-  const now = Date.now();
-  for(let i=29;i>=0;i--){
-    const d = new Date(now - i*24*3600*1000);
+function renderAttendanceChart(){
+  const attendance = read('attendance');
+  const last30days = Array.from({length:30}).map((_,i) => {
+    const d = new Date(); d.setDate(d.getDate() - (29 - i));
     const key = d.toISOString().split('T')[0];
-    counts[key]=0;
-  }
-  (read(ATT_KEY)||[]).forEach(a=>{
-    if(a.action==='in'){
-      const day = a.date.split('T')[0];
-      if(counts.hasOwnProperty(day)) counts[day] += 1;
-    }
+    const countIn = attendance.filter(a => a.action === 'in' && a.date.startsWith(key)).length;
+    return { day: key, in: countIn };
   });
-  const labels = Object.keys(counts);
-  const data = labels.map(k=>counts[k]);
+  const labels = last30days.map(r=>r.day.substr(5));
+  const data = last30days.map(r=>r.in);
   const ctx = document.getElementById('attChart').getContext('2d');
   if(attChart) attChart.destroy();
-  attChart = new Chart(ctx,{ type:'bar', data:{ labels, datasets:[{label:'Clock-ins', backgroundColor:'#0077cc', data}] }, options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}} }});
+  attChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets: [{ label:'Clock-ins (30d)', data, borderColor:'#0b63a3', backgroundColor:'rgba(11,99,163,0.12)', fill:true }]},
+    options: {responsive:true, plugins:{legend:{display:false}}}
+  });
 }
 
-/* ---------- Respond to storage changes (cross-window sync) ---------- */
-window.addEventListener('storage', (e)=>{
-  if(e.key && e.key.startsWith(ORG)){
-    employees = read(EMP_KEY);
-    payments = read(PAY_KEY);
-    notifications = read(NOTIF_KEY);
-    attData = read(ATT_KEY);
-    renderEmployees();
-    renderNotifs();
-    renderActivity();
-    drawAttChart();
-    updateNotifCount();
+/* Department productivity chart */
+let deptChart = null;
+function renderDeptChart(){
+  const employees = read('employees');
+  const attendance = read('attendance');
+  const depts = {};
+  employees.forEach(e => {
+    const d = e.department || 'Unassigned';
+    depts[d] = depts[d] || { employees:0, clockins:0, payroll:0 };
+    depts[d].employees++;
+    depts[d].payroll += Number(e.salary||0);
+    const hits = attendance.filter(a => (a.email || a.fullName) && ((a.email && a.email === e.email) || (a.fullName && a.fullName === e.fullName)) && a.action === 'in').length;
+    depts[d].clockins += hits;
+  });
+  const labels = Object.keys(depts);
+  const data = labels.map(l => depts[l].clockins);
+  const ctx = document.getElementById('deptChart').getContext('2d');
+  if(deptChart) deptChart.destroy();
+  deptChart = new Chart(ctx, {
+    type:'bar',
+    data:{ labels, datasets:[{ label:'Clockins', data, backgroundColor: labels.map((_,i)=> `hsl(${i*60 % 360} 65% 55% / 0.9)` ) }]},
+    options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
+  });
+}
+
+/* Payroll summary render */
+function renderPayrollSummary(){
+  const employees = read('employees');
+  const payments = read('payments');
+  const totalPayroll = employees.reduce((s,e)=> s + Number(e.salary||0), 0);
+  const paid = payments.reduce((s,p)=> s + Number(p.amount||0), 0);
+  const due = totalPayroll - paid;
+  document.getElementById('payrollSummary').innerHTML = `
+    <div class="small">Total monthly payroll: <strong>GHS ${totalPayroll.toLocaleString()}</strong></div>
+    <div class="small">Paid (this period): <strong>GHS ${paid.toLocaleString()}</strong></div>
+    <div class="small">Outstanding: <strong>GHS ${due.toLocaleString()}</strong></div>
+  `;
+  // populate payEmployee select
+  const sel = document.getElementById('payEmployee'); sel.innerHTML = '<option value="">-- select --</option>';
+  read('employees').forEach((e,i) => {
+    const opt = document.createElement('option'); opt.value = i; opt.textContent = `${e.fullName || e.email} — GHS ${Number(e.salary||0)}`;
+    sel.appendChild(opt);
+  });
+}
+
+/* render inbox */
+function renderInbox(){
+  const msgs = read('messages').slice().reverse();
+  const out = document.getElementById('inboxList');
+  out.innerHTML = msgs.map(m => `<div style="padding:8px;border-bottom:1px dashed rgba(0,0,0,0.04)"><strong>${m.subject||'Message'}</strong> • <span class="small">${new Date(m.date).toLocaleString()}</span><div class="small">${m.body}</div></div>`).join('') || '<div class="small">No messages</div>';
+}
+
+/* render log */
+function renderLog(){
+  const log = read('activity_log').slice(0,200);
+  const out = document.getElementById('logList');
+  out.innerHTML = log.map(l => `<div style="padding:6px;border-bottom:1px dashed rgba(0,0,0,0.05)"><strong>${l.action}</strong> <span class="small">• ${new Date(l.ts).toLocaleString()}</span><div class="small">${JSON.stringify(l.meta)}</div></div>`).join('') || '<div class="small">No actions yet</div>';
+}
+
+/* render everything */
+function loadAll(){
+  computeKPIs();
+  renderLive();
+  renderAttendanceChart();
+  renderDeptChart();
+  renderPayrollSummary();
+  renderInbox();
+  renderLog();
+  populateEmployeeSelector();
+}
+window.addEventListener('storage', (e) => {
+  // if other tabs create attendance or payments we respond
+  if(e.key && (e.key.endsWith('_attendance') || e.key.endsWith('_employees') || e.key.endsWith('_payments') || e.key.endsWith('_messages'))) {
+    // slight delay to allow consistent read
+    setTimeout(()=> loadAll(), 60);
+    // show notification when teacher clocks in/out
+    if(e.key && e.key.includes('_attendance')) {
+      const arr = safeParse(e.newValue) || [];
+      const last = arr[arr.length - 1];
+      if(last) showLiveNotification(last);
+    }
   }
 });
 
-/* ---------- Initial render ---------- */
-employees = read(EMP_KEY);
-payments = read(PAY_KEY);
-notifications = read(NOTIF_KEY);
-attData = read(ATT_KEY);
-renderEmployees();
-renderNotifs();
-renderActivity();
-drawAttChart();
-updateNotifCount();
+/* ----------------------------
+  Actions (payments, announcements, messages)
+---------------------------- */
 
-/* set theme from storage */
-if(localStorage.getItem('fg_theme_dark')==='true') document.documentElement.classList.add('dark');
-document.getElementById('toggleTheme').addEventListener('click', ()=>{
-  const now = document.documentElement.classList.toggle('dark');
-  localStorage.setItem('fg_theme_dark', now ? 'true' : 'false');
+/* New employee modal (simple prompt flow) */
+document.getElementById('newEmployeeBtn').addEventListener('click', ()=>{
+  const fullName = prompt('Full name'); if(!fullName) return;
+  const email = prompt('Email') || '';
+  const department = prompt('Department') || 'General';
+  const position = prompt('Position') || '';
+  const phone = prompt('Phone') || '';
+  const salary = Number(prompt('Monthly salary (number)') || 0);
+  const hireDate = prompt('Hire date (yyyy-mm-dd)') || new Date().toISOString().split('T')[0];
+  const employees = read('employees');
+  employees.push({ fullName, email, department, position, phone, salary, hireDate });
+  save('employees', employees);
+  pushLog('employee.add', { fullName, email, department });
+  showToast('Employee added');
+  loadAll();
 });
 
-/* quick auto-update on page */
-setInterval(()=>{ employees = read(EMP_KEY); renderEmployees(); renderActivity(); drawAttChart(); }, 30000);
+/* Record payment */
+document.getElementById('recordPaymentBtn').addEventListener('click', ()=>{
+  const sel = document.getElementById('payEmployee');
+  if(!sel.value) return alert('Select employee');
+  const idx = Number(sel.value);
+  const employees = read('employees');
+  const emp = employees[idx];
+  const amount = Number(document.getElementById('payAmount').value) || 0;
+  if(amount <= 0) return alert('Enter amount');
+  const payments = read('payments');
+  payments.push({ date: new Date().toISOString(), name: emp.fullName, email: emp.email, amount, by: 'HR' });
+  save('payments', payments);
+  pushLog('payment.record', { name: emp.fullName, amount });
+  showToast('Payment recorded');
+  renderPayrollSummary();
+});
 
-  function loadTeacherAttendance() {
-    const data = JSON.parse(localStorage.getItem("teacher_attendance") || "[]");
+/* download payslip for last payment of selected employee */
+document.getElementById('downloadPayslipBtn').addEventListener('click', ()=>{
+  const sel = document.getElementById('payEmployee');
+  if(!sel.value) return alert('Select employee');
+  const idx = Number(sel.value);
+  const emp = read('employees')[idx];
+  const payments = read('payments').filter(p => p.email === emp.email);
+  if(!payments.length) return alert('No payments for employee');
+  const p = payments[payments.length - 1];
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.setFontSize(14); doc.text('Flawless Graphics — Payslip', 20, 30);
+  doc.setFontSize(12); doc.text(`Name: ${p.name}`, 20, 50); doc.text(`Email: ${p.email}`, 20, 60); doc.text(`Amount: GHS ${p.amount}`, 20, 70); doc.text(`Date: ${new Date(p.date).toLocaleString()}`, 20, 80);
+  doc.save(`payslip_${p.name.replace(/\s+/g,'_')}.pdf`);
+});
 
-    const table = document.getElementById("teacherAttendanceTableBody");
-    if (!table) return;
+/* Post announcement */
+document.getElementById('postAnnBtn').addEventListener('click', ()=>{
+  const title = document.getElementById('annTitle').value.trim();
+  const body = document.getElementById('annBody').value.trim();
+  if(!title || !body) return alert('Complete announcement');
+  const anns = read('announcements');
+  anns.unshift({ title, body, ts: Date.now(), by: 'HR' });
+  save('announcements', anns);
+  pushLog('announcement.post', { title });
+  showToast('Announcement posted');
+  document.getElementById('annTitle').value=''; document.getElementById('annBody').value='';
+});
 
-    table.innerHTML = "";
-
-    data.forEach(r => {
-        table.innerHTML += `
-            <tr>
-                <td>${r.name}</td>
-                <td>${r.email}</td>
-                <td>${r.date}</td>
-                <td>${r.clockIn || "-"}</td>
-                <td>${r.clockOut || "-"}</td>
-                <td>${r.status}</td>
-            </tr>
-        `;
-    });
+/* ----------------------------
+  Live notification when teacher clocks in/out
+---------------------------- */
+function showLiveNotification(record){
+  // simple notification + push to inbox for HR
+  showToast(`${record.name || record.fullName || record.email} ${record.action.toUpperCase()}`);
+  // push into messages/notifications
+  const notes = read('notifications');
+  notes.unshift({ ts: Date.now(), type:'attendance', record });
+  save('notifications', notes);
+  // Also add to activity log
+  pushLog('attendance.event', { name: record.name, action: record.action });
 }
 
-loadTeacherAttendance();
+/* ----------------------------
+  Simple anomaly detector & AI-like insights
+---------------------------- */
+function detectAnomalies(){
+  const attendance = read('attendance');
+  const employees = read('employees');
+  const anomalies = [];
 
+  // detect employees with many late/out patterns
+  const byEmail = {};
+  attendance.forEach(a => {
+    const idKey = a.email || a.fullName || (a.name || 'unknown');
+    byEmail[idKey] = byEmail[idKey] || { in:0, out:0, lastDates:[] };
+    if(a.action === 'in') byEmail[idKey].in++;
+    if(a.action === 'out') byEmail[idKey].out++;
+    byEmail[idKey].lastDates.push(a.date);
+  });
+
+  Object.entries(byEmail).forEach(([k,v])=>{
+    if(v.in > 0 && v.lastDates.length >= 8) {
+      // heuristic: if >50% of last entries are after 10:30 (late) -> flag
+      const lateCount = v.lastDates.filter(d => {
+        try {
+          const t = new Date(d).toLocaleTimeString();
+          const hh = Number(t.split(':')[0]);
+          const mm = Number(t.split(':')[1]);
+          if(hh > 10) return true;
+          if(hh === 10 && mm > 30) return true;
+          return false;
+        } catch(e){ return false }
+      }).length;
+      if(lateCount / v.lastDates.length > 0.5) anomalies.push({ who: k, reason: 'Frequent Lateness', score: Math.round((lateCount/v.lastDates.length)*100) });
+    }
+    // sudden drop in attendance
+    if(v.in > 0 && v.in < 2) anomalies.push({ who: k, reason: 'Low activity', score: 60 });
+  });
+
+  // simple performance summary (highest clockins)
+  const perf = Object.entries(byEmail).map(([k,v]) => ({ who:k, clockins:v.in }));
+  perf.sort((a,b)=>b.clockins - a.clockins);
+  const top = perf.slice(0,3);
+
+  return { anomalies, top };
+}
+
+function renderAIInsights(){
+  const { anomalies, top } = detectAnomalies();
+  const el = document.createElement('div');
+  el.innerHTML = `<h4>Smart Insights</h4>
+    <div class="small"><strong>Top performers (by clock-ins):</strong> ${top.map(t=>`${t.who} (${t.clockins})`).join(', ') || 'N/A'}</div>
+    <div style="margin-top:8px"><strong>Anomalies:</strong></div>
+    <div class="small">${anomalies.length ? anomalies.map(a=>`${a.who}: ${a.reason} (${a.score}%)`).join('; ') : 'No anomalies detected'}</div>
+  `;
+  // inject into log widget top
+  const logWidget = document.getElementById('widgetLog');
+  if(logWidget) logWidget.insertBefore(el, logWidget.firstChild.nextSibling);
+}
+
+/* ----------------------------
+  Exports
+---------------------------- */
+document.getElementById('exportDataBtn').addEventListener('click', ()=>{
+  const data = {
+    employees: read('employees'),
+    attendance: read('attendance'),
+    payments: read('payments'),
+    announcements: read('announcements'),
+    messages: read('messages'),
+    activity_log: read('activity_log')
+  };
+  const blob = new Blob([JSON.stringify(data,null,2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${ACTIVE_ORG}_export.json`; a.click();
+});
+
+/* Export PDF (simple snapshot) */
+document.getElementById('exportPdfBtn').addEventListener('click', async ()=>{
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p','pt','a4');
+  doc.setFontSize(14); doc.text(`${ACTIVE_ORG} — HR Dashboard Snapshot`, 40, 40);
+  doc.setFontSize(10); doc.text(`Employees: ${read('employees').length}`, 40, 70);
+  doc.text(`Departments: ${[...new Set(read('employees').map(e=>e.department||''))].length}`, 40, 86);
+  doc.text(`Generated: ${new Date().toLocaleString()}`, 40, 102);
+  doc.save(`${ACTIVE_ORG}_dashboard_snapshot.pdf`);
+});
+
+/* Download log */
+document.getElementById('downloadLogBtn').addEventListener('click', ()=>{
+  const blob = new Blob([JSON.stringify(read('activity_log'),null,2)], { type:'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${ACTIVE_ORG}_activity_log.json`; a.click();
+});
+
+/* Clear log */
+document.getElementById('clearLogBtn').addEventListener('click', ()=>{
+  if(!confirm('Clear activity log?')) return;
+  save('activity_log', []); renderLog(); showToast('Activity log cleared');
+});
+
+/* Clear live */
+document.getElementById('clearLiveBtn').addEventListener('click', ()=>{
+  if(!confirm('Clear attendance records?')) return;
+  save('attendance', []); renderLive(); showToast('Attendance cleared'); pushLog('attendance.clear');
+});
+
+/* download payments and payroll export */
+document.getElementById('downloadPayslipBtn').addEventListener('click', ()=>{/* handled above */});
+
+/* clear all convenience */
+document.getElementById('refreshBtn').addEventListener('click', ()=> loadAll());
+
+/* ----------------------------
+  Employee selector populate
+---------------------------- */
+function populateEmployeeSelector(){
+  const sel = document.getElementById('payEmployee');
+  sel.innerHTML = '<option value="">-- select --</option>';
+  read('employees').forEach((e,i)=> {
+    const opt = document.createElement('option'); opt.value = i; opt.textContent = `${e.fullName || e.email} — ${e.department || 'General'}`;
+    sel.appendChild(opt);
+  });
+}
+
+/* ----------------------------
+  Activity listener for UI actions
+---------------------------- */
+function recordAction(action, meta){
+  pushLog(action, meta);
+}
+
+/* ----------------------------
+  Drag & drop widgets (reorder)
+---------------------------- */
+(function makeDraggable(){
+  const grid = document.getElementById('dashboardGrid');
+  let dragged = null;
+  grid.addEventListener('dragstart', (e)=> {
+    dragged = e.target;
+    e.target.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  grid.addEventListener('dragend', (e)=> {
+    if(dragged) dragged.classList.remove('dragging');
+    dragged = null;
+  });
+  grid.addEventListener('dragover', (e)=> {
+    e.preventDefault();
+    const after = getDragAfterElement(grid, e.clientY);
+    if(!dragged) return;
+    if(after == null) grid.appendChild(dragged);
+    else grid.insertBefore(dragged, after);
+  });
+  function getDragAfterElement(container, y){
+    const draggableElements = [...container.querySelectorAll('.widget:not(.dragging)')];
+    return draggableElements.reduce((closest, child) => {
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height/2;
+      if(offset < 0 && offset > closest.offset) return { offset, element: child };
+      else return closest;
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+  }
+  // enable drag attribute
+  document.querySelectorAll('.widget').forEach(w => w.setAttribute('draggable', 'true'));
+})();
+
+/* ----------------------------
+  Init known orgs & first load
+---------------------------- */
+(function init(){
+  const known = getKnownOrgs();
+  if(!known.includes(ACTIVE_ORG)) {
+    known.push(ACTIVE_ORG); saveKnownOrgs(known);
+  }
+  populateOrgs();
+  // seed empty arrays if missing
+  ['employees','attendance','payments','announcements','messages','activity_log','notifications'].forEach(k=> {
+    if(!localStorage.getItem(orgKey(k))) localStorage.setItem(orgKey(k), JSON.stringify([]));
+  });
+  loadAll();
+  renderAIInsights();
+})();
+
+/* ----------------------------
+  Utility: showLiveNotification toasts on page load (if any new)
+---------------------------- */
+function showLiveNotificationIfAny(){
+  const notes = read('notifications');
+  if(notes && notes.length){
+    const latest = notes[0];
+    showToast(`Notification: ${latest.record && (latest.record.name || latest.record.fullName || latest.record.email)} ${latest.record.action}`);
+  }
+}
+showLiveNotificationIfAny();
+
+/* ----------------------------
+  Extra: download activity/pinned actions
+---------------------------- */
+document.getElementById('clearLogBtn').addEventListener('click', ()=> {
+  save('activity_log', []);
+  renderLog();
+});
+
+/* ----------------------------
+  Additional helpers: export & download
+---------------------------- */
+document.getElementById('exportPdfBtn').addEventListener('click', ()=> {
+  showToast('Exporting PDF...');
+});
+
+/* ----------------------------
+  Buttons for pay / messages were initialized above. Now load,
+  and ensure pushLog called for key actions.
+---------------------------- */
+
+/* Hook into storage event for teacher attendance writes from teacher-profile: show notification */
+window.addEventListener('storage', (e) => {
+  // if attendance changed we will already re-run loadAll via previous listener
+  if(!e.key) return;
+  if(e.key.endsWith('_attendance') || e.key.endsWith('_attendance')) {
+    const arr = safeParse(e.newValue) || [];
+    const last = arr[arr.length - 1];
+    if(last) showLiveNotification(last);
+  }
+});
+
+/* Small helpers for buttons we didn't wire earlier */
+document.getElementById('clearLogBtn').addEventListener('click', ()=> {
+  if(confirm('Clear activity log?')) { save('activity_log', []); renderLog(); showToast('Log cleared') }
+});
+
+document.getElementById('downloadLogBtn').addEventListener('click', ()=> {
+  const blob = new Blob([JSON.stringify(read('activity_log'), null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${ACTIVE_ORG}_activity_log.json`; a.click();
+});
+
+/* initial render call (one more time) */
+loadAll();
 </script>
 </body>
 </html>
