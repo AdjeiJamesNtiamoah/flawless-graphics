@@ -10,6 +10,7 @@
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
 <!-- jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -40,156 +41,196 @@
   --primary:#3b82f6;
 }
 
-/* ----------------- BASE ----------------- */
+/* BASE */
 body {
-  margin:0; background:var(--bg); font-family:Inter,Roboto,Arial; color:var(--text-dark);
-  display:flex; height:100vh; overflow:hidden;
+  margin:0;
+  background:var(--bg);
+  font-family:Inter,Roboto,Arial;
+  color:var(--text-dark);
+  display:flex;
+  height:100vh;
+  overflow:hidden;
 }
 
 /* ----------------- SIDEBAR ----------------- */
 .sidebar {
-  width:250px; background:var(--sidebar-bg); color:white;
-  display:flex; flex-direction:column; padding:20px 0;
-  position:sticky; top:0; height:100vh;
+  width:250px;
+  background:var(--sidebar-bg);
+  color:white;
+  display:flex;
+  flex-direction:column;
+  padding:20px 0;
+  height:100vh;
   box-shadow:4px 0 18px rgba(0,0,0,.15);
 }
 
 .sidebar h2 {
-  margin:0; text-align:center; font-size:20px; margin-bottom:25px;
-  letter-spacing:1px; font-weight:700;
+  margin:0;
+  text-align:center;
+  font-size:20px;
+  margin-bottom:25px;
+  letter-spacing:1px;
+  font-weight:700;
 }
 
 .nav-item {
-  padding:14px 22px; cursor:pointer;
-  display:flex; align-items:center; gap:12px; color:#cbd5e1;
+  padding:14px 22px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  color:#cbd5e1;
   transition:.2s;
 }
 
 .nav-item:hover { background:var(--sidebar-hover); color:white; }
+.nav-item.active { background:var(--sidebar-hover); color:white; }
 
 .nav-item i { width:22px; }
 
 /* ---------------- CONTENT ---------------- */
 .content {
-  flex:1; overflow:auto; padding:25px;
+  flex:1;
+  overflow:auto;
+  padding:25px;
 }
 
 /* ---------------- HEADER ---------------- */
 .header {
-  display:flex; justify-content:space-between; align-items:center;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
   margin-bottom:22px;
 }
 
-.header .title { font-size:26px; font-weight:700; }
+.header .title {
+  font-size:26px;
+  font-weight:700;
+}
 
 .header-right {
-  display:flex; align-items:center; gap:12px;
+  display:flex;
+  align-items:center;
+  gap:12px;
 }
 
 .select {
-  padding:8px 10px; border-radius:var(--radius); border:1px solid #d1d5db; background:white;
+  padding:8px 10px;
+  border-radius:var(--radius);
+  border:1px solid #d1d5db;
+  background:white;
 }
 
 .btn {
-  padding:8px 14px; border-radius:var(--radius); cursor:pointer;
-  border:none; background:var(--primary); color:white; font-weight:600;
+  padding:8px 14px;
+  border-radius:var(--radius);
+  cursor:pointer;
+  border:none;
+  background:var(--primary);
+  color:white;
+  font-weight:600;
   transition:.2s;
 }
+
 .btn:hover { opacity:.85; }
 
 .btn.light { background:#e5e7eb; color:#1e293b; }
 .btn.danger { background:var(--danger); }
 
-/* ---------------- CARDS ---------------- */
+/* CARDS */
 .grid { display:grid; gap:18px; }
 
 .kpi {
-  background:var(--card-bg); padding:20px; border-radius:var(--radius);
-  display:flex; align-items:center; gap:18px;
+  background:var(--card-bg);
+  padding:20px;
+  border-radius:var(--radius);
+  display:flex;
+  align-items:center;
+  gap:18px;
   box-shadow:0 4px 14px rgba(0,0,0,.08);
 }
 
 .kpi i {
-  font-size:28px; padding:18px; border-radius:50%;
-  background:rgba(59,130,246,.12); color:var(--primary);
+  font-size:28px;
+  padding:18px;
+  border-radius:50%;
+  background:rgba(59,130,246,.12);
+  color:var(--primary);
 }
 
 .kpi .value { font-size:26px; font-weight:700; }
 .kpi .label { font-size:14px; color:var(--text-muted); }
 
-/* ------------ SECTION CARD ------------- */
+.page { display:none; }
+.page.active { display:block; }
+
+/* Card Wrapper */
 .card {
-  background:var(--card-bg); padding:22px; border-radius:var(--radius);
+  background:var(--card-bg);
+  padding:22px;
+  border-radius:var(--radius);
   box-shadow:0 6px 18px rgba(0,0,0,.06);
+  margin-bottom:22px;
 }
 
 .card-title { font-size:20px; font-weight:700; margin-bottom:10px; }
 
+/* Table */
 table { width:100%; border-collapse:collapse; }
 th,td { padding:10px; text-align:left; border-bottom:1px solid #e5e7eb; font-size:14px; }
 
 /* Toast */
 #toast {
-  position:fixed; right:30px; bottom:30px; padding:14px 18px;
-  background:#1e293b; color:white; border-radius:var(--radius);
-  opacity:0; transform:translateY(20px); transition:.3s;
+  position:fixed;
+  right:30px;
+  bottom:30px;
+  padding:14px 18px;
+  background:#1e293b;
+  color:white;
+  border-radius:var(--radius);
+  opacity:0;
+  transform:translateY(20px);
+  transition:.3s;
 }
 #toast.show { opacity:1; transform:none; }
 
-/* Scrollbar */
-::-webkit-scrollbar { width:8px; }
-::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:8px; }
-
-@media (max-width: 900px) {
-  .sidebar { display:none; }
-  body { height:auto; }
-}
 </style>
 </head>
 
 <body>
 
-<!-- ------------------ SIDEBAR ------------------ -->
-<div class="sidebar" id="sidebar">
+<!-- SIDEBAR -->
+<div class="sidebar">
   <h2>HR PANEL</h2>
 
-  <div class="nav-item" data-section="dashboard"><i class="fa fa-home"></i> Dashboard</div>
-  <div class="nav-item" data-section="employees"><i class="fa fa-users"></i> Employees</div>
-  <div class="nav-item" data-section="attendance"><i class="fa fa-calendar-check"></i> Attendance</div>
-  <div class="nav-item" data-section="payroll"><i class="fa fa-sack-dollar"></i> Payroll</div>
-  <div class="nav-item" data-section="analytics"><i class="fa fa-chart-pie"></i> Analytics</div>
-  <div class="nav-item" data-section="announcements"><i class="fa fa-bullhorn"></i> Announcements</div>
-  <div class="nav-item" data-section="messages"><i class="fa fa-envelope"></i> Messages</div>
-  <div class="nav-item" data-section="settings"><i class="fa fa-cog"></i> Settings</div>
+  <div class="nav-item active" data-page="dashboard"><i class="fa fa-home"></i> Dashboard</div>
+  <div class="nav-item" data-page="employees"><i class="fa fa-users"></i> Employees</div>
+  <div class="nav-item" data-page="attendance"><i class="fa fa-calendar-check"></i> Attendance</div>
+  <div class="nav-item" data-page="payroll"><i class="fa fa-sack-dollar"></i> Payroll</div>
+  <div class="nav-item" data-page="announcements"><i class="fa fa-bullhorn"></i> Announcements</div>
+  <div class="nav-item" data-page="activity"><i class="fa fa-list"></i> Activity Log</div>
+  <div class="nav-item" data-page="settings"><i class="fa fa-cog"></i> Settings</div>
+</div>
 
-  <div style="margin-top:auto; padding:18px;">
-    <div style="display:flex; gap:8px; align-items:center;">
-      <div style="width:44px; height:44px; border-radius:10px; background:linear-gradient(90deg,#00d1ff,#7a00ff); display:flex; align-items:center; justify-content:center; font-weight:700;">FG</div>
-      <div>
-        <div style="font-weight:700; color:#fff;" id="sidebarTeacherName">Loading...</div>
-        <div style="font-size:13px; color:#9fb4c9;" id="sidebarTeacherEmail">—</div>
-      </div>
-    </div>
+<!-- CONTENT -->
+<div class="content">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="title">HR Dashboard — <span id="orgNameDisplay">FLAWLESS</span></div>
+
+  <div class="header-right">
+    <select id="orgSwitcher" class="select"></select>
+    <button class="btn light" id="toggleTheme"><i class="fa fa-moon"></i></button>
+    <button class="btn" id="exportPDF">Export PDF</button>
+    <button class="btn danger" id="clearData">Reset</button>
   </div>
 </div>
 
-<!-- ------------------ MAIN CONTENT ------------------ -->
-<div class="content" id="mainContent">
+<!-- ========================= PAGE: DASHBOARD ========================= -->
+<div id="page-dashboard" class="page active">
 
-  <div class="header">
-    <div class="title">HR Dashboard — <span id="orgNameDisplay">FLAWLESS</span></div>
-
-    <div class="header-right">
-      <select id="orgSwitcher" class="select"></select>
-      <button class="btn light" id="toggleTheme" title="Toggle dark mode"><i class="fa fa-moon"></i></button>
-      <button class="btn" id="exportPDF">Export PDF</button>
-      <button class="btn danger" id="clearData">Reset</button>
-    </div>
-  </div>
-
-  <!-- ==================== KPI CARDS ==================== -->
   <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-bottom:22px;">
-
     <div class="kpi">
       <i class="fa fa-users"></i>
       <div>
@@ -221,12 +262,15 @@ th,td { padding:10px; text-align:left; border-bottom:1px solid #e5e7eb; font-siz
         <div class="label">Monthly Payroll</div>
       </div>
     </div>
-
   </div>
 
-  <!-- ===================== EMPLOYEE LIST ===================== -->
-  <div class="card" style="margin-bottom:22px;">
-    <div class="card-title">Employees</div>
+</div>
+
+<!-- ========================= PAGE: EMPLOYEES ========================= -->
+<div id="page-employees" class="page">
+
+  <div class="card">
+    <div class="card-title">Employee List</div>
     <button class="btn" id="addEmployeeBtn"><i class="fa fa-plus"></i> Add Employee</button>
     <br><br>
 
@@ -244,14 +288,33 @@ th,td { padding:10px; text-align:left; border-bottom:1px solid #e5e7eb; font-siz
     </table>
   </div>
 
-  <!-- ===================== ATTENDANCE OVERVIEW ===================== -->
-  <div class="card" style="margin-bottom:22px;">
+</div>
+
+<!-- ========================= PAGE: ATTENDANCE ========================= -->
+<div id="page-attendance" class="page">
+
+  <div class="card">
     <div class="card-title">Attendance Overview</div>
-    <canvas id="attendanceChart" height="120"></canvas>
+    <canvas id="attendanceChart" height="140"></canvas>
   </div>
 
-  <!-- ===================== ANNOUNCEMENTS ===================== -->
-  <div class="card" style="margin-bottom:22px;">
+</div>
+
+<!-- ========================= PAGE: PAYROLL ========================= -->
+<div id="page-payroll" class="page">
+
+  <div class="card">
+    <div class="card-title">Payroll Summary</div>
+    <canvas id="payrollChart" height="140"></canvas>
+  </div>
+
+</div>
+
+<!-- ========================= PAGE: ANNOUNCEMENTS ========================= -->
+<div id="page-announcements" class="page">
+
+  <div class="card">
+
     <div class="card-title">Announcements</div>
 
     <div style="display:flex; gap:10px;">
@@ -263,1185 +326,253 @@ th,td { padding:10px; text-align:left; border-bottom:1px solid #e5e7eb; font-siz
     <ul id="announcementList" style="margin-top:15px; padding-left:20px;"></ul>
   </div>
 
-  <!-- ===================== PAYROLL SUMMARY ===================== -->
-  <div class="card" style="margin-bottom:22px;">
-    <div class="card-title">Payroll Summary</div>
-    <canvas id="payrollChart" height="120"></canvas>
-  </div>
+</div>
 
-  <!-- ===================== ACTIVITY LOG ===================== -->
-  <div class="card" style="margin-bottom:22px;">
+<!-- ========================= PAGE: ACTIVITY ========================= -->
+<div id="page-activity" class="page">
+
+  <div class="card">
     <div class="card-title">Activity Log</div>
     <ul id="activityLog" style="padding-left:20px;"></ul>
   </div>
 
-  <!-- Toast -->
-  <div id="toast"></div>
+</div>
 
-</div> <!-- end content -->
+<!-- ========================= PAGE: SETTINGS ========================= -->
+<div id="page-settings" class="page">
 
-<!-- ======================================================================
-  The rest of the JS (sync with teacher pages, attendance teacher sync,
-  KPIs, storage listeners and helper functions) is sent in Part 2 / Part 3.
-  Ask "PART 2" when you are ready and I will send it next.
-  ====================================================================== -->
+  <div class="card">
+    <div class="card-title">Settings</div>
+    <p>Future settings will go here.</p>
+  </div>
+
+</div>
+
+</div> <!-- END CONTENT -->
+
+<div id="toast"></div>
+
+<!-- ======================== JAVASCRIPT ======================== -->
 <script>
-/* ===========================
-   HR DASHBOARD — Part 2 JS
-   =========================== */
+console.log("HR Dashboard Loaded");
 
-/* --- Helpers --- */
+/* UTILITIES */
 function safeParse(s){ try{return JSON.parse(s);}catch(e){return null;} }
-function read(key){ return safeParse(localStorage.getItem(key)) || []; }
-function save(key,val){ localStorage.setItem(key, JSON.stringify(val)); }
-function now(){ return Date.now(); }
-function showToast(msg, ms=2500){
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(()=> el.classList.remove('show'), ms);
+function read(k){ return safeParse(localStorage.getItem(k)) || []; }
+function save(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
 }
 
-/* --- Organization / Namespaced keys --- */
-const ACTIVE_ORG = (localStorage.getItem('active_org') || 'FLAWLESS').trim();
-const ORG_LIST_KEY = 'organizations_list';
+/* ORG HANDLING */
+const ACTIVE_ORG = localStorage.getItem('active_org') || 'FLAWLESS';
+document.getElementById('orgNameDisplay').textContent = ACTIVE_ORG;
+
 const EMP_KEY = `${ACTIVE_ORG}_employees`;
 const ATT_KEY = `${ACTIVE_ORG}_attendance`;
 const PAY_KEY = `${ACTIVE_ORG}_payments`;
 const ANN_KEY = `${ACTIVE_ORG}_announcements`;
 const ACT_KEY = `${ACTIVE_ORG}_activity`;
-const TEACH_ATT_KEY = `${ACTIVE_ORG}_teacher_attendance`; // teacher clock-ins (from teacher pages)
 
-/* --- Populate org switcher & display --- */
-document.getElementById('orgNameDisplay').textContent = ACTIVE_ORG;
-const orgSwitcher = document.getElementById('orgSwitcher');
-(function populateOrgs(){
-  let orgs = read(ORG_LIST_KEY);
-  if(!orgs.length){ orgs = [ACTIVE_ORG]; save(ORG_LIST_KEY, orgs); }
-  orgSwitcher.innerHTML = '';
-  orgs.forEach(o => {
-    const opt = document.createElement('option'); opt.value = o; opt.textContent = o;
-    if(o === ACTIVE_ORG) opt.selected = true;
-    orgSwitcher.appendChild(opt);
-  });
-})();
-orgSwitcher.addEventListener('change', (e)=>{
-  localStorage.setItem('active_org', e.target.value);
-  showToast(`Switched to ${e.target.value}`);
-  setTimeout(()=> location.reload(), 600);
-});
-
-/* --- Ensure keys exist (avoid nulls) --- */
 if(!localStorage.getItem(EMP_KEY)) save(EMP_KEY, []);
 if(!localStorage.getItem(ATT_KEY)) save(ATT_KEY, []);
 if(!localStorage.getItem(PAY_KEY)) save(PAY_KEY, []);
 if(!localStorage.getItem(ANN_KEY)) save(ANN_KEY, []);
 if(!localStorage.getItem(ACT_KEY)) save(ACT_KEY, []);
-if(!localStorage.getItem(TEACH_ATT_KEY)) save(TEACH_ATT_KEY, []);
 
-/* --- Activity log helper --- */
-function pushActivity(text){
+/* ACTIVITY */
+function pushActivity(msg){
   const arr = read(ACT_KEY);
-  arr.push({ text, time: new Date().toISOString() });
+  arr.push({ text:msg, time:new Date().toISOString() });
   save(ACT_KEY, arr);
   renderActivity();
 }
 
-/* --- Employees render / CRUD --- */
-const employeeTableEl = document.getElementById('employeeTable');
-const sidebarTeacherName = document.getElementById('sidebarTeacherName');
-const sidebarTeacherEmail = document.getElementById('sidebarTeacherEmail');
-
-/* Try to show logged-in teacher info if available */
-(function showSessionTeacher(){
-  const t = safeParse(localStorage.getItem('active_teacher')) || safeParse(localStorage.getItem('teacher_active_user'));
-  if(t){
-    sidebarTeacherName.textContent = t.name || t.email || 'Teacher';
-    sidebarTeacherEmail.textContent = t.email || '';
-  } else {
-    sidebarTeacherName.textContent = 'Guest';
-    sidebarTeacherEmail.textContent = '—';
-  }
-})();
-
+/* EMPLOYEES */
 function renderEmployees(){
-  const employees = read(EMP_KEY);
-  employeeTableEl.innerHTML = '';
-  employees.forEach((emp, idx) => {
-    // today's attendance quick lookup
-    const today = new Date().toISOString().split('T')[0];
-    const todays = read(ATT_KEY).filter(a => a.employeeId === emp.id && a.date.startsWith(today));
-    const last = todays[todays.length - 1];
-    const attText = last ? (last.action === 'in' ? 'IN' : 'OUT') : '—';
+  const list = read(EMP_KEY);
+  const table = document.getElementById('employeeTable');
+  table.innerHTML = '';
+  const att = read(ATT_KEY);
+  const today = new Date().toISOString().split("T")[0];
 
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${emp.name || emp.fullName || 'No name'}</td>
-      <td>${emp.role || emp.department || 'Staff'}</td>
-      <td>${emp.email || '-'}</td>
-      <td>₵ ${Number(emp.salary||0).toLocaleString()}</td>
-      <td>${attText}</td>
+  list.forEach(emp=>{
+    const todays = att.filter(a=>a.employeeId===emp.id && a.date.startsWith(today));
+    const status = todays.length ? (todays[todays.length-1].action==="in"?"IN":"OUT") : "—";
+
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td>${emp.name}</td>
+      <td>${emp.role}</td>
+      <td>${emp.email}</td>
+      <td>₵ ${Number(emp.salary).toLocaleString()}</td>
+      <td>${status}</td>
     `;
-    // double-click to edit
-    tr.addEventListener('dblclick', ()=> editEmployeePrompt(idx));
-    employeeTableEl.appendChild(tr);
+    table.appendChild(tr);
   });
 }
 
-/* Add employee */
-document.getElementById('addEmployeeBtn').addEventListener('click', ()=>{
-  const name = prompt('Full name');
-  if(!name) return showToast('Cancelled');
-  const role = prompt('Role / Department','Staff') || 'Staff';
-  const email = prompt('Email','') || '';
-  const salary = Number(prompt('Salary (monthly)','0') || 0);
-  const id = 'e_' + Date.now();
-  const employees = read(EMP_KEY);
-  employees.push({ id, name, role, email, salary });
-  save(EMP_KEY, employees);
+/* ADD EMPLOYEE */
+document.getElementById('addEmployeeBtn').onclick = () =>{
+  const name = prompt("Name?");
+  if(!name) return;
+  const role = prompt("Role?", "Staff") || "Staff";
+  const email = prompt("Email?", "") || "";
+  const salary = Number(prompt("Salary?","0")) || 0;
+
+  const list = read(EMP_KEY);
+  list.push({ id:"e_"+Date.now(), name, role, email, salary });
+  save(EMP_KEY, list);
+
   pushActivity(`Added employee ${name}`);
   renderEmployees(); updateKPIs(); updateCharts();
-  showToast('Employee added');
-});
+};
 
-/* Edit employee prompt */
-function editEmployeePrompt(index){
-  const employees = read(EMP_KEY);
-  const emp = employees[index];
-  if(!emp) return;
-  const name = prompt('Full name', emp.name || emp.fullName) || emp.name;
-  const role = prompt('Role / Department', emp.role || emp.department) || emp.role;
-  const email = prompt('Email', emp.email || '') || emp.email;
-  const salary = Number(prompt('Salary', emp.salary || 0) || emp.salary);
-  employees[index] = {...emp, name, role, email, salary};
-  save(EMP_KEY, employees);
-  pushActivity(`Updated employee ${name}`);
-  renderEmployees(); updateKPIs(); updateCharts();
-  showToast('Employee updated');
-}
-
-/* Delete employee helper (optional) */
-function deleteEmployeeById(id){
-  let arr = read(EMP_KEY);
-  const found = arr.find(a=>a.id===id);
-  if(!found) return;
-  if(!confirm(`Delete ${found.name || found.fullName}?`)) return;
-  arr = arr.filter(a=>a.id!==id);
-  save(EMP_KEY, arr);
-  pushActivity(`Deleted employee ${found.name || found.fullName}`);
-  renderEmployees(); updateKPIs(); updateCharts();
-  showToast('Deleted');
-}
-
-/* --- Attendance helpers --- */
-/* recordAttendance(employeeId, 'in'|'out') — usable from console or HR UI code */
-function recordAttendance(employeeId, action){
-  const arr = read(ATT_KEY);
-  arr.push({ employeeId, action, date: new Date().toISOString() });
-  save(ATT_KEY, arr);
-  pushActivity(`Attendance ${action.toUpperCase()} - ${employeeId}`);
-  updateKPIs(); updateCharts(); renderEmployees();
-}
-
-/* --- KPIs --- */
+/* KPI UPDATE */
 function updateKPIs(){
-  const employees = read(EMP_KEY);
-  const attendance = read(ATT_KEY);
-  const payments = read(PAY_KEY);
+  const emps = read(EMP_KEY);
+  const att = read(ATT_KEY);
 
-  document.getElementById('totalEmployees').textContent = employees.length;
+  const today = new Date().toISOString().split("T")[0];
+  const present = new Set(att.filter(a=>a.date.startsWith(today)&&a.action==='in').map(a=>a.employeeId));
 
-  // Present / Absent today
-  const today = new Date().toISOString().split('T')[0];
-  const actionsToday = attendance.filter(a => a.date.startsWith(today));
-  const presentSet = new Set(actionsToday.filter(a=>a.action==='in').map(a=>a.employeeId));
-  document.getElementById('presentToday').textContent = presentSet.size;
-  const absentCount = Math.max(0, employees.length - presentSet.size);
-  document.getElementById('absentToday').textContent = absentCount;
-
-  // payroll total monthly
-  const totalPayroll = employees.reduce((s,e)=> s + Number(e.salary || 0), 0);
-  document.getElementById('payrollTotal').textContent = '₵' + totalPayroll.toLocaleString();
+  document.getElementById('totalEmployees').textContent = emps.length;
+  document.getElementById('presentToday').textContent = present.size;
+  document.getElementById('absentToday').textContent = Math.max(0, emps.length - present.size);
+  document.getElementById('payrollTotal').textContent =
+    "₵"+emps.reduce((n,e)=>n+Number(e.salary),0).toLocaleString();
 }
 
-/* --- Charts (Attendance & Payroll) --- */
-let attendanceChart = null;
-let payrollChart = null;
+/* CHARTS */
+let attendanceChart=null, payrollChart=null;
 
 function updateCharts(){
-  // Attendance chart - last 7 days present count
-  const attendance = read(ATT_KEY);
-  const days = [];
+  const att=read(ATT_KEY);
+  const days=[];
   for(let i=6;i>=0;i--){
-    const d = new Date(); d.setDate(d.getDate() - i);
-    days.push(d.toISOString().split('T')[0]);
+    const d=new Date(); d.setDate(d.getDate()-i);
+    days.push(d.toISOString().split("T")[0]);
   }
-  const presentCounts = days.map(day => {
-    const set = new Set(attendance.filter(a=>a.date.startsWith(day) && a.action==='in').map(a=>a.employeeId));
-    return set.size;
+  const data=days.map(d=>{
+    return new Set(att.filter(a=>a.date.startsWith(d)&&a.action==='in').map(a=>a.employeeId)).size;
   });
 
-  const ac = document.getElementById('attendanceChart').getContext('2d');
+  const ctx1=document.getElementById('attendanceChart');
   if(attendanceChart) attendanceChart.destroy();
-  attendanceChart = new Chart(ac, {
-    type: 'bar',
-    data: { labels: days.map(d=>d.slice(5)), datasets: [{ label:'Present', data: presentCounts, backgroundColor: '#3b82f6' }] },
-    options: { plugins:{ legend:{ display:false }}, scales:{ y:{ beginAtZero:true } } }
+  attendanceChart=new Chart(ctx1,{
+    type:'bar',
+    data:{labels:days.map(d=>d.slice(5)),datasets:[{data,backgroundColor:'#3b82f6'}]},
+    options:{plugins:{legend:{display:false}}}
   });
 
-  // Payroll chart - last 6 months total payroll (derived from salaries)
-  const months = [];
-  const monthLabels = [];
-  const nowDate = new Date();
-  for(let m=5;m>=0; m--){
-    const dt = new Date(nowDate.getFullYear(), nowDate.getMonth()-m, 1);
-    const key = dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0');
-    months.push(key);
-    monthLabels.push(dt.toLocaleString('default',{month:'short'}));
+  const emps=read(EMP_KEY);
+  const months=[];
+  const mlabels=[];
+  const now=new Date();
+  for(let i=5;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    months.push(d);
+    mlabels.push(d.toLocaleString('default',{month:'short'}));
   }
-  const employees = read(EMP_KEY);
-  const payrollValues = months.map(()=> employees.reduce((s,e)=> s + Number(e.salary||0), 0));
+  const payroll=months.map(()=>emps.reduce((n,e)=>n+Number(e.salary),0));
 
-  const pc = document.getElementById('payrollChart').getContext('2d');
+  const ctx2=document.getElementById('payrollChart');
   if(payrollChart) payrollChart.destroy();
-  payrollChart = new Chart(pc, {
-    type: 'line',
-    data: { labels: monthLabels, datasets: [{ label:'Payroll (₵)', data: payrollValues, borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.12)', fill:true }] },
-    options: { plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true } } }
+  payrollChart=new Chart(ctx2,{
+    type:'line',
+    data:{labels:mlabels,datasets:[{data:payroll,borderColor:'#10b981',fill:true,backgroundColor:'rgba(16,185,129,0.12)'}]},
+    options:{plugins:{legend:{display:false}}}
   });
 }
 
-/* --- Announcements --- */
+/* ANNOUNCEMENTS */
 function renderAnnouncements(){
-  const list = read(ANN_KEY);
-  const ul = document.getElementById('announcementList');
-  ul.innerHTML = '';
-  list.slice().reverse().forEach(a=>{
-    const li = document.createElement('li');
-    li.innerHTML = `<strong>${a.title||'Announcement'}</strong> — <span style="color:var(--text-muted)">${new Date(a.time).toLocaleString()}</span><div>${a.body||''}</div>`;
+  const list=read(ANN_KEY).reverse();
+  const ul=document.getElementById('announcementList');
+  ul.innerHTML='';
+  list.forEach(a=>{
+    const li=document.createElement('li');
+    li.innerHTML = `<strong>${a.title}</strong> — <small>${new Date(a.time).toLocaleString()}</small><br>${a.body}`;
     ul.appendChild(li);
   });
 }
 
-document.getElementById('postAnnouncement').addEventListener('click', ()=>{
-  const text = document.getElementById('announcementInput').value.trim();
-  if(!text) return showToast('Enter an announcement');
-  const list = read(ANN_KEY);
-  list.push({ title: text.split('\n')[0], body: text, time: new Date().toISOString() });
-  save(ANN_KEY, list);
-  document.getElementById('announcementInput').value = '';
-  pushActivity('Posted announcement');
+document.getElementById('postAnnouncement').onclick = ()=>{
+  const text=document.getElementById('announcementInput').value.trim();
+  if(!text) return;
+
+  const ann=read(ANN_KEY);
+  ann.push({title:text,body:text,time:new Date().toISOString()});
+  save(ANN_KEY,ann);
+  document.getElementById('announcementInput').value='';
+
+  pushActivity("Posted announcement");
   renderAnnouncements();
-  showToast('Announcement posted');
-});
+};
 
-/* --- Activity log render --- */
+/* ACTIVITY */
 function renderActivity(){
-  const arr = read(ACT_KEY).slice().reverse();
-  const el = document.getElementById('activityLog');
-  el.innerHTML = '';
-  arr.slice(0,50).forEach(a=>{
-    const li = document.createElement('li');
-    li.innerHTML = `${a.text} — <span style="color:var(--text-muted)">${new Date(a.time).toLocaleString()}</span>`;
-    el.appendChild(li);
+  const arr=read(ACT_KEY).reverse();
+  const ul=document.getElementById('activityLog');
+  ul.innerHTML='';
+  arr.forEach(a=>{
+    const li=document.createElement('li');
+    li.innerHTML=`${a.text} — <small>${new Date(a.time).toLocaleString()}</small>`;
+    ul.appendChild(li);
   });
 }
 
-/* --- Export PDF --- */
-document.getElementById('exportPDF').addEventListener('click', ()=>{
-  const doc = new jsPDF('p','pt','a4');
-  doc.setFontSize(16);
-  doc.text(`${ACTIVE_ORG} — HR Report`, 40, 40);
-  doc.setFontSize(11);
-  doc.text(`Total employees: ${read(EMP_KEY).length}`, 40, 70);
-  doc.text(`Present today: ${document.getElementById('presentToday').textContent}`, 40, 86);
-  doc.text(`Payroll total: ${document.getElementById('payrollTotal').textContent}`, 40, 102);
+/* PAGE SWITCHING */
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click',()=>{
+    const page=item.getAttribute('data-page');
 
-  // list first 20 employees
-  const emps = read(EMP_KEY).slice(0,20);
-  let y = 140;
-  emps.forEach((e,i)=>{
-    doc.text(`${i+1}. ${e.name} — ${e.role} — ${e.email} — ₵ ${Number(e.salary||0).toLocaleString()}`, 40, y);
-    y += 14;
-    if(y > 740){ doc.addPage(); y = 40; }
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById(`page-${page}`).classList.add('active');
+
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    item.classList.add('active');
   });
-
-  doc.save(`${ACTIVE_ORG}_hr_report.pdf`);
 });
 
-/* --- Reset / Clear data --- */
-document.getElementById('clearData').addEventListener('click', ()=>{
-  if(!confirm('Reset all HR data for this organization? This cannot be undone.')) return;
-  localStorage.removeItem(EMP_KEY);
-  localStorage.removeItem(ATT_KEY);
-  localStorage.removeItem(PAY_KEY);
-  localStorage.removeItem(ANN_KEY);
-  localStorage.removeItem(ACT_KEY);
-  localStorage.removeItem(TEACH_ATT_KEY);
-  save(EMP_KEY, []); save(ATT_KEY, []); save(PAY_KEY, []); save(ANN_KEY, []); save(ACT_KEY, []); save(TEACH_ATT_KEY, []);
-  renderAll();
-  showToast('Reset complete');
-});
-
-/* --- Dark theme toggle --- */
-document.getElementById('toggleTheme').addEventListener('click', ()=>{
+/* DARK MODE */
+document.getElementById('toggleTheme').onclick=()=>{
   document.documentElement.classList.toggle('dark');
-  localStorage.setItem('hr_theme_dark', document.documentElement.classList.contains('dark') ? '1' : '0');
-});
-if(localStorage.getItem('hr_theme_dark') === '1') document.documentElement.classList.add('dark');
+  localStorage.setItem('hr_theme_dark',
+    document.documentElement.classList.contains('dark') ? '1':'0'
+  );
+};
+if(localStorage.getItem('hr_theme_dark')==="1")
+  document.documentElement.classList.add('dark');
 
-/* --- Teacher attendance sync (reads TEACH_ATT_KEY to show teacher clockins) ---
-   Teacher pages should push teacher logs into `${ACTIVE_ORG}_teacher_attendance`
-   Format: [ { email, log:[ { in: ISO, out: ISO|null }, ... ] }, ... ]
-   This block loads teacher attendance and also maps teacher email -> employeeId (if matched)
-*/
-function syncTeacherAttendanceToOrg(){
-  const teachArr = read(TEACH_ATT_KEY); // teacher attendance logs
-  if(!teachArr.length) return;
-  // Optionally, if you keep employees with teacher emails, map teacher logs into ATT_KEY
-  const employees = read(EMP_KEY);
-  const orgAtt = read(ATT_KEY);
-  let changed = false;
+/* EXPORT PDF */
+document.getElementById('exportPDF').onclick=()=>{
+  const doc=new jsPDF();
+  doc.text(`${ACTIVE_ORG} - HR Report`,20,20);
+  doc.save(`${ACTIVE_ORG}_hr_report.pdf`);
+};
 
-  teachArr.forEach(t => {
-    // find matching employee (by email)
-    const emp = employees.find(e => (e.email||'').toLowerCase() === (t.email||'').toLowerCase());
-    if(!emp) return; // no matching employee record
-    (t.log||[]).forEach(entry => {
-      // if we haven't already recorded these in org attendance, push in/out actions
-      const inIso = entry.in;
-      const outIso = entry.out;
-      // determine if inIso exists in orgAtt for this employee
-      const foundIn = orgAtt.find(a => a.employeeId === emp.id && a.date === inIso);
-      if(!foundIn && inIso){
-        orgAtt.push({ employeeId: emp.id, action:'in', date: inIso, source:'teacher' });
-        changed = true;
-      }
-      if(outIso){
-        const foundOut = orgAtt.find(a => a.employeeId === emp.id && a.date === outIso);
-        if(!foundOut){
-          orgAtt.push({ employeeId: emp.id, action:'out', date: outIso, source:'teacher' });
-          changed = true;
-        }
-      }
-    });
-  });
+/* RESET */
+document.getElementById('clearData').onclick=()=>{
+  if(!confirm("Reset all HR data?")) return;
+  save(EMP_KEY,[]); save(ATT_KEY,[]); save(PAY_KEY,[]);
+  save(ANN_KEY,[]); save(ACT_KEY,[]);
+  renderAll(); showToast("Reset complete");
+};
 
-  if(changed){
-    save(ATT_KEY, orgAtt);
-    pushActivity('Synced teacher attendance to HR attendance');
-    updateKPIs(); updateCharts(); renderEmployees();
-  }
-}
-
-/* --- Storage event: update across tabs --- */
-window.addEventListener('storage', (e)=>{
-  const keys = [EMP_KEY, ATT_KEY, PAY_KEY, ANN_KEY, ACT_KEY, TEACH_ATT_KEY];
-  if(keys.includes(e.key)){
-    renderAll();
-  }
-});
-
-/* --- Render all --- */
+/* RENDER ALL */
 function renderAll(){
   renderEmployees();
   updateKPIs();
   updateCharts();
   renderAnnouncements();
   renderActivity();
-  syncTeacherAttendanceToOrg();
 }
 renderAll();
 
-/* --- Demo seed if empty --- */
-(function seedDemo(){
-  const emps = read(EMP_KEY);
-  if(emps.length === 0){
-    const demo = [
-      { id:'e_1', name:'Adjei James', role:'Manager', email:'james@example.com', salary:3500 },
-      { id:'e_2', name:'Emmanuel Ofori', role:'Data Analyst', email:'emmanuel@example.com', salary:2500 },
-      { id:'e_3', name:'Ama Serwaa', role:'HR', email:'ama@example.com', salary:2200 }
-    ];
-    save(EMP_KEY, demo);
-    pushActivity('Seeded demo employees');
-    renderAll();
-  }
-})();
-
-/* --- Final ready message --- */
-console.log('HR Dashboard JS loaded — features wired.');
-</script>
-<script>
-/* ============================================================
-   HR DASHBOARD — PART 3
-   ADVANCED FEATURES + PRO UTILITIES
-   ============================================================ */
-
-/* ------------------------------------------------------------
-   1. GLOBAL SEARCH (Employees, Announcements, Activity Log)
-   ------------------------------------------------------------ */
-(function injectGlobalSearch(){
-  const header = document.querySelector(".header-right");
-
-  const box = document.createElement("input");
-  box.placeholder = "Search employees, logs, announcements…";
-  box.id = "globalSearchBox";
-  box.style = `
-    padding:8px 14px;
-    border-radius:var(--radius);
-    border:1px solid #d1d5db;
-    width:260px;
-  `;
-
-  header.prepend(box);
-
-  box.addEventListener("input", () => {
-    const q = box.value.toLowerCase();
-    filterEmployees(q);
-    filterAnnouncements(q);
-    filterActivity(q);
-  });
-})();
-
-/* Employee search filter */
-function filterEmployees(q){
-  const rows = document.querySelectorAll("#employeeTable tr");
-  rows.forEach(r=>{
-    r.style.display = r.textContent.toLowerCase().includes(q) ? "" : "none";
-  });
-}
-
-/* Announcement search */
-function filterAnnouncements(q){
-  const items = document.querySelectorAll("#announcementList li");
-  items.forEach(i=>{
-    i.style.display = i.textContent.toLowerCase().includes(q) ? "" : "none";
-  });
-}
-
-/* Activity search */
-function filterActivity(q){
-  const items = document.querySelectorAll("#activityLog li");
-  items.forEach(i=>{
-    i.style.display = i.textContent.toLowerCase().includes(q) ? "" : "none";
-  });
-}
-
-/* ------------------------------------------------------------
-   2. EXPORT EMPLOYEES TO CSV
-   ------------------------------------------------------------ */
-(function addCSVExportButton(){
-  const button = document.createElement("button");
-  button.className = "btn light";
-  button.style.marginLeft = "6px";
-  button.innerHTML = `<i class="fa fa-file-csv"></i> CSV`;
-  document.querySelector(".header-right").appendChild(button);
-
-  button.addEventListener("click", ()=> exportEmployeesCSV());
-})();
-
-function exportEmployeesCSV(){
-  const employees = read(EMP_KEY);
-  if(!employees.length) return showToast("No employee data found");
-
-  let csv = "Name,Role,Email,Salary\n";
-  employees.forEach(e=>{
-    csv += `${e.name || ""},${e.role || ""},${e.email || ""},${e.salary || 0}\n`;
-  });
-
-  const blob = new Blob([csv], {type:"text/csv"});
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${ACTIVE_ORG}_employees.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-
-  showToast("CSV exported");
-}
-
-/* ------------------------------------------------------------
-   3. HR AUDIT EXPORT (Everything: employees, attendance, activity)
-   ------------------------------------------------------------ */
-(function addAuditExportButton(){
-  const btn = document.createElement("button");
-  btn.className = "btn light";
-  btn.innerHTML = `<i class="fa fa-clipboard-list"></i> Full Audit`;
-  document.querySelector(".header-right").appendChild(btn);
-
-  btn.addEventListener("click", ()=> exportAudit());
-})();
-
-function exportAudit(){
-  const doc = new jsPDF('p','pt','a4');
-  let y = 40;
-
-  function write(text, size=11){
-    doc.setFontSize(size);
-    doc.text(text, 40, y);
-    y += 16;
-    if(y > 750){ doc.addPage(); y = 40; }
-  }
-
-  write(`${ACTIVE_ORG} — HR Full Audit Report`, 16);
-  write(`Generated: ${new Date().toLocaleString()}`);
-
-  /* Employees */
-  write("=== EMPLOYEES ===", 13);
-  read(EMP_KEY).forEach(e=>{
-    write(`${e.name} — ${e.role} — ${e.email} — ₵${e.salary}`);
-  });
-
-  /* Attendance */
-  write("=== ATTENDANCE ===", 13);
-  read(ATT_KEY).forEach(a=>{
-    write(`${a.employeeId} — ${a.action.toUpperCase()} — ${a.date}`);
-  });
-
-  /* Activity */
-  write("=== ACTIVITY LOG ===", 13);
-  read(ACT_KEY).forEach(a=>{
-    write(`${a.text} — ${new Date(a.time).toLocaleString()}`);
-  });
-
-  doc.save(`${ACTIVE_ORG}_audit_report.pdf`);
-  showToast("Audit exported");
-}
-
-/* ------------------------------------------------------------
-   4. ADVANCED PAYROLL ANALYTICS (Top Earners + Avg salary)
-   ------------------------------------------------------------ */
-(function injectPayrollAnalytics(){
-  const card = document.querySelector("#payrollChart").closest(".card");
-
-  const box = document.createElement("div");
-  box.style = "margin-top:16px; font-size:14px; color:var(--text-dark);";
-
-  box.innerHTML = `
-    <div><b>Top Earner:</b> <span id="payTopEarner">—</span></div>
-    <div><b>Average Salary:</b> <span id="payAvgSalary">—</span></div>
-  `;
-
-  card.appendChild(box);
-})();
-
-function updatePayrollExtras(){
-  const employees = read(EMP_KEY);
-  if(!employees.length) return;
-
-  const sorted = [...employees].sort((a,b)=> b.salary - a.salary);
-  const top = sorted[0];
-
-  document.getElementById("payTopEarner").textContent =
-    `${top.name} (₵${top.salary.toLocaleString()})`;
-
-  const avg = employees.reduce((s,e)=> s + +e.salary, 0) / employees.length;
-
-  document.getElementById("payAvgSalary").textContent =
-    `₵${avg.toFixed(2)}`;
-}
-
-/* Override updateCharts to include extras */
-const oldUpdateCharts = updateCharts;
-updateCharts = function(){
-  oldUpdateCharts();
-  updatePayrollExtras();
-}
-
-/* ------------------------------------------------------------
-   5. ADVANCED ATTENDANCE SUMMARY CARD (Late, Early, Perfect)
-   ------------------------------------------------------------ */
-(function injectAttendanceSummary(){
-  const attCard = document.querySelector("#attendanceChart").closest(".card");
-
-  const box = document.createElement("div");
-  box.style = "margin-top:16px; font-size:14px;";
-  box.innerHTML = `
-    <b>Daily Summary:</b>
-    <div>• Perfect Attendance: <span id="attPerfect">0</span></div>
-    <div>• Checked-in Late: <span id="attLate">0</span></div>
-    <div>• Checked-out Early: <span id="attEarly">0</span></div>
-  `;
-
-  attCard.appendChild(box);
-})();
-
-function updateAttendanceExtras(){
-  const employees = read(EMP_KEY);
-  const att = read(ATT_KEY);
-  const today = new Date().toISOString().split("T")[0];
-
-  let perfect = 0, late = 0, early = 0;
-
-  employees.forEach(emp=>{
-    const logs = att.filter(a => a.employeeId === emp.id && a.date.startsWith(today));
-    const inTime = logs.find(a=>a.action==='in');
-    const outTime = logs.find(a=>a.action==='out');
-
-    if(inTime){
-      const hour = new Date(inTime.date).getHours();
-      if(hour <= 8) perfect++;  
-      else late++;
-    }
-    if(outTime){
-      const hour = new Date(outTime.date).getHours();
-      if(hour < 16) early++;
-    }
-  });
-
-  document.getElementById("attPerfect").textContent = perfect;
-  document.getElementById("attLate").textContent = late;
-  document.getElementById("attEarly").textContent = early;
-}
-
-/* Inject into KPIs update */
-const oldUpdateKPIs = updateKPIs;
-updateKPIs = function(){
-  oldUpdateKPIs();
-  updateAttendanceExtras();
-}
-
-/* ------------------------------------------------------------
-   6. SMOOTH PAGE ENTRANCE ANIMATION (Professional feel)
-   ------------------------------------------------------------ */
-(function addFadeIn(){
-  document.body.style.opacity = "0";
-  document.body.style.transition = "opacity .6s";
-  setTimeout(()=> document.body.style.opacity = "1", 80);
-})();
-
-/* ------------------------------------------------------------
-   7. SMART AUTO-BACKUP (LocalStorage → downloadable file)
-   ------------------------------------------------------------ */
-(function addBackupButton(){
-  const btn = document.createElement("button");
-  btn.className = "btn light";
-  btn.style.marginLeft = "6px";
-  btn.innerHTML = `<i class="fa fa-database"></i> Backup`;
-  document.querySelector(".header-right").appendChild(btn);
-
-  btn.addEventListener("click", ()=> backupData());
-})();
-
-function backupData(){
-  const all = {
-    employees: read(EMP_KEY),
-    attendance: read(ATT_KEY),
-    teacherAttendance: read(TEACH_ATT_KEY),
-    announcements: read(ANN_KEY),
-    activity: read(ACT_KEY)
-  };
-
-  const blob = new Blob([JSON.stringify(all,null,2)], {type:"application/json"});
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${ACTIVE_ORG}_backup.json`;
-  a.click();
-
-  URL.revokeObjectURL(url);
-  showToast("Backup saved");
-}
-
-/* ------------------------------------------------------------
-   8. RESTORE BACKUP (Upload JSON → restore data)
-   ------------------------------------------------------------ */
-(function addRestoreButton(){
-  const btn = document.createElement("button");
-  btn.className = "btn light";
-  btn.style.marginLeft = "6px";
-  btn.innerHTML = `<i class="fa fa-upload"></i> Restore`;
-
-  const inp = document.createElement("input");
-  inp.type = "file";
-  inp.accept = ".json";
-  inp.style.display = "none";
-
-  btn.addEventListener("click", ()=> inp.click());
-  inp.addEventListener("change", ()=> restoreBackup(inp.files[0]));
-
-  document.querySelector(".header-right").appendChild(btn);
-})();
-
-function restoreBackup(file){
-  const reader = new FileReader();
-  reader.onload = function(){
-    try{
-      const data = JSON.parse(reader.result);
-
-      save(EMP_KEY, data.employees || []);
-      save(ATT_KEY, data.attendance || []);
-      save(TEACH_ATT_KEY, data.teacherAttendance || []);
-      save(ANN_KEY, data.announcements || []);
-      save(ACT_KEY, data.activity || []);
-
-      renderAll();
-      showToast("Backup restored");
-    }catch(e){
-      showToast("Invalid backup file");
-    }
-  }
-  reader.readAsText(file);
-}
-
-/* ------------------------------------------------------------
-   DONE — Part 3 Loaded
-   ------------------------------------------------------------ */
-
-console.log("HR Dashboard — Part 3 Loaded (Pro Features Active)");
-
-</script>
-<script>
-/* ============================================================
-   PART 4 — PRO MODULE
-   - HR Assistant (local)
-   - Employment Contract Generator (jsPDF)
-   - Attendance Rules Engine (config + apply)
-   - Advanced Reporting (PDF + CSV)
-   ============================================================ */
-
-(function Part4_Init(){
-  /* Reuse existing globals from earlier parts:
-     ACTIVE_ORG, EMP_KEY, ATT_KEY, PAY_KEY, ANN_KEY, ACT_KEY, TEACH_ATT_KEY,
-     read(), save(), showToast(), pushActivity(), updateKPIs(), updateCharts(), renderAll()
-  */
-
-  /* ----------------------------
-     1) Inject UI Buttons / Panels
-     ---------------------------- */
-  const headerRight = document.querySelector('.header-right');
-
-  // Assistant Button
-  const assistantBtn = document.createElement('button');
-  assistantBtn.className = 'btn light';
-  assistantBtn.innerHTML = '<i class="fa fa-robot"></i> Assistant';
-  headerRight.insertBefore(assistantBtn, headerRight.firstChild);
-
-  // Contract Button
-  const contractBtn = document.createElement('button');
-  contractBtn.className = 'btn light';
-  contractBtn.style.marginLeft = '6px';
-  contractBtn.innerHTML = '<i class="fa fa-file-contract"></i> Contract';
-  headerRight.appendChild(contractBtn);
-
-  // Rules Button
-  const rulesBtn = document.createElement('button');
-  rulesBtn.className = 'btn light';
-  rulesBtn.style.marginLeft = '6px';
-  rulesBtn.innerHTML = '<i class="fa fa-gavel"></i> Rules';
-  headerRight.appendChild(rulesBtn);
-
-  // Reports Button
-  const reportsBtn = document.createElement('button');
-  reportsBtn.className = 'btn light';
-  reportsBtn.style.marginLeft = '6px';
-  reportsBtn.innerHTML = '<i class="fa fa-file-chart-line"></i> Reports';
-  headerRight.appendChild(reportsBtn);
-
-  /* ----------------------------
-     2) ASSISTANT (LOCAL, CANNED)
-     ---------------------------- */
-  const assistantModal = createModal('assistantModal', 'HR Assistant');
-  assistantModal.querySelector('.modal-body').innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <input id="assistQuery" placeholder="Ask (e.g., 'how many on leave today?')" style="padding:8px;border-radius:8px;border:1px solid #ddd">
-      <div style="display:flex;gap:8px">
-        <button id="assistBtn" class="btn">Ask</button>
-        <button id="assistClear" class="btn light">Clear</button>
-      </div>
-      <div id="assistOutput" style="margin-top:8px;white-space:pre-wrap;font-size:13px;color:var(--text-dark)"></div>
-      <div class="tiny" style="color:var(--text-muted)">Note: local assistant uses canned logic and your data (no external API).</div>
-    </div>
-  `;
-  assistantBtn.addEventListener('click', ()=> openModal('assistantModal'));
-  assistantModal.querySelector('#assistBtn').addEventListener('click', assistantQuery);
-  assistantModal.querySelector('#assistClear').addEventListener('click', ()=> {
-    document.getElementById('assistQuery').value = '';
-    document.getElementById('assistOutput').textContent = '';
-  });
-
-  function assistantQuery(){
-    const q = (document.getElementById('assistQuery').value || '').toLowerCase();
-    const out = document.getElementById('assistOutput');
-    if(!q){ out.textContent = 'Please type a question.'; return; }
-
-    // simple canned intents
-    if(q.includes('present') || q.includes('on duty') || q.includes('attendance today')){
-      const att = read(ATT_KEY);
-      const today = new Date().toISOString().split('T')[0];
-      const present = new Set(att.filter(a=>a.date.startsWith(today) && a.action==='in').map(a=>a.employeeId));
-      out.textContent = `Present today: ${present.size}\nTotal employees: ${read(EMP_KEY).length}`;
-      return;
-    }
-    if(q.includes('payroll') || q.includes('salary total') || q.includes('monthly payroll')){
-      const total = read(EMP_KEY).reduce((s,e)=> s + Number(e.salary || 0), 0);
-      out.textContent = `Monthly payroll (sum of salaries): ₵${total.toLocaleString()}`;
-      return;
-    }
-    if(q.includes('leave') || q.includes('on leave')){
-      const leaves = read(LEAVE_KEY || `${ACTIVE_ORG}_leaves`) || [];
-      const pending = leaves.filter(l=> l.status === 'pending').length;
-      out.textContent = `Pending leave requests: ${pending}\nTotal leave records: ${leaves.length}`;
-      return;
-    }
-    if(q.includes('help') || q.includes('commands')){
-      out.textContent = `Try:\n - "attendance today"\n - "payroll"\n - "how many on leave?"\n - "top earner"\n`;
-      return;
-    }
-    // fallback
-    out.textContent = `Sorry — I couldn't parse that. Try: "attendance today", "payroll", "how many on leave?"`;
-  }
-
-  /* ----------------------------
-     3) CONTRACT GENERATOR (jsPDF)
-     ---------------------------- */
-  const contractModal = createModal('contractModal', 'Employment Contract Generator', 700);
-  contractModal.querySelector('.modal-body').innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div>
-        <label>Employee Name</label><input id="c_name" placeholder="Full name" style="width:100%;padding:8px;margin-top:6px">
-        <label>Role</label><input id="c_role" placeholder="Role" style="width:100%;padding:8px;margin-top:6px">
-        <label>Start Date</label><input id="c_start" type="date" style="width:100%;padding:8px;margin-top:6px">
-        <label>Salary (monthly)</label><input id="c_salary" type="number" style="width:100%;padding:8px;margin-top:6px">
-        <label>Duration (months or 'permanent')</label><input id="c_duration" placeholder="e.g., 12 or permanent" style="width:100%;padding:8px;margin-top:6px">
-      </div>
-      <div>
-        <label>Probation period (months)</label><input id="c_prob" type="number" style="width:100%;padding:8px;margin-top:6px" value="3">
-        <label>Notice period (weeks)</label><input id="c_notice" type="number" style="width:100%;padding:8px;margin-top:6px" value="4">
-        <label>Employer name</label><input id="c_employer" placeholder="Organization name" style="width:100%;padding:8px;margin-top:6px" value="${ACTIVE_ORG}">
-        <label>Extra clauses (optional)</label><textarea id="c_clauses" style="width:100%;height:86px;padding:8px;margin-top:6px" placeholder="Confidentiality, non-compete..."></textarea>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <button id="generateContractBtn" class="btn prim">Generate PDF</button>
-      <button id="previewContractBtn" class="btn light">Preview Text</button>
-      <button id="saveContractProfile" class="btn">Save to records</button>
-    </div>
-    <div id="contractPreview" style="margin-top:10px;font-size:13px;color:var(--text-muted)"></div>
-  `;
-
-  contractBtn.addEventListener('click', ()=> openModal('contractModal'));
-  contractModal.querySelector('#previewContractBtn').addEventListener('click', contractPreview);
-  contractModal.querySelector('#generateContractBtn').addEventListener('click', generateContractPDF);
-  contractModal.querySelector('#saveContractProfile').addEventListener('click', saveContractToEmployee);
-
-  function contractPreview(){
-    const p = collectContractForm();
-    const txt = buildContractText(p);
-    document.getElementById('contractPreview').textContent = txt;
-  }
-
-  function collectContractForm(){
-    return {
-      name: document.getElementById('c_name').value.trim(),
-      role: document.getElementById('c_role').value.trim(),
-      start: document.getElementById('c_start').value,
-      salary: Number(document.getElementById('c_salary').value || 0),
-      duration: document.getElementById('c_duration').value.trim(),
-      probation: document.getElementById('c_prob').value || 0,
-      notice: document.getElementById('c_notice').value || 0,
-      employer: document.getElementById('c_employer').value.trim() || ACTIVE_ORG,
-      clauses: document.getElementById('c_clauses').value.trim()
-    };
-  }
-
-  function buildContractText(p){
-    return `EMPLOYMENT CONTRACT\n\nThis Employment Contract is made between ${p.employer} (the "Employer") and ${p.name} (the "Employee").\n\nRole: ${p.role}\nStart Date: ${p.start}\nSalary: ₵${p.salary.toLocaleString()} per month\nDuration: ${p.duration}\nProbation: ${p.probation} months\nNotice Period: ${p.notice} weeks\n\nClauses:\n${p.clauses || 'None specified.'}\n\nSigned:\nEmployer: ____________________   Date: _______\nEmployee: ____________________   Date: _______`;
-  }
-
-  function generateContractPDF(){
-    const p = collectContractForm();
-    if(!p.name || !p.role || !p.start) return showToast('Please provide name, role and start date');
-
-    const doc = new jsPDF('p','pt','a4');
-    let y = 40;
-    doc.setFontSize(16); doc.text(`${p.employer} — Employment Contract`, 40, y); y += 30;
-    doc.setFontSize(11);
-    const lines = buildContractText(p).split('\n');
-    lines.forEach(line => { doc.text(line, 40, y); y += 14; if(y > 750){ doc.addPage(); y = 40; }});
-    const fname = `${p.name.replace(/\s+/g,'_')}_contract.pdf`;
-    doc.save(fname);
-    pushActivity(`Generated contract for ${p.name}`);
-    showToast('Contract PDF generated');
-  }
-
-  function saveContractToEmployee(){
-    const p = collectContractForm();
-    if(!p.name) return showToast('Employee name required to save');
-    // Add to employees if not exists
-    const employees = read(EMP_KEY);
-    let emp = employees.find(e => (e.name || '').toLowerCase() === p.name.toLowerCase());
-    if(!emp){
-      emp = { id:'e_'+Date.now(), name:p.name, role:p.role, email:'', salary:p.salary };
-      employees.push(emp);
-    } else {
-      emp.role = p.role || emp.role;
-      emp.salary = p.salary || emp.salary;
-    }
-    save(EMP_KEY, employees);
-    pushActivity(`Saved contract profile for ${p.name}`);
-    renderAll();
-    showToast('Contract saved to employees');
-  }
-
-  /* ----------------------------
-     4) ATTENDANCE RULES ENGINE
-     - store simple rules in SETTINGS_KEY.rules.attendance
-     - rule fields: lateAfterHour (e.g., 8.30 -> 8.5), earlyLeaveBefore (e.g., 16.0)
-     - latePenaltyPercent (applied to monthly salary pro-rated)
-     ---------------------------- */
-  const rulesModal = createModal('rulesModal', 'Attendance Rules Engine', 640);
-  rulesModal.querySelector('.modal-body').innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <label>Late after (hour as decimal, e.g., 8.5 = 8:30)</label>
-      <input id="r_lateAfter" type="number" step="0.01" style="padding:8px" value="8.50">
-      <label>Early leave before (hour decimal)</label>
-      <input id="r_earlyBefore" type="number" step="0.01" style="padding:8px" value="16.00">
-      <label>Late penalty (percent of monthly salary per late day)</label>
-      <input id="r_latePenalty" type="number" style="padding:8px" value="1.5">
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button id="r_save" class="btn prim">Save Rules</button>
-        <button id="r_apply" class="btn">Apply to Today</button>
-      </div>
-      <div class="tiny" id="r_status" style="margin-top:6px;color:var(--text-muted)"></div>
-    </div>
-  `;
-  rulesBtn.addEventListener('click', ()=> {
-    openModal('rulesModal');
-    loadRulesToUI();
-  });
-
-  rulesModal.querySelector('#r_save').addEventListener('click', ()=> {
-    const s = read(SETTINGS_KEY) || {};
-    s.rules = s.rules || {};
-    s.rules.attendance = {
-      lateAfter: Number(document.getElementById('r_lateAfter').value) || 8.5,
-      earlyBefore: Number(document.getElementById('r_earlyBefore').value) || 16.0,
-      latePenaltyPercent: Number(document.getElementById('r_latePenalty').value) || 1.5
-    };
-    save(SETTINGS_KEY, s);
-    document.getElementById('r_status').textContent = 'Saved';
-    pushActivity('Updated attendance rules');
-    showToast('Rules saved');
-  });
-
-  rulesModal.querySelector('#r_apply').addEventListener('click', applyRulesToToday);
-
-  function loadRulesToUI(){
-    const s = read(SETTINGS_KEY) || {};
-    const r = (s.rules && s.rules.attendance) || { lateAfter:8.5, earlyBefore:16.0, latePenaltyPercent:1.5 };
-    document.getElementById('r_lateAfter').value = r.lateAfter;
-    document.getElementById('r_earlyBefore').value = r.earlyBefore;
-    document.getElementById('r_latePenalty').value = r.latePenaltyPercent;
-  }
-
-  function applyRulesToToday(){
-    const s = read(SETTINGS_KEY) || {};
-    const r = (s.rules && s.rules.attendance) || { lateAfter:8.5, earlyBefore:16.0, latePenaltyPercent:1.5 };
-
-    const employees = read(EMP_KEY);
-    const att = read(ATT_KEY);
-    const today = new Date().toISOString().split('T')[0];
-
-    // compute per-employee: if they clocked in after lateAfter => mark as late
-    const lateList = [];
-    employees.forEach(emp=>{
-      const logs = att.filter(a=> a.employeeId === emp.id && a.date.startsWith(today));
-      const inLog = logs.find(a=> a.action === 'in');
-      const outLog = logs.find(a=> a.action === 'out');
-      if(inLog){
-        const h = new Date(inLog.date).getHours() + new Date(inLog.date).getMinutes()/60;
-        if(h > r.lateAfter) lateList.push(emp.id);
-      }
-    });
-
-    // calculate penalties (simple): penalty = (salary * percent/100) per late day
-    const penalties = {};
-    lateList.forEach(id => {
-      const emp = read(EMP_KEY).find(e=>e.id===id);
-      if(!emp) return;
-      const penalty = (Number(emp.salary||0) * (r.latePenaltyPercent/100));
-      penalties[id] = penalty;
-    });
-
-    // Save penalties into PAY_KEY (as deductions) - append today's deductions
-    const payArr = read(PAY_KEY);
-    Object.keys(penalties).forEach(empId=>{
-      payArr.push({ id:'ded_'+Date.now()+'_'+empId, employeeId:empId, type:'late_penalty', amount: penalties[empId], date: new Date().toISOString(), reason: 'Late arrival (rules engine)' });
-    });
-    save(PAY_KEY, payArr);
-    pushActivity(`Applied attendance rules — ${lateList.length} late`);
-    showToast(`${lateList.length} late detected — penalties applied`);
-    renderAll();
-  }
-
-  /* ----------------------------
-     5) ADVANCED REPORTS PANEL
-     - Quick: generate monthly summary CSV + PDF with payroll + attendance stats
-     ---------------------------- */
-  const reportsModal = createModal('reportsModal', 'Advanced Reports', 760);
-  reportsModal.querySelector('.modal-body').innerHTML = `
-    <div style="display:flex;gap:12px;align-items:center">
-      <label>Report type</label>
-      <select id="rpt_type" style="padding:8px">
-        <option value="monthly_summary">Monthly Summary</option>
-        <option value="attendance_list">Attendance List</option>
-        <option value="payroll_breakdown">Payroll Breakdown</option>
-      </select>
-      <label>Month</label>
-      <input id="rpt_month" type="month" style="padding:8px">
-      <button id="rpt_generate" class="btn prim">Generate</button>
-      <button id="rpt_csv" class="btn light">Export CSV</button>
-    </div>
-    <div id="rpt_output" style="margin-top:12px;max-height:360px;overflow:auto"></div>
-  `;
-  reportsBtn.addEventListener('click', ()=> {
-    openModal('reportsModal');
-    const now = new Date();
-    document.getElementById('rpt_month').value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  });
-
-  reportsModal.querySelector('#rpt_generate').addEventListener('click', generateReport);
-  reportsModal.querySelector('#rpt_csv').addEventListener('click', ()=> exportReportCsv(document.getElementById('rpt_type').value, document.getElementById('rpt_month').value));
-
-  function generateReport(){
-    const type = document.getElementById('rpt_type').value;
-    const month = document.getElementById('rpt_month').value; // YYYY-MM
-    const out = document.getElementById('rpt_output');
-    out.innerHTML = '';
-
-    if(type === 'monthly_summary'){
-      // payroll total, present/absent avg, top earners
-      const emps = read(EMP_KEY);
-      const att = read(ATT_KEY);
-      const monthPrefix = month ? month : new Date().toISOString().slice(0,7);
-      const payrollTotal = emps.reduce((s,e)=> s + Number(e.salary||0), 0);
-      const daysInMonth = 30;
-      // compute total present events in month
-      const presentCount = att.filter(a=> a.date.startsWith(monthPrefix) && a.action==='in').length;
-      const avgDailyPresent = Math.round(presentCount / Math.max(1, daysInMonth));
-
-      const top = [...emps].sort((a,b)=> b.salary - a.salary).slice(0,5);
-
-      out.innerHTML = `<div><b>Month:</b> ${monthPrefix}</div>
-        <div><b>Payroll total:</b> ₵${payrollTotal.toLocaleString()}</div>
-        <div><b>Avg daily present (est):</b> ${avgDailyPresent}</div>
-        <div style="margin-top:8px"><b>Top earners</b><ol>${top.map(t=>`<li>${t.name} — ₵${Number(t.salary||0).toLocaleString()}</li>`).join('')}</ol></div>`;
-    }
-
-    if(type === 'attendance_list'){
-      const att = read(ATT_KEY).filter(a => a.date.startsWith(document.getElementById('rpt_month').value || new Date().toISOString().slice(0,7)));
-      if(!att.length) out.innerHTML = '<div class="tiny">No attendance for selected month</div>';
-      else out.innerHTML = `<table><thead><tr><th>Date</th><th>Employee</th><th>Action</th></tr></thead><tbody>${att.map(a=>{
-        const e = read(EMP_KEY).find(x=>x.id===a.employeeId) || {name:a.employeeId};
-        return `<tr><td>${a.date}</td><td>${e.name}</td><td>${a.action}</td></tr>`;
-      }).join('')}</tbody></table>`;
-    }
-
-    if(type === 'payroll_breakdown'){
-      const emps = read(EMP_KEY);
-      const pays = read(PAY_KEY);
-      // summarize deductions for month
-      const monthPrefix = document.getElementById('rpt_month').value || new Date().toISOString().slice(0,7);
-      const deductions = pays.filter(p=> p.date.startsWith(monthPrefix));
-      const dedByEmp = {};
-      deductions.forEach(d => { dedByEmp[d.employeeId] = (dedByEmp[d.employeeId]||0) + Number(d.amount||0); });
-      out.innerHTML = `<table><thead><tr><th>Employee</th><th>Salary</th><th>Deductions</th><th>Net</th></tr></thead><tbody>${
-        emps.map(e => `<tr><td>${e.name}</td><td>₵${Number(e.salary||0).toLocaleString()}</td><td>₵${(dedByEmp[e.id]||0).toLocaleString()}</td><td>₵${(Number(e.salary||0) - (dedByEmp[e.id]||0)).toLocaleString()}</td></tr>`).join('')
-      }</tbody></table>`;
-    }
-  }
-
-  function exportReportCsv(type, month){
-    // builds simple CSV for the selected report type
-    if(type === 'monthly_summary'){
-      const emps = read(EMP_KEY);
-      const lines = [['Name','Role','Salary']];
-      emps.forEach(e => lines.push([e.name,e.role,e.salary || 0]));
-      downloadCsv(lines, `${ACTIVE_ORG}_monthly_summary_${month}.csv`);
-    }
-    if(type === 'attendance_list'){
-      const att = read(ATT_KEY).filter(a => a.date.startsWith(month));
-      const lines = [['Date','Employee','Action']];
-      att.forEach(a => {
-        const e = read(EMP_KEY).find(x=>x.id===a.employeeId) || {name:a.employeeId};
-        lines.push([a.date, e.name, a.action]);
-      });
-      downloadCsv(lines, `${ACTIVE_ORG}_attendance_${month}.csv`);
-    }
-    if(type === 'payroll_breakdown'){
-      const emps = read(EMP_KEY);
-      const pays = read(PAY_KEY).filter(p=> p.date.startsWith(month));
-      const dedByEmp = {};
-      pays.forEach(p=> dedByEmp[p.employeeId] = (dedByEmp[p.employeeId]||0) + Number(p.amount||0));
-      const lines = [['Name','Salary','Deductions','Net']];
-      emps.forEach(e=> lines.push([e.name, e.salary||0, dedByEmp[e.id]||0, (Number(e.salary||0) - (dedByEmp[e.id]||0))]));
-      downloadCsv(lines, `${ACTIVE_ORG}_payroll_${month}.csv`);
-    }
-    showToast('CSV exported');
-  }
-
-  function downloadCsv(rows, filename){
-    const csv = rows.map(r=> r.map(cell => `"${String(cell||'').replace(/"/g,'""')}"`).join(',')).join('\n');
-    const blob = new Blob([csv], {type:'text/csv'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url);
-  }
-
-  /* ----------------------------
-     Tiny utilities: modal creation, open/close
-     ---------------------------- */
-  function createModal(id, title, width=560){
-    // if exists, return
-    if(document.getElementById(id)) return document.getElementById(id);
-    const wrap = document.createElement('div');
-    wrap.id = id;
-    wrap.style = `position:fixed;left:0;top:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;z-index:9999`;
-    wrap.innerHTML = `
-      <div style="background:rgba(0,0,0,0.5);position:absolute;inset:0"></div>
-      <div class="modal-card" style="background:${getComputedStyle(document.documentElement).getPropertyValue('--card-bg') || '#fff'};width:${width}px;border-radius:12px;padding:12px 16px;box-shadow:0 10px 40px rgba(0,0,0,.5);position:relative;z-index:10">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <div style="font-weight:700">${title}</div>
-          <div><button class="btn light modal-close">Close</button></div>
-        </div>
-        <div class="modal-body"></div>
-      </div>
-    `;
-    document.body.appendChild(wrap);
-    wrap.querySelector('.modal-close').addEventListener('click', ()=> closeModal(id));
-    wrap.querySelector('div[style*="position:absolute"]')?.addEventListener('click', ()=> closeModal(id));
-    return wrap;
-  }
-  function openModal(id){ const el = document.getElementById(id); if(!el) return; el.style.display = 'flex'; }
-  function closeModal(id){ const el = document.getElementById(id); if(!el) return; el.style.display = 'none'; }
-
-  /* ----------------------------
-     Bindings for saved keys used earlier (ensure globals exist)
-     ---------------------------- */
-  // Ensure SETTINGS_KEY, LEAVE_KEY present for use in assistant and report paths
-  if(!localStorage.getItem(SETTINGS_KEY)) save(SETTINGS_KEY, {});
-  if(!localStorage.getItem(LEAVE_KEY)) save(LEAVE_KEY, []);
-
-  /* ----------------------------
-     Refresh helpers: update views after operations
-     ---------------------------- */
-  function refreshAllSmall(){
-    renderAll && typeof renderAll === 'function' ? renderAll() : console.warn('renderAll missing');
-    updateKPIs && typeof updateKPIs === 'function' ? updateKPIs() : null;
-    updateCharts && typeof updateCharts === 'function' ? updateCharts() : null;
-  }
-
-  // Bind contract saved or assistant interactions to refresh
-  // Already calls pushActivity and renderAll appropriately in functions above.
-
-  /* ----------------------------
-     Done initialization
-     ---------------------------- */
-  console.log('PART 4 loaded: Assistant, Contract generator, Rules engine, Advanced reports');
-
-})(); // end Part4 IIFE
 </script>
 
 </body>
