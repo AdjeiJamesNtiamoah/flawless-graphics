@@ -1,231 +1,786 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Finance Dashboard | Flawless Graphics</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Finance Dashboard — Flawless Graphics (Premium)</title>
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-body {
-    margin: 0;
-    background: #f4f7fb;
-    font-family: Poppins, Arial;
-    display: flex;
-}
-
-/* Sidebar */
-.sidebar {
-    width: 250px;
-    background: #0c1427;
-    color: white;
-    height: 100vh;
-    padding-top: 20px;
-}
-
-.sidebar h2 {
-    text-align: center;
-    margin-bottom: 25px;
-}
-
-.nav-item {
-    padding: 14px 20px;
-    cursor: pointer;
-    color: #cbd5e1;
-}
-.nav-item:hover {
-    background: #162544;
-    color: white;
-}
-
-/* Main */
-.main {
-    flex: 1;
-    padding: 25px;
-}
-
-/* Cards */
-.card {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 25px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-}
-
-.card-title {
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-th, td {
-    padding: 10px;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.btn {
-    padding: 8px 14px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-}
-.btn.approve { background:#10b981; color:white; }
-.btn.reject { background:#ef4444; color:white; }
-.btn.approve:hover{ opacity:.85; }
-.btn.reject:hover{ opacity:.85; }
-
-.status-pending { color: #d97706; font-weight: bold; }
-.status-paid { color: #10b981; font-weight: bold; }
-.status-rejected { color: #ef4444; font-weight: bold; }
+  :root{
+    --bg:#071127;
+    --card:#0f1b2b;
+    --muted:#9fb4c9;
+    --accent:#00c3ff;
+    --accent2:#7a00ff;
+    --success:#10b981;
+    --danger:#ef4444;
+    --glass: rgba(255,255,255,0.03);
+    --radius:12px;
+    --sidebar:#07142a;
+    --text:#e8f6ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter, "Poppins",Arial;background:linear-gradient(180deg,#021127 0%,var(--bg) 100%);color:var(--text);min-height:100vh}
+  .app{display:flex;min-height:100vh}
+  aside.sidebar{width:260px;background:linear-gradient(180deg,var(--sidebar),rgba(0,0,0,0.25));padding:20px;display:flex;flex-direction:column;gap:14px;border-right:1px solid rgba(255,255,255,0.02)}
+  .logo{font-weight:800;font-size:20px;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .nav{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+  .nav button{background:transparent;border:0;color:var(--muted);padding:10px;border-radius:8px;text-align:left;cursor:pointer;font-weight:600}
+  .nav button.active{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#021}
+  main{flex:1;padding:20px;overflow:auto}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:14px; border-radius:12px; border:1px solid var(--glass)}
+  .kpi h4{margin:0;color:var(--muted);font-size:13px}
+  .kpi .big{font-size:20px;font-weight:800}
+  .flex{display:flex;gap:12px;align-items:center}
+  .btn{padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700}
+  .btn.prim{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#021}
+  .btn.danger{background:var(--danger);color:#fff}
+  input,select,textarea{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.03);text-align:left}
+  .small{font-size:13px;color:var(--muted)}
+  .chart-card{height:220px}
+  .split{display:grid;grid-template-columns:1fr 420px;gap:12px}
+  .file{display:inline-block;padding:8px 10px;border-radius:8px;border:1px dashed rgba(255,255,255,0.05);cursor:pointer}
+  .tiny{font-size:12px;color:var(--muted)}
+  #toast{position:fixed;right:20px;bottom:20px;background:#021124;padding:10px 14px;border-radius:8px;color:#fff;opacity:0;transform:translateY(12px);transition:all .28s}
+  #toast.show{opacity:1;transform:none}
+  @media(max-width:1000px){ .kpis{grid-template-columns:repeat(2,1fr)} .split{grid-template-columns:1fr} aside.sidebar{display:none} }
 </style>
 </head>
-
 <body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">FLAWLESS FINANCE</div>
+    <div class="small">Organization</div>
+    <div id="orgNameMini" style="font-weight:700"></div>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-    <h2>FINANCE</h2>
-    <div class="nav-item">Dashboard</div>
-    <div class="nav-item">Pending Payments</div>
-    <div class="nav-item">Payment History</div>
-</div>
-
-<!-- MAIN -->
-<div class="main">
-
-    <h1>Finance Dashboard — <span id="orgDisplay"></span></h1>
-
-    <!-- Pending Requests -->
-    <div class="card">
-        <div class="card-title">Pending Payroll Requests</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Request ID</th>
-                    <th>Submitted</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="pendingTable"></tbody>
-        </table>
+    <div class="nav" role="navigation">
+      <button class="tab active" data-section="overview">Overview</button>
+      <button class="tab" data-section="invoices">Invoices</button>
+      <button class="tab" data-section="payments">Payments</button>
+      <button class="tab" data-section="accounts">Student Accounts</button>
+      <button class="tab" data-section="reports">Reports</button>
+      <button class="tab" data-section="reconcile">Reconcile</button>
+      <button class="tab" data-section="settings">Settings</button>
+      <a href="hr-dashboard.html" style="color:var(--muted);margin-top:6px;text-decoration:none">← HR Dashboard</a>
+      <a href="welcome.html" style="color:var(--muted);text-decoration:none">← Home</a>
     </div>
 
-    <!-- Payment History -->
-    <div class="card">
-        <div class="card-title">Payment History</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Request ID</th>
-                    <th>Paid At</th>
-                    <th>Total Amount</th>
-                </tr>
-            </thead>
-            <tbody id="historyTable"></tbody>
-        </table>
+    <div style="margin-top:auto">
+      <div class="small">Teacher clock-ins (synced)</div>
+      <div id="teacherSync" class="tiny">Loading teacher attendance…</div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="top">
+      <div>
+        <h2 id="pageTitle" style="margin:0">Finance • Overview</h2>
+        <div class="small" id="orgInfo">Loading…</div>
+      </div>
+      <div class="flex">
+        <input id="orgSwitcher" style="min-width:220px" />
+        <button class="btn" id="refreshBtn">Refresh</button>
+        <button class="btn prim" id="newInvoiceBtn">+ Invoice</button>
+      </div>
     </div>
 
+    <!-- KPIs -->
+    <div class="kpis">
+      <div class="card kpi">
+        <h4>Total Revenue (Received)</h4>
+        <div class="big" id="k_revenue">₵0</div>
+        <div class="small">All-time received</div>
+      </div>
+      <div class="card kpi">
+        <h4>Outstanding</h4>
+        <div class="big" id="k_outstanding">₵0</div>
+        <div class="small">Unpaid invoices</div>
+      </div>
+      <div class="card kpi">
+        <h4>Invoices</h4>
+        <div class="big" id="k_invoices">0</div>
+        <div class="small">Total invoices</div>
+      </div>
+      <div class="card kpi">
+        <h4>Overdue</h4>
+        <div class="big" id="k_overdue">0</div>
+        <div class="small">Overdue invoices</div>
+      </div>
+    </div>
+
+    <!-- Overview Section -->
+    <section id="overviewSection" class="card" style="margin-bottom:12px">
+      <div class="split">
+        <div>
+          <h3 style="margin-top:0">Recent Activity</h3>
+          <div id="activityFeed" class="tiny"></div>
+          <div style="margin-top:12px">
+            <h4 class="small">Quick actions</h4>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <label class="file" id="importJsonBtn">Import JSON</label>
+              <label class="file" id="importCsvBtn">Import CSV (payments)</label>
+              <button class="btn" id="exportAllBtn">Export JSON</button>
+              <button class="btn prim" id="exportCsvBtn">Export CSV</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card chart-card">
+            <h4 style="margin:0">Revenue (last 12 months)</h4>
+            <canvas id="revenueChart"></canvas>
+          </div>
+
+          <div style="height:12px"></div>
+
+          <div class="card chart-card">
+            <h4 style="margin:0">Paid vs Outstanding</h4>
+            <canvas id="paidDonut"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Invoices -->
+    <section id="invoicesSection" class="card" style="display:none;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 style="margin:0">Invoices</h3>
+        <div style="display:flex;gap:8px">
+          <input id="invoiceSearch" placeholder="Search by invoice, name or email" style="width:340px">
+          <select id="invoiceFilter">
+            <option value="">All</option>
+            <option value="unpaid">Unpaid</option>
+            <option value="paid">Paid</option>
+            <option value="overdue">Overdue</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:12px" class="table-scroll card">
+        <table>
+          <thead><tr><th>#</th><th>Invoice ID</th><th>To</th><th>Amount</th><th>Due</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="invoiceTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Payments -->
+    <section id="paymentsSection" class="card" style="display:none;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 style="margin:0">Payments</h3>
+        <div style="display:flex;gap:8px">
+          <button class="btn" id="newPaymentBtn">Record Payment</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px" class="table-scroll card">
+        <table>
+          <thead><tr><th>#</th><th>Invoice</th><th>Payer</th><th>Amount</th><th>Date</th><th>Method</th><th>Actions</th></tr></thead>
+          <tbody id="paymentsTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Student Accounts -->
+    <section id="accountsSection" class="card" style="display:none;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 style="margin:0">Student Fee Accounts</h3>
+        <div style="display:flex;gap:8px">
+          <button class="btn prim" id="newStudentAcctBtn">+ Add Student Account</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px" class="card">
+        <table>
+          <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Balance</th><th>Actions</th></tr></thead>
+          <tbody id="studentAcctTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Reports -->
+    <section id="reportsSection" class="card" style="display:none;margin-bottom:12px">
+      <h3 style="margin-top:0">Reports & Tools</h3>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <div class="card" style="min-width:260px">
+          <h4 class="small">Outstanding Invoices (CSV)</h4>
+          <div class="tiny" id="outstandingExportHint"></div>
+          <button class="btn prim" id="exportOutstandingBtn">Export outstanding</button>
+        </div>
+        <div class="card" style="min-width:260px">
+          <h4 class="small">Reconciliation</h4>
+          <div class="tiny">Find orphan payments and match to invoices.</div>
+          <button class="btn" id="findOrphansBtn">Find Orphans</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reconcile -->
+    <section id="reconcileSection" class="card" style="display:none;margin-bottom:12px">
+      <h3 style="margin-top:0">Reconciliation</h3>
+      <div id="orphansArea" class="tiny"></div>
+      <div id="reconcileArea" style="margin-top:12px"></div>
+    </section>
+
+    <!-- Settings -->
+    <section id="settingsSection" class="card" style="display:none;margin-bottom:12px">
+      <h3 style="margin-top:0">Settings</h3>
+      <div style="display:flex;gap:12px">
+        <div style="flex:1">
+          <label class="small">Default currency</label>
+          <input id="cfg_currency" placeholder="GHS" style="width:120px">
+          <div style="margin-top:12px">
+            <label class="small">Auto-seed demo data</label>
+            <select id="cfg_seed"><option value="yes">Yes</option><option value="no">No</option></select>
+          </div>
+        </div>
+        <div style="width:320px">
+          <h4 class="small">Quick import</h4>
+          <div class="tiny">Upload a JSON backup to restore finance data for this org.</div>
+          <label class="file" id="settingsImportJson">Upload JSON</label>
+        </div>
+      </div>
+    </section>
+
+    <div id="toast"></div>
+  </main>
 </div>
+
+<!-- Hidden file inputs -->
+<input type="file" id="hiddenImportJson" accept=".json" style="display:none">
+<input type="file" id="hiddenImportCsv" accept=".csv,text/csv" style="display:none">
+<input type="file" id="hiddenSettingsJson" accept=".json" style="display:none">
 
 <script>
-/* ---------- ORG CONFIG ---------- */
-const ACTIVE_ORG = localStorage.getItem("active_org") || "FLAWLESS";
-document.getElementById("orgDisplay").textContent = ACTIVE_ORG;
+/* ============================
+   Finance Dashboard — Full JS
+   ============================ */
 
-const REQ_KEY = `${ACTIVE_ORG}_finance_requests`;
-const PAY_KEY = `${ACTIVE_ORG}_finance_payments`;
+/* ---------- Utilities & Keys ---------- */
+function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
+function read(key){ return safeParse(localStorage.getItem(key)) || [] }
+function save(key,val){ localStorage.setItem(key, JSON.stringify(val)) }
+function now(){ return new Date().toISOString() }
+function showToast(msg, ms=3000){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'), ms) }
 
-function read(key){
-    return JSON.parse(localStorage.getItem(key) || "[]");
+/* Active org and namespaced keys */
+const DEFAULT_FINANCE_ORG = 'FLAWLESS';
+const ACTIVE_ORG = (localStorage.getItem('active_org') || DEFAULT_FINANCE_ORG).trim();
+const ORG = ACTIVE_ORG;
+document.getElementById('orgNameMini').textContent = ORG;
+document.getElementById('orgInfo').textContent = `${ORG} • Finance`;
+
+/* Namespaced storage keys */
+const INV_KEY = `${ORG}_finance_invoices`;
+const PAY_KEY = `${ORG}_finance_payments`;
+const STUD_KEY = `${ORG}_finance_students`;
+const ACT_KEY = `${ORG}_finance_activity`;
+const SET_KEY = `${ORG}_finance_settings`;
+const HR_TEACH_KEY = `${ORG}_teacher_attendance`;   // teacher page sync
+const ORG_ATT_KEY = `${ORG}_attendance`;            // alternate key used by teacher pages
+
+/* bootstrap empty structures if missing */
+if(!localStorage.getItem(INV_KEY)) save(INV_KEY, []);
+if(!localStorage.getItem(PAY_KEY)) save(PAY_KEY, []);
+if(!localStorage.getItem(STUD_KEY)) save(STUD_KEY, []);
+if(!localStorage.getItem(ACT_KEY)) save(ACT_KEY, []);
+if(!localStorage.getItem(SET_KEY)) save(SET_KEY, { currency: 'GHS', seed: 'yes' });
+
+/* helpers */
+function pushActivity(txt){
+  const arr = read(ACT_KEY);
+  arr.push({ id: 'a_'+Date.now(), text: txt, time: new Date().toISOString() });
+  save(ACT_KEY, arr);
+  renderActivity();
 }
-function save(key,val){
-    localStorage.setItem(key, JSON.stringify(val));
+
+/* ---------- UI: Tabs ---------- */
+document.querySelectorAll('.tab').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    const sec = btn.dataset.section;
+    document.querySelectorAll('section').forEach(s=> s.style.display = 'none');
+    if(sec==='overview') document.getElementById('overviewSection').style.display='block';
+    if(sec==='invoices') document.getElementById('invoicesSection').style.display='block';
+    if(sec==='payments') document.getElementById('paymentsSection').style.display='block';
+    if(sec==='accounts') document.getElementById('accountsSection').style.display='block';
+    if(sec==='reports') document.getElementById('reportsSection').style.display='block';
+    if(sec==='reconcile') document.getElementById('reconcileSection').style.display='block';
+    if(sec==='settings') document.getElementById('settingsSection').style.display='block';
+    document.getElementById('pageTitle').textContent = 'Finance • ' + (btn.textContent || '').trim();
+  });
+});
+
+/* ---------- Render activity ---------- */
+function renderActivity(){
+  const arr = read(ACT_KEY).slice().reverse();
+  const out = document.getElementById('activityFeed');
+  out.innerHTML = arr.slice(0,50).map(a => `<div class="tiny">${escapeHtml(a.text)} • <span style="color:var(--muted)">${new Date(a.time).toLocaleString()}</span></div>`).join('') || '<div class="tiny">No activity yet</div>';
 }
 
-/* ---------- RENDER PENDING ---------- */
-function renderPending(){
-    const list = read(REQ_KEY);
-    const tb = document.getElementById("pendingTable");
-    tb.innerHTML = "";
+/* ---------- Invoices CRUD ---------- */
+function genInvoiceId(){ return 'INV-' + Date.now().toString(36).toUpperCase().slice(-8) }
+function getInvoices(){ return read(INV_KEY) }
+function saveInvoices(v){ save(INV_KEY, v) }
+function createInvoice({ toName, toEmail, items=[], dueDate, notes='' }){
+  const id = genInvoiceId();
+  const amount = items.reduce((s,it)=> s + (Number(it.qty||1) * Number(it.price||0)), 0);
+  const inv = { id, toName, toEmail, items, amount, dueDate: dueDate || null, notes, status: 'unpaid', createdAt: now(), paidAt: null };
+  const arr = getInvoices(); arr.push(inv); saveInvoices(arr);
+  pushActivity(`Created invoice ${id} (${toName})`);
+  renderInvoices(); updateKPIs(); showToast('Invoice created');
+  return inv;
+}
 
-    list.filter(r=>r.status==="pending").forEach(r=>{
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${r.id}</td>
-            <td>${new Date(r.submittedAt).toLocaleString()}</td>
-            <td class="status-pending">PENDING</td>
-            <td>
-                <button class="btn approve" onclick="approve('${r.id}')">Approve</button>
-                <button class="btn reject" onclick="reject('${r.id}')">Reject</button>
-            </td>
-        `;
-        tb.appendChild(tr);
+function renderInvoices(){
+  const arr = getInvoices().slice().reverse();
+  document.getElementById('k_invoices').textContent = arr.length;
+  const tbody = document.getElementById('invoiceTable'); tbody.innerHTML = '';
+  const search = (document.getElementById('invoiceSearch') || {value:''}).value.trim().toLowerCase();
+  const filter = (document.getElementById('invoiceFilter') || {value:''}).value;
+  arr.forEach((inv,i)=>{
+    if(search){
+      const hay = `${inv.id} ${inv.toName||''} ${inv.toEmail||''} ${inv.notes||''}`.toLowerCase();
+      if(!hay.includes(search)) return;
+    }
+    if(filter==='unpaid' && inv.status!=='unpaid') return;
+    if(filter==='paid' && inv.status!=='paid') return;
+    if(filter==='overdue' && !(inv.status==='unpaid' && inv.dueDate && new Date(inv.dueDate) < new Date())) return;
+    const tr = document.createElement('tr');
+    const due = inv.dueDate ? new Date(inv.dueDate).toLocaleDateString() : '—';
+    const status = inv.status === 'paid' ? `<span style="color:var(--success)">PAID</span>` : (inv.dueDate && new Date(inv.dueDate) < new Date() ? `<span style="color:var(--danger)">OVERDUE</span>` : `<span style="color:var(--muted)">UNPAID</span>`);
+    tr.innerHTML = `<td>${i+1}</td><td>${inv.id}</td><td>${escapeHtml(inv.toName||inv.toEmail)}</td><td>${formatCurrency(inv.amount)}</td><td>${escapeHtml(due)}</td><td>${status}</td>
+      <td>
+        <button onclick="viewInvoice('${inv.id}')">View</button>
+        <button onclick="pdfInvoice('${inv.id}')">PDF</button>
+        ${inv.status==='unpaid' ? `<button onclick="markInvoicePaidPrompt('${inv.id}')">Mark Paid</button>` : ''}
+        <button onclick="deleteInvoice('${inv.id}')">Delete</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* View invoice modal (simple prompt style) */
+function viewInvoice(id){
+  const inv = getInvoices().find(i=>i.id===id);
+  if(!inv) return showToast('Invoice not found');
+  const lines = inv.items.map(it=> `${it.qty} x ${it.description} @ ${formatCurrency(it.price)} = ${formatCurrency(it.qty*it.price)}`).join('\\n');
+  alert(`Invoice ${inv.id}\\nTo: ${inv.toName} <${inv.toEmail}>\\nAmount: ${formatCurrency(inv.amount)}\\nDue: ${inv.dueDate || '—'}\\n\\nItems:\\n${lines}\\n\\nNotes:\\n${inv.notes||'—'}`);
+}
+
+/* Delete invoice */
+function deleteInvoice(id){
+  if(!confirm('Delete invoice?')) return;
+  const arr = getInvoices().filter(i=>i.id!==id); saveInvoices(arr);
+  pushActivity(`Deleted invoice ${id}`);
+  renderInvoices(); updateKPIs();
+  showToast('Deleted');
+}
+
+/* Mark invoice paid (prompt for payment details) */
+function markInvoicePaidPrompt(id){
+  const inv = getInvoices().find(i=>i.id===id);
+  if(!inv) return;
+  const amount = inv.amount;
+  const payer = inv.toName || inv.toEmail || 'Customer';
+  const method = prompt('Payment method (Cash / Bank / Mobile):', 'Bank') || 'Bank';
+  const date = new Date().toISOString();
+  // Create payment record and link
+  const pay = recordPayment({ invoiceId: id, payer, amount, date, method });
+  // Update invoice status
+  inv.status = 'paid'; inv.paidAt = date; saveInvoices(getInvoices());
+  pushActivity(`Invoice ${id} marked paid (Payment ${pay.id})`);
+  renderInvoices(); renderPayments(); updateKPIs();
+  showToast('Invoice marked paid');
+}
+
+/* ---------- Payments ---------- */
+function getPayments(){ return read(PAY_KEY) }
+function savePayments(arr){ save(PAY_KEY, arr) }
+function recordPayment({invoiceId=null, payer='', amount=0, date=null, method='Cash', notes='' }){
+  const id = 'PAY-'+Date.now().toString(36).toUpperCase().slice(-8);
+  const p = { id, invoiceId, payer, amount: Number(amount||0), date: date || new Date().toISOString(), method, notes };
+  const arr = getPayments(); arr.push(p); savePayments(arr);
+  pushActivity(`Recorded payment ${id} (${formatCurrency(p.amount)})`);
+  // if invoiceId present, mark invoice as paid if sums match
+  if(invoiceId){
+    const inv = getInvoices().find(i=>i.id===invoiceId);
+    if(inv){
+      inv.status = 'paid';
+      inv.paidAt = p.date;
+      saveInvoices(getInvoices());
+    }
+  }
+  renderPayments(); updateKPIs(); return p;
+}
+function renderPayments(){
+  const arr = getPayments().slice().reverse();
+  const tbody = document.getElementById('paymentsTable'); tbody.innerHTML = '';
+  arr.forEach((p,i)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${i+1}</td><td>${p.invoiceId||'—'}</td><td>${escapeHtml(p.payer)}</td><td>${formatCurrency(p.amount)}</td><td>${new Date(p.date).toLocaleString()}</td><td>${escapeHtml(p.method)}</td>
+      <td><button onclick="deletePayment('${p.id}')">Delete</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+function deletePayment(id){
+  if(!confirm('Delete payment?')) return;
+  const arr = getPayments().filter(p=>p.id!==id); savePayments(arr);
+  pushActivity(`Deleted payment ${id}`);
+  renderPayments(); updateKPIs(); showToast('Deleted');
+}
+
+/* ---------- Student Accounts ---------- */
+function getStudents(){ return read(STUD_KEY) }
+function saveStudents(arr){ save(STUD_KEY, arr) }
+function renderStudentAccounts(){
+  const arr = getStudents();
+  const tbody = document.getElementById('studentAcctTable'); tbody.innerHTML = '';
+  arr.forEach((s,i)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.email||'')}</td><td>${formatCurrency(Number(s.balance||0))}</td>
+      <td><button onclick="editStudentAcct('${s.id}')">Edit</button> <button onclick="deleteStudentAcct('${s.id}')">Delete</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+function newStudentAccount(){
+  const name = prompt('Student name'); if(!name) return;
+  const email = prompt('Email','')||'';
+  const balance = Number(prompt('Opening balance','0')||0);
+  const id = 'S_'+Date.now();
+  const arr = getStudents(); arr.push({ id, name, email, balance }); saveStudents(arr); renderStudentAccounts(); pushActivity(`Added student ${name}`); showToast('Student added');
+}
+function editStudentAcct(id){
+  const arr = getStudents(); const s = arr.find(x=>x.id===id); if(!s) return;
+  const name = prompt('Name', s.name) || s.name;
+  const email = prompt('Email', s.email||'') || s.email;
+  const bal = Number(prompt('Balance', s.balance||0) || s.balance);
+  s.name = name; s.email = email; s.balance = bal;
+  saveStudents(arr); renderStudentAccounts(); pushActivity(`Updated student ${name}`); showToast('Saved');
+}
+function deleteStudentAcct(id){ if(!confirm('Delete student account?')) return; const arr = getStudents().filter(x=>x.id!==id); saveStudents(arr); renderStudentAccounts(); pushActivity('Deleted student'); showToast('Deleted'); }
+
+/* ---------- KPIs & Charts ---------- */
+function updateKPIs(){
+  const payments = getPayments();
+  const invoices = getInvoices();
+  const revenue = payments.reduce((s,p)=> s + Number(p.amount||0), 0);
+  const outstanding = invoices.filter(i=>i.status!=='paid').reduce((s,i)=> s + Number(i.amount||0), 0);
+  const overdue = invoices.filter(i=> i.status!=='paid' && i.dueDate && new Date(i.dueDate) < new Date()).length;
+  document.getElementById('k_revenue').textContent = formatCurrency(revenue);
+  document.getElementById('k_outstanding').textContent = formatCurrency(outstanding);
+  document.getElementById('k_invoices').textContent = invoices.length;
+  document.getElementById('k_overdue').textContent = overdue;
+  // charts
+  drawRevenueChart();
+  drawPaidDonut();
+}
+
+/* revenue timeline (last 12 months) */
+let revenueChart = null;
+function drawRevenueChart(){
+  const payments = getPayments();
+  const labels = [];
+  const data = [];
+  const nowDate = new Date();
+  for(let i=11;i>=0;i--){
+    const d = new Date(nowDate.getFullYear(), nowDate.getMonth()-i, 1);
+    const key = d.getFullYear() + '-' + (d.getMonth()+1);
+    labels.push(d.toLocaleString('default',{month:'short', year:'numeric'}));
+    const sum = payments.filter(p=>{
+      const dt = new Date(p.date);
+      return dt.getFullYear()===d.getFullYear() && dt.getMonth()===d.getMonth();
+    }).reduce((s,p)=> s + Number(p.amount||0), 0);
+    data.push(sum);
+  }
+  const ctx = document.getElementById('revenueChart').getContext('2d');
+  if(revenueChart) revenueChart.destroy();
+  revenueChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets:[{ label:'Revenue', data, backgroundColor:'#00c3ff' }] },
+    options: { plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true } } }
+  });
+}
+
+/* paid vs outstanding donut */
+let donutChart = null;
+function drawPaidDonut(){
+  const invoices = getInvoices();
+  const paid = invoices.filter(i=>i.status==='paid').reduce((s,i)=> s + Number(i.amount||0), 0);
+  const outstanding = invoices.filter(i=>i.status!=='paid').reduce((s,i)=> s + Number(i.amount||0), 0);
+  const ctx = document.getElementById('paidDonut').getContext('2d');
+  if(donutChart) donutChart.destroy();
+  donutChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels:['Paid','Outstanding'], datasets:[{ data:[paid, outstanding], backgroundColor:['#10b981','#ffb020'] }] },
+    options:{ plugins:{ legend:{ position:'bottom' } } }
+  });
+}
+
+/* ---------- Export / Import ---------- */
+function exportAllJSON(){
+  const data = { invoices:getInvoices(), payments:getPayments(), students:getStudents(), activity:read(ACT_KEY), meta:{ org: ORG, exportedAt: now() } };
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${ORG}_finance_backup_${Date.now()}.json`; a.click();
+  showToast('Exported JSON');
+}
+
+function importJSONFile(file){
+  const r = new FileReader();
+  r.onload = ()=> {
+    try{
+      const data = JSON.parse(r.result);
+      if(data.invoices) save(INV_KEY, data.invoices);
+      if(data.payments) save(PAY_KEY, data.payments);
+      if(data.students) save(STUD_KEY, data.students);
+      if(data.activity) save(ACT_KEY, data.activity);
+      renderAll();
+      showToast('Imported JSON');
+    }catch(e){ alert('Invalid JSON file') }
+  };
+  r.readAsText(file);
+}
+
+function exportCSV(rows, filename){
+  if(!rows || !rows.length) { alert('No data'); return; }
+  const keys = Object.keys(rows[0]);
+  const lines = [keys.join(',')];
+  rows.forEach(r => lines.push(keys.map(k=>`"${String(r[k]||'').replace(/"/g,'""')}"`).join(',')));
+  const blob = new Blob([lines.join('\\n')], { type:'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+}
+
+/* export outstanding invoices as CSV */
+document.getElementById('exportOutstandingBtn').addEventListener('click', ()=>{
+  const rows = getInvoices().filter(i=>i.status!=='paid').map(i=> ({ id:i.id, to: i.toName||i.toEmail, amount: i.amount, due: i.dueDate || '' }) );
+  exportCSV(rows, `${ORG}_outstanding_invoices.csv`);
+});
+
+/* quick export all CSV (payments) */
+document.getElementById('exportCsvBtn').addEventListener('click', ()=> {
+  const rows = getPayments().map(p=> ({ id:p.id, invoiceId:p.invoiceId||'', payer:p.payer, amount:p.amount, date:p.date, method:p.method }) );
+  exportCSV(rows, `${ORG}_payments_${Date.now()}.csv`);
+});
+
+/* import payments CSV (basic parser) */
+function parseCSV(text){
+  const lines = text.split(/\\r?\\n/).map(l=>l.trim()).filter(Boolean);
+  if(!lines.length) return [];
+  const headers = lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim());
+  return lines.slice(1).map(l=>{
+    const values = l.match(/(".*?"|[^",\\s]+)(?=,|$)/g) || [];
+    const obj = {};
+    headers.forEach((h,idx)=> obj[h.trim()] = (values[idx] || '').replace(/^"|"$/g,''));
+    return obj;
+  });
+}
+
+/* handle file inputs */
+document.getElementById('hiddenImportJson').addEventListener('change', (e)=>{
+  const f = e.target.files[0]; if(!f) return;
+  importJSONFile(f); e.target.value = '';
+});
+document.getElementById('hiddenImportCsv').addEventListener('change', (e)=>{
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader(); r.onload = ()=>{
+    const rows = parseCSV(r.result);
+    // Expect columns: invoiceId,payer,amount,date,method (best effort)
+    rows.forEach(rw=>{
+      recordPayment({ invoiceId: rw.invoiceId||null, payer: rw.payer||rw.name||'Import', amount: Number(rw.amount||0), date: rw.date? new Date(rw.date).toISOString(): new Date().toISOString(), method: rw.method||'Import' });
     });
+    showToast('Imported CSV payments');
+    document.getElementById('hiddenImportCsv').value = '';
+  };
+  r.readAsText(f);
+});
+
+/* wire UI labels to hidden inputs */
+document.getElementById('importJsonBtn').addEventListener('click', ()=> document.getElementById('hiddenImportJson').click());
+document.getElementById('importCsvBtn').addEventListener('click', ()=> document.getElementById('hiddenImportCsv').click());
+document.getElementById('settingsImportJson').addEventListener('click', ()=> document.getElementById('hiddenSettingsJson').click());
+document.getElementById('hiddenSettingsJson').addEventListener('change', (e)=> {
+  const f = e.target.files[0]; if(!f) return; importJSONFile(f); e.target.value = '';
+});
+
+/* ---------- PDF invoice generation ---------- */
+function pdfInvoice(id){
+  const inv = getInvoices().find(x=>x.id===id); if(!inv) return alert('Invoice not found');
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p','pt','a4');
+  doc.setFontSize(18); doc.text(`${ORG} — Invoice`, 40, 40);
+  doc.setFontSize(12);
+  doc.text(`Invoice ID: ${inv.id}`, 40, 70);
+  doc.text(`To: ${inv.toName || inv.toEmail}`, 40, 88);
+  doc.text(`Date: ${new Date(inv.createdAt).toLocaleDateString()}`, 40, 106);
+  doc.text(`Due: ${inv.dueDate || '—'}`, 40, 124);
+  let y = 156;
+  doc.setFontSize(11);
+  doc.text('Items:', 40, y); y += 14;
+  inv.items.forEach(it=>{
+    const line = `${it.qty} x ${it.description} @ ${formatCurrency(it.price)} = ${formatCurrency(it.qty*it.price)}`;
+    doc.text(line, 60, y); y += 14;
+  });
+  y += 8;
+  doc.setFontSize(13); doc.text(`Total: ${formatCurrency(inv.amount)}`, 40, y);
+  doc.save(`${inv.id}_invoice.pdf`);
 }
 
-/* ---------- RENDER HISTORY ---------- */
-function renderHistory(){
-    const history = read(PAY_KEY);
-    const tb = document.getElementById("historyTable");
-    tb.innerHTML = "";
+/* ---------- Reconciliation: Orphan payments ---------- */
+function findOrphanPayments(){
+  const payments = getPayments();
+  const invoices = getInvoices();
+  const invoiceIds = new Set(invoices.map(i=>i.id));
+  const orphans = payments.filter(p=> p.invoiceId && !invoiceIds.has(p.invoiceId));
+  return orphans;
+}
+document.getElementById('findOrphansBtn').addEventListener('click', ()=>{
+  const orphans = findOrphanPayments();
+  const out = document.getElementById('orphansArea');
+  if(!orphans.length) out.innerHTML = '<div class="tiny">No orphan payments found</div>';
+  else {
+    out.innerHTML = orphans.map(o=> `<div class="tiny">Payment ${o.id} for invoice ${o.invoiceId} • ${formatCurrency(o.amount)} • <button onclick="attemptMatch('${o.id}')">Match</button></div>`).join('');
+  }
+});
 
-    history.forEach(h=>{
-        const total = h.data.reduce((s,e)=> s + Number(e.salary||0), 0);
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${h.id}</td>
-            <td>${new Date(h.paidAt).toLocaleString()}</td>
-            <td>₵${total.toLocaleString()}</td>
-        `;
-        tb.appendChild(tr);
-    });
+/* Attempt manual match: prompt for invoice id */
+function attemptMatch(paymentId){
+  const p = getPayments().find(x=>x.id===paymentId);
+  if(!p) return;
+  const invoiceId = prompt('Enter invoice ID to match this payment to:');
+  if(!invoiceId) return;
+  const inv = getInvoices().find(i=>i.id===invoiceId);
+  if(!inv) return alert('Invoice not found');
+  p.invoiceId = invoiceId; savePayments(getPayments());
+  inv.status = 'paid'; inv.paidAt = p.date; saveInvoices(getInvoices());
+  pushActivity(`Matched payment ${p.id} to invoice ${invoiceId}`);
+  renderPayments(); renderInvoices(); updateKPIs(); showToast('Matched');
 }
 
-/* ---------- APPROVE ---------- */
-function approve(id){
-    const list = read(REQ_KEY);
-    const item = list.find(r=>r.id===id);
-    if(!item) return;
+/* ---------- Helpers ---------- */
+function formatCurrency(n){ const cur = (read(SET_KEY).currency || 'GHS') || 'GHS'; return `${cur} ${Number(n||0).toLocaleString()}` }
+function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-    item.status = "paid";
-    item.paidAt = new Date().toISOString();
+/* ---------- Quick UI events ---------- */
+document.getElementById('newInvoiceBtn').addEventListener('click', ()=>{
+  // Prompt-based invoice builder for simplicity
+  const toName = prompt('Bill to (name)') || '';
+  const toEmail = prompt('Bill to (email)') || '';
+  const dueDate = prompt('Due date (YYYY-MM-DD) — blank for none', '') || '';
+  const items = [];
+  while(true){
+    const desc = prompt('Item description (leave blank to finish)');
+    if(!desc) break;
+    const price = Number(prompt('Unit price','0')||0);
+    const qty = Number(prompt('Qty','1')||1);
+    items.push({ description: desc, price, qty });
+  }
+  if(!items.length) return showToast('No items added — cancelled');
+  const notes = prompt('Notes (optional)','') || '';
+  createInvoice({ toName, toEmail, items, dueDate, notes });
+});
 
-    save(REQ_KEY, list);
+document.getElementById('newPaymentBtn').addEventListener('click', ()=> {
+  const invoiceId = prompt('Invoice ID (leave blank if not linked)', '') || null;
+  const payer = prompt('Payer name', '') || 'Customer';
+  const amount = Number(prompt('Amount', '0') || 0);
+  const method = prompt('Method (Cash/Bank/Mobile)','Bank') || 'Bank';
+  if(!amount || amount <= 0) return alert('Invalid amount');
+  recordPayment({ invoiceId, payer, amount, method, date: new Date().toISOString() });
+  showToast('Payment recorded');
+});
 
-    const history = read(PAY_KEY);
-    history.push(item);
-    save(PAY_KEY, history);
+document.getElementById('newStudentAcctBtn').addEventListener('click', newStudentAccount);
 
-    alert("Payroll approved and marked as PAID.");
-    renderPending();
-    renderHistory();
+/* search/filter wiring */
+document.getElementById('invoiceSearch').addEventListener('input', renderInvoices);
+document.getElementById('invoiceFilter').addEventListener('change', renderInvoices);
+
+/* export/import UI */
+document.getElementById('exportAllBtn').addEventListener('click', exportAllJSON);
+document.getElementById('refreshBtn').addEventListener('click', ()=> { renderAll(); showToast('Refreshed') });
+
+/* ---------- Teacher attendance sync widget ---------- */
+function renderTeacherSync(){
+  // Check both keys teachers might use
+  const arr1 = read(HR_TEACH_KEY);
+  const arr2 = read(ORG_ATT_KEY);
+  const arr = (arr1 || []).concat(arr2 || []);
+  if(!arr.length){ document.getElementById('teacherSync').textContent = 'No teacher attendance records'; return; }
+  const last = arr.slice().reverse()[0];
+  const el = document.getElementById('teacherSync');
+  el.textContent = `${last.email || last.employee || 'Teacher'} • ${last.action || 'in/out'} • ${ new Date(last.date || last.time || last.createdAt || Date.now()).toLocaleString() }`;
 }
 
-/* ---------- REJECT ---------- */
-function reject(id){
-    const list = read(REQ_KEY);
-    const item = list.find(r=>r.id===id);
-    if(!item) return;
-
-    item.status = "rejected";
-    save(REQ_KEY, list);
-
-    alert("Request marked as REJECTED.");
-    renderPending();
+/* ---------- Reconciliation area render ---------- */
+function renderReconcileArea(){
+  const payments = getPayments();
+  const invoices = getInvoices();
+  const orphans = payments.filter(p => p.invoiceId && !invoices.find(i=>i.id===p.invoiceId));
+  const matched = payments.filter(p => p.invoiceId && invoices.find(i=>i.id===p.invoiceId));
+  const out = document.getElementById('reconcileArea');
+  out.innerHTML = `<div class="tiny">Matched payments: ${matched.length} • Orphans: ${orphans.length}</div>`;
+  if(orphans.length) out.innerHTML += '<div style="margin-top:8px">' + orphans.map(o=>`<div class="tiny">${o.id} • ${formatCurrency(o.amount)} • ${escapeHtml(o.payer)} — Invoice ${o.invoiceId} <button onclick="attemptMatch('${o.id}')">Match</button></div>`).join('') + '</div>';
 }
 
-/* ---------- INITIAL RENDER ---------- */
-renderPending();
-renderHistory();
+/* ---------- Storage sync & seed ---------- */
+window.addEventListener('storage', (e)=>{
+  if([INV_KEY,PAY_KEY,STUD_KEY,ACT_KEY,SET_KEY,HR_TEACH_KEY,ORG_ATT_KEY].includes(e.key)){
+    renderAll();
+  }
+});
+
+/* ---------- Seed demo data (if empty and config allows) ---------- */
+(function seedIfEmpty(){
+  const cfg = read(SET_KEY);
+  if(cfg.seed === 'no') return;
+  if(getInvoices().length || getPayments().length || getStudents().length) return;
+  // seed students + invoices + payments
+  const s1 = { id:'s_1', name:'Ama Serwaa', email:'ama@school.com', balance:0 };
+  const s2 = { id:'s_2', name:'Kofi Mensah', email:'kofi@school.com', balance:0 };
+  saveStudents([s1,s2]);
+  const inv1 = createInvoice({ toName:'Ama Serwaa', toEmail:'ama@school.com', items:[{description:'Term fees',price:1200,qty:1}], dueDate: new Date(Date.now()+7*24*3600*1000).toISOString().split('T')[0], notes:'Term 1 fee' });
+  const inv2 = createInvoice({ toName:'Kofi Mensah', toEmail:'kofi@school.com', items:[{description:'Library fine',price:50,qty:1}], dueDate: new Date(Date.now()-3*24*3600*1000).toISOString().split('T')[0], notes:'Late fee' });
+  // one payment
+  recordPayment({ invoiceId: inv1.id, payer: inv1.toName, amount: inv1.amount, date: new Date().toISOString(), method:'Bank' });
+  pushActivity('Seeded demo finance data');
+})();
+
+/* ---------- Render everything ---------- */
+function renderAll(){
+  renderActivity();
+  renderInvoices();
+  renderPayments();
+  renderStudentAccounts();
+  updateKPIs();
+  renderTeacherSync();
+  renderReconcileArea();
+}
+renderAll();
+
+/* ---------- Simple helpers exposed to console for HR sync ---------- */
+window.finance = {
+  recordPayment,
+  createInvoice,
+  getInvoices,
+  getPayments,
+  getStudents,
+  INV_KEY, PAY_KEY, STUD_KEY, HR_TEACH_KEY, ORG_ATT_KEY
+};
+
+/* Final ready */
+console.log('Finance dashboard ready — keys:', INV_KEY, PAY_KEY, STUD_KEY);
+
+/* ---------- Utility: escapeHtml already declared above ---------- */
 </script>
+
 </body>
 </html>
