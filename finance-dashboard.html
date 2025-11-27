@@ -830,6 +830,407 @@ body {
 
 })();
 </script>
+<script>
+/*
+  PART 3 — Message 3
+  Bulk CSV import, invoice PDF generation, reconciliation, auto-sync helpers
+  Depends on FEES_KEY and PAYMENTS_KEY naming (uses ACTIVE_ORG fallback)
+*/
+
+(function(){
+  function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
+  function read(key){ return safeParse(localStorage.getItem(key)) || []; }
+  function save(key,val){ localStorage.setItem(key, JSON.stringify(val)); }
+  function toast(msg,ms=2500){ const t=document.getElementById('toast'); if(t){ t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), ms); } else console.log('TOAST:', msg); }
+
+  // Respect existing ACTIVE_ORG
+  const ORG = (typeof ACTIVE_ORG !== 'undefined' && ACTIVE_ORG) ? ACTIVE_ORG : (localStorage.getItem('active_org') || 'FLAWLESS');
+  const FEES_KEY = `${ORG}_fees`;
+  const PAYMENTS_KEY = `${ORG}_fee_payments`;
+  const FIN_ACT_KEY = `${ORG}_finance_activity`;
+  if(!localStorage.getItem(FEES_KEY)) save(FEES_KEY, []);
+  if(!localStorage.getItem(PAYMENTS_KEY)) save(PAYMENTS_KEY, []);
+  if(!localStorage.getItem(FIN_ACT_KEY)) save(FIN_ACT_KEY, []);
+
+  /* ------------------------
+     CSV Import / Bulk Create
+     Expected CSV columns (header row):
+     studentName,studentId,className,amount,desc,createdAt
+     createdAt optional (ISO date), amount numeric
+  ------------------------ */
+  async function importFeesCsvFile(file){
+    if(!file) return toast('No file selected');
+    const text = await file.text();
+    const rows = csvParse(text);
+    if(!rows.length) return toast('CSV empty');
+
+    // first row is headers - attempt to detect
+    let header = rows[0].map(h => String(h||'').trim().toLowerCase());
+    const hasHeader = header.includes('studentname') || header.includes('student_id') || header.includes('studentid');
+    const startIdx = hasHeader ? 1 : 0;
+
+    const fees = read(FEES_KEY);
+    let created = 0;
+    for(let i=startIdx;i<rows.length;i++){
+      const r = rows[i]; // array of fields
+      // map fields by header if present, otherwise assume order above
+      let obj = {};
+      if(hasHeader){
+        header.forEach((h, idx) => {
+          obj[h] = (r[idx] || '').trim();
+        });
+        const studentName = obj['studentname'] || obj['name'] || obj['student'] || '';
+        const studentId = obj['studentid'] || obj['student_id'] || obj['id'] || '';
+        const className = obj['classname'] || obj['class'] || '';
+        const amount = Number((obj['amount']||'').replace(/[^0-9.-]/g,'')) || 0;
+        const desc = obj['desc'] || obj['description'] || '';
+        const createdAt = obj['createdat'] || new Date().toISOString();
+        fees.push({
+          id: 'f_' + Date.now() + '_' + i,
+          studentName, studentId, className, amount, desc, createdAt, payments:[]
+        });
+        created++;
+      } else {
+        // order: studentName,studentId,className,amount,desc,createdAt
+        const studentName = (r[0]||'').trim();
+        const studentId = (r[1]||'').trim();
+        const className = (r[2]||'').trim();
+        const amount = Number((r[3]||'').replace(/[^0-9.-]/g,'')) || 0;
+        const desc = (r[4]||'').trim();
+        const createdAt = (r[5]||new Date().toISOString()).trim();
+        fees.push({
+          id: 'f_' + Date.now() + '_' + i,
+          studentName, studentId, className, amount, desc, createdAt, payments:[]
+        });
+        created++;
+      }
+    }
+    save(FEES_KEY, fees);
+    pushFinanceActivity(`Imported ${created} invoices from CSV`);
+    toast(`Imported ${created} invoices`);
+    // re-render in page if your UI exists
+    if(window.renderFees) window.renderFees();
+    if(window.updateFeeHistory) window.updateFeeHistory();
+  }
+
+  // Simple CSV parser that splits lines and commas (does not fully support complex quoted fields).
+  function csvParse(text){
+    const lines = text.split(/\r\n|\n/).map(l => l.trim()).filter(l => l.length > 0);
+    return lines.map(line => {
+      // basic handling for quoted fields
+      const out = [];
+      let cur = '', inQuotes = false;
+      for(let i=0;i<line.length;i++){
+        const ch = line[i];
+        if(ch === '"' ){ inQuotes = !inQuotes; continue; }
+        if(ch === ',' && !inQuotes){ out.push(cur); cur=''; continue; }
+        cur += ch;
+      }
+      out.push(cur);
+      return out.map(s=>s.trim());
+    });
+  }
+
+  // Optional: wire to a file input with id 'importFeesCsv'
+  const importInput = document.getElementById('importFeesCsv');
+  const importBtn = document.getElementById('importFeesBtn');
+  if(importBtn && importInput){
+    importBtn.addEventListener('click', ()=> {
+      const f = importInput.files[0];
+      if(!f) return toast('Select CSV file');
+      importFeesCsvFile(f);
+    });
+  }
+
+  /* ------------------------
+     Invoice PDF generation
+     Uses jsPDF if available (you included jspdf earlier)
+  ------------------------ */
+  function generateInvoicePdf(invoiceId){
+    const inv = read(FEES_KEY).find(f => f.id === invoiceId);
+    if(!inv) return toast('Invoice not found');
+    if(typeof jspdf === 'undefined' && typeof window.jspdf === 'undefined' && typeof jsPDF === 'undefined'){
+      // try global from CDN: window.jspdf or jsPDF
+      if(window.jspdf && window.jspdf.jsPDF) {
+        const doc = new window.jspdf.jsPDF();
+        buildInvoiceDoc(doc, inv);
+        doc.save(`${ORG}_invoice_${inv.studentId || inv.id}.pdf`);
+        return;
+      }
+      return alert('jsPDF not found. Include jsPDF to enable PDF generation.');
+    }
+    const { jsPDF } = window.jspdf || window.jspdf || (window.jspdf && window.jspdf.jsPDF) || window;
+    const doc = new (jsPDF || window.jspdf.jsPDF || window.jsPDF)();
+    buildInvoiceDoc(doc, inv);
+    doc.save(`${ORG}_invoice_${inv.studentId || inv.id}.pdf`);
+    toast('PDF generated');
+  }
+
+  function buildInvoiceDoc(doc, inv){
+    // minimal invoice layout
+    doc.setFontSize(18);
+    doc.text(`${ORG} — Invoice`, 40, 40);
+    doc.setFontSize(12);
+    doc.text(`Invoice ID: ${inv.id}`, 40, 64);
+    doc.text(`Student: ${inv.studentName} (${inv.studentId || '-'})`, 40, 80);
+    doc.text(`Class: ${inv.className || '-'}`, 40, 96);
+    doc.text(`Amount: ₵ ${Number(inv.amount||0).toLocaleString()}`, 40, 112);
+    doc.text(`Description: ${inv.desc || '-'}`, 40, 128);
+    doc.text(`Created: ${new Date(inv.createdAt).toLocaleString()}`, 40, 144);
+
+    // payments
+    const payments = read(PAYMENTS_KEY).filter(p => p.invoiceId === inv.id);
+    doc.setFontSize(12);
+    doc.text('Payments:', 40, 170);
+    let y = 186;
+    if(!payments.length) doc.text('- None -', 40, y);
+    payments.forEach(p => {
+      doc.text(`${new Date(p.date).toLocaleString()} — ₵ ${Number(p.amount||0).toLocaleString()} — ${p.method || 'cash'} ${p.note ? '• ' + p.note : ''}`, 40, y);
+      y += 14;
+      if(y > 760){ doc.addPage(); y = 40; }
+    });
+
+    const status = computeInvoiceStatus(inv);
+    doc.setFontSize(12);
+    doc.text(`Total Paid: ₵ ${Number(status.paid||0).toLocaleString()}`, 40, y+20);
+    doc.text(`Balance: ₵ ${Number(status.balance||0).toLocaleString()}`, 40, y+36);
+  }
+
+  // Expose generateInvoicePdf globally (so inline buttons can call it)
+  window.FIN_generateInvoicePdf = generateInvoicePdf;
+
+  /* ------------------------
+     Reconciliation tools
+     - find unmatched payments (payments without invoice)
+     - list overdue invoices (balance > 0 and older than N days)
+  ------------------------ */
+  function findOrphanPayments(){
+    const payments = read(PAYMENTS_KEY);
+    const invoices = read(FEES_KEY);
+    const orphan = payments.filter(p => !p.invoiceId || !invoices.find(i=>i.id === p.invoiceId));
+    return orphan;
+  }
+
+  function listOverdueInvoices(days = 30){
+    const invoices = read(FEES_KEY);
+    const cutoff = Date.now() - (days * 24 * 3600 * 1000);
+    return invoices.filter(inv => {
+      const status = computeInvoiceStatus(inv);
+      return (status.balance > 0) && (new Date(inv.createdAt).getTime() < cutoff);
+    });
+  }
+
+  // Small UI-exposed functions
+  window.FIN_findOrphans = function(){
+    const orphans = findOrphanPayments();
+    if(!orphans.length) return alert('No orphan payments');
+    alert('Orphan payments:\n' + orphans.map(p=> `${p.id} • ${p.studentId || p.studentName} • ₵${p.amount} • ${p.date}`).join('\n'));
+  };
+
+  window.FIN_overdue = function(days){
+    days = Number(days) || 30;
+    const arr = listOverdueInvoices(days);
+    if(!arr.length) return alert('No overdue invoices');
+    alert(`Overdue > ${days} days:\n` + arr.map(i=> `${i.id} • ${i.studentName} • ₵${i.amount} • ${i.createdAt}`).join('\n'));
+  };
+
+  /* ------------------------
+     Auto-sync helpers for teacher attendance & student index
+     - listens to `${ORG}_teacher_attendance` (teacher clock-in/out)
+     - listens to `${ORG}_students` to auto-link invoice studentNames -> studentId/class
+     - also provides convenience function teachers can call to push payments directly
+  ------------------------ */
+  const TEACH_ATT_KEY = `${ORG}_teacher_attendance`; // teacher attendance logs (array)
+  const STUDENT_INDEX_KEY = `${ORG}_students`; // optional students index
+
+  // Watch storage events and react
+  window.addEventListener('storage', (e)=>{
+    if(!e.key) return;
+    if(e.key === TEACH_ATT_KEY){
+      // teacher clocks — push finance activity so HR sees teacher presence
+      const arr = read(TEACH_ATT_KEY);
+      const last = arr[arr.length -1];
+      if(last) pushFinanceActivity(`[Teacher] ${last.email || last.name} ${last.in ? 'clocked IN' : ''} ${last.out ? 'clocked OUT' : ''}`);
+      // no financial mutation, just note activity
+    }
+    if(e.key === STUDENT_INDEX_KEY){
+      // If student index changed, we could auto-fill matching student data in invoices
+      tryAutoLinkStudents(); // defined below
+    }
+  });
+
+  function tryAutoLinkStudents(){
+    const students = read(STUDENT_INDEX_KEY);
+    if(!students || !students.length) return;
+    // build simple map by name lowercase -> student record
+    const m = {};
+    students.forEach(s=>{
+      if(s.name) m[(s.name||'').toLowerCase()] = s;
+      if(s.id) m[(s.id||'').toLowerCase()] = s;
+    });
+    // attempt to match invoices with missing studentId
+    const fees = read(FEES_KEY);
+    let matched = 0;
+    fees.forEach(inv => {
+      if((!inv.studentId || inv.studentId === '') && inv.studentName){
+        const found = m[(inv.studentName||'').toLowerCase()];
+        if(found){
+          inv.studentId = found.id || inv.studentId;
+          inv.className = inv.className || found.class || found.className || '';
+          matched++;
+        }
+      }
+    });
+    if(matched){
+      save(FEES_KEY, fees);
+      pushFinanceActivity(`Auto-linked ${matched} invoices to student index`);
+      toast(`Auto-linked ${matched} invoices`);
+      if(window.renderFees) window.renderFees();
+    }
+  }
+
+  // Allow teachers to call a helper to record payment from their page (example)
+  // Usage (on teacher page): FIN_recordPaymentFromTeacher({ invoiceId, studentId, amount, method, note })
+  window.FIN_recordPaymentFromTeacher = function({ invoiceId=null, studentId='', amount=0, method='cash', note='' }){
+    if(!studentId || !amount) return false;
+    // record and attach to invoice if present
+    const payment = { id: 'p_' + Date.now(), invoiceId, studentId, studentName: '', amount: Number(amount)||0, method, note, date: new Date().toISOString() };
+    const payments = read(PAYMENTS_KEY);
+    payments.push(payment);
+    save(PAYMENTS_KEY, payments);
+    pushFinanceActivity(`[Teacher API] Payment ₵${payment.amount} by ${studentId}`);
+    // attach to invoice if provided
+    if(invoiceId){
+      const fees = read(FEES_KEY);
+      const inv = fees.find(f => f.id === invoiceId);
+      if(inv){
+        inv.payments = inv.payments || [];
+        inv.payments.push(payment.id);
+        save(FEES_KEY, fees);
+      }
+    }
+    // broadcast via localStorage for other tabs
+    localStorage.setItem(PAYMENTS_KEY, JSON.stringify(payments));
+    return payment;
+  };
+
+  /* ------------------------
+     Reconciliation convenience: produce a reconciliation report (CSV)
+     Columns: invoiceId, student, amount, paid, balance, lastPaymentDate
+  ------------------------ */
+  function produceReconciliationCsv(){
+    const fees = read(FEES_KEY);
+    const payments = read(PAYMENTS_KEY);
+    const rows = fees.map(f => {
+      const ps = payments.filter(p => p.invoiceId === f.id);
+      const paid = ps.reduce((s,p)=> s + Number(p.amount||0), 0);
+      const balance = Number(f.amount||0) - paid;
+      const lastPaymentDate = ps.length ? ps[ps.length-1].date : '';
+      return {
+        invoiceId: f.id,
+        studentName: f.studentName,
+        studentId: f.studentId,
+        className: f.className || '',
+        amount: f.amount || 0,
+        paid,
+        balance,
+        lastPaymentDate
+      };
+    });
+    const csv = toCsv(rows);
+    downloadText(csv, `${ORG}_reconciliation_${(new Date()).toISOString().slice(0,10)}.csv`, 'text/csv');
+    toast('Reconciliation CSV ready');
+  }
+
+  // Expose reconciliation to global
+  window.FIN_produceReconciliationCsv = produceReconciliationCsv;
+
+  /* ------------------------
+     Utilities reused
+  ------------------------ */
+  function computeInvoiceStatus(inv){
+    const payments = read(PAYMENTS_KEY).filter(p=>p.invoiceId === inv.id);
+    const paid = payments.reduce((s,p)=> s + Number(p.amount||0), 0);
+    const balance = Number(inv.amount||0) - paid;
+    return { paid, balance, payments };
+  }
+
+  function toCsv(rows){
+    if(!rows || !rows.length) return '';
+    const keys = Object.keys(rows[0]);
+    const lines = [ keys.join(',') ];
+    rows.forEach(r => {
+      lines.push(keys.map(k=> `"${String(r[k]||'').replace(/"/g,'""')}"`).join(','));
+    });
+    return lines.join('\n');
+  }
+  function downloadText(text, filename, mime='text/plain'){
+    const blob = new Blob([text], { type: mime });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  function pushFinanceActivity(text){
+    const arr = read(FIN_ACT_KEY);
+    arr.push({ text, time: new Date().toISOString() });
+    save(FIN_ACT_KEY, arr);
+    // Also push to HR activity key if present
+    try{
+      const hrKey = `${ORG}_activity`;
+      const hr = read(hrKey);
+      hr.push({ text: '[Finance] ' + text, time: new Date().toISOString() });
+      save(hrKey, hr);
+    }catch(e){}
+  }
+
+  /* ------------------------
+     Boot: optionally wire simple UI controls if present
+  ------------------------ */
+  // import input/button
+  const impInput = document.getElementById('importFeesCsv');
+  const impBtn = document.getElementById('importFeesBtn');
+  if(impBtn && impInput){
+    impBtn.addEventListener('click', ()=> {
+      if(!impInput.files || !impInput.files.length) return toast('Choose CSV file');
+      importFeesCsvFile(impInput.files[0]);
+    });
+  }
+
+  // Export reconciliation hook (button id 'exportReconcileBtn')
+  const exportReconcileBtn = document.getElementById('exportReconcileBtn');
+  if(exportReconcileBtn){
+    exportReconcileBtn.addEventListener('click', produceReconciliationCsv);
+  }
+
+  // Orphan check hook (button id 'findOrphansBtn')
+  const orphansBtn = document.getElementById('findOrphansBtn');
+  if(orphansBtn){
+    orphansBtn.addEventListener('click', ()=> {
+      const orphans = findOrphanPayments();
+      if(!orphans.length) return toast('No orphan payments');
+      // simple output
+      const s = orphans.map(p=> `${p.id} • ${p.studentId||p.studentName} • ₵${p.amount}`).join('\n');
+      alert('Orphan payments:\n' + s);
+    });
+  }
+
+  // Auto-link students if student index present
+  tryAutoLinkStudents();
+
+  // Expose utility functions
+  window.FIN_importFeesCsvFile = importFeesCsvFile;
+  window.FIN_produceReconciliationCsv = produceReconciliationCsv;
+  window.FIN_findOrphanPayments = findOrphanPayments;
+
+  // Done
+  console.log('Finance PART3 loaded: CSV import, invoice PDF, reconciliation, auto-sync helpers ready.');
+
+})();
+</script>
 
   <section id="payrollSection" class="card" style="display:none"><h3 class="card-title">Payroll</h3><div id="payrollArea"></div></section>
   <section id="budgetSection" class="card" style="display:none"><h3 class="card-title">Budget Planner</h3><div id="budgetArea"></div></section>
