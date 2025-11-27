@@ -304,6 +304,48 @@
 <div class="toast" id="toast"></div>
 
 <script>
+  /* ----------------------------
+   FINANCE REQUEST PUSH LOGIC
+----------------------------- */
+
+const FIN_REQUEST_KEY = `${ORG}_finance_requests`;
+
+if (!localStorage.getItem(FIN_REQUEST_KEY)) {
+    localStorage.setItem(FIN_REQUEST_KEY, "[]");
+}
+
+document.getElementById("sendToFinance").addEventListener("click", () => {
+    const employees = read(EMP_KEY);
+
+    if (employees.length === 0) {
+        showToast("No employee data to send.");
+        return;
+    }
+
+    const requestList = read(FIN_REQUEST_KEY);
+
+    const payrollData = employees.map(emp => ({
+        id: emp.id,
+        name: emp.name,
+        salary: emp.salary,
+        role: emp.role,
+        email: emp.email
+    }));
+
+    requestList.push({
+        id: "PAY_" + Date.now(),
+        org: ORG,
+        status: "pending",
+        submittedAt: new Date().toISOString(),
+        data: payrollData
+    });
+
+    save(FIN_REQUEST_KEY, requestList);
+
+    showToast("Payroll sent to Finance!");
+    pushActivity("Payroll submitted to Finance");
+});
+
 /* ----------------------------
   Utilities & Namespaced Keys
 -----------------------------*/
