@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Finance Dashboard — Flawless Graphics</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+/* ---------- COLOR THEME ---------- */
+:root {
+  --primary: #00c3ff;
+  --dark: #0c1427;
+  --bg: #f4f7fb;
+  --card: #ffffff;
+  --accent: #00ffbb;
+  --danger: #ff4d4d;
+  --radius: 14px;
+}
+
+.dark {
+  --bg:#0d1117;
+  --card:#161b22;
+  --dark:#0b0f15;
+  --primary:#3b82f6;
+}
+
+/* ---------- LAYOUT ---------- */
+body {
+  margin: 0;
+  background: var(--bg);
+  display: flex;
+  font-family: Poppins, Arial;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ---------- SIDEBAR ---------- */
+.sidebar {
+  width: 250px;
+  background: var(--dark);
+  color: #fff;
+  padding-top: 20px;
+  box-shadow: 4px 0 15px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar h2 {
+  text-align: center;
+  margin: 0 0 22px 0;
+}
+
+.nav-item {
+  padding: 14px 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  cursor: pointer;
+  color: #c8d0e0;
+  transition: .25s;
+}
+.nav-item:hover {
+  background: #152133;
+  color: #fff;
+}
+
+/* ---------- CONTENT AREA ---------- */
+.content {
+  flex: 1;
+  padding: 25px;
+  overflow-y: auto;
+}
+
+.card {
+  background: var(--card);
+  padding: 22px;
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+  box-shadow: 0 5px 18px rgba(0,0,0,0.1);
+}
+
+.kpi-box {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 18px;
+}
+
+.kpi {
+  background: var(--card);
+  padding: 22px;
+  border-radius: var(--radius);
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  box-shadow: 0 5px 14px rgba(0,0,0,0.08);
+}
+
+.kpi i {
+  font-size: 28px;
+  background: rgba(0,195,255,0.15);
+  padding: 18px;
+  border-radius: 50%;
+  color: var(--primary);
+}
+
+.kpi .value {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #dbe1ec;
+}
+
+.btn {
+  background: var(--primary);
+  color: #fff;
+  padding: 10px 16px;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn:hover { opacity: .8; }
+
+/* TOAST */
+#toast {
+  position: fixed;
+  right: 25px;
+  bottom: 25px;
+  background: #000;
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: .3s;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+
+<body>
+
+<!-- ================= SIDEBAR ================= -->
+<div class="sidebar">
+  <h2>FINANCE</h2>
+
+  <div class="nav-item" data-page="overview"><i class="fa fa-chart-line"></i> Overview</div>
+  <div class="nav-item" data-page="transactions"><i class="fa fa-receipt"></i> Transactions</div>
+  <div class="nav-item" data-page="payroll"><i class="fa fa-sack-dollar"></i> Payroll</div>
+  <div class="nav-item" data-page="reports"><i class="fa fa-file-invoice"></i> Reports</div>
+  <div class="nav-item" id="themeToggle"><i class="fa fa-moon"></i> Theme</div>
+</div>
+
+<!-- ================= CONTENT ================= -->
+<div class="content">
+
+<!-- OVERVIEW -->
+<div class="card page" id="overview">
+  <h2>Finance Overview — <span id="orgName"></span></h2>
+
+  <div class="kpi-box">
+    <div class="kpi"><i class="fa fa-money-bill-trend-up"></i><div><div class="value" id="totalIncome">₵0</div><div>Total Income</div></div></div>
+    <div class="kpi"><i class="fa fa-money-bill"></i><div><div class="value" id="totalExpense">₵0</div><div>Total Expenses</div></div></div>
+    <div class="kpi"><i class="fa fa-coins"></i><div><div class="value" id="netBalance">₵0</div><div>Net Balance</div></div></div>
+  </div>
+
+  <canvas id="financeChart" height="120" style="margin-top:20px;"></canvas>
+</div>
+
+<!-- TRANSACTIONS -->
+<div class="card page" id="transactions" style="display:none;">
+  <h2>Transactions</h2>
+
+  <button class="btn" id="addTrans">+ Add Transaction</button>
+  <br><br>
+
+  <table>
+    <thead><tr><th>Type</th><th>Amount</th><th>Label</th><th>Date</th></tr></thead>
+    <tbody id="transTable"></tbody>
+  </table>
+</div>
+
+<!-- PAYROLL -->
+<div class="card page" id="payroll" style="display:none;">
+  <h2>Payroll Summary</h2>
+
+  <table>
+    <thead><tr><th>Name</th><th>Role</th><th>Email</th><th>Salary</th></tr></thead>
+    <tbody id="payrollList"></tbody>
+  </table>
+</div>
+
+<!-- REPORTS -->
+<div class="card page" id="reports" style="display:none;">
+  <h2>Reports</h2>
+  <button class="btn" id="exportCSV">Export CSV</button>
+  <button class="btn" id="exportPDF">Export PDF</button>
+</div>
+
+<div id="toast"></div>
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2000);
+}
+
+/* ORG KEYS */
+const ORG = localStorage.getItem("active_org") || "FLAWLESS";
+document.getElementById("orgName").textContent = ORG;
+
+const FIN_KEY = ORG + "_finance";
+const EMP_KEY = ORG + "_employees";
+
+/* LOAD FINANCE DATA */
+function getFinance(){
+  return JSON.parse(localStorage.getItem(FIN_KEY) || "[]");
+}
+function saveFinance(data){
+  localStorage.setItem(FIN_KEY, JSON.stringify(data));
+}
+
+/* OVERVIEW */
+function updateOverview(){
+  const arr = getFinance();
+  let income = arr.filter(t=>t.type==="income").reduce((a,b)=>a+b.amount,0);
+  let expense = arr.filter(t=>t.type==="expense").reduce((a,b)=>a+b.amount,0);
+  let net = income - expense;
+
+  document.getElementById("totalIncome").textContent = "₵" + income.toLocaleString();
+  document.getElementById("totalExpense").textContent = "₵" + expense.toLocaleString();
+  document.getElementById("netBalance").textContent = "₵" + net.toLocaleString();
+
+  renderChart(income, expense);
+}
+
+/* TRANSACTION LIST */
+function renderTransactions(){
+  const arr=getFinance();
+  const tbody=document.getElementById("transTable");
+  tbody.innerHTML="";
+
+  arr.slice().reverse().forEach(t=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td>${t.type}</td>
+      <td>₵${t.amount.toLocaleString()}</td>
+      <td>${t.label}</td>
+      <td>${new Date(t.time).toLocaleString()}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ADD TRANSACTION */
+document.getElementById("addTrans").onclick=function(){
+  const type=prompt("Type (income / expense)");
+  if(!type) return;
+
+  const amt=Number(prompt("Amount:"));
+  if(!amt) return;
+
+  const label=prompt("Description:");
+
+  const arr=getFinance();
+  arr.push({
+    type:type.toLowerCase(),
+    amount:amt,
+    label:label,
+    time:Date.now()
+  });
+
+  saveFinance(arr);
+  showToast("Transaction Added");
+  updateOverview();
+  renderTransactions();
+};
+
+/* PAYROLL */
+function renderPayroll(){
+  const arr = JSON.parse(localStorage.getItem(EMP_KEY) || "[]");
+  const tbody=document.getElementById("payrollList");
+  tbody.innerHTML="";
+
+  arr.forEach(e=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td>${e.name}</td>
+      <td>${e.role}</td>
+      <td>${e.email}</td>
+      <td>₵${Number(e.salary).toLocaleString()}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* NAVIGATION */
+document.querySelectorAll(".nav-item").forEach(nav=>{
+  nav.addEventListener("click",()=>{
+    const page=nav.dataset.page;
+    document.querySelectorAll(".page").forEach(p=>p.style.display="none");
+    document.getElementById(page).style.display="block";
+
+    if(page==="transactions") renderTransactions();
+    if(page==="payroll") renderPayroll();
+  });
+});
+
+/* THEME TOGGLE */
+document.getElementById("themeToggle").onclick=function(){
+  document.body.classList.toggle("dark");
+  showToast("Theme changed");
+};
+
+/* CHART */
+let chart=null;
+function renderChart(income,expense){
+  const ctx=document.getElementById("financeChart").getContext("2d");
+  if(chart) chart.destroy();
+
+  chart=new Chart(ctx,{
+    type:"bar",
+    data:{
+      labels:["Income","Expenses"],
+      datasets:[{
+        data:[income,expense],
+        backgroundColor:["#00c3ff","#ff4d4d"]
+      }]
+    },
+    options:{ plugins:{legend:{display:false}} }
+  });
+}
+
+updateOverview();
+renderPayroll();
+</script>
+
+</body>
+</html>
