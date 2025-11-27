@@ -2,353 +2,335 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Finance Dashboard — Flawless Graphics</title>
+<title>Finance Dashboard | Flawless Graphics</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<!-- Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 <style>
-/* ---------- COLOR THEME ---------- */
+/* -------------------- COLORS -------------------- */
 :root {
-  --primary: #00c3ff;
-  --dark: #0c1427;
-  --bg: #f4f7fb;
-  --card: #ffffff;
-  --accent: #00ffbb;
-  --danger: #ff4d4d;
-  --radius: 14px;
+  --primary:#007bff;
+  --primary-light:#3ba1ff;
+  --accent:#00d98f;
+  --danger:#ff4b4b;
+  --warning:#ffb400;
+  --bg:#f5f7fa;
+  --sidebar-bg:#0e1a35;
+  --text-dark:#1f2937;
+  --card-bg:#ffffff;
+  --radius:14px;
 }
 
+/* Dark mode */
 .dark {
   --bg:#0d1117;
-  --card:#161b22;
-  --dark:#0b0f15;
+  --card-bg:#161b22;
+  --sidebar-bg:#0b0f14;
+  --text-dark:#e5e7eb;
   --primary:#3b82f6;
 }
 
-/* ---------- LAYOUT ---------- */
+/* -------------------- BASE -------------------- */
 body {
-  margin: 0;
-  background: var(--bg);
-  display: flex;
-  font-family: Poppins, Arial;
-  height: 100vh;
-  overflow: hidden;
+  margin:0;
+  background:var(--bg);
+  font-family:Poppins, Arial;
+  color:var(--text-dark);
+  display:flex;
+  height:100vh;
+  overflow:hidden;
 }
 
-/* ---------- SIDEBAR ---------- */
+/* -------------------- SIDEBAR -------------------- */
 .sidebar {
-  width: 250px;
-  background: var(--dark);
-  color: #fff;
-  padding-top: 20px;
-  box-shadow: 4px 0 15px rgba(0,0,0,0.4);
-  display: flex;
-  flex-direction: column;
+  width:260px;
+  background:var(--sidebar-bg);
+  color:white;
+  display:flex;
+  flex-direction:column;
+  padding:20px;
+  box-shadow:4px 0 20px rgba(0,0,0,.25);
 }
 
 .sidebar h2 {
-  text-align: center;
-  margin: 0 0 22px 0;
+  text-align:center;
+  margin:0 0 20px;
+  font-size:22px;
+  font-weight:700;
 }
 
 .nav-item {
-  padding: 14px 20px;
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  cursor: pointer;
-  color: #c8d0e0;
-  transition: .25s;
+  padding:14px 16px;
+  margin-bottom:5px;
+  cursor:pointer;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  border-radius:10px;
+  color:#d0d7e3;
+  transition:.2s;
 }
-.nav-item:hover {
-  background: #152133;
-  color: #fff;
+.nav-item:hover, .nav-item.active {
+  background:#1b2a4a;
+  color:white;
 }
 
-/* ---------- CONTENT AREA ---------- */
+.nav-item i { width:22px; }
+
+/* -------------------- CONTENT -------------------- */
 .content {
-  flex: 1;
-  padding: 25px;
-  overflow-y: auto;
+  flex:1;
+  overflow:auto;
+  padding:25px;
 }
 
-.card {
-  background: var(--card);
-  padding: 22px;
-  border-radius: var(--radius);
-  margin-bottom: 20px;
-  box-shadow: 0 5px 18px rgba(0,0,0,0.1);
+/* Header */
+.header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:25px;
 }
 
-.kpi-box {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 18px;
+.header .title {
+  font-size:26px;
+  font-weight:700;
 }
 
-.kpi {
-  background: var(--card);
-  padding: 22px;
-  border-radius: var(--radius);
-  display: flex;
-  gap: 18px;
-  align-items: center;
-  box-shadow: 0 5px 14px rgba(0,0,0,0.08);
-}
-
-.kpi i {
-  font-size: 28px;
-  background: rgba(0,195,255,0.15);
-  padding: 18px;
-  border-radius: 50%;
-  color: var(--primary);
-}
-
-.kpi .value {
-  font-size: 26px;
-  font-weight: 700;
-}
-
-/* TABLE */
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-th, td {
-  padding: 12px;
-  border-bottom: 1px solid #dbe1ec;
+.header-buttons {
+  display:flex;
+  gap:10px;
 }
 
 .btn {
-  background: var(--primary);
-  color: #fff;
-  padding: 10px 16px;
-  border: none;
-  border-radius: var(--radius);
-  cursor: pointer;
-  font-weight: 600;
+  padding:10px 14px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+  transition:.2s;
 }
-.btn:hover { opacity: .8; }
 
-/* TOAST */
-#toast {
-  position: fixed;
-  right: 25px;
-  bottom: 25px;
-  background: #000;
-  color: #fff;
-  padding: 12px 16px;
-  border-radius: var(--radius);
-  opacity: 0;
-  transform: translateY(20px);
-  transition: .3s;
+.btn.primary { background:var(--primary); color:white; }
+.btn.light { background:#e5e7eb; }
+.btn.danger { background:var(--danger); color:white; }
+
+/* KPI Cards */
+.grid { display:grid; gap:18px; }
+
+.kpi {
+  background:var(--card-bg);
+  padding:22px;
+  border-radius:var(--radius);
+  display:flex;
+  align-items:center;
+  gap:18px;
+  box-shadow:0 4px 14px rgba(0,0,0,.08);
 }
-#toast.show { opacity: 1; transform: translateY(0); }
+
+.kpi i {
+  font-size:28px;
+  padding:16px;
+  background:rgba(59,130,246,0.18);
+  border-radius:50%;
+  color:var(--primary);
+}
+
+.kpi .value {
+  font-size:26px;
+  font-weight:700;
+}
+
+.kpi .label {
+  color:gray;
+  font-size:14px;
+}
+
+/* Section card */
+.card {
+  background:var(--card-bg);
+  padding:22px;
+  border-radius:var(--radius);
+  margin-bottom:22px;
+  box-shadow:0 6px 18px rgba(0,0,0,.09);
+}
+
+.card-title {
+  font-size:20px;
+  margin-bottom:12px;
+  font-weight:700;
+}
+
+/* Toast */
+#toast {
+  position:fixed;
+  right:25px;
+  bottom:25px;
+  background:#1e293b;
+  color:white;
+  padding:14px 18px;
+  border-radius:12px;
+  opacity:0;
+  transform:translateY(20px);
+  transition:.3s;
+}
+#toast.show { opacity:1; transform:translateY(0); }
+
 </style>
 </head>
 
 <body>
 
-<!-- ================= SIDEBAR ================= -->
+<!-- -------------------- SIDEBAR -------------------- -->
 <div class="sidebar">
-  <h2>FINANCE</h2>
 
-  <div class="nav-item" data-page="overview"><i class="fa fa-chart-line"></i> Overview</div>
-  <div class="nav-item" data-page="transactions"><i class="fa fa-receipt"></i> Transactions</div>
-  <div class="nav-item" data-page="payroll"><i class="fa fa-sack-dollar"></i> Payroll</div>
-  <div class="nav-item" data-page="reports"><i class="fa fa-file-invoice"></i> Reports</div>
-  <div class="nav-item" id="themeToggle"><i class="fa fa-moon"></i> Theme</div>
-</div>
+  <h2>FINANCE PANEL</h2>
 
-<!-- ================= CONTENT ================= -->
-<div class="content">
-
-<!-- OVERVIEW -->
-<div class="card page" id="overview">
-  <h2>Finance Overview — <span id="orgName"></span></h2>
-
-  <div class="kpi-box">
-    <div class="kpi"><i class="fa fa-money-bill-trend-up"></i><div><div class="value" id="totalIncome">₵0</div><div>Total Income</div></div></div>
-    <div class="kpi"><i class="fa fa-money-bill"></i><div><div class="value" id="totalExpense">₵0</div><div>Total Expenses</div></div></div>
-    <div class="kpi"><i class="fa fa-coins"></i><div><div class="value" id="netBalance">₵0</div><div>Net Balance</div></div></div>
+  <div class="nav-item active" data-page="overview">
+    <i class="fa fa-chart-line"></i> Overview
   </div>
 
-  <canvas id="financeChart" height="120" style="margin-top:20px;"></canvas>
+  <div class="nav-item" data-page="transactions">
+    <i class="fa fa-wallet"></i> Income & Expenses
+  </div>
+
+  <div class="nav-item" data-page="fees">
+    <i class="fa fa-coins"></i> Fee Collection
+  </div>
+
+  <div class="nav-item" data-page="payroll">
+    <i class="fa fa-money-bill-wave"></i> Payroll
+  </div>
+
+  <div class="nav-item" data-page="budget">
+    <i class="fa fa-chart-pie"></i> Budget Planner
+  </div>
+
+  <div class="nav-item" data-page="audit">
+    <i class="fa fa-clipboard-list"></i> Audit Logs
+  </div>
+
+  <div class="nav-item" data-page="settings">
+    <i class="fa fa-cog"></i> Settings
+  </div>
+
 </div>
 
-<!-- TRANSACTIONS -->
-<div class="card page" id="transactions" style="display:none;">
-  <h2>Transactions</h2>
+<!-- -------------------- CONTENT AREA -------------------- -->
+<div class="content">
 
-  <button class="btn" id="addTrans">+ Add Transaction</button>
-  <br><br>
+  <div class="header">
+    <div class="title">Finance Dashboard — <span id="orgName">FLAWLESS</span></div>
 
-  <table>
-    <thead><tr><th>Type</th><th>Amount</th><th>Label</th><th>Date</th></tr></thead>
-    <tbody id="transTable"></tbody>
-  </table>
+    <div class="header-buttons">
+      <button class="btn light" id="themeToggle"><i class="fa fa-moon"></i></button>
+      <button class="btn primary" id="exportPDF">Export PDF</button>
+    </div>
+  </div>
+
+  <!-- -------- KPI CARDS -------- -->
+  <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-bottom:20px;">
+
+    <div class="kpi">
+      <i class="fa fa-arrow-trend-up"></i>
+      <div>
+        <div class="value" id="totalIncome">₵0</div>
+        <div class="label">Total Income</div>
+      </div>
+    </div>
+
+    <div class="kpi">
+      <i class="fa fa-arrow-trend-down"></i>
+      <div>
+        <div class="value" id="totalExpenses">₵0</div>
+        <div class="label">Total Expenses</div>
+      </div>
+    </div>
+
+    <div class="kpi">
+      <i class="fa fa-wallet"></i>
+      <div>
+        <div class="value" id="netBalance">₵0</div>
+        <div class="label">Net Balance</div>
+      </div>
+    </div>
+
+    <div class="kpi">
+      <i class="fa fa-coins"></i>
+      <div>
+        <div class="value" id="feesCollected">₵0</div>
+        <div class="label">Fees Collected</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- -------- CHARTS AREA -------- -->
+  <div class="card">
+    <div class="card-title">Finance Overview Chart</div>
+    <canvas id="overviewChart" height="130"></canvas>
+  </div>
+
+  <!-- Placeholder (more parts coming) -->
+  <div id="sectionContainer"></div>
+
 </div>
 
-<!-- PAYROLL -->
-<div class="card page" id="payroll" style="display:none;">
-  <h2>Payroll Summary</h2>
-
-  <table>
-    <thead><tr><th>Name</th><th>Role</th><th>Email</th><th>Salary</th></tr></thead>
-    <tbody id="payrollList"></tbody>
-  </table>
-</div>
-
-<!-- REPORTS -->
-<div class="card page" id="reports" style="display:none;">
-  <h2>Reports</h2>
-  <button class="btn" id="exportCSV">Export CSV</button>
-  <button class="btn" id="exportPDF">Export PDF</button>
-</div>
-
+<!-- Toast -->
 <div id="toast"></div>
-</div>
 
-<!-- ================= SCRIPT ================= -->
 <script>
-function showToast(msg){
+/* ----------------- BASIC DATA HANDLING ----------------- */
+function safeParse(x){ try{return JSON.parse(x);}catch{return null;} }
+function read(k){ return safeParse(localStorage.getItem(k)) || []; }
+function save(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+function toast(msg){
   const t=document.getElementById("toast");
   t.textContent=msg;
   t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"),2000);
+  setTimeout(()=>t.classList.remove("show"),2500);
 }
 
-/* ORG KEYS */
+/* ----------------- KEYS ----------------- */
 const ORG = localStorage.getItem("active_org") || "FLAWLESS";
 document.getElementById("orgName").textContent = ORG;
 
-const FIN_KEY = ORG + "_finance";
-const EMP_KEY = ORG + "_employees";
+const TX_KEY = `${ORG}_finance_transactions`;
+const FEE_KEY = `${ORG}_finance_fees`;
+const PAY_KEY = `${ORG}_finance_payroll`;
+const AUDIT_KEY = `${ORG}_finance_audit`;
 
-/* LOAD FINANCE DATA */
-function getFinance(){
-  return JSON.parse(localStorage.getItem(FIN_KEY) || "[]");
-}
-function saveFinance(data){
-  localStorage.setItem(FIN_KEY, JSON.stringify(data));
-}
-
-/* OVERVIEW */
-function updateOverview(){
-  const arr = getFinance();
-  let income = arr.filter(t=>t.type==="income").reduce((a,b)=>a+b.amount,0);
-  let expense = arr.filter(t=>t.type==="expense").reduce((a,b)=>a+b.amount,0);
-  let net = income - expense;
-
-  document.getElementById("totalIncome").textContent = "₵" + income.toLocaleString();
-  document.getElementById("totalExpense").textContent = "₵" + expense.toLocaleString();
-  document.getElementById("netBalance").textContent = "₵" + net.toLocaleString();
-
-  renderChart(income, expense);
-}
-
-/* TRANSACTION LIST */
-function renderTransactions(){
-  const arr=getFinance();
-  const tbody=document.getElementById("transTable");
-  tbody.innerHTML="";
-
-  arr.slice().reverse().forEach(t=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=`
-      <td>${t.type}</td>
-      <td>₵${t.amount.toLocaleString()}</td>
-      <td>${t.label}</td>
-      <td>${new Date(t.time).toLocaleString()}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-/* ADD TRANSACTION */
-document.getElementById("addTrans").onclick=function(){
-  const type=prompt("Type (income / expense)");
-  if(!type) return;
-
-  const amt=Number(prompt("Amount:"));
-  if(!amt) return;
-
-  const label=prompt("Description:");
-
-  const arr=getFinance();
-  arr.push({
-    type:type.toLowerCase(),
-    amount:amt,
-    label:label,
-    time:Date.now()
-  });
-
-  saveFinance(arr);
-  showToast("Transaction Added");
-  updateOverview();
-  renderTransactions();
-};
-
-/* PAYROLL */
-function renderPayroll(){
-  const arr = JSON.parse(localStorage.getItem(EMP_KEY) || "[]");
-  const tbody=document.getElementById("payrollList");
-  tbody.innerHTML="";
-
-  arr.forEach(e=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=`
-      <td>${e.name}</td>
-      <td>${e.role}</td>
-      <td>${e.email}</td>
-      <td>₵${Number(e.salary).toLocaleString()}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-/* NAVIGATION */
-document.querySelectorAll(".nav-item").forEach(nav=>{
-  nav.addEventListener("click",()=>{
-    const page=nav.dataset.page;
-    document.querySelectorAll(".page").forEach(p=>p.style.display="none");
-    document.getElementById(page).style.display="block";
-
-    if(page==="transactions") renderTransactions();
-    if(page==="payroll") renderPayroll();
-  });
+/* Create storage if missing */
+[TX_KEY,FEE_KEY,PAY_KEY,AUDIT_KEY].forEach(k=>{
+  if(!localStorage.getItem(k)) save(k,[]);
 });
 
-/* THEME TOGGLE */
-document.getElementById("themeToggle").onclick=function(){
-  document.body.classList.toggle("dark");
-  showToast("Theme changed");
-};
+/* ----------------- KPIs UPDATE ----------------- */
+function updateKPIs(){
+  const tx = read(TX_KEY);
 
-/* CHART */
-let chart=null;
-function renderChart(income,expense){
-  const ctx=document.getElementById("financeChart").getContext("2d");
-  if(chart) chart.destroy();
+  const income = tx.filter(t=>t.type==="income")
+                   .reduce((a,b)=>a+Number(b.amount),0);
 
-  chart=new Chart(ctx,{
-    type:"bar",
-    data:{
-      labels:["Income","Expenses"],
-      datasets:[{
-        data:[income,expense],
-        backgroundColor:["#00c3ff","#ff4d4d"]
-      }]
-    },
-    options:{ plugins:{legend:{display:false}} }
-  });
+  const expenses = tx.filter(t=>t.type==="expense")
+                     .reduce((a,b)=>a+Number(b.amount),0);
+
+  const fees = read(FEE_KEY).reduce((a,b)=>a+b.amount,0);
+
+  document.getElementById("totalIncome").textContent = "₵"+income.toLocaleString();
+  document.getElementById("totalExpenses").textContent = "₵"+expenses.toLocaleString();
+  document.getElementById("netBalance").textContent = "₵"+(income-expenses).toLocaleString();
+  document.getElementById("feesCollected").textContent = "₵"+fees.toLocaleString();
 }
 
-updateOverview();
-renderPayroll();
-</script>
+/* Initial load */
+updateKPIs();
 
+</script>
 </body>
 </html>
