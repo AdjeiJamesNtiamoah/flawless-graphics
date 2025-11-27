@@ -1,786 +1,737 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Finance Dashboard — Flawless Graphics (Premium)</title>
+<meta charset="UTF-8">
+<title>Finance Dashboard — Flawless Graphics</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- Font Awesome -->
+<link rel="stylesheet" 
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- jsPDF (PDF export) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-  :root{
-    --bg:#071127;
-    --card:#0f1b2b;
-    --muted:#9fb4c9;
-    --accent:#00c3ff;
-    --accent2:#7a00ff;
-    --success:#10b981;
-    --danger:#ef4444;
-    --glass: rgba(255,255,255,0.03);
-    --radius:12px;
-    --sidebar:#07142a;
-    --text:#e8f6ff;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:Inter, "Poppins",Arial;background:linear-gradient(180deg,#021127 0%,var(--bg) 100%);color:var(--text);min-height:100vh}
-  .app{display:flex;min-height:100vh}
-  aside.sidebar{width:260px;background:linear-gradient(180deg,var(--sidebar),rgba(0,0,0,0.25));padding:20px;display:flex;flex-direction:column;gap:14px;border-right:1px solid rgba(255,255,255,0.02)}
-  .logo{font-weight:800;font-size:20px;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
-  .nav{display:flex;flex-direction:column;gap:8px;margin-top:6px}
-  .nav button{background:transparent;border:0;color:var(--muted);padding:10px;border-radius:8px;text-align:left;cursor:pointer;font-weight:600}
-  .nav button.active{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#021}
-  main{flex:1;padding:20px;overflow:auto}
-  .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
-  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:14px; border-radius:12px; border:1px solid var(--glass)}
-  .kpi h4{margin:0;color:var(--muted);font-size:13px}
-  .kpi .big{font-size:20px;font-weight:800}
-  .flex{display:flex;gap:12px;align-items:center}
-  .btn{padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700}
-  .btn.prim{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#021}
-  .btn.danger{background:var(--danger);color:#fff}
-  input,select,textarea{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.03);text-align:left}
-  .small{font-size:13px;color:var(--muted)}
-  .chart-card{height:220px}
-  .split{display:grid;grid-template-columns:1fr 420px;gap:12px}
-  .file{display:inline-block;padding:8px 10px;border-radius:8px;border:1px dashed rgba(255,255,255,0.05);cursor:pointer}
-  .tiny{font-size:12px;color:var(--muted)}
-  #toast{position:fixed;right:20px;bottom:20px;background:#021124;padding:10px 14px;border-radius:8px;color:#fff;opacity:0;transform:translateY(12px);transition:all .28s}
-  #toast.show{opacity:1;transform:none}
-  @media(max-width:1000px){ .kpis{grid-template-columns:repeat(2,1fr)} .split{grid-template-columns:1fr} aside.sidebar{display:none} }
+:root {
+    --primary: #00c3ff;
+    --secondary: #00ffbb;
+    --dark: #001f3f;
+    --light-dark: #0b2b55;
+    --bg: #f2f6ff;
+    --card-bg: #ffffff;
+    --radius: 14px;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    font-family: Poppins, Arial;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 260px;
+    background: var(--dark);
+    color: white;
+    padding: 25px 0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 4px 0 14px rgba(0,0,0,0.25);
+}
+
+.sidebar h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 22px;
+    letter-spacing: 1px;
+}
+
+.nav-item {
+    padding: 15px 25px;
+    cursor: pointer;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    color: #cde6ff;
+    transition: .2s;
+}
+
+.nav-item:hover {
+    background: var(--light-dark);
+    color: white;
+}
+
+.nav-item i {
+    width: 22px;
+}
+
+/* MAIN CONTENT */
+.content {
+    flex: 1;
+    padding: 25px;
+    overflow-y: auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.header .title {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--dark);
+}
+
+.header-right {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn.primary { background: var(--primary); color: white; }
+.btn.success { background: var(--secondary); color: #002d1f; }
+.btn.danger { background: #ff4444; color: white; }
+.btn.light { background: #e6f0ff; color: #002244; }
+
+/* CARDS */
+.card {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+/* GRID */
+.grid {
+    display: grid;
+    gap: 20px;
+}
+
+.kpi {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: var(--card-bg);
+    padding: 18px;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.kpi i {
+    font-size: 28px;
+    color: var(--primary);
+}
+
+.kpi .value {
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.kpi .label {
+    color: #6c7a8a;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 14px;
+}
+
+/* Toast */
+#toast {
+    position: fixed;
+    right: 25px;
+    bottom: 25px;
+    background: var(--dark);
+    color: white;
+    padding: 14px 18px;
+    border-radius: 10px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: .3s;
+}
+#toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
 </style>
 </head>
 <body>
-<div class="app">
-  <aside class="sidebar">
-    <div class="logo">FLAWLESS FINANCE</div>
-    <div class="small">Organization</div>
-    <div id="orgNameMini" style="font-weight:700"></div>
 
-    <div class="nav" role="navigation">
-      <button class="tab active" data-section="overview">Overview</button>
-      <button class="tab" data-section="invoices">Invoices</button>
-      <button class="tab" data-section="payments">Payments</button>
-      <button class="tab" data-section="accounts">Student Accounts</button>
-      <button class="tab" data-section="reports">Reports</button>
-      <button class="tab" data-section="reconcile">Reconcile</button>
-      <button class="tab" data-section="settings">Settings</button>
-      <a href="hr-dashboard.html" style="color:var(--muted);margin-top:6px;text-decoration:none">← HR Dashboard</a>
-      <a href="welcome.html" style="color:var(--muted);text-decoration:none">← Home</a>
+<!---------------- SIDEBAR ---------------->
+<div class="sidebar">
+    <h2>FINANCE</h2>
+
+    <div class="nav-item" onclick="scrollToSection('dashboard')">
+        <i class="fa fa-chart-line"></i> Dashboard
     </div>
 
-    <div style="margin-top:auto">
-      <div class="small">Teacher clock-ins (synced)</div>
-      <div id="teacherSync" class="tiny">Loading teacher attendance…</div>
-    </div>
-  </aside>
-
-  <main>
-    <div class="top">
-      <div>
-        <h2 id="pageTitle" style="margin:0">Finance • Overview</h2>
-        <div class="small" id="orgInfo">Loading…</div>
-      </div>
-      <div class="flex">
-        <input id="orgSwitcher" style="min-width:220px" />
-        <button class="btn" id="refreshBtn">Refresh</button>
-        <button class="btn prim" id="newInvoiceBtn">+ Invoice</button>
-      </div>
+    <div class="nav-item" onclick="scrollToSection('pendingPayroll')">
+        <i class="fa fa-sack-dollar"></i> Pending Payroll
     </div>
 
-    <!-- KPIs -->
-    <div class="kpis">
-      <div class="card kpi">
-        <h4>Total Revenue (Received)</h4>
-        <div class="big" id="k_revenue">₵0</div>
-        <div class="small">All-time received</div>
-      </div>
-      <div class="card kpi">
-        <h4>Outstanding</h4>
-        <div class="big" id="k_outstanding">₵0</div>
-        <div class="small">Unpaid invoices</div>
-      </div>
-      <div class="card kpi">
-        <h4>Invoices</h4>
-        <div class="big" id="k_invoices">0</div>
-        <div class="small">Total invoices</div>
-      </div>
-      <div class="card kpi">
-        <h4>Overdue</h4>
-        <div class="big" id="k_overdue">0</div>
-        <div class="small">Overdue invoices</div>
-      </div>
+    <div class="nav-item" onclick="scrollToSection('approvedPayroll')">
+        <i class="fa fa-check-circle"></i> Approved Payroll
     </div>
 
-    <!-- Overview Section -->
-    <section id="overviewSection" class="card" style="margin-bottom:12px">
-      <div class="split">
-        <div>
-          <h3 style="margin-top:0">Recent Activity</h3>
-          <div id="activityFeed" class="tiny"></div>
-          <div style="margin-top:12px">
-            <h4 class="small">Quick actions</h4>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <label class="file" id="importJsonBtn">Import JSON</label>
-              <label class="file" id="importCsvBtn">Import CSV (payments)</label>
-              <button class="btn" id="exportAllBtn">Export JSON</button>
-              <button class="btn prim" id="exportCsvBtn">Export CSV</button>
-            </div>
-          </div>
-        </div>
+    <div class="nav-item" onclick="scrollToSection('salaryAdvances')">
+        <i class="fa fa-coins"></i> Salary Advances
+    </div>
 
-        <div>
-          <div class="card chart-card">
-            <h4 style="margin:0">Revenue (last 12 months)</h4>
-            <canvas id="revenueChart"></canvas>
-          </div>
+    <div class="nav-item" onclick="scrollToSection('messages')">
+        <i class="fa fa-envelope"></i> Finance Messages
+    </div>
 
-          <div style="height:12px"></div>
+    <div class="nav-item" onclick="scrollToSection('audit')">
+        <i class="fa fa-history"></i> Audit Trail
+    </div>
 
-          <div class="card chart-card">
-            <h4 style="margin:0">Paid vs Outstanding</h4>
-            <canvas id="paidDonut"></canvas>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Invoices -->
-    <section id="invoicesSection" class="card" style="display:none;margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <h3 style="margin:0">Invoices</h3>
-        <div style="display:flex;gap:8px">
-          <input id="invoiceSearch" placeholder="Search by invoice, name or email" style="width:340px">
-          <select id="invoiceFilter">
-            <option value="">All</option>
-            <option value="unpaid">Unpaid</option>
-            <option value="paid">Paid</option>
-            <option value="overdue">Overdue</option>
-          </select>
-        </div>
-      </div>
-
-      <div style="margin-top:12px" class="table-scroll card">
-        <table>
-          <thead><tr><th>#</th><th>Invoice ID</th><th>To</th><th>Amount</th><th>Due</th><th>Status</th><th>Actions</th></tr></thead>
-          <tbody id="invoiceTable"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- Payments -->
-    <section id="paymentsSection" class="card" style="display:none;margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <h3 style="margin:0">Payments</h3>
-        <div style="display:flex;gap:8px">
-          <button class="btn" id="newPaymentBtn">Record Payment</button>
-        </div>
-      </div>
-
-      <div style="margin-top:12px" class="table-scroll card">
-        <table>
-          <thead><tr><th>#</th><th>Invoice</th><th>Payer</th><th>Amount</th><th>Date</th><th>Method</th><th>Actions</th></tr></thead>
-          <tbody id="paymentsTable"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- Student Accounts -->
-    <section id="accountsSection" class="card" style="display:none;margin-bottom:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <h3 style="margin:0">Student Fee Accounts</h3>
-        <div style="display:flex;gap:8px">
-          <button class="btn prim" id="newStudentAcctBtn">+ Add Student Account</button>
-        </div>
-      </div>
-
-      <div style="margin-top:12px" class="card">
-        <table>
-          <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Balance</th><th>Actions</th></tr></thead>
-          <tbody id="studentAcctTable"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- Reports -->
-    <section id="reportsSection" class="card" style="display:none;margin-bottom:12px">
-      <h3 style="margin-top:0">Reports & Tools</h3>
-      <div style="display:flex;gap:12px;flex-wrap:wrap">
-        <div class="card" style="min-width:260px">
-          <h4 class="small">Outstanding Invoices (CSV)</h4>
-          <div class="tiny" id="outstandingExportHint"></div>
-          <button class="btn prim" id="exportOutstandingBtn">Export outstanding</button>
-        </div>
-        <div class="card" style="min-width:260px">
-          <h4 class="small">Reconciliation</h4>
-          <div class="tiny">Find orphan payments and match to invoices.</div>
-          <button class="btn" id="findOrphansBtn">Find Orphans</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Reconcile -->
-    <section id="reconcileSection" class="card" style="display:none;margin-bottom:12px">
-      <h3 style="margin-top:0">Reconciliation</h3>
-      <div id="orphansArea" class="tiny"></div>
-      <div id="reconcileArea" style="margin-top:12px"></div>
-    </section>
-
-    <!-- Settings -->
-    <section id="settingsSection" class="card" style="display:none;margin-bottom:12px">
-      <h3 style="margin-top:0">Settings</h3>
-      <div style="display:flex;gap:12px">
-        <div style="flex:1">
-          <label class="small">Default currency</label>
-          <input id="cfg_currency" placeholder="GHS" style="width:120px">
-          <div style="margin-top:12px">
-            <label class="small">Auto-seed demo data</label>
-            <select id="cfg_seed"><option value="yes">Yes</option><option value="no">No</option></select>
-          </div>
-        </div>
-        <div style="width:320px">
-          <h4 class="small">Quick import</h4>
-          <div class="tiny">Upload a JSON backup to restore finance data for this org.</div>
-          <label class="file" id="settingsImportJson">Upload JSON</label>
-        </div>
-      </div>
-    </section>
-
-    <div id="toast"></div>
-  </main>
+    <div class="nav-item" onclick="window.location.href='index.html'">
+        <i class="fa fa-door-open"></i> Exit
+    </div>
 </div>
 
-<!-- Hidden file inputs -->
-<input type="file" id="hiddenImportJson" accept=".json" style="display:none">
-<input type="file" id="hiddenImportCsv" accept=".csv,text/csv" style="display:none">
-<input type="file" id="hiddenSettingsJson" accept=".json" style="display:none">
+<!---------------- MAIN CONTENT ---------------->
+<div class="content">
+    
+    <div class="header">
+        <div class="title">Finance Dashboard — <span id="orgDisplay"></span></div>
 
+        <div class="header-right">
+            <button class="btn light" id="switchOrgBtn"><i class="fa fa-building"></i></button>
+            <button class="btn success" id="exportFinancePDF"><i class="fa fa-file-pdf"></i> Export</button>
+        </div>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div id="dashboard" class="grid" 
+         style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+
+        <div class="kpi">
+            <i class="fa fa-sack-dollar"></i>
+            <div>
+                <div class="value" id="kpiPending">0</div>
+                <div class="label">Pending Payroll</div>
+            </div>
+        </div>
+
+        <div class="kpi">
+            <i class="fa fa-circle-check"></i>
+            <div>
+                <div class="value" id="kpiApproved">0</div>
+                <div class="label">Approved This Month</div>
+            </div>
+        </div>
+
+        <div class="kpi">
+            <i class="fa fa-coins"></i>
+            <div>
+                <div class="value" id="kpiAdvances">0</div>
+                <div class="label">Active Salary Advances</div>
+            </div>
+        </div>
+
+        <div class="kpi">
+            <i class="fa fa-users"></i>
+            <div>
+                <div class="value" id="kpiEmployees">0</div>
+                <div class="label">Total Employees</div>
+            </div>
+        </div>
+    </div>
+    <!-- === Pending Payroll === -->
+    <section id="pendingPayroll" class="card" style="margin-top:18px;">
+      <div class="card-title">Pending Payroll Requests</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="tiny">HR submits payroll batches here for Finance approval / payment.</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" id="refreshPending">Refresh</button>
+          <button class="btn primary" id="bulkApproveBtn">Approve All Visible</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px; overflow:auto;">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Batch ID</th><th>Submitted By</th><th>Period</th><th>Total</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="pendingTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- === Approved Payroll === -->
+    <section id="approvedPayroll" class="card" style="margin-top:18px; display:none;">
+      <div class="card-title">Approved / Paid Payroll</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="tiny">History of approved payrolls and payments.</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" id="exportPayrollCsv">Export CSV</button>
+          <button class="btn" id="exportPayrollPdf">Export PDF</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px; overflow:auto;">
+        <table>
+          <thead><tr><th>#</th><th>Batch ID</th><th>Approved By</th><th>Period</th><th>Total</th><th>Paid On</th><th>Details</th></tr></thead>
+          <tbody id="approvedTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- === Salary Advances === -->
+    <section id="salaryAdvances" class="card" style="margin-top:18px; display:none;">
+      <div class="card-title">Salary Advances</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="tiny">Employees can request advances; Finance approves/rejects.</div>
+        <div>
+          <button class="btn primary" id="newAdvanceBtn">New Advance</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px; overflow:auto;">
+        <table>
+          <thead><tr><th>#</th><th>Request ID</th><th>Employee</th><th>Amount</th><th>Reason</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="advancesTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- === Messages (Finance ↔ HR) === -->
+    <section id="messages" class="card" style="margin-top:18px; display:none;">
+      <div class="card-title">Finance Messages</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="msgTo" placeholder="To (hr or email)" style="flex:1; padding:8px">
+        <input id="msgSubject" placeholder="Subject" style="width:260px; padding:8px">
+      </div>
+      <textarea id="msgBody" rows="4" style="width:100%; margin-top:8px; padding:8px" placeholder="Message body"></textarea>
+      <div style="margin-top:8px; display:flex; gap:8px;">
+        <button class="btn primary" id="sendMsgBtn">Send</button>
+        <button class="btn" id="loadMsgsBtn">Refresh</button>
+      </div>
+
+      <div style="margin-top:12px; max-height:320px; overflow:auto;">
+        <table>
+          <thead><tr><th>#</th><th>From</th><th>To</th><th>Subject</th><th>Date</th></tr></thead>
+          <tbody id="messagesTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- === Audit Trail === -->
+    <section id="audit" class="card" style="margin-top:18px; display:none;">
+      <div class="card-title">Audit Trail</div>
+      <div id="auditLog" style="max-height:420px; overflow:auto; margin-top:8px;"></div>
+    </section>
+
+    <!-- Toast -->
+    <div id="toast"></div>
+  </div> <!-- end .content -->
+
+<!-- ============================
+     SCRIPT: Finance Logic
+     ============================ -->
 <script>
-/* ============================
-   Finance Dashboard — Full JS
-   ============================ */
-
-/* ---------- Utilities & Keys ---------- */
-function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
+/* ---------- Utilities ---------- */
+function safeParse(s){ try{ return JSON.parse(s) } catch(e){ return null } }
 function read(key){ return safeParse(localStorage.getItem(key)) || [] }
 function save(key,val){ localStorage.setItem(key, JSON.stringify(val)) }
-function now(){ return new Date().toISOString() }
-function showToast(msg, ms=3000){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'), ms) }
+function uid(prefix='id'){ return prefix + '_' + Date.now().toString(36) }
+function show(msg, ms=2500){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), ms) }
+function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
 
-/* Active org and namespaced keys */
-const DEFAULT_FINANCE_ORG = 'FLAWLESS';
-const ACTIVE_ORG = (localStorage.getItem('active_org') || DEFAULT_FINANCE_ORG).trim();
-const ORG = ACTIVE_ORG;
-document.getElementById('orgNameMini').textContent = ORG;
-document.getElementById('orgInfo').textContent = `${ORG} • Finance`;
+/* ---------- Keys & Namespacing ---------- */
+const ORG = localStorage.getItem('active_org') || 'FLAWLESS';
+document.getElementById('orgDisplay').textContent = ORG;
+const HR_PAYROLL_KEY = `${ORG}_hr_payroll_batches`;     // HR -> Finance pending batches
+const FIN_APPROVED_KEY = `${ORG}_finance_approved_batches`; // Finance approved/payout history
+const FIN_MSG_KEY = `${ORG}_finance_messages`;         // Finance messages
+const FIN_AUDIT_KEY = `${ORG}_finance_audit`;          // Audit trail
+const TEACH_ATT_KEY = `${ORG}_teacher_attendance`;     // teacher attendance sync (teacher pages push here)
+const ORG_ATT_KEY = `${ORG}_attendance`;               // alternate teacher key
 
-/* Namespaced storage keys */
-const INV_KEY = `${ORG}_finance_invoices`;
-const PAY_KEY = `${ORG}_finance_payments`;
-const STUD_KEY = `${ORG}_finance_students`;
-const ACT_KEY = `${ORG}_finance_activity`;
-const SET_KEY = `${ORG}_finance_settings`;
-const HR_TEACH_KEY = `${ORG}_teacher_attendance`;   // teacher page sync
-const ORG_ATT_KEY = `${ORG}_attendance`;            // alternate key used by teacher pages
+/* ensure keys exist */
+if(!localStorage.getItem(HR_PAYROLL_KEY)) save(HR_PAYROLL_KEY, []);
+if(!localStorage.getItem(FIN_APPROVED_KEY)) save(FIN_APPROVED_KEY, []);
+if(!localStorage.getItem(FIN_MSG_KEY)) save(FIN_MSG_KEY, []);
+if(!localStorage.getItem(FIN_AUDIT_KEY)) save(FIN_AUDIT_KEY, []);
 
-/* bootstrap empty structures if missing */
-if(!localStorage.getItem(INV_KEY)) save(INV_KEY, []);
-if(!localStorage.getItem(PAY_KEY)) save(PAY_KEY, []);
-if(!localStorage.getItem(STUD_KEY)) save(STUD_KEY, []);
-if(!localStorage.getItem(ACT_KEY)) save(ACT_KEY, []);
-if(!localStorage.getItem(SET_KEY)) save(SET_KEY, { currency: 'GHS', seed: 'yes' });
-
-/* helpers */
-function pushActivity(txt){
-  const arr = read(ACT_KEY);
-  arr.push({ id: 'a_'+Date.now(), text: txt, time: new Date().toISOString() });
-  save(ACT_KEY, arr);
-  renderActivity();
-}
-
-/* ---------- UI: Tabs ---------- */
-document.querySelectorAll('.tab').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    btn.classList.add('active');
-    const sec = btn.dataset.section;
-    document.querySelectorAll('section').forEach(s=> s.style.display = 'none');
-    if(sec==='overview') document.getElementById('overviewSection').style.display='block';
-    if(sec==='invoices') document.getElementById('invoicesSection').style.display='block';
-    if(sec==='payments') document.getElementById('paymentsSection').style.display='block';
-    if(sec==='accounts') document.getElementById('accountsSection').style.display='block';
-    if(sec==='reports') document.getElementById('reportsSection').style.display='block';
-    if(sec==='reconcile') document.getElementById('reconcileSection').style.display='block';
-    if(sec==='settings') document.getElementById('settingsSection').style.display='block';
-    document.getElementById('pageTitle').textContent = 'Finance • ' + (btn.textContent || '').trim();
+/* ---------- NAV helper (sidebar scrolling) ---------- */
+function scrollToSection(id){
+  const sec = document.getElementById(id);
+  if(!sec) return;
+  // hide others and show target (mimic tabs)
+  ['pendingPayroll','approvedPayroll','salaryAdvances','messages','audit'].forEach(sid=>{
+    const el = document.getElementById(sid);
+    if(el) el.style.display = (sid===id) ? 'block' : 'none';
   });
-});
-
-/* ---------- Render activity ---------- */
-function renderActivity(){
-  const arr = read(ACT_KEY).slice().reverse();
-  const out = document.getElementById('activityFeed');
-  out.innerHTML = arr.slice(0,50).map(a => `<div class="tiny">${escapeHtml(a.text)} • <span style="color:var(--muted)">${new Date(a.time).toLocaleString()}</span></div>`).join('') || '<div class="tiny">No activity yet</div>';
+  // ensure dashboard visible state
+  if(id === 'dashboard'){
+    ['pendingPayroll','approvedPayroll','salaryAdvances','messages','audit'].forEach(sid=>{
+      const el = document.getElementById(sid);
+      if(el) el.style.display = 'none';
+    });
+    document.getElementById('dashboard').scrollIntoView({behavior:'smooth'});
+  } else {
+    document.getElementById('dashboard').scrollIntoView({behavior:'smooth'});
+    document.getElementById(id).scrollIntoView({behavior:'smooth'});
+  }
 }
 
-/* ---------- Invoices CRUD ---------- */
-function genInvoiceId(){ return 'INV-' + Date.now().toString(36).toUpperCase().slice(-8) }
-function getInvoices(){ return read(INV_KEY) }
-function saveInvoices(v){ save(INV_KEY, v) }
-function createInvoice({ toName, toEmail, items=[], dueDate, notes='' }){
-  const id = genInvoiceId();
-  const amount = items.reduce((s,it)=> s + (Number(it.qty||1) * Number(it.price||0)), 0);
-  const inv = { id, toName, toEmail, items, amount, dueDate: dueDate || null, notes, status: 'unpaid', createdAt: now(), paidAt: null };
-  const arr = getInvoices(); arr.push(inv); saveInvoices(arr);
-  pushActivity(`Created invoice ${id} (${toName})`);
-  renderInvoices(); updateKPIs(); showToast('Invoice created');
-  return inv;
+/* ---------- Audit ---------- */
+function pushAudit(actor, action, payload=''){
+  const arr = read(FIN_AUDIT_KEY);
+  arr.push({ id: uid('audit'), actor, action, payload, time: new Date().toISOString() });
+  save(FIN_AUDIT_KEY, arr);
+  renderAudit();
 }
 
-function renderInvoices(){
-  const arr = getInvoices().slice().reverse();
-  document.getElementById('k_invoices').textContent = arr.length;
-  const tbody = document.getElementById('invoiceTable'); tbody.innerHTML = '';
-  const search = (document.getElementById('invoiceSearch') || {value:''}).value.trim().toLowerCase();
-  const filter = (document.getElementById('invoiceFilter') || {value:''}).value;
-  arr.forEach((inv,i)=>{
-    if(search){
-      const hay = `${inv.id} ${inv.toName||''} ${inv.toEmail||''} ${inv.notes||''}`.toLowerCase();
-      if(!hay.includes(search)) return;
-    }
-    if(filter==='unpaid' && inv.status!=='unpaid') return;
-    if(filter==='paid' && inv.status!=='paid') return;
-    if(filter==='overdue' && !(inv.status==='unpaid' && inv.dueDate && new Date(inv.dueDate) < new Date())) return;
+/* ---------- Render audit ---------- */
+function renderAudit(){
+  const arr = read(FIN_AUDIT_KEY).slice().reverse();
+  const out = document.getElementById('auditLog');
+  if(!arr.length) { out.innerHTML = '<div class="tiny">No audit records</div>'; return; }
+  out.innerHTML = arr.map(a => `<div style="padding:8px;border-bottom:1px solid rgba(0,0,0,0.06)"><strong>${escapeHtml(a.actor)}</strong> — ${escapeHtml(a.action)} <div class="tiny" style="color:#666">${new Date(a.time).toLocaleString()}</div><div class="tiny">${escapeHtml(a.payload)}</div></div>`).join('');
+}
+
+/* ---------- Pending payroll rendering ---------- */
+function renderPending(){
+  const arr = read(HR_PAYROLL_KEY).slice().reverse();
+  const tbody = document.getElementById('pendingTable');
+  tbody.innerHTML = '';
+  arr.forEach((b, i) => {
+    const status = b.status || 'pending';
     const tr = document.createElement('tr');
-    const due = inv.dueDate ? new Date(inv.dueDate).toLocaleDateString() : '—';
-    const status = inv.status === 'paid' ? `<span style="color:var(--success)">PAID</span>` : (inv.dueDate && new Date(inv.dueDate) < new Date() ? `<span style="color:var(--danger)">OVERDUE</span>` : `<span style="color:var(--muted)">UNPAID</span>`);
-    tr.innerHTML = `<td>${i+1}</td><td>${inv.id}</td><td>${escapeHtml(inv.toName||inv.toEmail)}</td><td>${formatCurrency(inv.amount)}</td><td>${escapeHtml(due)}</td><td>${status}</td>
+    tr.innerHTML = `<td>${i+1}</td>
+      <td>${escapeHtml(b.batchId)}</td>
+      <td>${escapeHtml(b.submittedBy||'HR')}</td>
+      <td>${escapeHtml(b.period||'—')}</td>
+      <td>${formatCurrency(b.total || 0)}</td>
+      <td>${escapeHtml(status)}</td>
       <td>
-        <button onclick="viewInvoice('${inv.id}')">View</button>
-        <button onclick="pdfInvoice('${inv.id}')">PDF</button>
-        ${inv.status==='unpaid' ? `<button onclick="markInvoicePaidPrompt('${inv.id}')">Mark Paid</button>` : ''}
-        <button onclick="deleteInvoice('${inv.id}')">Delete</button>
+        <button onclick="viewBatch('${b.batchId}')">View</button>
+        ${status === 'pending' ? `<button onclick="approveBatch('${b.batchId}')">Approve</button><button onclick="rejectBatch('${b.batchId}')">Reject</button>` : ''}
       </td>`;
     tbody.appendChild(tr);
   });
+  document.getElementById('kpiPending').textContent = arr.filter(x=> (x.status||'pending') === 'pending').length;
 }
 
-/* View invoice modal (simple prompt style) */
-function viewInvoice(id){
-  const inv = getInvoices().find(i=>i.id===id);
-  if(!inv) return showToast('Invoice not found');
-  const lines = inv.items.map(it=> `${it.qty} x ${it.description} @ ${formatCurrency(it.price)} = ${formatCurrency(it.qty*it.price)}`).join('\\n');
-  alert(`Invoice ${inv.id}\\nTo: ${inv.toName} <${inv.toEmail}>\\nAmount: ${formatCurrency(inv.amount)}\\nDue: ${inv.dueDate || '—'}\\n\\nItems:\\n${lines}\\n\\nNotes:\\n${inv.notes||'—'}`);
-}
-
-/* Delete invoice */
-function deleteInvoice(id){
-  if(!confirm('Delete invoice?')) return;
-  const arr = getInvoices().filter(i=>i.id!==id); saveInvoices(arr);
-  pushActivity(`Deleted invoice ${id}`);
-  renderInvoices(); updateKPIs();
-  showToast('Deleted');
-}
-
-/* Mark invoice paid (prompt for payment details) */
-function markInvoicePaidPrompt(id){
-  const inv = getInvoices().find(i=>i.id===id);
-  if(!inv) return;
-  const amount = inv.amount;
-  const payer = inv.toName || inv.toEmail || 'Customer';
-  const method = prompt('Payment method (Cash / Bank / Mobile):', 'Bank') || 'Bank';
-  const date = new Date().toISOString();
-  // Create payment record and link
-  const pay = recordPayment({ invoiceId: id, payer, amount, date, method });
-  // Update invoice status
-  inv.status = 'paid'; inv.paidAt = date; saveInvoices(getInvoices());
-  pushActivity(`Invoice ${id} marked paid (Payment ${pay.id})`);
-  renderInvoices(); renderPayments(); updateKPIs();
-  showToast('Invoice marked paid');
-}
-
-/* ---------- Payments ---------- */
-function getPayments(){ return read(PAY_KEY) }
-function savePayments(arr){ save(PAY_KEY, arr) }
-function recordPayment({invoiceId=null, payer='', amount=0, date=null, method='Cash', notes='' }){
-  const id = 'PAY-'+Date.now().toString(36).toUpperCase().slice(-8);
-  const p = { id, invoiceId, payer, amount: Number(amount||0), date: date || new Date().toISOString(), method, notes };
-  const arr = getPayments(); arr.push(p); savePayments(arr);
-  pushActivity(`Recorded payment ${id} (${formatCurrency(p.amount)})`);
-  // if invoiceId present, mark invoice as paid if sums match
-  if(invoiceId){
-    const inv = getInvoices().find(i=>i.id===invoiceId);
-    if(inv){
-      inv.status = 'paid';
-      inv.paidAt = p.date;
-      saveInvoices(getInvoices());
-    }
-  }
-  renderPayments(); updateKPIs(); return p;
-}
-function renderPayments(){
-  const arr = getPayments().slice().reverse();
-  const tbody = document.getElementById('paymentsTable'); tbody.innerHTML = '';
-  arr.forEach((p,i)=>{
+/* ---------- Approved payroll rendering ---------- */
+function renderApproved(){
+  const arr = read(FIN_APPROVED_KEY).slice().reverse();
+  const tbody = document.getElementById('approvedTable');
+  tbody.innerHTML = '';
+  arr.forEach((b,i) => {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td><td>${p.invoiceId||'—'}</td><td>${escapeHtml(p.payer)}</td><td>${formatCurrency(p.amount)}</td><td>${new Date(p.date).toLocaleString()}</td><td>${escapeHtml(p.method)}</td>
-      <td><button onclick="deletePayment('${p.id}')">Delete</button></td>`;
+    tr.innerHTML = `<td>${i+1}</td>
+      <td>${escapeHtml(b.batchId)}</td>
+      <td>${escapeHtml(b.approvedBy||'Finance')}</td>
+      <td>${escapeHtml(b.period||'—')}</td>
+      <td>${formatCurrency(b.total||0)}</td>
+      <td>${b.paidOn ? new Date(b.paidOn).toLocaleString() : '—'}</td>
+      <td><button onclick="viewApproved('${b.batchId}')">Details</button></td>`;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('kpiApproved').textContent = arr.length;
+}
+
+/* ---------- Salary advances rendering ---------- */
+function getAdvances(){ return read(`${ORG}_salary_advances`) }
+function saveAdvances(a){ save(`${ORG}_salary_advances`, a) }
+if(!localStorage.getItem(`${ORG}_salary_advances`)) saveAdvances([]);
+
+function renderAdvances(){
+  const arr = getAdvances().slice().reverse();
+  const tbody = document.getElementById('advancesTable'); tbody.innerHTML = '';
+  arr.forEach((r,i)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${i+1}</td><td>${r.requestId}</td><td>${escapeHtml(r.employee)}</td><td>${formatCurrency(r.amount)}</td><td>${escapeHtml(r.reason||'')}</td><td>${escapeHtml(r.status)}</td>
+      <td>
+        ${r.status==='pending' ? `<button onclick="approveAdvance('${r.requestId}')">Approve</button><button onclick="rejectAdvance('${r.requestId}')">Reject</button>` : ''}
+      </td>`;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('kpiAdvances').textContent = arr.filter(x=>x.status==='approved').length;
+}
+
+/* ---------- Messages ---------- */
+function getFinanceMsgs(){ return read(FIN_MSG_KEY) }
+function saveFinanceMsgs(m){ save(FIN_MSG_KEY, m) }
+
+document.getElementById('sendMsgBtn').addEventListener('click', ()=>{
+  const to = document.getElementById('msgTo').value.trim();
+  const subj = document.getElementById('msgSubject').value.trim();
+  const body = document.getElementById('msgBody').value.trim();
+  if(!subj || !body) return show('Complete subject & message');
+  const arr = getFinanceMsgs();
+  arr.push({ id: uid('msg'), from: 'finance@'+ORG.toLowerCase()+'.local', to, subject: subj, body, date: new Date().toISOString() });
+  saveFinanceMsgs(arr);
+  pushAudit('Finance', `Sent message to ${to}`, `${subj}`);
+  renderMessages();
+  show('Message sent');
+  document.getElementById('msgTo').value=''; document.getElementById('msgSubject').value=''; document.getElementById('msgBody').value='';
+});
+
+function renderMessages(){
+  const arr = getFinanceMsgs().slice().reverse();
+  const tbody = document.getElementById('messagesTable'); tbody.innerHTML='';
+  arr.forEach((m,i)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(m.from)}</td><td>${escapeHtml(m.to)}</td><td>${escapeHtml(m.subject)}</td><td>${new Date(m.date).toLocaleString()}</td>`;
     tbody.appendChild(tr);
   });
 }
-function deletePayment(id){
-  if(!confirm('Delete payment?')) return;
-  const arr = getPayments().filter(p=>p.id!==id); savePayments(arr);
-  pushActivity(`Deleted payment ${id}`);
-  renderPayments(); updateKPIs(); showToast('Deleted');
+
+/* ---------- Batch view / approve / reject ---------- */
+function viewBatch(batchId){
+  const arr = read(HR_PAYROLL_KEY);
+  const b = arr.find(x=>x.batchId===batchId);
+  if(!b) return show('Batch not found');
+  // show details in prompt (simpler than modal)
+  const details = (b.items||[]).map(it=> `${it.employee} — ${formatCurrency(it.amount)} — ${it.bank||'N/A'}`).join('\\n');
+  alert(`Batch ${b.batchId}\\nSubmitted by: ${b.submittedBy}\\nPeriod: ${b.period}\\nTotal: ${formatCurrency(b.total)}\\n\\nItems:\\n${details}`);
 }
 
-/* ---------- Student Accounts ---------- */
-function getStudents(){ return read(STUD_KEY) }
-function saveStudents(arr){ save(STUD_KEY, arr) }
-function renderStudentAccounts(){
-  const arr = getStudents();
-  const tbody = document.getElementById('studentAcctTable'); tbody.innerHTML = '';
-  arr.forEach((s,i)=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.email||'')}</td><td>${formatCurrency(Number(s.balance||0))}</td>
-      <td><button onclick="editStudentAcct('${s.id}')">Edit</button> <button onclick="deleteStudentAcct('${s.id}')">Delete</button></td>`;
-    tbody.appendChild(tr);
+function approveBatch(batchId){
+  const arr = read(HR_PAYROLL_KEY);
+  const idx = arr.findIndex(x=>x.batchId===batchId);
+  if(idx === -1) return show('Not found');
+  const batch = arr[idx];
+  if(batch.status && batch.status !== 'pending') return show('Batch already processed');
+
+  // move to finance approved key
+  const approved = read(FIN_APPROVED_KEY);
+  const approvedRecord = Object.assign({}, batch, { approvedBy: 'finance@'+ORG.toLowerCase()+'.local', approvedAt: new Date().toISOString(), paidOn: new Date().toISOString(), status: 'approved' });
+  approved.push(approvedRecord);
+  save(FIN_APPROVED_KEY, approved);
+
+  // mark original HR batch as approved
+  batch.status = 'approved';
+  batch.processedAt = new Date().toISOString();
+  save(HR_PAYROLL_KEY, arr);
+
+  pushAudit('Finance', 'Approved payroll batch', batch.batchId);
+  // notify HR (message push)
+  const msgs = getFinanceMsgs();
+  msgs.push({ id: uid('msg'), from:'finance@'+ORG.toLowerCase()+'.local', to: batch.submittedBy || 'hr@'+ORG.toLowerCase()+'.local', subject: `Payroll batch ${batch.batchId} approved`, body: `Your payroll batch ${batch.batchId} has been approved and paid.`, date: new Date().toISOString() });
+  saveFinanceMsgs(msgs);
+
+  renderPending(); renderApproved(); show('Batch approved & paid');
+}
+
+function rejectBatch(batchId){
+  const arr = read(HR_PAYROLL_KEY);
+  const b = arr.find(x=>x.batchId===batchId);
+  if(!b) return show('Not found');
+  const reason = prompt('Reason for rejection', 'Incorrect totals');
+  b.status = 'rejected';
+  b.rejectedBy = 'finance@'+ORG.toLowerCase()+'.local';
+  b.rejectionReason = reason || '';
+  b.processedAt = new Date().toISOString();
+  save(HR_PAYROLL_KEY, arr);
+  pushAudit('Finance', 'Rejected payroll batch', `${batchId} — ${reason}`);
+  // notify HR
+  const msgs = getFinanceMsgs(); msgs.push({ id: uid('msg'), from: 'finance@'+ORG.toLowerCase()+'.local', to: b.submittedBy || 'hr@'+ORG.toLowerCase()+'.local', subject: `Payroll ${batchId} rejected`, body: reason || 'See notes', date: new Date().toISOString() }); saveFinanceMsgs(msgs);
+  renderPending(); renderMessages(); show('Batch rejected');
+}
+
+/* Bulk approve visible */
+document.getElementById('bulkApproveBtn').addEventListener('click', ()=>{
+  const arr = read(HR_PAYROLL_KEY);
+  const pending = arr.filter(x=> (x.status||'pending') === 'pending');
+  if(!pending.length) return show('No pending batches');
+  if(!confirm(`Approve ${pending.length} pending batches?`)) return;
+  pending.forEach(b => approveBatch(b.batchId));
+  show('Bulk approved');
+});
+
+/* ---------- Advance requests ---------- */
+document.getElementById('newAdvanceBtn').addEventListener('click', ()=>{
+  const employee = prompt('Employee name (email optional)');
+  if(!employee) return show('Cancelled');
+  const amount = Number(prompt('Amount', '0')||0);
+  if(!amount) return show('Invalid amount');
+  const reason = prompt('Reason','') || '';
+  const arr = getAdvances();
+  const req = { requestId: uid('adv'), employee, amount, reason, status: 'pending', requestedAt: new Date().toISOString() };
+  arr.push(req); saveAdvances(arr); pushAudit('Finance', 'Created advance request', req.requestId); renderAdvances(); show('Advance requested');
+});
+
+function approveAdvance(requestId){
+  const arr = getAdvances();
+  const r = arr.find(x=>x.requestId===requestId);
+  if(!r) return show('Not found');
+  r.status = 'approved'; r.approvedAt = new Date().toISOString(); saveAdvances(arr);
+  pushAudit('Finance', 'Approved advance', requestId);
+  show('Advance approved');
+  renderAdvances();
+}
+
+function rejectAdvance(requestId){
+  const arr = getAdvances();
+  const r = arr.find(x=>x.requestId===requestId);
+  if(!r) return show('Not found');
+  const reason = prompt('Reason for rejection','');
+  r.status = 'rejected'; r.rejectionReason = reason || ''; saveAdvances(arr);
+  pushAudit('Finance', 'Rejected advance', requestId+' — '+(reason||''));
+  show('Advance rejected');
+  renderAdvances();
+}
+
+/* ---------- View approved details ---------- */
+function viewApproved(batchId){
+  const arr = read(FIN_APPROVED_KEY);
+  const b = arr.find(x=>x.batchId===batchId);
+  if(!b) return show('Not found');
+  const lines = (b.items||[]).map(it=> `${it.employee} — ${formatCurrency(it.amount)} — ${it.bank||'N/A'}`).join('\\n');
+  alert(`Approved Batch ${b.batchId}\\nApproved by: ${b.approvedBy}\\nPeriod: ${b.period}\\nTotal: ${formatCurrency(b.total)}\\nPaid On: ${b.paidOn}\\n\\nItems:\\n${lines}`);
+}
+
+/* ---------- Exports ---------- */
+document.getElementById('exportPayrollCsv').addEventListener('click', ()=>{
+  const rows = read(FIN_APPROVED_KEY).map(b => ({ batchId: b.batchId, approvedBy: b.approvedBy, period: b.period, total: b.total, paidOn: b.paidOn }));
+  if(!rows.length) return show('No approved payroll to export');
+  exportCSV(rows, `${ORG}_approved_payroll_${Date.now()}.csv`);
+});
+
+document.getElementById('exportPayrollPdf').addEventListener('click', ()=>{
+  const approved = read(FIN_APPROVED_KEY).slice().reverse();
+  if(!approved.length) return show('No approved payroll');
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p','pt','a4'); doc.setFontSize(14); doc.text(`${ORG} — Approved Payroll`, 40, 40); let y=70;
+  approved.forEach((b,i)=>{
+    doc.text(`${i+1}. ${b.batchId} • ${b.period} • ${formatCurrency(b.total)} • ${b.paidOn ? new Date(b.paidOn).toLocaleString() : '—'}`, 40, y);
+    y+=14; if(y>720){ doc.addPage(); y=40; }
   });
-}
-function newStudentAccount(){
-  const name = prompt('Student name'); if(!name) return;
-  const email = prompt('Email','')||'';
-  const balance = Number(prompt('Opening balance','0')||0);
-  const id = 'S_'+Date.now();
-  const arr = getStudents(); arr.push({ id, name, email, balance }); saveStudents(arr); renderStudentAccounts(); pushActivity(`Added student ${name}`); showToast('Student added');
-}
-function editStudentAcct(id){
-  const arr = getStudents(); const s = arr.find(x=>x.id===id); if(!s) return;
-  const name = prompt('Name', s.name) || s.name;
-  const email = prompt('Email', s.email||'') || s.email;
-  const bal = Number(prompt('Balance', s.balance||0) || s.balance);
-  s.name = name; s.email = email; s.balance = bal;
-  saveStudents(arr); renderStudentAccounts(); pushActivity(`Updated student ${name}`); showToast('Saved');
-}
-function deleteStudentAcct(id){ if(!confirm('Delete student account?')) return; const arr = getStudents().filter(x=>x.id!==id); saveStudents(arr); renderStudentAccounts(); pushActivity('Deleted student'); showToast('Deleted'); }
+  doc.save(`${ORG}_approved_payroll_${Date.now()}.pdf`);
+});
 
-/* ---------- KPIs & Charts ---------- */
-function updateKPIs(){
-  const payments = getPayments();
-  const invoices = getInvoices();
-  const revenue = payments.reduce((s,p)=> s + Number(p.amount||0), 0);
-  const outstanding = invoices.filter(i=>i.status!=='paid').reduce((s,i)=> s + Number(i.amount||0), 0);
-  const overdue = invoices.filter(i=> i.status!=='paid' && i.dueDate && new Date(i.dueDate) < new Date()).length;
-  document.getElementById('k_revenue').textContent = formatCurrency(revenue);
-  document.getElementById('k_outstanding').textContent = formatCurrency(outstanding);
-  document.getElementById('k_invoices').textContent = invoices.length;
-  document.getElementById('k_overdue').textContent = overdue;
-  // charts
-  drawRevenueChart();
-  drawPaidDonut();
-}
-
-/* revenue timeline (last 12 months) */
-let revenueChart = null;
-function drawRevenueChart(){
-  const payments = getPayments();
-  const labels = [];
-  const data = [];
-  const nowDate = new Date();
-  for(let i=11;i>=0;i--){
-    const d = new Date(nowDate.getFullYear(), nowDate.getMonth()-i, 1);
-    const key = d.getFullYear() + '-' + (d.getMonth()+1);
-    labels.push(d.toLocaleString('default',{month:'short', year:'numeric'}));
-    const sum = payments.filter(p=>{
-      const dt = new Date(p.date);
-      return dt.getFullYear()===d.getFullYear() && dt.getMonth()===d.getMonth();
-    }).reduce((s,p)=> s + Number(p.amount||0), 0);
-    data.push(sum);
-  }
-  const ctx = document.getElementById('revenueChart').getContext('2d');
-  if(revenueChart) revenueChart.destroy();
-  revenueChart = new Chart(ctx, {
-    type: 'bar',
-    data: { labels, datasets:[{ label:'Revenue', data, backgroundColor:'#00c3ff' }] },
-    options: { plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true } } }
-  });
-}
-
-/* paid vs outstanding donut */
-let donutChart = null;
-function drawPaidDonut(){
-  const invoices = getInvoices();
-  const paid = invoices.filter(i=>i.status==='paid').reduce((s,i)=> s + Number(i.amount||0), 0);
-  const outstanding = invoices.filter(i=>i.status!=='paid').reduce((s,i)=> s + Number(i.amount||0), 0);
-  const ctx = document.getElementById('paidDonut').getContext('2d');
-  if(donutChart) donutChart.destroy();
-  donutChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: { labels:['Paid','Outstanding'], datasets:[{ data:[paid, outstanding], backgroundColor:['#10b981','#ffb020'] }] },
-    options:{ plugins:{ legend:{ position:'bottom' } } }
-  });
-}
-
-/* ---------- Export / Import ---------- */
-function exportAllJSON(){
-  const data = { invoices:getInvoices(), payments:getPayments(), students:getStudents(), activity:read(ACT_KEY), meta:{ org: ORG, exportedAt: now() } };
-  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${ORG}_finance_backup_${Date.now()}.json`; a.click();
-  showToast('Exported JSON');
-}
-
-function importJSONFile(file){
-  const r = new FileReader();
-  r.onload = ()=> {
-    try{
-      const data = JSON.parse(r.result);
-      if(data.invoices) save(INV_KEY, data.invoices);
-      if(data.payments) save(PAY_KEY, data.payments);
-      if(data.students) save(STUD_KEY, data.students);
-      if(data.activity) save(ACT_KEY, data.activity);
-      renderAll();
-      showToast('Imported JSON');
-    }catch(e){ alert('Invalid JSON file') }
-  };
-  r.readAsText(file);
-}
-
+/* ---------- CSV helper ---------- */
 function exportCSV(rows, filename){
-  if(!rows || !rows.length) { alert('No data'); return; }
+  if(!rows.length) return;
   const keys = Object.keys(rows[0]);
   const lines = [keys.join(',')];
-  rows.forEach(r => lines.push(keys.map(k=>`"${String(r[k]||'').replace(/"/g,'""')}"`).join(',')));
+  rows.forEach(r=> lines.push(keys.map(k=>`"${String(r[k]||'').replace(/"/g,'""')}"`).join(',')));
   const blob = new Blob([lines.join('\\n')], { type:'text/csv' });
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
 }
 
-/* export outstanding invoices as CSV */
-document.getElementById('exportOutstandingBtn').addEventListener('click', ()=>{
-  const rows = getInvoices().filter(i=>i.status!=='paid').map(i=> ({ id:i.id, to: i.toName||i.toEmail, amount: i.amount, due: i.dueDate || '' }) );
-  exportCSV(rows, `${ORG}_outstanding_invoices.csv`);
-});
+/* ---------- Helper: format currency ---------- */
+function formatCurrency(n){ const fmt = new Intl.NumberFormat(undefined,{ style:'currency', currency: 'GHS', maximumFractionDigits:2 }); try{ return fmt.format(Number(n||0)) }catch(e){ return 'GHS ' + Number(n||0).toFixed(2) } }
 
-/* quick export all CSV (payments) */
-document.getElementById('exportCsvBtn').addEventListener('click', ()=> {
-  const rows = getPayments().map(p=> ({ id:p.id, invoiceId:p.invoiceId||'', payer:p.payer, amount:p.amount, date:p.date, method:p.method }) );
-  exportCSV(rows, `${ORG}_payments_${Date.now()}.csv`);
-});
-
-/* import payments CSV (basic parser) */
-function parseCSV(text){
-  const lines = text.split(/\\r?\\n/).map(l=>l.trim()).filter(Boolean);
-  if(!lines.length) return [];
-  const headers = lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim());
-  return lines.slice(1).map(l=>{
-    const values = l.match(/(".*?"|[^",\\s]+)(?=,|$)/g) || [];
-    const obj = {};
-    headers.forEach((h,idx)=> obj[h.trim()] = (values[idx] || '').replace(/^"|"$/g,''));
-    return obj;
-  });
-}
-
-/* handle file inputs */
-document.getElementById('hiddenImportJson').addEventListener('change', (e)=>{
-  const f = e.target.files[0]; if(!f) return;
-  importJSONFile(f); e.target.value = '';
-});
-document.getElementById('hiddenImportCsv').addEventListener('change', (e)=>{
-  const f = e.target.files[0]; if(!f) return;
-  const r = new FileReader(); r.onload = ()=>{
-    const rows = parseCSV(r.result);
-    // Expect columns: invoiceId,payer,amount,date,method (best effort)
-    rows.forEach(rw=>{
-      recordPayment({ invoiceId: rw.invoiceId||null, payer: rw.payer||rw.name||'Import', amount: Number(rw.amount||0), date: rw.date? new Date(rw.date).toISOString(): new Date().toISOString(), method: rw.method||'Import' });
-    });
-    showToast('Imported CSV payments');
-    document.getElementById('hiddenImportCsv').value = '';
-  };
-  r.readAsText(f);
-});
-
-/* wire UI labels to hidden inputs */
-document.getElementById('importJsonBtn').addEventListener('click', ()=> document.getElementById('hiddenImportJson').click());
-document.getElementById('importCsvBtn').addEventListener('click', ()=> document.getElementById('hiddenImportCsv').click());
-document.getElementById('settingsImportJson').addEventListener('click', ()=> document.getElementById('hiddenSettingsJson').click());
-document.getElementById('hiddenSettingsJson').addEventListener('change', (e)=> {
-  const f = e.target.files[0]; if(!f) return; importJSONFile(f); e.target.value = '';
-});
-
-/* ---------- PDF invoice generation ---------- */
-function pdfInvoice(id){
-  const inv = getInvoices().find(x=>x.id===id); if(!inv) return alert('Invoice not found');
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF('p','pt','a4');
-  doc.setFontSize(18); doc.text(`${ORG} — Invoice`, 40, 40);
-  doc.setFontSize(12);
-  doc.text(`Invoice ID: ${inv.id}`, 40, 70);
-  doc.text(`To: ${inv.toName || inv.toEmail}`, 40, 88);
-  doc.text(`Date: ${new Date(inv.createdAt).toLocaleDateString()}`, 40, 106);
-  doc.text(`Due: ${inv.dueDate || '—'}`, 40, 124);
-  let y = 156;
-  doc.setFontSize(11);
-  doc.text('Items:', 40, y); y += 14;
-  inv.items.forEach(it=>{
-    const line = `${it.qty} x ${it.description} @ ${formatCurrency(it.price)} = ${formatCurrency(it.qty*it.price)}`;
-    doc.text(line, 60, y); y += 14;
-  });
-  y += 8;
-  doc.setFontSize(13); doc.text(`Total: ${formatCurrency(inv.amount)}`, 40, y);
-  doc.save(`${inv.id}_invoice.pdf`);
-}
-
-/* ---------- Reconciliation: Orphan payments ---------- */
-function findOrphanPayments(){
-  const payments = getPayments();
-  const invoices = getInvoices();
-  const invoiceIds = new Set(invoices.map(i=>i.id));
-  const orphans = payments.filter(p=> p.invoiceId && !invoiceIds.has(p.invoiceId));
-  return orphans;
-}
-document.getElementById('findOrphansBtn').addEventListener('click', ()=>{
-  const orphans = findOrphanPayments();
-  const out = document.getElementById('orphansArea');
-  if(!orphans.length) out.innerHTML = '<div class="tiny">No orphan payments found</div>';
-  else {
-    out.innerHTML = orphans.map(o=> `<div class="tiny">Payment ${o.id} for invoice ${o.invoiceId} • ${formatCurrency(o.amount)} • <button onclick="attemptMatch('${o.id}')">Match</button></div>`).join('');
-  }
-});
-
-/* Attempt manual match: prompt for invoice id */
-function attemptMatch(paymentId){
-  const p = getPayments().find(x=>x.id===paymentId);
-  if(!p) return;
-  const invoiceId = prompt('Enter invoice ID to match this payment to:');
-  if(!invoiceId) return;
-  const inv = getInvoices().find(i=>i.id===invoiceId);
-  if(!inv) return alert('Invoice not found');
-  p.invoiceId = invoiceId; savePayments(getPayments());
-  inv.status = 'paid'; inv.paidAt = p.date; saveInvoices(getInvoices());
-  pushActivity(`Matched payment ${p.id} to invoice ${invoiceId}`);
-  renderPayments(); renderInvoices(); updateKPIs(); showToast('Matched');
-}
-
-/* ---------- Helpers ---------- */
-function formatCurrency(n){ const cur = (read(SET_KEY).currency || 'GHS') || 'GHS'; return `${cur} ${Number(n||0).toLocaleString()}` }
-function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-/* ---------- Quick UI events ---------- */
-document.getElementById('newInvoiceBtn').addEventListener('click', ()=>{
-  // Prompt-based invoice builder for simplicity
-  const toName = prompt('Bill to (name)') || '';
-  const toEmail = prompt('Bill to (email)') || '';
-  const dueDate = prompt('Due date (YYYY-MM-DD) — blank for none', '') || '';
-  const items = [];
-  while(true){
-    const desc = prompt('Item description (leave blank to finish)');
-    if(!desc) break;
-    const price = Number(prompt('Unit price','0')||0);
-    const qty = Number(prompt('Qty','1')||1);
-    items.push({ description: desc, price, qty });
-  }
-  if(!items.length) return showToast('No items added — cancelled');
-  const notes = prompt('Notes (optional)','') || '';
-  createInvoice({ toName, toEmail, items, dueDate, notes });
-});
-
-document.getElementById('newPaymentBtn').addEventListener('click', ()=> {
-  const invoiceId = prompt('Invoice ID (leave blank if not linked)', '') || null;
-  const payer = prompt('Payer name', '') || 'Customer';
-  const amount = Number(prompt('Amount', '0') || 0);
-  const method = prompt('Method (Cash/Bank/Mobile)','Bank') || 'Bank';
-  if(!amount || amount <= 0) return alert('Invalid amount');
-  recordPayment({ invoiceId, payer, amount, method, date: new Date().toISOString() });
-  showToast('Payment recorded');
-});
-
-document.getElementById('newStudentAcctBtn').addEventListener('click', newStudentAccount);
-
-/* search/filter wiring */
-document.getElementById('invoiceSearch').addEventListener('input', renderInvoices);
-document.getElementById('invoiceFilter').addEventListener('change', renderInvoices);
-
-/* export/import UI */
-document.getElementById('exportAllBtn').addEventListener('click', exportAllJSON);
-document.getElementById('refreshBtn').addEventListener('click', ()=> { renderAll(); showToast('Refreshed') });
-
-/* ---------- Teacher attendance sync widget ---------- */
+/* ---------- Teacher attendance sync rendering ---------- */
 function renderTeacherSync(){
-  // Check both keys teachers might use
-  const arr1 = read(HR_TEACH_KEY);
-  const arr2 = read(ORG_ATT_KEY);
-  const arr = (arr1 || []).concat(arr2 || []);
-  if(!arr.length){ document.getElementById('teacherSync').textContent = 'No teacher attendance records'; return; }
-  const last = arr.slice().reverse()[0];
-  const el = document.getElementById('teacherSync');
-  el.textContent = `${last.email || last.employee || 'Teacher'} • ${last.action || 'in/out'} • ${ new Date(last.date || last.time || last.createdAt || Date.now()).toLocaleString() }`;
+  const arr1 = read(TEACH_ATT_KEY) || [];
+  const arr2 = read(ORG_ATT_KEY) || [];
+  const all = (arr1.concat(arr2)).slice().reverse();
+  const el = document.getElementById('kpiEmployees'); // reuse KPI to show employees count too
+  document.getElementById('kpiEmployees').textContent = /* fallback count */ (read(`${ORG}_employees`) || []).length || all.length || 0;
+  const widget = document.getElementById('teacherSync');
+  const joined = all.slice(0,5).map(a => `${a.email||a.employee||a.name||'T'} ${a.action||''} @ ${new Date(a.date||a.time||a.createdAt||Date.now()).toLocaleTimeString()}`).join('\\n');
+  widget && (widget.textContent = all.length ? (all[0].email||all[0].employee||'Teacher') + ' — ' + (all[0].action||'') + ' — ' + new Date(all[0].date||all[0].time||Date.now()).toLocaleString() : 'No teacher attendance records');
 }
 
-/* ---------- Reconciliation area render ---------- */
-function renderReconcileArea(){
-  const payments = getPayments();
-  const invoices = getInvoices();
-  const orphans = payments.filter(p => p.invoiceId && !invoices.find(i=>i.id===p.invoiceId));
-  const matched = payments.filter(p => p.invoiceId && invoices.find(i=>i.id===p.invoiceId));
-  const out = document.getElementById('reconcileArea');
-  out.innerHTML = `<div class="tiny">Matched payments: ${matched.length} • Orphans: ${orphans.length}</div>`;
-  if(orphans.length) out.innerHTML += '<div style="margin-top:8px">' + orphans.map(o=>`<div class="tiny">${o.id} • ${formatCurrency(o.amount)} • ${escapeHtml(o.payer)} — Invoice ${o.invoiceId} <button onclick="attemptMatch('${o.id}')">Match</button></div>`).join('') + '</div>';
-}
-
-/* ---------- Storage sync & seed ---------- */
-window.addEventListener('storage', (e)=>{
-  if([INV_KEY,PAY_KEY,STUD_KEY,ACT_KEY,SET_KEY,HR_TEACH_KEY,ORG_ATT_KEY].includes(e.key)){
-    renderAll();
-  }
-});
-
-/* ---------- Seed demo data (if empty and config allows) ---------- */
-(function seedIfEmpty(){
-  const cfg = read(SET_KEY);
-  if(cfg.seed === 'no') return;
-  if(getInvoices().length || getPayments().length || getStudents().length) return;
-  // seed students + invoices + payments
-  const s1 = { id:'s_1', name:'Ama Serwaa', email:'ama@school.com', balance:0 };
-  const s2 = { id:'s_2', name:'Kofi Mensah', email:'kofi@school.com', balance:0 };
-  saveStudents([s1,s2]);
-  const inv1 = createInvoice({ toName:'Ama Serwaa', toEmail:'ama@school.com', items:[{description:'Term fees',price:1200,qty:1}], dueDate: new Date(Date.now()+7*24*3600*1000).toISOString().split('T')[0], notes:'Term 1 fee' });
-  const inv2 = createInvoice({ toName:'Kofi Mensah', toEmail:'kofi@school.com', items:[{description:'Library fine',price:50,qty:1}], dueDate: new Date(Date.now()-3*24*3600*1000).toISOString().split('T')[0], notes:'Late fee' });
-  // one payment
-  recordPayment({ invoiceId: inv1.id, payer: inv1.toName, amount: inv1.amount, date: new Date().toISOString(), method:'Bank' });
-  pushActivity('Seeded demo finance data');
+/* ---------- Seed / Demo helpers (only if HR batches empty) ---------- */
+(function seedDemoPayroll(){
+  const hr = read(HR_PAYROLL_KEY);
+  if(hr.length) return;
+  // create sample HR batch
+  const sample = {
+    batchId: 'BATCH_' + Date.now().toString(36).slice(-6).toUpperCase(),
+    submittedBy: 'hr@' + ORG.toLowerCase() + '.local',
+    period: new Date().toISOString().split('T')[0],
+    items: [
+      { employee: 'Adjei James', account: 'ACCT-001', bank: 'Bank A', amount: 1200 },
+      { employee: 'Ama Serwaa', account: 'ACCT-002', bank: 'Bank B', amount: 1100 },
+      { employee: 'Kofi Mensah', account: 'ACCT-003', bank: 'Bank C', amount: 1000 }
+    ],
+    total: 3300,
+    status: 'pending',
+    submittedAt: new Date().toISOString()
+  };
+  hr.push(sample);
+  save(HR_PAYROLL_KEY, hr);
+  pushAudit('System', 'Seeded demo payroll batch', sample.batchId);
 })();
 
 /* ---------- Render everything ---------- */
 function renderAll(){
-  renderActivity();
-  renderInvoices();
-  renderPayments();
-  renderStudentAccounts();
-  updateKPIs();
+  renderPending();
+  renderApproved();
+  renderAdvances();
+  renderMessages();
+  renderAudit();
   renderTeacherSync();
-  renderReconcileArea();
 }
 renderAll();
 
-/* ---------- Simple helpers exposed to console for HR sync ---------- */
-window.finance = {
-  recordPayment,
-  createInvoice,
-  getInvoices,
-  getPayments,
-  getStudents,
-  INV_KEY, PAY_KEY, STUD_KEY, HR_TEACH_KEY, ORG_ATT_KEY
+/* ---------- Wire refresh button ---------- */
+document.getElementById('refreshBtn').addEventListener('click', ()=>{ renderAll(); show('Refreshed') });
+document.getElementById('refreshPending').addEventListener('click', ()=>{ renderPending(); show('Pending refreshed') });
+
+/* ---------- Storage sync across tabs (teacher pages push attendance) ---------- */
+window.addEventListener('storage', (e)=>{
+  const keys = [HR_PAYROLL_KEY, FIN_APPROVED_KEY, `${ORG}_salary_advances`, FIN_MSG_KEY, FIN_AUDIT_KEY, TEACH_ATT_KEY, ORG_ATT_KEY];
+  if(keys.includes(e.key)){
+    // small debounce
+    setTimeout(()=> renderAll(), 120);
+  }
+});
+
+/* expose small API for HR pages to push payroll batches and teacher attendance */
+window.financeAPI = {
+  pushPayrollBatch: function(batch){
+    const arr = read(HR_PAYROLL_KEY);
+    batch.batchId = batch.batchId || uid('batch');
+    batch.status = 'pending';
+    batch.submittedAt = new Date().toISOString();
+    arr.push(batch);
+    save(HR_PAYROLL_KEY, arr);
+    pushAudit('HR', 'Submitted payroll batch', batch.batchId);
+    renderAll();
+    return batch.batchId;
+  },
+  markApproved: function(batchId){
+    approveBatch(batchId);
+  },
+  pushTeacherAttendance: function(rec){
+    const arr = read(TEACH_ATT_KEY);
+    arr.push(Object.assign({}, rec, { createdAt: new Date().toISOString() }));
+    save(TEACH_ATT_KEY, arr);
+    renderTeacherSync();
+  }
 };
 
-/* Final ready */
-console.log('Finance dashboard ready — keys:', INV_KEY, PAY_KEY, STUD_KEY);
-
-/* ---------- Utility: escapeHtml already declared above ---------- */
 </script>
-
 </body>
 </html>
