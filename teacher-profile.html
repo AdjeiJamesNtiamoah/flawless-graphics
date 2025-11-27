@@ -322,6 +322,92 @@ function saveTeacherAttendance(status) {
     alert("Attendance saved!");
 }
 </script>
+<script>
+/* ============================================================
+   TEACHER → HR DASHBOARD SYNC MODULE
+   - Syncs teacher attendance with HR Dashboard attendance
+   ============================================================ */
+
+function safeParse(v){ try{ return JSON.parse(v); } catch{ return null; } }
+function read(key){ return safeParse(localStorage.getItem(key)) || []; }
+function save(key,val){ localStorage.setItem(key, JSON.stringify(val)); }
+
+const ACTIVE_ORG = localStorage.getItem("active_org") || "FLAWLESS";
+const EMP_KEY = `${ACTIVE_ORG}_employees`;
+const ATT_KEY = `${ACTIVE_ORG}_attendance`;
+
+/* ============================================================
+   1. Ensure teacher exists inside HR Employee list
+   ============================================================ */
+
+function ensureTeacherInHREmployees(teacherUser){
+    let emps = read(EMP_KEY);
+
+    // If teacher already exists, stop here
+    let exists = emps.find(e => e.email === teacherUser.email);
+    if (exists) return exists.id;
+
+    // If not, create HR employee entry automatically
+    const newId = "e_" + Date.now();
+
+    const newEmp = {
+        id: newId,
+        name: teacherUser.name,
+        role: "Teacher",
+        email: teacherUser.email,
+        salary: teacherUser.salary || 0
+    };
+
+    emps.push(newEmp);
+    save(EMP_KEY, emps);
+
+    console.log("Teacher synced into HR employees →", newEmp);
+    return newId;
+}
+
+
+/* ============================================================
+   2. Sync clock-in / clock-out to HR attendance system
+   ============================================================ */
+
+function syncTeacherAttendance(action){
+    const teacherUser = JSON.parse(localStorage.getItem("active_teacher"));
+    if (!teacherUser){
+        alert("Teacher session missing!");
+        return;
+    }
+
+    // Make sure teacher exists in HR employee registry
+    const empId = ensureTeacherInHREmployees(teacherUser);
+
+    const attendance = read(ATT_KEY);
+    attendance.push({
+        employeeId: empId,
+        teacherEmail: teacherUser.email,
+        action: action, // "in" or "out"
+        date: new Date().toISOString()
+    });
+
+    save(ATT_KEY, attendance);
+
+    console.log(`Attendance synced → ${action.toUpperCase()}`, attendance);
+}
+
+
+/* ============================================================
+   3. Attach this sync to your existing buttons
+   ============================================================ */
+
+document.getElementById("clockInBtn").addEventListener("click", function () {
+    syncTeacherAttendance("in");
+});
+
+document.getElementById("clockOutBtn").addEventListener("click", function () {
+    syncTeacherAttendance("out");
+});
+
+console.log("Teacher → HR sync module loaded.");
+</script>
 
 
 <script>
