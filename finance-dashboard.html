@@ -166,6 +166,18 @@ body {
   font-weight:700;
 }
 
+/* Transactions UI */
+.tx-grid { display:grid; grid-template-columns: 1fr 420px; gap:18px; align-items:start; }
+.form-row { display:flex; gap:8px; margin-bottom:8px; }
+.input, select { padding:8px 10px; border-radius:8px; border:1px solid #e5e7eb; width:100%; }
+.small { font-size:13px; color:#6b7280; }
+
+.tx-table { width:100%; border-collapse:collapse; margin-top:8px; }
+.tx-table th, .tx-table td { padding:10px; border-bottom:1px solid #eef2f7; font-size:14px; text-align:left; }
+
+/* responsive adjustments */
+@media(max-width:1100px){ .tx-grid{ grid-template-columns:1fr } .sidebar{display:none} }
+
 /* Toast */
 #toast {
   position:fixed;
@@ -270,14 +282,169 @@ body {
 
   </div>
 
-  <!-- -------- CHARTS AREA -------- -->
+  <!-- -------- OVERVIEW CHART -------- -->
   <div class="card">
     <div class="card-title">Finance Overview Chart</div>
-    <canvas id="overviewChart" height="130"></canvas>
+    <canvas id="overviewChart" height="120"></canvas>
   </div>
 
-  <!-- Placeholder (more parts coming) -->
-  <div id="sectionContainer"></div>
+  <!-- -------- SECTIONS (hidden/shown by nav) -------- -->
+  <section id="overviewSection" class="card" style="margin-bottom:18px;">
+    <h3 class="card-title">Quick Overview</h3>
+    <div class="small">This overview summarizes recent financial activity; use the side nav to manage transactions, payroll and fees.</div>
+    <div id="recentTx" style="margin-top:12px"></div>
+  </section>
+
+  <section id="transactionsSection" class="card" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><h3 class="card-title">Income & Expenses</h3><div class="small">Add and manage transactions.</div></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn" id="exportTxCSV">Export CSV</button>
+        <button class="btn" id="clearTx">Clear Transactions</button>
+      </div>
+    </div>
+
+    <div class="tx-grid" style="margin-top:12px">
+      <!-- left: list -->
+      <div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+          <select id="filterType" class="input" style="width:160px">
+            <option value="">All types</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+          <input id="filterSearch" class="input" placeholder="Search description or category">
+          <input type="date" id="filterFrom" class="input" style="width:150px">
+          <input type="date" id="filterTo" class="input" style="width:150px">
+          <button class="btn" id="applyFilters">Apply</button>
+        </div>
+
+        <table class="tx-table">
+          <thead>
+            <tr><th>Date</th><th>Type</th><th>Category</th><th>Description</th><th style="text-align:right">Amount</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="txTableBody"></tbody>
+        </table>
+      </div>
+
+      <!-- right: add form and charts -->
+      <div>
+        <div style="margin-bottom:12px">
+          <div class="card-title">Add Transaction</div>
+          <div class="form-row"><select id="txType" class="input"><option value="income">Income</option><option value="expense">Expense</option></select></div>
+          <div class="form-row"><input id="txDate" type="date" class="input"></div>
+          <div class="form-row"><input id="txCategory" class="input" placeholder="Category (e.g. Tuition, Utilities)"></div>
+          <div class="form-row"><input id="txDesc" class="input" placeholder="Description"></div>
+          <div class="form-row"><input id="txAmount" class="input" placeholder="Amount (numeric)"></div>
+          <div style="display:flex;gap:8px"><button class="btn primary" id="addTxBtn">Add</button><button class="btn" id="clearFormBtn">Clear</button></div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="card-title">Monthly Tx Chart</div>
+          <canvas id="txChart" height="220"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- fees, payroll, budget, audit, settings placeholders -->
+  <section id="feesSection" class="card" style="display:none">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div>
+          <h3 class="card-title">Fee Collection</h3>
+          <div class="small">Manage invoices, payments & balances</div>
+      </div>
+
+      <div style="display:flex; gap:8px;">
+          <button class="btn" id="exportFeesCSV">Export CSV</button>
+          <button class="btn primary" id="newInvoiceBtn"><i class="fa fa-file-invoice"></i> New Invoice</button>
+      </div>
+  </div>
+
+  <div style="margin-top:15px; display:flex; gap:20px; align-items:flex-start;">
+      
+      <!-- LEFT: FEE LIST -->
+      <div style="flex:2;">
+          <div style="display:flex; gap:8px; margin-bottom:10px;">
+              <input id="feeSearch" class="input" placeholder="Search student name or ID">
+              <select id="feeClassFilter" class="input" style="width:160px;">
+                  <option value="">All Classes</option>
+                  <option value="KG1">KG1</option>
+                  <option value="KG2">KG2</option>
+                  <option value="Basic 1">Basic 1</option>
+                  <option value="Basic 2">Basic 2</option>
+                  <option value="Basic 3">Basic 3</option>
+                  <option value="JHS 1">JHS 1</option>
+                  <option value="JHS 2">JHS 2</option>
+              </select>
+              <button class="btn" id="applyFeeFilters">Apply</button>
+          </div>
+
+          <table class="tx-table">
+              <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Class</th>
+                    <th>Invoice</th>
+                    <th>Paid</th>
+                    <th>Balance</th>
+                    <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="feesTableBody"></tbody>
+          </table>
+      </div>
+
+      <!-- RIGHT: INVOICE FORM -->
+      <div style="flex:1; background:var(--card-bg); padding:18px; border-radius:var(--radius); box-shadow:0 6px 18px rgba(0,0,0,.1);">
+          <h4 style="margin:0 0 10px 0;">Create / Update Invoice</h4>
+
+          <input class="input" id="invStudent" placeholder="Student Name">
+          <input class="input" id="invStudentID" placeholder="Student ID (unique)">
+          <select class="input" id="invClass">
+              <option value="">Select Class</option>
+              <option>KG1</option><option>KG2</option>
+              <option>Basic 1</option><option>Basic 2</option><option>Basic 3</option>
+              <option>JHS 1</option><option>JHS 2</option>
+          </select>
+          <input class="input" id="invAmount" placeholder="Invoice Amount (e.g 200)">
+          <input class="input" id="invDesc" placeholder="Description (e.g Tuition Fees)">
+          
+          <button class="btn primary" id="saveInvoiceBtn">Save Invoice</button>
+          <button class="btn" id="clearInvoiceForm">Clear</button>
+
+          <br><br>
+
+          <h4>Record Payment</h4>
+          <input class="input" id="payStudentID" placeholder="Student ID">
+          <input class="input" id="payAmount" placeholder="Amount Paid">
+          <button class="btn primary" id="recordPaymentBtn">Record Payment</button>
+      </div>
+
+  </div>
+
+  <div style="margin-top:25px;">
+      <h4>Payment History</h4>
+      <table class="tx-table">
+          <thead>
+              <tr>
+                  <th>Date</th>
+                  <th>Student</th>
+                  <th>Amount</th>
+                  <th>Description</th>
+              </tr>
+          </thead>
+          <tbody id="feeHistoryBody"></tbody>
+      </table>
+  </div>
+
+</section>
+
+  <section id="payrollSection" class="card" style="display:none"><h3 class="card-title">Payroll</h3><div id="payrollArea"></div></section>
+  <section id="budgetSection" class="card" style="display:none"><h3 class="card-title">Budget Planner</h3><div id="budgetArea"></div></section>
+  <section id="auditSection" class="card" style="display:none"><h3 class="card-title">Audit Logs</h3><div id="auditArea"></div></section>
+  <section id="settingsSection" class="card" style="display:none"><h3 class="card-title">Settings</h3><div id="settingsArea"></div></section>
 
 </div>
 
@@ -285,52 +452,326 @@ body {
 <div id="toast"></div>
 
 <script>
-/* ----------------- BASIC DATA HANDLING ----------------- */
+/* ----------------- Utilities ----------------- */
 function safeParse(x){ try{return JSON.parse(x);}catch{return null;} }
 function read(k){ return safeParse(localStorage.getItem(k)) || []; }
 function save(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
-function toast(msg){
-  const t=document.getElementById("toast");
-  t.textContent=msg;
-  t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"),2500);
-}
+function showToast(msg,ms=2200){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),ms); }
 
-/* ----------------- KEYS ----------------- */
-const ORG = localStorage.getItem("active_org") || "FLAWLESS";
-document.getElementById("orgName").textContent = ORG;
+/* ----------------- Keys & Init ----------------- */
+const ORG = localStorage.getItem('active_org') || 'FLAWLESS';
+document.getElementById('orgName').textContent = ORG;
 
 const TX_KEY = `${ORG}_finance_transactions`;
 const FEE_KEY = `${ORG}_finance_fees`;
 const PAY_KEY = `${ORG}_finance_payroll`;
 const AUDIT_KEY = `${ORG}_finance_audit`;
 
-/* Create storage if missing */
-[TX_KEY,FEE_KEY,PAY_KEY,AUDIT_KEY].forEach(k=>{
-  if(!localStorage.getItem(k)) save(k,[]);
+if(!localStorage.getItem(TX_KEY)) save(TX_KEY, []);
+if(!localStorage.getItem(FEE_KEY)) save(FEE_KEY, []);
+if(!localStorage.getItem(PAY_KEY)) save(PAY_KEY, []);
+if(!localStorage.getItem(AUDIT_KEY)) save(AUDIT_KEY, []);
+
+/* ----------------- NAV TABS ----------------- */
+document.querySelectorAll('.nav-item').forEach(el=>{
+  el.addEventListener('click', ()=> {
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    el.classList.add('active');
+    const page = el.dataset.page;
+    // hide all sections
+    ['overview','transactions','fees','payroll','budget','audit','settings'].forEach(p=>{
+      const id = p+'Section';
+      const s = document.getElementById(id);
+      if(s) s.style.display = (p === page) ? 'block' : 'none';
+    });
+    // show overview by default
+    if(page === 'overview') {
+      document.getElementById('overviewSection').style.display = 'block';
+    }
+  });
 });
 
-/* ----------------- KPIs UPDATE ----------------- */
-function updateKPIs(){
-  const tx = read(TX_KEY);
+/* show overview on load */
+document.getElementById('overviewSection').style.display = 'block';
 
-  const income = tx.filter(t=>t.type==="income")
-                   .reduce((a,b)=>a+Number(b.amount),0);
+/* ----------------- TRANSACTIONS (CRUD + Filters) ----------------- */
+const txTableBody = document.getElementById('txTableBody');
+const txChartCtx = document.getElementById('txChart').getContext('2d');
+let txChart = null;
 
-  const expenses = tx.filter(t=>t.type==="expense")
-                     .reduce((a,b)=>a+Number(b.amount),0);
+function getTransactions(){ return read(TX_KEY).slice().reverse(); }
+function saveTransactions(arr){ save(TX_KEY, arr.slice().reverse()); }
 
-  const fees = read(FEE_KEY).reduce((a,b)=>a+b.amount,0);
+function renderTransactions(filters){
+  const rows = read(TX_KEY).slice().reverse();
+  let out = rows;
 
-  document.getElementById("totalIncome").textContent = "₵"+income.toLocaleString();
-  document.getElementById("totalExpenses").textContent = "₵"+expenses.toLocaleString();
-  document.getElementById("netBalance").textContent = "₵"+(income-expenses).toLocaleString();
-  document.getElementById("feesCollected").textContent = "₵"+fees.toLocaleString();
+  // apply filters
+  if(filters){
+    if(filters.type) out = out.filter(r => r.type === filters.type);
+    if(filters.search) {
+      const q = filters.search.toLowerCase();
+      out = out.filter(r => (r.description||'').toLowerCase().includes(q) || (r.category||'').toLowerCase().includes(q));
+    }
+    if(filters.from) out = out.filter(r => r.date >= filters.from);
+    if(filters.to) out = out.filter(r => r.date <= filters.to);
+  }
+
+  txTableBody.innerHTML = '';
+  out.forEach(tx => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${tx.date || ''}</td>
+      <td>${tx.type}</td>
+      <td>${tx.category || ''}</td>
+      <td>${tx.description || ''}</td>
+      <td style="text-align:right">₵ ${Number(tx.amount||0).toLocaleString()}</td>
+      <td>
+        <button data-id="${tx.id}" class="btn editTx">Edit</button>
+        <button data-id="${tx.id}" class="btn danger delTx">Delete</button>
+      </td>`;
+    txTableBody.appendChild(tr);
+  });
+
+  // wire edit / delete
+  document.querySelectorAll('.delTx').forEach(b=> b.addEventListener('click', (e)=> {
+    const id = e.target.dataset.id;
+    if(!confirm('Delete transaction?')) return;
+    const arr = read(TX_KEY).filter(t=>t.id !== id);
+    save(TX_KEY, arr);
+    saveAudit(`Deleted transaction ${id}`);
+    renderTransactions(filters);
+    updateKPIs(); updateOverviewChart(); drawTxChart();
+    showToast('Deleted transaction');
+  }));
+  document.querySelectorAll('.editTx').forEach(b=> b.addEventListener('click', (e)=>{
+    const id = e.target.dataset.id;
+    const arr = read(TX_KEY);
+    const tx = arr.find(t=>t.id===id);
+    if(!tx) return showToast('Not found');
+    // prefill right panel and switch to transactions tab
+    document.querySelector('[data-page="transactions"]').click();
+    document.getElementById('txType').value = tx.type;
+    document.getElementById('txDate').value = tx.date;
+    document.getElementById('txCategory').value = tx.category || '';
+    document.getElementById('txDesc').value = tx.description || '';
+    document.getElementById('txAmount').value = tx.amount;
+    // set temporary editId
+    document.getElementById('addTxBtn').dataset.editId = id;
+    showToast('Editing transaction — click Save (Add) to update');
+  }));
+
+  // update recent list (overview)
+  const recent = rows.slice(0,6).map(r=>`${r.date} • ${r.type} • ₵${Number(r.amount||0).toLocaleString()} • ${r.category||''}`).join('<br>');
+  document.getElementById('recentTx').innerHTML = recent || '<div class="small">No recent transactions</div>';
 }
 
-/* Initial load */
-updateKPIs();
+/* Add transaction */
+document.getElementById('addTxBtn').addEventListener('click', ()=>{
+  const type = document.getElementById('txType').value || 'income';
+  const date = document.getElementById('txDate').value || new Date().toISOString().split('T')[0];
+  const category = document.getElementById('txCategory').value.trim();
+  const description = document.getElementById('txDesc').value.trim();
+  const amount = Number(document.getElementById('txAmount').value) || 0;
+  if(!amount) return showToast('Enter amount');
 
+  let arr = read(TX_KEY);
+  const editId = document.getElementById('addTxBtn').dataset.editId;
+  if(editId){
+    // update
+    arr = arr.map(t => t.id === editId ? {...t, type, date, category, description, amount} : t);
+    delete document.getElementById('addTxBtn').dataset.editId;
+    save(TX_KEY, arr);
+    saveAudit(`Updated transaction ${editId}`);
+    showToast('Transaction updated');
+  } else {
+    const id = 'tx_' + Date.now();
+    arr.push({ id, type, date, category, description, amount });
+    save(TX_KEY, arr);
+    saveAudit(`Added transaction ${id}`);
+    showToast('Transaction added');
+  }
+
+  // clear form
+  document.getElementById('txCategory').value = '';
+  document.getElementById('txDesc').value = '';
+  document.getElementById('txAmount').value = '';
+  document.getElementById('txDate').value = '';
+
+  renderTransactions(currentFilters());
+  updateKPIs(); updateOverviewChart(); drawTxChart();
+});
+
+/* Clear form */
+document.getElementById('clearFormBtn').addEventListener('click', ()=> {
+  document.getElementById('txCategory').value = '';
+  document.getElementById('txDesc').value = '';
+  document.getElementById('txAmount').value = '';
+  document.getElementById('txDate').value = '';
+  delete document.getElementById('addTxBtn').dataset.editId;
+});
+
+/* Filters */
+function currentFilters(){
+  return {
+    type: document.getElementById('filterType').value || '',
+    search: document.getElementById('filterSearch').value.trim() || '',
+    from: document.getElementById('filterFrom').value || '',
+    to: document.getElementById('filterTo').value || ''
+  };
+}
+document.getElementById('applyFilters').addEventListener('click', ()=> renderTransactions(currentFilters()));
+
+/* Export CSV */
+document.getElementById('exportTxCSV').addEventListener('click', ()=>{
+  const rows = read(TX_KEY);
+  if(!rows.length) return showToast('No transactions to export');
+  const keys = ['id','date','type','category','description','amount'];
+  const lines = [keys.join(',')];
+  rows.forEach(r=>{
+    lines.push(keys.map(k=> `"${String(r[k]||'').replace(/"/g,'""')}"`).join(','));
+  });
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${ORG}_transactions.csv`; a.click();
+});
+
+/* Clear transactions */
+document.getElementById('clearTx').addEventListener('click', ()=> {
+  if(!confirm('Clear all transactions for this org?')) return;
+  save(TX_KEY, []);
+  saveAudit('Cleared all transactions');
+  renderTransactions(); updateKPIs(); updateOverviewChart(); drawTxChart();
+  showToast('Transactions cleared');
+});
+
+/* ----------------- Overview Chart & KPIs (update functions) ----------------- */
+const overviewCtx = document.getElementById('overviewChart').getContext('2d');
+let overviewChart = null;
+
+function updateKPIs(){
+  const tx = read(TX_KEY);
+  const income = tx.filter(t=>t.type==='income').reduce((s,t)=> s + Number(t.amount||0), 0);
+  const expenses = tx.filter(t=>t.type==='expense').reduce((s,t)=> s + Number(t.amount||0), 0);
+  const fees = read(FEE_KEY).reduce((s,f)=> s + Number(f.amount||0), 0);
+
+  document.getElementById('totalIncome').textContent = '₵' + income.toLocaleString();
+  document.getElementById('totalExpenses').textContent = '₵' + expenses.toLocaleString();
+  document.getElementById('netBalance').textContent = '₵' + (income - expenses).toLocaleString();
+  document.getElementById('feesCollected').textContent = '₵' + fees.toLocaleString();
+}
+
+/* overview - last 6 months income/expense */
+function updateOverviewChart(){
+  const tx = read(TX_KEY);
+  const months = [];
+  const labels = [];
+  const now = new Date();
+  for(let m=5;m>=0;m--){
+    const d = new Date(now.getFullYear(), now.getMonth()-m, 1);
+    const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+    months.push(key);
+    labels.push(d.toLocaleString('default',{month:'short'}));
+  }
+  const incomeSeries = months.map(k => tx.filter(t=> t.date && t.date.startsWith(k)).filter(t=>t.type==='income').reduce((s,t)=> s + Number(t.amount||0),0));
+  const expenseSeries = months.map(k => tx.filter(t=> t.date && t.date.startsWith(k)).filter(t=>t.type==='expense').reduce((s,t)=> s + Number(t.amount||0),0));
+
+  if(overviewChart) overviewChart.destroy();
+  overviewChart = new Chart(overviewCtx, {
+    type:'bar',
+    data:{ labels: labels, datasets:[
+      { label:'Income', data: incomeSeries, backgroundColor: '#3b82f6' },
+      { label:'Expenses', data: expenseSeries, backgroundColor: '#ef4444' }
+    ]},
+    options:{ responsive:true, plugins:{ legend:{ position:'top' } }, scales:{ y:{ beginAtZero:true } } }
+  });
+}
+
+/* ----------------- Transaction chart (detailed) ----------------- */
+function drawTxChart(){
+  const rows = read(TX_KEY);
+  // group last 12 months totals
+  const months = [];
+  const labels = [];
+  const now = new Date();
+  for(let m=11;m>=0;m--){
+    const d = new Date(now.getFullYear(), now.getMonth()-m, 1);
+    const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+    months.push(key);
+    labels.push(d.toLocaleString('default',{month:'short'}));
+  }
+  const incomeSeries = months.map(k => rows.filter(t=> t.date && t.date.startsWith(k) && t.type==='income').reduce((s,t)=> s + Number(t.amount||0),0));
+  const expenseSeries = months.map(k => rows.filter(t=> t.date && t.date.startsWith(k) && t.type==='expense').reduce((s,t)=> s + Number(t.amount||0),0));
+
+  if(txChart) txChart.destroy();
+  txChart = new Chart(txChartCtx, {
+    type:'line',
+    data:{ labels, datasets:[
+      { label:'Income', data: incomeSeries, borderColor: '#3b82f6', backgroundColor:'rgba(59,130,246,0.12)', fill:true },
+      { label:'Expenses', data: expenseSeries, borderColor: '#ef4444', backgroundColor:'rgba(239,68,68,0.08)', fill:true }
+    ]},
+    options:{ responsive:true, plugins:{ legend:{ position:'top' } }, scales:{ y:{ beginAtZero:true } } }
+  });
+}
+
+/* ----------------- Audit log helper ----------------- */
+function saveAudit(text){
+  const arr = read(AUDIT_KEY);
+  arr.push({ text, time: new Date().toISOString() });
+  save(AUDIT_KEY, arr);
+}
+
+/* ----------------- Storage sync & boot ----------------- */
+window.addEventListener('storage', (e)=>{
+  if([TX_KEY, FEE_KEY, PAY_KEY, AUDIT_KEY].includes(e.key)){
+    renderTransactions(currentFilters());
+    updateKPIs(); updateOverviewChart(); drawTxChart();
+  }
+});
+
+/* initial render calls */
+renderTransactions();
+updateKPIs();
+updateOverviewChart();
+drawTxChart();
+
+/* ----------------- UI helpers (theme, export PDF) ----------------- */
+document.getElementById('themeToggle').addEventListener('click', ()=>{
+  document.documentElement.classList.toggle('dark');
+  const isDark = document.documentElement.classList.contains('dark');
+  localStorage.setItem('finance_theme_dark', isDark ? '1' : '0');
+});
+if(localStorage.getItem('finance_theme_dark') === '1') document.documentElement.classList.add('dark');
+
+document.getElementById('exportPDF').addEventListener('click', ()=>{
+  // simple text export to new window — lightweight option
+  const rows = read(TX_KEY);
+  let html = `<h2>${ORG} — Finance Report</h2>`;
+  html += `<p>Total transactions: ${rows.length}</p>`;
+  html += `<table border="1" cellpadding="6" cellspacing="0"><tr><th>Date</th><th>Type</th><th>Category</th><th>Description</th><th>Amount</th></tr>`;
+  rows.slice().reverse().slice(0,200).forEach(r => html += `<tr><td>${r.date}</td><td>${r.type}</td><td>${r.category||''}</td><td>${r.description||''}</td><td>₵${Number(r.amount||0)}</td></tr>`);
+  html += `</table>`;
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+  w.print();
+});
+
+/* quick CSV export helper (for entire page) available globally */
+window.exportAllTransactions = function(){ document.getElementById('exportTxCSV').click(); };
+
+/* --- render audit, fees, payroll placeholders --- */
+function renderAudit(){ const arr = read(AUDIT_KEY).slice().reverse(); const el = document.getElementById('auditArea'); el.innerHTML = ''; arr.forEach(a=> el.innerHTML += `<div class="small">${a.time} • ${a.text}</div>`); }
+function renderFees(){ const arr = read(FEE_KEY); const el = document.getElementById('feesArea'); el.innerHTML = '<div class="small">Fees module coming — stored fees: '+arr.length+'</div>'; }
+function renderPayroll(){ const arr = read(PAY_KEY); const el = document.getElementById('payrollArea'); el.innerHTML = '<div class="small">Payroll module coming — records: '+arr.length+'</div>'; }
+function renderSettings(){ const el = document.getElementById('settingsArea'); el.innerHTML = '<div class="small">Settings: No special config yet.</div>'; }
+
+renderAudit(); renderFees(); renderPayroll(); renderSettings();
+
+/* initial audit push */
+saveAudit('Finance dashboard loaded');
+
+/* done */
+console.log('Finance dashboard (Parts 1+2) loaded');
 </script>
 </body>
 </html>
