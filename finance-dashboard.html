@@ -16,7 +16,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-      :root {
+
+/* ==========================================================
+   GLOBAL VARIABLES
+========================================================== */
+:root {
     --primary: #00c3ff;
     --secondary: #00ffbb;
     --dark: #001f3f;
@@ -24,402 +28,221 @@
     --bg: #f2f6ff;
     --card-bg: #ffffff;
     --radius: 14px;
+
+    /* Finance Theme Variables */
+    --panel:#ffffff;
+    --muted:#6b7280;
+    --text:#0b1b2e;
+    --accent:#00c3ff;
+    --accent-2:#6b5fff;
+    --success:#10b981;
+    --danger:#ef4444;
+    --glass: rgba(11,27,46,0.04);
+    --shadow-1: 0 6px 18px rgba(8,20,40,0.06);
+    --shadow-2: 0 10px 30px rgba(8,20,40,0.08);
+    --sidebar:#00224a;
+    --sidebar-contrast:#06305a;
+    --muted-2:#9aa7bd;
+    --card-border: rgba(2,8,23,0.04);
+    --max-width:1200px;
+    --transition: 240ms cubic-bezier(.2,.9,.3,1);
 }
+
+/* DARK MODE (auto toggled) */
+html.dark {
+    --bg:#071026;
+    --panel:#0f1724;
+    --muted:#9fb4c9;
+    --text:#e8f6ff;
+    --accent:#00e0ff;
+    --accent-2:#b08bff;
+    --glass: rgba(255,255,255,0.03);
+    --sidebar:#041428;
+    --sidebar-contrast:#072439;
+    --card-border: rgba(255,255,255,0.03);
+}
+
+/* ==========================================================
+   BASE
+========================================================== */
+* { box-sizing: border-box; }
 
 body {
     margin: 0;
-    background: var(--bg);
-    font-family: Poppins, Arial;
-    display: flex;
     height: 100vh;
+    display: flex;
+    background: linear-gradient(180deg, var(--bg), #ffffff);
+    font-family: Inter, Poppins, Arial;
+    color: var(--text);
     overflow: hidden;
 }
 
-/* SIDEBAR */
+/* ==========================================================
+   SIDEBAR
+========================================================== */
 .sidebar {
     width: 260px;
-    background: var(--dark);
+    background: linear-gradient(180deg, var(--sidebar), var(--sidebar-contrast));
+    padding: 22px 0;
     color: white;
-    padding: 25px 0;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 4px 0 14px rgba(0,0,0,0.25);
+    border-radius: 0 16px 16px 0;
+    box-shadow: 4px 0 12px rgba(0,0,0,0.20);
 }
 
 .sidebar h2 {
     text-align: center;
-    margin-bottom: 25px;
-    font-size: 22px;
+    font-size: 18px;
+    margin-bottom: 22px;
     letter-spacing: 1px;
 }
 
 .nav-item {
-    padding: 15px 25px;
-    cursor: pointer;
+    padding: 14px 24px;
     display: flex;
-    gap: 14px;
     align-items: center;
-    color: #cde6ff;
-    transition: .2s;
+    gap: 14px;
+    cursor: pointer;
+    color: #d7e7ff;
+    transition: 0.25s;
 }
 
 .nav-item:hover {
-    background: var(--light-dark);
+    background: rgba(255, 255, 255, 0.08);
     color: white;
 }
 
 .nav-item i {
     width: 22px;
+    font-size: 18px;
 }
 
-/* MAIN CONTENT */
+/* ==========================================================
+   MAIN CONTENT
+========================================================== */
 .content {
     flex: 1;
     padding: 25px;
     overflow-y: auto;
 }
 
+/* HEADER */
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 18px;
 }
 
 .header .title {
-    font-size: 26px;
+    font-size: 24px;
     font-weight: 700;
-    color: var(--dark);
-}
-
-.header-right {
-    display: flex;
-    gap: 10px;
 }
 
 .btn {
     padding: 10px 14px;
-    border: none;
     border-radius: 10px;
+    border: none;
     cursor: pointer;
     font-weight: 600;
+    transition: 0.2s;
 }
 
 .btn.primary { background: var(--primary); color: white; }
-.btn.success { background: var(--secondary); color: #002d1f; }
-.btn.danger { background: #ff4444; color: white; }
-.btn.light { background: #e6f0ff; color: #002244; }
+.btn.success { background: var(--success); color: white; }
+.btn.light { background: #eaf3ff; color: #002244; }
+.btn.danger { background: var(--danger); color: white; }
 
-/* CARDS */
-.card {
-    background: var(--card-bg);
-    padding: 20px;
-    border-radius: var(--radius);
-    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-    margin-bottom: 20px;
-}
-
-.card-title {
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 10px;
-}
-
-/* GRID */
-.grid {
-    display: grid;
-    gap: 20px;
-}
-
+/* ==========================================================
+   KPI CARDS
+========================================================== */
 .kpi {
     display: flex;
     align-items: center;
-    gap: 15px;
-    background: var(--card-bg);
+    gap: 16px;
     padding: 18px;
-    border-radius: var(--radius);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    background: var(--panel);
+    border-radius: 14px;
+    border: 1px solid var(--card-border);
+    box-shadow: var(--shadow-1);
 }
 
 .kpi i {
-    font-size: 28px;
-    color: var(--primary);
+    font-size: 30px;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.06);
+    color: var(--accent);
 }
 
 .kpi .value {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 800;
 }
 
 .kpi .label {
-    color: #6c7a8a;
-}
-
-/* TEACHER SYNC WIDGET */
-#teacherSync {
-    padding: 14px;
-    background: #e6f7ff;
-    border-radius: var(--radius);
-    margin-top: 15px;
-    color: #004466;
     font-size: 13px;
-    white-space: pre-line;
+    color: var(--muted);
 }
 
-/* TABLES */
+/* ==========================================================
+   CARDS
+========================================================== */
+.card {
+    background: var(--panel);
+    padding: 18px;
+    border-radius: 14px;
+    border: 1px solid var(--card-border);
+    box-shadow: var(--shadow-2);
+    margin-bottom: 22px;
+}
+
+.card-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+/* ==========================================================
+   TABLES
+========================================================== */
 table {
     width: 100%;
     border-collapse: collapse;
 }
 
-th, td {
+th {
+    text-align: left;
     padding: 12px;
-    border-bottom: 1px solid #e2e8f0;
-    font-size: 14px;
+    font-size: 13px;
+    color: var(--muted);
+    background: rgba(0,0,0,0.03);
 }
 
-/* Toast */
+td {
+    padding: 12px;
+    border-bottom: 1px solid var(--card-border);
+}
+
+/* ==========================================================
+   TOAST
+========================================================== */
 #toast {
     position: fixed;
     right: 25px;
     bottom: 25px;
-    background: var(--dark);
-    color: white;
     padding: 14px 18px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
     border-radius: 10px;
+    color: #021;
     opacity: 0;
-    transform: translateY(20px);
-    transition: .3s;
+    transform: translateY(14px);
+    transition: 0.3s;
 }
+
 #toast.show {
     opacity: 1;
     transform: translateY(0);
 }
-
-/* ---------- THEME / VARIABLES ---------- */
-:root{
-  --bg:#f4f7fb;
-  --panel:#ffffff;
-  --muted:#6b7280;
-  --text:#0b1b2e;
-  --accent:#00c3ff;
-  --accent-2:#6b5fff;
-  --success:#10b981;
-  --danger:#ef4444;
-  --glass: rgba(11,27,46,0.04);
-  --radius:12px;
-  --shadow-1: 0 6px 18px rgba(8,20,40,0.06);
-  --shadow-2: 0 10px 30px rgba(8,20,40,0.08);
-  --sidebar:#00224a;
-  --sidebar-contrast:#06305a;
-  --muted-2:#9aa7bd;
-  --card-border: rgba(2,8,23,0.04);
-  --max-width:1200px;
-  --transition: 240ms cubic-bezier(.2,.9,.3,1);
-}
-
-/* Dark mode-ready variables (toggle by adding .dark on <html>) */
-.dark {
-  --bg:#071026;
-  --panel:#0f1724;
-  --muted:#9fb4c9;
-  --text:#e8f6ff;
-  --accent:#00e0ff;
-  --accent-2:#b08bff;
-  --glass: rgba(255,255,255,0.03);
-  --sidebar:#041428;
-  --sidebar-contrast:#072439;
-  --card-border: rgba(255,255,255,0.03);
-}
-
-/* ---------- BASE ---------- */
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;
-  background: linear-gradient(180deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 90%, #fff 10%) 100%);
-  color:var(--text);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  line-height:1.4;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* center content container */
-.content, .sidebar { -webkit-font-smoothing:antialiased; }
-
-/* ---------- LAYOUT ---------- */
-.app-layout{ display:flex; min-height:100vh; gap:20px; align-items:flex-start; padding:20px; justify-content:center; }
-.container{ width:100%; max-width:var(--max-width); display:flex; gap:18px; }
-
-/* collapsed sidebar small-screen */
-@media (max-width:980px){
-  .sidebar{ display:none; }
-}
-
-/* ---------- MAIN CONTENT ---------- */
-.content{
-  flex:1;
-  padding:0;
-}
-.header{
-  display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;
-}
-.header .title{ font-size:20px; font-weight:700; color:var(--text); margin:0; display:flex; gap:8px; align-items:center; }
-.header .subtitle{ font-size:13px; color:var(--muted); }
-
-/* header controls */
-.header .controls{ display:flex; gap:10px; align-items:center; }
-.select, input[type="text"], input[type="search"], input[type="date"]{
-  padding:10px 12px; border-radius:10px; border:1px solid var(--card-border); background:var(--panel); color:var(--text);
-  outline:none; min-width:140px; transition:box-shadow var(--transition), border-color var(--transition);
-}
-.select:focus, input:focus{ box-shadow:0 8px 28px rgba(11,27,46,0.06); border-color: color-mix(in srgb, var(--accent) 60%, var(--card-border) 40%); }
-
-/* buttons */
-.btn{
-  padding:8px 12px; border-radius:10px; border:0; cursor:pointer; font-weight:700; transition:transform var(--transition), box-shadow var(--transition);
-  background:var(--panel); color:var(--text); border:1px solid var(--card-border);
-}
-.btn:hover{ transform:translateY(-3px); box-shadow:var(--shadow-1); }
-.btn.primary{ background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:#021; border:0; box-shadow:0 10px 26px rgba(11,27,46,0.12); }
-.btn.success{ background:var(--success); color:white; }
-.btn.danger{ background:var(--danger); color:white; }
-
-/* layout cards / grid */
-.grid{
-  display:grid;
-  gap:16px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  margin-bottom:18px;
-}
-.kpi{
-  background:var(--panel); padding:16px; border-radius:12px; border:1px solid var(--card-border); box-shadow:var(--shadow-1);
-  display:flex; align-items:center; gap:12px;
-}
-.kpi i{ font-size:28px; color:var(--accent); background:rgba(0,0,0,0.02); padding:12px; border-radius:10px; }
-.kpi .value{ font-size:20px; font-weight:800; margin-bottom:4px; color:var(--text); }
-.kpi .label{ font-size:13px; color:var(--muted); }
-
-/* ---------- CARD / SECTION ---------- */
-.card{
-  background: linear-gradient(180deg, var(--panel), color-mix(in srgb, var(--panel) 94%, #fff 6%));
-  padding:18px; border-radius:12px; border:1px solid var(--card-border); box-shadow:var(--shadow-2);
-}
-.card-title{ font-size:16px; font-weight:700; margin-bottom:8px; color:var(--text); }
-.tiny{ font-size:13px; color:var(--muted); }
-
-/* table */
-.table-wrap{ overflow:auto; border-radius:8px; }
-table{
-  width:100%; border-collapse:collapse; min-width:720px;
-}
-thead th{
-  text-align:left; padding:12px; font-size:13px; font-weight:700; color:var(--muted);
-  background: linear-gradient(180deg, rgba(0,0,0,0.02), transparent);
-  position: sticky; top:0; z-index:1;
-}
-tbody td{ padding:12px; border-bottom:1px solid var(--card-border); font-size:14px; color:var(--text); vertical-align:middle; }
-tr:hover td{ background: linear-gradient(90deg, rgba(0,0,0,0.01), transparent); }
-
-/* actions inside table */
-table button{ padding:6px 8px; border-radius:8px; font-weight:700; border:1px solid var(--card-border); background:var(--panel) }
-table button.primary{ background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#021; border:0; }
-
-/* small helpers */
-.status-pill{ display:inline-block; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px; color:white; }
-.status-pending{ background: #f59e0b; }
-.status-approved{ background: var(--success); }
-.status-paid{ background: var(--success); }
-.status-overdue{ background:var(--danger); }
-
-/* responsive cards stacking */
-@media (max-width:880px){
-  .grid{ grid-template-columns: repeat(2, 1fr); }
-  .card { padding:14px }
-}
-@media (max-width:560px){
-  .grid{ grid-template-columns: 1fr; }
-  .header { flex-direction: column; align-items:flex-start; gap:10px; }
-  .card{ padding:12px }
-  table{ min-width:620px } /* allow horizontal scroll inside wrapper */
-}
-
-/* ---------- TOAST ---------- */
-#toast{
-  position:fixed; right:20px; bottom:24px; padding:12px 16px; border-radius:10px; background: linear-gradient(90deg,var(--accent),var(--accent-2));
-  color:#021; font-weight:700; transform:translateY(8px); opacity:0; transition:all 320ms ease;
-  box-shadow:0 12px 36px rgba(3,18,36,0.18);
-}
-#toast.show{ opacity:1; transform:none }
-
-/* ---------- PRINT ---------- */
-@media print{
-  body *{ visibility:hidden; }
-  .content, .content *{ visibility:visible; }
-  .sidebar, .btn, .nav-item, #toast { display:none !important; }
-  .content{ width:100%; }
-}
-
-/* ---------- TINY ANIMATIONS ---------- */
-.fade-in { animation: fadeIn .42s cubic-bezier(.2,.9,.3,1); }
-@keyframes fadeIn { from { opacity:0; transform: translateY(6px) } to { opacity:1; transform:none } }
-
-/* utility */
-.text-muted{ color:var(--muted); font-size:13px; }
-.center { text-align:center; }
-
-      /* ---------- MODALS ---------- */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  backdrop-filter: blur(4px);
-  z-index: 9999;
-}
-
-.hidden {
-  display: none;
-}
-
-.modal-content {
-  width: 92%;
-  max-width: 420px;
-  background: var(--panel);
-  border-radius: 14px;
-  padding: 22px;
-  box-shadow: var(--shadow-2);
-  animation: fadeIn .3s ease;
-}
-
-.modal-text {
-  font-size: 14px;
-  color: var(--text);
-  margin: 12px 0;
-}
-
-.modal-input {
-  width: 100%;
-  height: 90px;
-  border-radius: 10px;
-  border: 1px solid var(--card-border);
-  padding: 10px;
-  background: var(--glass);
-  color: var(--text);
-  resize: none;
-}
-
-.modal-actions {
-  margin-top: 18px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
 
 </style>
 </head>
@@ -471,7 +294,10 @@ table button.primary{ background:linear-gradient(90deg,var(--accent),var(--accen
             <button class="btn primary" id="refreshBtn">
                 <i class="fa fa-rotate"></i>
             </button>
-        <a href="welcome.html" style="color:var(--muted);text-decoration:none">← Home</a>
+
+            <a href="welcome.html" style="color:var(--muted);text-decoration:none">← Home</a>
+        </div>
+    </div>
 
     <!-- KPI CARDS -->
     <div id="dashboard" class="grid" 
@@ -603,7 +429,8 @@ table button.primary{ background:linear-gradient(90deg,var(--accent),var(--accen
     <!-- Toast -->
     <div id="toast"></div>
 
-</div> <!-- end .content -->
+</div>
+      <!-- end .content -->
 <script>
 // -------------------------
 // KEY DEFINITIONS
@@ -692,7 +519,6 @@ function loadPendingPayroll() {
                 <button class="btn success" onclick="approvePayroll('${p.batchId}')">Approve</button>
             </td>
         </tr>
-        
         `;
     });
 }
@@ -1186,7 +1012,6 @@ document.addEventListener("DOMContentLoaded", loadSalarySheets);
 </script>
 
 <!-- APPROVE MODAL -->
-      <section>
 <div id="approveModal" class="modal hidden">
   <div class="modal-content">
     <h2>Approve Salary</h2>
@@ -1229,204 +1054,5 @@ document.addEventListener("DOMContentLoaded", loadSalarySheets);
 
 <!-- Toast Notification -->
 <div id="toast"></div>
-      </section>
-<script>      
-/* ---------- Batch view / approve / reject ---------- */
-function viewBatch(batchId){
-  const arr = read(HR_PAYROLL_KEY);
-  const b = arr.find(x=>x.batchId===batchId);
-  if(!b) return show('Batch not found');
-  // show details in prompt (simpler than modal)
-  const details = (b.items||[]).map(it=> `${it.employee} — ${formatCurrency(it.amount)} — ${it.bank||'N/A'}`).join('\\n');
-  alert(`Batch ${b.batchId}\\nSubmitted by: ${b.submittedBy}\\nPeriod: ${b.period}\\nTotal: ${formatCurrency(b.total)}\\n\\nItems:\\n${details}`);
-}
-
-function approveBatch(batchId){
-  const arr = read(HR_PAYROLL_KEY);
-  const idx = arr.findIndex(x=>x.batchId===batchId);
-  if(idx === -1) return show('Not found');
-  const batch = arr[idx];
-  if(batch.status && batch.status !== 'pending') return show('Batch already processed');
-
-  // move to finance approved key
-  const approved = read(FIN_APPROVED_KEY);
-  const approvedRecord = Object.assign({}, batch, { approvedBy: 'finance@'+ORG.toLowerCase()+'.local', approvedAt: new Date().toISOString(), paidOn: new Date().toISOString(), status: 'approved' });
-  approved.push(approvedRecord);
-  save(FIN_APPROVED_KEY, approved);
-
-  // mark original HR batch as approved
-  batch.status = 'approved';
-  batch.processedAt = new Date().toISOString();
-  save(HR_PAYROLL_KEY, arr);
-
-  pushAudit('Finance', 'Approved payroll batch', batch.batchId);
-  // notify HR (message push)
-  const msgs = getFinanceMsgs();
-  msgs.push({ id: uid('msg'), from:'finance@'+ORG.toLowerCase()+'.local', to: batch.submittedBy || 'hr@'+ORG.toLowerCase()+'.local', subject: `Payroll batch ${batch.batchId} approved`, body: `Your payroll batch ${batch.batchId} has been approved and paid.`, date: new Date().toISOString() });
-  saveFinanceMsgs(msgs);
-
-  renderPending(); renderApproved(); show('Batch approved & paid');
-}
-
-function rejectBatch(batchId){
-  const arr = read(HR_PAYROLL_KEY);
-  const b = arr.find(x=>x.batchId===batchId);
-  if(!b) return show('Not found');
-  const reason = prompt('Reason for rejection', 'Incorrect totals');
-  b.status = 'rejected';
-  b.rejectedBy = 'finance@'+ORG.toLowerCase()+'.local';
-  b.rejectionReason = reason || '';
-  b.processedAt = new Date().toISOString();
-  save(HR_PAYROLL_KEY, arr);
-  pushAudit('Finance', 'Rejected payroll batch', `${batchId} — ${reason}`);
-  // notify HR
-  const msgs = getFinanceMsgs(); msgs.push({ id: uid('msg'), from: 'finance@'+ORG.toLowerCase()+'.local', to: b.submittedBy || 'hr@'+ORG.toLowerCase()+'.local', subject: `Payroll ${batchId} rejected`, body: reason || 'See notes', date: new Date().toISOString() }); saveFinanceMsgs(msgs);
-  renderPending(); renderMessages(); show('Batch rejected');
-}
-
-/* Bulk approve visible */
-document.getElementById('bulkApproveBtn').addEventListener('click', ()=>{
-  const arr = read(HR_PAYROLL_KEY);
-  const pending = arr.filter(x=> (x.status||'pending') === 'pending');
-  if(!pending.length) return show('No pending batches');
-  if(!confirm(`Approve ${pending.length} pending batches?`)) return;
-  pending.forEach(b => approveBatch(b.batchId));
-  show('Bulk approved');
-});
-
-/* ---------- Advance requests ---------- */
-document.getElementById('newAdvanceBtn').addEventListener('click', ()=>{
-  const employee = prompt('Employee name (email optional)');
-  if(!employee) return show('Cancelled');
-  const amount = Number(prompt('Amount', '0')||0);
-  if(!amount) return show('Invalid amount');
-  const reason = prompt('Reason','') || '';
-  const arr = getAdvances();
-  const req = { requestId: uid('adv'), employee, amount, reason, status: 'pending', requestedAt: new Date().toISOString() };
-  arr.push(req); saveAdvances(arr); pushAudit('Finance', 'Created advance request', req.requestId); renderAdvances(); show('Advance requested');
-});
-
-function approveAdvance(requestId){
-  const arr = getAdvances();
-  const r = arr.find(x=>x.requestId===requestId);
-  if(!r) return show('Not found');
-  r.status = 'approved'; r.approvedAt = new Date().toISOString(); saveAdvances(arr);
-  pushAudit('Finance', 'Approved advance', requestId);
-  show('Advance approved');
-  renderAdvances();
-}
-
-function rejectAdvance(requestId){
-  const arr = getAdvances();
-  const r = arr.find(x=>x.requestId===requestId);
-  if(!r) return show('Not found');
-  const reason = prompt('Reason for rejection','');
-  r.status = 'rejected'; r.rejectionReason = reason || ''; saveAdvances(arr);
-  pushAudit('Finance', 'Rejected advance', requestId+' — '+(reason||''));
-  show('Advance rejected');
-  renderAdvances();
-}
-
-/* ---------- View approved details ---------- */
-function viewApproved(batchId){
-  const arr = read(FIN_APPROVED_KEY);
-  const b = arr.find(x=>x.batchId===batchId);
-  if(!b) return show('Not found');
-  const lines = (b.items||[]).map(it=> `${it.employee} — ${formatCurrency(it.amount)} — ${it.bank||'N/A'}`).join('\\n');
-  alert(`Approved Batch ${b.batchId}\\nApproved by: ${b.approvedBy}\\nPeriod: ${b.period}\\nTotal: ${formatCurrency(b.total)}\\nPaid On: ${b.paidOn}\\n\\nItems:\\n${lines}`);
-}
-
-/* ---------- Exports ---------- */
-document.getElementById('exportPayrollCsv').addEventListener('click', ()=>{
-  const rows = read(FIN_APPROVED_KEY).map(b => ({ batchId: b.batchId, approvedBy: b.approvedBy, period: b.period, total: b.total, paidOn: b.paidOn }));
-  if(!rows.length) return show('No approved payroll to export');
-  exportCSV(rows, `${ORG}_approved_payroll_${Date.now()}.csv`);
-});
-
-document.getElementById('exportPayrollPdf').addEventListener('click', ()=>{
-  const approved = read(FIN_APPROVED_KEY).slice().reverse();
-  if(!approved.length) return show('No approved payroll');
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF('p','pt','a4'); doc.setFontSize(14); doc.text(`${ORG} — Approved Payroll`, 40, 40); let y=70;
-  approved.forEach((b,i)=>{
-    doc.text(`${i+1}. ${b.batchId} • ${b.period} • ${formatCurrency(b.total)} • ${b.paidOn ? new Date(b.paidOn).toLocaleString() : '—'}`, 40, y);
-    y+=14; if(y>720){ doc.addPage(); y=40; }
-  });
-  doc.save(`${ORG}_approved_payroll_${Date.now()}.pdf`);
-});
-
-/* ---------- CSV helper ---------- */
-function exportCSV(rows, filename){
-  if(!rows.length) return;
-  const keys = Object.keys(rows[0]);
-  const lines = [keys.join(',')];
-  rows.forEach(r=> lines.push(keys.map(k=>`"${String(r[k]||'').replace(/"/g,'""')}"`).join(',')));
-  const blob = new Blob([lines.join('\\n')], { type:'text/csv' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
-}
-
-/* ---------- Helper: format currency ---------- */
-function formatCurrency(n){ const fmt = new Intl.NumberFormat(undefined,{ style:'currency', currency: 'GHS', maximumFractionDigits:2 }); try{ return fmt.format(Number(n||0)) }catch(e){ return 'GHS ' + Number(n||0).toFixed(2) } }
-
-/* ---------- Teacher attendance sync rendering ---------- */
-function renderTeacherSync(){
-  const arr1 = read(TEACH_ATT_KEY) || [];
-  const arr2 = read(ORG_ATT_KEY) || [];
-  const all = (arr1.concat(arr2)).slice().reverse();
-  const el = document.getElementById('kpiEmployees'); // reuse KPI to show employees count too
-  document.getElementById('kpiEmployees').textContent = /* fallback count */ (read(`${ORG}_employees`) || []).length || all.length || 0;
-  const widget = document.getElementById('teacherSync');
-  const joined = all.slice(0,5).map(a => `${a.email||a.employee||a.name||'T'} ${a.action||''} @ ${new Date(a.date||a.time||a.createdAt||Date.now()).toLocaleTimeString()}`).join('\\n');
-  widget && (widget.textContent = all.length ? (all[0].email||all[0].employee||'Teacher') + ' — ' + (all[0].action||'') + ' — ' + new Date(all[0].date||all[0].time||Date.now()).toLocaleString() : 'No teacher attendance records');
-}
-
-/* ---------- Render everything ---------- */
-function renderAll(){
-  renderPending();
-  renderApproved();
-  renderAdvances();
-  renderMessages();
-  renderAudit();
-  renderTeacherSync();
-}
-renderAll();
-
-/* ---------- Wire refresh button ---------- */
-document.getElementById('refreshBtn').addEventListener('click', ()=>{ renderAll(); show('Refreshed') });
-document.getElementById('refreshPending').addEventListener('click', ()=>{ renderPending(); show('Pending refreshed') });
-
-/* ---------- Storage sync across tabs (teacher pages push attendance) ---------- */
-window.addEventListener('storage', (e)=>{
-  const keys = [HR_PAYROLL_KEY, FIN_APPROVED_KEY, `${ORG}_salary_advances`, FIN_MSG_KEY, FIN_AUDIT_KEY, TEACH_ATT_KEY, ORG_ATT_KEY];
-  if(keys.includes(e.key)){
-    // small debounce
-    setTimeout(()=> renderAll(), 120);
-  }
-});
-
-/* expose small API for HR pages to push payroll batches and teacher attendance */
-window.financeAPI = {
-  pushPayrollBatch: function(batch){
-    const arr = read(HR_PAYROLL_KEY);
-    batch.batchId = batch.batchId || uid('batch');
-    batch.status = 'pending';
-    batch.submittedAt = new Date().toISOString();
-    arr.push(batch);
-    save(HR_PAYROLL_KEY, arr);
-    pushAudit('HR', 'Submitted payroll batch', batch.batchId);
-    renderAll();
-    return batch.batchId;
-  },
-  markApproved: function(batchId){
-    approveBatch(batchId);
-  },
-  pushTeacherAttendance: function(rec){
-    const arr = read(TEACH_ATT_KEY);
-    arr.push(Object.assign({}, rec, { createdAt: new Date().toISOString() }));
-    save(TEACH_ATT_KEY, arr);
-    renderTeacherSync();
-  }
-};
-</script>
 </body>
 </html>
