@@ -304,7 +304,49 @@
 <div class="toast" id="toast"></div>
 
 <script>
- 
+ /* ---------------------------
+   HR → FINANCE PAYROLL SENDER
+---------------------------*/
+document.getElementById('sendToFinance').addEventListener('click', ()=> {
+
+  const id = document.getElementById('payEmployeeSelect').value;
+  if(!id) return alert("Select employee first.");
+
+  const employees = read(EMP_KEY);
+  const emp = employees.find(e=> e.id === id);
+
+  if(!emp) return alert("Employee not found.");
+
+  const bonus = Number(document.getElementById('bonus').value) || 0;
+  const deductions = Number(document.getElementById('deductions').value) || 0;
+  const gross = Number(emp.salary || 0) + bonus;
+  const tax = Math.round(gross * 0.12);
+  const net = gross - tax - deductions;
+
+  const request = {
+    id: "finreq_" + Date.now(),
+    employeeId: emp.id,
+    employeeName: emp.name,
+    salary: emp.salary,
+    bonus,
+    deductions,
+    gross,
+    tax,
+    net,
+    status: "PENDING",
+    sentBy: currentUser.name,
+    sentAt: new Date().toISOString()
+  };
+
+  const inbox = read(FINANCE_INBOX_KEY);
+  inbox.push(request);
+  save(FINANCE_INBOX_KEY, inbox);
+
+  pushActivity(`Payroll for ${emp.name} sent to Finance`);
+  showToast("Payroll request sent to Finance.");
+
+});
+
 /* ----------------------------
   Utilities & Namespaced Keys
 -----------------------------*/
@@ -338,6 +380,9 @@ if(!localStorage.getItem(PAY_KEY)) save(PAY_KEY, []);
 if(!localStorage.getItem(ANN_KEY)) save(ANN_KEY, []);
 if(!localStorage.getItem(ACT_KEY)) save(ACT_KEY, []);
 if(!localStorage.getItem(DEPT_KEY)) save(DEPT_KEY, ['HR','Finance','Admin','Teaching']);
+/* Payroll Requests sent from HR to Finance */
+const FINANCE_INBOX_KEY = key('finance_inbox');
+if(!localStorage.getItem(FINANCE_INBOX_KEY)) save(FINANCE_INBOX_KEY, []);
 
 /* --- Current user (role simulation) --- */
 let currentUser = safeParse(localStorage.getItem('hr_current_user')) || { name:'Admin', email:'hr@org.local', role:'hr' };
