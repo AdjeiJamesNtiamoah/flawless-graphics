@@ -695,6 +695,7 @@ function loadPendingPayroll() {
                 <button class="btn success" onclick="approvePayroll('${p.batchId}')">Approve</button>
             </td>
         </tr>
+        
         `;
     });
 }
@@ -1232,5 +1233,203 @@ document.addEventListener("DOMContentLoaded", loadSalarySheets);
 <!-- Toast Notification -->
 <div id="toast"></div>
       </section>
+<script>      
+/* ---------- Batch view / approve / reject ---------- */
+function viewBatch(batchId){
+  const arr = read(HR_PAYROLL_KEY);
+  const b = arr.find(x=>x.batchId===batchId);
+  if(!b) return show('Batch not found');
+  // show details in prompt (simpler than modal)
+  const details = (b.items||[]).map(it=> `${it.employee} — ${formatCurrency(it.amount)} — ${it.bank||'N/A'}`).join('\\n');
+  alert(`Batch ${b.batchId}\\nSubmitted by: ${b.submittedBy}\\nPeriod: ${b.period}\\nTotal: ${formatCurrency(b.total)}\\n\\nItems:\\n${details}`);
+}
+
+function approveBatch(batchId){
+  const arr = read(HR_PAYROLL_KEY);
+  const idx = arr.findIndex(x=>x.batchId===batchId);
+  if(idx === -1) return show('Not found');
+  const batch = arr[idx];
+  if(batch.status && batch.status !== 'pending') return show('Batch already processed');
+
+  // move to finance approved key
+  const approved = read(FIN_APPROVED_KEY);
+  const approvedRecord = Object.assign({}, batch, { approvedBy: 'finance@'+ORG.toLowerCase()+'.local', approvedAt: new Date().toISOString(), paidOn: new Date().toISOString(), status: 'approved' });
+  approved.push(approvedRecord);
+  save(FIN_APPROVED_KEY, approved);
+
+  // mark original HR batch as approved
+  batch.status = 'approved';
+  batch.processedAt = new Date().toISOString();
+  save(HR_PAYROLL_KEY, arr);
+
+  pushAudit('Finance', 'Approved payroll batch', batch.batchId);
+  // notify HR (message push)
+  const msgs = getFinanceMsgs();
+  msgs.push({ id: uid('msg'), from:'finance@'+ORG.toLowerCase()+'.local', to: batch.submittedBy || 'hr@'+ORG.toLowerCase()+'.local', subject: `Payroll batch ${batch.batchId} approved`, body: `Your payroll batch ${batch.batchId} has been approved and paid.`, date: new Date().toISOString() });
+  saveFinanceMsgs(msgs);
+
+  renderPending(); renderApproved(); show('Batch approved & paid');
+}
+
+function rejectBatch(batchId){
+  const arr = read(HR_PAYROLL_KEY);
+  const b = arr.find(x=>x.batchId===batchId);
+  if(!b) return show('Not found');
+  const reason = prompt('Reason for rejection', 'Incorrect totals');
+  b.status = 'rejected';
+  b.rejectedBy = 'finance@'+ORG.toLowerCase()+'.local';
+  b.rejectionReason = reason || '';
+  b.processedAt = new Date().toISOString();
+  save(HR_PAYROLL_KEY, arr);
+  pushAudit('Finance', 'Rejected payroll batch', `${batchId} — ${reason}`);
+  // notify HR
+  const msgs = getFinanceMsgs(); msgs.push({ id: uid('msg'), from: 'finance@'+ORG.toLowerCase()+'.local', to: b.submittedBy || 'hr@'+ORG.toLowerCase()+'.local', subject: `Payroll ${batchId} rejected`, body: reason || 'See notes', date: new Date().toISOString() }); saveFinanceMsgs(msgs);
+  renderPending(); renderMessages(); show('Batch rejected');
+}
+
+/* Bulk approve visible */
+document.getElementById('bulkApproveBtn').addEventListener('click', ()=>{
+  const arr = read(HR_PAYROLL_KEY);
+  const pending = arr.filter(x=> (x.status||'pending') === 'pending');
+  if(!pending.length) return show('No pending batches');
+  if(!confirm(`Approve ${pending.length} pending batches?`)) return;
+  pending.forEach(b => approveBatch(b.batchId));
+  show('Bulk approved');
+});
+
+/* ---------- Advance requests ---------- */
+document.getElementById('newAdvanceBtn').addEventListener('click', ()=>{
+  const employee = prompt('Employee name (email optional)');
+  if(!employee) return show('Cancelled');
+  const amount = Number(prompt('Amount', '0')||0);
+  if(!amount) return show('Invalid amount');
+  const reason = prompt('Reason','') || '';
+  const arr = getAdvances();
+  const req = { requestId: uid('adv'), employee, amount, reason, status: 'pending', requestedAt: new Date().toISOString() };
+  arr.push(req); saveAdvances(arr); pushAudit('Finance', 'Created advance request', req.requestId); renderAdvances(); show('Advance requested');
+});
+
+function approveAdvance(requestId){
+  const arr = getAdvances();
+  const r = arr.find(x=>x.requestId===requestId);
+  if(!r) return show('Not found');
+  r.status = 'approved'; r.approvedAt = new Date().toISOString(); saveAdvances(arr);
+  pushAudit('Finance', 'Approved advance', requestId);
+  show('Advance approved');
+  renderAdvances();
+}
+
+function rejectAdvance(requestId){
+  const arr = getAdvances();
+  const r = arr.find(x=>x.requestId===requestId);
+  if(!r) return show('Not found');
+  const reason = prompt('Reason for rejection','');
+  r.status = 'rejected'; r.rejectionReason = reason || ''; saveAdvances(arr);
+  pushAudit('Finance', 'Rejected advance', requestId+' — '+(reason||''));
+  show('Advance rejected');
+  renderAdvances();
+}
+
+/* ---------- View approved details ---------- */
+function viewApproved(batchId){
+  const arr = read(FIN_APPROVED_KEY);
+  const b = arr.find(x=>x.batchId===batchId);
+  if(!b) return show('Not found');
+  const lines = (b.items||[]).map(it=> `${it.employee} — ${formatCurrency(it.amount)} — ${it.bank||'N/A'}`).join('\\n');
+  alert(`Approved Batch ${b.batchId}\\nApproved by: ${b.approvedBy}\\nPeriod: ${b.period}\\nTotal: ${formatCurrency(b.total)}\\nPaid On: ${b.paidOn}\\n\\nItems:\\n${lines}`);
+}
+
+/* ---------- Exports ---------- */
+document.getElementById('exportPayrollCsv').addEventListener('click', ()=>{
+  const rows = read(FIN_APPROVED_KEY).map(b => ({ batchId: b.batchId, approvedBy: b.approvedBy, period: b.period, total: b.total, paidOn: b.paidOn }));
+  if(!rows.length) return show('No approved payroll to export');
+  exportCSV(rows, `${ORG}_approved_payroll_${Date.now()}.csv`);
+});
+
+document.getElementById('exportPayrollPdf').addEventListener('click', ()=>{
+  const approved = read(FIN_APPROVED_KEY).slice().reverse();
+  if(!approved.length) return show('No approved payroll');
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p','pt','a4'); doc.setFontSize(14); doc.text(`${ORG} — Approved Payroll`, 40, 40); let y=70;
+  approved.forEach((b,i)=>{
+    doc.text(`${i+1}. ${b.batchId} • ${b.period} • ${formatCurrency(b.total)} • ${b.paidOn ? new Date(b.paidOn).toLocaleString() : '—'}`, 40, y);
+    y+=14; if(y>720){ doc.addPage(); y=40; }
+  });
+  doc.save(`${ORG}_approved_payroll_${Date.now()}.pdf`);
+});
+
+/* ---------- CSV helper ---------- */
+function exportCSV(rows, filename){
+  if(!rows.length) return;
+  const keys = Object.keys(rows[0]);
+  const lines = [keys.join(',')];
+  rows.forEach(r=> lines.push(keys.map(k=>`"${String(r[k]||'').replace(/"/g,'""')}"`).join(',')));
+  const blob = new Blob([lines.join('\\n')], { type:'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+}
+
+/* ---------- Helper: format currency ---------- */
+function formatCurrency(n){ const fmt = new Intl.NumberFormat(undefined,{ style:'currency', currency: 'GHS', maximumFractionDigits:2 }); try{ return fmt.format(Number(n||0)) }catch(e){ return 'GHS ' + Number(n||0).toFixed(2) } }
+
+/* ---------- Teacher attendance sync rendering ---------- */
+function renderTeacherSync(){
+  const arr1 = read(TEACH_ATT_KEY) || [];
+  const arr2 = read(ORG_ATT_KEY) || [];
+  const all = (arr1.concat(arr2)).slice().reverse();
+  const el = document.getElementById('kpiEmployees'); // reuse KPI to show employees count too
+  document.getElementById('kpiEmployees').textContent = /* fallback count */ (read(`${ORG}_employees`) || []).length || all.length || 0;
+  const widget = document.getElementById('teacherSync');
+  const joined = all.slice(0,5).map(a => `${a.email||a.employee||a.name||'T'} ${a.action||''} @ ${new Date(a.date||a.time||a.createdAt||Date.now()).toLocaleTimeString()}`).join('\\n');
+  widget && (widget.textContent = all.length ? (all[0].email||all[0].employee||'Teacher') + ' — ' + (all[0].action||'') + ' — ' + new Date(all[0].date||all[0].time||Date.now()).toLocaleString() : 'No teacher attendance records');
+}
+
+/* ---------- Render everything ---------- */
+function renderAll(){
+  renderPending();
+  renderApproved();
+  renderAdvances();
+  renderMessages();
+  renderAudit();
+  renderTeacherSync();
+}
+renderAll();
+
+/* ---------- Wire refresh button ---------- */
+document.getElementById('refreshBtn').addEventListener('click', ()=>{ renderAll(); show('Refreshed') });
+document.getElementById('refreshPending').addEventListener('click', ()=>{ renderPending(); show('Pending refreshed') });
+
+/* ---------- Storage sync across tabs (teacher pages push attendance) ---------- */
+window.addEventListener('storage', (e)=>{
+  const keys = [HR_PAYROLL_KEY, FIN_APPROVED_KEY, `${ORG}_salary_advances`, FIN_MSG_KEY, FIN_AUDIT_KEY, TEACH_ATT_KEY, ORG_ATT_KEY];
+  if(keys.includes(e.key)){
+    // small debounce
+    setTimeout(()=> renderAll(), 120);
+  }
+});
+
+/* expose small API for HR pages to push payroll batches and teacher attendance */
+window.financeAPI = {
+  pushPayrollBatch: function(batch){
+    const arr = read(HR_PAYROLL_KEY);
+    batch.batchId = batch.batchId || uid('batch');
+    batch.status = 'pending';
+    batch.submittedAt = new Date().toISOString();
+    arr.push(batch);
+    save(HR_PAYROLL_KEY, arr);
+    pushAudit('HR', 'Submitted payroll batch', batch.batchId);
+    renderAll();
+    return batch.batchId;
+  },
+  markApproved: function(batchId){
+    approveBatch(batchId);
+  },
+  pushTeacherAttendance: function(rec){
+    const arr = read(TEACH_ATT_KEY);
+    arr.push(Object.assign({}, rec, { createdAt: new Date().toISOString() }));
+    save(TEACH_ATT_KEY, arr);
+    renderTeacherSync();
+  }
+};
+</script>
 </body>
 </html>
