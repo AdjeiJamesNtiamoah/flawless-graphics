@@ -846,20 +846,6 @@ window.openEdit = openEdit;
 --------------------------*/
 console.log('Upgraded HR Dashboard loaded — All features wired locally.');
 </script>
-  <script>
-function sendPayrollToFinance() {
-    const payroll = JSON.parse(localStorage.getItem("hr_payroll") || "[]");
-
-    if (payroll.length === 0) {
-        alert("No payroll data available.");
-        return;
-    }
-
-    localStorage.setItem("finance_pending_payroll", JSON.stringify(payroll));
-
-    showToast("Payroll sent to Finance for approval");
-}
-</script>
 
 </body>
 </html>
