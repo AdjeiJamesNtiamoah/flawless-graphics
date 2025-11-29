@@ -784,7 +784,9 @@ window.financeAPI = {
     renderTeacherSync();
   }
 };
-      <script>
+
+
+      
 function loadPendingPayroll() {
     const table = document.querySelector("#pendingPayrollTable tbody");
     table.innerHTML = "";
@@ -808,8 +810,7 @@ function loadPendingPayroll() {
     });
 }
 loadPendingPayroll();
-</script>
-<script>
+      
 function addPaymentAccount() {
     let accounts = JSON.parse(localStorage.getItem("finance_accounts") || "[]");
 
@@ -843,8 +844,7 @@ function loadAccounts() {
     });
 }
 loadAccounts();
-</script>
-<script>
+
 let activePayrollIndex = null;
 
 function openPaymentScreen(index) {
@@ -876,7 +876,7 @@ function confirmPayment() {
     loadPendingPayroll();
     alert("Payment successful!");
 }
-</script>
+
 </script>
 </body>
 </html>
