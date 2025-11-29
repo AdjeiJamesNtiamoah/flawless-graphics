@@ -845,6 +845,217 @@ window.addEventListener('storage', (e)=>{
 });
 
 </script>
+<!-- ===========================
+     PART 3 — Login Modal + Payslip Export + Bank Stub UI
+     =========================== -->
+
+<!-- LOGIN / SESSION UI -->
+<style>
+  /* small login modal styles */
+  #loginModal { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(2,6,23,0.55); z-index:9999; }
+  #loginCard{ width:360px; background:var(--panel); border-radius:12px; padding:18px; box-shadow:var(--shadow-2); }
+  #loginCard h3{ margin:0 0 8px 0; font-size:18px }
+  .login-field{ width:100%; padding:10px 12px; margin-bottom:8px; border-radius:8px; border:1px solid var(--card-border); background:var(--panel); color:var(--text) }
+  #sessionBar{ display:flex; gap:8px; align-items:center; margin-left:12px; font-weight:700; color:var(--muted) }
+  #logoutBtn{ padding:6px 10px; border-radius:8px; border:0; cursor:pointer; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#021; font-weight:700 }
+  .hidden{ display:none!important; }
+</style>
+
+<!-- session & login area in header -->
+<div id="sessionBarContainer" style="position:absolute; right:28px; top:18px; z-index:40;">
+  <span id="sessionBar">Not signed in</span>
+  <button id="logoutBtn" style="display:none">Logout</button>
+</div>
+
+<!-- Login modal -->
+<div id="loginModal" class="hidden" aria-hidden="true">
+  <div id="loginCard">
+    <h3>Sign in to <span id="orgNameLogin"></span></h3>
+    <input id="loginEmail" class="login-field" placeholder="Email (e.g., hr@flawless.local)">
+    <input id="loginPassword" class="login-field" type="password" placeholder="Password">
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" id="loginCancelBtn">Cancel</button>
+      <button class="btn primary" id="loginSubmitBtn">Sign in</button>
+    </div>
+    <div class="tiny" style="margin-top:8px">Demo accounts: <b>hr@flawless.local / hr123</b>, <b>finance@flawless.local / fin123</b></div>
+  </div>
+</div>
+
+<script>
+/* ----------------------------
+   PART 3: Login modal + session UI
+   ----------------------------*/
+
+(function(){
+  const ORG_NAME = document.getElementById('orgDisplay') ? document.getElementById('orgDisplay').textContent : (localStorage.getItem('active_org')||'FLAWLESS');
+  document.getElementById('orgNameLogin').textContent = ORG_NAME;
+
+  const USERS_KEY = `${ORG}_users`; // from earlier code
+  // ensure seeded users exist (non-destructive)
+  const seeded = read(USERS_KEY);
+  if(!seeded || !seeded.length){
+    save(USERS_KEY, [
+      { email: 'hr@'+ORG.toLowerCase()+'.local', password: 'hr123', role: 'hr', name:'HR Admin' },
+      { email: 'finance@'+ORG.toLowerCase()+'.local', password: 'fin123', role: 'finance', name:'Finance Officer' }
+    ]);
+  }
+
+  const loginModal = document.getElementById('loginModal');
+  const loginEmail = document.getElementById('loginEmail');
+  const loginPassword = document.getElementById('loginPassword');
+  const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+  const loginCancelBtn = document.getElementById('loginCancelBtn');
+  const sessionBar = document.getElementById('sessionBar');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  // show login modal (used on initial require)
+  function showLoginModal(){
+    loginEmail.value = '';
+    loginPassword.value = '';
+    loginModal.classList.remove('hidden');
+    loginModal.setAttribute('aria-hidden','false');
+  }
+
+  // hide modal
+  function hideLoginModal(){
+    loginModal.classList.add('hidden');
+    loginModal.setAttribute('aria-hidden','true');
+  }
+
+  // set session UI
+  function updateSessionUI(){
+    const s = safeParse(localStorage.getItem(`${ORG}_session`));
+    if(!s){
+      sessionBar.textContent = 'Not signed in';
+      logoutBtn.style.display = 'none';
+    } else {
+      sessionBar.textContent = `${s.name} • ${s.role.toUpperCase()}`;
+      logoutBtn.style.display = 'inline-block';
+    }
+    applyRoleUI(); // reapply role-based UI
+  }
+
+  loginSubmitBtn.addEventListener('click', ()=>{
+    const email = loginEmail.value.trim();
+    const pwd = loginPassword.value;
+    if(!email || !pwd) return alert('Provide credentials');
+    const users = read(USERS_KEY);
+    const u = users.find(x=> x.email.toLowerCase() === email.toLowerCase() && x.password === pwd);
+    if(!u){ alert('Invalid credentials'); return; }
+    const session = { email: u.email, name: u.name, role: u.role, loggedAt: new Date().toISOString() };
+    localStorage.setItem(`${ORG}_session`, JSON.stringify(session));
+    hideLoginModal();
+    updateSessionUI();
+    showToast(`Signed in as ${u.name}`);
+    renderAll();
+  });
+
+  loginCancelBtn.addEventListener('click', ()=>{
+    hideLoginModal();
+  });
+
+  // logout
+  logoutBtn.addEventListener('click', ()=>{
+    localStorage.removeItem(`${ORG}_session`);
+    updateSessionUI();
+    // show login modal to re-login
+    setTimeout(()=> showLoginModal(), 250);
+  });
+
+  // expose requireLogin replacement that shows modal if no session
+  window.requireLogin = function(){
+    const s = safeParse(localStorage.getItem(`${ORG}_session`));
+    if(!s){ showLoginModal(); throw new Error('Login required'); }
+    return s;
+  };
+
+  // initialize UI on load
+  updateSessionUI();
+  // if no session, auto open login modal (friendly)
+  if(!safeParse(localStorage.getItem(`${ORG}_session`))) showLoginModal();
+})();
+</script>
+
+<!-- =============================
+    PART 3: Export all payslips for an approved batch (button wiring)
+    ============================= -->
+<script>
+/* Export payslips for selected approved batch:
+   - UI: when viewing Approved Payroll, user can click "Details" then "Export Payslips"
+   - For simplicity we add a function that finds a batch and exports payslips using jsPDF (one file per employee)
+*/
+
+function viewApproved(batchId){
+  const arr = read(FIN_APPROVED_KEY);
+  const b = arr.find(x=> x.batchId === batchId);
+  if(!b) return showToast('Not found');
+  // show prompt with option to export payslips
+  const details = (b.items||[]).map(it=> `${it.employee} — ${formatCurrency(it.amount)} — ${it.account || 'N/A'}`).join('\\n');
+  if(confirm(`Batch ${b.batchId}\\nTotal ${formatCurrency(b.total)}\\n\\nOpen export payslips for this batch?`)){
+    // generate payslip PDFs one-by-one
+    (b.items || []).forEach(it => {
+      const doc = generatePayslipPdf(it.employee, b.period||'—', it.gross||it.amount, it.deductions||0, it.net||it.amount, { notes: it.notes || '' });
+      doc.save(`${b.batchId}_${it.employee.replace(/\\s+/g,'_')}_payslip.pdf`);
+    });
+    showToast('Payslips exported');
+  } else {
+    alert('Batch details:\\n' + details);
+  }
+}
+</script>
+
+<!-- =============================
+    PART 3: Mock Bank/MoMo Integration — visible test / webhook stub
+    ============================= -->
+<style>
+  #bankStubArea { position:fixed; left:18px; bottom:18px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#021; padding:10px; border-radius:10px; font-weight:700; box-shadow:0 12px 36px rgba(3,18,36,0.12); z-index:30; }
+  #bankStubArea button{ margin-left:8px; padding:6px 8px; border-radius:8px; border:0; cursor:pointer; }
+</style>
+
+<div id="bankStubArea" title="Demo bank / MoMo stub">
+  BANK STUB
+  <button id="simulateCallbackBtn">Simulate Callback</button>
+</div>
+
+<script>
+/* The "simulate callback" will mark latest pending payment as paid by mimicking bank success.
+   Useful for testing without a real bank integration.
+*/
+document.getElementById('simulateCallbackBtn').addEventListener('click', ()=>{
+  const logs = read(PAYMENTS_LOG_KEY);
+  if(!logs.length) return alert('No recent payment to callback');
+  // mark last payment record success if not yet successful
+  const last = logs[logs.length-1];
+  last.callback = { success: true, timestamp: new Date().toISOString(), note: 'Simulated bank callback' };
+  save(PAYMENTS_LOG_KEY, logs);
+  showToast('Simulated bank callback applied');
+  pushAudit('System','Simulated bank callback', last.id || '');
+});
+</script>
+
+<!-- =============================
+    PART 3: Final small polish - ensure session bar present on header and role-based UI applied
+    ============================= -->
+<script>
+/* Ensure session bar text and role UI are applied after everything loaded */
+setTimeout(()=> {
+  // create roleDisplay span if doesn't exist (used earlier code)
+  if(!document.getElementById('roleDisplay')){
+    const s = document.createElement('span'); s.id='roleDisplay'; s.style.marginLeft='8px';
+    const parent = document.querySelector('.header .title');
+    if(parent) parent.appendChild(s);
+  }
+  // reflect session
+  const sess = safeParse(localStorage.getItem(`${ORG}_session`));
+  if(sess){
+    document.getElementById('sessionBar').textContent = `${sess.name} • ${sess.role.toUpperCase()}`;
+    document.getElementById('logoutBtn').style.display = 'inline-block';
+  } else {
+    document.getElementById('sessionBar').textContent = 'Not signed in';
+  }
+  applyRoleUI();
+}, 250);
+</script>
 
 </body>
 </html>
