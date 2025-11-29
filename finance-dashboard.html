@@ -1,341 +1,234 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Finance Dashboard — Flawless Graphics</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Finance Dashboard — Flawless Graphics (Glassmorphism)</title>
 
-<!-- Font Awesome -->
-<link rel="stylesheet" 
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<!-- jsPDF (PDF export) -->
+<!-- Icons & libs -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-:root {
-    --primary: #00c3ff;
-    --secondary: #00ffbb;
-    --dark: #001f3f;
-    --light-dark: #0b2b55;
-    --bg: #f2f6ff;
-    --card-bg: #ffffff;
+  /* ===== Glassmorphism Premium Theme ===== */
+  :root{
+    --bg: linear-gradient(180deg, rgba(245,248,251,1) 0%, rgba(239,246,255,1) 100%);
+    --glass-bg: rgba(255,255,255,0.62);
+    --glass-border: rgba(255,255,255,0.45);
+    --panel-shadow: 0 10px 30px rgba(8,20,40,0.08);
+    --accent1: #6b5fff;
+    --accent2: #00e0ff;
+    --muted: #6b7280;
+    --text: #072031;
     --radius: 14px;
-}
+    --glass-blur: 10px;
+    --success: #10b981;
+    --danger: #ef4444;
+  }
 
-body {
-    margin: 0;
-    background: var(--bg);
-    font-family: Poppins, Arial;
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
-}
+  html,body{height:100%;margin:0;font-family:Inter, "Poppins", system-ui, Arial; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased;}
 
-/* SIDEBAR */
-.sidebar {
-    width: 260px;
-    background: var(--dark);
-    color: white;
-    padding: 25px 0;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 4px 0 14px rgba(0,0,0,0.25);
-}
+  .app {
+    max-width:1200px;
+    margin:28px auto;
+    display:grid;
+    grid-template-columns: 260px 1fr;
+    gap:20px;
+    align-items:start;
+    padding:0 18px;
+  }
 
-.sidebar h2 {
-    text-align: center;
-    margin-bottom: 25px;
-    font-size: 22px;
-    letter-spacing: 1px;
-}
+  /* ----- SIDEBAR (glass) ----- */
+  .sidebar{
+    background: linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0.30));
+    border-radius:var(--radius);
+    padding:18px;
+    backdrop-filter: blur(var(--glass-blur));
+    border:1px solid var(--glass-border);
+    box-shadow:var(--panel-shadow);
+    height:calc(100vh - 56px);
+    position:sticky; top:28px;
+  }
+  .brand { display:flex; gap:12px; align-items:center; margin-bottom:12px; }
+  .logo { width:46px; height:46px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:800;
+    background:linear-gradient(135deg,var(--accent1),var(--accent2)); color:#031224; box-shadow:0 8px 20px rgba(107,95,255,0.12);}
+  .orgName { font-weight:800; font-size:16px;}
+  .small { color:var(--muted); font-size:13px; }
 
-.nav-item {
-    padding: 15px 25px;
-    cursor: pointer;
-    display: flex;
-    gap: 14px;
-    align-items: center;
-    color: #cde6ff;
-    transition: .2s;
-}
+  .nav { margin-top:10px; display:flex; flex-direction:column; gap:8px; }
+  .nav .item { display:flex; gap:12px; align-items:center; padding:10px; border-radius:10px; cursor:pointer; color: #072031; font-weight:700; background: rgba(255,255,255,0.4); border:1px solid transparent; transition:all .18s; }
+  .nav .item:hover { transform:translateY(-3px); box-shadow:0 8px 22px rgba(3,18,36,0.06); background: linear-gradient(90deg, rgba(255,255,255,0.86), rgba(255,255,255,0.72)); }
+  .nav .item.active { background: linear-gradient(90deg,var(--accent1),var(--accent2)); color:#021; box-shadow:0 12px 36px rgba(107,95,255,0.12); }
 
-.nav-item:hover {
-    background: var(--light-dark);
-    color: white;
-}
+  .sidebar .footer { margin-top:auto; display:flex; gap:8px; align-items:center; justify-content:space-between; }
 
-.nav-item i {
-    width: 22px;
-}
+  /* ----- MAIN area ----- */
+  .main {
+    min-height:calc(100vh - 56px);
+    background: linear-gradient(180deg, rgba(255,255,255,0.7), rgba(250,252,255,0.92));
+    border-radius:var(--radius);
+    padding:18px;
+    backdrop-filter: blur(6px);
+    border:1px solid var(--glass-border);
+    box-shadow:var(--panel-shadow);
+  }
 
-/* MAIN CONTENT */
-.content {
-    flex: 1;
-    padding: 25px;
-    overflow-y: auto;
-}
+  .header { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px; }
+  .title { font-size:18px; font-weight:800; display:flex; gap:12px; align-items:center;}
+  .controls { display:flex; gap:8px; align-items:center; }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-}
+  .btn { padding:8px 12px; border-radius:10px; border:0; cursor:pointer; font-weight:800; }
+  .btn.ghost { background:transparent; border:1px solid rgba(3,18,36,0.05); color:var(--text); }
+  .btn.primary { background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#021; box-shadow:0 10px 26px rgba(11,27,46,0.08); }
+  .btn.success { background:var(--success); color:white; }
+  .btn.danger { background:var(--danger); color:white; }
 
-.header .title {
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--dark);
-}
+  /* KPI grid */
+  .kpi-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:12px; margin-bottom:14px; }
+  .kpi { padding:14px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,255,255,0.7)); border:1px solid rgba(3,18,36,0.03); box-shadow:0 10px 24px rgba(8,20,40,0.04); display:flex; gap:12px; align-items:center; }
+  .kpi i{ padding:8px; border-radius:8px; background:rgba(3,18,36,0.04); color:var(--accent2); }
+  .kpi .value { font-weight:900; font-size:20px; }
+  .kpi .label { color:var(--muted); font-size:13px; }
 
-.header-right {
-    display: flex;
-    gap: 10px;
-}
+  /* card sections */
+  .card { margin-bottom:14px; border-radius:12px; padding:14px; background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.72)); border:1px solid rgba(3,18,36,0.03); box-shadow:0 10px 30px rgba(8,20,40,0.04); }
+  .card-title { font-weight:800; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; }
+  .table-wrap { overflow:auto; border-radius:10px; }
+  table { width:100%; border-collapse:collapse; min-width:700px; }
+  thead th { text-align:left; font-size:13px; color:var(--muted); padding:10px; border-bottom:1px solid rgba(3,18,36,0.06); position:sticky; top:0; background:transparent; }
+  tbody td { padding:10px; border-bottom:1px solid rgba(3,18,36,0.03); font-size:14px; color:var(--text); }
 
-.btn {
-    padding: 10px 14px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 600;
-}
+  .status-pill { display:inline-block; padding:6px 10px; border-radius:999px; font-weight:800; font-size:12px; color:#fff; }
+  .pending { background:#f59e0b; }
+  .approved { background:var(--success); }
+  .paid { background:var(--success); }
+  .rejected { background:var(--danger); }
 
-.btn.primary { background: var(--primary); color: white; }
-.btn.success { background: var(--secondary); color: #002d1f; }
-.btn.danger { background: #ff4444; color: white; }
-.btn.light { background: #e6f0ff; color: #002244; }
+  /* teacher widget */
+  #teacherSync { margin-bottom:12px; padding:12px; border-radius:12px; background:linear-gradient(90deg, rgba(0,224,255,0.06), rgba(107,95,255,0.04)); color:var(--text); }
 
-/* CARDS */
-.card {
-    background: var(--card-bg);
-    padding: 20px;
-    border-radius: var(--radius);
-    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-    margin-bottom: 20px;
-}
+  /* modal */
+  .modal-backdrop { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(3,18,36,0.35); z-index:999; }
+  .modal-backdrop.show { display:flex; }
+  .modal { width:720px; max-width:94%; border-radius:12px; padding:18px; background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9)); border:1px solid rgba(3,18,36,0.04); box-shadow:0 20px 50px rgba(3,18,36,0.18); }
+  .form-row { display:flex; gap:8px; margin-bottom:8px; }
+  .input, select, textarea { padding:10px 12px; border-radius:10px; border:1px solid rgba(3,18,36,0.06); background:rgba(255,255,255,0.9); color:var(--text); width:100%; }
+  textarea { min-height:96px; resize:vertical; }
 
-.card-title {
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 10px;
-}
+  /* responsive */
+  @media (max-width:980px){
+    .app { grid-template-columns: 1fr; margin:12px; }
+    .sidebar{ position:relative; height:auto; top:auto; }
+    .modal{ width:92%; }
+  }
 
-/* GRID */
-.grid {
-    display: grid;
-    gap: 20px;
-}
-
-.kpi {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    background: var(--card-bg);
-    padding: 18px;
-    border-radius: var(--radius);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.kpi i {
-    font-size: 28px;
-    color: var(--primary);
-}
-
-.kpi .value {
-    font-size: 24px;
-    font-weight: 800;
-}
-
-.kpi .label {
-    color: #6c7a8a;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th, td {
-    padding: 12px;
-    border-bottom: 1px solid #e2e8f0;
-    font-size: 14px;
-}
-
-/* Toast */
-#toast {
-    position: fixed;
-    right: 25px;
-    bottom: 25px;
-    background: var(--dark);
-    color: white;
-    padding: 14px 18px;
-    border-radius: 10px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: .3s;
-}
-#toast.show {
-    opacity: 1;
-    transform: translateY(0);
-}
+  /* toast */
+  #toast { position:fixed; right:20px; bottom:20px; background:linear-gradient(90deg,var(--accent2),var(--accent1)); color:#021; padding:10px 14px; border-radius:12px; font-weight:800; display:none; box-shadow:0 12px 36px rgba(3,18,36,0.12); z-index:1000; }
+  #toast.show{ display:block; }
 </style>
 </head>
 <body>
 
-<!---------------- SIDEBAR ---------------->
-<div class="sidebar">
-    <h2>FINANCE</h2>
-    <div class="nav-item" onclick="scrollToSection('dashboard')">
-        <i class="fa fa-chart-line"></i> Dashboard
+<div class="app" role="application">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" aria-label="Finance navigation">
+    <div class="brand">
+      <div class="logo">F</div>
+      <div>
+        <div class="orgName" id="orgName">FLAWLESS</div>
+        <div class="small">Finance Portal</div>
+      </div>
     </div>
 
-    <div class="nav-item" onclick="scrollToSection('pendingPayroll')">
-        <i class="fa fa-sack-dollar"></i> Pending Payroll
-    </div>
+    <nav class="nav" id="nav">
+      <div class="item active" data-section="dashboard"><i class="fa fa-chart-line"></i> Dashboard</div>
+      <div class="item" data-section="pendingPayroll"><i class="fa fa-sack-dollar"></i> Pending Payroll</div>
+      <div class="item" data-section="approvedPayroll"><i class="fa fa-check-circle"></i> Approved Payroll</div>
+      <div class="item" data-section="salaryAdvances"><i class="fa fa-coins"></i> Salary Advances</div>
+      <div class="item" data-section="messages"><i class="fa fa-envelope"></i> Messages</div>
+      <div class="item" data-section="audit"><i class="fa fa-history"></i> Audit Trail</div>
+    </nav>
 
-    <div class="nav-item" onclick="scrollToSection('approvedPayroll')">
-        <i class="fa fa-check-circle"></i> Approved Payroll
+    <div class="footer small" style="margin-top:auto">
+      <div>Theme</div>
+      <div>
+        <button class="btn ghost" id="toggleDark"><i class="fa fa-moon"></i></button>
+      </div>
     </div>
+  </aside>
 
-    <div class="nav-item" onclick="scrollToSection('salaryAdvances')">
-        <i class="fa fa-coins"></i> Salary Advances
-    </div>
-
-    <div class="nav-item" onclick="scrollToSection('messages')">
-        <i class="fa fa-envelope"></i> Finance Messages
-    </div>
-
-    <div class="nav-item" onclick="scrollToSection('audit')">
-        <i class="fa fa-history"></i> Audit Trail
-    </div>
-
-    <div class="nav-item" onclick="window.location.href='index.html'">
-        <i class="fa fa-door-open"></i> Exit
-    </div>
-</div>
-
-<!---------------- MAIN CONTENT ---------------->
-<div class="content">
-    
+  <!-- MAIN -->
+  <main class="main" id="main">
     <div class="header">
-        <div class="title">Finance Dashboard — <span id="orgDisplay"></span></div>
-
-        <div class="header-right">
-            <button class="btn light" id="switchOrgBtn"><i class="fa fa-building"></i></button>
-            <button class="btn success" id="exportFinancePDF"><i class="fa fa-file-pdf"></i> Export</button>
-              <a href="welcome.html" style="color:var(--muted);text-decoration:none">← Home</a>
-        </div>
+      <div>
+        <div class="title">Finance Dashboard — <span id="orgTitle">FLAWLESS</span></div>
+        <div class="small">Glassmorphism premium interface</div>
+      </div>
+      <div class="controls">
+        <select id="orgSwitcher" class="input" style="width:160px"></select>
+        <button class="btn ghost" id="refreshBtn" title="Refresh"><i class="fa fa-rotate"></i></button>
+        <button class="btn primary" id="exportAllBtn"><i class="fa fa-file-export"></i> Export</button>
+      </div>
     </div>
 
-    <!-- KPI CARDS -->
-    <div id="dashboard" class="grid" 
-         style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
-
-        <div class="kpi">
-            <i class="fa fa-sack-dollar"></i>
-            <div>
-                <div class="value" id="kpiPending">0</div>
-                <div class="label">Pending Payroll</div>
-            </div>
-        </div>
-
-        <div class="kpi">
-            <i class="fa fa-circle-check"></i>
-            <div>
-                <div class="value" id="kpiApproved">0</div>
-                <div class="label">Approved This Month</div>
-            </div>
-        </div>
-
-        <div class="kpi">
-            <i class="fa fa-coins"></i>
-            <div>
-                <div class="value" id="kpiAdvances">0</div>
-                <div class="label">Active Salary Advances</div>
-            </div>
-        </div>
-
-        <div class="kpi">
-            <i class="fa fa-users"></i>
-            <div>
-                <div class="value" id="kpiEmployees">0</div>
-                <div class="label">Total Employees</div>
-            </div>
-        </div>
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi"><i class="fa fa-sack-dollar"></i><div><div class="value" id="kPending">0</div><div class="label">Pending Payroll</div></div></div>
+      <div class="kpi"><i class="fa fa-circle-check"></i><div><div class="value" id="kApproved">0</div><div class="label">Approved / Paid</div></div></div>
+      <div class="kpi"><i class="fa fa-coins"></i><div><div class="value" id="kAdvances">0</div><div class="label">Active Advances</div></div></div>
+      <div class="kpi"><i class="fa fa-users"></i><div><div class="value" id="kEmployees">0</div><div class="label">Total Employees</div></div></div>
     </div>
 
-       <div style="background:white; padding:25px; width:420px; border-radius:14px;">
-        <h3>Process Salary Payment</h3>
-
-        <label>Choose Payment Method</label>
-        <select id="paymentMethod" class="input">
-            <option value="momo">Mobile Money</option>
-            <option value="bank">Bank Transfer</option>
-            <option value="wallet">Internal Wallet</option>
-        </select>
-
-        <label>Select Linked Account</label>
-        <select id="linkedAccount" class="input"></select>
-
-        <button class="btn primary" onclick="confirmPayment()">Confirm & Pay</button>
-        <button class="btn danger" onclick="closePaymentModal()">Cancel</button>
+    <!-- Teacher attendance quick -->
+    <div id="teacherSync" class="card">
+      <strong>Today's Teacher Attendance</strong>
+      <div id="teacherSyncContent" class="small" style="margin-top:8px">Loading teacher attendance…</div>
     </div>
-</div>
-<div class="card">
-    <div class="card-title">Linked Payment Accounts</div>
 
-    <div id="linkedAccountsList"></div>
-
-    <h4>Add New Account</h4>
-    <select id="accType" class="input">
-        <option value="momo">Mobile Money</option>
-        <option value="bank">Bank Account</option>
-        <option value="wallet">Internal Wallet</option>
-    </select>
-
-    <input id="accName" class="input" placeholder="Account Name">
-    <input id="accNumber" class="input" placeholder="Account Number">
-
-    <button class="btn success" onclick="addPaymentAccount()">Add Account</button>
-</div>
-    <!-- === Pending Payroll === -->
-    <section id="pendingPayroll" class="card" style="margin-top:18px;">
-      <div class="card-title">Pending Payroll Requests</div>
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div class="tiny">HR submits payroll batches here for Finance approval / payment.</div>
-        <div style="display:flex;gap:8px">
-          <button class="btn" id="refreshPending">Refresh</button>
-          <button class="btn primary" id="bulkApproveBtn">Approve All Visible</button>
+    <!-- Sections (cards) -->
+    <section id="dashboardSection" class="card">
+      <div class="card-title"><span>Overview</span>
+        <div>
+          <button class="btn ghost" id="btnLoadDemo">Seed Demo</button>
         </div>
       </div>
 
-      <div style="margin-top:12px; overflow:auto;">
+      <div class="table-wrap" style="margin-top:8px">
+        <table aria-label="Recent activity">
+          <thead><tr><th>#</th><th>Activity</th><th>Date</th></tr></thead>
+          <tbody id="activityTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="pendingPayrollSection" class="card" style="display:none">
+      <div class="card-title">
+        <span>Pending Payroll Requests</span>
+        <div>
+          <button class="btn" id="btnApproveAll">Approve All</button>
+          <button class="btn ghost" id="btnExportPending">Export CSV</button>
+        </div>
+      </div>
+
+      <div class="table-wrap" style="margin-top:8px">
         <table>
-          <thead>
-            <tr><th>#</th><th>Batch ID</th><th>Submitted By</th><th>Period</th><th>Total</th><th>Status</th><th>Actions</th></tr>
-          </thead>
+          <thead><tr><th>#</th><th>Batch ID</th><th>Submitted By</th><th>Period</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
           <tbody id="pendingTable"></tbody>
         </table>
       </div>
     </section>
 
-    <!-- === Approved Payroll === -->
-    <section id="approvedPayroll" class="card" style="margin-top:18px; display:none;">
-      <div class="card-title">Approved / Paid Payroll</div>
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div class="tiny">History of approved payrolls and payments.</div>
-        <div style="display:flex;gap:8px">
-          <button class="btn" id="exportPayrollCsv">Export CSV</button>
-          <button class="btn" id="exportPayrollPdf">Export PDF</button>
+    <section id="approvedPayrollSection" class="card" style="display:none">
+      <div class="card-title">
+        <span>Approved / Paid Payroll</span>
+        <div>
+          <button class="btn ghost" id="exportApprovedCSV">Download CSV</button>
+          <button class="btn ghost" id="exportApprovedPDF">Download PDF</button>
         </div>
       </div>
 
-      <div style="margin-top:12px; overflow:auto;">
+      <div class="table-wrap" style="margin-top:8px">
         <table>
           <thead><tr><th>#</th><th>Batch ID</th><th>Approved By</th><th>Period</th><th>Total</th><th>Paid On</th><th>Details</th></tr></thead>
           <tbody id="approvedTable"></tbody>
@@ -343,17 +236,13 @@ th, td {
       </div>
     </section>
 
-    <!-- === Salary Advances === -->
-    <section id="salaryAdvances" class="card" style="margin-top:18px; display:none;">
-      <div class="card-title">Salary Advances</div>
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div class="tiny">Employees can request advances; Finance approves/rejects.</div>
-        <div>
-          <button class="btn primary" id="newAdvanceBtn">New Advance</button>
-        </div>
+    <section id="advancesSection" class="card" style="display:none">
+      <div class="card-title">
+        <span>Salary Advances</span>
+        <div><button class="btn primary" id="btnNewAdvance">New Advance</button></div>
       </div>
 
-      <div style="margin-top:12px; overflow:auto;">
+      <div class="table-wrap" style="margin-top:8px">
         <table>
           <thead><tr><th>#</th><th>Request ID</th><th>Employee</th><th>Amount</th><th>Reason</th><th>Status</th><th>Actions</th></tr></thead>
           <tbody id="advancesTable"></tbody>
@@ -361,20 +250,18 @@ th, td {
       </div>
     </section>
 
-    <!-- === Messages (Finance ↔ HR) === -->
-    <section id="messages" class="card" style="margin-top:18px; display:none;">
-      <div class="card-title">Finance Messages</div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input id="msgTo" placeholder="To (hr or email)" style="flex:1; padding:8px">
-        <input id="msgSubject" placeholder="Subject" style="width:260px; padding:8px">
-      </div>
-      <textarea id="msgBody" rows="4" style="width:100%; margin-top:8px; padding:8px" placeholder="Message body"></textarea>
-      <div style="margin-top:8px; display:flex; gap:8px;">
-        <button class="btn primary" id="sendMsgBtn">Send</button>
-        <button class="btn" id="loadMsgsBtn">Refresh</button>
+    <section id="messagesSection" class="card" style="display:none">
+      <div class="card-title"><span>Finance Messages</span><div></div></div>
+
+      <div style="display:flex; gap:8px; margin-top:8px; align-items:center">
+        <input id="msgTo" class="input" placeholder="To (hr or email)" style="width:30%">
+        <input id="msgSubject" class="input" placeholder="Subject" style="width:40%">
+        <button class="btn primary" id="btnSendMsg">Send</button>
       </div>
 
-      <div style="margin-top:12px; max-height:320px; overflow:auto;">
+      <textarea id="msgBody" class="input" placeholder="Message body" style="margin-top:8px"></textarea>
+
+      <div class="table-wrap" style="margin-top:8px">
         <table>
           <thead><tr><th>#</th><th>From</th><th>To</th><th>Subject</th><th>Date</th></tr></thead>
           <tbody id="messagesTable"></tbody>
@@ -382,83 +269,122 @@ th, td {
       </div>
     </section>
 
-    <!-- === Audit Trail === -->
-    <section id="audit" class="card" style="margin-top:18px; display:none;">
-      <div class="card-title">Audit Trail</div>
-      <div id="auditLog" style="max-height:420px; overflow:auto; margin-top:8px;"></div>
+    <section id="auditSection" class="card" style="display:none">
+      <div class="card-title"><span>Audit Trail</span><div></div></div>
+      <div id="auditLog" style="margin-top:8px; max-height:420px; overflow:auto"></div>
     </section>
 
-    <!-- Toast -->
-    <div id="toast"></div>
-  </div> <!-- end .content -->
-<div class="card">
-    <div class="card-title">Pending Payroll Approval</div>
-    <table id="pendingPayrollTable">
-        <thead>
-            <tr>
-                <th>Employee</th>
-                <th>Salary</th>
-                <th>Month</th>
-                <th>Status</th>
-                <th>Pay</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <!-- Linked accounts + payment modal trigger -->
+    <section class="card" style="display:flex; gap:18px; align-items:flex-start; margin-top:12px">
+      <div style="flex:1">
+        <div class="card-title">Linked Payment Accounts</div>
+        <div id="linkedAccountsList" class="small" style="margin-bottom:8px"></div>
+
+        <div style="display:flex; gap:8px; margin-top:8px">
+          <select id="accType" class="input" style="width:36%"><option value="momo">Mobile Money</option><option value="bank">Bank</option><option value="wallet">Wallet</option></select>
+          <input id="accName" class="input" placeholder="Account name (e.g., Finance Wallet)">
+          <input id="accNumber" class="input" placeholder="Number / IBAN / Identifier" style="width:28%">
+          <button class="btn success" id="btnAddAccount">Add Account</button>
+        </div>
+      </div>
+
+      <div style="width:360px">
+        <div class="card-title">Quick Payment</div>
+        <div style="display:flex; flex-direction:column; gap:8px">
+          <select id="selectPendingForPayment" class="input"></select>
+          <select id="paymentMethod" class="input"><option value="momo">Mobile Money</option><option value="bank">Bank Transfer</option><option value="wallet">Internal Wallet</option></select>
+          <select id="linkedAccount" class="input"></select>
+          <div style="display:flex; gap:8px">
+            <button class="btn primary" id="btnPayNow">Pay Selected</button>
+            <button class="btn ghost" id="btnCancelPay">Clear</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
 </div>
-<div id="paymentModal" style="display:none; position:fixed; 
-    top:0; left:0; width:100%; height:100%; 
-    background:rgba(0,0,0,0.6); 
-    align-items:center; justify-content:center;">
-    
-<!-- ============================
-     SCRIPT: Finance Logic
-     ============================ -->
+
+<!-- Payment Modal (detail view) -->
+<div class="modal-backdrop" id="paymentModal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="payTitle">
+    <h3 id="payTitle">Process Payment</h3>
+    <div style="display:flex; gap:10px; margin-top:8px">
+      <div style="flex:1">
+        <label class="small">Batch</label>
+        <input id="modalBatchId" class="input" readonly />
+        <label class="small" style="margin-top:6px">Amount</label>
+        <input id="modalAmount" class="input" readonly />
+        <label class="small" style="margin-top:6px">Method</label>
+        <select id="modalMethod" class="input"><option value="momo">Mobile Money</option><option value="bank">Bank Transfer</option><option value="wallet">Internal Wallet</option></select>
+        <label class="small" style="margin-top:6px">Linked Account</label>
+        <select id="modalLinkedAccount" class="input"></select>
+      </div>
+      <div style="width:280px">
+        <label class="small">Notes</label>
+        <textarea id="modalNotes" class="input" placeholder="Payment reference / notes"></textarea>
+        <div style="display:flex; gap:8px; margin-top:8px">
+          <button class="btn ghost" id="modalCancel">Cancel</button>
+          <button class="btn primary" id="modalConfirmPay">Confirm & Pay</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" role="status" aria-live="polite"></div>
+
 <script>
+/* ============================
+   Finance Dashboard JS (modular)
+   Glassmorphism Premium UI
+   ============================ */
+
 /* ---------- Utilities ---------- */
-function safeParse(s){ try{ return JSON.parse(s) } catch(e){ return null } }
-function read(key){ return safeParse(localStorage.getItem(key)) || [] }
-function save(key,val){ localStorage.setItem(key, JSON.stringify(val)) }
 function uid(prefix='id'){ return prefix + '_' + Date.now().toString(36) }
-function show(msg, ms=2500){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), ms) }
-function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) }
+function read(key){ return JSON.parse(localStorage.getItem(key) || '[]') }
+function save(key,val){ localStorage.setItem(key, JSON.stringify(val)) }
+function showToast(msg, ms=2600){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); t.style.display='block'; setTimeout(()=>{ t.classList.remove('show'); t.style.display='none'; }, ms); }
 
-/* ---------- Keys & Namespacing ---------- */
+/* ---------- Namespaced keys ---------- */
 const ORG = localStorage.getItem('active_org') || 'FLAWLESS';
-document.getElementById('orgDisplay').textContent = ORG;
-const HR_PAYROLL_KEY = `${ORG}_hr_payroll_batches`;     // HR -> Finance pending batches
-const FIN_APPROVED_KEY = `${ORG}_finance_approved_batches`; // Finance approved/payout history
-const FIN_MSG_KEY = `${ORG}_finance_messages`;         // Finance messages
-const FIN_AUDIT_KEY = `${ORG}_finance_audit`;          // Audit trail
-const TEACH_ATT_KEY = `${ORG}_teacher_attendance`;     // teacher attendance sync (teacher pages push here)
-const ORG_ATT_KEY = `${ORG}_attendance`;               // alternate teacher key
+document.getElementById('orgName').textContent = ORG;
+document.getElementById('orgTitle').textContent = ORG;
+const HR_PAYROLL_KEY = `${ORG}_hr_payroll_batches`;
+const FIN_APPROVED_KEY = `${ORG}_finance_approved_batches`;
+const FIN_MSG_KEY = `${ORG}_finance_messages`;
+const FIN_AUDIT_KEY = `${ORG}_finance_audit`;
+const FIN_ADV_KEY = `${ORG}_salary_advances`;
+const TEACH_ATT_KEY = `${ORG}_teacher_attendance`;
+const ORG_ATT_KEY = `${ORG}_attendance`;
+const ACCOUNTS_KEY = `${ORG}_payment_accounts`;
+const FIN_PAYMENTS_KEY = `${ORG}_payments_log`;
 
-/* ensure keys exist */
+/* ensure storage initializations */
 if(!localStorage.getItem(HR_PAYROLL_KEY)) save(HR_PAYROLL_KEY, []);
 if(!localStorage.getItem(FIN_APPROVED_KEY)) save(FIN_APPROVED_KEY, []);
 if(!localStorage.getItem(FIN_MSG_KEY)) save(FIN_MSG_KEY, []);
 if(!localStorage.getItem(FIN_AUDIT_KEY)) save(FIN_AUDIT_KEY, []);
+if(!localStorage.getItem(FIN_ADV_KEY)) save(FIN_ADV_KEY, []);
+if(!localStorage.getItem(ACCOUNTS_KEY)) save(ACCOUNTS_KEY, []);
+if(!localStorage.getItem(FIN_PAYMENTS_KEY)) save(FIN_PAYMENTS_KEY, []);
 
-/* ---------- NAV helper (sidebar scrolling) ---------- */
-function scrollToSection(id){
-  const sec = document.getElementById(id);
-  if(!sec) return;
-  // hide others and show target (mimic tabs)
-  ['pendingPayroll','approvedPayroll','salaryAdvances','messages','audit'].forEach(sid=>{
-    const el = document.getElementById(sid);
-    if(el) el.style.display = (sid===id) ? 'block' : 'none';
-  });
-  // ensure dashboard visible state
-  if(id === 'dashboard'){
-    ['pendingPayroll','approvedPayroll','salaryAdvances','messages','audit'].forEach(sid=>{
-      const el = document.getElementById(sid);
-      if(el) el.style.display = 'none';
-    });
-    document.getElementById('dashboard').scrollIntoView({behavior:'smooth'});
-  } else {
-    document.getElementById('dashboard').scrollIntoView({behavior:'smooth'});
-    document.getElementById(id).scrollIntoView({behavior:'smooth'});
-  }
+/* ---------- UI wiring (nav sections) ---------- */
+const navItems = document.querySelectorAll('.nav .item');
+function showSection(id){
+  document.querySelectorAll('[id$="Section"]').forEach(s=> s.style.display = 'none');
+  document.getElementById(id + 'Section').style.display = 'block';
+  navItems.forEach(n=> n.classList.remove('active'));
+  document.querySelector('.nav .item[data-section="'+id+'"]').classList.add('active');
+}
+navItems.forEach(n=> n.addEventListener('click', ()=> showSection(n.dataset.section)));
+showSection('dashboard');
+
+/* ---------- Render helpers ---------- */
+function formatCurrency(n){
+  try { return new Intl.NumberFormat(undefined, {style:'currency', currency:'GHS'}).format(Number(n||0)); }
+  catch(e){ return '₵' + Number(n||0).toFixed(2); }
 }
 
 /* ---------- Audit ---------- */
@@ -468,277 +394,310 @@ function pushAudit(actor, action, payload=''){
   save(FIN_AUDIT_KEY, arr);
   renderAudit();
 }
-
-/* ---------- Render audit ---------- */
 function renderAudit(){
   const arr = read(FIN_AUDIT_KEY).slice().reverse();
-  const out = document.getElementById('auditLog');
-  if(!arr.length) { out.innerHTML = '<div class="tiny">No audit records</div>'; return; }
-  out.innerHTML = arr.map(a => `<div style="padding:8px;border-bottom:1px solid rgba(0,0,0,0.06)"><strong>${escapeHtml(a.actor)}</strong> — ${escapeHtml(a.action)} <div class="tiny" style="color:#666">${new Date(a.time).toLocaleString()}</div><div class="tiny">${escapeHtml(a.payload)}</div></div>`).join('');
+  const el = document.getElementById('auditLog');
+  if(!arr.length){ el.innerHTML = '<div class="small">No audit records</div>'; return; }
+  el.innerHTML = arr.map(a=> `<div style="padding:8px;border-bottom:1px solid rgba(3,18,36,0.04)"><strong>${a.actor}</strong> — ${a.action} <div class="small" style="color:var(--muted)">${new Date(a.time).toLocaleString()}</div><div class="small">${a.payload||''}</div></div>`).join('');
 }
+
+/* ---------- Messages ---------- */
+function renderMessages(){
+  const arr = read(FIN_MSG_KEY).slice().reverse();
+  const t = document.getElementById('messagesTable'); t.innerHTML = '';
+  arr.forEach((m,i)=>{ const tr=document.createElement('tr'); tr.innerHTML = `<td>${i+1}</td><td>${m.from}</td><td>${m.to}</td><td>${m.subject}</td><td>${new Date(m.date).toLocaleString()}</td>`; t.appendChild(tr); });
+}
+document.getElementById('btnSendMsg').addEventListener('click', ()=>{
+  const to = document.getElementById('msgTo').value.trim();
+  const subject = document.getElementById('msgSubject').value.trim();
+  const body = document.getElementById('msgBody').value.trim();
+  if(!to || !subject || !body) return showToast('Fill message fields');
+  const arr = read(FIN_MSG_KEY);
+  arr.push({ id: uid('msg'), from: 'finance@'+ORG.toLowerCase()+'.local', to, subject, body, date: new Date().toISOString() });
+  save(FIN_MSG_KEY, arr);
+  pushAudit('Finance','Sent message', subject);
+  document.getElementById('msgTo').value = ''; document.getElementById('msgSubject').value = ''; document.getElementById('msgBody').value = '';
+  renderMessages();
+  showToast('Message sent');
+});
 
 /* ---------- Pending payroll rendering ---------- */
 function renderPending(){
   const arr = read(HR_PAYROLL_KEY).slice().reverse();
-  const tbody = document.getElementById('pendingTable');
-  tbody.innerHTML = '';
-  arr.forEach((b, i) => {
-    const status = b.status || 'pending';
+  const tbody = document.getElementById('pendingTable'); tbody.innerHTML = '';
+  const selectPending = document.getElementById('selectPendingForPayment');
+  selectPending.innerHTML = '<option value="">Select batch to pay…</option>';
+  arr.forEach((b,i)=>{
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td>
-      <td>${escapeHtml(b.batchId)}</td>
-      <td>${escapeHtml(b.submittedBy||'HR')}</td>
-      <td>${escapeHtml(b.period||'—')}</td>
-      <td>${formatCurrency(b.total || 0)}</td>
-      <td>${escapeHtml(status)}</td>
+    const status = (b.status || 'pending');
+    tr.innerHTML = `<td>${i+1}</td><td>${b.batchId}</td><td>${b.submittedBy||'HR'}</td><td>${b.period||'—'}</td><td>${formatCurrency(b.total)}</td><td><span class="status-pill ${status==='pending'?'pending':status==='approved'?'approved':status==='paid'?'paid':'rejected'}">${status.toUpperCase()}</span></td>
       <td>
-        <button onclick="viewBatch('${b.batchId}')">View</button>
-        ${status === 'pending' ? `<button onclick="approveBatch('${b.batchId}')">Approve</button><button onclick="rejectBatch('${b.batchId}')">Reject</button>` : ''}
+        <button class="btn ghost" onclick="viewBatch('${b.batchId}')">View</button>
+        ${status==='pending' ? `<button class="btn primary" onclick="approveBatch('${b.batchId}')">Approve</button><button class="btn danger" onclick="rejectBatch('${b.batchId}')">Reject</button>` : ''}
+        ${status!=='paid' ? `<button class="btn success" onclick="openPaymentModal('${b.batchId}')">Pay</button>` : ''}
       </td>`;
     tbody.appendChild(tr);
+    // populate quick select
+    selectPending.innerHTML += `<option value="${b.batchId}">${b.batchId} — ${formatCurrency(b.total)}</option>`;
   });
-  document.getElementById('kpiPending').textContent = arr.filter(x=> (x.status||'pending') === 'pending').length;
+  document.getElementById('kPending').textContent = arr.filter(x=> (x.status||'pending')==='pending').length;
 }
 
-/* ---------- Approved payroll rendering ---------- */
+/* ---------- Approved rendering ---------- */
 function renderApproved(){
   const arr = read(FIN_APPROVED_KEY).slice().reverse();
-  const tbody = document.getElementById('approvedTable');
-  tbody.innerHTML = '';
-  arr.forEach((b,i) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td>
-      <td>${escapeHtml(b.batchId)}</td>
-      <td>${escapeHtml(b.approvedBy||'Finance')}</td>
-      <td>${escapeHtml(b.period||'—')}</td>
-      <td>${formatCurrency(b.total||0)}</td>
-      <td>${b.paidOn ? new Date(b.paidOn).toLocaleString() : '—'}</td>
-      <td><button onclick="viewApproved('${b.batchId}')">Details</button></td>`;
-    tbody.appendChild(tr);
-  });
-  document.getElementById('kpiApproved').textContent = arr.length;
+  const tbody = document.getElementById('approvedTable'); tbody.innerHTML = '';
+  arr.forEach((b,i)=>{ const tr=document.createElement('tr'); tr.innerHTML = `<td>${i+1}</td><td>${b.batchId}</td><td>${b.approvedBy||'Finance'}</td><td>${b.period}</td><td>${formatCurrency(b.total)}</td><td>${b.paidOn?new Date(b.paidOn).toLocaleString():'—'}</td><td><button class="btn ghost" onclick="viewApproved('${b.batchId}')">Details</button></td>`; tbody.appendChild(tr); });
+  document.getElementById('kApproved').textContent = arr.length;
 }
 
-/* ---------- Salary advances rendering ---------- */
-function getAdvances(){ return read(`${ORG}_salary_advances`) }
-function saveAdvances(a){ save(`${ORG}_salary_advances`, a) }
-if(!localStorage.getItem(`${ORG}_salary_advances`)) saveAdvances([]);
-
+/* ---------- Advances ---------- */
 function renderAdvances(){
-  const arr = getAdvances().slice().reverse();
+  const arr = read(FIN_ADV_KEY).slice().reverse();
   const tbody = document.getElementById('advancesTable'); tbody.innerHTML = '';
-  arr.forEach((r,i)=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td><td>${r.requestId}</td><td>${escapeHtml(r.employee)}</td><td>${formatCurrency(r.amount)}</td><td>${escapeHtml(r.reason||'')}</td><td>${escapeHtml(r.status)}</td>
-      <td>
-        ${r.status==='pending' ? `<button onclick="approveAdvance('${r.requestId}')">Approve</button><button onclick="rejectAdvance('${r.requestId}')">Reject</button>` : ''}
-      </td>`;
-    tbody.appendChild(tr);
-  });
-  document.getElementById('kpiAdvances').textContent = arr.filter(x=>x.status==='approved').length;
+  arr.forEach((r,i)=>{ const tr=document.createElement('tr'); tr.innerHTML = `<td>${i+1}</td><td>${r.requestId}</td><td>${r.employee}</td><td>${formatCurrency(r.amount)}</td><td>${r.reason||''}</td><td><span class="status-pill ${r.status==='approved'?'approved':r.status==='rejected'?'rejected':'pending'}">${r.status.toUpperCase()}</span></td><td>${r.status==='pending'?`<button class="btn primary" onclick="approveAdvance('${r.requestId}')">Approve</button><button class="btn danger" onclick="rejectAdvance('${r.requestId}')">Reject</button>`:''}</td>`; tbody.appendChild(tr); });
+  document.getElementById('kAdvances').textContent = arr.filter(x=>x.status==='approved').length;
 }
-
-/* ---------- Messages ---------- */
-function getFinanceMsgs(){ return read(FIN_MSG_KEY) }
-function saveFinanceMsgs(m){ save(FIN_MSG_KEY, m) }
-
-document.getElementById('sendMsgBtn').addEventListener('click', ()=>{
-  const to = document.getElementById('msgTo').value.trim();
-  const subj = document.getElementById('msgSubject').value.trim();
-  const body = document.getElementById('msgBody').value.trim();
-  if(!subj || !body) return show('Complete subject & message');
-  const arr = getFinanceMsgs();
-  arr.push({ id: uid('msg'), from: 'finance@'+ORG.toLowerCase()+'.local', to, subject: subj, body, date: new Date().toISOString() });
-  saveFinanceMsgs(arr);
-  pushAudit('Finance', `Sent message to ${to}`, `${subj}`);
-  renderMessages();
-  show('Message sent');
-  document.getElementById('msgTo').value=''; document.getElementById('msgSubject').value=''; document.getElementById('msgBody').value='';
+document.getElementById('btnNewAdvance').addEventListener('click', ()=>{
+  const employee = prompt('Employee name / email');
+  if(!employee) return;
+  const amount = Number(prompt('Amount','0')||0);
+  if(!amount) return showToast('Invalid amount');
+  const reason = prompt('Reason','')||'';
+  const arr = read(FIN_ADV_KEY);
+  arr.push({ requestId: uid('adv'), employee, amount, reason, status:'pending', requestedAt: new Date().toISOString() });
+  save(FIN_ADV_KEY, arr);
+  pushAudit('Finance','Created advance', employee+' • '+formatCurrency(amount));
+  renderAdvances();
+  showToast('Advance requested');
 });
+function approveAdvance(id){ const arr = read(FIN_ADV_KEY); const r = arr.find(x=>x.requestId===id); if(!r) return; r.status='approved'; r.approvedAt=new Date().toISOString(); save(FIN_ADV_KEY, arr); pushAudit('Finance','Approved advance', id); renderAdvances(); showToast('Approved'); }
+function rejectAdvance(id){ const arr = read(FIN_ADV_KEY); const r = arr.find(x=>x.requestId===id); if(!r) return; r.status='rejected'; r.rejectionReason = prompt('Rejection reason',''); r.rejectedAt=new Date().toISOString(); save(FIN_ADV_KEY, arr); pushAudit('Finance','Rejected advance', id); renderAdvances(); showToast('Rejected'); }
 
-function renderMessages(){
-  const arr = getFinanceMsgs().slice().reverse();
-  const tbody = document.getElementById('messagesTable'); tbody.innerHTML='';
-  arr.forEach((m,i)=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(m.from)}</td><td>${escapeHtml(m.to)}</td><td>${escapeHtml(m.subject)}</td><td>${new Date(m.date).toLocaleString()}</td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-/* ---------- Batch view / approve / reject ---------- */
+/* ---------- Batch operations: view / approve / reject ---------- */
 function viewBatch(batchId){
   const arr = read(HR_PAYROLL_KEY);
   const b = arr.find(x=>x.batchId===batchId);
-  if(!b) return show('Batch not found');
-  // show details in prompt (simpler than modal)
+  if(!b) return showToast('Batch not found');
   const details = (b.items||[]).map(it=> `${it.employee} — ${formatCurrency(it.amount)} — ${it.bank||'N/A'}`).join('\\n');
   alert(`Batch ${b.batchId}\\nSubmitted by: ${b.submittedBy}\\nPeriod: ${b.period}\\nTotal: ${formatCurrency(b.total)}\\n\\nItems:\\n${details}`);
 }
-
 function approveBatch(batchId){
   const arr = read(HR_PAYROLL_KEY);
   const idx = arr.findIndex(x=>x.batchId===batchId);
-  if(idx === -1) return show('Not found');
+  if(idx===-1) return showToast('Not found');
   const batch = arr[idx];
-  if(batch.status && batch.status !== 'pending') return show('Batch already processed');
-
-  // move to finance approved key
+  if(batch.status && batch.status !== 'pending') return showToast('Already processed');
+  // move to approved
   const approved = read(FIN_APPROVED_KEY);
-  const approvedRecord = Object.assign({}, batch, { approvedBy: 'finance@'+ORG.toLowerCase()+'.local', approvedAt: new Date().toISOString(), paidOn: new Date().toISOString(), status: 'approved' });
-  approved.push(approvedRecord);
-  save(FIN_APPROVED_KEY, approved);
-
-  // mark original HR batch as approved
-  batch.status = 'approved';
-  batch.processedAt = new Date().toISOString();
-  save(HR_PAYROLL_KEY, arr);
-
-  pushAudit('Finance', 'Approved payroll batch', batch.batchId);
-  // notify HR (message push)
-  const msgs = getFinanceMsgs();
-  msgs.push({ id: uid('msg'), from:'finance@'+ORG.toLowerCase()+'.local', to: batch.submittedBy || 'hr@'+ORG.toLowerCase()+'.local', subject: `Payroll batch ${batch.batchId} approved`, body: `Your payroll batch ${batch.batchId} has been approved and paid.`, date: new Date().toISOString() });
-  saveFinanceMsgs(msgs);
-
-  renderPending(); renderApproved(); show('Batch approved & paid');
+  const approvedRecord = Object.assign({}, batch, { approvedBy:'finance@'+ORG.toLowerCase()+'.local', approvedAt:new Date().toISOString(), paidOn:new Date().toISOString(), status:'paid' });
+  approved.push(approvedRecord); save(FIN_APPROVED_KEY, approved);
+  // update original
+  batch.status='paid'; batch.processedAt=new Date().toISOString(); arr[idx]=batch; save(HR_PAYROLL_KEY, arr);
+  pushAudit('Finance','Approved payroll', batchId);
+  // notify HR via message
+  const msgs = read(FIN_MSG_KEY); msgs.push({ id: uid('msg'), from:'finance@'+ORG.toLowerCase()+'.local', to: batch.submittedBy || 'hr@'+ORG.toLowerCase()+'.local', subject:`Payroll ${batchId} approved`, body:`Batch ${batchId} approved and paid.`, date:new Date().toISOString() }); save(FIN_MSG_KEY, msgs);
+  renderPending(); renderApproved(); renderMessages(); showToast('Batch approved & paid');
 }
-
 function rejectBatch(batchId){
-  const arr = read(HR_PAYROLL_KEY);
-  const b = arr.find(x=>x.batchId===batchId);
-  if(!b) return show('Not found');
-  const reason = prompt('Reason for rejection', 'Incorrect totals');
-  b.status = 'rejected';
-  b.rejectedBy = 'finance@'+ORG.toLowerCase()+'.local';
-  b.rejectionReason = reason || '';
-  b.processedAt = new Date().toISOString();
-  save(HR_PAYROLL_KEY, arr);
-  pushAudit('Finance', 'Rejected payroll batch', `${batchId} — ${reason}`);
+  const arr = read(HR_PAYROLL_KEY); const b = arr.find(x=>x.batchId===batchId); if(!b) return showToast('Not found');
+  const reason = prompt('Reason for rejection','Incorrect totals') || '';
+  b.status='rejected'; b.rejectedBy='finance@'+ORG.toLowerCase()+'.local'; b.rejectionReason = reason; b.processedAt=new Date().toISOString(); save(HR_PAYROLL_KEY, arr);
+  pushAudit('Finance','Rejected payroll', batchId+' — '+reason);
   // notify HR
-  const msgs = getFinanceMsgs(); msgs.push({ id: uid('msg'), from: 'finance@'+ORG.toLowerCase()+'.local', to: b.submittedBy || 'hr@'+ORG.toLowerCase()+'.local', subject: `Payroll ${batchId} rejected`, body: reason || 'See notes', date: new Date().toISOString() }); saveFinanceMsgs(msgs);
-  renderPending(); renderMessages(); show('Batch rejected');
+  const msgs=read(FIN_MSG_KEY); msgs.push({ id:uid('msg'), from:'finance@'+ORG.toLowerCase()+'.local', to:b.submittedBy||'hr@'+ORG.toLowerCase()+'.local', subject:`Payroll ${batchId} rejected`, body:reason, date:new Date().toISOString() }); save(FIN_MSG_KEY, msgs);
+  renderPending(); renderMessages(); showToast('Batch rejected');
 }
 
-/* Bulk approve visible */
-document.getElementById('bulkApproveBtn').addEventListener('click', ()=>{
-  const arr = read(HR_PAYROLL_KEY);
-  const pending = arr.filter(x=> (x.status||'pending') === 'pending');
-  if(!pending.length) return show('No pending batches');
-  if(!confirm(`Approve ${pending.length} pending batches?`)) return;
-  pending.forEach(b => approveBatch(b.batchId));
-  show('Bulk approved');
-});
-
-/* ---------- Advance requests ---------- */
-document.getElementById('newAdvanceBtn').addEventListener('click', ()=>{
-  const employee = prompt('Employee name (email optional)');
-  if(!employee) return show('Cancelled');
-  const amount = Number(prompt('Amount', '0')||0);
-  if(!amount) return show('Invalid amount');
-  const reason = prompt('Reason','') || '';
-  const arr = getAdvances();
-  const req = { requestId: uid('adv'), employee, amount, reason, status: 'pending', requestedAt: new Date().toISOString() };
-  arr.push(req); saveAdvances(arr); pushAudit('Finance', 'Created advance request', req.requestId); renderAdvances(); show('Advance requested');
-});
-
-function approveAdvance(requestId){
-  const arr = getAdvances();
-  const r = arr.find(x=>x.requestId===requestId);
-  if(!r) return show('Not found');
-  r.status = 'approved'; r.approvedAt = new Date().toISOString(); saveAdvances(arr);
-  pushAudit('Finance', 'Approved advance', requestId);
-  show('Advance approved');
-  renderAdvances();
-}
-
-function rejectAdvance(requestId){
-  const arr = getAdvances();
-  const r = arr.find(x=>x.requestId===requestId);
-  if(!r) return show('Not found');
-  const reason = prompt('Reason for rejection','');
-  r.status = 'rejected'; r.rejectionReason = reason || ''; saveAdvances(arr);
-  pushAudit('Finance', 'Rejected advance', requestId+' — '+(reason||''));
-  show('Advance rejected');
-  renderAdvances();
-}
-
-/* ---------- View approved details ---------- */
-function viewApproved(batchId){
-  const arr = read(FIN_APPROVED_KEY);
-  const b = arr.find(x=>x.batchId===batchId);
-  if(!b) return show('Not found');
-  const lines = (b.items||[]).map(it=> `${it.employee} — ${formatCurrency(it.amount)} — ${it.bank||'N/A'}`).join('\\n');
-  alert(`Approved Batch ${b.batchId}\\nApproved by: ${b.approvedBy}\\nPeriod: ${b.period}\\nTotal: ${formatCurrency(b.total)}\\nPaid On: ${b.paidOn}\\n\\nItems:\\n${lines}`);
-}
-
-/* ---------- Exports ---------- */
-document.getElementById('exportPayrollCsv').addEventListener('click', ()=>{
-  const rows = read(FIN_APPROVED_KEY).map(b => ({ batchId: b.batchId, approvedBy: b.approvedBy, period: b.period, total: b.total, paidOn: b.paidOn }));
-  if(!rows.length) return show('No approved payroll to export');
-  exportCSV(rows, `${ORG}_approved_payroll_${Date.now()}.csv`);
-});
-
-document.getElementById('exportPayrollPdf').addEventListener('click', ()=>{
-  const approved = read(FIN_APPROVED_KEY).slice().reverse();
-  if(!approved.length) return show('No approved payroll');
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF('p','pt','a4'); doc.setFontSize(14); doc.text(`${ORG} — Approved Payroll`, 40, 40); let y=70;
-  approved.forEach((b,i)=>{
-    doc.text(`${i+1}. ${b.batchId} • ${b.period} • ${formatCurrency(b.total)} • ${b.paidOn ? new Date(b.paidOn).toLocaleString() : '—'}`, 40, y);
-    y+=14; if(y>720){ doc.addPage(); y=40; }
+/* ---------- Payments: linked accounts + modal ---------- */
+function loadAccounts(){
+  const accounts = read(ACCOUNTS_KEY);
+  const list = document.getElementById('linkedAccountsList');
+  const linked = document.getElementById('linkedAccount');
+  const modalLinked = document.getElementById('modalLinkedAccount');
+  list.innerHTML = ''; linked.innerHTML = '<option value="">Select account</option>'; modalLinked.innerHTML = '<option value="">Select account</option>';
+  accounts.forEach(a=>{
+    list.innerHTML += `<div style="padding:8px;border-radius:8px;border:1px solid rgba(3,18,36,0.03); margin-bottom:6px"><strong>${a.name}</strong> <div class="small">${a.type} — ${a.number}</div></div>`;
+    const label = `${a.name} — ${a.number}`;
+    linked.innerHTML += `<option value="${a.name}|${a.number}|${a.type}">${label}</option>`;
+    modalLinked.innerHTML += `<option value="${a.name}|${a.number}|${a.type}">${label}</option>`;
   });
-  doc.save(`${ORG}_approved_payroll_${Date.now()}.pdf`);
+}
+document.getElementById('btnAddAccount').addEventListener('click', ()=>{
+  const type = document.getElementById('accType').value;
+  const name = document.getElementById('accName').value.trim();
+  const number = document.getElementById('accNumber').value.trim();
+  if(!name || !number) return showToast('Fill account name & identifier');
+  const arr = read(ACCOUNTS_KEY); arr.push({ id: uid('acc'), type, name, number }); save(ACCOUNTS_KEY, arr); loadAccounts();
+  document.getElementById('accName').value=''; document.getElementById('accNumber').value='';
+  showToast('Account added');
 });
 
-/* ---------- CSV helper ---------- */
-function exportCSV(rows, filename){
-  if(!rows.length) return;
-  const keys = Object.keys(rows[0]);
-  const lines = [keys.join(',')];
-  rows.forEach(r=> lines.push(keys.map(k=>`"${String(r[k]||'').replace(/"/g,'""')}"`).join(',')));
-  const blob = new Blob([lines.join('\\n')], { type:'text/csv' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+/* Quick pay UI */
+document.getElementById('btnPayNow').addEventListener('click', ()=>{
+  const selected = document.getElementById('selectPendingForPayment').value;
+  if(!selected) return showToast('Choose pending batch');
+  const method = document.getElementById('paymentMethod').value;
+  const accountVal = document.getElementById('linkedAccount').value;
+  if(!accountVal) return showToast('Choose linked account');
+  openPaymentModal(selected, method, accountVal);
+});
+document.getElementById('btnCancelPay').addEventListener('click', ()=> { document.getElementById('selectPendingForPayment').value=''; document.getElementById('linkedAccount').value=''; document.getElementById('paymentMethod').value='momo'; });
+
+/* Open Payment Modal */
+function openPaymentModal(batchId, method=null, accountVal=null){
+  const arr = read(HR_PAYROLL_KEY);
+  const b = arr.find(x=>x.batchId===batchId);
+  if(!b) return showToast('Batch not found');
+  document.getElementById('modalBatchId').value = b.batchId;
+  document.getElementById('modalAmount').value = formatCurrency(b.total);
+  document.getElementById('modalMethod').value = method || 'momo';
+  const modalLinked = document.getElementById('modalLinkedAccount');
+  if(accountVal) modalLinked.value = accountVal;
+  document.getElementById('modalNotes').value = '';
+  document.getElementById('paymentModal').classList.add('show');
 }
+document.getElementById('modalCancel').addEventListener('click', ()=> document.getElementById('paymentModal').classList.remove('show'));
 
-/* ---------- Helper: format currency ---------- */
-function formatCurrency(n){ const fmt = new Intl.NumberFormat(undefined,{ style:'currency', currency: 'GHS', maximumFractionDigits:2 }); try{ return fmt.format(Number(n||0)) }catch(e){ return 'GHS ' + Number(n||0).toFixed(2) } }
+/* Confirm & perform payment */
+document.getElementById('modalConfirmPay').addEventListener('click', ()=>{
+  const batchId = document.getElementById('modalBatchId').value;
+  const method = document.getElementById('modalMethod').value;
+  const accountVal = document.getElementById('modalLinkedAccount').value;
+  const notes = document.getElementById('modalNotes').value.trim();
+  if(!batchId) return;
+  // perform local "payment" (record in payments log)
+  const hr = read(HR_PAYROLL_KEY);
+  const idx = hr.findIndex(x=> x.batchId === batchId);
+  if(idx === -1) return showToast('Batch missing');
+  const batch = hr[idx];
+  batch.status = 'paid';
+  batch.paidVia = method;
+  batch.paidTo = accountVal;
+  batch.paidOn = new Date().toISOString();
+  batch.paymentNotes = notes;
+  // update HR pending list
+  hr[idx] = batch; save(HR_PAYROLL_KEY, hr);
+  // push into approved/payout history
+  const approved = read(FIN_APPROVED_KEY);
+  approved.push(Object.assign({}, batch, { approvedBy:'finance@'+ORG.toLowerCase()+'.local', approvedAt:new Date().toISOString() }));
+  save(FIN_APPROVED_KEY, approved);
+  // payments log
+  const payments = read(FIN_PAYMENTS_KEY);
+  payments.push({ id: uid('pay'), batchId, amount: batch.total, method, account: accountVal, notes, date: new Date().toISOString() });
+  save(FIN_PAYMENTS_KEY, payments);
+  pushAudit('Finance','Processed payment', `${batchId} • ${method} • ${accountVal}`);
+  // notify HR
+  const msgs = read(FIN_MSG_KEY); msgs.push({ id: uid('msg'), from:'finance@'+ORG.toLowerCase()+'.local', to: batch.submittedBy || 'hr@'+ORG.toLowerCase()+'.local', subject:`Payroll ${batchId} paid`, body:`Batch ${batchId} paid via ${method}. Notes: ${notes}`, date:new Date().toISOString() }); save(FIN_MSG_KEY, msgs);
+  renderPending(); renderApproved(); renderMessages();
+  document.getElementById('paymentModal').classList.remove('show');
+  showToast('Payment recorded & notified HR');
+});
 
-/* ---------- Teacher attendance sync rendering ---------- */
+/* ---------- Teacher attendance / timetable / notes sync ---------- */
 function renderTeacherSync(){
   const arr1 = read(TEACH_ATT_KEY) || [];
   const arr2 = read(ORG_ATT_KEY) || [];
-  const all = (arr1.concat(arr2)).slice().reverse();
-  const el = document.getElementById('kpiEmployees'); // reuse KPI to show employees count too
-  document.getElementById('kpiEmployees').textContent = /* fallback count */ (read(`${ORG}_employees`) || []).length || all.length || 0;
-  const widget = document.getElementById('teacherSync');
-  const joined = all.slice(0,5).map(a => `${a.email||a.employee||a.name||'T'} ${a.action||''} @ ${new Date(a.date||a.time||a.createdAt||Date.now()).toLocaleTimeString()}`).join('\\n');
-  widget && (widget.textContent = all.length ? (all[0].email||all[0].employee||'Teacher') + ' — ' + (all[0].action||'') + ' — ' + new Date(all[0].date||all[0].time||Date.now()).toLocaleString() : 'No teacher attendance records');
+  const all = arr1.concat(arr2);
+  const content = document.getElementById('teacherSyncContent');
+  if(!all || !all.length){ content.textContent = 'No teacher attendance records.'; return; }
+  const last = all.slice().reverse()[0];
+  content.textContent = `${last.email||last.name||last.employee} • ${last.action||'in/out'} • ${new Date(last.date||last.time||last.createdAt||Date.now()).toLocaleString()}`;
+  // quick KPI for total teachers (unique)
+  const uniqueTeachers = new Set(all.map(a=> a.email || a.employee || a.name)).size;
+  document.getElementById('kEmployees').textContent = uniqueTeachers || (read(`${ORG}_employees`) || []).length || 0;
 }
 
-/* ---------- Seed / Demo helpers (only if HR batches empty) ---------- */
-(function seedDemoPayroll(){
-  const hr = read(HR_PAYROLL_KEY);
-  if(hr.length) return;
-  // create sample HR batch
-  const sample = {
-    batchId: 'BATCH_' + Date.now().toString(36).slice(-6).toUpperCase(),
-    submittedBy: 'hr@' + ORG.toLowerCase() + '.local',
-    period: new Date().toISOString().split('T')[0],
-    items: [
-      { employee: 'Adjei James', account: 'ACCT-001', bank: 'Bank A', amount: 1200 },
-      { employee: 'Ama Serwaa', account: 'ACCT-002', bank: 'Bank B', amount: 1100 },
-      { employee: 'Kofi Mensah', account: 'ACCT-003', bank: 'Bank C', amount: 1000 }
-    ],
-    total: 3300,
-    status: 'pending',
-    submittedAt: new Date().toISOString()
-  };
-  hr.push(sample);
-  save(HR_PAYROLL_KEY, hr);
-  pushAudit('System', 'Seeded demo payroll batch', sample.batchId);
-})();
+/* ---------- Activity / KPI ---------- */
+function renderActivity(){
+  const act = read(FIN_AUDIT_KEY).slice().reverse();
+  const t = document.getElementById('activityTable'); t.innerHTML = '';
+  act.slice(0,50).forEach((a,i)=>{ const tr=document.createElement('tr'); tr.innerHTML = `<td>${i+1}</td><td>${a.action} • ${a.payload||''}</td><td>${new Date(a.time).toLocaleString()}</td>`; t.appendChild(tr); });
+}
 
-/* ---------- Render everything ---------- */
+/* ---------- Exports ---------- */
+function exportCSVFromRows(rows, filename){
+  if(!rows.length) return showToast('No data to export');
+  const keys = Object.keys(rows[0]);
+  const lines = [keys.join(',')];
+  rows.forEach(r=> lines.push(keys.map(k=> `"${String(r[k]||'').replace(/"/g,'""')}"`).join(',')));
+  const blob = new Blob([lines.join('\\n')], { type:'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+}
+document.getElementById('exportAllBtn').addEventListener('click', ()=>{
+  const payload = { payroll: read(HR_PAYROLL_KEY), approved: read(FIN_APPROVED_KEY), payments: read(FIN_PAYMENTS_KEY), accounts: read(ACCOUNTS_KEY), audit: read(FIN_AUDIT_KEY) };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${ORG}_finance_backup_${Date.now()}.json`; a.click();
+  showToast('Exported JSON');
+});
+document.getElementById('btnExportPending').addEventListener('click', ()=> exportCSVFromRows(read(HR_PAYROLL_KEY), `${ORG}_pending_payroll.csv`));
+document.getElementById('exportApprovedCSV').addEventListener('click', ()=> exportCSVFromRows(read(FIN_APPROVED_KEY), `${ORG}_approved_payroll.csv`));
+document.getElementById('exportApprovedPDF').addEventListener('click', ()=>{
+  const approved = read(FIN_APPROVED_KEY);
+  if(!approved.length) return showToast('No approved records');
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p','pt','a4'); doc.setFontSize(14); doc.text(`${ORG} — Approved Payroll`, 40, 40);
+  let y = 70;
+  approved.slice().reverse().forEach((b,i)=>{ doc.text(`${i+1}. ${b.batchId} • ${b.period} • ${formatCurrency(b.total)} • ${b.paidOn?new Date(b.paidOn).toLocaleString():'—'}`, 40, y); y+=14; if(y>740){ doc.addPage(); y=40; } });
+  doc.save(`${ORG}_approved_payroll_${Date.now()}.pdf`);
+});
+
+/* ---------- Seed demo (for first load) ---------- */
+document.getElementById('btnLoadDemo').addEventListener('click', seedDemo);
+function seedDemo(){
+  // create a sample HR payroll batch if none exists
+  const hr = read(HR_PAYROLL_KEY);
+  if(!hr.length){
+    const sample = {
+      batchId: 'BATCH_'+Date.now().toString(36).slice(-6).toUpperCase(),
+      submittedBy: 'hr@'+ORG.toLowerCase()+'.local',
+      period: new Date().toISOString().split('T')[0],
+      items: [
+        { employee:'Adjei James', account:'ACCT-001', bank:'Bank A', amount:1200 },
+        { employee:'Ama Serwaa', account:'ACCT-002', bank:'Bank B', amount:1100 },
+        { employee:'Kofi Mensah', account:'ACCT-003', bank:'Bank C', amount:1000 }
+      ],
+      total: 3300,
+      status: 'pending',
+      submittedAt: new Date().toISOString()
+    };
+    hr.push(sample); save(HR_PAYROLL_KEY, hr);
+    pushAudit('System','Seeded demo payroll', sample.batchId);
+  }
+  // seed an account
+  const accs = read(ACCOUNTS_KEY);
+  if(!accs.length) { accs.push({ id: uid('acc'), type:'bank', name:'Main Bank', number:'0123456789' }, { id: uid('acc'), type:'momo', name:'Finance MoMo', number:'0551234567' }); save(ACCOUNTS_KEY, accs); }
+  renderAll();
+  showToast('Demo seeded');
+}
+
+/* ---------- Quick view helpers ---------- */
+function viewApproved(batchId){
+  const arr = read(FIN_APPROVED_KEY);
+  const b = arr.find(x=>x.batchId===batchId);
+  if(!b) return showToast('Not found');
+  const lines = (b.items||[]).map(it=> `${it.employee} — ${formatCurrency(it.amount)} — ${it.bank||'N/A'}`).join('\\n');
+  alert(`Approved Batch ${b.batchId}\\nApproved by: ${b.approvedBy}\\nPeriod: ${b.period}\\nTotal: ${formatCurrency(b.total)}\\nPaid On: ${b.paidOn || '—'}\\n\\nItems:\\n${lines}`);
+}
+
+/* ---------- Approve all visible ---------- */
+document.getElementById('btnApproveAll').addEventListener('click', ()=>{
+  const arr = read(HR_PAYROLL_KEY);
+  const pending = arr.filter(x=> (x.status||'pending')==='pending');
+  if(!pending.length) return showToast('No pending batches');
+  if(!confirm(`Approve ${pending.length} pending batches?`)) return;
+  pending.forEach(p => approveBatch(p.batchId));
+  renderAll();
+  showToast('Bulk approved');
+});
+
+/* ---------- Storage sync (across tabs) ---------- */
+window.addEventListener('storage', (e)=>{
+  const watched = [HR_PAYROLL_KEY, FIN_APPROVED_KEY, FIN_MSG_KEY, FIN_AUDIT_KEY, FIN_ADV_KEY, TEACH_ATT_KEY, ORG_ATT_KEY, ACCOUNTS_KEY, FIN_PAYMENTS_KEY];
+  if(watched.includes(e.key)) setTimeout(renderAll, 120);
+});
+
+/* ---------- Render all ---------- */
 function renderAll(){
   renderPending();
   renderApproved();
@@ -746,138 +705,53 @@ function renderAll(){
   renderMessages();
   renderAudit();
   renderTeacherSync();
+  renderActivity();
+  loadAccounts();
 }
 renderAll();
 
-/* ---------- Wire refresh button ---------- */
-document.getElementById('refreshBtn').addEventListener('click', ()=>{ renderAll(); show('Refreshed') });
-document.getElementById('refreshPending').addEventListener('click', ()=>{ renderPending(); show('Pending refreshed') });
-
-/* ---------- Storage sync across tabs (teacher pages push attendance) ---------- */
-window.addEventListener('storage', (e)=>{
-  const keys = [HR_PAYROLL_KEY, FIN_APPROVED_KEY, `${ORG}_salary_advances`, FIN_MSG_KEY, FIN_AUDIT_KEY, TEACH_ATT_KEY, ORG_ATT_KEY];
-  if(keys.includes(e.key)){
-    // small debounce
-    setTimeout(()=> renderAll(), 120);
-  }
+/* ---------- Buttons wiring ---------- */
+document.getElementById('refreshBtn').addEventListener('click', ()=>{ renderAll(); showToast('Refreshed') });
+document.getElementById('selectPendingForPayment').addEventListener('change', (e)=> {
+  const val = e.target.value;
+  if(!val) return;
+  // set quick fields by batch
+  const batch = read(HR_PAYROLL_KEY).find(b=>b.batchId===val);
+  if(batch) document.getElementById('paymentMethod').value = 'momo';
 });
+document.getElementById('exportAllBtn').addEventListener('click', ()=> { /* handled above */ });
 
-/* expose small API for HR pages to push payroll batches and teacher attendance */
+/* ---------- Utility: approve/reject/bulk done earlier ---------- */
+
+/* ---------- Expose financeAPI for HR pages ---------- */
 window.financeAPI = {
   pushPayrollBatch: function(batch){
     const arr = read(HR_PAYROLL_KEY);
     batch.batchId = batch.batchId || uid('batch');
-    batch.status = 'pending';
+    batch.status = batch.status || 'pending';
     batch.submittedAt = new Date().toISOString();
-    arr.push(batch);
-    save(HR_PAYROLL_KEY, arr);
-    pushAudit('HR', 'Submitted payroll batch', batch.batchId);
+    arr.push(batch); save(HR_PAYROLL_KEY, arr);
+    pushAudit('HR','Submitted payroll batch', batch.batchId);
     renderAll();
     return batch.batchId;
   },
-  markApproved: function(batchId){
-    approveBatch(batchId);
-  },
+  markApproved: function(batchId){ approveBatch(batchId); },
   pushTeacherAttendance: function(rec){
-    const arr = read(TEACH_ATT_KEY);
-    arr.push(Object.assign({}, rec, { createdAt: new Date().toISOString() }));
-    save(TEACH_ATT_KEY, arr);
-    renderTeacherSync();
-  }
+    const arr = read(TEACH_ATT_KEY); arr.push(Object.assign({}, rec, { createdAt: new Date().toISOString() })); save(TEACH_ATT_KEY, arr); renderTeacherSync();
+  },
+  pushTimetable: function(t){ save(`${ORG}_teacher_timetable`, t || []); },
+  pushNotes: function(notes){ save(`${ORG}_teacher_notes`, notes || []); }
 };
 
-
-      
-function loadPendingPayroll() {
-    const table = document.querySelector("#pendingPayrollTable tbody");
-    table.innerHTML = "";
-
-    const payroll = JSON.parse(localStorage.getItem("finance_pending_payroll") || "[]");
-
-    payroll.forEach((p, index) => {
-        table.innerHTML += `
-            <tr>
-                <td>${p.name}</td>
-                <td>₵${p.salary}</td>
-                <td>${p.month}</td>
-                <td>${p.status || "Pending"}</td>
-                <td>
-                    <button class="btn success" onclick="openPaymentScreen(${index})">
-                        Pay Now
-                    </button>
-                </td>
-            </tr>
-        `;
-    });
-}
-loadPendingPayroll();
-      
-function addPaymentAccount() {
-    let accounts = JSON.parse(localStorage.getItem("finance_accounts") || "[]");
-
-    const type = accType.value;
-    const name = accName.value.trim();
-    const number = accNumber.value.trim();
-
-    if (!name || !number) return alert("Fill all fields");
-
-    accounts.push({ type, name, number });
-
-    localStorage.setItem("finance_accounts", JSON.stringify(accounts));
-
-    loadAccounts();
-    alert("Account added!");
-}
-
-function loadAccounts() {
-    let accounts = JSON.parse(localStorage.getItem("finance_accounts") || "[]");
-    linkedAccountsList.innerHTML = "";
-    linkedAccount.innerHTML = "";
-
-    accounts.forEach(acc => {
-        linkedAccountsList.innerHTML += `
-            <p><strong>${acc.name}</strong> (${acc.type}) — ${acc.number}</p>
-        `;
-
-        linkedAccount.innerHTML += `
-            <option>${acc.name} — ${acc.number}</option>
-        `;
-    });
-}
+/* ---------- Small helpers & initial load ---------- */
+function loadAccounts(){ /* load accounts defined earlier */ } // function declared above
 loadAccounts();
 
-let activePayrollIndex = null;
-
-function openPaymentScreen(index) {
-    activePayrollIndex = index;
-    document.getElementById("paymentModal").style.display = "flex";
-}
-
-function closePaymentModal() {
-    document.getElementById("paymentModal").style.display = "none";
-}
-
-function confirmPayment() {
-    const payroll = JSON.parse(localStorage.getItem("finance_pending_payroll") || "[]");
-    const pay = payroll[activePayrollIndex];
-
-    pay.status = "Paid";
-    pay.paidVia = paymentMethod.value;
-    pay.account = linkedAccount.value;
-    pay.paidAt = new Date().toISOString();
-
-    // Save payment record
-    let log = JSON.parse(localStorage.getItem("finance_payments") || "[]");
-    log.push(pay);
-
-    localStorage.setItem("finance_payments", JSON.stringify(log));
-    localStorage.setItem("finance_pending_payroll", JSON.stringify(payroll));
-
-    closePaymentModal();
-    loadPendingPayroll();
-    alert("Payment successful!");
-}
-
+/* ---------- Initial demo if empty ---------- */
+(function initIfEmpty(){
+  if(!read(HR_PAYROLL_KEY).length) seedDemo();
+})();
 </script>
+
 </body>
 </html>
