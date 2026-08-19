@@ -22,11 +22,9 @@ if (!isset($_SESSION['user'])) {
     
     <!-- Core Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
         :root {
-            /* Palette Architecture */
             --brand-primary: #1e40af;
             --brand-primary-hover: #1d4ed8;
             --brand-surface: #f8fafc;
@@ -50,21 +48,15 @@ if (!isset($_SESSION['user'])) {
             --amber-600: #d97706;
             --amber-50: #fffbeb;
 
-            /* Visual Hierarchy */
             --radius-sm: 6px;
             --radius-md: 10px;
             --radius-lg: 16px;
-            --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
             --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
             --shadow-elevation: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -76,7 +68,7 @@ if (!isset($_SESSION['user'])) {
             -webkit-font-smoothing: antialiased;
         }
 
-        /* App Layout Architecture */
+        /* App Layout */
         .app-sidebar {
             width: 280px;
             background-color: var(--slate-900);
@@ -96,23 +88,10 @@ if (!isset($_SESSION['user'])) {
             border-bottom: 1px solid var(--slate-800);
         }
 
-        .sidebar-header i {
-            font-size: 24px;
-            color: var(--brand-accent);
-        }
+        .sidebar-header i { font-size: 24px; color: var(--brand-accent); }
+        .sidebar-header h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
 
-        .sidebar-header h2 {
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-
-        .nav-group {
-            padding: 16px 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+        .nav-group { padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
 
         .nav-item {
             padding: 12px 16px;
@@ -120,30 +99,27 @@ if (!isset($_SESSION['user'])) {
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 14px;
+            justify-content: space-between;
             color: var(--slate-400);
             font-size: 14px;
             font-weight: 500;
             transition: var(--transition-fast);
         }
 
-        .nav-item:hover {
-            background-color: var(--slate-800);
+        .nav-item-content { display: flex; align-items: center; gap: 14px; }
+        .nav-item:hover { background-color: var(--slate-800); color: white; }
+        .nav-item.active { background-color: var(--brand-primary); color: white; font-weight: 600; }
+
+        .unread-badge {
+            background-color: var(--rose-600);
             color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 9999px;
         }
 
-        .nav-item.active {
-            background-color: var(--brand-primary);
-            color: white;
-            font-weight: 600;
-        }
-
-        .app-main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+        .app-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
         .top-navbar {
             background: white;
@@ -155,24 +131,11 @@ if (!isset($_SESSION['user'])) {
             padding: 0 32px;
         }
 
-        .page-title h1 {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--slate-900);
-        }
+        .page-title h1 { font-size: 20px; font-weight: 700; color: var(--slate-900); }
+        .page-title p { font-size: 12px; color: var(--slate-500); }
 
-        .page-title p {
-            font-size: 12px;
-            color: var(--slate-500);
-        }
+        .content-container { flex: 1; padding: 32px; overflow-y: auto; }
 
-        .content-container {
-            flex: 1;
-            padding: 32px;
-            overflow-y: auto;
-        }
-
-        /* System Controls & Components */
         .btn {
             padding: 9px 16px;
             border-radius: var(--radius-sm);
@@ -190,8 +153,6 @@ if (!isset($_SESSION['user'])) {
         .btn-primary:hover { background-color: var(--brand-primary-hover); }
         .btn-secondary { background-color: white; border-color: var(--slate-300); color: var(--slate-700); }
         .btn-secondary:hover { background-color: var(--slate-50); }
-        .btn-danger { background-color: var(--rose-600); color: white; }
-        .btn-danger:hover { background-color: #be123c; }
 
         .card {
             background: white;
@@ -202,161 +163,141 @@ if (!isset($_SESSION['user'])) {
             margin-bottom: 24px;
         }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card-title { font-size: 16px; font-weight: 600; color: var(--slate-900); }
 
-        .card-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--slate-900);
-        }
+        .table-wrapper { width: 100%; overflow-x: auto; border: 1px solid var(--slate-200); border-radius: var(--radius-sm); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background-color: var(--slate-50); padding: 12px 16px; font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--slate-500); border-bottom: 1px solid var(--slate-200); }
+        td { padding: 16px; font-size: 14px; border-bottom: 1px solid var(--slate-200); color: var(--slate-700); }
 
-        /* Metric Indicators */
-        .kpi-grid {
+        /* Messaging Center Interface */
+        .messaging-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-bottom: 24px;
-        }
-
-        .kpi-card {
-            background: white;
+            grid-template-columns: 320px 1fr;
+            height: calc(100vh - 180px);
             border: 1px solid var(--slate-200);
             border-radius: var(--radius-md);
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .kpi-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: var(--radius-sm);
-            background-color: var(--slate-100);
-            color: var(--brand-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-
-        .kpi-data .value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--slate-900);
-            line-height: 1.2;
-        }
-
-        .kpi-data .label {
-            font-size: 13px;
-            color: var(--slate-500);
-            margin-top: 4px;
-        }
-
-        /* Professional Data Table */
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            border: 1px solid var(--slate-200);
-            border-radius: var(--radius-sm);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th {
-            background-color: var(--slate-50);
-            padding: 12px 16px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--slate-500);
-            border-bottom: 1px solid var(--slate-200);
-        }
-
-        td {
-            padding: 16px;
-            font-size: 14px;
-            border-bottom: 1px solid var(--slate-200);
-            color: var(--slate-700);
-        }
-
-        tr:last-child td { border-bottom: none; }
-        tr:hover td { background-color: var(--slate-50); }
-
-        /* Badge Indicators */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 8px;
-            border-radius: 9999px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .badge-pending { background-color: var(--amber-50); color: var(--amber-600); }
-        .badge-approved { background-color: var(--emerald-50); color: var(--emerald-600); }
-        .badge-rejected { background-color: var(--rose-50); color: var(--rose-600); }
-
-        /* Dialog System */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 50;
-        }
-
-        .modal-dialog {
             background: white;
-            border-radius: var(--radius-lg);
-            width: 100%;
-            max-width: 480px;
-            box-shadow: var(--shadow-elevation);
             overflow: hidden;
         }
 
-        .modal-header {
-            padding: 20px 24px;
+        .chat-sidebar {
+            border-right: 1px solid var(--slate-200);
+            display: flex;
+            flex-direction: column;
+            background: var(--slate-50);
+        }
+
+        .chat-search-box { padding: 16px; border-bottom: 1px solid var(--slate-200); }
+
+        .chat-role-filter {
+            display: flex;
+            gap: 6px;
+            padding: 0 16px 12px 16px;
+            border-bottom: 1px solid var(--slate-200);
+        }
+
+        .role-chip {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            background: var(--slate-200);
+            color: var(--slate-700);
+            cursor: pointer;
+        }
+
+        .role-chip.active { background: var(--brand-primary); color: white; }
+
+        .contact-list { flex: 1; overflow-y: auto; }
+
+        .contact-item {
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--slate-200);
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .contact-item:hover, .contact-item.active { background-color: white; }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--brand-accent);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .role-badge-tag {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+        }
+        .tag-hr { background: #dbeafe; color: #1e40af; }
+        .tag-teacher { background: #fef3c7; color: #b45309; }
+
+        .chat-window { display: flex; flex-direction: column; background: white; }
+
+        .chat-header {
+            padding: 16px 24px;
             border-bottom: 1px solid var(--slate-200);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .modal-body { padding: 24px; }
-        .modal-footer {
-            padding: 16px 24px;
-            background-color: var(--slate-50);
+        .chat-messages {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: var(--slate-50);
+        }
+
+        .message-bubble {
+            max-width: 65%;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .msg-incoming {
+            align-self: flex-start;
+            background: white;
+            border: 1px solid var(--slate-200);
+            color: var(--slate-800);
+        }
+
+        .msg-outgoing {
+            align-self: flex-end;
+            background: var(--brand-primary);
+            color: white;
+        }
+
+        .msg-time { font-size: 10px; margin-top: 4px; opacity: 0.75; text-align: right; }
+
+        .chat-input-area {
+            padding: 16px;
             border-top: 1px solid var(--slate-200);
             display: flex;
-            justify-content: flex-end;
             gap: 12px;
-        }
-
-        /* Form Control Overhauls */
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--slate-700);
-            margin-bottom: 6px;
+            background: white;
         }
 
         .form-control {
@@ -366,47 +307,16 @@ if (!isset($_SESSION['user'])) {
             border: 1px solid var(--slate-300);
             font-family: inherit;
             font-size: 14px;
-            transition: var(--transition-fast);
         }
 
-        .form-control:focus {
-            outline: none;
-            border-color: var(--brand-primary);
-            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
-        }
-
-        /* Notification Toast Architecture */
-        #toast-container {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            z-index: 100;
-        }
-
-        .toast {
-            background-color: var(--slate-900);
-            color: white;
-            padding: 12px 20px;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-elevation);
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 8px;
-            animation: slideIn 0.2s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+        #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 100; }
+        .toast { background-color: var(--slate-900); color: white; padding: 12px 20px; border-radius: var(--radius-md); font-size: 14px; }
     </style>
 </head>
 
 <body>
 
-    <!-- Sidebar Architecture -->
+    <!-- Sidebar Navigation -->
     <aside class="app-sidebar">
         <div>
             <div class="sidebar-header">
@@ -415,631 +325,239 @@ if (!isset($_SESSION['user'])) {
             </div>
             <nav class="nav-group">
                 <div class="nav-item active" data-section="dashboard">
-                    <i class="fa-solid fa-chart-pie"></i> Executive Overview
+                    <div class="nav-item-content">
+                        <i class="fa-solid fa-chart-pie"></i> Overview
+                    </div>
+                </div>
+                <div class="nav-item" data-section="messaging">
+                    <div class="nav-item-content">
+                        <i class="fa-solid fa-comments"></i> HR & Staff Chat
+                    </div>
+                    <span class="unread-badge" id="unreadMsgCount">2</span>
                 </div>
                 <div class="nav-item" data-section="pendingPayroll">
-                    <i class="fa-solid fa-file-invoice-dollar"></i> Pending Payroll
-                </div>
-                <div class="nav-item" data-section="approvedPayroll">
-                    <i class="fa-solid fa-circle-check"></i> Approved Payroll
-                </div>
-                <div class="nav-item hrOnly" data-section="salaryAdvances">
-                    <i class="fa-solid fa-hand-holding-dollar"></i> Salary Advances
-                </div>
-                <div class="nav-item financeOnly" data-section="audit">
-                    <i class="fa-solid fa-shield-halved"></i> Security Audit Trail
+                    <div class="nav-item-content">
+                        <i class="fa-solid fa-file-invoice-dollar"></i> Pending Payroll
+                    </div>
                 </div>
             </nav>
         </div>
         <div class="nav-group">
             <div class="nav-item" id="logoutBtn">
-                <i class="fa-solid fa-right-from-bracket"></i> Terminate Session
+                <div class="nav-item-content">
+                    <i class="fa-solid fa-right-from-bracket"></i> Terminate Session
+                </div>
             </div>
         </div>
     </aside>
 
-    <!-- Main Engine Context -->
+    <!-- Main Container -->
     <main class="app-main">
         <header class="top-navbar">
             <div class="page-title">
                 <h1 id="sectionHeading">Executive Overview</h1>
-                <p><span id="orgDisplay"></span> Platform — Authenticated as <span id="roleDisplay"></span></p>
-            </div>
-            <div style="display:flex; gap:12px;">
-                <button class="btn btn-secondary" id="exportFinancePDF">
-                    <i class="fa-solid fa-file-pdf"></i> Generate Report
-                </button>
+                <p><span id="orgDisplay"></span> Suite — Logged in as Finance Officer</p>
             </div>
         </header>
 
         <section class="content-container">
             
-            <!-- Dashboard Overview Panel -->
+            <!-- Dashboard View -->
             <div id="dashboard" class="view-section">
-                <div class="kpi-grid">
-                    <div class="kpi-card">
-                        <div class="kpi-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
-                        <div class="kpi-data">
-                            <div class="value" id="kpiPending">0</div>
-                            <div class="label">Pending Payrolls</div>
-                        </div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-icon"><i class="fa-solid fa-circle-dollar-to-slot"></i></div>
-                        <div class="kpi-data">
-                            <div class="value" id="kpiApproved">0</div>
-                            <div class="label">Approved This Period</div>
-                        </div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-icon"><i class="fa-solid fa-coins"></i></div>
-                        <div class="kpi-data">
-                            <div class="value" id="kpiAdvances">0</div>
-                            <div class="label">Active Advances</div>
-                        </div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-icon"><i class="fa-solid fa-users"></i></div>
-                        <div class="kpi-data">
-                            <div class="value" id="kpiEmployees">0</div>
-                            <div class="label">Active Personnel</div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="card">
                     <div class="card-header">
-                        <div class="card-title">Pending Payroll Approvals (Direct Individual Settlement)</div>
+                        <div class="card-title">Pending Payroll Authorizations</div>
                     </div>
-                    <div class="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Personnel Name</th>
-                                    <th>Base Amount</th>
-                                    <th>Pay Period</th>
-                                    <th>State</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pendingPayrollTableBody"></tbody>
-                        </table>
-                    </div>
+                    <p style="color: var(--slate-500); font-size: 14px;">Select the "HR & Staff Chat" tab from the sidebar to communicate with HR Officers or Teaching staff regarding payroll verifications.</p>
                 </div>
             </div>
 
-            <!-- Pending Batches Section -->
+            <!-- Messaging View -->
+            <div id="messaging" class="view-section" style="display:none;">
+                <div class="messaging-grid">
+                    
+                    <!-- Contacts Column -->
+                    <div class="chat-sidebar">
+                        <div class="chat-search-box">
+                            <input type="text" id="contactSearch" class="form-control" placeholder="Search HR or Teachers...">
+                        </div>
+                        <div class="chat-role-filter">
+                            <span class="role-chip active" onclick="AppController.filterContacts('all', this)">All</span>
+                            <span class="role-chip" onclick="AppController.filterContacts('hr', this)">HR Team</span>
+                            <span class="role-chip" onclick="AppController.filterContacts('teacher', this)">Teachers</span>
+                        </div>
+                        <div class="contact-list" id="contactList"></div>
+                    </div>
+
+                    <!-- Chat Active Window -->
+                    <div class="chat-window">
+                        <div class="chat-header">
+                            <div>
+                                <h3 id="activeContactName" style="font-size: 15px; font-weight: 600;">Select a Conversation</h3>
+                                <p id="activeContactRole" style="font-size: 12px; color: var(--slate-500);">Direct Channel</p>
+                            </div>
+                            <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px;">
+                                <i class="fa-solid fa-user-gear"></i> View Profile
+                            </button>
+                        </div>
+                        
+                        <div class="chat-messages" id="chatThread">
+                            <p style="text-align: center; color: var(--slate-400); margin-auto: auto;">Select HR or Teacher to view message log</p>
+                        </div>
+
+                        <form id="sendMessageForm" class="chat-input-area">
+                            <input type="text" id="messageInput" class="form-control" placeholder="Type a message or inquiry..." required autocomplete="off">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa-solid fa-paper-plane"></i> Send
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Pending Payroll View Placeholder -->
             <div id="pendingPayroll" class="view-section" style="display:none;">
                 <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">Pending Batch Authorizations</div>
-                        <button class="btn btn-primary" id="bulkApproveBtn">
-                            <i class="fa-solid fa-check-double"></i> Authorize All Batches
-                        </button>
-                    </div>
-                    <div class="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Index</th>
-                                    <th>Batch Reference</th>
-                                    <th>Originator</th>
-                                    <th>Period</th>
-                                    <th>Gross Amount</th>
-                                    <th>Status</th>
-                                    <th>Control Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pendingTable"></tbody>
-                        </table>
-                    </div>
+                    <div class="card-title">Pending Batches</div>
                 </div>
-            </div>
-
-            <!-- Approved Batches Section -->
-            <div id="approvedPayroll" class="view-section" style="display:none;">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">Historical Disbursed Payrolls</div>
-                    </div>
-                    <div class="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Index</th>
-                                    <th>Batch Reference</th>
-                                    <th>Approver</th>
-                                    <th>Period</th>
-                                    <th>Gross Amount</th>
-                                    <th>Settlement Date</th>
-                                </tr>
-                            </thead>
-                            <tbody id="approvedTable"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Salary Advances Section -->
-            <div id="salaryAdvances" class="view-section" style="display:none;">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">Salary Advance Requests</div>
-                        <button class="btn btn-primary" id="newAdvanceBtn"><i class="fa-solid fa-plus"></i> Request Advance</button>
-                    </div>
-                    <div class="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Employee</th>
-                                    <th>Requested Value</th>
-                                    <th>Justification</th>
-                                    <th>State</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="advancesTable"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- System Audit Log Section -->
-            <div id="audit" class="view-section" style="display:none;">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">System Audit Log & Immutable Trails</div>
-                    </div>
-                    <div id="auditLog" style="display:flex; flex-direction:column; gap:12px;"></div>
-                </div>
-            </div>
-
-            <!-- Financial Settlement Accounts Panel -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">Linked Disbursal Accounts</div>
-                </div>
-                <div id="linkedAccountsList" style="margin-bottom:16px;"></div>
-                <form id="addAccountForm" style="display:grid; grid-template-columns: 1fr 1fr 1fr auto; gap:12px; align-items:end;">
-                    <div class="form-group" style="margin:0;">
-                        <label>Account Modality</label>
-                        <select id="accType" class="form-control">
-                            <option value="momo">Mobile Money Platform</option>
-                            <option value="bank">Commercial Bank Account</option>
-                            <option value="wallet">Internal Treasury Account</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="margin:0;">
-                        <label>Account Label</label>
-                        <input id="accName" class="form-control" placeholder="e.g. Operations Clearing" required>
-                    </div>
-                    <div class="form-group" style="margin:0;">
-                        <label>Identifier / Number</label>
-                        <input id="accNumber" class="form-control" placeholder="e.g. 024XXXXXXX" required>
-                    </div>
-                    <button type="submit" class="btn btn-secondary"><i class="fa-solid fa-plus"></i> Link Channel</button>
-                </form>
             </div>
 
         </section>
     </main>
 
-    <!-- Disbursal Payment Modal Container -->
-    <div class="modal-overlay" id="paymentModal">
-        <div class="modal-dialog">
-            <div class="modal-header">
-                <h3 style="font-size:16px; font-weight:600;">Execute Disbursement Settlement</h3>
-                <button class="btn btn-secondary" style="padding:4px 8px;" onclick="AppController.closePaymentModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Preferred Settlement Channel</label>
-                    <select id="paymentMethod" class="form-control">
-                        <option value="momo">Mobile Money API</option>
-                        <option value="bank">Direct ACH / Clearing House</option>
-                        <option value="wallet">Internal Ledger Allocation</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Funding Account Source</label>
-                    <select id="linkedAccount" class="form-control"></select>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="AppController.closePaymentModal()">Cancel</button>
-                <button class="btn btn-primary" id="confirmPayBtn"><i class="fa-solid fa-paper-plane"></i> Execute Payment</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Notification Engine Mount Container -->
     <div id="toast-container"></div>
 
-    <!-- Modular Script Engine -->
     <script>
-        /**
-         * Enterprise Storage Management Service
-         */
-        class StorageService {
-            static parse(key) {
-                try {
-                    return JSON.parse(localStorage.getItem(key)) || [];
-                } catch (e) {
-                    console.error(`Storage read failure for key: ${key}`, e);
-                    return [];
-                }
-            }
-
-            static save(key, value) {
-                try {
-                    localStorage.setItem(key, JSON.stringify(value));
-                } catch (e) {
-                    console.error(`Storage write failure for key: ${key}`, e);
-                }
-            }
-        }
-
-        /**
-         * Application Core Controller
-         */
         const AppController = (function () {
             const ORG = localStorage.getItem('active_org') || 'FLAWLESS';
             
-            // Storage Namespace Definitions
-            const KEYS = {
-                HR_PAYROLL: `${ORG}_hr_payroll_batches`,
-                FIN_APPROVED: `${ORG}_finance_approved_batches`,
-                FIN_AUDIT: `${ORG}_finance_audit`,
-                ACCOUNTS: `${ORG}_finance_accounts`,
-                PENDING_EMP: `${ORG}_employee_pending_payments`,
-                ADVANCES: `${ORG}_salary_advances`
-            };
+            // Mock Contacts Data (HR Officers & Teachers)
+            const contacts = [
+                { id: 'c1', name: 'Sarah Jenkins', role: 'hr', title: 'HR Manager', initials: 'SJ' },
+                { id: 'c2', name: 'David Miller', role: 'teacher', title: 'Senior Math Teacher', initials: 'DM' },
+                { id: 'c3', name: 'Grace Adams', role: 'hr', title: 'Payroll Specialist', initials: 'GA' },
+                { id: 'c4', name: 'Robert Chen', role: 'teacher', title: 'Science Lead', initials: 'RC' }
+            ];
 
-            let state = {
-                session: null,
-                activePayrollIndex: null
-            };
+            let activeContactId = 'c1';
+            let currentFilter = 'all';
 
-            // Public Initializer
             function init() {
                 document.getElementById('orgDisplay').textContent = ORG;
-                setupSecuritySession();
-                bindEventHandlers();
-                refreshState();
+                bindEvents();
+                renderContacts();
+                loadChatThread('c1');
             }
 
-            function setupSecuritySession() {
-                state.session = JSON.parse(localStorage.getItem(`${ORG}_session`)) || {
-                    email: 'system.admin@' + ORG.toLowerCase() + '.com',
-                    role: 'finance',
-                    name: 'System Controller'
-                };
-                
-                document.getElementById('roleDisplay').textContent = state.session.role.toUpperCase();
-                
-                // Enforce Access Visual Boundaries
-                document.querySelectorAll('.hrOnly').forEach(el => 
-                    el.style.display = state.session.role === 'hr' ? 'flex' : 'none'
-                );
-                document.querySelectorAll('.financeOnly').forEach(el => 
-                    el.style.display = state.session.role === 'finance' ? 'flex' : 'none'
-                );
-            }
-
-            function bindEventHandlers() {
-                // Navigation Logic
+            function bindEvents() {
+                // Navigation handler
                 document.querySelectorAll('.nav-item[data-section]').forEach(item => {
                     item.addEventListener('click', (e) => {
                         const section = e.currentTarget.dataset.section;
-                        
                         document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
                         e.currentTarget.classList.add('active');
                         
                         document.querySelectorAll('.view-section').forEach(sec => sec.style.display = 'none');
                         document.getElementById(section).style.display = 'block';
-                        
                         document.getElementById('sectionHeading').textContent = e.currentTarget.innerText.trim();
                     });
                 });
 
-                // Control Handlers
-                document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-                document.getElementById('addAccountForm').addEventListener('submit', handleAddAccount);
-                document.getElementById('confirmPayBtn').addEventListener('click', executeIndividualPayment);
-                document.getElementById('bulkApproveBtn')?.addEventListener('click', handleBulkApproval);
-                document.getElementById('newAdvanceBtn')?.addEventListener('click', handleAdvanceRequest);
-            }
-
-            function formatCurrency(val) {
-                return new Intl.NumberFormat('en-GH', { style: 'currency', currency: 'GHS' }).format(val || 0);
-            }
-
-            function notify(msg) {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                toast.className = 'toast';
-                toast.innerHTML = `<i class="fa-solid fa-circle-info"></i> ${msg}`;
-                container.appendChild(toast);
-                setTimeout(() => toast.remove(), 4000);
-            }
-
-            function pushAudit(action, payload = '') {
-                const logs = StorageService.parse(KEYS.FIN_AUDIT);
-                logs.unshift({
-                    id: 'aud_' + Date.now(),
-                    actor: state.session.email,
-                    action,
-                    payload,
-                    timestamp: new Date().toISOString()
+                // Chat submit
+                document.getElementById('sendMessageForm').addEventListener('submit', handleSendMessage);
+                
+                // Contact search
+                document.getElementById('contactSearch').addEventListener('input', (e) => {
+                    renderContacts(e.target.value.toLowerCase());
                 });
-                StorageService.save(KEYS.FIN_AUDIT, logs);
-                renderAuditLogs();
             }
 
-            function refreshState() {
-                renderKPIs();
-                renderPendingBatches();
-                renderApprovedBatches();
-                renderIndividualPayments();
-                renderLinkedAccounts();
-                renderAuditLogs();
-                renderAdvances();
+            function filterContacts(role, el) {
+                currentFilter = role;
+                document.querySelectorAll('.role-chip').forEach(c => c.classList.remove('active'));
+                el.classList.add('active');
+                renderContacts();
             }
 
-            function renderKPIs() {
-                const pending = StorageService.parse(KEYS.HR_PAYROLL).filter(x => (x.status || 'pending') === 'pending');
-                const approved = StorageService.parse(KEYS.FIN_APPROVED);
-                const advances = StorageService.parse(KEYS.ADVANCES).filter(x => x.status === 'approved');
-                
-                document.getElementById('kpiPending').textContent = pending.length;
-                document.getElementById('kpiApproved').textContent = approved.length;
-                document.getElementById('kpiAdvances').textContent = advances.length;
-                document.getElementById('kpiEmployees').textContent = '124'; // System baseline
-            }
+            function renderContacts(query = '') {
+                const list = document.getElementById('contactList');
+                const filtered = contacts.filter(c => {
+                    const matchesRole = currentFilter === 'all' || c.role === currentFilter;
+                    const matchesSearch = c.name.toLowerCase().includes(query) || c.title.toLowerCase().includes(query);
+                    return matchesRole && matchesSearch;
+                });
 
-            function renderIndividualPayments() {
-                const list = StorageService.parse(KEYS.PENDING_EMP);
-                const tbody = document.getElementById('pendingPayrollTableBody');
-                tbody.innerHTML = list.length === 0 
-                    ? `<tr><td colspan="5" style="text-align:center; color:var(--slate-400);">No individual pending transactions found</td></tr>`
-                    : list.map((p, idx) => `
-                        <tr>
-                            <td style="font-weight:500;">${escapeHtml(p.name)}</td>
-                            <td>${formatCurrency(p.salary)}</td>
-                            <td>${escapeHtml(p.month)}</td>
-                            <td><span class="badge badge-pending">${escapeHtml(p.status || 'Pending')}</span></td>
-                            <td>
-                                <button class="btn btn-primary" style="padding:4px 10px; font-size:12px;" onclick="AppController.openPaymentModal(${idx})">
-                                    Disburse Payment
-                                </button>
-                            </td>
-                        </tr>
-                    `).join('');
-            }
-
-            function renderPendingBatches() {
-                const batches = StorageService.parse(KEYS.HR_PAYROLL);
-                const tbody = document.getElementById('pendingTable');
-                tbody.innerHTML = batches.map((b, i) => `
-                    <tr>
-                        <td>${i + 1}</td>
-                        <td><code>${escapeHtml(b.batchId)}</code></td>
-                        <td>${escapeHtml(b.submittedBy || 'HR Engine')}</td>
-                        <td>${escapeHtml(b.period || 'N/A')}</td>
-                        <td>${formatCurrency(b.total)}</td>
-                        <td><span class="badge badge-pending">${escapeHtml(b.status || 'pending')}</span></td>
-                        <td>
-                            ${(b.status || 'pending') === 'pending' ? `
-                                <button class="btn btn-secondary" style="padding:4px 8px;" onclick="AppController.approveBatch('${b.batchId}')">Authorize</button>
-                            ` : 'Processed'}
-                        </td>
-                    </tr>
-                `).join('');
-            }
-
-            function renderApprovedBatches() {
-                const batches = StorageService.parse(KEYS.FIN_APPROVED);
-                const tbody = document.getElementById('approvedTable');
-                tbody.innerHTML = batches.map((b, i) => `
-                    <tr>
-                        <td>${i + 1}</td>
-                        <td><code>${escapeHtml(b.batchId)}</code></td>
-                        <td>${escapeHtml(b.approvedBy)}</td>
-                        <td>${escapeHtml(b.period || 'N/A')}</td>
-                        <td>${formatCurrency(b.total)}</td>
-                        <td>${new Date(b.paidOn).toLocaleDateString()}</td>
-                    </tr>
-                `).join('');
-            }
-
-            function renderLinkedAccounts() {
-                const accounts = StorageService.parse(KEYS.ACCOUNTS);
-                const list = document.getElementById('linkedAccountsList');
-                const select = document.getElementById('linkedAccount');
-                
-                list.innerHTML = accounts.map(a => `
-                    <div style="padding:8px 12px; background:var(--slate-50); border:1px solid var(--slate-200); border-radius:var(--radius-sm); margin-bottom:6px; display:flex; justify-content:space-between; font-size:13px;">
-                        <span><strong>${escapeHtml(a.name)}</strong> (${escapeHtml(a.type).toUpperCase()})</span>
-                        <code style="color:var(--slate-600);">${escapeHtml(a.number)}</code>
-                    </div>
-                `).join('');
-
-                select.innerHTML = accounts.map(a => `<option value="${a.id}">${escapeHtml(a.name)} (${escapeHtml(a.number)})</option>`).join('');
-            }
-
-            function renderAuditLogs() {
-                const logs = StorageService.parse(KEYS.FIN_AUDIT);
-                const container = document.getElementById('auditLog');
-                container.innerHTML = logs.map(l => `
-                    <div style="padding:12px; background:var(--slate-50); border:1px solid var(--slate-200); border-radius:var(--radius-sm);">
-                        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--slate-500); margin-bottom:4px;">
-                            <span><strong>${escapeHtml(l.actor)}</strong> — ${escapeHtml(l.action)}</span>
-                            <span>${new Date(l.timestamp).toLocaleString()}</span>
+                list.innerHTML = filtered.map(c => `
+                    <div class="contact-item ${c.id === activeContactId ? 'active' : ''}" onclick="AppController.selectContact('${c.id}')">
+                        <div class="avatar">
+                            ${c.initials}
                         </div>
-                        <div style="font-size:13px; color:var(--slate-700); font-family:monospace;">${escapeHtml(l.payload)}</div>
+                        <div style="flex:1; overflow:hidden;">
+                            <div style="display:flex; align-items:center; justify-content:space-between;">
+                                <strong style="font-size:13px;">${c.name}</strong>
+                                <span class="role-badge-tag ${c.role === 'hr' ? 'tag-hr' : 'tag-teacher'}">${c.role}</span>
+                            </div>
+                            <p style="font-size:12px; color:var(--slate-500); text-overflow:ellipsis; white-space:nowrap; overflow:hidden;">${c.title}</p>
+                        </div>
                     </div>
                 `).join('');
             }
 
-            function renderAdvances() {
-                const advances = StorageService.parse(KEYS.ADVANCES);
-                const tbody = document.getElementById('advancesTable');
-                tbody.innerHTML = advances.map((r) => `
-                    <tr>
-                        <td><code>${escapeHtml(r.requestId)}</code></td>
-                        <td>${escapeHtml(r.employee)}</td>
-                        <td>${formatCurrency(r.amount)}</td>
-                        <td>${escapeHtml(r.reason)}</td>
-                        <td><span class="badge badge-${r.status === 'approved' ? 'approved' : 'pending'}">${escapeHtml(r.status)}</span></td>
-                        <td>
-                            ${r.status === 'pending' ? `<button class="btn btn-secondary" style="padding:2px 8px;" onclick="AppController.approveAdvance('${r.requestId}')">Approve</button>` : '—'}
-                        </td>
-                    </tr>
+            function selectContact(id) {
+                activeContactId = id;
+                renderContacts();
+                loadChatThread(id);
+            }
+
+            function loadChatThread(contactId) {
+                const contact = contacts.find(c => c.id === contactId);
+                if (!contact) return;
+
+                document.getElementById('activeContactName').textContent = contact.name;
+                document.getElementById('activeContactRole').textContent = `${contact.title} (${contact.role.toUpperCase()})`;
+
+                const storageKey = `chat_${ORG}_${contactId}`;
+                const messages = JSON.parse(localStorage.getItem(storageKey)) || [
+                    { sender: 'them', text: `Hello Finance, reaching out regarding the updated allowance structure for this period.`, time: '10:15 AM' }
+                ];
+
+                const chatThread = document.getElementById('chatThread');
+                chatThread.innerHTML = messages.map(m => `
+                    <div class="message-bubble ${m.sender === 'me' ? 'msg-outgoing' : 'msg-incoming'}">
+                        <div>${m.text}</div>
+                        <div class="msg-time">${m.time}</div>
+                    </div>
                 `).join('');
+                
+                chatThread.scrollTop = chatThread.scrollHeight;
             }
 
-            function handleAddAccount(e) {
+            function handleSendMessage(e) {
                 e.preventDefault();
-                const name = document.getElementById('accName').value.trim();
-                const number = document.getElementById('accNumber').value.trim();
-                const type = document.getElementById('accType').value;
-                
-                if (!name || !number) return;
+                const input = document.getElementById('messageInput');
+                const text = input.value.trim();
+                if (!text) return;
 
-                const accounts = StorageService.parse(KEYS.ACCOUNTS);
-                accounts.push({ id: 'acc_' + Date.now(), name, number, type });
-                StorageService.save(KEYS.ACCOUNTS, accounts);
-                
-                pushAudit('Account Linked', `Registered new payment channel: ${name}`);
-                notify('Payment Channel Successfully Registered');
-                document.getElementById('addAccountForm').reset();
-                renderLinkedAccounts();
-            }
+                const storageKey = `chat_${ORG}_${activeContactId}`;
+                const messages = JSON.parse(localStorage.getItem(storageKey)) || [];
 
-            function openPaymentModal(index) {
-                state.activePayrollIndex = index;
-                document.getElementById('paymentModal').style.display = 'flex';
-            }
+                const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                messages.push({ sender: 'me', text, time: timeStr });
 
-            function closePaymentModal() {
-                document.getElementById('paymentModal').style.display = 'none';
-                state.activePayrollIndex = null;
-            }
-
-            function executeIndividualPayment() {
-                if (state.activePayrollIndex === null) return;
-                
-                const list = StorageService.parse(KEYS.PENDING_EMP);
-                const record = list[state.activePayrollIndex];
-                
-                record.status = 'Paid';
-                StorageService.save(KEYS.PENDING_EMP, list);
-                
-                pushAudit('Disbursement Executed', `Paid ${record.name}: ${formatCurrency(record.salary)}`);
-                notify(`Payment transaction completed successfully.`);
-                
-                closePaymentModal();
-                refreshState();
-            }
-
-            function handleBulkApproval() {
-                const batches = StorageService.parse(KEYS.HR_PAYROLL);
-                const approved = StorageService.parse(KEYS.FIN_APPROVED);
-                
-                batches.forEach(b => {
-                    if (b.status === 'pending' || !b.status) {
-                        b.status = 'approved';
-                        approved.push({
-                            ...b,
-                            approvedBy: state.session.email,
-                            paidOn: new Date().toISOString()
-                        });
-                    }
-                });
-                
-                StorageService.save(KEYS.HR_PAYROLL, batches);
-                StorageService.save(KEYS.FIN_APPROVED, approved);
-                pushAudit('Bulk Batch Authorization', 'Authorized all outstanding pending batches.');
-                notify('All pending payroll batches successfully processed.');
-                refreshState();
-            }
-
-            function handleAdvanceRequest() {
-                const emp = prompt('Enter Employee Name:');
-                const amt = prompt('Enter Requested Amount:');
-                if (!emp || !amt) return;
-
-                const advances = StorageService.parse(KEYS.ADVANCES);
-                advances.push({
-                    requestId: 'adv_' + Date.now(),
-                    employee: emp,
-                    amount: parseFloat(amt),
-                    reason: 'General Disbursal Advance',
-                    status: 'pending'
-                });
-                StorageService.save(KEYS.ADVANCES, advances);
-                notify('Salary advance request posted');
-                refreshState();
-            }
-
-            function approveAdvance(id) {
-                const advances = StorageService.parse(KEYS.ADVANCES);
-                const adv = advances.find(x => x.requestId === id);
-                if (adv) {
-                    adv.status = 'approved';
-                    StorageService.save(KEYS.ADVANCES, advances);
-                    pushAudit('Advance Approval', `Authorized advance for ${adv.employee}`);
-                    notify('Advance approved');
-                    refreshState();
-                }
-            }
-
-            function approveBatch(batchId) {
-                const batches = StorageService.parse(KEYS.HR_PAYROLL);
-                const approved = StorageService.parse(KEYS.FIN_APPROVED);
-                
-                const idx = batches.findIndex(x => x.batchId === batchId);
-                if (idx !== -1) {
-                    batches[idx].status = 'approved';
-                    approved.push({
-                        ...batches[idx],
-                        approvedBy: state.session.email,
-                        paidOn: new Date().toISOString()
-                    });
-                    
-                    StorageService.save(KEYS.HR_PAYROLL, batches);
-                    StorageService.save(KEYS.FIN_APPROVED, approved);
-                    pushAudit('Batch Approved', `Authorized payroll batch ${batchId}`);
-                    notify(`Batch ${batchId} successfully authorized`);
-                    refreshState();
-                }
-            }
-
-            function handleLogout() {
-                localStorage.removeItem(`${ORG}_session`);
-                window.location.reload();
-            }
-
-            function escapeHtml(str) {
-                return String(str || '').replace(/[&<>"']/g, c => ({
-                    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-                }[c]));
+                localStorage.setItem(storageKey, JSON.stringify(messages));
+                input.value = '';
+                loadChatThread(activeContactId);
             }
 
             return {
                 init,
-                openPaymentModal,
-                closePaymentModal,
-                approveBatch,
-                approveAdvance
+                filterContacts,
+                selectContact
             };
         })();
 
-        // Bootstrapping Platform Context
-        document.addEventListener('DOMContentLoaded', () => {
-            AppController.init();
-        });
+        document.addEventListener('DOMContentLoaded', AppController.init);
     </script>
 </body>
 </html>
