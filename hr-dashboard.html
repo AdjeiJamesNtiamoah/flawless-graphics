@@ -16,7 +16,6 @@
   .dark{ --bg:#0d1117; --card:#0f1724; --text:#e6eef8; --muted:#9aa9bf; --sidebar:#071026; --sidebar-hover:#153049; }
   *{box-sizing:border-box}
   body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:var(--text);height:100vh;display:flex;overflow:hidden}
-  
   /* sidebar */
   .sidebar{width:260px;background:var(--sidebar);color:white;display:flex;flex-direction:column;padding:18px;gap:12px;transition:width .22s}
   .sidebar.collapsed{width:64px}
@@ -48,14 +47,14 @@
   .actions button{margin-right:6px}
 
   /* modal */
-  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:100}
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center}
   .modal-backdrop.show{display:flex}
   .modal{width:720px;max-width:95%;background:var(--card);padding:16px;border-radius:12px}
   .form-grid{display:grid;grid-template-columns:1fr 320px;gap:12px}
   @media(max-width:900px){ .form-grid{grid-template-columns:1fr} .sidebar{display:none} }
 
   /* toast */
-  .toast{position:fixed;right:18px;bottom:18px;background:#0b1220;color:white;padding:12px 14px;border-radius:10px;opacity:0;transform:translateY(16px);transition:.3s;z-index:200}
+  .toast{position:fixed;right:18px;bottom:18px;background:#0b1220;color:white;padding:12px 14px;border-radius:10px;opacity:0;transform:translateY(16px);transition:.3s;z-index:9999}
   .toast.show{opacity:1;transform:none}
 
   .small{font-size:13px;color:var(--muted)}
@@ -64,8 +63,8 @@
   /* profile flyout */
   .flyout{position:fixed;right:18px;top:80px;width:420px;background:var(--card);padding:12px;border-radius:12px;box-shadow:0 18px 48px rgba(2,6,23,0.2);display:none;z-index:50}
   .flyout.show{display:block}
+  .toggle-theme {padding:8px;border-radius:8px;border:1px solid var(--glass);cursor:pointer;background:transparent}
 
-  /* settings panel color picks */
   .color-swatch{width:28px;height:28px;border-radius:6px;display:inline-block;margin-right:8px;cursor:pointer;border:1px solid rgba(0,0,0,0.06)}
 </style>
 </head>
@@ -82,7 +81,7 @@
   </div>
 
   <div class="profile-row">
-    <img id="sidePhoto" class="profile-thumb" src="https://via.placeholder.com/44" alt="photo">
+    <img id="sidePhoto" class="profile-thumb" src="" alt="photo">
     <div>
       <div id="sideName">—</div>
       <div class="small" id="sideEmail">—</div>
@@ -98,7 +97,7 @@
     <button data-section="announcements"><i class="fa fa-bullhorn"></i> Announcements</button>
     <button data-section="messages"><i class="fa fa-envelope"></i> Messages</button>
     <button data-section="settings"><i class="fa fa-cog"></i> Settings</button>
-    <a href="welcome.html" style="color:var(--muted);text-decoration:none;padding:10px;font-weight:600">← Home</a>
+     <a href="welcome.html" style="color:var(--muted);text-decoration:none;padding:10px;font-weight:600">← Home</a>
   </nav>
 
   <button class="collapse-btn" id="collapseBtn"><i class="fa fa-angle-left"></i> Collapse</button>
@@ -197,7 +196,7 @@
         </div>
       </div>
       <div style="width:320px;background:rgba(0,0,0,0.02);padding:12px;border-radius:8px">
-        <h4>Net Pay Details</h4>
+        <h4>Net Pay</h4>
         <div id="payResult" class="small">Select employee & compute</div>
       </div>
     </div>
@@ -220,8 +219,8 @@
   <section class="panel" id="messagesSectionPanel" style="display:none">
     <h3>Messages</h3>
     <div style="display:flex;gap:8px">
-      <input id="msgTo" class="select" placeholder="To (email or group)">
-      <input id="msgSubject" class="select" placeholder="Subject">
+      <input id="msgTo" class="select" placeholder="To (email or group)" style="flex:1">
+      <input id="msgSubject" class="select" placeholder="Subject" style="flex:1">
     </div>
     <textarea id="msgBody" rows="4" style="width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1px solid var(--glass)"></textarea>
     <div style="margin-top:8px">
@@ -252,7 +251,7 @@
       <div style="width:260px">
         <h4>AI Assistant</h4>
         <div id="aiPanel" style="background:rgba(0,0,0,0.03);padding:10px;border-radius:8px">
-          <input id="aiQuery" class="select" placeholder="Ask HR assistant (e.g., 'who is absent today?')">
+          <input id="aiQuery" class="select" placeholder="Ask HR assistant...">
           <div style="margin-top:8px">
             <button class="btn ghost" id="askAiBtn">Ask</button>
           </div>
@@ -261,6 +260,7 @@
       </div>
     </div>
   </section>
+
 </main>
 
 <!-- MODAL: Add/Edit Employee -->
@@ -270,15 +270,15 @@
     <div class="form-grid">
       <div>
         <label class="small">Full name</label>
-        <input id="emp_name" class="select" style="width:100%"/>
+        <input id="emp_name" class="select" />
         <label class="small">Role</label>
-        <input id="emp_role" class="select" style="width:100%"/>
+        <input id="emp_role" class="select" />
         <label class="small">Department</label>
-        <input id="emp_dept" class="select" style="width:100%"/>
+        <input id="emp_dept" class="select" />
         <label class="small">Email</label>
-        <input id="emp_email" class="select" style="width:100%"/>
+        <input id="emp_email" class="select" />
         <label class="small">Salary (monthly ₵)</label>
-        <input id="emp_salary" type="number" class="select" style="width:100%"/>
+        <input id="emp_salary" type="number" class="select" />
         <div style="margin-top:8px">
           <button class="btn" id="saveEmpBtn">Save</button>
           <button class="btn ghost" id="cancelEmpBtn">Cancel</button>
@@ -286,7 +286,7 @@
       </div>
       <div>
         <label class="small">Photo</label>
-        <img id="emp_preview" class="profile-thumb" src="https://via.placeholder.com/160" alt="preview" style="width:160px;height:160px">
+        <img id="emp_preview" class="profile-thumb" src="" alt="preview" style="width:160px;height:160px">
         <input id="emp_photo" type="file" accept="image/*" style="margin-top:8px">
         <div class="small" style="margin-top:8px">Tip: Profile photo stored in localStorage (base64)</div>
       </div>
@@ -314,28 +314,16 @@ let orgs = read(ORG_LIST_KEY);
 if(!orgs || !orgs.length){ save(ORG_LIST_KEY, DEFAULT_ORGS); orgs = DEFAULT_ORGS }
 const orgSwitcher = document.getElementById('orgSwitcher');
 const ACTIVE_ORG = localStorage.getItem('active_org') || orgs[0];
-
 function populateOrgSwitcher(){
-  orgSwitcher.innerHTML=''; 
-  orgs.forEach(o=>{ 
-    const opt=document.createElement('option'); 
-    opt.value=o; 
-    opt.textContent=o; 
-    if(o===ACTIVE_ORG) opt.selected=true; 
-    orgSwitcher.appendChild(opt); 
-  });
+  orgSwitcher.innerHTML=''; orgs.forEach(o=>{ const opt=document.createElement('option'); opt.value=o; opt.textContent=o; if(o===ACTIVE_ORG) opt.selected=true; orgSwitcher.appendChild(opt) })
 }
 populateOrgSwitcher();
-orgSwitcher.addEventListener('change',()=>{ localStorage.setItem('active_org', orgSwitcher.value); location.reload(); });
+orgSwitcher.addEventListener('change',()=>{ localStorage.setItem('active_org', orgSwitcher.value); location.reload() })
 
-/* --- Keys per Org --- */
+/* --- keys per org --- */
 function key(k){ const A = localStorage.getItem('active_org') || ACTIVE_ORG; return `${A}_${k}` }
-const EMP_KEY = key('employees'); 
-const ATT_KEY = key('attendance'); 
-const PAY_KEY = key('payments');
-const ANN_KEY = key('announcements'); 
-const ACT_KEY = key('activity'); 
-const DEPT_KEY = key('departments');
+const EMP_KEY = key('employees'); const ATT_KEY = key('attendance'); const PAY_KEY = key('payments');
+const ANN_KEY = key('announcements'); const ACT_KEY = key('activity'); const DEPT_KEY = key('departments');
 const TEACH_ATT_KEY = key('teacher_attendance'); 
 const FINANCE_INBOX_KEY = key('finance_inbox');
 
@@ -362,9 +350,7 @@ document.getElementById('roleSwitcher').addEventListener('change', (e)=>{
   showToast('Role switched to ' + currentUser.role);
 });
 
-/* ------------------------
-   UI Navigation
--------------------------*/
+/* UI sections */
 const sections = {
   dashboard: document.getElementById('dashboardSection'),
   employees: document.getElementById('employeesSection'),
@@ -375,32 +361,31 @@ const sections = {
   messages: document.getElementById('messagesSectionPanel'),
   settings: document.getElementById('settingsSectionPanel')
 };
-
 function showSection(name){
-  document.querySelectorAll('main section.panel').forEach(s=> s.style.display='none');
+  Object.values(sections).forEach(s=> s.style.display='none');
   if(sections[name]) sections[name].style.display = 'block';
   document.querySelectorAll('#nav button').forEach(b=> b.classList.remove('active'));
-  const btn = document.querySelector('#nav button[data-section="'+name+'"]');
-  if(btn) {
-    btn.classList.add('active');
-    document.getElementById('pageTitle').textContent = btn.textContent.trim();
+  const activeBtn = document.querySelector('#nav button[data-section="'+name+'"]');
+  if(activeBtn) {
+    activeBtn.classList.add('active');
+    document.getElementById('pageTitle').textContent = activeBtn.textContent.trim();
   }
 }
 document.querySelectorAll('#nav button').forEach(b=> b.addEventListener('click', ()=> showSection(b.dataset.section)));
+showSection('dashboard');
 
-/* Sidebar Toggle */
+/* Collapse sidebar */
 const sidebar = document.getElementById('sidebar'), collapseBtn = document.getElementById('collapseBtn');
 let collapsed = false;
-collapseBtn.addEventListener('click', ()=>{ 
-  collapsed=!collapsed; 
-  sidebar.classList.toggle('collapsed', collapsed); 
-  collapseBtn.innerHTML = collapsed? '<i class="fa fa-angle-right"></i>' : '<i class="fa fa-angle-left"></i> Collapse'; 
-});
+collapseBtn.addEventListener('click', ()=>{ collapsed=!collapsed; sidebar.classList.toggle('collapsed', collapsed); collapseBtn.innerHTML = collapsed? '<i class="fa fa-angle-right"></i> Expand':'<i class="fa fa-angle-left"></i> Collapse'; });
 
-/* Theme Toggle */
+/* Theme toggle */
+let isDark = localStorage.getItem('hr_dark_mode') === 'true';
+if(isDark) document.documentElement.classList.add('dark');
 document.getElementById('themeToggle').addEventListener('click', ()=>{
-  document.body.classList.toggle('dark');
-  showToast('Theme toggled');
+  isDark = !isDark;
+  document.documentElement.classList.toggle('dark', isDark);
+  localStorage.setItem('hr_dark_mode', isDark);
 });
 
 /* Modal controls */
@@ -417,15 +402,11 @@ function openEmpModal(emp){
     document.getElementById('emp_dept').value = emp.dept || '';
     document.getElementById('emp_email').value = emp.email || '';
     document.getElementById('emp_salary').value = emp.salary || 0;
-    document.getElementById('emp_preview').src = emp.photo || 'https://via.placeholder.com/160';
+    document.getElementById('emp_preview').src = emp.photo||'';
     document.getElementById('saveEmpBtn').dataset.editId = emp.id;
   } else {
-    document.getElementById('emp_name').value=''; 
-    document.getElementById('emp_role').value=''; 
-    document.getElementById('emp_dept').value='';
-    document.getElementById('emp_email').value=''; 
-    document.getElementById('emp_salary').value='0'; 
-    document.getElementById('emp_preview').src='https://via.placeholder.com/160';
+    document.getElementById('emp_name').value=''; document.getElementById('emp_role').value=''; document.getElementById('emp_dept').value='';
+    document.getElementById('emp_email').value=''; document.getElementById('emp_salary').value='0'; document.getElementById('emp_preview').src='';
     delete document.getElementById('saveEmpBtn').dataset.editId;
   }
 }
@@ -433,9 +414,7 @@ function closeEmpModal(){ modalBackdrop.classList.remove('show'); }
 
 document.getElementById('emp_photo').addEventListener('change', (e)=>{
   const f = e.target.files[0]; if(!f) return;
-  const r = new FileReader(); 
-  r.onload = ()=> document.getElementById('emp_preview').src = r.result; 
-  r.readAsDataURL(f);
+  const r = new FileReader(); r.onload = ()=> document.getElementById('emp_preview').src = r.result; r.readAsDataURL(f);
 });
 
 document.getElementById('saveEmpBtn').addEventListener('click', ()=>{
@@ -448,15 +427,9 @@ document.getElementById('saveEmpBtn').addEventListener('click', ()=>{
   const photo = document.getElementById('emp_preview').src || '';
   const employees = read(EMP_KEY);
   const editId = document.getElementById('saveEmpBtn').dataset.editId;
-
   if(editId){
     const idx = employees.findIndex(e=> e.id === editId);
-    if(idx>=0){ 
-      employees[idx] = {...employees[idx], name, role, dept, email, salary, photo}; 
-      save(EMP_KEY, employees); 
-      pushActivity(`Updated ${name}`); 
-      showToast('Employee updated'); 
-    }
+    if(idx>=0){ employees[idx] = {...employees[idx], name, role, dept, email, salary, photo}; save(EMP_KEY, employees); pushActivity(`Updated ${name}`); showToast('Employee updated'); }
   } else {
     const id = 'e_'+Date.now();
     employees.push({ id, name, role, dept, email, salary, photo });
@@ -464,51 +437,52 @@ document.getElementById('saveEmpBtn').addEventListener('click', ()=>{
     pushActivity(`Added ${name}`);
     showToast('Employee added');
   }
-  closeEmpModal(); 
-  renderAll();
+  closeEmpModal(); renderAll();
 });
 
-/* Activity logging */
-function pushActivity(text){ 
-  const arr = read(ACT_KEY); 
-  arr.push({ text, time:new Date().toISOString() }); 
-  save(ACT_KEY, arr); 
-  renderActivity(); 
-}
+/* Seed Demo data */
+(function seed(){
+  const emps = read(EMP_KEY);
+  if(emps.length===0){
+    const demo = [
+      { id:'e_1', name:'Adjei James', role:'Manager', dept:'Admin', email:'james@example.com', salary:3500, photo:'' },
+      { id:'e_2', name:'Emmanuel Ofori', role:'Analyst', dept:'Finance', email:'emmanuel@example.com', salary:2500, photo:'' },
+      { id:'e_3', name:'Ama Serwaa', role:'Teacher', dept:'Teaching', email:'ama@example.com', salary:2200, photo:'' }
+    ]; save(EMP_KEY, demo); pushActivity('Seeded demo employees');
+  }
+})();
 
-function renderActivity(){ 
-  const arr = read(ACT_KEY).slice().reverse(); 
-  const el = document.getElementById('activityFeed'); 
-  el.innerHTML = arr.slice(0,12).map(a=> `<div class="small">${new Date(a.time).toLocaleString()} • ${a.text}</div>`).join(''); 
-}
+function pushActivity(text){ const arr = read(ACT_KEY); arr.push({ text, time:new Date().toISOString() }); save(ACT_KEY, arr); renderActivity(); }
+function renderActivity(){ const arr = read(ACT_KEY).slice().reverse(); const el = document.getElementById('activityFeed'); if(el) el.innerHTML = arr.slice(0,12).map(a=> `<div class="small">${new Date(a.time).toLocaleString()} • ${a.text}</div>`).join(''); }
 
 function renderAnnouncements(){ 
   const list = read(ANN_KEY).slice().reverse(); 
   const el = document.getElementById('announcementList'); 
-  el.innerHTML = list.map(a=> `<div style="padding:8px;border-bottom:1px solid var(--glass)"><strong>${a.title}</strong> <div class="small">${new Date(a.time).toLocaleString()}</div><div>${a.body}</div></div>`).join(''); 
+  if(el) el.innerHTML = list.map(a=> `<div style="padding:8px;border-bottom:1px solid var(--glass)"><strong>${a.title}</strong> <div class="small">${new Date(a.time).toLocaleString()}</div><div>${a.body}</div></div>`).join(''); 
 }
 
 document.getElementById('postAnnouncement').addEventListener('click', ()=>{
   const input = document.getElementById('announcementInput');
-  const text = input.value.trim();
-  if(!text) return;
+  const val = input.value.trim();
+  if(!val) return;
   const list = read(ANN_KEY);
-  list.push({ title: 'Announcement', body: text, time: new Date().toISOString() });
+  list.push({ title:'General Notice', body:val, time:new Date().toISOString() });
   save(ANN_KEY, list);
-  input.value = '';
+  input.value='';
   renderAnnouncements();
   showToast('Announcement posted');
 });
 
-/* Render Table & Filters */
+/* Employee Table Rendering */
 const employeeTable = document.getElementById('employeeTable');
 function renderEmployees(filterText=''){
   const arr = read(EMP_KEY);
   const roleFilter = document.getElementById('filterRole').value;
   const deptFilter = document.getElementById('filterDept').value;
   const search = filterText.toLowerCase();
+  if(!employeeTable) return;
   employeeTable.innerHTML = '';
-
+  
   arr.filter(e=>{
     if(roleFilter && e.role !== roleFilter) return false;
     if(deptFilter && e.dept !== deptFilter) return false;
@@ -522,19 +496,9 @@ function renderEmployees(filterText=''){
     const todays = read(ATT_KEY).filter(a=> a.employeeId === e.id && a.date.startsWith(today));
     const last = todays[todays.length-1];
     const att = last? (last.action==='in'?'IN':'OUT') : '—';
-    
     const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${e.name}</td>
-      <td>${e.role}</td>
-      <td>${e.dept||''}</td>
-      <td>${e.email||''}</td>
-      <td>₵ ${Number(e.salary||0).toLocaleString()}</td>
-      <td>${att}</td>
-      <td class="actions">
-        <button class="btn ghost" onclick="openEdit('${e.id}')">Edit</button>
-        <button class="btn" onclick="openProfile('${e.id}')">Profile</button>
-      </td>`;
+    tr.innerHTML = `<td>${e.name}</td><td>${e.role}</td><td>${e.dept||''}</td><td>${e.email||''}</td><td>₵ ${Number(e.salary||0).toLocaleString()}</td><td>${att}</td>
+      <td class="actions"><button class="btn ghost" onclick="openEdit('${e.id}', event)">Edit</button><button class="btn" onclick="openProfile('${e.id}')">Profile</button></td>`;
     tr.addEventListener('dblclick', ()=> openEdit(e.id));
     employeeTable.appendChild(tr);
   });
@@ -546,62 +510,60 @@ function updateFilters(){
   const roles = new Set(read(EMP_KEY).map(e=> e.role || 'Staff'));
   const deps = read(DEPT_KEY);
   const roleSel = document.getElementById('filterRole'); 
-  roleSel.innerHTML = '<option value="">All roles</option>';
-  roles.forEach(r=> roleSel.appendChild(Object.assign(document.createElement('option'), { value:r, textContent:r })));
-  
+  if(roleSel) {
+    roleSel.innerHTML = '<option value="">All roles</option>';
+    roles.forEach(r=> roleSel.appendChild(Object.assign(document.createElement('option'), { value:r, textContent:r })));
+  }
   const deptSel = document.getElementById('filterDept'); 
-  deptSel.innerHTML = '<option value="">All departments</option>';
-  deps.forEach(d=> deptSel.appendChild(Object.assign(document.createElement('option'), { value:d, textContent:d })));
+  if(deptSel) {
+    deptSel.innerHTML = '<option value="">All departments</option>';
+    deps.forEach(d=> deptSel.appendChild(Object.assign(document.createElement('option'), { value:d, textContent:d })));
+  }
 }
-
 document.getElementById('filterRole').addEventListener('change', ()=> renderEmployees(document.getElementById('searchEmployee').value));
 document.getElementById('filterDept').addEventListener('change', ()=> renderEmployees(document.getElementById('searchEmployee').value));
 document.getElementById('searchEmployee').addEventListener('input', (e)=> renderEmployees(e.target.value));
 
-function openEdit(id){
+window.openEdit = function(id){
   const emp = read(EMP_KEY).find(x=>x.id===id);
   if(!emp) return;
   openEmpModal(emp);
 }
 
-/* Profile Flyout */
+/* Profile flyout */
 const flyout = document.getElementById('profileFlyout');
-function openProfile(id){
+window.openProfile = function(id){
   const emp = read(EMP_KEY).find(x=> x.id === id);
   if(!emp) return;
-  flyout.innerHTML = `
-    <div style="display:flex;gap:12px;align-items:center">
-      <img src="${emp.photo||'https://via.placeholder.com/84'}" style="width:84px;height:84px;border-radius:12px;object-fit:cover">
-      <div><strong>${emp.name}</strong><div class="small">${emp.role} • ${emp.dept||''}</div><div class="small">${emp.email||''}</div></div>
-    </div>
-    <hr style="border:0;border-top:1px solid var(--glass);margin:12px 0">
-    <div class="small"><strong>Recent Attendance</strong></div>
-    <div class="small">${renderProfileAttendanceHtml(emp.id)}</div>
-    <hr style="border:0;border-top:1px solid var(--glass);margin:12px 0">
-    <div class="small">Salary: ₵ ${Number(emp.salary||0).toLocaleString()}</div>
-    <div style="margin-top:8px"><button class="btn ghost" onclick="closeFlyout()">Close</button></div>`;
-  flyout.classList.add('show');
+  const html = `<div style="display:flex;gap:12px;align-items:center">
+    <img src="${emp.photo||''}" style="width:84px;height:84px;border-radius:12px;object-fit:cover">
+    <div><strong>${emp.name}</strong><div class="small">${emp.role} • ${emp.dept||''}</div><div class="small">${emp.email||''}</div></div>
+  </div>
+  <hr>
+  <div class="small"><strong>Attendance (recent)</strong></div>
+  <div class="small">${renderProfileAttendanceHtml(emp.id)}</div>
+  <hr>
+  <div class="small"><strong>Payroll</strong></div>
+  <div class="small">Salary: ₵ ${Number(emp.salary||0).toLocaleString()}</div>
+  <div style="margin-top:8px"><button class="btn ghost" onclick="closeFlyout()">Close</button></div>`;
+  flyout.innerHTML = html; flyout.classList.add('show');
 }
-function closeFlyout(){ flyout.classList.remove('show'); }
-
+window.closeFlyout = function(){ flyout.classList.remove('show') }
 function renderProfileAttendanceHtml(empId){
-  const arr = read(ATT_KEY).filter(a=> a.employeeId === empId).slice().reverse().slice(0,5);
-  if(!arr.length) return 'No records found';
-  return arr.map(a=> `${new Date(a.date).toLocaleDateString()} ${new Date(a.date).toLocaleTimeString()} - <strong>${a.action.toUpperCase()}</strong>`).join('<br>');
+  const arr = read(ATT_KEY).filter(a=> a.employeeId === empId).slice().reverse().slice(0,8);
+  if(!arr.length) return 'No records';
+  return arr.map(a=> `${new Date(a.date).toLocaleString()} • ${a.action.toUpperCase()}`).join('<br>');
 }
 
-/* Attendance Actions */
+/* Attendance */
 document.getElementById('openMarkBtn').addEventListener('click', renderAttendanceMarkArea);
-
 function renderAttendanceMarkArea(){
   const classes = read(DEPT_KEY);
   const classSel = document.getElementById('attClassSelect');
-  if(!classSel.children.length){
-    classSel.innerHTML = '<option value="">-- Select Dept --</option>';
-    classes.forEach(c=> classSel.appendChild(Object.assign(document.createElement('option'), { value:c, textContent:c })));
-  }
-  const area = document.getElementById('attendanceArea'); 
-  area.innerHTML='';
+  classSel.innerHTML = '<option value="">-- select dept --</option>';
+  classes.forEach(c=> classSel.appendChild(Object.assign(document.createElement('option'), { value:c, textContent:c })));
+  
+  const area = document.getElementById('attendanceArea'); area.innerHTML='';
   const dept = classSel.value || classes[0];
   const employees = read(EMP_KEY).filter(e=> (e.dept||'') === (dept||''));
   if(!employees.length) { area.innerHTML = '<div class="small">No employees in this department</div>'; return; }
@@ -611,80 +573,52 @@ function renderAttendanceMarkArea(){
   const tbody = document.createElement('tbody');
   employees.forEach((e,i)=> {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td><td>${e.name}</td><td>
-      <button class="btn" onclick="markAttendance('${e.id}','in')">IN</button>
-      <button class="btn ghost" onclick="markAttendance('${e.id}','out')">OUT</button>
-    </td>`;
+    tr.innerHTML = `<td>${i+1}</td><td>${e.name}</td><td><button class="btn" onclick="markAttendance('${e.id}','in')">IN</button>
+      <button class="btn ghost" onclick="markAttendance('${e.id}','out')">OUT</button></td>`;
     tbody.appendChild(tr);
   });
   table.appendChild(tbody);
   area.appendChild(table);
 }
-
-function markAttendance(employeeId, action){
+window.markAttendance = function(employeeId, action){
   const arr = read(ATT_KEY);
   arr.push({ employeeId, action, date: new Date().toISOString() });
   save(ATT_KEY, arr);
-  pushActivity(`Attendance recorded: ${action.toUpperCase()} for ${employeeId}`);
+  pushActivity(`Attendance ${action.toUpperCase()}`);
   showToast('Attendance recorded');
   renderAll();
 }
 
-document.getElementById('syncTeachersBtn').addEventListener('click', ()=> {
-  const tarr = read(TEACH_ATT_KEY);
-  if(!tarr.length) return showToast('No teacher records to sync');
-  const employees = read(EMP_KEY);
-  let count = 0;
-  const attArr = read(ATT_KEY);
-  tarr.forEach(trec=>{
-    const emp = employees.find(e=> (e.email||'').toLowerCase() === (trec.email||'').toLowerCase());
-    if(emp && trec.log){
-      trec.log.forEach(l=>{
-        if(l.in) { attArr.push({ employeeId: emp.id, action:'in', date: l.in }); count++; }
-        if(l.out){ attArr.push({ employeeId: emp.id, action:'out', date: l.out }); count++; }
-      });
-    }
-  });
-  save(ATT_KEY, attArr);
-  pushActivity(`Synced ${count} teacher clock records`);
-  showToast(`Synced ${count} records`);
-  renderAll();
-});
-
-/* Payroll Calculations */
+/* Payroll Calculator & Finance Sender */
 function populatePayrollSelect(){
   const sel = document.getElementById('payEmployeeSelect'); 
+  if(!sel) return;
   sel.innerHTML = '<option value="">-- select employee --</option>';
   read(EMP_KEY).forEach(e=> sel.appendChild(Object.assign(document.createElement('option'), { value:e.id, textContent: e.name })));
 }
 
-document.getElementById('calcPayrollBtn').addEventListener('click', () => {
-  const id = document.getElementById('payEmployeeSelect').value; 
-  if(!id) return alert('Select employee');
+document.getElementById('calcPayrollBtn').addEventListener('click', ()=> {
+  const id = document.getElementById('payEmployeeSelect').value; if(!id) return alert('Select employee');
   const bonus = Number(document.getElementById('bonus').value) || 0;
   const deductions = Number(document.getElementById('deductions').value) || 0;
   const emp = read(EMP_KEY).find(x=>x.id===id);
-  
-  const base = Number(emp.salary || 0);
-  const gross = base + bonus;
+  if(!emp) return;
+  const gross = Number(emp.salary || 0) + bonus;
   const tax = Math.round(gross * 0.12);
   const net = gross - tax - deductions;
-
   document.getElementById('payResult').innerHTML = `
-    <strong>Employee:</strong> ${emp.name}<br>
-    <strong>Base Salary:</strong> ₵${base.toLocaleString()}<br>
-    <strong>Bonus:</strong> ₵${bonus.toLocaleString()}<br>
+    <strong>Gross:</strong> ₵${gross.toLocaleString()}<br>
     <strong>Tax (12%):</strong> ₵${tax.toLocaleString()}<br>
     <strong>Deductions:</strong> ₵${deductions.toLocaleString()}<br>
-    <hr style="border:0;border-top:1px solid var(--glass);margin:6px 0">
-    <strong>Net Pay:</strong> <span style="color:var(--accent);font-weight:800;font-size:16px">₵${net.toLocaleString()}</span>
+    <strong>Net Pay:</strong> ₵${net.toLocaleString()}
   `;
 });
 
 document.getElementById('sendToFinance').addEventListener('click', ()=> {
   const id = document.getElementById('payEmployeeSelect').value;
   if(!id) return alert("Select employee first.");
-  const emp = read(EMP_KEY).find(e=> e.id === id);
+  const employees = read(EMP_KEY);
+  const emp = employees.find(e=> e.id === id);
   if(!emp) return alert("Employee not found.");
 
   const bonus = Number(document.getElementById('bonus').value) || 0;
@@ -698,11 +632,7 @@ document.getElementById('sendToFinance').addEventListener('click', ()=> {
     employeeId: emp.id,
     employeeName: emp.name,
     salary: emp.salary,
-    bonus,
-    deductions,
-    gross,
-    tax,
-    net,
+    bonus, deductions, gross, tax, net,
     status: "PENDING",
     sentBy: currentUser.name,
     sentAt: new Date().toISOString()
@@ -716,40 +646,31 @@ document.getElementById('sendToFinance').addEventListener('click', ()=> {
   showToast("Payroll request sent to Finance.");
 });
 
-/* Calculate KPI totals & update UI */
-function renderAll(){
-  const employees = read(EMP_KEY);
-  document.getElementById('totalEmployees').textContent = employees.length;
-
-  const today = new Date().toISOString().split('T')[0];
-  const attendanceToday = read(ATT_KEY).filter(a=> a.date.startsWith(today));
+/* KPI calculations */
+function renderKPIs(){
+  const emps = read(EMP_KEY);
+  document.getElementById('totalEmployees').textContent = emps.length;
   
-  const presentSet = new Set(attendanceToday.filter(a=> a.action === 'in').map(a=> a.employeeId));
+  const today = new Date().toISOString().split('T')[0];
+  const att = read(ATT_KEY).filter(a=> a.date.startsWith(today));
+  const presentSet = new Set(att.filter(a=> a.action==='in').map(a=> a.employeeId));
+  
   document.getElementById('presentToday').textContent = presentSet.size;
-  document.getElementById('absentToday').textContent = Math.max(0, employees.length - presentSet.size);
+  document.getElementById('absentToday').textContent = Math.max(0, emps.length - presentSet.size);
 
-  const totalPay = employees.reduce((acc, e) => acc + Number(e.salary || 0), 0);
+  const totalPay = emps.reduce((acc, curr)=> acc + Number(curr.salary || 0), 0);
   document.getElementById('payrollTotal').textContent = '₵' + totalPay.toLocaleString();
+}
 
-  renderEmployees(document.getElementById('searchEmployee').value);
+function renderAll(){
+  renderKPIs();
+  renderEmployees();
   renderActivity();
   renderAnnouncements();
 }
 
-// Seed Demo Data if empty
-(function seed(){
-  const emps = read(EMP_KEY);
-  if(emps.length === 0){
-    const demo = [
-      { id:'e_1', name:'Adjei James', role:'Manager', dept:'Admin', email:'james@example.com', salary:3500, photo:'' },
-      { id:'e_2', name:'Emmanuel Ofori', role:'Analyst', dept:'Finance', email:'emmanuel@example.com', salary:2500, photo:'' },
-      { id:'e_3', name:'Ama Serwaa', role:'Teacher', dept:'Teaching', email:'ama@example.com', salary:2200, photo:'' }
-    ]; 
-    save(EMP_KEY, demo); 
-    pushActivity('Seeded demo employees'); 
-  }
-  renderAll();
-})();
+/* Initial load */
+renderAll();
 </script>
 </body>
 </html>
