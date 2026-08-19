@@ -239,13 +239,98 @@
         margin-bottom: 6px;
     }
 
+    /* Logo Upload Styles */
+    .logo-upload-container {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px dashed rgba(255, 255, 255, 0.25);
+        border-radius: 10px;
+        padding: 12px 14px;
+        transition: all 0.2s ease;
+    }
+
+    .logo-upload-container:hover {
+        border-color: #a2e8dd;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .logo-preview-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .logo-preview-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .logo-preview-box i {
+        font-size: 18px;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .logo-upload-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+    }
+
+    .btn-upload-trigger {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        width: fit-content;
+        transition: all 0.2s ease;
+    }
+
+    .btn-upload-trigger:hover {
+        background: rgba(255, 255, 255, 0.25);
+    }
+
+    .logo-hint {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .btn-remove-logo {
+        color: #ff9999;
+        font-size: 11px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        display: none;
+    }
+
     .input-wrapper {
         position: relative;
         display: flex;
         align-items: center;
     }
 
-    input {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
         width: 100%;
         padding: 12px 40px 12px 14px;
         background: rgba(255, 255, 255, 0.08);
@@ -406,6 +491,25 @@
                 <div id="msg" class="msg"></div>
 
                 <form id="registerForm" onsubmit="register(event)">
+                    
+                    <!-- Organization Logo Upload Field -->
+                    <div class="form-group">
+                        <label>Organization Logo (Optional)</label>
+                        <div class="logo-upload-container">
+                            <div class="logo-preview-box" id="logoPreviewBox">
+                                <i class="fa-regular fa-image" id="logoPlaceholderIcon"></i>
+                            </div>
+                            <div class="logo-upload-actions">
+                                <input type="file" id="orgLogo" accept="image/png, image/jpeg, image/svg+xml, image/webp" style="display: none;" onchange="handleLogoChange(event)">
+                                <button type="button" class="btn-upload-trigger" onclick="document.getElementById('orgLogo').click()">
+                                    <i class="fa-solid fa-upload"></i> Upload Logo
+                                </button>
+                                <span class="logo-hint" id="logoHint">PNG, JPG or SVG (Max 2MB)</span>
+                                <button type="button" class="btn-remove-logo" id="removeLogoBtn" onclick="removeLogo()">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label for="orgName">Organization Name</label>
                         <div class="input-wrapper">
@@ -451,6 +555,7 @@
 
 <script>
 const USERS_KEY = "organizations_users";
+let currentLogoBase64 = null;
 
 function readUsers() {
     try {
@@ -487,6 +592,37 @@ function togglePasswordVisibility() {
     }
 }
 
+function handleLogoChange(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+        showMessage("Logo image size must be under 2MB.");
+        event.target.value = "";
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        currentLogoBase64 = e.target.result;
+        
+        const previewBox = document.getElementById("logoPreviewBox");
+        previewBox.innerHTML = `<img src="${currentLogoBase64}" alt="Logo Preview">`;
+        
+        document.getElementById("removeLogoBtn").style.display = "inline-block";
+        document.getElementById("logoHint").style.display = "none";
+    };
+    reader.readAsDataURL(file);
+}
+
+function removeLogo() {
+    currentLogoBase64 = null;
+    document.getElementById("orgLogo").value = "";
+    document.getElementById("logoPreviewBox").innerHTML = `<i class="fa-regular fa-image" id="logoPlaceholderIcon"></i>`;
+    document.getElementById("removeLogoBtn").style.display = "none";
+    document.getElementById("logoHint").style.display = "inline";
+}
+
 async function register(event) {
     event.preventDefault();
 
@@ -519,6 +655,7 @@ async function register(event) {
 
         users.push({
             org: org,
+            logo: currentLogoBase64,
             name: name,
             email: email,
             pass: hashed,
