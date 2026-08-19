@@ -5,69 +5,105 @@
 <title>Register Organization</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
+    * {
+        box-sizing: border-box;
+    }
     body {
-        background:#071833;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        height:100vh;
-        margin:0;
-        font-family:Arial;
-        color:white;
+        background: #071833;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        color: white;
     }
     .box {
-        width:360px;
-        background:#102a57;
-        padding:30px;
-        border-radius:10px;
-        box-shadow:0 0 20px rgba(0,0,0,0.4);
+        width: 100%;
+        max-width: 380px;
+        background: #102a57;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.4);
     }
-    h2 { text-align:center; margin-bottom:20px; }
-    input, select {
-        width:100%;
-        padding:12px;
-        border-radius:6px;
-        border:none;
-        margin-top:6px;
-        margin-bottom:12px;
+    h2 { 
+        text-align: center; 
+        margin-top: 0;
+        margin-bottom: 20px; 
+    }
+    label {
+        display: block;
+        margin-top: 10px;
+        font-size: 14px;
+    }
+    input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        margin-top: 6px;
+        margin-bottom: 12px;
+        font-size: 14px;
+    }
+    input:focus {
+        outline: 2px solid #00a8ff;
     }
     button {
-        width:100%;
-        padding:12px;
-        border:none;
-        border-radius:6px;
-        background:#00a8ff;
-        color:white;
-        font-size:16px;
-        cursor:pointer;
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 6px;
+        background: #00a8ff;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 10px;
+        font-weight: bold;
     }
-    button:hover { background:#0089d6; }
-    a { color:#4ac3ff; }
-    .center { text-align:center; margin-top:10px; }
+    button:hover { background: #0089d6; }
+    button:disabled { background: #555; cursor: not-allowed; }
+    a { color: #4ac3ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .center { text-align: center; margin-top: 15px; font-size: 14px; }
+    
+    .msg {
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        display: none;
+        font-size: 14px;
+        text-align: center;
+    }
+    .msg.error { background: #e74c3c; color: white; display: block; }
+    .msg.success { background: #2ecc71; color: white; display: block; }
 </style>
 </head>
 <body>
 
 <div class="box">
-    <h2>Create Organization Account</h2>
+    <h2>Create Account</h2>
 
-    <label>Organization Name</label>
-    <input type="text" id="orgName" placeholder="Flawless Graphics Ltd">
+    <div id="msg" class="msg"></div>
 
-    <label>Admin Full Name</label>
-    <input type="text" id="fullName" placeholder="John Doe">
+    <form id="registerForm" onsubmit="register(event)">
+        <label for="orgName">Organization Name</label>
+        <input type="text" id="orgName" placeholder="Flawless Graphics Ltd" required>
 
-    <label>Email (Login Username)</label>
-    <input type="email" id="email" placeholder="admin@company.com">
+        <label for="fullName">Admin Full Name</label>
+        <input type="text" id="fullName" placeholder="John Doe" required>
 
-    <label>Password</label>
-    <input type="password" id="password" placeholder="Minimum 8 characters">
+        <label for="email">Email (Login Username)</label>
+        <input type="email" id="email" placeholder="admin@company.com" required>
 
-    <button onclick="register()">Register</button>
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Minimum 8 characters" required minlength="8">
+
+        <button type="submit" id="submitBtn">Register</button>
+    </form>
 
     <div class="center">
-        Already registered?  
-        <a href="site-login.html">Login</a>
+        Already registered? <a href="site-login.html">Login</a>
     </div>
 </div>
 
@@ -75,52 +111,78 @@
 const USERS_KEY = "organizations_users";
 
 function readUsers() {
-    return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+    try {
+        return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+    } catch (e) {
+        return [];
+    }
 }
 
 async function sha256(text) {
     const buf = new TextEncoder().encode(text);
     const hash = await crypto.subtle.digest("SHA-256", buf);
-    return [...new Uint8Array(hash)].map(x=>x.toString(16).padStart(2,"0")).join("");
+    return [...new Uint8Array(hash)].map(x => x.toString(16).padStart(2, "0")).join("");
 }
 
-async function register() {
+function showMessage(text, isError = true) {
+    const msgEl = document.getElementById("msg");
+    msgEl.textContent = text;
+    msgEl.className = "msg " + (isError ? "error" : "success");
+}
+
+async function register(event) {
+    event.preventDefault(); // Prevents page refresh on form submit
+
+    const submitBtn = document.getElementById("submitBtn");
     const org = document.getElementById("orgName").value.trim();
     const name = document.getElementById("fullName").value.trim();
     const email = document.getElementById("email").value.trim().toLowerCase();
     const pw = document.getElementById("password").value;
-    const role = "teacher"; // default role for teacher registration (You can change this later)
+    const role = "admin";
 
-    if (!org || !name || !email || !pw)
-        return alert("Please complete all fields.");
+    if (!org || !name || !email || !pw) {
+        return showMessage("Please complete all fields.");
+    }
 
-    if (pw.length < 8)
-        return alert("Password too short (min 8 chars).");
+    if (pw.length < 8) {
+        return showMessage("Password must be at least 8 characters.");
+    }
 
-    let users = readUsers();
+    submitBtn.disabled = true;
 
-    if (users.some(u => u.email === email))
-        return alert("Email already registered.");
+    try {
+        let users = readUsers();
 
-    const hashed = await sha256(pw);
+        if (users.some(u => u.email === email)) {
+            submitBtn.disabled = false;
+            return showMessage("Email address is already registered.");
+        }
 
-    // STORE IN FORMAT THAT LOGIN EXPECTS
-    users.push({
-        org: org,
-        name: name,
-        email: email,
-        pass: hashed,
-        role: role,
-        createdAt: Date.now()
-    });
+        const hashed = await sha256(pw);
 
-    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        users.push({
+            org: org,
+            name: name,
+            email: email,
+            pass: hashed,
+            role: role,
+            createdAt: Date.now()
+        });
 
-    alert("Registration successful!\nYou can now login.");
-    window.location.href = "site-login.html";
+        localStorage.setItem(USERS_KEY, JSON.stringify(users));
+
+        showMessage("Registration successful! Redirecting to login...", false);
+
+        setTimeout(() => {
+            window.location.href = "site-login.html";
+        }, 1500);
+
+    } catch (err) {
+        console.error(err);
+        showMessage("An error occurred during registration.", true);
+        submitBtn.disabled = false;
+    }
 }
 </script>
-
-
 </body>
 </html>
