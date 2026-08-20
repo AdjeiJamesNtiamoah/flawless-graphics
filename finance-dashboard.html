@@ -44,6 +44,8 @@
       --radius-md: 12px;
       --success: #10B981;
       --danger: #EF4444;
+      --input-bg: rgba(255, 255, 255, 0.7);
+      --input-border: rgba(203, 213, 225, 0.8);
     }
 
     .dark {
@@ -57,6 +59,8 @@
       --accent-gradient: linear-gradient(135deg, #0284C7 0%, #6366F1 100%);
       --glass-glow: rgba(56, 189, 248, 0.1);
       --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      --input-bg: rgba(15, 23, 42, 0.6);
+      --input-border: rgba(255, 255, 255, 0.12);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease; }
@@ -127,6 +131,10 @@
       border-radius: 20px;
       font-size: 13px;
       font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
       transition: all 0.2s ease;
     }
     nav a:hover, nav a.active { color: #fff; background: rgba(255, 255, 255, 0.1); }
@@ -153,6 +161,9 @@
 
     /* LAYOUT */
     main { max-width: 1280px; margin: 32px auto; padding: 0 24px; width: 100%; flex: 1; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
     .glass-card {
       background: var(--card-bg);
@@ -224,6 +235,165 @@
     .badge.success { background: rgba(16, 185, 129, 0.15); color: var(--success); }
     .badge.pending { background: rgba(245, 158, 11, 0.15); color: #F59E0B; }
 
+    /* MESSAGING LAYOUT */
+    .chat-layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+      height: 600px;
+    }
+    @media (max-width: 768px) { .chat-layout { grid-template-columns: 1fr; height: auto; } }
+
+    .chat-sidebar {
+      border-right: 1px solid var(--card-border);
+      padding-right: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-search {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text-main);
+      font-size: 13px;
+      margin-bottom: 14px;
+      outline: none;
+    }
+    .contact-list { list-style: none; overflow-y: auto; flex: 1; }
+    .contact-item {
+      padding: 12px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+      transition: background 0.2s ease;
+    }
+    .contact-item:hover, .contact-item.active { background: var(--glass-glow); }
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--accent-gradient);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      position: relative;
+    }
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--success);
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      border: 2px solid var(--bg-outer);
+    }
+    .contact-info .name { font-size: 13px; font-weight: 700; }
+    .contact-info .sub { font-size: 11px; color: var(--text-muted); }
+
+    .chat-window { display: flex; flex-direction: column; height: 100%; }
+    .chat-header {
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .message-bubble {
+      max-width: 70%;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .message-bubble.incoming {
+      background: rgba(0, 0, 0, 0.05);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+    .dark .message-bubble.incoming { background: rgba(255, 255, 255, 0.05); }
+    .message-bubble.outgoing {
+      background: var(--accent-gradient);
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .message-time { font-size: 10px; opacity: 0.7; margin-top: 4px; text-align: right; }
+
+    .chat-input-area {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--card-border);
+    }
+    .chat-input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 30px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text-main);
+      outline: none;
+      font-size: 13px;
+    }
+
+    /* SETTINGS FORM */
+    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 768px) { .settings-grid { grid-template-columns: 1fr; } }
+
+    .form-group { margin-bottom: 18px; }
+    .form-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text-main);
+      font-size: 13px;
+      outline: none;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 480px;
+      padding: 28px;
+      box-shadow: var(--shadow-lg);
+    }
+
     footer { text-align: center; padding: 24px; font-size: 13px; color: var(--text-muted); border-top: 1px solid var(--card-border); }
   </style>
 </head>
@@ -242,8 +412,10 @@
     <div class="header-actions">
       <nav>
         <ul>
-          <li><a href="welcome.html">Home</a></li>
-          <li><a href="finance-dashboard.html" class="active">Finance</a></li>
+          <li><a id="navHome" href="welcome.html"><i class="fa-solid fa-house"></i> Home</a></li>
+          <li><a id="navDashboard" class="active" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-pie"></i> Finance</a></li>
+          <li><a id="navMessaging" onclick="switchTab('messaging')"><i class="fa-solid fa-comments"></i> Messages</a></li>
+          <li><a id="navSettings" onclick="switchTab('settings')"><i class="fa-solid fa-gear"></i> Settings</a></li>
         </ul>
       </nav>
 
@@ -258,117 +430,307 @@
     </div>
   </header>
 
-  <!-- MAIN -->
+  <!-- MAIN CONTAINER -->
   <main>
-    <div class="page-title" data-aos="fade-down" data-aos-duration="600">
-      <div>
-        <h2>Finance & Payroll Control</h2>
-        <div style="font-size:13px; color:var(--text-muted)">Real-time ledger overview & department distributions</div>
+    
+    <!-- 1. DASHBOARD TAB -->
+    <div id="tabDashboard" class="tab-content active">
+      <div class="page-title" data-aos="fade-down" data-aos-duration="600">
+        <div>
+          <h2>Finance & Payroll Control</h2>
+          <div style="font-size:13px; color:var(--text-muted)">Real-time ledger overview & department distributions</div>
+        </div>
+        <div class="org-badge" id="displayOrg">Organization: Loaded</div>
       </div>
-      <div class="org-badge" id="displayOrg">Organization: Loaded</div>
+
+      <!-- METRICS -->
+      <div class="metrics-grid" data-aos="fade-up" data-aos-duration="600">
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fa-solid fa-wallet"></i></div>
+          <div class="metric-info">
+            <div class="label">Annual Budget</div>
+            <div class="val"><span class="curr">GHS</span> <span id="valBudget">450,000</span></div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fa-solid fa-users-gear"></i></div>
+          <div class="metric-info">
+            <div class="label">Monthly Payroll</div>
+            <div class="val"><span class="curr">GHS</span> <span id="valPayroll">0</span></div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
+          <div class="metric-info">
+            <div class="label">OpEx Expenses</div>
+            <div class="val"><span class="curr">GHS</span> <span id="valOpEx">38,200</span></div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fa-solid fa-piggy-bank"></i></div>
+          <div class="metric-info">
+            <div class="label">Net Liquidity</div>
+            <div class="val"><span class="curr">GHS</span> <span id="valLiquidity">312,800</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS -->
+      <div class="charts-grid">
+        <div class="glass-card" data-aos="fade-right" data-aos-duration="700">
+          <h3 style="font-size:16px; font-weight:800; margin-bottom:16px;">Cash Flow Analysis (2026)</h3>
+          <div style="position:relative; width:100%; height:260px;">
+            <canvas id="cashFlowChart"></canvas>
+          </div>
+        </div>
+
+        <div class="glass-card" data-aos="fade-left" data-aos-duration="700">
+          <h3 style="font-size:16px; font-weight:800; margin-bottom:16px;">Expense Allocation</h3>
+          <div style="position:relative; width:100%; height:260px;">
+            <canvas id="expenseAllocationChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECENT TRANSACTIONS TABLE -->
+      <div class="glass-card" data-aos="fade-up" data-aos-duration="800">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+          <h3 style="font-size:16px; font-weight:800;">Recent Ledger Transactions</h3>
+          <button class="btn-action" style="background:var(--accent-gradient)" onclick="openModal('disbursementModal')">+ New Disbursement</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Transaction ID</th>
+                <th>Category</th>
+                <th>Beneficiary</th>
+                <th>Date</th>
+                <th>Amount (<span class="curr">GHS</span>)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="transactionBody">
+              <tr>
+                <td>#TR-8921</td>
+                <td>Payroll Disbursement</td>
+                <td>All Active Staff</td>
+                <td>2026-08-01</td>
+                <td id="tablePayrollVal">0.00</td>
+                <td><span class="badge success">Processed</span></td>
+              </tr>
+              <tr>
+                <td>#TR-8920</td>
+                <td>Software Licenses</td>
+                <td>Adobe Creative Cloud</td>
+                <td>2026-08-05</td>
+                <td>4,200.00</td>
+                <td><span class="badge success">Processed</span></td>
+              </tr>
+              <tr>
+                <td>#TR-8919</td>
+                <td>Office Logistics</td>
+                <td>Accra Tech Hub</td>
+                <td>2026-08-12</td>
+                <td>1,850.00</td>
+                <td><span class="badge pending">Pending Approval</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
-    <!-- METRICS -->
-    <div class="metrics-grid" data-aos="fade-up" data-aos-duration="600">
-      <div class="metric-card">
-        <div class="metric-icon"><i class="fa-solid fa-wallet"></i></div>
-        <div class="metric-info">
-          <div class="label">Annual Budget</div>
-          <div class="val">GHS <span id="valBudget">450,000</span></div>
-        </div>
-      </div>
+    <!-- 2. MESSAGING TAB -->
+    <div id="tabMessaging" class="tab-content">
+      <div class="glass-card" data-aos="fade-up" data-aos-duration="600">
+        <div class="chat-layout">
+          
+          <!-- SIDEBAR CONTACTS -->
+          <div class="chat-sidebar">
+            <input type="text" class="chat-search" placeholder="Search team members..." id="searchContact" oninput="filterContacts()">
+            <ul class="contact-list" id="contactList">
+              <li class="contact-item active" onclick="selectContact(this, 'Kofi Mensah', 'Chief Accountant')">
+                <div class="avatar">KM <div class="status-dot"></div></div>
+                <div class="contact-info">
+                  <div class="name">Kofi Mensah</div>
+                  <div class="sub">Chief Accountant</div>
+                </div>
+              </li>
+              <li class="contact-item" onclick="selectContact(this, 'Ama Osei', 'Payroll Specialist')">
+                <div class="avatar" style="background:linear-gradient(135deg,#10B981,#059669)">AO <div class="status-dot"></div></div>
+                <div class="contact-info">
+                  <div class="name">Ama Osei</div>
+                  <div class="sub">Payroll Specialist</div>
+                </div>
+              </li>
+              <li class="contact-item" onclick="selectContact(this, 'Yaw Boateng', 'IT Admin')">
+                <div class="avatar" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9)">YB <div class="status-dot" style="background:#F59E0B"></div></div>
+                <div class="contact-info">
+                  <div class="name">Yaw Boateng</div>
+                  <div class="sub">IT Admin</div>
+                </div>
+              </li>
+            </ul>
+            <button class="btn-action" style="background:var(--accent-gradient); width:100%; justify-content:center; margin-top:12px;" onclick="openModal('newMessageModal')">+ New Direct Message</button>
+          </div>
 
-      <div class="metric-card">
-        <div class="metric-icon"><i class="fa-solid fa-users-gear"></i></div>
-        <div class="metric-info">
-          <div class="label">Monthly Payroll</div>
-          <div class="val">GHS <span id="valPayroll">0</span></div>
-        </div>
-      </div>
+          <!-- CHAT WINDOW -->
+          <div class="chat-window">
+            <div class="chat-header">
+              <div>
+                <h3 id="activeChatName" style="font-size:16px; font-weight:800;">Kofi Mensah</h3>
+                <span id="activeChatRole" style="font-size:12px; color:var(--text-muted)">Chief Accountant</span>
+              </div>
+              <button class="btn-action" style="padding:6px 12px;" onclick="alert('Calling module integrated with VoIP.')"><i class="fa-solid fa-phone"></i></button>
+            </div>
 
-      <div class="metric-card">
-        <div class="metric-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
-        <div class="metric-info">
-          <div class="label">OpEx Expenses</div>
-          <div class="val">GHS <span id="valOpEx">38,200</span></div>
-        </div>
-      </div>
+            <div class="chat-messages" id="chatMessages">
+              <div class="message-bubble incoming">
+                Hello Admin! Have you approved the Q3 Software budget request yet?
+                <div class="message-time">10:14 AM</div>
+              </div>
+              <div class="message-bubble outgoing">
+                Hey Kofi, checking the ledger right now. Will approve in a few minutes.
+                <div class="message-time">10:16 AM</div>
+              </div>
+            </div>
 
-      <div class="metric-card">
-        <div class="metric-icon"><i class="fa-solid fa-piggy-bank"></i></div>
-        <div class="metric-info">
-          <div class="label">Net Liquidity</div>
-          <div class="val">GHS <span id="valLiquidity">312,800</span></div>
+            <form class="chat-input-area" id="chatForm">
+              <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." required>
+              <button type="submit" class="btn-action" style="background:var(--accent-gradient); border-radius:30px;"><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
+          </div>
+
         </div>
       </div>
     </div>
 
-    <!-- CHARTS -->
-    <div class="charts-grid">
-      <div class="glass-card" data-aos="fade-right" data-aos-duration="700">
-        <h3 style="font-size:16px; font-weight:800; margin-bottom:16px;">Cash Flow Analysis (2026)</h3>
-        <div style="position:relative; width:100%; height:260px;">
-          <canvas id="cashFlowChart"></canvas>
-        </div>
-      </div>
+    <!-- 3. SETTINGS TAB -->
+    <div id="tabSettings" class="tab-content">
+      <div class="glass-card" data-aos="fade-up" data-aos-duration="600">
+        <h3 style="font-size:20px; font-weight:800; margin-bottom:20px;">System & Portal Settings</h3>
+        
+        <form id="settingsForm" onsubmit="saveSettings(event)">
+          <div class="settings-grid">
+            
+            <!-- PROFILE / GENERAL -->
+            <div>
+              <h4 style="font-size:14px; font-weight:700; margin-bottom:14px; color:var(--accent);">Admin Profile Preferences</h4>
+              
+              <div class="form-group">
+                <label class="form-label">Administrator Display Name</label>
+                <input type="text" class="form-input" id="setAdminName" value="Finance Admin">
+              </div>
 
-      <div class="glass-card" data-aos="fade-left" data-aos-duration="700">
-        <h3 style="font-size:16px; font-weight:800; margin-bottom:16px;">Expense Allocation</h3>
-        <div style="position:relative; width:100%; height:260px;">
-          <canvas id="expenseAllocationChart"></canvas>
-        </div>
+              <div class="form-group">
+                <label class="form-label">System Currency Display</label>
+                <select class="form-select" id="setCurrency" onchange="updateCurrencySymbol(this.value)">
+                  <option value="GHS">GHS (Ghanaian Cedi)</option>
+                  <option value="USD">USD ($ - US Dollar)</option>
+                  <option value="EUR">EUR (€ - Euro)</option>
+                  <option value="GBP">GBP (£ - British Pound)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Automatic Logout Timeout</label>
+                <select class="form-select" id="setTimeout">
+                  <option value="15">15 Minutes</option>
+                  <option value="30" selected>30 Minutes</option>
+                  <option value="60">1 Hour</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- SECURITY & AUDIT -->
+            <div>
+              <h4 style="font-size:14px; font-weight:700; margin-bottom:14px; color:var(--accent);">Security & Governance</h4>
+
+              <div class="form-group">
+                <label class="form-label">Two-Factor Authentication (2FA)</label>
+                <select class="form-select" id="set2FA">
+                  <option value="enabled">Enabled (Enforced)</option>
+                  <option value="disabled">Disabled</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Data Backup Options</label>
+                <button type="button" class="btn-action" style="width:100%; justify-content:center; background:var(--glass-glow); border-color:var(--card-border);" onclick="exportData()">
+                  <i class="fa-solid fa-download"></i> Export Local Financial Ledger (JSON)
+                </button>
+              </div>
+
+              <div class="form-group" style="margin-top:28px;">
+                <button type="button" class="btn-action logout" style="width:100%; justify-content:center;" onclick="purgeSystem()">
+                  <i class="fa-solid fa-trash"></i> Reset All Saved Session Data
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <div style="margin-top:24px; text-align:right;">
+            <button type="submit" class="btn-action" style="background:var(--accent-gradient); padding:10px 24px; font-size:13px;">Save Configuration</button>
+          </div>
+        </form>
       </div>
     </div>
 
-    <!-- RECENT TRANSACTIONS TABLE -->
-    <div class="glass-card" data-aos="fade-up" data-aos-duration="800">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-        <h3 style="font-size:16px; font-weight:800;">Recent Ledger Transactions</h3>
-        <button class="btn-action" style="background:var(--accent-gradient)" onclick="alert('Disbursement form ready for processing.')">+ New Disbursement</button>
-      </div>
-
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Transaction ID</th>
-              <th>Category</th>
-              <th>Beneficiary</th>
-              <th>Date</th>
-              <th>Amount (GHS)</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="transactionBody">
-            <tr>
-              <td>#TR-8921</td>
-              <td>Payroll Disbursement</td>
-              <td>All Active Staff</td>
-              <td>2026-08-01</td>
-              <td id="tablePayrollVal">0.00</td>
-              <td><span class="badge success">Processed</span></td>
-            </tr>
-            <tr>
-              <td>#TR-8920</td>
-              <td>Software Licenses</td>
-              <td>Adobe Creative Cloud</td>
-              <td>2026-08-05</td>
-              <td>4,200.00</td>
-              <td><span class="badge success">Processed</span></td>
-            </tr>
-            <tr>
-              <td>#TR-8919</td>
-              <td>Office Logistics</td>
-              <td>Accra Tech Hub</td>
-              <td>2026-08-12</td>
-              <td>1,850.00</td>
-              <td><span class="badge pending">Pending Approval</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
   </main>
+
+  <!-- MODALS -->
+
+  <!-- 1. NEW DISBURSEMENT MODAL -->
+  <div class="modal-overlay" id="disbursementModal">
+    <div class="modal-card">
+      <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;">New Ledger Disbursement</h3>
+      <form id="disbursementForm" onsubmit="addTransaction(event)">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <input type="text" id="disbCategory" class="form-input" placeholder="e.g. Logistics, Equipment" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Beneficiary</label>
+          <input type="text" id="disbBeneficiary" class="form-input" placeholder="e.g. Vendor Name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Amount</label>
+          <input type="number" id="disbAmount" class="form-input" placeholder="0.00" step="0.01" required>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+          <button type="button" class="btn-action" style="background:rgba(0,0,0,0.1)" onclick="closeModal('disbursementModal')">Cancel</button>
+          <button type="submit" class="btn-action" style="background:var(--accent-gradient)">Submit Entry</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. NEW MESSAGE MODAL -->
+  <div class="modal-overlay" id="newMessageModal">
+    <div class="modal-card">
+      <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;">Start Direct Message</h3>
+      <form id="newMsgForm" onsubmit="createContact(event)">
+        <div class="form-group">
+          <label class="form-label">Recipient Name</label>
+          <input type="text" id="newMsgName" class="form-input" placeholder="e.g. Sarah Jenkins" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Role / Department</label>
+          <input type="text" id="newMsgRole" class="form-input" placeholder="e.g. Financial Analyst" required>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+          <button type="button" class="btn-action" style="background:rgba(0,0,0,0.1)" onclick="closeModal('newMessageModal')">Cancel</button>
+          <button type="submit" class="btn-action" style="background:var(--accent-gradient)">Start Chat</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <footer>
     © <span id="year"></span> Flawless Graphics — Enterprise & Financial Control System
@@ -377,6 +739,24 @@
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
     AOS.init({ once: true });
+
+    // ---------- TAB SWITCHER LOGIC ----------
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+
+      if (tabName === 'dashboard') {
+        document.getElementById('tabDashboard').classList.add('active');
+        document.getElementById('navDashboard').classList.add('active');
+        if (window.cashFlowChart) renderCharts();
+      } else if (tabName === 'messaging') {
+        document.getElementById('tabMessaging').classList.add('active');
+        document.getElementById('navMessaging').classList.add('active');
+      } else if (tabName === 'settings') {
+        document.getElementById('tabSettings').classList.add('active');
+        document.getElementById('navSettings').classList.add('active');
+      }
+    }
 
     // ---------- THEME SWITCHER ----------
     const el = document.documentElement;
@@ -404,10 +784,11 @@
       localStorage.removeItem('active_org');
       localStorage.removeItem('activeOrg');
       localStorage.removeItem('activeFinance');
+      localStorage.removeItem('activeHR');
       window.location.href = 'finance-login.html';
     });
 
-    // ---------- DATA READING ----------
+    // ---------- DATA READING & INITIALIZATION ----------
     const activeOrg = localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || 'Flawless Graphics';
     const EMP_KEY = `${activeOrg}_employees`;
 
@@ -435,7 +816,6 @@
       const isDark = el.classList.contains('dark');
       const textColor = isDark ? '#94A3B8' : '#64748B';
 
-      // 1. Line Chart
       const ctx1 = document.getElementById('cashFlowChart').getContext('2d');
       if (cashFlowChart) cashFlowChart.destroy();
 
@@ -459,7 +839,6 @@
         }
       });
 
-      // 2. Pie Chart
       const ctx2 = document.getElementById('expenseAllocationChart').getContext('2d');
       if (expenseChart) expenseChart.destroy();
 
@@ -484,6 +863,139 @@
         }
       });
     }
+
+    // ---------- CHAT LOGIC ----------
+    let currentContact = 'Kofi Mensah';
+
+    function selectContact(element, name, role) {
+      document.querySelectorAll('.contact-item').forEach(i => i.classList.remove('active'));
+      element.classList.add('active');
+      currentContact = name;
+      document.getElementById('activeChatName').textContent = name;
+      document.getElementById('activeChatRole').textContent = role;
+      
+      // Load saved messages for contact
+      const savedMsgs = safeParse(localStorage.getItem(`chat_${name}`)) || [];
+      const chatContainer = document.getElementById('chatMessages');
+      
+      if (savedMsgs.length === 0) {
+        chatContainer.innerHTML = `
+          <div class="message-bubble incoming">
+            Hello Admin! Have you approved the Q3 Software budget request yet?
+            <div class="message-time">10:14 AM</div>
+          </div>`;
+      } else {
+        chatContainer.innerHTML = savedMsgs.map(m => `
+          <div class="message-bubble ${m.type}">
+            ${m.text}
+            <div class="message-time">${m.time}</div>
+          </div>`).join('');
+      }
+    }
+
+    document.getElementById('chatForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const chatContainer = document.getElementById('chatMessages');
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      const msgHTML = `<div class="message-bubble outgoing">${text}<div class="message-time">${time}</div></div>`;
+      chatContainer.insertAdjacentHTML('beforeend', msgHTML);
+      
+      // Save
+      const savedMsgs = safeParse(localStorage.getItem(`chat_${currentContact}`)) || [];
+      savedMsgs.push({ type: 'outgoing', text, time });
+      localStorage.setItem(`chat_${currentContact}`, JSON.stringify(savedMsgs));
+
+      input.value = '';
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    });
+
+    function filterContacts() {
+      const q = document.getElementById('searchContact').value.toLowerCase();
+      document.querySelectorAll('.contact-item').forEach(item => {
+        const name = item.querySelector('.name').textContent.toLowerCase();
+        item.style.display = name.includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    function createContact(e) {
+      e.preventDefault();
+      const name = document.getElementById('newMsgName').value;
+      const role = document.getElementById('newMsgRole').value;
+      const initials = name.split(' ').map(n=>n[0]).join('').toUpperCase().substring(0,2);
+
+      const li = document.createElement('li');
+      li.className = 'contact-item';
+      li.onclick = () => selectContact(li, name, role);
+      li.innerHTML = `
+        <div class="avatar" style="background:linear-gradient(135deg,#EC4899,#8B5CF6)">${initials} <div class="status-dot"></div></div>
+        <div class="contact-info">
+          <div class="name">${name}</div>
+          <div class="sub">${role}</div>
+        </div>`;
+
+      document.getElementById('contactList').appendChild(li);
+      closeModal('newMessageModal');
+      selectContact(li, name, role);
+    }
+
+    // ---------- TRANSACTIONS MODAL & LOGIC ----------
+    function addTransaction(e) {
+      e.preventDefault();
+      const cat = document.getElementById('disbCategory').value;
+      const ben = document.getElementById('disbBeneficiary').value;
+      const amt = Number(document.getElementById('disbAmount').value);
+      const id = '#TR-' + Math.floor(1000 + Math.random() * 9000);
+      const date = new Date().toISOString().split('T')[0];
+
+      const rowHTML = `
+        <tr>
+          <td>${id}</td>
+          <td>${cat}</td>
+          <td>${ben}</td>
+          <td>${date}</td>
+          <td>${formatNum(amt)}</td>
+          <td><span class="badge pending">Pending Approval</span></td>
+        </tr>`;
+
+      document.getElementById('transactionBody').insertAdjacentHTML('afterbegin', rowHTML);
+      closeModal('disbursementModal');
+    }
+
+    // ---------- SETTINGS LOGIC ----------
+    function updateCurrencySymbol(symbol) {
+      document.querySelectorAll('.curr').forEach(e => e.textContent = symbol);
+    }
+
+    function saveSettings(e) {
+      e.preventDefault();
+      alert('Settings saved successfully!');
+    }
+
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage));
+      const anchor = document.createElement('a');
+      anchor.setAttribute("href", dataStr);
+      anchor.setAttribute("download", `${activeOrg}_financial_backup.json`);
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+    }
+
+    function purgeSystem() {
+      if (confirm('Are you sure you want to clear all saved session data? You will be logged out.')) {
+        localStorage.clear();
+        window.location.href = 'finance-login.html';
+      }
+    }
+
+    // ---------- MODAL CONTROLE ----------
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
     document.getElementById('year').textContent = new Date().getFullYear();
 
