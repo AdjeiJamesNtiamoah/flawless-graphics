@@ -94,6 +94,36 @@
     }
     .brand-title { font-size: 15px; font-weight: 800; letter-spacing: 0.5px; }
 
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* BUTTON STYLES */
+    .btn-back {
+      background: rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--input-border);
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .dark .btn-back { background: rgba(255, 255, 255, 0.05); }
+    .btn-back:hover {
+      background: rgba(37, 99, 235, 0.1);
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateX(-2px);
+    }
+
     .theme-toggle-btn {
       background: rgba(0, 0, 0, 0.05);
       border: 1px solid var(--input-border);
@@ -204,6 +234,24 @@
     }
     .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 14px 24px -5px rgba(37, 99, 235, 0.5); }
 
+    .card-footer-link {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+    }
+    .card-footer-link a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s ease;
+    }
+    .card-footer-link a:hover {
+      color: var(--accent);
+    }
+
     /* ERROR FEEDBACK */
     .alert-error {
       background: rgba(239, 68, 68, 0.1);
@@ -225,14 +273,23 @@
 
   <!-- HEADER -->
   <header>
-    <a href="index.html" class="brand">
+    <a href="welcome.html" class="brand">
       <div class="logo-circle">FG</div>
       <div class="brand-title">FLAWLESS GRAPHICS</div>
     </a>
 
-    <button class="theme-toggle-btn" id="themeBtn">
-      <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
-    </button>
+    <div class="header-actions">
+      <!-- BACK TO WELCOME BUTTON -->
+      <a href="welcome.html" class="btn-back">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Back to Home</span>
+      </a>
+
+      <!-- THEME TOGGLE BUTTON -->
+      <button class="theme-toggle-btn" id="themeBtn">
+        <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
+      </button>
+    </div>
   </header>
 
   <!-- LOGIN CARD -->
@@ -286,6 +343,11 @@
           <i class="fa-solid fa-arrow-right"></i>
         </button>
       </form>
+
+      <!-- CARD FOOTER RETURN LINK -->
+      <div class="card-footer-link">
+        <a href="welcome.html"><i class="fa-solid fa-house"></i> Return to Welcome Page</a>
+      </div>
     </div>
   </main>
 
