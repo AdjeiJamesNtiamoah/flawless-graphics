@@ -181,7 +181,7 @@
       margin-bottom: 24px;
     }
 
-    .page-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .page-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
     .page-title h2 { font-size: 26px; font-weight: 800; }
     .org-badge {
       font-size: 12px;
@@ -390,6 +390,25 @@
     }
     .audit-item:last-child { border-bottom: none; }
 
+    /* CHECKLIST STYLE */
+    .employee-checklist {
+      max-height: 180px;
+      overflow-y: auto;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      border-radius: var(--radius-md);
+      padding: 10px;
+    }
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      font-size: 13px;
+      border-bottom: 1px dashed var(--card-border);
+    }
+    .checklist-item:last-child { border-bottom: none; }
+
     /* MODAL */
     .modal-overlay {
       position: fixed;
@@ -407,7 +426,7 @@
       border: 1px solid var(--card-border);
       border-radius: var(--radius-xl);
       width: 100%;
-      max-width: 480px;
+      max-width: 520px;
       padding: 28px;
       box-shadow: var(--shadow-lg);
     }
@@ -459,7 +478,12 @@
           <h2>Finance & Payroll Control</h2>
           <div style="font-size:13px; color:var(--text-muted)">Real-time ledger overview & department distributions</div>
         </div>
-        <div class="org-badge" id="displayOrg">Organization: Loaded</div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button class="btn-action" style="background:var(--accent-gradient); padding:10px 18px; font-size:13px;" onclick="openPrepareSalaryModal()">
+            <i class="fa-solid fa-hand-holding-dollar"></i> Prepare Salary Payment
+          </button>
+          <div class="org-badge" id="displayOrg">Organization: Loaded</div>
+        </div>
       </div>
 
       <!-- METRICS -->
@@ -763,7 +787,48 @@
 
   <!-- MODALS -->
 
-  <!-- 1. NEW DISBURSEMENT MODAL -->
+  <!-- PREPARE SALARY PAYMENT MODAL -->
+  <div class="modal-overlay" id="prepareSalaryModal">
+    <div class="modal-card">
+      <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;"><i class="fa-solid fa-calculator"></i> Prepare Salary Payment</h3>
+      <form id="prepareSalaryForm" onsubmit="processPreparedSalary(event)">
+        
+        <div class="form-group">
+          <label class="form-label">Pay Period / Month</label>
+          <input type="month" id="payPeriodMonth" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Select Staff Members to Include</label>
+          <div class="employee-checklist" id="empChecklist">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <div class="form-group" style="background:var(--glass-glow); padding:14px; border-radius:var(--radius-md); border:1px solid var(--card-border);">
+          <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;">
+            <span style="color:var(--text-muted)">Total Gross Calculated:</span>
+            <span style="font-weight:700;"><span class="curr">GHS</span> <span id="prepGrossVal">0.00</span></span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;">
+            <span style="color:var(--text-muted)">Estimated Tax/Deductions:</span>
+            <span style="font-weight:700; color:var(--danger);">- <span class="curr">GHS</span> <span id="prepTaxVal">0.00</span></span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:800; border-top:1px solid var(--card-border); padding-top:6px; margin-top:6px;">
+            <span>Net Payable Outlay:</span>
+            <span style="color:var(--success)"><span class="curr">GHS</span> <span id="prepNetVal">0.00</span></span>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+          <button type="button" class="btn-action" style="background:rgba(0,0,0,0.1)" onclick="closeModal('prepareSalaryModal')">Cancel</button>
+          <button type="submit" class="btn-action" style="background:var(--accent-gradient)">Submit to Approval Queue</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- NEW DISBURSEMENT MODAL -->
   <div class="modal-overlay" id="disbursementModal">
     <div class="modal-card">
       <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;">New Ledger Disbursement</h3>
@@ -788,7 +853,7 @@
     </div>
   </div>
 
-  <!-- 2. NEW MESSAGE MODAL -->
+  <!-- NEW MESSAGE MODAL -->
   <div class="modal-overlay" id="newMessageModal">
     <div class="modal-card">
       <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;">Start Direct Message</h3>
@@ -923,6 +988,67 @@
 
       const netLiquidity = 450000 - approvedOutlay - 38200;
       document.getElementById('valLiquidity').textContent = formatNum(netLiquidity);
+    }
+
+    // ---------- SALARY PREPARATION MODAL LOGIC ----------
+    function openPrepareSalaryModal() {
+      const emps = readKey(EMP_KEY);
+      const checklistContainer = document.getElementById('empChecklist');
+      
+      const now = new Date();
+      document.getElementById('payPeriodMonth').value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+      if (emps.length === 0) {
+        checklistContainer.innerHTML = `<div style="font-size:12px; color:var(--text-muted);">No employees found in ${activeOrg}.</div>`;
+      } else {
+        checklistContainer.innerHTML = emps.map((e, idx) => `
+          <div class="checklist-item">
+            <input type="checkbox" id="empCheck_${idx}" value="${Number(e.salary) || 0}" checked onchange="recalculatePrepTotals()">
+            <label for="empCheck_${idx}" style="flex:1;">${e.name || 'Staff Member'} (${e.role || 'General'})</label>
+            <span style="font-weight:700;"><span class="curr">GHS</span> ${formatNum(e.salary || 0)}</span>
+          </div>
+        `).join('');
+      }
+
+      recalculatePrepTotals();
+      openModal('prepareSalaryModal');
+    }
+
+    function recalculatePrepTotals() {
+      let grossSum = 0;
+      document.querySelectorAll('#empChecklist input[type="checkbox"]:checked').forEach(cb => {
+        grossSum += Number(cb.value);
+      });
+
+      const taxVal = grossSum * (taxRatePercent / 100);
+      const netVal = grossSum - taxVal;
+
+      document.getElementById('prepGrossVal').textContent = formatNum(grossSum);
+      document.getElementById('prepTaxVal').textContent = formatNum(taxVal);
+      document.getElementById('prepNetVal').textContent = formatNum(netVal);
+    }
+
+    function processPreparedSalary(e) {
+      e.preventDefault();
+      const month = document.getElementById('payPeriodMonth').value;
+      const emps = readKey(EMP_KEY);
+      const approvalMap = readKey(APPROVAL_KEY);
+
+      let processedCount = 0;
+      document.querySelectorAll('#empChecklist input[type="checkbox"]').forEach((cb, idx) => {
+        if (cb.checked && emps[idx]) {
+          const empId = emps[idx].id || emps[idx].name;
+          approvalMap[empId] = 'Pending';
+          processedCount++;
+        }
+      });
+
+      writeKey(APPROVAL_KEY, approvalMap);
+      logAudit(`Prepared salary batch for ${month} (${processedCount} staff members added to pending approvals queue)`);
+      
+      closeModal('prepareSalaryModal');
+      loadFinancials();
+      switchTab('approval');
     }
 
     // ---------- SALARY APPROVAL SYSTEM ----------
