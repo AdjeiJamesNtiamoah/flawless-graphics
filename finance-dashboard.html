@@ -1,444 +1,496 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zarss — Finance Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FLAWLESS GRAPHICS — Finance & Payroll Dashboard</title>
+
+  <!-- Route Guard Check (Must be at the top) -->
+  <script>
+    (function() {
+      const activeOrg = localStorage.getItem('active_org') || localStorage.getItem('activeOrg');
+      const activeHR = localStorage.getItem('activeHR');
+      if (!activeOrg || !activeHR) {
+        alert('Access Denied. Please log in as HR/Finance Admin first.');
+        window.location.href = 'login.html';
+      }
+    })();
+  </script>
+
+  <!-- Typography & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Animations & Charts -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
   <style>
     :root {
-      --bg-outer: #EAE6DF;
-      --sidebar-bg: #222325;
-      --main-bg: #F4F0EA;
-      --card-bg: #FAF8F5;
-      --text-main: #1D1E20;
-      --text-muted: #8E8D8A;
-      --text-sidebar: #A0A0A0;
-      --card-green: #D7E5D9;
-      --accent-green: #3F7A54;
-      --card-yellow: #FBECCB;
-      --accent-yellow: #B88126;
-      --card-purple: #959BFE;
-      --radius-lg: 24px;
-      --radius-md: 16px;
-      --radius-sm: 10px;
+      --bg-outer: #F4F7FB;
+      --card-bg: rgba(255, 255, 255, 0.75);
+      --card-border: rgba(255, 255, 255, 0.8);
+      --nav-bg: #0A192F;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --accent: #2563EB;
+      --accent-gradient: linear-gradient(135deg, #2563EB 0%, #06B6D4 100%);
+      --glass-glow: rgba(37, 99, 235, 0.08);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+      --radius-xl: 24px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --success: #10B981;
+      --danger: #EF4444;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-    body { background-color: var(--bg-outer); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; color: var(--text-main); }
-    .dashboard-container { width: 100%; max-width: 1380px; height: 900px; background-color: var(--main-bg); border-radius: var(--radius-lg); display: flex; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.06); }
+    .dark {
+      --bg-outer: #030712;
+      --card-bg: rgba(17, 24, 39, 0.65);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --nav-bg: #0B0F19;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --accent: #38BDF8;
+      --accent-gradient: linear-gradient(135deg, #0284C7 0%, #6366F1 100%);
+      --glass-glow: rgba(56, 189, 248, 0.1);
+      --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    }
 
-    /* SIDEBAR */
-    .sidebar { width: 240px; background-color: var(--sidebar-bg); padding: 30px 20px; display: flex; flex-direction: column; justify-content: space-between; flex-shrink: 0; }
-    .brand { display: flex; align-items: center; gap: 10px; color: #fff; font-size: 20px; font-weight: 800; cursor: pointer; }
-    .brand-icon { width: 28px; height: 28px; border: 2px solid #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
-    .profile-card { text-align: center; margin-top: 24px; margin-bottom: 24px; cursor: pointer; }
-    .profile-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 12px; filter: grayscale(100%); transition: filter 0.2s; }
-    .profile-card:hover .profile-img { filter: grayscale(0%); }
-    .profile-card p { color: var(--text-sidebar); font-size: 11px; font-weight: 500; margin-bottom: 4px; }
-    .profile-card h4 { color: #fff; font-size: 14px; font-weight: 700; }
-    .nav-menu { display: flex; flex-direction: column; gap: 8px; flex: 1; }
-    .nav-item { display: flex; align-items: center; gap: 14px; padding: 12px 14px; color: var(--text-sidebar); text-decoration: none; font-size: 13px; font-weight: 600; border-radius: var(--radius-sm); transition: all 0.2s; cursor: pointer; }
-    .nav-item:hover, .nav-item.active { color: #fff; background: rgba(255,255,255,0.05); }
-    .nav-item.active { position: relative; }
-    .nav-item.active::before { content: ''; position: absolute; left: -20px; width: 4px; height: 20px; background-color: var(--accent-yellow); border-radius: 0 4px 4px 0; }
-    .badge { background-color: #585CE5; color: #fff; font-size: 10px; padding: 2px 7px; border-radius: 10px; margin-left: auto; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease; }
 
-    /* CONTENT AREA */
-    .content-grid { flex: 1; display: grid; grid-template-columns: 1fr 340px; overflow-y: auto; }
-    .main-panel { padding: 30px; display: flex; flex-direction: column; gap: 24px; }
-    .top-bar { display: flex; justify-content: space-between; align-items: center; }
-    .header-title h1 { font-size: 18px; font-weight: 800; }
-    .header-title p { font-size: 12px; color: var(--text-muted); }
-    .search-box { background-color: #fff; padding: 10px 16px; border-radius: 30px; display: flex; align-items: center; gap: 10px; width: 280px; }
-    .search-box input { border: none; outline: none; background: transparent; font-size: 12px; width: 100%; }
-    .search-box i { color: var(--text-muted); font-size: 13px; }
+    body {
+      background-color: var(--bg-outer);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
+    }
 
-    /* Metrics */
-    .metrics-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .metric-card { border-radius: var(--radius-md); padding: 20px; position: relative; cursor: pointer; transition: transform 0.2s; }
-    .metric-card:hover { transform: translateY(-2px); }
-    .card-green { background-color: var(--card-green); }
-    .card-yellow { background-color: var(--card-yellow); }
-    .card-purple { background-color: var(--card-purple); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-    .metric-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-    .metric-header span { font-size: 12px; font-weight: 700; }
-    .pill-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 12px; margin-left: auto; }
-    .card-green .pill-badge { background-color: rgba(63, 122, 84, 0.2); color: var(--accent-green); }
-    .card-yellow .pill-badge { background-color: rgba(184, 129, 38, 0.2); color: var(--accent-yellow); }
-    .metric-amount { font-size: 24px; font-weight: 800; margin-bottom: 10px; }
-    .sparkline { width: 100%; height: 25px; }
-    .purple-btn { background-color: #3C33C0; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
-    .purple-btn:hover { background-color: #2b2498; }
+    /* Ambient Glows */
+    body::before, body::after {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: var(--accent-gradient);
+      filter: blur(140px);
+      opacity: 0.12;
+      z-index: -1;
+      pointer-events: none;
+    }
+    body::before { top: -100px; left: -100px; }
+    body::after { bottom: 0; right: -100px; }
 
-    /* Charts & Orders */
-    .chart-section { background-color: transparent; flex: 1; display: flex; flex-direction: column; }
-    .chart-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
-    .chart-header h2 { font-size: 26px; font-weight: 800; }
-    .chart-header span { font-size: 11px; color: var(--text-muted); font-weight: 600; cursor: pointer; }
-    .chart-wrapper { position: relative; flex: 1; min-height: 200px; }
-    .orders-section h3 { font-size: 14px; font-weight: 800; margin-bottom: 12px; }
-    .orders-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .order-controls { display: flex; gap: 12px; }
-    .tag-btn { background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.08); padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 600; color: var(--text-muted); cursor: pointer; }
-    .orders-list { display: flex; flex-direction: column; gap: 10px; }
-    .order-row { background-color: var(--card-bg); padding: 12px 20px; border-radius: 30px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; cursor: pointer; transition: background 0.2s; }
-    .order-row:hover { background-color: #fff; }
-    .user-info { display: flex; align-items: center; gap: 10px; width: 160px; }
-    .user-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
-    .order-status { display: flex; align-items: center; gap: 6px; font-weight: 600; }
-    .dot { width: 6px; height: 6px; border-radius: 50%; }
+    /* HEADER */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      background: rgba(10, 25, 47, 0.85);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 14px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #fff;
+    }
 
-    /* RIGHT PANEL */
-    .right-panel { padding: 30px 24px; border-left: 1px solid rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 32px; }
-    .panel-header { display: flex; justify-content: space-between; align-items: center; }
-    .panel-header h3 { font-size: 14px; font-weight: 800; }
-    .panel-header span { font-size: 11px; color: var(--text-muted); }
-    .icon-btn { width: 28px; height: 28px; border-radius: 8px; background: rgba(0,0,0,0.04); display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; }
-    .donut-container { position: relative; width: 140px; height: 140px; margin: 0 auto; }
-    .donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
-    .donut-center span { font-size: 9px; color: var(--text-muted); display: block; }
-    .donut-center strong { font-size: 13px; font-weight: 800; }
-    .donut-legend { display: flex; justify-content: space-around; margin-top: 16px; text-align: center; }
-    .legend-item p { font-size: 10px; color: var(--text-muted); }
-    .legend-item h5 { font-size: 12px; font-weight: 800; }
-    .sales-list { display: flex; flex-direction: column; gap: 10px; }
-    .sales-item { background-color: var(--card-bg); padding: 10px 16px; border-radius: 30px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: background 0.2s; }
-    .sales-item:hover { background-color: #fff; }
-    .sales-user { display: flex; align-items: center; gap: 12px; }
-    .sales-user h4 { font-size: 12px; font-weight: 700; }
-    .sales-user p { font-size: 10px; color: var(--text-muted); }
-    .sales-amount { font-size: 12px; font-weight: 800; }
+    .brand { display: flex; align-items: center; gap: 14px; text-decoration: none; color: inherit; }
+    .logo-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+    }
+    header h1 { font-size: 16px; font-weight: 800; letter-spacing: 0.5px; margin: 0; }
+    .brand-sub { font-size: 11px; color: rgba(255, 255, 255, 0.6); font-weight: 500; }
 
-    .toast { position: fixed; bottom: 30px; right: 30px; background-color: var(--sidebar-bg); color: #fff; padding: 12px 20px; border-radius: 12px; font-size: 13px; font-weight: 600; box-shadow: 0 10px 20px rgba(0,0,0,0.15); opacity: 0; transform: translateY(20px); transition: all 0.3s ease; pointer-events: none; z-index: 1000; }
-    .toast.show { opacity: 1; transform: translateY(0); }
+    nav ul { list-style: none; display: flex; gap: 8px; align-items: center; }
+    nav a {
+      color: rgba(255, 255, 255, 0.75);
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    nav a:hover, nav a.active { color: #fff; background: rgba(255, 255, 255, 0.1); }
+
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+
+    .btn-action {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .btn-action:hover { background: rgba(255, 255, 255, 0.18); }
+    .btn-action.logout:hover { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #EF4444; }
+
+    /* LAYOUT */
+    main { max-width: 1280px; margin: 32px auto; padding: 0 24px; width: 100%; flex: 1; }
+
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .page-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .page-title h2 { font-size: 26px; font-weight: 800; }
+    .org-badge {
+      font-size: 12px;
+      background: var(--glass-glow);
+      border: 1px solid var(--card-border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    /* METRICS GRID */
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 28px; }
+    .metric-card {
+      background: rgba(255, 255, 255, 0.4);
+      border: 1px solid var(--card-border);
+      padding: 20px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .dark .metric-card { background: rgba(255, 255, 255, 0.02); }
+    .metric-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: var(--glass-glow);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .metric-info .label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+    .metric-info .val { font-size: 22px; font-weight: 800; }
+
+    /* CHARTS GRID */
+    .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 28px; }
+    @media (max-width: 980px) { .charts-grid { grid-template-columns: 1fr; } }
+
+    /* DATA TABLE */
+    .table-container { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+    th { padding: 14px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); border-bottom: 1px solid var(--card-border); }
+    td { padding: 16px; border-bottom: 1px solid var(--card-border); font-weight: 500; }
+    tr:last-child td { border-bottom: none; }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge.success { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+    .badge.pending { background: rgba(245, 158, 11, 0.15); color: #F59E0B; }
+
+    footer { text-align: center; padding: 24px; font-size: 13px; color: var(--text-muted); border-top: 1px solid var(--card-border); }
   </style>
 </head>
 <body>
 
-  <div class="dashboard-container">
-    <aside class="sidebar">
+  <!-- HEADER -->
+  <header>
+    <a href="welcome.html" class="brand">
+      <div class="logo-circle">FG</div>
       <div>
-        <div class="brand" onclick="notify('Zarss Dashboard Home')">
-          <div class="brand-icon"><i class="fa-solid fa-cube"></i></div>
-          <span>Zarss</span>
-        </div>
-        <div class="profile-card" onclick="notify('Opening Mark Johnson Profile')">
-          <img class="profile-img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" alt="Mark Johnson">
-          <p>Welcome Back,</p>
-          <h4 id="userDisplayName">Mark Johnson</h4>
-        </div>
-        <nav class="nav-menu">
-          <a class="nav-item active" data-name="Dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
-          <a class="nav-item" data-name="Statistics"><i class="fa-solid fa-chart-line"></i> Statistics</a>
-          <a class="nav-item" data-name="Payment"><i class="fa-regular fa-credit-card"></i> Payment</a>
-          <a class="nav-item" data-name="Transactions"><i class="fa-solid fa-arrow-right-arrow-left"></i> Transactions</a>
-          <a class="nav-item" data-name="Products"><i class="fa-solid fa-box"></i> Products</a>
-          <a class="nav-item" data-name="Customer"><i class="fa-regular fa-user"></i> Customer</a>
-          <a class="nav-item" data-name="Messages"><i class="fa-regular fa-comment"></i> Messages <span class="badge">5</span></a>
-          <a class="nav-item" data-name="Settings"><i class="fa-solid fa-sliders"></i> Settings</a>
-        </nav>
+        <h1>FLAWLESS GRAPHICS</h1>
+        <div class="brand-sub">Financial Control System</div>
       </div>
-      <a class="nav-item" onclick="notify('Logging Out...')"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out</a>
-    </aside>
+    </a>
 
-    <div class="content-grid">
-      <main class="main-panel">
-        <div class="top-bar">
-          <div class="header-title">
-            <h1 id="pageTitle">Dashboard</h1>
-            <p>Payments Updates</p>
-          </div>
-          <div class="search-box">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="searchInput" placeholder="Search orders, customers...">
-          </div>
-        </div>
+    <div class="header-actions">
+      <nav>
+        <ul>
+          <li><a href="welcome.html">Home</a></li>
+          <li><a href="hr-dashboard.html">HR Portal</a></li>
+          <li><a href="finance-dashboard.html" class="active">Finance</a></li>
+        </ul>
+      </nav>
 
-        <div class="metrics-row">
-          <div class="metric-card card-green" onclick="notify('Opening Balance Breakdown')">
-            <div class="metric-header">
-              <i class="fa-solid fa-dollar-sign"></i>
-              <span>Balance</span>
-              <span class="pill-badge" id="balanceBadge">+ 17%</span>
-            </div>
-            <div class="metric-amount" id="balanceAmount">$ 56,874</div>
-            <canvas id="sparkline1" class="sparkline"></canvas>
-          </div>
+      <button class="btn-action" id="themeBtn">
+        <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
+      </button>
 
-          <div class="metric-card card-yellow" onclick="notify('Opening Sales Details')">
-            <div class="metric-header">
-              <i class="fa-solid fa-percent"></i>
-              <span>Sales</span>
-              <span class="pill-badge" id="salesBadge">+ 23%</span>
-            </div>
-            <div class="metric-amount" id="salesAmount">$ 24,575</div>
-            <canvas id="sparkline2" class="sparkline"></canvas>
-          </div>
-
-          <div class="metric-card card-purple">
-            <h4 style="font-size: 14px; font-weight: 800;">Upgrade</h4>
-            <p style="font-size: 10px; margin-top: 4px; opacity: 0.9;">Get more information and opportunities</p>
-            <button class="purple-btn" onclick="saveDashboardState()">Sync All Dashboards</button>
-          </div>
-        </div>
-
-        <div class="chart-section">
-          <div class="chart-header">
-            <div>
-              <p style="font-size: 12px; font-weight: 700; color: var(--text-muted);">User in The Last Week</p>
-              <h2 id="weeklyGrowth">+ 3,2%</h2>
-            </div>
-            <span onclick="notify('Loading full statistics...')">See statistics for all time</span>
-          </div>
-          <div class="chart-wrapper">
-            <canvas id="barChart"></canvas>
-          </div>
-        </div>
-
-        <div class="orders-section">
-          <div class="orders-header">
-            <h3>Last Orders</h3>
-            <div class="order-controls">
-              <span class="tag-btn" onclick="fetchDashboardData()">Sync Data</span>
-              <span class="tag-btn" style="border:none; background:none;" onclick="notify('Opening all orders...')">View All Orders</span>
-            </div>
-          </div>
-          <div class="orders-list" id="ordersList"></div>
-        </div>
-      </main>
-
-      <aside class="right-panel">
-        <div>
-          <div class="panel-header" style="margin-bottom: 20px;">
-            <div>
-              <h3>Monthly Profits</h3>
-              <span>Total Profit Growth of 26%</span>
-            </div>
-            <div class="icon-btn" onclick="notify('Sharing monthly report...')"><i class="fa-solid fa-share-nodes"></i></div>
-          </div>
-          <div class="donut-container">
-            <canvas id="profitDonut"></canvas>
-            <div class="donut-center">
-              <span>Total</span>
-              <strong id="profitTotal">$76,356</strong>
-            </div>
-          </div>
-          <div class="donut-legend">
-            <div class="legend-item"><p>Giveaway</p><h5 id="legGiveaway">60%</h5></div>
-            <div class="legend-item"><p>Affiliate</p><h5 id="legAffiliate">24%</h5></div>
-            <div class="legend-item"><p>Offline Sales</p><h5 id="legOffline">16%</h5></div>
-          </div>
-        </div>
-
-        <div>
-          <div class="panel-header" style="margin-bottom: 16px;">
-            <h3>Recent Sales</h3>
-            <span style="cursor: pointer;" onclick="notify('Loading recent sales list...')">See All</span>
-          </div>
-          <div class="sales-list" id="salesList"></div>
-        </div>
-      </aside>
+      <button class="btn-action logout" id="logoutBtn">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Logout</span>
+      </button>
     </div>
-  </div>
+  </header>
 
-  <div class="toast" id="toast">Notification</div>
+  <!-- MAIN -->
+  <main>
+    <div class="page-title" data-aos="fade-down" data-aos-duration="600">
+      <div>
+        <h2>Finance & Payroll Control</h2>
+        <div style="font-size:13px; color:var(--text-muted)">Real-time ledger overview & department distributions</div>
+      </div>
+      <div class="org-badge" id="displayOrg">Organization: Loaded</div>
+    </div>
 
+    <!-- METRICS -->
+    <div class="metrics-grid" data-aos="fade-up" data-aos-duration="600">
+      <div class="metric-card">
+        <div class="metric-icon"><i class="fa-solid fa-wallet"></i></div>
+        <div class="metric-info">
+          <div class="label">Annual Budget</div>
+          <div class="val">GHS <span id="valBudget">450,000</span></div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon"><i class="fa-solid fa-users-gear"></i></div>
+        <div class="metric-info">
+          <div class="label">Monthly Payroll</div>
+          <div class="val">GHS <span id="valPayroll">0</span></div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
+        <div class="metric-info">
+          <div class="label">OpEx Expenses</div>
+          <div class="val">GHS <span id="valOpEx">38,200</span></div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon"><i class="fa-solid fa-piggy-bank"></i></div>
+        <div class="metric-info">
+          <div class="label">Net Liquidity</div>
+          <div class="val">GHS <span id="valLiquidity">312,800</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="charts-grid">
+      <div class="glass-card" data-aos="fade-right" data-aos-duration="700">
+        <h3 style="font-size:16px; font-weight:800; margin-bottom:16px;">Cash Flow Analysis (2026)</h3>
+        <div style="position:relative; width:100%; height:260px;">
+          <canvas id="cashFlowChart"></canvas>
+        </div>
+      </div>
+
+      <div class="glass-card" data-aos="fade-left" data-aos-duration="700">
+        <h3 style="font-size:16px; font-weight:800; margin-bottom:16px;">Expense Allocation</h3>
+        <div style="position:relative; width:100%; height:260px;">
+          <canvas id="expenseAllocationChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECENT TRANSACTIONS TABLE -->
+    <div class="glass-card" data-aos="fade-up" data-aos-duration="800">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+        <h3 style="font-size:16px; font-weight:800;">Recent Ledger Transactions</h3>
+        <button class="btn-action" style="background:var(--accent-gradient)" onclick="alert('Disbursement form ready for processing.')">+ New Disbursement</button>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Transaction ID</th>
+              <th>Category</th>
+              <th>Beneficiary</th>
+              <th>Date</th>
+              <th>Amount (GHS)</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="transactionBody">
+            <tr>
+              <td>#TR-8921</td>
+              <td>Payroll Disbursement</td>
+              <td>All Active Staff</td>
+              <td>2026-08-01</td>
+              <td id="tablePayrollVal">0.00</td>
+              <td><span class="badge success">Processed</span></td>
+            </tr>
+            <tr>
+              <td>#TR-8920</td>
+              <td>Software Licenses</td>
+              <td>Adobe Creative Cloud</td>
+              <td>2026-08-05</td>
+              <td>4,200.00</td>
+              <td><span class="badge success">Processed</span></td>
+            </tr>
+            <tr>
+              <td>#TR-8919</td>
+              <td>Office Logistics</td>
+              <td>Accra Tech Hub</td>
+              <td>2026-08-12</td>
+              <td>1,850.00</td>
+              <td><span class="badge pending">Pending Approval</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    © <span id="year"></span> Flawless Graphics — Enterprise HR & Financial Control System
+  </footer>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
-    // ==========================================
-    // SHARED SAVE PATHS CONFIGURATION
-    // ==========================================
-    const SHARED_CONFIG = {
-      // 1. API SAVE PATHS (Change to match your backend endpoints for HR & Teacher dashboards)
-      API_GET_PATH: '/api/shared-dashboard/data',
-      API_SAVE_PATH: '/api/shared-dashboard/save',
-      
-      // 2. LOCALSTORAGE FALLBACK KEY (Must be identical across HR, Teacher, & Finance files)
-      STORAGE_KEY: 'shared_zarss_dashboard_state'
-    };
+    AOS.init({ once: true });
 
-    // Shared State Schema
-    let sharedState = {
-      user: { name: "Mark Johnson" },
-      metrics: { balance: "$ 56,874", balanceGrowth: "+ 17%", sales: "$ 24,575", salesGrowth: "+ 23%", userGrowth: "+ 3,2%" },
-      orders: [
-        { name: "David Astee", amount: "$1,456", status: "Chargeback", date: "11 Sep 2022", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80" },
-        { name: "Maria Hulama", amount: "$42,4378", status: "Completed", date: "11 Sep 2022", avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&q=80" },
-        { name: "Arnold Swarz", amount: "$3,412", status: "Completed", date: "11 Sep 2022", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=80&q=80" }
-      ],
-      sales: [
-        { name: "Steven Summer", time: "02 Minutes Ago", amount: "+ $52.00", avatar: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=80&q=80" },
-        { name: "Jordan Maizee", time: "02 Minutes Ago", amount: "+ $83.00", avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=80&q=80" },
-        { name: "Jessica Alba", time: "05 Minutes Ago", amount: "+ $61.60", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=80&q=80" }
-      ]
-    };
+    // ---------- THEME SWITCHER ----------
+    const el = document.documentElement;
+    const themeBtn = document.getElementById('themeBtn');
 
-    // ==========================================
-    // DATA FETCHING & SYNCHRONIZATION
-    // ==========================================
-    async function fetchDashboardData() {
-      try {
-        const response = await fetch(SHARED_CONFIG.API_GET_PATH);
-        if (response.ok) {
-          sharedState = await response.json();
-          notify("Data synchronized from server");
-        } else {
-          throw new Error("Server path unreachable");
-        }
-      } catch (err) {
-        // Fallback to LocalStorage if backend API is not yet running
-        const localData = localStorage.getItem(SHARED_CONFIG.STORAGE_KEY);
-        if (localData) {
-          sharedState = JSON.parse(localData);
-          notify("Loaded shared data from local state");
-        }
+    function applyTheme(isDark) {
+      if (isDark) {
+        el.classList.add('dark');
+        themeBtn.innerHTML = `<i class="fa-solid fa-sun"></i> <span>Light</span>`;
+      } else {
+        el.classList.remove('dark');
+        themeBtn.innerHTML = `<i class="fa-solid fa-moon"></i> <span>Dark</span>`;
       }
-      renderDashboard();
+      localStorage.setItem('fg_theme_dark', isDark);
+      if (window.cashFlowChart && window.expenseChart) renderCharts();
     }
 
-    async function saveDashboardState() {
-      // Save locally
-      localStorage.setItem(SHARED_CONFIG.STORAGE_KEY, JSON.stringify(sharedState));
-      
-      // Save to common backend path
-      try {
-        const response = await fetch(SHARED_CONFIG.API_SAVE_PATH, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(sharedState)
-        });
-        if (response.ok) {
-          notify("Saved to shared path!");
-        } else {
-          notify("Saved locally (Server path offline)");
-        }
-      } catch (err) {
-        notify("Saved to shared local storage!");
-      }
-    }
+    const savedTheme = localStorage.getItem('fg_theme_dark');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(savedTheme === null ? prefersDark : savedTheme === 'true');
+    themeBtn.addEventListener('click', () => applyTheme(!el.classList.contains('dark')));
 
-    // ==========================================
-    // UI RENDER FUNCTIONS
-    // ==========================================
-    function renderDashboard() {
-      document.getElementById('userDisplayName').textContent = sharedState.user.name;
-      document.getElementById('balanceAmount').textContent = sharedState.metrics.balance;
-      document.getElementById('balanceBadge').textContent = sharedState.metrics.balanceGrowth;
-      document.getElementById('salesAmount').textContent = sharedState.metrics.sales;
-      document.getElementById('salesBadge').textContent = sharedState.metrics.salesGrowth;
-      document.getElementById('weeklyGrowth').textContent = sharedState.metrics.userGrowth;
-
-      // Render Orders List
-      const ordersContainer = document.getElementById('ordersList');
-      ordersContainer.innerHTML = sharedState.orders.map(order => `
-        <div class="order-row" onclick="notify('Viewing Order: ${order.name}')">
-          <div class="user-info">
-            <img src="${order.avatar}" class="user-avatar" alt="${order.name}">
-            <strong>${order.name}</strong>
-          </div>
-          <div><strong>${order.amount}</strong></div>
-          <div class="order-status"><span class="dot" style="background:${order.status === 'Completed' ? '#B0B0B0' : '#585CE5'};"></span> ${order.status}</div>
-          <div style="color: var(--text-muted);">${order.date}</div>
-        </div>
-      `).join('');
-
-      // Render Sales List
-      const salesContainer = document.getElementById('salesList');
-      salesContainer.innerHTML = sharedState.sales.map(sale => `
-        <div class="sales-item" onclick="notify('Sale details: ${sale.name}')">
-          <div class="sales-user">
-            <img src="${sale.avatar}" class="user-avatar" alt="${sale.name}">
-            <div>
-              <h4>${sale.name}</h4>
-              <p>${sale.time}</p>
-            </div>
-          </div>
-          <span class="sales-amount">${sale.amount}</span>
-        </div>
-      `).join('');
-    }
-
-    // Listener for cross-tab local updates (syncs HR/Teacher changes dynamically in real time)
-    window.addEventListener('storage', (e) => {
-      if (e.key === SHARED_CONFIG.STORAGE_KEY) {
-        sharedState = JSON.parse(e.newValue);
-        renderDashboard();
-        notify("Dashboard updated from external action");
-      }
+    // ---------- LOGOUT LOGIC ----------
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('active_org');
+      localStorage.removeItem('activeOrg');
+      localStorage.removeItem('activeHR');
+      window.location.href = 'login.html';
     });
 
-    // Notification Helper
-    let toastTimeout;
-    function notify(message) {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.classList.add('show');
-      clearTimeout(toastTimeout);
-      toastTimeout = setTimeout(() => toast.classList.remove('show'), 2500);
+    // ---------- DATA READING ----------
+    const activeOrg = localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || 'Flawless Graphics';
+    const EMP_KEY = `${activeOrg}_employees`;
+
+    function safeParse(s) { try { return JSON.parse(s); } catch(e) { return null; } }
+    function readKey(k) { return safeParse(localStorage.getItem(k)) || []; }
+    function formatNum(n) { return Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+    function loadFinancials() {
+      document.getElementById('displayOrg').textContent = `Org: ${activeOrg}`;
+      const emps = readKey(EMP_KEY);
+      const totalPayroll = emps.reduce((s, e) => s + (Number(e.salary) || 0), 0);
+
+      document.getElementById('valPayroll').textContent = formatNum(totalPayroll);
+      document.getElementById('tablePayrollVal').textContent = formatNum(totalPayroll);
+
+      const netLiquidity = 450000 - totalPayroll - 38200;
+      document.getElementById('valLiquidity').textContent = formatNum(netLiquidity);
     }
 
-    // Navigation Active Handler
-    document.querySelectorAll('.nav-menu .nav-item').forEach(item => {
-      item.addEventListener('click', (e) => {
-        document.querySelectorAll('.nav-menu .nav-item').forEach(i => i.classList.remove('active'));
-        e.currentTarget.classList.add('active');
-        const tabName = e.currentTarget.getAttribute('data-name');
-        document.getElementById('pageTitle').textContent = tabName;
-        notify(`Switched view to ${tabName}`);
-      });
-    });
+    // ---------- CHARTS ENGINE ----------
+    let cashFlowChart = null;
+    let expenseChart = null;
 
-    // Real-Time Search Filter
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-      const query = e.target.value.toLowerCase();
-      document.querySelectorAll('.order-row').forEach(row => {
-        row.style.display = row.textContent.toLowerCase().includes(query) ? 'flex' : 'none';
-      });
-      document.querySelectorAll('.sales-item').forEach(item => {
-        item.style.display = item.textContent.toLowerCase().includes(query) ? 'flex' : 'none';
-      });
-    });
+    function renderCharts() {
+      const isDark = el.classList.contains('dark');
+      const textColor = isDark ? '#94A3B8' : '#64748B';
 
-    // Initialize Charts & Fetch Initial Data
-    window.addEventListener('DOMContentLoaded', () => {
-      fetchDashboardData();
+      // 1. Line Chart
+      const ctx1 = document.getElementById('cashFlowChart').getContext('2d');
+      if (cashFlowChart) cashFlowChart.destroy();
 
-      new Chart(document.getElementById('sparkline1'), {
+      cashFlowChart = new Chart(ctx1, {
         type: 'line',
-        data: { labels: [1,2,3,4,5,6,7], datasets: [{ data: [12, 19, 10, 15, 12, 17, 14], borderColor: '#3F7A54', borderWidth: 2, pointRadius: 0, tension: 0.4 }] },
-        options: { plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
-      });
-
-      new Chart(document.getElementById('sparkline2'), {
-        type: 'line',
-        data: { labels: [1,2,3,4,5,6,7], datasets: [{ data: [10, 15, 8, 18, 12, 16, 11], borderColor: '#B88126', borderWidth: 2, pointRadius: 0, tension: 0.4 }] },
-        options: { plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
-      });
-
-      new Chart(document.getElementById('barChart'), {
-        type: 'bar',
         data: {
-          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
           datasets: [
-            { label: 'Active', data: [12, 32, 34, 15, 12, 30, 24], backgroundColor: '#222325', borderRadius: 12, borderSkipped: false },
-            { label: 'Remaining', data: [28, 8, 6, 25, 28, 10, 16], backgroundColor: '#EAE6DF', borderRadius: 12, borderSkipped: false }
+            { label: 'Revenue', data: [65000, 72000, 80000, 85000, 92000, 88000, 95000, 102000], borderColor: '#10B981', tension: 0.3, fill: false },
+            { label: 'Expenditure', data: [42000, 45000, 48000, 51000, 53000, 49000, 56000, 58000], borderColor: '#EF4444', tension: 0.3, fill: false }
           ]
         },
         options: {
-          responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-          scales: { x: { stacked: true, grid: { display: false }, border: { display: false } }, y: { stacked: true, grid: { display: false }, border: { display: false }, ticks: { callback: v => v + ' K', stepSize: 10 } } }
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: textColor, font: { family: 'Plus Jakarta Sans' } } } },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: textColor } },
+            y: { grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }, ticks: { color: textColor } }
+          }
         }
       });
 
-      new Chart(document.getElementById('profitDonut'), {
+      // 2. Pie Chart
+      const ctx2 = document.getElementById('expenseAllocationChart').getContext('2d');
+      if (expenseChart) expenseChart.destroy();
+
+      const emps = readKey(EMP_KEY);
+      const totalPayroll = emps.reduce((s, e) => s + (Number(e.salary) || 0), 0);
+
+      expenseChart = new Chart(ctx2, {
         type: 'doughnut',
-        data: { datasets: [{ data: [60, 24, 16], backgroundColor: ['#959BFE', '#B4C5B8', '#F5D899'], borderWidth: 0 }] },
-        options: { cutout: '78%', plugins: { legend: { display: false } } }
+        data: {
+          labels: ['Payroll', 'OpEx', 'Marketing', 'Reserve'],
+          datasets: [{
+            data: [totalPayroll || 25000, 38200, 15000, 80000],
+            backgroundColor: ['#2563EB', '#06B6D4', '#8B5CF6', '#10B981'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom', labels: { color: textColor } } },
+          cutout: '65%'
+        }
       });
-    });
+    }
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // INIT
+    loadFinancials();
+    renderCharts();
   </script>
 </body>
 </html>
