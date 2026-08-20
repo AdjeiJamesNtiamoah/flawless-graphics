@@ -4,102 +4,589 @@
 <meta charset="UTF-8">
 <title>Welcome | Flawless Graphics</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 <style>
-    body {
+    * {
+        box-sizing: border-box;
         margin: 0;
-        background: linear-gradient(135deg, #001f3f, #003366, #00509e);
-        height: 100vh;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: #9292db;
+        background-image: 
+            radial-gradient(at 0% 0%, #a5a6f6 0px, transparent 50%),
+            radial-gradient(at 100% 100%, #311868 0px, transparent 50%),
+            radial-gradient(at 50% 50%, #4c2882 0px, transparent 100%);
+        background-size: 140% 140%;
+        animation: gradientGlow 12s ease infinite alternate;
+        min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        font-family: Poppins, Arial;
-        color: white;
+        padding: 20px;
+        color: #ffffff;
+        overflow-x: hidden;
+    }
+
+    @keyframes gradientGlow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Window Frame UI Container */
+    .app-window {
+        width: 100%;
+        max-width: 1000px;
+        background: #3c1e78;
+        border-radius: 20px;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        animation: windowEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes windowEntrance {
+        from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.98);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    /* Mock Mac Top Bar */
+    .window-header {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 12px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .window-dots {
+        display: flex;
+        gap: 8px;
+    }
+
+    .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+    .dot-1 { background: #9c8ce8; }
+    .dot-2 { background: #72efdd; }
+    .dot-3 { background: #92b0ff; }
+
+    .user-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.8);
+        background: rgba(255, 255, 255, 0.1);
+        padding: 4px 12px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .user-badge i {
+        color: #72efdd;
+    }
+
+    /* Main Split Body Layout */
+    .main-container {
+        display: flex;
+        flex-direction: row;
+        min-height: 580px;
+        position: relative;
+    }
+
+    /* Left Hero Banner Section */
+    .hero-section {
+        flex: 1;
+        padding: 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
         overflow: hidden;
     }
 
-    .box {
-        text-align: center;
-        padding: 40px;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        box-shadow: 0 0 40px rgba(0,0,0,0.4);
-        animation: fadeIn 1.2s ease-out;
-        backdrop-filter: blur(10px);
-        width: 90%;
-        max-width: 450px;
+    /* Abstract Animated 3D Ribbons */
+    .ribbon-container {
+        position: absolute;
+        top: -40px;
+        left: -40px;
+        width: 320px;
+        height: 320px;
+        pointer-events: none;
     }
 
-    h1 {
-        font-size: 32px;
-        margin-bottom: 10px;
-        animation: slideDown 1s ease-out;
+    .ribbon {
+        position: absolute;
+        border-radius: 50%;
+        border: 28px solid transparent;
     }
 
-    p {
-        margin-bottom: 25px;
-        font-size: 1.1em;
-        opacity: 0.9;
+    .ribbon-1 {
+        width: 240px;
+        height: 240px;
+        border-top-color: #5ce1e6;
+        border-right-color: #5ce1e6;
+        transform: rotate(-25deg);
+        filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+        animation: floatShape1 6s ease-in-out infinite alternate;
     }
 
-    button, a.btn {
+    .ribbon-2 {
+        width: 200px;
+        height: 200px;
+        top: 30px;
+        left: 20px;
+        border-bottom-color: #8c52ff;
+        border-left-color: #8c52ff;
+        transform: rotate(15deg);
+        filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+        animation: floatShape2 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatShape1 {
+        0% { transform: rotate(-25deg) translateY(0px); }
+        100% { transform: rotate(-15deg) translateY(12px); }
+    }
+
+    @keyframes floatShape2 {
+        0% { transform: rotate(15deg) translateY(0px); }
+        100% { transform: rotate(25deg) translateY(-10px); }
+    }
+
+    .brand-logo-container {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        z-index: 2;
+        margin-top: 80px;
+    }
+
+    .org-logo-preview {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    .org-logo-preview img {
         width: 100%;
-        padding: 14px;
-        margin-top: 12px;
-        border: none;
-        border-radius: 6px;
-        font-size: 18px;
-        cursor: pointer;
-        font-weight: 600;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .org-logo-preview i {
+        font-size: 28px;
+        color: #ffffff;
+    }
+
+    .brand-title {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        line-height: 1.2;
+    }
+
+    .brand-subtitle {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.6);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 2px;
+    }
+
+    .hero-text {
+        z-index: 2;
+        margin-top: 30px;
+        max-width: 360px;
+    }
+
+    .hero-text h1 {
+        font-size: 24px;
+        font-weight: 500;
+        line-height: 1.3;
+        color: #ffffff;
+    }
+
+    .hero-text span {
+        font-weight: 800;
+        background: linear-gradient(90deg, #ffffff, #a2e8dd);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .hero-footer-link {
+        margin-top: 30px;
+        z-index: 2;
+    }
+
+    .link-subtle {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 12px;
         text-decoration: none;
-        display: block;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: color 0.2s ease;
     }
 
-    .continue {
-        background: #00c3ff;
-        color: #001f3f;
-    }
-    .login {
-        background: #00ffbb;
-        color: #003322;
-    }
-    .register {
-        background: #ffaa00;
-        color: #402200;
+    .link-subtle:hover {
+        color: #ffffff;
+        text-decoration: underline;
     }
 
-    .continue:hover { background: #00a6db; }
-    .login:hover { background: #00cc99; }
-    .register:hover { background: #e69900; }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: scale(0.95); }
-        to { opacity: 1; transform: scale(1); }
+    /* Right Navigation Portal Card */
+    .form-section {
+        flex: 1;
+        padding: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
-    @keyframes slideDown {
-        from { transform: translateY(-30px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
+    .card {
+        width: 100%;
+        max-width: 420px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 32px;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .card-header {
+        margin-bottom: 24px;
+    }
+
+    .card h2 {
+        font-size: 20px;
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+    .card-desc {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 4px;
+    }
+
+    /* Portal Option Buttons */
+    .portal-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .btn-portal {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 1px solid transparent;
+        opacity: 0;
+        animation: btnSlideUp 0.5s ease forwards;
+    }
+
+    .btn-portal:nth-child(1) { animation-delay: 0.1s; }
+    .btn-portal:nth-child(2) { animation-delay: 0.2s; }
+    .btn-portal:nth-child(3) { animation-delay: 0.3s; }
+    .btn-portal:nth-child(4) { animation-delay: 0.4s; }
+
+    @keyframes btnSlideUp {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .portal-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .portal-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+    }
+
+    /* Distinct Button Themes */
+    .btn-primary {
+        background: #a2e8dd;
+        color: #1a0836;
+        border-color: rgba(162, 232, 221, 0.4);
+    }
+
+    .btn-primary .portal-icon {
+        background: rgba(26, 8, 54, 0.1);
+        color: #1a0836;
+    }
+
+    .btn-primary:hover {
+        background: #8ce2d5;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(162, 232, 221, 0.3);
+    }
+
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.08);
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-secondary .portal-icon {
+        background: rgba(255, 255, 255, 0.1);
+        color: #a2e8dd;
+    }
+
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-portal .arrow-icon {
+        font-size: 12px;
+        transition: transform 0.2s ease;
+        opacity: 0.7;
+    }
+
+    .btn-portal:hover .arrow-icon {
+        transform: translateX(4px);
+        opacity: 1;
+    }
+
+    .card-footer {
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 11px;
+    }
+
+    .btn-logout {
+        color: #ff9999;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: opacity 0.2s ease;
+    }
+
+    .btn-logout:hover {
+        opacity: 0.8;
+        text-decoration: underline;
+    }
+
+    /* Responsive Layout Adjustments */
+    @media (max-width: 850px) {
+        .main-container {
+            flex-direction: column;
+        }
+        .hero-section {
+            padding: 30px;
+        }
+        .ribbon-container {
+            transform: scale(0.7);
+            top: -60px;
+            left: -60px;
+        }
+        .brand-logo-container {
+            margin-top: 40px;
+        }
     }
 </style>
 </head>
 <body>
 
-<div class="box">
-    <h1>FLAWLESS GRAPHICS</h1>
-    <p>Employee & Classroom Management System</p>
+<div class="app-window">
+    <!-- Window Controls Header -->
+    <div class="window-header">
+        <div class="window-dots">
+            <div class="dot dot-1"></div>
+            <div class="dot dot-2"></div>
+            <div class="dot dot-3"></div>
+        </div>
+        <div class="user-badge" id="userBadge" style="display: none;">
+            <i class="fa-solid fa-circle-user"></i>
+            <span id="userName">User</span>
+        </div>
+    </div>
 
-    <!-- Continue to normal website -->
-    <a href="home.html" class="btn continue">Continue to Website</a>
+    <div class="main-container">
+        <!-- Left Hero Banner -->
+        <div class="hero-section">
+            <div class="ribbon-container">
+                <div class="ribbon ribbon-1"></div>
+                <div class="ribbon ribbon-2"></div>
+            </div>
 
-    <!-- Login -->
-    <a href="hr-dashboard.html" class="btn login">HR Dashboard</a>
+            <div class="brand-logo-container">
+                <div class="org-logo-preview" id="orgLogoBox">
+                    <i class="fa-solid fa-elephant"></i>
+                </div>
+                <div>
+                    <div class="brand-title" id="orgTitle">FLAWLESS GRAPHICS</div>
+                    <div class="brand-subtitle">Employee & Classroom Network</div>
+                </div>
+            </div>
 
-    <!-- Login -->
-    <a href="teacher-dashboard.html" class="btn register">Teachers Portal</a>
+            <div class="hero-text">
+                <h1>Welcome to your central <span>LUCY™ Management System</span></h1>
+            </div>
 
-    <!-- Login -->
-    <a href="finance-dashboard.html" class="btn register">Finance Portal</a>
+            <div class="hero-footer-link">
+                <a href="#" class="link-subtle">
+                    <i class="fa-solid fa-circle-info"></i> System Requirements & Status
+                </a>
+            </div>
+        </div>
+
+        <!-- Right Portal Actions Section -->
+        <div class="form-section">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Select Workspace</h2>
+                    <div class="card-desc">Choose a portal to begin your active session</div>
+                </div>
+
+                <div class="portal-actions">
+                    <!-- Continue to Website -->
+                    <a href="home.html" class="btn-portal btn-primary">
+                        <div class="portal-info">
+                            <div class="portal-icon">
+                                <i class="fa-solid fa-globe"></i>
+                            </div>
+                            <span>Continue to Main Site</span>
+                        </div>
+                        <i class="fa-solid fa-arrow-right arrow-icon"></i>
+                    </a>
+
+                    <!-- HR Dashboard -->
+                    <a href="hr-dashboard.html" class="btn-portal btn-secondary">
+                        <div class="portal-info">
+                            <div class="portal-icon">
+                                <i class="fa-solid fa-users-gear"></i>
+                            </div>
+                            <span>HR Management</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                    </a>
+
+                    <!-- Teachers Portal -->
+                    <a href="teacher-dashboard.html" class="btn-portal btn-secondary">
+                        <div class="portal-info">
+                            <div class="portal-icon">
+                                <i class="fa-solid fa-chalkboard-user"></i>
+                            </div>
+                            <span>Teachers Portal</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                    </a>
+
+                    <!-- Finance Portal -->
+                    <a href="finance-dashboard.html" class="btn-portal btn-secondary">
+                        <div class="portal-info">
+                            <div class="portal-icon">
+                                <i class="fa-solid fa-wallet"></i>
+                            </div>
+                            <span>Finance Portal</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                    </a>
+                </div>
+
+                <div class="card-footer">
+                    <span style="color: rgba(255,255,255,0.5);">Session Active</span>
+                    <a href="site-login.html" class="btn-logout" onclick="logout()">
+                        <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    try {
+        const activeUserRaw = localStorage.getItem("active_org_user");
+        if (activeUserRaw) {
+            const activeUser = JSON.parse(activeUserRaw);
+
+            // Display Active User Badge
+            if (activeUser.name) {
+                document.getElementById("userName").textContent = activeUser.name;
+                document.getElementById("userBadge").style.display = "flex";
+            }
+
+            // Display Registered Organization Name if available
+            if (activeUser.org) {
+                document.getElementById("orgTitle").textContent = activeUser.org.toUpperCase();
+            }
+
+            // Display Saved Organization Logo if uploaded
+            if (activeUser.logo) {
+                document.getElementById("orgLogoBox").innerHTML = `<img src="${activeUser.logo}" alt="Organization Logo">`;
+            }
+        }
+    } catch (e) {
+        console.warn("Could not parse user session details:", e);
+    }
+});
+
+function logout() {
+    localStorage.removeItem("active_org_user");
+}
+</script>
 
 </body>
 </html>
