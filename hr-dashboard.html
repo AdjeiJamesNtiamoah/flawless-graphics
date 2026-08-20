@@ -6,7 +6,6 @@
     const activeOrg = localStorage.getItem('active_org') || localStorage.getItem('activeOrg');
     const activeHR = localStorage.getItem('activeHR');
 
-    // If active session data is missing, redirect immediately to login
     if (!activeOrg || !activeHR) {
       alert('Access Denied. Please log in as HR first.');
       window.location.href = 'login.html';
@@ -220,6 +219,7 @@
   }
   .badge-green { background: var(--accent-green-bg); color: var(--accent-green); }
   .badge-red { background: var(--accent-red-bg); color: var(--accent-red); }
+  .badge-orange { background: var(--accent-orange-bg); color: var(--accent-orange); }
 
   /* --- PANELS & TABLES --- */
   .dashboard-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px; }
@@ -252,6 +252,20 @@
   }
   .modal-backdrop.show .modal { transform: translateY(0); }
   .form-grid { display: grid; grid-template-columns: 1fr 240px; gap: 20px; }
+
+  .student-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .student-card-box {
+    background: var(--bg);
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
 
   /* --- TOAST --- */
   .toast {
@@ -292,6 +306,7 @@
   <nav class="nav" id="nav">
     <button data-section="dashboard" class="active"><i class="fa-solid fa-chart-pie"></i> <span class="hide-collapsed">Dashboard</span></button>
     <button data-section="employees"><i class="fa-solid fa-users"></i> <span class="hide-collapsed">Employees</span></button>
+    <button data-section="students"><i class="fa-solid fa-graduation-cap"></i> <span class="hide-collapsed">Students</span></button>
     <button data-section="attendance"><i class="fa-solid fa-calendar-check"></i> <span class="hide-collapsed">Attendance</span></button>
     <button data-section="payroll"><i class="fa-solid fa-file-invoice-dollar"></i> <span class="hide-collapsed">Payroll</span></button>
     <button data-section="analytics"><i class="fa-solid fa-chart-line"></i> <span class="hide-collapsed">Analytics</span></button>
@@ -335,11 +350,11 @@
       </div>
     </div>
     <div class="kpi">
-      <div class="kpi-icon" style="background:var(--accent-green-bg);color:var(--accent-green)"><i class="fa-solid fa-user-check"></i></div>
+      <div class="kpi-icon" style="background:var(--accent-green-bg);color:var(--accent-green)"><i class="fa-solid fa-graduation-cap"></i></div>
       <div>
-        <h4>Present Today</h4>
-        <div class="val" id="presentToday">0</div>
-        <div class="badge-pill badge-green"><i class="fa-solid fa-check"></i> 96% Rate</div>
+        <h4>Total Students</h4>
+        <div class="val" id="totalStudents">0</div>
+        <div class="badge-pill badge-green"><i class="fa-solid fa-user-check"></i> Enrolled</div>
       </div>
     </div>
     <div class="kpi">
@@ -393,6 +408,36 @@
     <table>
       <thead><tr><th>Employee</th><th>Role</th><th>Department</th><th>Email</th><th>Salary</th><th>Status</th><th>Actions</th></tr></thead>
       <tbody id="employeeTable"></tbody>
+    </table>
+  </section>
+
+  <!-- STUDENTS SECTION -->
+  <section class="panel" id="studentsSection" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="display:flex;gap:12px;align-items:center">
+        <input id="searchStudent" class="select" placeholder="Search students by name, ID or class..." style="min-width:280px" oninput="renderStudents()"/>
+        <select id="filterFeeStatus" class="select" onchange="renderStudents()">
+          <option value="">All Fee Statuses</option>
+          <option value="Paid">Paid</option>
+          <option value="Owing">Owing</option>
+          <option value="Partial">Partial</option>
+        </select>
+      </div>
+      <div class="small"><i class="fa-solid fa-info-circle"></i> Click "View Details" to see attendance, grades, and tuition records.</div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Class / Grade</th>
+          <th>Teacher Attendance</th>
+          <th>Tuition / Fees</th>
+          <th>Academic GPA</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="studentsTable"></tbody>
     </table>
   </section>
 
@@ -490,7 +535,7 @@
         <input id="emp_dept" class="select" style="width:100%;margin-bottom:12px"/>
         <label class="small" style="font-weight:600">Work Email</label>
         <input id="emp_email" class="select" style="width:100%;margin-bottom:12px"/>
-        <label class="small" style="font-weight:600">Base Base Monthly Salary ($)</label>
+        <label class="small" style="font-weight:600">Base Monthly Salary ($)</label>
         <input id="emp_salary" type="number" class="select" style="width:100%;margin-bottom:20px"/>
         <div style="display:flex;gap:8px">
           <button class="btn" id="saveEmpBtn">Save Changes</button>
@@ -502,6 +547,20 @@
         <img id="emp_preview" class="profile-thumb" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" alt="preview" style="width:140px;height:140px;border-radius:20px;margin-bottom:12px;object-fit:cover">
         <input id="emp_photo" type="file" accept="image/*" style="width:100%;font-size:11px">
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: STUDENT DETAILS -->
+<div class="modal-backdrop" id="studentModalBackdrop">
+  <div class="modal" style="width:720px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3 id="studentModalName" style="margin:0;font-size:20px;font-weight:800">Student Comprehensive Details</h3>
+      <button class="btn ghost" onclick="closeStudentModal()" style="padding:4px 8px"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="studentModalContent" style="margin-top:16px"></div>
+    <div style="margin-top:20px;text-align:right">
+      <button class="btn ghost" onclick="closeStudentModal()">Close</button>
     </div>
   </div>
 </div>
@@ -537,6 +596,7 @@ orgSwitcher.addEventListener('change',()=>{ localStorage.setItem('active_org', o
 
 function key(k){ return `${localStorage.getItem('active_org') || ACTIVE_ORG}_${k}` }
 const EMP_KEY = key('employees'); 
+const STUDENT_KEY = key('students');
 const ACT_KEY = key('activity'); 
 const DEPT_KEY = key('departments');
 
@@ -548,6 +608,75 @@ if(!localStorage.getItem(EMP_KEY)) {
     { id:'e3', name:'Michael Scott', role:'Regional Manager', dept:'Management', email:'michael@org.com', salary:9000, photo:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80' }
   ]);
 }
+
+if(!localStorage.getItem(STUDENT_KEY)) {
+  save(STUDENT_KEY, [
+    {
+      id: 's101',
+      name: 'Ethan Hunt',
+      classGrade: 'Grade 11 - A',
+      teacherRecordedAttendance: 'Present (98% Rate)',
+      attendanceLog: [
+        { date: '2026-03-28', status: 'Present', teacher: 'Mr. Davis' },
+        { date: '2026-03-27', status: 'Present', teacher: 'Mr. Davis' },
+        { date: '2026-03-26', status: 'Absent', teacher: 'Mr. Davis' }
+      ],
+      feeStatus: 'Paid',
+      totalFees: 3500,
+      feesPaid: 3500,
+      feesOwing: 0,
+      academicGPA: '3.9 / 4.0',
+      academicRecords: [
+        { subject: 'Mathematics', grade: 'A', score: 94 },
+        { subject: 'Physics', grade: 'A', score: 91 },
+        { subject: 'English', grade: 'B+', score: 87 }
+      ]
+    },
+    {
+      id: 's102',
+      name: 'Emma Watson',
+      classGrade: 'Grade 12 - B',
+      teacherRecordedAttendance: 'Present Today (92% Rate)',
+      attendanceLog: [
+        { date: '2026-03-28', status: 'Present', teacher: 'Mrs. Gable' },
+        { date: '2026-03-27', status: 'Late', teacher: 'Mrs. Gable' },
+        { date: '2026-03-26', status: 'Present', teacher: 'Mrs. Gable' }
+      ],
+      feeStatus: 'Owing',
+      totalFees: 4000,
+      feesPaid: 1500,
+      feesOwing: 2500,
+      academicGPA: '3.7 / 4.0',
+      academicRecords: [
+        { subject: 'Chemistry', grade: 'A', score: 92 },
+        { subject: 'Biology', grade: 'A-', score: 89 },
+        { subject: 'History', grade: 'B', score: 83 }
+      ]
+    },
+    {
+      id: 's103',
+      name: 'Lucas Vance',
+      classGrade: 'Grade 10 - A',
+      teacherRecordedAttendance: 'Absent Today (85% Rate)',
+      attendanceLog: [
+        { date: '2026-03-28', status: 'Absent', teacher: 'Mr. Henderson' },
+        { date: '2026-03-27', status: 'Present', teacher: 'Mr. Henderson' },
+        { date: '2026-03-26', status: 'Present', teacher: 'Mr. Henderson' }
+      ],
+      feeStatus: 'Partial',
+      totalFees: 3200,
+      feesPaid: 2000,
+      feesOwing: 1200,
+      academicGPA: '3.2 / 4.0',
+      academicRecords: [
+        { subject: 'Algebra', grade: 'B', score: 82 },
+        { subject: 'Literature', grade: 'C+', score: 77 },
+        { subject: 'Art', grade: 'A', score: 95 }
+      ]
+    }
+  ]);
+}
+
 if(!localStorage.getItem(DEPT_KEY)) save(DEPT_KEY, ['Engineering','Design','Management','Marketing','HR']);
 
 document.getElementById('sideOrg').textContent = ACTIVE_ORG;
@@ -556,6 +685,7 @@ document.getElementById('sideOrg').textContent = ACTIVE_ORG;
 const sections = {
   dashboard: document.getElementById('dashboardSection'),
   employees: document.getElementById('employeesSection'),
+  students: document.getElementById('studentsSection'),
   attendance: document.getElementById('attendanceSectionPanel'),
   payroll: document.getElementById('payrollSection'),
   analytics: document.getElementById('analyticsSection'),
@@ -662,7 +792,7 @@ function renderActivity(){
   el.innerHTML = arr.slice(0,6).map(a=> `<div style="padding:8px 0;border-bottom:1px solid var(--border)"><strong>${new Date(a.time).toLocaleTimeString()}</strong> - ${a.text}</div>`).join(''); 
 }
 
-/* TABLE RENDERING */
+/* TABLE RENDERING: EMPLOYEES */
 function renderEmployees(){
   const arr = read(EMP_KEY);
   const employeeTable = document.getElementById('employeeTable');
@@ -694,6 +824,111 @@ function renderEmployees(){
   renderAttendanceTable();
 }
 
+/* TABLE RENDERING: STUDENTS */
+function renderStudents(){
+  const arr = read(STUDENT_KEY);
+  const searchVal = document.getElementById('searchStudent').value.toLowerCase();
+  const feeFilter = document.getElementById('filterFeeStatus').value;
+  const tbody = document.getElementById('studentsTable');
+  tbody.innerHTML = '';
+
+  const filtered = arr.filter(s => {
+    const matchesSearch = s.name.toLowerCase().includes(searchVal) || s.classGrade.toLowerCase().includes(searchVal);
+    const matchesFee = feeFilter ? s.feeStatus === feeFilter : true;
+    return matchesSearch && matchesFee;
+  });
+
+  filtered.forEach(s => {
+    let feeBadgeClass = 'badge-green';
+    if (s.feeStatus === 'Owing') feeBadgeClass = 'badge-red';
+    if (s.feeStatus === 'Partial') feeBadgeClass = 'badge-orange';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${s.name}</strong><br><span class="small">ID: ${s.id}</span></td>
+      <td>${s.classGrade}</td>
+      <td><span class="badge-pill badge-green"><i class="fa-solid fa-user-check"></i> ${s.teacherRecordedAttendance}</span></td>
+      <td>
+        <span class="badge-pill ${feeBadgeClass}">${s.feeStatus}</span><br>
+        <span class="small" style="display:inline-block;margin-top:4px">
+          Paid: $${s.feesPaid} | Owing: <strong style="color:var(--accent-red)">$${s.feesOwing}</strong>
+        </span>
+      </td>
+      <td><strong>${s.academicGPA}</strong></td>
+      <td>
+        <button class="btn ghost" style="padding:4px 10px;font-size:11px" onclick="viewStudentDetails('${s.id}')">
+          <i class="fa-solid fa-eye"></i> View Details
+        </button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function viewStudentDetails(studentId) {
+  const students = read(STUDENT_KEY);
+  const s = students.find(item => item.id === studentId);
+  if(!s) return;
+
+  document.getElementById('studentModalName').textContent = `${s.name} (${s.classGrade})`;
+
+  const modalContent = document.getElementById('studentModalContent');
+  modalContent.innerHTML = `
+    <div class="student-detail-grid">
+      <div class="student-card-box">
+        <h4 style="margin-top:0"><i class="fa-solid fa-graduation-cap"></i> Academic Performance</h4>
+        <div><strong>GPA:</strong> ${s.academicGPA}</div>
+        <hr style="border:0;border-top:1px solid var(--border);margin:10px 0"/>
+        <div style="font-weight:700;margin-bottom:6px" class="small">Subject Breakdown:</div>
+        ${s.academicRecords.map(r => `
+          <div style="display:flex;justify-content:space-between;" class="small">
+            <span>${r.subject}</span>
+            <span><strong>${r.grade}</strong> (${r.score}%)</span>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="student-card-box">
+        <h4 style="margin-top:0"><i class="fa-solid fa-file-invoice-dollar"></i> Fee Statement</h4>
+        <div class="small"><strong>Total Tuition:</strong> $${s.totalFees}</div>
+        <div class="small"><strong>Amount Paid:</strong> $${s.feesPaid}</div>
+        <div class="small" style="color:var(--accent-red)"><strong>Amount Balance:</strong> $${s.feesOwing}</div>
+        <div style="margin-top:8px">
+          <strong>Status:</strong> <span class="badge-pill ${s.feeStatus === 'Paid' ? 'badge-green' : 'badge-red'}">${s.feeStatus}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="student-card-box" style="margin-top:16px">
+      <h4 style="margin-top:0"><i class="fa-solid fa-clipboard-user"></i> Teacher Attendance Records</h4>
+      <div class="small" style="margin-bottom:8px"><strong>Latest Reported Status:</strong> ${s.teacherRecordedAttendance}</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Teacher</th>
+            <th>Attendance Record</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${s.attendanceLog.map(log => `
+            <tr>
+              <td>${log.date}</td>
+              <td>${log.teacher}</td>
+              <td><span class="badge-pill ${log.status === 'Present' ? 'badge-green' : 'badge-red'}">${log.status}</span></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  document.getElementById('studentModalBackdrop').classList.add('show');
+}
+
+function closeStudentModal() {
+  document.getElementById('studentModalBackdrop').classList.remove('show');
+}
+
 function openEdit(id){
   const emp = read(EMP_KEY).find(x=>x.id===id);
   if(emp) openEmpModal(emp);
@@ -701,8 +936,9 @@ function openEdit(id){
 
 function updateKPIs(){
   const employees = read(EMP_KEY);
+  const students = read(STUDENT_KEY);
   document.getElementById('totalEmployees').textContent = employees.length;
-  document.getElementById('presentToday').textContent = Math.ceil(employees.length * 0.95);
+  document.getElementById('totalStudents').textContent = students.length;
   document.getElementById('absentToday').textContent = Math.floor(employees.length * 0.05);
   const totalSal = employees.reduce((acc, e) => acc + Number(e.salary || 0), 0);
   document.getElementById('payrollTotal').textContent = '$' + totalSal.toLocaleString();
@@ -746,75 +982,17 @@ document.getElementById('calcPayrollBtn').addEventListener('click', ()=>{
       <div>Bonuses: <strong style="color:var(--accent-green)">+$${bonus.toLocaleString()}</strong></div>
       <div>Deductions: <strong style="color:var(--accent-red)">-$${deductions.toLocaleString()}</strong></div>
       <hr style="border:0;border-top:1px solid var(--border);margin:8px 0"/>
-      <div style="font-size:16px">Calculated Net Pay: <strong>$${net.toLocaleString()}</strong></div>
-    </div>
-  `;
+      <div style="font-size:16px">Calculated Net: <strong>$${net.toLocaleString()}</strong></div>
+    </div>`;
 });
 
-/* THEME ACCENT SELECTION */
-document.querySelectorAll('.color-swatch').forEach(swatch => {
-  swatch.addEventListener('click', (e) => {
-    const color = e.target.dataset.color;
-    document.documentElement.style.setProperty('--primary', color);
-    showToast('Primary Accent Color Updated');
-  });
-});
-
-/* CHARTS INITIALIZATION */
-function initCharts() {
-  const ctxOverview = document.getElementById('overviewChart');
-  if(ctxOverview) {
-    new Chart(ctxOverview, {
-      type: 'line',
-      data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-        datasets: [{
-          label: 'Attendance Rate %',
-          data: [95, 98, 92, 96, 94, 90],
-          borderColor: '#635bfc',
-          tension: 0.3,
-          fill: false
-        }]
-      },
-      options: { responsive: true, plugins: { legend: { display: false } } }
-    });
-  }
-
-  const ctxDept = document.getElementById('deptChart');
-  if(ctxDept) {
-    new Chart(ctxDept, {
-      type: 'doughnut',
-      data: {
-        labels: ['Engineering', 'Design', 'Management', 'HR'],
-        datasets: [{
-          data: [40, 25, 20, 15],
-          backgroundColor: ['#635bfc', '#10b981', '#f59e0b', '#8b5cf6']
-        }]
-      },
-      options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
-    });
-  }
-}
-
-function renderAll(){
+function renderAll() {
   renderEmployees();
+  renderStudents();
   renderActivity();
 }
 
-window.addEventListener('DOMContentLoaded', ()=>{
-  renderAll();
-  initCharts();
-});
-
-  document.getElementById('logoutBtn').addEventListener('click', () => {
-  // Clear active authentication keys
-  localStorage.removeItem('active_org');
-  localStorage.removeItem('activeOrg');
-  localStorage.removeItem('activeHR');
-
-  // Redirect back to login
-  window.location.href = 'login.html';
-});
+renderAll();
 </script>
 </body>
 </html>
