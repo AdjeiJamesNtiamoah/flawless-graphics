@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FLAWLESS GRAPHICS — Finance Portal Sign In</title>
+  <title>FLAWLESS GRAPHICS — Finance Portal Auth</title>
 
   <!-- Typography & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,6 +28,7 @@
       --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
       --radius-xl: 24px;
       --radius-md: 12px;
+      --success: #10B981;
     }
 
     .dark {
@@ -156,12 +157,40 @@
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-lg);
       width: 100%;
-      max-width: 440px;
+      max-width: 460px;
       padding: 40px;
       position: relative;
     }
 
-    .login-header { text-align: center; margin-bottom: 28px; }
+    /* TAB TOGGLER */
+    .auth-tabs {
+      display: flex;
+      background: rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--input-border);
+      padding: 4px;
+      border-radius: 30px;
+      margin-bottom: 24px;
+    }
+    .dark .auth-tabs { background: rgba(255, 255, 255, 0.04); }
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 13px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .tab-btn.active {
+      background: var(--card-bg);
+      color: var(--accent);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .login-header { text-align: center; margin-bottom: 24px; }
     .login-header h2 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
     .login-header p { font-size: 13px; color: var(--text-muted); }
 
@@ -252,11 +281,8 @@
       color: var(--accent);
     }
 
-    /* ERROR FEEDBACK */
-    .alert-error {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: #EF4444;
+    /* FEEDBACK MESSAGES */
+    .alert-box {
       padding: 10px 14px;
       border-radius: var(--radius-md);
       font-size: 12px;
@@ -264,6 +290,16 @@
       display: none;
       align-items: center;
       gap: 8px;
+    }
+    .alert-error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #EF4444;
+    }
+    .alert-success {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--success);
     }
 
     footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-muted); }
@@ -292,20 +328,34 @@
     </div>
   </header>
 
-  <!-- LOGIN CARD -->
+  <!-- MAIN CARD -->
   <main>
     <div class="login-card" data-aos="zoom-in" data-aos-duration="600">
-      <div class="login-header">
-        <h2>Finance Portal Login</h2>
-        <p>Access your organization's administrative tools</p>
+      
+      <!-- AUTH MODE SWITCHER -->
+      <div class="auth-tabs">
+        <button class="tab-btn active" id="tabSignIn">Sign In</button>
+        <button class="tab-btn" id="tabSignUp">Create Account</button>
       </div>
 
-      <div class="alert-error" id="errorBox">
+      <div class="login-header">
+        <h2 id="formTitle">Finance Portal Login</h2>
+        <p id="formSub">Access your organization's administrative tools</p>
+      </div>
+
+      <!-- ALERTS -->
+      <div class="alert-box alert-error" id="errorBox">
         <i class="fa-solid fa-circle-exclamation"></i>
         <span id="errorMessage">Please complete all fields.</span>
       </div>
 
-      <form id="hrLoginForm">
+      <div class="alert-box alert-success" id="successBox">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="successMessage">Account created! You can now sign in.</span>
+      </div>
+
+      <!-- FORM -->
+      <form id="authForm">
         <div class="form-group">
           <label class="form-label" for="orgName">Organization Code / Name</label>
           <div class="input-wrapper">
@@ -315,7 +365,7 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="hrEmail">finance Email</label>
+          <label class="form-label" for="hrEmail">Finance Email</label>
           <div class="input-wrapper">
             <i class="fa-solid fa-envelope icon"></i>
             <input type="email" id="hrEmail" class="form-input" placeholder="admin@flawlessgraphics.com" required />
@@ -331,14 +381,23 @@
           </div>
         </div>
 
-        <div class="form-options">
+        <!-- SIGN UP ONLY FIELD: CONFIRM PASSWORD -->
+        <div class="form-group" id="confirmPassGroup" style="display: none;">
+          <label class="form-label" for="confirmPassword">Confirm Password</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-shield-halved icon"></i>
+            <input type="password" id="confirmPassword" class="form-input" placeholder="••••••••" />
+          </div>
+        </div>
+
+        <div class="form-options" id="signInOptions">
           <label class="remember-me">
             <input type="checkbox" id="rememberMe"> Remember active session
           </label>
           <a href="#" class="forgot-link" onclick="alert('Please contact System IT Support to reset credentials.')">Forgot password?</a>
         </div>
 
-        <button type="submit" class="btn-submit">
+        <button type="submit" class="btn-submit" id="submitBtn">
           <span>Sign In to Finance Dashboard</span>
           <i class="fa-solid fa-arrow-right"></i>
         </button>
@@ -352,7 +411,7 @@
   </main>
 
   <footer>
-    © <span id="year"></span> Flawless Graphics — Enterprise finance System
+    © <span id="year"></span> Flawless Graphics — Enterprise Finance System
   </footer>
 
   <!-- SCRIPT LOGIC -->
@@ -392,17 +451,59 @@
       togglePassword.classList.toggle('fa-eye-slash');
     });
 
-    // ---------- LOGIN AUTH LOGIC ----------
-    const loginForm = document.getElementById('hrLoginForm');
+    // ---------- TAB SWITCHING LOGIC ----------
+    let isSignUpMode = false;
+    const tabSignIn = document.getElementById('tabSignIn');
+    const tabSignUp = document.getElementById('tabSignUp');
+    const confirmPassGroup = document.getElementById('confirmPassGroup');
+    const signInOptions = document.getElementById('signInOptions');
+    const formTitle = document.getElementById('formTitle');
+    const formSub = document.getElementById('formSub');
+    const submitBtn = document.getElementById('submitBtn');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+
+    tabSignIn.addEventListener('click', () => setMode(false));
+    tabSignUp.addEventListener('click', () => setMode(true));
+
+    function setMode(signUp) {
+      isSignUpMode = signUp;
+      hideMessages();
+
+      if (signUp) {
+        tabSignUp.classList.add('active');
+        tabSignIn.classList.remove('active');
+        confirmPassGroup.style.display = 'block';
+        confirmPasswordInput.setAttribute('required', 'true');
+        signInOptions.style.display = 'none';
+        formTitle.textContent = 'Register Finance Account';
+        formSub.textContent = 'Create administrator credentials for your organization';
+        submitBtn.innerHTML = `<span>Create Finance Account</span> <i class="fa-solid fa-user-plus"></i>`;
+      } else {
+        tabSignIn.classList.add('active');
+        tabSignUp.classList.remove('active');
+        confirmPassGroup.style.display = 'none';
+        confirmPasswordInput.removeAttribute('required');
+        signInOptions.style.display = 'flex';
+        formTitle.textContent = 'Finance Portal Login';
+        formSub.textContent = 'Access your organization\'s administrative tools';
+        submitBtn.innerHTML = `<span>Sign In to Finance Dashboard</span> <i class="fa-solid fa-arrow-right"></i>`;
+      }
+    }
+
+    // ---------- AUTH LOGIC ----------
+    const authForm = document.getElementById('authForm');
     const errorBox = document.getElementById('errorBox');
     const errorMessage = document.getElementById('errorMessage');
+    const successBox = document.getElementById('successBox');
+    const successMessage = document.getElementById('successMessage');
 
     // Pre-fill active org if available
     const existingOrg = localStorage.getItem('active_org') || localStorage.getItem('activeOrg');
     if (existingOrg) document.getElementById('orgName').value = existingOrg;
 
-    loginForm.addEventListener('submit', (e) => {
+    authForm.addEventListener('submit', (e) => {
       e.preventDefault();
+      hideMessages();
 
       const orgName = document.getElementById('orgName').value.trim();
       const hrEmail = document.getElementById('hrEmail').value.trim();
@@ -418,21 +519,70 @@
         return;
       }
 
-      // Persist active session credentials for dashboard reading
-      localStorage.setItem('active_org', orgName);
-      localStorage.setItem('activeFinance', JSON.stringify({
-        name: hrEmail.split('@')[0],
-        email: hrEmail,
-        role: 'HR Admin'
-      }));
+      // Read registered users from storage
+      const users = JSON.parse(localStorage.getItem('fg_registered_users') || '[]');
 
-      // Redirect to the HR Dashboard
-      window.location.href = 'finance-dashboard.html';
+      if (isSignUpMode) {
+        // --- SIGN UP WORKFLOW ---
+        const confirmPassword = confirmPasswordInput.value.trim();
+        if (password !== confirmPassword) {
+          showError('Passwords do not match.');
+          return;
+        }
+
+        const userExists = users.some(u => u.email.toLowerCase() === hrEmail.toLowerCase());
+        if (userExists) {
+          showError('An account with this email already exists. Please sign in.');
+          return;
+        }
+
+        // Save user
+        users.push({ org: orgName, email: hrEmail, password: password });
+        localStorage.setItem('fg_registered_users', JSON.stringify(users));
+
+        showSuccess('Account created successfully! Switching to sign in...');
+        setTimeout(() => {
+          setMode(false);
+          document.getElementById('hrPassword').value = '';
+          confirmPasswordInput.value = '';
+        }, 1500);
+
+      } else {
+        // --- SIGN IN WORKFLOW ---
+        const userMatch = users.find(u => u.email.toLowerCase() === hrEmail.toLowerCase() && u.password === password);
+
+        // Allow login if user matches registered account OR simple default validation
+        if (!userMatch && users.length > 0) {
+          showError('Invalid email or password.');
+          return;
+        }
+
+        // Save session credentials
+        localStorage.setItem('active_org', orgName);
+        localStorage.setItem('activeFinance', JSON.stringify({
+          name: hrEmail.split('@')[0],
+          email: hrEmail,
+          role: 'Finance Admin'
+        }));
+        localStorage.setItem('activeHR', 'true'); // Satisfies dashboard route guard
+
+        window.location.href = 'finance-dashboard.html';
+      }
     });
 
     function showError(msg) {
       errorMessage.textContent = msg;
       errorBox.style.display = 'flex';
+    }
+
+    function showSuccess(msg) {
+      successMessage.textContent = msg;
+      successBox.style.display = 'flex';
+    }
+
+    function hideMessages() {
+      errorBox.style.display = 'none';
+      successBox.style.display = 'none';
     }
 
     document.getElementById('year').textContent = new Date().getFullYear();
