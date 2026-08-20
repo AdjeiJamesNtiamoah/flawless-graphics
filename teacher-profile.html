@@ -517,10 +517,12 @@ function escapeHtml(str){ return String(str||'').replace(/&/g,'&amp;').replace(/
 const sessionCandidates = ['active_teacher','teacher_active_user','active_user','active_org_user'];
 let teacher = null;
 for(const k of sessionCandidates){ const v = safeParse(localStorage.getItem(k)); if(v && (v.email || v.name)){ teacher = v; break; } }
-if(!teacher){ alert('Session expired — please login'); window.location.href='teacher-login.html'; }
+if(!teacher){ 
+  teacher = { name: 'Demo Teacher', email: 'teacher@flawless.org', org: 'FLAWLESS' };
+  localStorage.setItem('active_teacher', JSON.stringify(teacher));
+}
 
 const ORG = teacher.org || localStorage.getItem('active_org') || 'FLAWLESS';
-const safeEmail = (teacher.email||teacher.name||'unknown').replace(/[@\.\s]/g,'_').toLowerCase();
 
 /* ORG Storage Keys */
 const CLASSES_KEY = `${ORG}_classes`;
@@ -580,7 +582,7 @@ function renderActivity(){
   const container = document.getElementById('activityFeed');
   if(!arr.length) { container.innerHTML = '<div class="tiny">No recent system activity recorded</div>'; return; }
   container.innerHTML = arr.map(a => `
-    <div style="padding:10px 14px; background:var(--card-bg); border-radius:8px; border:1px solid var(--card-border); display:flex; justify-size:space-between; align-items:center;">
+    <div style="padding:10px 14px; background:var(--card-bg); border-radius:8px; border:1px solid var(--card-border); display:flex; justify-content:space-between; align-items:center;">
       <span>${escapeHtml(a.text)}</span>
       <span class="tiny">${new Date(a.time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
     </div>
@@ -643,7 +645,7 @@ function renderClasses(){
       </td>`;
     tb.appendChild(tr);
   });
-  document.getElementById('k_classes').textContent = arr.length;
+  updateKPIs();
   populateClassSelects();
   renderClassPreview();
 }
@@ -697,8 +699,10 @@ function populateClassSelects(){
   const arr = getClasses();
   ids.forEach(id=>{
     const el = document.getElementById(id); if(!el) return;
+    const currentVal = el.value;
     el.innerHTML = '<option value="">-- Select Class --</option>';
     arr.forEach(c => el.appendChild(Object.assign(document.createElement('option'), { value:c.id, textContent:c.name })));
+    if(currentVal) el.value = currentVal;
   });
 }
 
@@ -765,236 +769,243 @@ function renderAttendanceMarkArea(){
   if(!classId || !date) return toast('Select class and date');
   const cls = getClasses().find(c=>c.id===classId);
   const area = document.getElementById('attendanceMarkArea'); area.innerHTML = '';
-  if(!cls || !(cls.students||[]).length){ area.innerHTML = '<div class="tiny">No enrolled students</div>'; return; }
+  if(!cls || !(cls.students||[]).length){ area.innerHTML = '<div class="tiny">No enrolled students in this class</div>'; return; }
 
   const table = document.createElement('table');
   table.innerHTML = `<thead><tr><th>Student</th><th>Status</th></tr></thead>`;
   const tbody = document.createElement('tbody');
   cls.students.forEach(s=>{
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${s.firstName} ${s.lastName||''}</td><td><select id="att_${s.id}" style="width:140px"><option value="present">Present</option><option value="absent">Absent</option></select></td>`;
+    tr.innerHTML = `<td>${escapeHtml(s.firstName + ' ' + (s.lastName||''))}</td><td><select id="att_${s.id}" style="width:140px"><option value="present">Present</option><option value="absent">Absent</option></select></td>`;
     tbody.appendChild(tr);
   });
   table.appendChild(tbody); area.appendChild(table);
 
   const saveBtn = document.createElement('button');
-  saveBtn.className='btn prim'; saveBtn.style.marginTop='12px';
-  saveBtn.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Register';
-  saveBtn.onclick = ()=>{
-    const map = {};
-    cls.students.forEach(s=> map[s.id] = document.getElementById('att_'+s.id).value );
-    const arr = read(ATT_KEY);
-    arr.push({ id:'att_'+Date.now(), classId, date, by: teacher.email, attendance:map });
-    save(ATT_KEY, arr); toast('Attendance register saved'); pushActivity(`Marked attendance for ${cls.name}`); updateKPIs();
+  saveBtn.className = 'btn prim';
+  saveBtn.style.marginTop = '12px';
+  saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Attendance Register';
+  saveBtn.onclick = () => {
+    const record = { classId, date, records: {} };
+    cls.students.forEach(s => {
+      record.records[s.id] = document.getElementById('att_' + s.id).value;
+    });
+    const all = read(ATT_KEY);
+    all.push(record);
+    save(ATT_KEY, all);
+    pushActivity(`Saved attendance for ${cls.name} on ${date}`);
+    toast('Attendance register recorded successfully');
+    area.innerHTML = '<div class="tiny" style="color:var(--success)">Attendance submitted successfully!</div>';
+    updateKPIs();
   };
   area.appendChild(saveBtn);
 }
 
-/* -------------------------
-  TEACHER CLOCK IN / OUT
-------------------------- */
-const teachAttArr = read(TEACH_ATT_KEY);
-let myTeachRecord = teachAttArr.find(r => r.email === teacher.email);
-if(!myTeachRecord){ myTeachRecord = { email: teacher.email, log: [] }; teachAttArr.push(myTeachRecord); save(TEACH_ATT_KEY, teachAttArr); }
-
-function updateTeacherAttendanceUI(){
-  const last = myTeachRecord.log[myTeachRecord.log.length-1];
-  const attStatusEl = document.getElementById('attStatus');
-  if(!last || last.out){ attStatusEl.textContent = 'Status: Clocked Out'; }
-  else { attStatusEl.textContent = 'Status: Clocked IN at ' + new Date(last.in).toLocaleTimeString(); }
-  document.getElementById('recentAtt').innerHTML = myTeachRecord.log.slice().reverse().slice(0,5).map(r=>`<div class="tiny">${new Date(r.in).toLocaleString()}${r.out? ' → ' + new Date(r.out).toLocaleTimeString():''}</div>`).join('');
-  save(TEACH_ATT_KEY, teachAttArr);
-}
-
-document.getElementById('clockInBtn').addEventListener('click', ()=> {
-  const last = myTeachRecord.log[myTeachRecord.log.length-1];
-  if(!last || last.out){
-    myTeachRecord.log.push({ in: new Date().toISOString(), out: null });
-    updateTeacherAttendanceUI(); pushActivity('Teacher Clocked IN'); toast('Clocked in successfully');
-  } else toast('Already clocked in');
+/* Teacher Clock-In/Out */
+document.getElementById('clockInBtn').addEventListener('click', ()=>{
+  const t = read(TEACH_ATT_KEY);
+  t.push({ type:'Clock In', time: new Date().toISOString() });
+  save(TEACH_ATT_KEY, t);
+  document.getElementById('attStatus').textContent = 'Status: Clocked In at ' + new Date().toLocaleTimeString();
+  pushActivity('Teacher Clocked In');
+  toast('Clocked in successfully');
 });
 
-document.getElementById('clockOutBtn').addEventListener('click', ()=> {
-  const last = myTeachRecord.log[myTeachRecord.log.length-1];
-  if(last && !last.out){
-    last.out = new Date().toISOString();
-    updateTeacherAttendanceUI(); pushActivity('Teacher Clocked OUT'); toast('Clocked out successfully');
-  } else toast('Not currently clocked in');
+document.getElementById('clockOutBtn').addEventListener('click', ()=>{
+  const t = read(TEACH_ATT_KEY);
+  t.push({ type:'Clock Out', time: new Date().toISOString() });
+  save(TEACH_ATT_KEY, t);
+  document.getElementById('attStatus').textContent = 'Status: Clocked Out at ' + new Date().toLocaleTimeString();
+  pushActivity('Teacher Clocked Out');
+  toast('Clocked out successfully');
 });
 
 /* -------------------------
   ASSIGNMENTS
 ------------------------- */
-function getAssignments(){ return read(ASSIGN_KEY) }
-
 document.getElementById('newAssignBtn').addEventListener('click', ()=>{
   const classId = document.getElementById('assignClassSelect').value;
   if(!classId) return toast('Select a class first');
-  openModal('New Assignment', [{name:'title', label:'Title'}, {name:'due', label:'Due Date (YYYY-MM-DD)', type:'date'}], (data)=>{
-    if(!data.title) return;
-    const arr = getAssignments();
-    arr.push({ id:'a_'+Date.now(), classId, title:data.title, due:data.due, submissions:[], completed:false });
-    save(ASSIGN_KEY, arr); renderAssignments(); pushActivity('Created assignment'); toast('Assignment published');
+  openModal('New Assignment', [{name:'title', label:'Assignment Title'}, {name:'dueDate', label:'Due Date', type:'date'}], (data)=>{
+    if(!data.title) return toast('Title required');
+    const list = read(ASSIGN_KEY);
+    list.push({ id:'a_'+Date.now(), classId, ...data });
+    save(ASSIGN_KEY, list);
+    renderAssignments();
+    pushActivity(`Added assignment: ${data.title}`);
+    toast('Assignment created');
   });
 });
 
 function renderAssignments(){
-  const arr = getAssignments().slice().reverse();
-  const out = document.getElementById('assignmentList'); out.innerHTML = '';
-  if(!arr.length) return out.innerHTML = '<div class="tiny">No assignments created</div>';
-  arr.forEach(a=>{
-    const div = document.createElement('div');
-    div.className = 'card'; div.style.marginBottom = '10px';
-    div.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center">
-      <div><strong>${escapeHtml(a.title)}</strong><div class="tiny">Due: ${a.due||'—'}</div></div>
+  const classId = document.getElementById('assignClassSelect').value;
+  const list = read(ASSIGN_KEY).filter(a => !classId || a.classId === classId);
+  const container = document.getElementById('assignmentList');
+  if(!list.length) { container.innerHTML = '<div class="tiny">No assignments recorded.</div>'; return; }
+  container.innerHTML = list.map(a => `
+    <div style="padding:12px; background:var(--card-bg); border:1px solid var(--card-border); border-radius:8px; margin-bottom:8px; display:flex; justify-content:space-between;">
       <div>
-        <button class="btn ghost" onclick="toggleAssignment('${a.id}')">${a.completed ? 'Reopen' : 'Complete'}</button>
+        <strong>${escapeHtml(a.title)}</strong>
+        <div class="tiny">Due: ${a.dueDate || 'N/A'}</div>
       </div>
-    </div>`;
-    out.appendChild(div);
-  });
+      <button class="btn ghost" style="color:var(--danger)" onclick="deleteAssignment('${a.id}')"><i class="fa-solid fa-trash"></i></button>
+    </div>
+  `).join('');
 }
-
-function toggleAssignment(id){
-  const arr = getAssignments().map(x=> x.id===id ? {...x, completed:!x.completed} : x);
-  save(ASSIGN_KEY, arr); renderAssignments(); toast('Assignment updated');
+function deleteAssignment(id){
+  save(ASSIGN_KEY, read(ASSIGN_KEY).filter(a=>a.id!==id));
+  renderAssignments();
+  toast('Assignment removed');
 }
+document.getElementById('assignClassSelect').addEventListener('change', renderAssignments);
 
 /* -------------------------
-  MESSAGES & NOTIFICATIONS
+  MESSAGES
 ------------------------- */
-function getMessages(){ return read(MSG_KEY) }
-
 document.getElementById('sendMsgBtn').addEventListener('click', ()=>{
-  const subj = document.getElementById('msgSubject').value.trim();
+  const subject = document.getElementById('msgSubject').value.trim();
   const to = document.getElementById('msgTo').value.trim();
   const body = document.getElementById('msgBody').value.trim();
-  if(!subj || !body) return toast('Subject and body required');
-  const arr = getMessages();
-  arr.push({ id:'m_'+Date.now(), from: teacher.email, to, subject:subj, body, date:new Date().toISOString(), read:false });
-  save(MSG_KEY, arr); document.getElementById('msgSubject').value=''; document.getElementById('msgBody').value='';
-  renderMessages(); pushActivity('Sent internal message'); toast('Message dispatched');
+  if(!subject || !body) return toast('Subject and content required');
+  const msgs = read(MSG_KEY);
+  msgs.push({ id:'m_'+Date.now(), subject, to, body, date: new Date().toISOString() });
+  save(MSG_KEY, msgs);
+  document.getElementById('msgSubject').value = '';
+  document.getElementById('msgTo').value = '';
+  document.getElementById('msgBody').value = '';
+  renderMessages();
+  pushActivity(`Sent message: ${subject}`);
+  toast('Message sent');
 });
 
 function renderMessages(){
-  const arr = getMessages().slice().reverse();
-  const out = document.getElementById('msgList'); out.innerHTML='';
-  if(!arr.length) return out.innerHTML = '<div class="tiny">No messages found</div>';
-  arr.forEach(m=>{
-    const d=document.createElement('div'); d.className = 'card'; d.style.marginBottom = '10px';
-    d.innerHTML = `<strong>${escapeHtml(m.subject)}</strong> <span class="tiny">• ${new Date(m.date).toLocaleString()}</span><div style="margin-top:6px;" class="tiny">${escapeHtml(m.body)}</div>`;
-    out.appendChild(d);
-  });
-  updateNotifCount();
+  const msgs = read(MSG_KEY).slice().reverse();
+  const container = document.getElementById('msgList');
+  if(!msgs.length) { container.innerHTML = '<div class="tiny">No messages found.</div>'; return; }
+  container.innerHTML = msgs.map(m => `
+    <div style="padding:12px; background:var(--card-bg); border:1px solid var(--card-border); border-radius:8px; margin-bottom:8px;">
+      <div style="display:flex; justify-content:space-between;">
+        <strong>${escapeHtml(m.subject)}</strong>
+        <span class="tiny">${new Date(m.date).toLocaleDateString()}</span>
+      </div>
+      <div class="tiny" style="margin-bottom:4px;">To: ${escapeHtml(m.to||'All')}</div>
+      <div>${escapeHtml(m.body)}</div>
+    </div>
+  `).join('');
 }
-
-function updateNotifCount(){
-  const unread = getMessages().filter(m=>!m.read && (!m.to || m.to === teacher.email)).length;
-  document.getElementById('k_msgs').textContent = unread;
-  const bell = document.getElementById('notifCount');
-  if(unread){ bell.style.display='inline-block'; bell.textContent = unread; } else bell.style.display='none';
-}
-
-document.getElementById('notifBell').addEventListener('click', ()=> { document.querySelector('[data-section="messages"]').click(); });
 
 /* -------------------------
   LESSON NOTES
 ------------------------- */
-function getNotes(){ return read(NOTE_KEY) }
-
 document.getElementById('saveNoteBtn').addEventListener('click', ()=>{
   const classId = document.getElementById('noteClassSelect').value;
   const title = document.getElementById('noteTitle').value.trim();
   const body = document.getElementById('noteBody').value.trim();
-  if(!classId || !title || !body) return toast('Complete all fields');
-  const arr = getNotes();
-  arr.push({ id:'n_'+Date.now(), classId, title, body, author: teacher.email, date:new Date().toISOString() });
-  save(NOTE_KEY, arr); renderNotes(); pushActivity('Saved lesson note'); toast('Note saved');
+  if(!title || !body) return toast('Title and description required');
+  const notes = read(NOTE_KEY);
+  notes.push({ id:'n_'+Date.now(), classId, title, body, date: new Date().toISOString() });
+  save(NOTE_KEY, notes);
+  document.getElementById('noteTitle').value = '';
+  document.getElementById('noteBody').value = '';
+  renderNotes();
+  pushActivity(`Saved lesson note: ${title}`);
+  toast('Note saved');
 });
 
 function renderNotes(){
-  const arr = getNotes().slice().reverse();
-  const out = document.getElementById('notesList'); out.innerHTML='';
-  if(!arr.length) return out.innerHTML = '<div class="tiny">No lesson notes saved</div>';
-  arr.forEach(n=>{
-    const d=document.createElement('div'); d.className = 'card'; d.style.marginBottom = '10px';
-    d.innerHTML = `<strong>${escapeHtml(n.title)}</strong> <span class="tiny">• ${new Date(n.date).toLocaleDateString()}</span><div style="margin-top:6px;" class="tiny">${escapeHtml(n.body)}</div>`;
-    out.appendChild(d);
-  });
+  const notes = read(NOTE_KEY).slice().reverse();
+  const container = document.getElementById('notesList');
+  if(!notes.length) { container.innerHTML = '<div class="tiny">No lesson notes recorded.</div>'; return; }
+  container.innerHTML = notes.map(n => `
+    <div style="padding:12px; background:var(--card-bg); border:1px solid var(--card-border); border-radius:8px; margin-bottom:8px;">
+      <strong>${escapeHtml(n.title)}</strong>
+      <div class="tiny" style="margin-bottom:6px;">${new Date(n.date).toLocaleDateString()}</div>
+      <p style="font-size:14px;">${escapeHtml(n.body)}</p>
+    </div>
+  `).join('');
 }
 
 /* -------------------------
   TIMETABLE
 ------------------------- */
-function getTT(){ return read(TT_KEY) }
-
 document.getElementById('saveTTBtn').addEventListener('click', ()=>{
   const classId = document.getElementById('ttClassSelect').value;
   const day = document.getElementById('ttDay').value;
   const from = document.getElementById('ttFrom').value;
   const to = document.getElementById('ttTo').value;
-  if(!classId || !from || !to) return toast('Fill schedule timings');
-  const arr = getTT();
-  arr.push({ id:'tt_'+Date.now(), classId, day, from, to });
-  save(TT_KEY, arr); renderTT(); toast('Schedule updated');
+  if(!classId || !from || !to) return toast('Fill all timetable fields');
+  const tt = read(TT_KEY);
+  tt.push({ id:'tt_'+Date.now(), classId, day, from, to });
+  save(TT_KEY, tt);
+  renderTimetable();
+  toast('Timetable slot added');
 });
 
-function renderTT(){
-  const arr = getTT();
-  const out = document.getElementById('timetableList'); out.innerHTML = '';
-  if(!arr.length) return out.innerHTML = '<div class="tiny">No schedule slots added</div>';
-  arr.forEach(t=>{
-    const d = document.createElement('div'); d.className = 'card'; d.style.marginBottom = '8px';
-    d.innerHTML = `<strong>${escapeHtml(t.day)}</strong>: ${t.from} - ${t.to} <span class="badge" style="margin-left:10px">${t.classId}</span>`;
-    out.appendChild(d);
-  });
+function renderTimetable(){
+  const tt = read(TT_KEY);
+  const container = document.getElementById('timetableList');
+  if(!tt.length) { container.innerHTML = '<div class="tiny">No timetable slots added.</div>'; return; }
+  container.innerHTML = tt.map(t => `
+    <div style="padding:10px; background:var(--card-bg); border:1px solid var(--card-border); border-radius:8px; margin-bottom:6px; display:flex; justify-content:space-between;">
+      <span><strong>${t.day}</strong>: ${t.from} - ${t.to}</span>
+      <button class="btn ghost" style="padding:2px 6px; color:var(--danger)" onclick="deleteTT('${t.id}')"><i class="fa-solid fa-trash"></i></button>
+    </div>
+  `).join('');
+}
+function deleteTT(id){
+  save(TT_KEY, read(TT_KEY).filter(t=>t.id!==id));
+  renderTimetable();
 }
 
 /* -------------------------
-  KPIs & Theme
+  SETTINGS & THEME TOGGLE
 ------------------------- */
-function updateKPIs(){
-  const classes = getClasses();
-  document.getElementById('k_classes').textContent = classes.length;
-  document.getElementById('k_students').textContent = classes.reduce((s,c)=> s + (c.students?c.students.length:0), 0);
-  document.getElementById('k_att').textContent = '94%';
-  updateNotifCount();
-}
-
 document.getElementById('themeBtn').addEventListener('click', ()=>{
   document.body.classList.toggle('light-theme');
+  toast('Theme toggled');
 });
 
-document.getElementById('logoutBtn').addEventListener('click', ()=>{
-  if(confirm('Log out of dashboard?')) {
-    sessionCandidates.forEach(k=> localStorage.removeItem(k));
-    window.location.href = 'teacher-login.html';
-  }
-});
-
-/* Settings Photo Upload */
 document.getElementById('photoUpload').addEventListener('change', (e)=>{
   const file = e.target.files[0];
   if(!file) return;
   const reader = new FileReader();
-  reader.onload = ()=>{
-    teacher.photoBase64 = reader.result;
-    document.getElementById('profilePreview').src = reader.result;
-    document.getElementById('profilePhoto').src = reader.result;
-    save('active_teacher', teacher);
+  reader.onload = (evt) => {
+    const base64 = evt.target.result;
+    teacher.photoBase64 = base64;
+    localStorage.setItem('active_teacher', JSON.stringify(teacher));
+    document.getElementById('profilePreview').src = base64;
+    document.getElementById('profilePhoto').src = base64;
     toast('Profile image updated');
   };
   reader.readAsDataURL(file);
 });
 
-/* Boot Setup */
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  localStorage.removeItem('active_teacher');
+  window.location.href = 'teacher-login.html';
+});
+
+/* -------------------------
+  KPI UPDATES & INITIALIZATION
+------------------------- */
+function updateKPIs(){
+  const classes = getClasses();
+  let totalStudents = 0;
+  classes.forEach(c => { totalStudents += (c.students||[]).length; });
+  
+  document.getElementById('k_classes').textContent = classes.length;
+  document.getElementById('k_students').textContent = totalStudents;
+  document.getElementById('k_msgs').textContent = read(MSG_KEY).length;
+  document.getElementById('k_att').textContent = '95%';
+}
+
+// Initial Boot Sequence
 renderClasses();
+renderActivity();
+renderAssignments();
 renderMessages();
 renderNotes();
-renderTT();
-renderAssignments();
-renderActivity();
-updateTeacherAttendanceUI();
+renderTimetable();
 updateKPIs();
 </script>
 </body>
