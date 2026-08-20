@@ -1,684 +1,863 @@
-<?php
-session_start();
-if (!isset($_SESSION['user'])) {
-    header("Location: login.php");
-    exit();
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finance & Payroll Enterprise Suite</title>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- FontAwesome Pro Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
-    <!-- Core Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zarss — Finance Dashboard</title>
+  <!-- Google Fonts & FontAwesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-    <style>
-        :root {
-            --brand-primary: #1e40af;
-            --brand-primary-hover: #1d4ed8;
-            --brand-surface: #f8fafc;
-            --brand-accent: #0284c7;
-            
-            --slate-50: #f8fafc;
-            --slate-100: #f1f5f9;
-            --slate-200: #e2e8f0;
-            --slate-300: #cbd5e1;
-            --slate-400: #94a3b8;
-            --slate-500: #64748b;
-            --slate-600: #475569;
-            --slate-700: #334155;
-            --slate-800: #1e293b;
-            --slate-900: #0f172a;
-            
-            --emerald-600: #059669;
-            --emerald-50: #ecfdf5;
-            --rose-600: #e11d48;
-            --rose-50: #fff1f2;
-            --amber-600: #d97706;
-            --amber-50: #fffbeb;
+  <style>
+    :root {
+      --bg-outer: #EAE6DF;
+      --sidebar-bg: #222325;
+      --main-bg: #F4F0EA;
+      --card-bg: #FAF8F5;
+      
+      --text-main: #1D1E20;
+      --text-muted: #8E8D8A;
+      --text-sidebar: #A0A0A0;
+      
+      --card-green: #D7E5D9;
+      --accent-green: #3F7A54;
+      --card-yellow: #FBECCB;
+      --accent-yellow: #B88126;
+      --card-purple: #959BFE;
+      
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
+    }
 
-            --radius-sm: 6px;
-            --radius-md: 10px;
-            --radius-lg: 16px;
-            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            --shadow-elevation: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-outer);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: var(--text-main);
+    }
 
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: var(--slate-100);
-            color: var(--slate-800);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
+    /* Main Container Frame */
+    .dashboard-container {
+      width: 100%;
+      max-width: 1380px;
+      height: 900px;
+      background-color: var(--main-bg);
+      border-radius: var(--radius-lg);
+      display: flex;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+    }
 
-        /* App Layout */
-        .app-sidebar {
-            width: 280px;
-            background-color: var(--slate-900);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            border-right: 1px solid var(--slate-800);
-            z-index: 20;
-        }
+    /* --- SIDEBAR --- */
+    .sidebar {
+      width: 240px;
+      background-color: var(--sidebar-bg);
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
 
-        .sidebar-header {
-            padding: 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid var(--slate-800);
-        }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 800;
+    }
 
-        .sidebar-header i { font-size: 24px; color: var(--brand-accent); }
-        .sidebar-header h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+    .brand-icon {
+      width: 28px;
+      height: 28px;
+      border: 2px solid #fff;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
 
-        .nav-group { padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+    .profile-card {
+      text-align: center;
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
 
-        .nav-item {
-            padding: 12px 16px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            color: var(--slate-400);
-            font-size: 14px;
-            font-weight: 500;
-            transition: var(--transition-fast);
-        }
+    .profile-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 12px;
+      filter: grayscale(100%);
+    }
 
-        .nav-item-content { display: flex; align-items: center; gap: 14px; }
-        .nav-item:hover { background-color: var(--slate-800); color: white; }
-        .nav-item.active { background-color: var(--brand-primary); color: white; font-weight: 600; }
+    .profile-card p {
+      color: var(--text-sidebar);
+      font-size: 11px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
 
-        .unread-badge {
-            background-color: var(--rose-600);
-            color: white;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 2px 7px;
-            border-radius: 9999px;
-        }
+    .profile-card h4 {
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+    }
 
-        .app-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
 
-        .top-navbar {
-            background: white;
-            height: 70px;
-            border-bottom: 1px solid var(--slate-200);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 32px;
-        }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 14px;
+      color: var(--text-sidebar);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s;
+    }
 
-        .page-title h1 { font-size: 20px; font-weight: 700; color: var(--slate-900); }
-        .page-title p { font-size: 12px; color: var(--slate-500); }
+    .nav-item:hover, .nav-item.active {
+      color: #fff;
+    }
 
-        .content-container { flex: 1; padding: 32px; overflow-y: auto; }
+    .nav-item.active {
+      position: relative;
+    }
 
-        .btn {
-            padding: 9px 16px;
-            border-radius: var(--radius-sm);
-            border: 1px solid transparent;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: var(--transition-fast);
-        }
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: -20px;
+      width: 4px;
+      height: 20px;
+      background-color: var(--accent-yellow);
+      border-radius: 0 4px 4px 0;
+    }
 
-        .btn-primary { background-color: var(--brand-primary); color: white; }
-        .btn-primary:hover { background-color: var(--brand-primary-hover); }
-        .btn-secondary { background-color: white; border-color: var(--slate-300); color: var(--slate-700); }
-        .btn-secondary:hover { background-color: var(--slate-50); }
+    .badge {
+      background-color: #585CE5;
+      color: #fff;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      margin-left: auto;
+    }
 
-        .card {
-            background: white;
-            border: 1px solid var(--slate-200);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-card);
-            padding: 24px;
-            margin-bottom: 24px;
-        }
+    /* --- CONTENT AREA --- */
+    .content-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      overflow-y: auto;
+    }
 
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .card-title { font-size: 16px; font-weight: 600; color: var(--slate-900); }
+    .main-panel {
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
 
-        /* Messaging Center Interface */
-        .messaging-grid {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            height: calc(100vh - 180px);
-            border: 1px solid var(--slate-200);
-            border-radius: var(--radius-md);
-            background: white;
-            overflow: hidden;
-        }
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-        .chat-sidebar {
-            border-right: 1px solid var(--slate-200);
-            display: flex;
-            flex-direction: column;
-            background: var(--slate-50);
-        }
+    .header-title h1 {
+      font-size: 18px;
+      font-weight: 800;
+    }
 
-        .chat-search-box { padding: 16px; border-bottom: 1px solid var(--slate-200); }
+    .header-title p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
 
-        .chat-role-filter {
-            display: flex;
-            gap: 6px;
-            padding: 0 16px 12px 16px;
-            border-bottom: 1px solid var(--slate-200);
-        }
+    .search-box {
+      background-color: #fff;
+      padding: 10px 16px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 280px;
+    }
 
-        .role-chip {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 9999px;
-            background: var(--slate-200);
-            color: var(--slate-700);
-            cursor: pointer;
-        }
+    .search-box input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 12px;
+      width: 100%;
+    }
 
-        .role-chip.active { background: var(--brand-primary); color: white; }
+    .search-box i {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
 
-        .contact-list { flex: 1; overflow-y: auto; }
+    /* Metric Cards */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
 
-        .contact-item {
-            padding: 14px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid var(--slate-200);
-            cursor: pointer;
-            transition: var(--transition-fast);
-        }
+    .metric-card {
+      border-radius: var(--radius-md);
+      padding: 20px;
+      position: relative;
+    }
 
-        .contact-item:hover, .contact-item.active { background-color: white; }
+    .card-green { background-color: var(--card-green); }
+    .card-yellow { background-color: var(--card-yellow); }
+    .card-purple { 
+      background-color: var(--card-purple); 
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
 
-        .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--brand-accent);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 14px;
-        }
+    .metric-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
 
-        .role-badge-tag {
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-left: 6px;
-        }
-        .tag-hr { background: #dbeafe; color: #1e40af; }
-        .tag-teacher { background: #fef3c7; color: #b45309; }
+    .metric-header span {
+      font-size: 12px;
+      font-weight: 700;
+    }
 
-        .chat-window { display: flex; flex-direction: column; background: white; }
+    .pill-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+      margin-left: auto;
+    }
 
-        .chat-header {
-            padding: 16px 24px;
-            border-bottom: 1px solid var(--slate-200);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .card-green .pill-badge { background-color: rgba(63, 122, 84, 0.2); color: var(--accent-green); }
+    .card-yellow .pill-badge { background-color: rgba(184, 129, 38, 0.2); color: var(--accent-yellow); }
 
-        .chat-messages {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            background: var(--slate-50);
-        }
+    .metric-amount {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
 
-        .message-bubble {
-            max-width: 65%;
-            padding: 12px 16px;
-            border-radius: var(--radius-md);
-            font-size: 14px;
-            line-height: 1.5;
-        }
+    .sparkline {
+      width: 100%;
+      height: 25px;
+    }
 
-        .msg-incoming {
-            align-self: flex-start;
-            background: white;
-            border: 1px solid var(--slate-200);
-            color: var(--slate-800);
-        }
+    .purple-btn {
+      background-color: #3C33C0;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+    }
 
-        .msg-outgoing {
-            align-self: flex-end;
-            background: var(--brand-primary);
-            color: white;
-        }
+    /* Main Bar Chart Section */
+    .chart-section {
+      background-color: transparent;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
 
-        .msg-time { font-size: 10px; margin-top: 4px; opacity: 0.75; text-align: right; }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
 
-        /* File Attachment Extensions */
-        .chat-input-area {
-            padding: 16px;
-            border-top: 1px solid var(--slate-200);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            background: white;
-        }
+    .chart-header h2 {
+      font-size: 26px;
+      font-weight: 800;
+    }
 
-        .file-preview-bar {
-            background: var(--slate-100);
-            border: 1px solid var(--slate-200);
-            border-radius: var(--radius-sm);
-            padding: 8px 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 12px;
-        }
+    .chart-header span {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
 
-        .file-preview-info { display: flex; align-items: center; gap: 8px; color: var(--slate-700); font-weight: 500; }
-        .file-preview-info i { color: var(--rose-600); font-size: 16px; }
-        .file-size { color: var(--slate-500); font-weight: normal; }
-        .btn-remove-file { background: none; border: none; font-size: 16px; color: var(--slate-500); cursor: pointer; }
-        .btn-remove-file:hover { color: var(--rose-600); }
+    .chart-wrapper {
+      position: relative;
+      flex: 1;
+      min-height: 200px;
+    }
 
-        .doc-attachment {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: rgba(0, 0, 0, 0.05);
-            padding: 10px 12px;
-            border-radius: var(--radius-sm);
-            margin-top: 6px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-        }
+    /* Orders Section */
+    .orders-section h3 {
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
 
-        .msg-outgoing .doc-attachment { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.2); }
-        .doc-icon { font-size: 24px; color: var(--rose-600); }
-        .msg-outgoing .doc-icon { color: #fecdd3; }
-        .doc-meta { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
-        .doc-name { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .doc-size { font-size: 11px; opacity: 0.8; }
-        .doc-download { color: inherit; font-size: 14px; padding: 4px 8px; border-radius: var(--radius-sm); text-decoration: none; }
-        .doc-download:hover { opacity: 0.8; }
+    .orders-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
 
-        .form-control {
-            width: 100%;
-            padding: 10px 12px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--slate-300);
-            font-family: inherit;
-            font-size: 14px;
-        }
+    .order-controls {
+      display: flex;
+      gap: 12px;
+    }
 
-        #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 100; }
-        .toast { background-color: var(--slate-900); color: white; padding: 12px 20px; border-radius: var(--radius-md); font-size: 14px; }
-    </style>
+    .tag-btn {
+      background: rgba(0,0,0,0.03);
+      border: 1px solid rgba(0,0,0,0.08);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .orders-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .order-row {
+      background-color: var(--card-bg);
+      padding: 12px 20px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 160px;
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .order-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    /* --- RIGHT PANEL --- */
+    .right-panel {
+      padding: 30px 24px;
+      border-left: 1px solid rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-header h3 {
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .panel-header span {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .icon-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+    }
+
+    /* Donut Legend */
+    .donut-container {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      margin: 0 auto;
+    }
+
+    .donut-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .donut-center span {
+      font-size: 9px;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .donut-center strong {
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .donut-legend {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 16px;
+      text-align: center;
+    }
+
+    .legend-item p {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .legend-item h5 {
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    /* Recent Sales List */
+    .sales-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sales-item {
+      background-color: var(--card-bg);
+      padding: 10px 16px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sales-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sales-user h4 {
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .sales-user p {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .sales-amount {
+      font-size: 12px;
+      font-weight: 800;
+    }
+  </style>
 </head>
-
 <body>
 
-    <!-- Sidebar Navigation -->
-    <aside class="app-sidebar">
-        <div>
-            <div class="sidebar-header">
-                <i class="fa-solid fa-vault"></i>
-                <h2>Payroll Suite</h2>
-            </div>
-            <nav class="nav-group">
-                <div class="nav-item active" data-section="dashboard">
-                    <div class="nav-item-content">
-                        <i class="fa-solid fa-chart-pie"></i> Overview
-                    </div>
-                </div>
-                <div class="nav-item" data-section="messaging">
-                    <div class="nav-item-content">
-                        <i class="fa-solid fa-comments"></i> HR & Staff Chat
-                    </div>
-                    <span class="unread-badge" id="unreadMsgCount">2</span>
-                </div>
-            </nav>
+  <div class="dashboard-container">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div>
+        <div class="brand">
+          <div class="brand-icon"><i class="fa-solid fa-cube"></i></div>
+          <span>Zarss</span>
         </div>
-        <div class="nav-group">
-            <div class="nav-item" id="logoutBtn">
-                <div class="nav-item-content">
-                    <i class="fa-solid fa-right-from-bracket"></i> Terminate Session
-                </div>
-            </div>
+
+        <div class="profile-card">
+          <img class="profile-img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" alt="Mark Johnson">
+          <p>Welcome Back,</p>
+          <h4>Mark Johnson</h4>
         </div>
+
+        <nav class="nav-menu">
+          <a href="#" class="nav-item active"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+          <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i> Statistics</a>
+          <a href="#" class="nav-item"><i class="fa-regular fa-credit-card"></i> Payment</a>
+          <a href="#" class="nav-item"><i class="fa-solid fa-arrow-right-arrow-left"></i> Transactions</a>
+          <a href="#" class="nav-item"><i class="fa-solid fa-box"></i> Products</a>
+          <a href="#" class="nav-item"><i class="fa-regular fa-user"></i> Customer</a>
+          <a href="#" class="nav-item"><i class="fa-regular fa-comment"></i> Messages <span class="badge">5</span></a>
+          <a href="#" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
+        </nav>
+      </div>
+
+      <a href="#" class="nav-item"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out</a>
     </aside>
 
-    <!-- Main Container -->
-    <main class="app-main">
-        <header class="top-navbar">
-            <div class="page-title">
-                <h1 id="sectionHeading">Executive Overview</h1>
-                <p><span id="orgDisplay"></span> Suite — Logged in as Finance Officer</p>
-            </div>
-        </header>
+    <!-- MAIN DASHBOARD CONTENT -->
+    <div class="content-grid">
+      
+      <main class="main-panel">
+        
+        <!-- Top Search/Header -->
+        <div class="top-bar">
+          <div class="header-title">
+            <h1>Dashboard</h1>
+            <p>Payments Updates</p>
+          </div>
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Search">
+          </div>
+        </div>
 
-        <section class="content-container">
-            
-            <!-- Dashboard View -->
-            <div id="dashboard" class="view-section">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">Document & Payroll Dispatch Hub</div>
-                    </div>
-                    <p style="color: var(--slate-500); font-size: 14px;">Select the "HR & Staff Chat" tab from the sidebar to communicate with HR Officers or Teaching staff and transmit PDF pay slips or tax records.</p>
+        <!-- Metric Cards -->
+        <div class="metrics-row">
+          <div class="metric-card card-green">
+            <div class="metric-header">
+              <i class="fa-solid fa-dollar-sign"></i>
+              <span>Balance</span>
+              <span class="pill-badge">+ 17%</span>
+            </div>
+            <div class="metric-amount">$ 56,874</div>
+            <canvas id="sparkline1" class="sparkline"></canvas>
+          </div>
+
+          <div class="metric-card card-yellow">
+            <div class="metric-header">
+              <i class="fa-solid fa-percent"></i>
+              <span>Sales</span>
+              <span class="pill-badge">+ 23%</span>
+            </div>
+            <div class="metric-amount">$ 24,575</div>
+            <canvas id="sparkline2" class="sparkline"></canvas>
+          </div>
+
+          <div class="metric-card card-purple">
+            <h4 style="font-size: 14px; font-weight: 800;">Upgrade</h4>
+            <p style="font-size: 10px; margin-top: 4px; opacity: 0.9;">Get more information and opportunities</p>
+            <button class="purple-btn">Go Pro</button>
+          </div>
+        </div>
+
+        <!-- Main Weekly Chart -->
+        <div class="chart-section">
+          <div class="chart-header">
+            <div>
+              <p style="font-size: 12px; font-weight: 700; color: var(--text-muted);">User in The Last Week</p>
+              <h2>+ 3,2%</h2>
+            </div>
+            <span>See statistics for all time</span>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="barChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Last Orders Table -->
+        <div class="orders-section">
+          <div class="orders-header">
+            <h3>Last Orders</h3>
+            <div class="order-controls">
+              <span class="tag-btn">Data Updates Every 3 Hours</span>
+              <span class="tag-btn" style="border:none; background:none;">View All Orders</span>
+            </div>
+          </div>
+
+          <div class="orders-list">
+            <div class="order-row">
+              <div class="user-info">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80" class="user-avatar" alt="David">
+                <strong>David Astee</strong>
+              </div>
+              <div><strong>$1,456</strong></div>
+              <div class="order-status"><span class="dot" style="background:#585CE5;"></span> Chargeback</div>
+              <div style="color: var(--text-muted);">11 Sep 2022</div>
+            </div>
+
+            <div class="order-row">
+              <div class="user-info">
+                <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&q=80" class="user-avatar" alt="Maria">
+                <strong>Maria Hulama</strong>
+              </div>
+              <div><strong>$42,4378</strong></div>
+              <div class="order-status"><span class="dot" style="background:#B0B0B0;"></span> Completed</div>
+              <div style="color: var(--text-muted);">11 Sep 2022</div>
+            </div>
+
+            <div class="order-row">
+              <div class="user-info">
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=80&q=80" class="user-avatar" alt="Arnold">
+                <strong>Arnold Swarz</strong>
+              </div>
+              <div><strong>$3,412</strong></div>
+              <div class="order-status"><span class="dot" style="background:#B0B0B0;"></span> Completed</div>
+              <div style="color: var(--text-muted);">11 Sep 2022</div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+      <!-- RIGHT SIDE PANEL -->
+      <aside class="right-panel">
+        
+        <!-- Monthly Profits Donut -->
+        <div>
+          <div class="panel-header" style="margin-bottom: 20px;">
+            <div>
+              <h3>Monthly Profits</h3>
+              <span>Total Profit Growth of 26%</span>
+            </div>
+            <div class="icon-btn"><i class="fa-solid fa-share-nodes"></i></div>
+          </div>
+
+          <div class="donut-container">
+            <canvas id="profitDonut"></canvas>
+            <div class="donut-center">
+              <span>Total</span>
+              <strong>$76,356</strong>
+            </div>
+          </div>
+
+          <div class="donut-legend">
+            <div class="legend-item">
+              <p>Giveaway</p>
+              <h5>60%</h5>
+            </div>
+            <div class="legend-item">
+              <p>Affiliate</p>
+              <h5>24%</h5>
+            </div>
+            <div class="legend-item">
+              <p>Offline Sales</p>
+              <h5>16%</h5>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Sales -->
+        <div>
+          <div class="panel-header" style="margin-bottom: 16px;">
+            <h3>Recent Sales</h3>
+            <span style="cursor: pointer;">See All</span>
+          </div>
+
+          <div class="sales-list">
+            <div class="sales-item">
+              <div class="sales-user">
+                <img src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=80&q=80" class="user-avatar" alt="User">
+                <div>
+                  <h4>Steven Summer</h4>
+                  <p>02 Minutes Ago</p>
                 </div>
+              </div>
+              <span class="sales-amount">+ $52.00</span>
             </div>
 
-            <!-- Messaging View -->
-            <div id="messaging" class="view-section" style="display:none;">
-                <div class="messaging-grid">
-                    
-                    <!-- Contacts Column -->
-                    <div class="chat-sidebar">
-                        <div class="chat-search-box">
-                            <input type="text" id="contactSearch" class="form-control" placeholder="Search HR or Teachers...">
-                        </div>
-                        <div class="chat-role-filter">
-                            <span class="role-chip active" onclick="AppController.filterContacts('all', this)">All</span>
-                            <span class="role-chip" onclick="AppController.filterContacts('hr', this)">HR Team</span>
-                            <span class="role-chip" onclick="AppController.filterContacts('teacher', this)">Teachers</span>
-                        </div>
-                        <div class="contact-list" id="contactList"></div>
-                    </div>
-
-                    <!-- Chat Active Window -->
-                    <div class="chat-window">
-                        <div class="chat-header">
-                            <div>
-                                <h3 id="activeContactName" style="font-size: 15px; font-weight: 600;">Select a Conversation</h3>
-                                <p id="activeContactRole" style="font-size: 12px; color: var(--slate-500);">Direct Channel</p>
-                            </div>
-                            <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px;">
-                                <i class="fa-solid fa-user-gear"></i> View Profile
-                            </button>
-                        </div>
-                        
-                        <div class="chat-messages" id="chatThread">
-                            <p style="text-align: center; color: var(--slate-400); margin: auto;">Select HR or Teacher to view message log</p>
-                        </div>
-
-                        <!-- Chat Input Area with Attachment Functionality -->
-                        <form id="sendMessageForm" class="chat-input-area">
-                            <div id="filePreviewBar" class="file-preview-bar" style="display:none;">
-                                <div class="file-preview-info">
-                                    <i class="fa-solid fa-file-pdf"></i>
-                                    <span id="filePreviewName">payslip.pdf</span>
-                                    <span id="filePreviewSize" class="file-size">(0 KB)</span>
-                                </div>
-                                <button type="button" class="btn-remove-file" id="removeFileBtn" title="Remove attachment">&times;</button>
-                            </div>
-                            
-                            <div style="display: flex; gap: 8px; width: 100%;">
-                                <input type="file" id="fileInput" accept="application/pdf,image/*" style="display:none;">
-                                <button type="button" class="btn btn-secondary" id="attachFileBtn" title="Attach Pay Slip or Tax Document (PDF)">
-                                    <i class="fa-solid fa-paperclip"></i>
-                                </button>
-                                <input type="text" id="messageInput" class="form-control" placeholder="Type a message or attach PDF document..." autocomplete="off">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fa-solid fa-paper-plane"></i> Send
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
+            <div class="sales-item">
+              <div class="sales-user">
+                <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=80&q=80" class="user-avatar" alt="User">
+                <div>
+                  <h4>Jordan Maizee</h4>
+                  <p>02 Minutes Ago</p>
                 </div>
+              </div>
+              <span class="sales-amount">+ $83.00</span>
             </div>
 
-        </section>
-    </main>
+            <div class="sales-item">
+              <div class="sales-user">
+                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=80&q=80" class="user-avatar" alt="User">
+                <div>
+                  <h4>Jessica Alba</h4>
+                  <p>05 Minutes Ago</p>
+                </div>
+              </div>
+              <span class="sales-amount">+ $61.60</span>
+            </div>
 
-    <div id="toast-container"></div>
+            <div class="sales-item">
+              <div class="sales-user">
+                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=80&q=80" class="user-avatar" alt="User">
+                <div>
+                  <h4>Anna Armas</h4>
+                  <p>05 Minutes Ago</p>
+                </div>
+              </div>
+              <span class="sales-amount">+ $2351.00</span>
+            </div>
 
-    <script>
-        const AppController = (function () {
-            const ORG = localStorage.getItem('active_org') || 'FLAWLESS';
-            
-            const contacts = [
-                { id: 'c1', name: 'Sarah Jenkins', role: 'hr', title: 'HR Manager', initials: 'SJ' },
-                { id: 'c2', name: 'David Miller', role: 'teacher', title: 'Senior Math Teacher', initials: 'DM' },
-                { id: 'c3', name: 'Grace Adams', role: 'hr', title: 'Payroll Specialist', initials: 'GA' },
-                { id: 'c4', name: 'Robert Chen', role: 'teacher', title: 'Science Lead', initials: 'RC' }
-            ];
+            <div class="sales-item">
+              <div class="sales-user">
+                <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=80&q=80" class="user-avatar" alt="User">
+                <div>
+                  <h4>Angelina Boo</h4>
+                  <p>10 Minutes Ago</p>
+                </div>
+              </div>
+              <span class="sales-amount">+ $152.00</span>
+            </div>
 
-            let activeContactId = 'c1';
-            let currentFilter = 'all';
-            let currentAttachedFile = null;
+            <div class="sales-item">
+              <div class="sales-user">
+                <img src="https://images.unsplash.com/photo-1554151228-14d9def656e4?auto=format&fit=crop&w=80&q=80" class="user-avatar" alt="User">
+                <div>
+                  <h4>Anastasia Koss</h4>
+                  <p>12 Minutes Ago</p>
+                </div>
+              </div>
+              <span class="sales-amount">+ $542.00</span>
+            </div>
+          </div>
+        </div>
 
-            function init() {
-                document.getElementById('orgDisplay').textContent = ORG;
-                bindEvents();
-                renderContacts();
-                loadChatThread('c1');
-            }
+      </aside>
 
-            function bindEvents() {
-                // Navigation
-                document.querySelectorAll('.nav-item[data-section]').forEach(item => {
-                    item.addEventListener('click', (e) => {
-                        const section = e.currentTarget.dataset.section;
-                        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-                        e.currentTarget.classList.add('active');
-                        
-                        document.querySelectorAll('.view-section').forEach(sec => sec.style.display = 'none');
-                        document.getElementById(section).style.display = 'block';
-                        document.getElementById('sectionHeading').textContent = e.currentTarget.innerText.trim();
-                    });
-                });
+    </div>
+  </div>
 
-                // Chat submit
-                document.getElementById('sendMessageForm').addEventListener('submit', handleSendMessage);
-                
-                // Contact search
-                document.getElementById('contactSearch').addEventListener('input', (e) => {
-                    renderContacts(e.target.value.toLowerCase());
-                });
+  <!-- CHART INITIALIZATION SCRIPTS -->
+  <script>
+    // Sparkline 1
+    new Chart(document.getElementById('sparkline1'), {
+      type: 'line',
+      data: {
+        labels: [1,2,3,4,5,6,7],
+        datasets: [{
+          data: [12, 19, 10, 15, 12, 17, 14],
+          borderColor: '#3F7A54',
+          borderWidth: 2,
+          pointRadius: 0,
+          tension: 0.4
+        }]
+      },
+      options: { plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+    });
 
-                // Attachment logic
-                const fileInput = document.getElementById('fileInput');
-                document.getElementById('attachFileBtn').addEventListener('click', () => fileInput.click());
-                fileInput.addEventListener('change', handleFileSelection);
-                document.getElementById('removeFileBtn').addEventListener('click', clearFileAttachment);
-            }
+    // Sparkline 2
+    new Chart(document.getElementById('sparkline2'), {
+      type: 'line',
+      data: {
+        labels: [1,2,3,4,5,6,7],
+        datasets: [{
+          data: [10, 15, 8, 18, 12, 16, 11],
+          borderColor: '#B88126',
+          borderWidth: 2,
+          pointRadius: 0,
+          tension: 0.4
+        }]
+      },
+      options: { plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+    });
 
-            function handleFileSelection(e) {
-                const file = e.target.files[0];
-                if (!file) return;
+    // Main Weekly Stacked Bar Chart
+    new Chart(document.getElementById('barChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [
+          {
+            label: 'Active',
+            data: [12, 32, 34, 15, 12, 30, 24],
+            backgroundColor: '#222325',
+            borderRadius: 12,
+            borderSkipped: false,
+          },
+          {
+            label: 'Remaining',
+            data: [28, 8, 6, 25, 28, 10, 16],
+            backgroundColor: '#EAE6DF',
+            borderRadius: 12,
+            borderSkipped: false,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { stacked: true, grid: { display: false }, border: { display: false } },
+          y: { 
+            stacked: true, 
+            grid: { display: false }, 
+            border: { display: false },
+            ticks: { callback: v => v + ' K', stepSize: 10 }
+          }
+        }
+      }
+    });
 
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('File size exceeds the 5MB enterprise limit.');
-                    clearFileAttachment();
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = function (event) {
-                    currentAttachedFile = {
-                        name: file.name,
-                        size: formatBytes(file.size),
-                        type: file.type,
-                        dataUrl: event.target.result
-                    };
-
-                    document.getElementById('filePreviewName').textContent = file.name;
-                    document.getElementById('filePreviewSize').textContent = `(${currentAttachedFile.size})`;
-                    document.getElementById('filePreviewBar').style.display = 'flex';
-                };
-                reader.readAsDataURL(file);
-            }
-
-            function clearFileAttachment() {
-                currentAttachedFile = null;
-                document.getElementById('fileInput').value = '';
-                document.getElementById('filePreviewBar').style.display = 'none';
-            }
-
-            function formatBytes(bytes) {
-                if (bytes === 0) return '0 Bytes';
-                const k = 1024;
-                const sizes = ['Bytes', 'KB', 'MB'];
-                const i = Math.floor(Math.log(bytes) / Math.log(k));
-                return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-            }
-
-            function filterContacts(role, el) {
-                currentFilter = role;
-                document.querySelectorAll('.role-chip').forEach(c => c.classList.remove('active'));
-                el.classList.add('active');
-                renderContacts();
-            }
-
-            function renderContacts(query = '') {
-                const list = document.getElementById('contactList');
-                const filtered = contacts.filter(c => {
-                    const matchesRole = currentFilter === 'all' || c.role === currentFilter;
-                    const matchesSearch = c.name.toLowerCase().includes(query) || c.title.toLowerCase().includes(query);
-                    return matchesRole && matchesSearch;
-                });
-
-                list.innerHTML = filtered.map(c => `
-                    <div class="contact-item ${c.id === activeContactId ? 'active' : ''}" onclick="AppController.selectContact('${c.id}')">
-                        <div class="avatar">${c.initials}</div>
-                        <div style="flex:1; overflow:hidden;">
-                            <div style="display:flex; align-items:center; justify-content:space-between;">
-                                <strong style="font-size:13px;">${c.name}</strong>
-                                <span class="role-badge-tag ${c.role === 'hr' ? 'tag-hr' : 'tag-teacher'}">${c.role}</span>
-                            </div>
-                            <p style="font-size:12px; color:var(--slate-500); text-overflow:ellipsis; white-space:nowrap; overflow:hidden;">${c.title}</p>
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            function selectContact(id) {
-                activeContactId = id;
-                renderContacts();
-                loadChatThread(id);
-            }
-
-            function loadChatThread(contactId) {
-                const contact = contacts.find(c => c.id === contactId);
-                if (!contact) return;
-
-                document.getElementById('activeContactName').textContent = contact.name;
-                document.getElementById('activeContactRole').textContent = `${contact.title} (${contact.role.toUpperCase()})`;
-
-                const storageKey = `chat_${ORG}_${contactId}`;
-                const messages = JSON.parse(localStorage.getItem(storageKey)) || [
-                    { 
-                        sender: 'them', 
-                        text: `Hello Finance, here is my signed tax compliance sheet.`, 
-                        time: '10:15 AM',
-                        file: {
-                            name: 'Tax_Declaration_2026.pdf',
-                            size: '240 KB',
-                            dataUrl: '#'
-                        }
-                    }
-                ];
-
-                const chatThread = document.getElementById('chatThread');
-                chatThread.innerHTML = messages.map(m => `
-                    <div class="message-bubble ${m.sender === 'me' ? 'msg-outgoing' : 'msg-incoming'}">
-                        ${m.text ? `<div>${escapeHtml(m.text)}</div>` : ''}
-                        ${m.file ? `
-                            <div class="doc-attachment">
-                                <i class="fa-solid fa-file-pdf doc-icon"></i>
-                                <div class="doc-meta">
-                                    <span class="doc-name">${escapeHtml(m.file.name)}</span>
-                                    <span class="doc-size">${m.file.size}</span>
-                                </div>
-                                <a href="${m.file.dataUrl}" download="${escapeHtml(m.file.name)}" class="doc-download" title="Download Document">
-                                    <i class="fa-solid fa-download"></i>
-                                </a>
-                            </div>
-                        ` : ''}
-                        <div class="msg-time">${m.time}</div>
-                    </div>
-                `).join('');
-                
-                chatThread.scrollTop = chatThread.scrollHeight;
-            }
-
-            function handleSendMessage(e) {
-                e.preventDefault();
-                const input = document.getElementById('messageInput');
-                const text = input.value.trim();
-
-                if (!text && !currentAttachedFile) return;
-
-                const storageKey = `chat_${ORG}_${activeContactId}`;
-                const messages = JSON.parse(localStorage.getItem(storageKey)) || [];
-
-                const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                
-                const payload = {
-                    sender: 'me',
-                    text: text,
-                    time: timeStr
-                };
-
-                if (currentAttachedFile) {
-                    payload.file = { ...currentAttachedFile };
-                }
-
-                messages.push(payload);
-                localStorage.setItem(storageKey, JSON.stringify(messages));
-                
-                input.value = '';
-                clearFileAttachment();
-                loadChatThread(activeContactId);
-            }
-
-            function escapeHtml(str) {
-                return String(str || '').replace(/[&<>"']/g, c => ({
-                    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-                }[c]));
-            }
-
-            return {
-                init,
-                filterContacts,
-                selectContact
-            };
-        })();
-
-        document.addEventListener('DOMContentLoaded', AppController.init);
-    </script>
+    // Monthly Profit Donut
+    new Chart(document.getElementById('profitDonut'), {
+      type: 'doughnut',
+      data: {
+        datasets: [{
+          data: [60, 24, 16],
+          backgroundColor: ['#959BFE', '#B4C5B8', '#F5D899'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        cutout: '78%',
+        plugins: { legend: { display: false } }
+      }
+    });
+  </script>
 </body>
 </html>
