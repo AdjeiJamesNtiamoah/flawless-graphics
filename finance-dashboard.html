@@ -12,7 +12,7 @@
       const activeHR = localStorage.getItem('activeHR');
       if (!activeOrg || !activeHR) {
         alert('Access Denied. Please log in as HR/Finance Admin first.');
-        window.location.href = 'login.html';
+        window.location.href = 'finance-login.html';
       }
     })();
   </script>
@@ -243,7 +243,6 @@
       <nav>
         <ul>
           <li><a href="welcome.html">Home</a></li>
-          <li><a href="hr-dashboard.html">HR Portal</a></li>
           <li><a href="finance-dashboard.html" class="active">Finance</a></li>
         </ul>
       </nav>
@@ -372,7 +371,7 @@
   </main>
 
   <footer>
-    © <span id="year"></span> Flawless Graphics — Enterprise HR & Financial Control System
+    © <span id="year"></span> Flawless Graphics — Enterprise & Financial Control System
   </footer>
 
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -404,8 +403,8 @@
     document.getElementById('logoutBtn').addEventListener('click', () => {
       localStorage.removeItem('active_org');
       localStorage.removeItem('activeOrg');
-      localStorage.removeItem('activeHR');
-      window.location.href = 'login.html';
+      localStorage.removeItem('activeFinance');
+      window.location.href = 'finance-login.html';
     });
 
     // ---------- DATA READING ----------
