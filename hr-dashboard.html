@@ -1,5 +1,18 @@
 <!doctype html>
 <html lang="en">
+  <script>
+  // ---------- ROUTE GUARD / AUTH CHECK ----------
+  (function() {
+    const activeOrg = localStorage.getItem('active_org') || localStorage.getItem('activeOrg');
+    const activeHR = localStorage.getItem('activeHR');
+
+    // If active session data is missing, redirect immediately to login
+    if (!activeOrg || !activeHR) {
+      alert('Access Denied. Please log in as HR first.');
+      window.location.href = 'login.html';
+    }
+  })();
+</script>
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -285,7 +298,9 @@
     <button data-section="announcements"><i class="fa-solid fa-bullhorn"></i> <span class="hide-collapsed">Broadcasts</span></button>
     <button data-section="settings"><i class="fa-solid fa-sliders"></i> <span class="hide-collapsed">Settings</span></button>
   </nav>
-
+<button class="btn ghost" id="logoutBtn">
+  <i class="fa-solid fa-right-from-bracket"></i> Log Out
+</button>
   <button class="collapse-btn" id="collapseBtn"><i class="fa-solid fa-angle-left"></i></button>
 </aside>
 
@@ -789,6 +804,16 @@ function renderAll(){
 window.addEventListener('DOMContentLoaded', ()=>{
   renderAll();
   initCharts();
+});
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+  // Clear active authentication keys
+  localStorage.removeItem('active_org');
+  localStorage.removeItem('activeOrg');
+  localStorage.removeItem('activeHR');
+
+  // Redirect back to login
+  window.location.href = 'login.html';
 });
 </script>
 </body>
