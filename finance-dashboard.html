@@ -160,8 +160,6 @@
     .btn-action.logout:hover { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #EF4444; }
     .btn-action.success-btn { background: var(--success); border: none; }
     .btn-action.success-btn:hover { background: #059669; }
-    .btn-action.danger-btn { background: var(--danger); border: none; }
-    .btn-action.danger-btn:hover { background: #DC2626; }
 
     /* LAYOUT */
     main { max-width: 1280px; margin: 32px auto; padding: 0 24px; width: 100%; flex: 1; }
@@ -227,7 +225,6 @@
     table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
     th { padding: 14px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); border-bottom: 1px solid var(--card-border); }
     td { padding: 16px; border-bottom: 1px solid var(--card-border); font-weight: 500; }
-    tr:last-child td { border-bottom: none; }
 
     .badge {
       display: inline-block;
@@ -238,127 +235,6 @@
     }
     .badge.success { background: rgba(16, 185, 129, 0.15); color: var(--success); }
     .badge.pending { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
-    .badge.rejected { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
-
-    /* MESSAGING LAYOUT */
-    .chat-layout {
-      display: grid;
-      grid-template-columns: 300px 1fr;
-      gap: 20px;
-      height: 600px;
-    }
-    @media (max-width: 768px) { .chat-layout { grid-template-columns: 1fr; height: auto; } }
-
-    .chat-sidebar {
-      border-right: 1px solid var(--card-border);
-      padding-right: 16px;
-      display: flex;
-      flex-direction: column;
-    }
-    .chat-search {
-      width: 100%;
-      padding: 10px 14px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--input-border);
-      background: var(--input-bg);
-      color: var(--text-main);
-      font-size: 13px;
-      margin-bottom: 14px;
-      outline: none;
-    }
-    .contact-list { list-style: none; overflow-y: auto; flex: 1; }
-    .contact-item {
-      padding: 12px;
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 6px;
-      transition: background 0.2s ease;
-    }
-    .contact-item:hover, .contact-item.active { background: var(--glass-glow); }
-    .avatar {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: var(--accent-gradient);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 13px;
-      position: relative;
-    }
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--success);
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      border: 2px solid var(--bg-outer);
-    }
-    .contact-info .name { font-size: 13px; font-weight: 700; }
-    .contact-info .sub { font-size: 11px; color: var(--text-muted); }
-
-    .chat-window { display: flex; flex-direction: column; height: 100%; }
-    .chat-header {
-      padding-bottom: 14px;
-      border-bottom: 1px solid var(--card-border);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding-right: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .message-bubble {
-      max-width: 70%;
-      padding: 12px 16px;
-      border-radius: 16px;
-      font-size: 13px;
-      line-height: 1.4;
-    }
-    .message-bubble.incoming {
-      background: rgba(0, 0, 0, 0.05);
-      align-self: flex-start;
-      border-bottom-left-radius: 4px;
-    }
-    .dark .message-bubble.incoming { background: rgba(255, 255, 255, 0.05); }
-    .message-bubble.outgoing {
-      background: var(--accent-gradient);
-      color: #fff;
-      align-self: flex-end;
-      border-bottom-right-radius: 4px;
-    }
-    .message-time { font-size: 10px; opacity: 0.7; margin-top: 4px; text-align: right; }
-
-    .chat-input-area {
-      display: flex;
-      gap: 10px;
-      margin-top: 16px;
-      padding-top: 14px;
-      border-top: 1px solid var(--card-border);
-    }
-    .chat-input {
-      flex: 1;
-      padding: 12px 16px;
-      border-radius: 30px;
-      border: 1px solid var(--input-border);
-      background: var(--input-bg);
-      color: var(--text-main);
-      outline: none;
-      font-size: 13px;
-    }
 
     /* SETTINGS & FORM COMPONENTS */
     .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
@@ -376,37 +252,6 @@
       font-size: 13px;
       outline: none;
     }
-
-    /* AUDIT LOG LIST */
-    .audit-list { list-style: none; }
-    .audit-item {
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--card-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 13px;
-    }
-    .audit-item:last-child { border-bottom: none; }
-
-    /* CHECKLIST STYLE */
-    .employee-checklist {
-      max-height: 180px;
-      overflow-y: auto;
-      border: 1px solid var(--input-border);
-      background: var(--input-bg);
-      border-radius: var(--radius-md);
-      padding: 10px;
-    }
-    .checklist-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 6px 0;
-      font-size: 13px;
-      border-bottom: 1px dashed var(--card-border);
-    }
-    .checklist-item:last-child { border-bottom: none; }
 
     /* MODAL */
     .modal-overlay {
@@ -451,7 +296,6 @@
           <li><a id="navHome" href="welcome.html"><i class="fa-solid fa-house"></i> Home</a></li>
           <li><a id="navDashboard" class="active" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-pie"></i> Finance</a></li>
           <li><a id="navApproval" onclick="switchTab('approval')"><i class="fa-solid fa-file-invoice-dollar"></i> Approvals</a></li>
-          <li><a id="navMessaging" onclick="switchTab('messaging')"><i class="fa-solid fa-comments"></i> Messages</a></li>
           <li><a id="navSettings" onclick="switchTab('settings')"><i class="fa-solid fa-gear"></i> Settings</a></li>
         </ul>
       </nav>
@@ -469,85 +313,48 @@
 
   <!-- MAIN CONTAINER -->
   <main>
-    
+
     <!-- 1. DASHBOARD TAB -->
     <div id="tabDashboard" class="tab-content active">
-      <div class="page-title" data-aos="fade-down" data-aos-duration="600">
+      <div class="page-title">
         <div>
           <h2>Finance & Payroll Control</h2>
-          <div style="font-size:13px; color:var(--text-muted)">Real-time ledger overview, student fees & department distributions</div>
+          <div style="font-size:13px; color:var(--text-muted)">Real-time ledger overview, student fees & payment options</div>
         </div>
-        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-          <button class="btn-action success-btn" style="padding:10px 18px; font-size:13px;" onclick="openModal('studentFeeModal')">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <button class="btn-action success-btn" style="padding:10px 18px; font-size:13px;" onclick="openStudentFeeModal()">
             <i class="fa-solid fa-graduation-cap"></i> Record Student Fee
           </button>
-          <button class="btn-action" style="background:var(--accent-gradient); padding:10px 18px; font-size:13px;" onclick="openPrepareSalaryModal()">
-            <i class="fa-solid fa-hand-holding-dollar"></i> Prepare Salary Payment
-          </button>
-          <div class="org-badge" id="displayOrg">Organization: Loaded</div>
+          <div class="org-badge" id="displayOrg">Organization: Active</div>
         </div>
       </div>
 
       <!-- METRICS -->
-      <div class="metrics-grid" data-aos="fade-up" data-aos-duration="600">
-        <div class="metric-card">
-          <div class="metric-icon"><i class="fa-solid fa-wallet"></i></div>
-          <div class="metric-info">
-            <div class="label">Annual Budget</div>
-            <div class="val"><span class="curr">GHS</span> <span id="valBudget">450,000</span></div>
-          </div>
-        </div>
-
+      <div class="metrics-grid">
         <div class="metric-card">
           <div class="metric-icon"><i class="fa-solid fa-graduation-cap"></i></div>
           <div class="metric-info">
             <div class="label">Total Fees Collected</div>
-            <div class="val"><span class="curr">GHS</span> <span id="valTotalFees">0.00</span></div>
+            <div class="val"><span class="curr">GHS</span> <span id="valTotalFees">12,500.00</span></div>
           </div>
         </div>
-
         <div class="metric-card">
-          <div class="metric-icon"><i class="fa-solid fa-users-gear"></i></div>
+          <div class="metric-icon"><i class="fa-solid fa-wallet"></i></div>
           <div class="metric-info">
-            <div class="label">Total Gross Payroll</div>
-            <div class="val"><span class="curr">GHS</span> <span id="valPayroll">0</span></div>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-icon"><i class="fa-solid fa-piggy-bank"></i></div>
-          <div class="metric-info">
-            <div class="label">Net Liquidity</div>
-            <div class="val"><span class="curr">GHS</span> <span id="valLiquidity">312,800</span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- CHARTS -->
-      <div class="charts-grid">
-        <div class="glass-card" data-aos="fade-right" data-aos-duration="700">
-          <h3 style="font-size:16px; font-weight:800; margin-bottom:16px;">Cash Flow Analysis (2026)</h3>
-          <div style="position:relative; width:100%; height:260px;">
-            <canvas id="cashFlowChart"></canvas>
-          </div>
-        </div>
-
-        <div class="glass-card" data-aos="fade-left" data-aos-duration="700">
-          <h3 style="font-size:16px; font-weight:800; margin-bottom:16px;">Expense Allocation</h3>
-          <div style="position:relative; width:100%; height:260px;">
-            <canvas id="expenseAllocationChart"></canvas>
+            <div class="label">Active Gateway</div>
+            <div class="val" id="activeGatewayBadge" style="font-size:16px; color:var(--accent);">Mobile Money (MTN MoMo)</div>
           </div>
         </div>
       </div>
 
       <!-- STUDENT FEES RECORD TABLE -->
-      <div class="glass-card" data-aos="fade-up" data-aos-duration="750">
+      <div class="glass-card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
           <div>
             <h3 style="font-size:16px; font-weight:800;">Student Fee Payment Records</h3>
-            <div style="font-size:12px; color:var(--text-muted)">Recent tuition & institutional fee transactions</div>
+            <div style="font-size:12px; color:var(--text-muted)">Recent tuition & fee payments</div>
           </div>
-          <button class="btn-action success-btn" onclick="openModal('studentFeeModal')">+ Collect Student Fee</button>
+          <button class="btn-action success-btn" onclick="openStudentFeeModal()">+ Collect Student Fee</button>
         </div>
 
         <div class="table-container">
@@ -558,62 +365,20 @@
                 <th>Student Name</th>
                 <th>Student ID</th>
                 <th>Fee Category</th>
-                <th>Payment Date</th>
+                <th>Payment Method</th>
                 <th>Amount Paid (<span class="curr">GHS</span>)</th>
                 <th>Status</th>
-                <th style="text-align:right;">Receipt</th>
               </tr>
             </thead>
             <tbody id="studentFeeBody">
-              <!-- Rendered via JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- RECENT TRANSACTIONS TABLE -->
-      <div class="glass-card" data-aos="fade-up" data-aos-duration="800">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-          <h3 style="font-size:16px; font-weight:800;">Recent General Ledger Transactions</h3>
-          <button class="btn-action" style="background:var(--accent-gradient)" onclick="openModal('disbursementModal')">+ New Disbursement</button>
-        </div>
-
-        <div class="table-container">
-          <table>
-            <thead>
               <tr>
-                <th>Transaction ID</th>
-                <th>Category</th>
-                <th>Beneficiary</th>
-                <th>Date</th>
-                <th>Amount (<span class="curr">GHS</span>)</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="transactionBody">
-              <tr>
-                <td>#TR-8921</td>
-                <td>Payroll Disbursement</td>
-                <td>All Active Staff</td>
-                <td>2026-08-01</td>
-                <td id="tablePayrollVal">0.00</td>
-                <td><span class="badge success">Processed</span></td>
-              </tr>
-              <tr>
-                <td>#TR-8920</td>
-                <td>Software Licenses</td>
-                <td>Adobe Creative Cloud</td>
-                <td>2026-08-05</td>
-                <td>4,200.00</td>
-                <td><span class="badge success">Processed</span></td>
-              </tr>
-              <tr>
-                <td>#TR-8919</td>
-                <td>Office Logistics</td>
-                <td>Accra Tech Hub</td>
-                <td>2026-08-12</td>
-                <td>1,850.00</td>
-                <td><span class="badge pending">Pending Approval</span></td>
+                <td>#REC-2026-001</td>
+                <td>Kwame Mensah</td>
+                <td>STU-2026-001</td>
+                <td>Tuition Fee</td>
+                <td>MTN Mobile Money</td>
+                <td>2,500.00</td>
+                <td><span class="badge success">Paid</span></td>
               </tr>
             </tbody>
           </table>
@@ -621,877 +386,272 @@
       </div>
     </div>
 
-    <!-- 2. SALARY APPROVAL TAB -->
-    <div id="tabApproval" class="tab-content">
-      <div class="page-title" data-aos="fade-down" data-aos-duration="600">
-        <div>
-          <h2>Salary Payment Approval Workflow</h2>
-          <div style="font-size:13px; color:var(--text-muted)">Authorize individual employee payouts or execute batch approvals</div>
-        </div>
-        <button class="btn-action success-btn" onclick="approveAllPayroll()"><i class="fa-solid fa-check-double"></i> Authorize Batch Disbursement</button>
-      </div>
-
-      <!-- APPROVAL METRICS -->
-      <div class="metrics-grid" data-aos="fade-up" data-aos-duration="600">
-        <div class="metric-card">
-          <div class="metric-icon"><i class="fa-solid fa-clock"></i></div>
-          <div class="metric-info">
-            <div class="label">Pending Approval</div>
-            <div class="val"><span class="curr">GHS</span> <span id="valPendingPayroll">0</span></div>
-          </div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-icon"><i class="fa-solid fa-check-circle"></i></div>
-          <div class="metric-info">
-            <div class="label">Approved Sum</div>
-            <div class="val"><span class="curr">GHS</span> <span id="valApprovedSum">0</span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- PAYROLL TABLE -->
-      <div class="glass-card" data-aos="fade-up" data-aos-duration="700">
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Employee Name</th>
-                <th>Department / Role</th>
-                <th>Gross Salary</th>
-                <th>Deductions (<span class="curr">GHS</span>)</th>
-                <th>Net Payable (<span class="curr">GHS</span>)</th>
-                <th>Approval Status</th>
-                <th style="text-align:right;">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="payrollApprovalBody">
-              <!-- Rendered via JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- 3. MESSAGING TAB -->
-    <div id="tabMessaging" class="tab-content">
-      <div class="glass-card" data-aos="fade-up" data-aos-duration="600">
-        <div class="chat-layout">
-          
-          <!-- SIDEBAR CONTACTS -->
-          <div class="chat-sidebar">
-            <input type="text" class="chat-search" placeholder="Search team members..." id="searchContact" oninput="filterContacts()">
-            <ul class="contact-list" id="contactList">
-              <li class="contact-item active" onclick="selectContact(this, 'Kofi Mensah', 'Chief Accountant')">
-                <div class="avatar">KM <div class="status-dot"></div></div>
-                <div class="contact-info">
-                  <div class="name">Kofi Mensah</div>
-                  <div class="sub">Chief Accountant</div>
-                </div>
-              </li>
-              <li class="contact-item" onclick="selectContact(this, 'Ama Osei', 'Payroll Specialist')">
-                <div class="avatar" style="background:linear-gradient(135deg,#10B981,#059669)">AO <div class="status-dot"></div></div>
-                <div class="contact-info">
-                  <div class="name">Ama Osei</div>
-                  <div class="sub">Payroll Specialist</div>
-                </div>
-              </li>
-              <li class="contact-item" onclick="selectContact(this, 'Yaw Boateng', 'IT Admin')">
-                <div class="avatar" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9)">YB <div class="status-dot" style="background:#F59E0B"></div></div>
-                <div class="contact-info">
-                  <div class="name">Yaw Boateng</div>
-                  <div class="sub">IT Admin</div>
-                </div>
-              </li>
-            </ul>
-            <button class="btn-action" style="background:var(--accent-gradient); width:100%; justify-content:center; margin-top:12px;" onclick="openModal('newMessageModal')">+ New Direct Message</button>
-          </div>
-
-          <!-- CHAT WINDOW -->
-          <div class="chat-window">
-            <div class="chat-header">
-              <div>
-                <h3 id="activeChatName" style="font-size:16px; font-weight:800;">Kofi Mensah</h3>
-                <span id="activeChatRole" style="font-size:12px; color:var(--text-muted)">Chief Accountant</span>
-              </div>
-              <button class="btn-action" style="padding:6px 12px;" onclick="alert('Calling module integrated with VoIP.')"><i class="fa-solid fa-phone"></i></button>
-            </div>
-
-            <div class="chat-messages" id="chatMessages">
-              <div class="message-bubble incoming">
-                Hello Admin! Have you approved the Q3 Software budget request yet?
-                <div class="message-time">10:14 AM</div>
-              </div>
-              <div class="message-bubble outgoing">
-                Hey Kofi, checking the ledger right now. Will approve in a few minutes.
-                <div class="message-time">10:16 AM</div>
-              </div>
-            </div>
-
-            <form class="chat-input-area" id="chatForm">
-              <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." required>
-              <button type="submit" class="btn-action" style="background:var(--accent-gradient); border-radius:30px;"><i class="fa-solid fa-paper-plane"></i></button>
-            </form>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <!-- 4. SETTINGS TAB -->
+    <!-- 2. SETTINGS TAB WITH PAYMENT METHOD SETUP -->
     <div id="tabSettings" class="tab-content">
-      <div class="glass-card" data-aos="fade-up" data-aos-duration="600">
-        <h3 style="font-size:20px; font-weight:800; margin-bottom:20px;">System & Portal Settings</h3>
-        
+      <div class="glass-card">
+        <h3 style="font-size:20px; font-weight:800; margin-bottom:20px;">System & Payment Integration Settings</h3>
+
         <form id="settingsForm" onsubmit="saveSettings(event)">
           <div class="settings-grid">
-            
-            <!-- PROFILE / GENERAL -->
+            <!-- GENERAL SETTINGS -->
             <div>
-              <h4 style="font-size:14px; font-weight:700; margin-bottom:14px; color:var(--accent);">Admin Profile Preferences</h4>
-              
+              <h4 style="font-size:14px; font-weight:700; margin-bottom:14px; color:var(--accent);">System Preferences</h4>
               <div class="form-group">
                 <label class="form-label">Administrator Display Name</label>
                 <input type="text" class="form-input" id="setAdminName" value="Finance Admin">
               </div>
-
               <div class="form-group">
-                <label class="form-label">System Currency Display</label>
-                <select class="form-select" id="setCurrency" onchange="updateCurrencySymbol(this.value)">
+                <label class="form-label">System Currency</label>
+                <select class="form-select" id="setCurrency">
                   <option value="GHS">GHS (Ghanaian Cedi)</option>
                   <option value="USD">USD ($ - US Dollar)</option>
-                  <option value="EUR">EUR (€ - Euro)</option>
-                  <option value="GBP">GBP (£ - British Pound)</option>
                 </select>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Tax / SSNIT Rate (%)</label>
-                <input type="number" class="form-input" id="setTaxRate" value="13.5" step="0.1" onchange="updateTaxRate(this.value)">
               </div>
             </div>
 
-            <!-- SECURITY & AUDIT -->
+            <!-- PAYMENT GATEWAY SETTINGS -->
             <div>
-              <h4 style="font-size:14px; font-weight:700; margin-bottom:14px; color:var(--accent);">Security & Governance</h4>
+              <h4 style="font-size:14px; font-weight:700; margin-bottom:14px; color:var(--accent);">
+                <i class="fa-solid fa-credit-card"></i> Connected Payment Method
+              </h4>
 
               <div class="form-group">
-                <label class="form-label">Two-Factor Authentication (2FA)</label>
-                <select class="form-select" id="set2FA">
-                  <option value="enabled">Enabled (Enforced)</option>
-                  <option value="disabled">Disabled</option>
+                <label class="form-label">Default Site Payment Gateway</label>
+                <select class="form-select" id="defaultPaymentGateway" onchange="toggleGatewayFields()">
+                  <option value="momo">MTN Mobile Money / Mobile Money</option>
+                  <option value="paystack">Paystack Gateway</option>
+                  <option value="flutterwave">Flutterwave Gateway</option>
+                  <option value="bank">Direct Bank Transfer</option>
                 </select>
               </div>
 
-              <div class="form-group">
-                <label class="form-label">Data Backup Options</label>
-                <button type="button" class="btn-action" style="width:100%; justify-content:center; background:var(--glass-glow); border-color:var(--card-border);" onclick="exportData()">
-                  <i class="fa-solid fa-download"></i> Export Local Financial Ledger (JSON)
-                </button>
+              <div class="form-group" id="momoFields">
+                <label class="form-label">MoMo Merchant Phone Number</label>
+                <input type="text" class="form-input" id="momoNumber" placeholder="055XXXXXXX" value="0240001122">
               </div>
 
-              <div class="form-group" style="margin-top:28px;">
-                <button type="button" class="btn-action logout" style="width:100%; justify-content:center;" onclick="purgeSystem()">
-                  <i class="fa-solid fa-trash"></i> Reset All Saved Session Data
-                </button>
+              <div class="form-group" id="apiKeyFields" style="display:none;">
+                <label class="form-label">Payment API Secret Key</label>
+                <input type="password" class="form-input" id="gatewayApiKey" placeholder="sk_live_xxxxxxxxxxxx">
+              </div>
+
+              <div class="form-group" id="bankFields" style="display:none;">
+                <label class="form-label">Bank Account Number / IBAN</label>
+                <input type="text" class="form-input" id="bankAccNo" placeholder="Account Number">
               </div>
             </div>
-
           </div>
 
           <div style="margin-top:24px; text-align:right;">
-            <button type="submit" class="btn-action" style="background:var(--accent-gradient); padding:10px 24px; font-size:13px;">Save Configuration</button>
+            <button type="submit" class="btn-action" style="background:var(--accent-gradient); padding:10px 24px;">Save Settings & Payment Method</button>
           </div>
         </form>
       </div>
-
-      <!-- AUDIT LOG SECTION -->
-      <div class="glass-card" data-aos="fade-up" data-aos-duration="700">
-        <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;">System Activity & Audit Trail</h3>
-        <ul class="audit-list" id="auditList">
-          <li class="audit-item">
-            <span>System initialization completed successfully</span>
-            <span style="color:var(--text-muted); font-size:11px;">2026-08-20</span>
-          </li>
-        </ul>
-      </div>
     </div>
-
   </main>
 
-  <!-- MODALS -->
-
-  <!-- RECORD STUDENT FEE MODAL -->
+  <!-- RECORD STUDENT FEE MODAL (WITH STUDENT FETCH DROPDOWN) -->
   <div class="modal-overlay" id="studentFeeModal">
     <div class="modal-card">
-      <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;"><i class="fa-solid fa-graduation-cap"></i> Record Student Fee Payment</h3>
+      <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;">
+        <i class="fa-solid fa-graduation-cap"></i> Record Student Fee Payment
+      </h3>
       <form id="studentFeeForm" onsubmit="addStudentFee(event)">
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-          <div class="form-group">
-            <label class="form-label">Student ID</label>
-            <input type="text" id="feeStudentId" class="form-input" placeholder="e.g. STU-2026-001" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Student Full Name</label>
-            <input type="text" id="feeStudentName" class="form-input" placeholder="e.g. Kwame Mensah" required>
-          </div>
-        </div>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-          <div class="form-group">
-            <label class="form-label">Class / Grade Level</label>
-            <input type="text" id="feeStudentClass" class="form-input" placeholder="e.g. Grade 11 / Level 300" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Fee Category</label>
-            <select id="feeCategory" class="form-select" required>
-              <option value="Tuition Fee">Tuition Fee</option>
-              <option value="Facility & Lab Fee">Facility & Lab Fee</option>
-              <option value="Examination Fee">Examination Fee</option>
-              <option value="Library / Tech Fee">Library / Tech Fee</option>
-              <option value="Other / Misc">Other / Misc</option>
-            </select>
-          </div>
-        </div>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-          <div class="form-group">
-            <label class="form-label">Amount Paid (<span class="curr">GHS</span>)</label>
-            <input type="number" id="feeAmount" class="form-input" placeholder="0.00" step="0.01" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Payment Method</label>
-            <select id="feePaymentMethod" class="form-select" required>
-              <option value="Mobile Money (MoMo)">Mobile Money (MoMo)</option>
-              <option value="Bank Deposit / Transfer">Bank Deposit / Transfer</option>
-              <option value="Cash">Cash</option>
-              <option value="Cheque">Cheque</option>
-            </select>
-          </div>
-        </div>
 
         <div class="form-group">
-          <label class="form-label">Payment Status</label>
-          <select id="feeStatus" class="form-select">
-            <option value="Full Paid">Full Paid</option>
-            <option value="Partial Payment">Partial Payment</option>
+          <label class="form-label">Select Student (Fetched List)</label>
+          <select class="form-select" id="feeStudentSelect" onchange="autoFillStudentDetails()" required>
+            <option value="">-- Choose Student --</option>
+            <!-- Dynamically populated -->
           </select>
         </div>
 
-        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-          <button type="button" class="btn-action" style="background:rgba(0,0,0,0.1)" onclick="closeModal('studentFeeModal')">Cancel</button>
-          <button type="submit" class="btn-action success-btn"><i class="fa-solid fa-receipt"></i> Submit & Log Fee Payment</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- PREPARE SALARY PAYMENT MODAL -->
-  <div class="modal-overlay" id="prepareSalaryModal">
-    <div class="modal-card">
-      <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;"><i class="fa-solid fa-calculator"></i> Prepare Salary Payment</h3>
-      <form id="prepareSalaryForm" onsubmit="processPreparedSalary(event)">
-        
-        <div class="form-group">
-          <label class="form-label">Pay Period / Month</label>
-          <input type="month" id="payPeriodMonth" class="form-input" required>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Select Staff Members to Include</label>
-          <div class="employee-checklist" id="empChecklist">
-            <!-- Dynamically populated -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label class="form-label">Student ID</label>
+            <input type="text" id="feeStudentId" class="form-input" readonly placeholder="Auto-filled">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Student Full Name</label>
+            <input type="text" id="feeStudentName" class="form-input" readonly placeholder="Auto-filled">
           </div>
         </div>
 
-        <div class="form-group" style="background:var(--glass-glow); padding:14px; border-radius:var(--radius-md); border:1px solid var(--card-border);">
-          <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;">
-            <span style="color:var(--text-muted)">Total Gross Calculated:</span>
-            <span style="font-weight:700;"><span class="curr">GHS</span> <span id="prepGrossVal">0.00</span></span>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label class="form-label">Fee Category</label>
+            <select class="form-select" id="feeCategory" required>
+              <option value="Tuition Fee">Tuition Fee</option>
+              <option value="Registration Fee">Registration Fee</option>
+              <option value="Facility / Lab Fee">Facility / Lab Fee</option>
+            </select>
           </div>
-          <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;">
-            <span style="color:var(--text-muted)">Estimated Tax/Deductions:</span>
-            <span style="font-weight:700; color:var(--danger);">- <span class="curr">GHS</span> <span id="prepTaxVal">0.00</span></span>
-          </div>
-          <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:800; border-top:1px solid var(--card-border); padding-top:6px; margin-top:6px;">
-            <span>Net Payable Outlay:</span>
-            <span style="color:var(--success)"><span class="curr">GHS</span> <span id="prepNetVal">0.00</span></span>
+          <div class="form-group">
+            <label class="form-label">Payment Method</label>
+            <select class="form-select" id="feePaymentMethod" required>
+              <!-- Auto syncs active setting method -->
+            </select>
           </div>
         </div>
 
-        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-          <button type="button" class="btn-action" style="background:rgba(0,0,0,0.1)" onclick="closeModal('prepareSalaryModal')">Cancel</button>
-          <button type="submit" class="btn-action" style="background:var(--accent-gradient)">Submit to Approval Queue</button>
+        <div class="form-group">
+          <label class="form-label">Amount Paid (GHS)</label>
+          <input type="number" id="feeAmount" class="form-input" placeholder="e.g. 1500" required>
         </div>
-      </form>
-    </div>
-  </div>
 
-  <!-- NEW DISBURSEMENT MODAL -->
-  <div class="modal-overlay" id="disbursementModal">
-    <div class="modal-card">
-      <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;">New Ledger Disbursement</h3>
-      <form id="disbursementForm" onsubmit="addTransaction(event)">
-        <div class="form-group">
-          <label class="form-label">Category</label>
-          <input type="text" id="disbCategory" class="form-input" placeholder="e.g. Logistics, Equipment" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Beneficiary</label>
-          <input type="text" id="disbBeneficiary" class="form-input" placeholder="e.g. Vendor Name" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Amount</label>
-          <input type="number" id="disbAmount" class="form-input" placeholder="0.00" step="0.01" required>
-        </div>
         <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-          <button type="button" class="btn-action" style="background:rgba(0,0,0,0.1)" onclick="closeModal('disbursementModal')">Cancel</button>
-          <button type="submit" class="btn-action" style="background:var(--accent-gradient)">Submit Entry</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- NEW MESSAGE MODAL -->
-  <div class="modal-overlay" id="newMessageModal">
-    <div class="modal-card">
-      <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;">Start Direct Message</h3>
-      <form id="newMsgForm" onsubmit="createContact(event)">
-        <div class="form-group">
-          <label class="form-label">Recipient Name</label>
-          <input type="text" id="newMsgName" class="form-input" placeholder="e.g. Sarah Jenkins" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Role / Department</label>
-          <input type="text" id="newMsgRole" class="form-input" placeholder="e.g. Financial Analyst" required>
-        </div>
-        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-          <button type="button" class="btn-action" style="background:rgba(0,0,0,0.1)" onclick="closeModal('newMessageModal')">Cancel</button>
-          <button type="submit" class="btn-action" style="background:var(--accent-gradient)">Start Chat</button>
+          <button type="button" class="btn-action" onclick="closeModal('studentFeeModal')">Cancel</button>
+          <button type="submit" class="btn-action success-btn">Execute Payment</button>
         </div>
       </form>
     </div>
   </div>
 
   <footer>
-    © <span id="year"></span> Flawless Graphics — Enterprise & Financial Control System
+    &copy; 2026 FLAWLESS GRAPHICS. Financial Portal Systems. All rights reserved.
   </footer>
 
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
-    AOS.init({ once: true });
+    // Sample fetched list of students
+    const fetchedStudents = [
+      { id: 'STU-2026-001', name: 'Kwame Mensah', course: 'Graphic Design' },
+      { id: 'STU-2026-002', name: 'Ama Serwaa', course: 'UI/UX Design' },
+      { id: 'STU-2026-003', name: 'Kofi Arhin', course: 'Motion Graphics' },
+      { id: 'STU-2026-004', name: 'Abena Osei', course: 'Fullstack Web' }
+    ];
 
-    // ---------- SYSTEM STATE & CONSTANTS ----------
-    const activeOrg = localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || 'Flawless Graphics';
-    const EMP_KEY = `${activeOrg}_employees`;
-    const APPROVAL_KEY = `${activeOrg}_payroll_approvals`;
-    const FEES_KEY = `${activeOrg}_student_fees`;
-    const AUDIT_KEY = `${activeOrg}_audit_log`;
+    // Initialize App & Dynamic Lists
+    document.addEventListener('DOMContentLoaded', () => {
+      loadPaymentSettings();
+      populateStudentDropdown();
+    });
 
-    let taxRatePercent = 13.5;
-
-    function safeParse(s) { try { return JSON.parse(s); } catch(e) { return null; } }
-    function readKey(k) { return safeParse(localStorage.getItem(k)) || []; }
-    function writeKey(k, val) { localStorage.setItem(k, JSON.stringify(val)); }
-    function formatNum(n) { return Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
-
-    function logAudit(action) {
-      const logs = readKey(AUDIT_KEY);
-      const entry = { action, date: new Date().toISOString().replace('T', ' ').substring(0, 19) };
-      logs.unshift(entry);
-      writeKey(AUDIT_KEY, logs);
-      renderAuditLog();
-    }
-
-    function renderAuditLog() {
-      const logs = readKey(AUDIT_KEY);
-      const container = document.getElementById('auditList');
-      if (logs.length === 0) return;
-      container.innerHTML = logs.map(l => `
-        <li class="audit-item">
-          <span>${l.action}</span>
-          <span style="color:var(--text-muted); font-size:11px;">${l.date}</span>
-        </li>
-      `).join('');
-    }
-
-    // ---------- TAB SWITCHER LOGIC ----------
+    // Tab Switching logic
     function switchTab(tabName) {
-      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('nav a').forEach(el => el.classList.remove('active'));
 
-      if (tabName === 'dashboard') {
+      if(tabName === 'dashboard') {
         document.getElementById('tabDashboard').classList.add('active');
         document.getElementById('navDashboard').classList.add('active');
-        if (window.cashFlowChart) renderCharts();
-      } else if (tabName === 'approval') {
-        document.getElementById('tabApproval').classList.add('active');
-        document.getElementById('navApproval').classList.add('active');
-        loadApprovalWorkflow();
-      } else if (tabName === 'messaging') {
-        document.getElementById('tabMessaging').classList.add('active');
-        document.getElementById('navMessaging').classList.add('active');
-      } else if (tabName === 'settings') {
+      } else if(tabName === 'settings') {
         document.getElementById('tabSettings').classList.add('active');
         document.getElementById('navSettings').classList.add('active');
-        renderAuditLog();
       }
     }
 
-    // ---------- THEME SWITCHER ----------
-    const el = document.documentElement;
-    const themeBtn = document.getElementById('themeBtn');
+    // Modal Control
+    function openStudentFeeModal() {
+      document.getElementById('studentFeeModal').classList.add('active');
+      syncPaymentOptionsInModal();
+    }
 
-    function applyTheme(isDark) {
-      if (isDark) {
-        el.classList.add('dark');
-        themeBtn.innerHTML = `<i class="fa-solid fa-sun"></i> <span>Light</span>`;
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    // Populate Students Dropdown
+    function populateStudentDropdown() {
+      const select = document.getElementById('feeStudentSelect');
+      select.innerHTML = '<option value="">-- Select Student from List --</option>';
+      fetchedStudents.forEach(stu => {
+        const option = document.createElement('option');
+        option.value = stu.id;
+        option.textContent = `${stu.name} (${stu.id}) - ${stu.course}`;
+        select.appendChild(option);
+      });
+    }
+
+    // Auto Fill Student Information upon selection
+    function autoFillStudentDetails() {
+      const selectedId = document.getElementById('feeStudentSelect').value;
+      const student = fetchedStudents.find(s => s.id === selectedId);
+
+      if (student) {
+        document.getElementById('feeStudentId').value = student.id;
+        document.getElementById('feeStudentName').value = student.name;
       } else {
-        el.classList.remove('dark');
-        themeBtn.innerHTML = `<i class="fa-solid fa-moon"></i> <span>Dark</span>`;
-      }
-      localStorage.setItem('fg_theme_dark', isDark);
-      if (window.cashFlowChart && window.expenseChart) renderCharts();
-    }
-
-    const savedTheme = localStorage.getItem('fg_theme_dark');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    applyTheme(savedTheme === null ? prefersDark : savedTheme === 'true');
-    themeBtn.addEventListener('click', () => applyTheme(!el.classList.contains('dark')));
-
-    // ---------- LOGOUT LOGIC ----------
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem('active_org');
-      localStorage.removeItem('activeOrg');
-      localStorage.removeItem('activeFinance');
-      localStorage.removeItem('activeHR');
-      window.location.href = 'finance-login.html';
-    });
-
-    // ---------- DATA READING & INITIALIZATION ----------
-    function loadFinancials() {
-      document.getElementById('displayOrg').textContent = `Org: ${activeOrg}`;
-      const emps = readKey(EMP_KEY);
-      const totalPayroll = emps.reduce((s, e) => s + (Number(e.salary) || 0), 0);
-
-      const approvalMap = readKey(APPROVAL_KEY);
-      let approvedOutlay = 0;
-      emps.forEach(e => {
-        if (approvalMap[e.id || e.name] === 'Approved') {
-          approvedOutlay += (Number(e.salary) || 0);
-        }
-      });
-
-      document.getElementById('valPayroll').textContent = formatNum(totalPayroll);
-      document.getElementById('tablePayrollVal').textContent = formatNum(approvedOutlay || totalPayroll);
-
-      // Student fees calculations
-      const studentFees = readKey(FEES_KEY);
-      const totalFees = studentFees.reduce((sum, f) => sum + (Number(f.amount) || 0), 0);
-      document.getElementById('valTotalFees').textContent = formatNum(totalFees);
-
-      const netLiquidity = 450000 + totalFees - approvedOutlay - 38200;
-      document.getElementById('valLiquidity').textContent = formatNum(netLiquidity);
-
-      renderStudentFeeTable();
-    }
-
-    // ---------- STUDENT FEES LOGIC ----------
-    function addStudentFee(e) {
-      e.preventDefault();
-      const studentId = document.getElementById('feeStudentId').value.trim();
-      const studentName = document.getElementById('feeStudentName').value.trim();
-      const gradeClass = document.getElementById('feeStudentClass').value.trim();
-      const category = document.getElementById('feeCategory').value;
-      const amount = Number(document.getElementById('feeAmount').value);
-      const method = document.getElementById('feePaymentMethod').value;
-      const status = document.getElementById('feeStatus').value;
-
-      const receiptId = 'REC-' + Math.floor(100000 + Math.random() * 900000);
-      const date = new Date().toISOString().split('T')[0];
-
-      const newFeeRecord = { receiptId, studentId, studentName, gradeClass, category, amount, method, status, date };
-      
-      const feesList = readKey(FEES_KEY);
-      feesList.unshift(newFeeRecord);
-      writeKey(FEES_KEY, feesList);
-
-      logAudit(`Recorded student fee payment of GHS ${amount} for ${studentName} (${studentId}) - ${receiptId}`);
-      
-      closeModal('studentFeeModal');
-      document.getElementById('studentFeeForm').reset();
-      loadFinancials();
-    }
-
-    function renderStudentFeeTable() {
-      const feesList = readKey(FEES_KEY);
-      const container = document.getElementById('studentFeeBody');
-
-      if (feesList.length === 0) {
-        container.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:20px;">No student fee records logged yet. Click "+ Collect Student Fee" above.</td></tr>`;
-        return;
-      }
-
-      container.innerHTML = feesList.map(f => {
-        let statusBadge = f.status === 'Full Paid' ? 'success' : 'pending';
-        return `
-          <tr>
-            <td style="font-weight:700;">${f.receiptId}</td>
-            <td>${f.studentName}</td>
-            <td><code>${f.studentId}</code></td>
-            <td>${f.category}</td>
-            <td>${f.date}</td>
-            <td style="font-weight:700;">${formatNum(f.amount)}</td>
-            <td><span class="badge ${statusBadge}">${f.status}</span></td>
-            <td style="text-align:right;">
-              <button class="btn-action" style="padding:4px 10px; font-size:11px;" onclick="printReceipt('${f.receiptId}')">
-                <i class="fa-solid fa-print"></i> Receipt
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function printReceipt(receiptId) {
-      const feesList = readKey(FEES_KEY);
-      const record = feesList.find(f => f.receiptId === receiptId);
-      if (!record) return;
-
-      alert(`--- OFFICIAL FEE RECEIPT ---\n\nReceipt No: ${record.receiptId}\nStudent: ${record.studentName} (${record.studentId})\nClass: ${record.gradeClass}\nFee Category: ${record.category}\nAmount: GHS ${formatNum(record.amount)}\nMethod: ${record.method}\nStatus: ${record.status}\nDate: ${record.date}`);
-    }
-
-    // ---------- SALARY PREPARATION MODAL LOGIC ----------
-    function openPrepareSalaryModal() {
-      const emps = readKey(EMP_KEY);
-      const checklistContainer = document.getElementById('empChecklist');
-      
-      const now = new Date();
-      document.getElementById('payPeriodMonth').value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-
-      if (emps.length === 0) {
-        checklistContainer.innerHTML = `<div style="font-size:12px; color:var(--text-muted);">No employees found in ${activeOrg}.</div>`;
-      } else {
-        checklistContainer.innerHTML = emps.map((e, idx) => `
-          <div class="checklist-item">
-            <input type="checkbox" id="empCheck_${idx}" value="${Number(e.salary) || 0}" checked onchange="recalculatePrepTotals()">
-            <label for="empCheck_${idx}" style="flex:1;">${e.name || 'Staff Member'} (${e.role || 'General'})</label>
-            <span style="font-weight:700;"><span class="curr">GHS</span> ${formatNum(e.salary || 0)}</span>
-          </div>
-        `).join('');
-      }
-
-      recalculatePrepTotals();
-      openModal('prepareSalaryModal');
-    }
-
-    function recalculatePrepTotals() {
-      let grossSum = 0;
-      document.querySelectorAll('#empChecklist input[type="checkbox"]:checked').forEach(cb => {
-        grossSum += Number(cb.value);
-      });
-
-      const taxVal = grossSum * (taxRatePercent / 100);
-      const netVal = grossSum - taxVal;
-
-      document.getElementById('prepGrossVal').textContent = formatNum(grossSum);
-      document.getElementById('prepTaxVal').textContent = formatNum(taxVal);
-      document.getElementById('prepNetVal').textContent = formatNum(netVal);
-    }
-
-    function processPreparedSalary(e) {
-      e.preventDefault();
-      const month = document.getElementById('payPeriodMonth').value;
-      const emps = readKey(EMP_KEY);
-      const approvalMap = readKey(APPROVAL_KEY);
-
-      let processedCount = 0;
-      document.querySelectorAll('#empChecklist input[type="checkbox"]').forEach((cb, idx) => {
-        if (cb.checked && emps[idx]) {
-          const empId = emps[idx].id || emps[idx].name;
-          approvalMap[empId] = 'Pending';
-          processedCount++;
-        }
-      });
-
-      writeKey(APPROVAL_KEY, approvalMap);
-      logAudit(`Prepared salary batch for ${month} (${processedCount} staff members added to pending approvals queue)`);
-      
-      closeModal('prepareSalaryModal');
-      loadFinancials();
-      switchTab('approval');
-    }
-
-    // ---------- SALARY APPROVAL SYSTEM ----------
-    function loadApprovalWorkflow() {
-      const emps = readKey(EMP_KEY);
-      const approvalMap = readKey(APPROVAL_KEY);
-      const container = document.getElementById('payrollApprovalBody');
-
-      if (emps.length === 0) {
-        container.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:24px;">No employee payroll records found for ${activeOrg}.</td></tr>`;
-        return;
-      }
-
-      let pendingSum = 0;
-      let approvedSum = 0;
-
-      container.innerHTML = emps.map(e => {
-        const empId = e.id || e.name;
-        const gross = Number(e.salary) || 0;
-        const deductions = gross * (taxRatePercent / 100);
-        const net = gross - deductions;
-        const status = approvalMap[empId] || 'Pending';
-
-        if (status === 'Approved') approvedSum += net;
-        else if (status === 'Pending') pendingSum += net;
-
-        let badgeClass = 'pending';
-        if (status === 'Approved') badgeClass = 'success';
-        if (status === 'Rejected') badgeClass = 'rejected';
-
-        return `
-          <tr>
-            <td style="font-weight:700;">${e.name || 'Staff Member'}</td>
-            <td>${e.role || e.department || 'General'}</td>
-            <td>${formatNum(gross)}</td>
-            <td style="color:var(--danger)">${formatNum(deductions)}</td>
-            <td style="font-weight:700">${formatNum(net)}</td>
-            <td><span class="badge ${badgeClass}">${status}</span></td>
-            <td style="text-align:right;">
-              ${status !== 'Approved' ? `<button class="btn-action success-btn" style="padding:4px 10px; display:inline-flex;" onclick="updateApprovalStatus('${empId}', 'Approved')"><i class="fa-solid fa-check"></i> Approve</button>` : ''}
-              ${status !== 'Rejected' ? `<button class="btn-action danger-btn" style="padding:4px 10px; display:inline-flex; margin-left:6px;" onclick="updateApprovalStatus('${empId}', 'Rejected')"><i class="fa-solid fa-xmark"></i> Reject</button>` : ''}
-            </td>
-          </tr>
-        `;
-      }).join('');
-
-      document.getElementById('valPendingPayroll').textContent = formatNum(pendingSum);
-      document.getElementById('valApprovedSum').textContent = formatNum(approvedSum);
-    }
-
-    function updateApprovalStatus(empId, status) {
-      const approvalMap = readKey(APPROVAL_KEY);
-      approvalMap[empId] = status;
-      writeKey(APPROVAL_KEY, approvalMap);
-      logAudit(`Updated salary payout status for employee (${empId}) to ${status}`);
-      loadApprovalWorkflow();
-      loadFinancials();
-    }
-
-    function approveAllPayroll() {
-      const emps = readKey(EMP_KEY);
-      const approvalMap = readKey(APPROVAL_KEY);
-      emps.forEach(e => {
-        approvalMap[e.id || e.name] = 'Approved';
-      });
-      writeKey(APPROVAL_KEY, approvalMap);
-      logAudit(`Batch authorization executed for all ${emps.length} payroll records`);
-      loadApprovalWorkflow();
-      loadFinancials();
-    }
-
-    // ---------- CHARTS ENGINE ----------
-    let cashFlowChart = null;
-    let expenseChart = null;
-
-    function renderCharts() {
-      const isDark = el.classList.contains('dark');
-      const textColor = isDark ? '#94A3B8' : '#64748B';
-
-      const ctx1 = document.getElementById('cashFlowChart').getContext('2d');
-      if (cashFlowChart) cashFlowChart.destroy();
-
-      cashFlowChart = new Chart(ctx1, {
-        type: 'line',
-        data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
-          datasets: [
-            { label: 'Revenue & Fees', data: [65000, 72000, 80000, 85000, 92000, 88000, 95000, 102000], borderColor: '#10B981', tension: 0.3, fill: false },
-            { label: 'Expenditure', data: [42000, 45000, 48000, 51000, 53000, 49000, 56000, 58000], borderColor: '#EF4444', tension: 0.3, fill: false }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { labels: { color: textColor, font: { family: 'Plus Jakarta Sans' } } } },
-          scales: {
-            x: { grid: { display: false }, ticks: { color: textColor } },
-            y: { grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }, ticks: { color: textColor } }
-          }
-        }
-      });
-
-      const ctx2 = document.getElementById('expenseAllocationChart').getContext('2d');
-      if (expenseChart) expenseChart.destroy();
-
-      const emps = readKey(EMP_KEY);
-      const totalPayroll = emps.reduce((s, e) => s + (Number(e.salary) || 0), 0);
-
-      expenseChart = new Chart(ctx2, {
-        type: 'doughnut',
-        data: {
-          labels: ['Payroll', 'OpEx', 'Marketing', 'Reserve'],
-          datasets: [{
-            data: [totalPayroll || 25000, 38200, 15000, 80000],
-            backgroundColor: ['#2563EB', '#06B6D4', '#8B5CF6', '#10B981'],
-            borderWidth: 0
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { position: 'bottom', labels: { color: textColor } } },
-          cutout: '65%'
-        }
-      });
-    }
-
-    // ---------- CHAT LOGIC ----------
-    let currentContact = 'Kofi Mensah';
-
-    function selectContact(element, name, role) {
-      document.querySelectorAll('.contact-item').forEach(i => i.classList.remove('active'));
-      element.classList.add('active');
-      currentContact = name;
-      document.getElementById('activeChatName').textContent = name;
-      document.getElementById('activeChatRole').textContent = role;
-      
-      const savedMsgs = safeParse(localStorage.getItem(`chat_${name}`)) || [];
-      const chatContainer = document.getElementById('chatMessages');
-      
-      if (savedMsgs.length === 0) {
-        chatContainer.innerHTML = `
-          <div class="message-bubble incoming">
-            Hello Admin! Have you approved the Q3 Software budget request yet?
-            <div class="message-time">10:14 AM</div>
-          </div>`;
-      } else {
-        chatContainer.innerHTML = savedMsgs.map(m => `
-          <div class="message-bubble ${m.type}">
-            ${m.text}
-            <div class="message-time">${m.time}</div>
-          </div>`).join('');
+        document.getElementById('feeStudentId').value = '';
+        document.getElementById('feeStudentName').value = '';
       }
     }
 
-    document.getElementById('chatForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const input = document.getElementById('chatInput');
-      const text = input.value.trim();
-      if (!text) return;
-
-      const chatContainer = document.getElementById('chatMessages');
-      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-      const msgHTML = `<div class="message-bubble outgoing">${text}<div class="message-time">${time}</div></div>`;
-      chatContainer.insertAdjacentHTML('beforeend', msgHTML);
-      
-      const savedMsgs = safeParse(localStorage.getItem(`chat_${currentContact}`)) || [];
-      savedMsgs.push({ type: 'outgoing', text, time });
-      localStorage.setItem(`chat_${currentContact}`, JSON.stringify(savedMsgs));
-
-      input.value = '';
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    });
-
-    function filterContacts() {
-      const q = document.getElementById('searchContact').value.toLowerCase();
-      document.querySelectorAll('.contact-item').forEach(item => {
-        const name = item.querySelector('.name').textContent.toLowerCase();
-        item.style.display = name.includes(q) ? 'flex' : 'none';
-      });
+    // Payment Gateway dynamic form toggles
+    function toggleGatewayFields() {
+      const selected = document.getElementById('defaultPaymentGateway').value;
+      document.getElementById('momoFields').style.display = selected === 'momo' ? 'block' : 'none';
+      document.getElementById('apiKeyFields').style.display = (selected === 'paystack' || selected === 'flutterwave') ? 'block' : 'none';
+      document.getElementById('bankFields').style.display = selected === 'bank' ? 'block' : 'none';
     }
 
-    function createContact(e) {
-      e.preventDefault();
-      const name = document.getElementById('newMsgName').value;
-      const role = document.getElementById('newMsgRole').value;
-      const initials = name.split(' ').map(n=>n[0]).join('').toUpperCase().substring(0,2);
-
-      const li = document.createElement('li');
-      li.className = 'contact-item';
-      li.onclick = () => selectContact(li, name, role);
-      li.innerHTML = `
-        <div class="avatar" style="background:linear-gradient(135deg,#EC4899,#8B5CF6)">${initials} <div class="status-dot"></div></div>
-        <div class="contact-info">
-          <div class="name">${name}</div>
-          <div class="sub">${role}</div>
-        </div>`;
-
-      document.getElementById('contactList').appendChild(li);
-      closeModal('newMessageModal');
-      selectContact(li, name, role);
-    }
-
-    // ---------- TRANSACTIONS MODAL & LOGIC ----------
-    function addTransaction(e) {
-      e.preventDefault();
-      const cat = document.getElementById('disbCategory').value;
-      const ben = document.getElementById('disbBeneficiary').value;
-      const amt = Number(document.getElementById('disbAmount').value);
-      const id = '#TR-' + Math.floor(1000 + Math.random() * 9000);
-      const date = new Date().toISOString().split('T')[0];
-
-      const rowHTML = `
-        <tr>
-          <td>${id}</td>
-          <td>${cat}</td>
-          <td>${ben}</td>
-          <td>${date}</td>
-          <td>${formatNum(amt)}</td>
-          <td><span class="badge pending">Pending Approval</span></td>
-        </tr>`;
-
-      document.getElementById('transactionBody').insertAdjacentHTML('afterbegin', rowHTML);
-      logAudit(`Added new ledger disbursement (${id}) for ${ben} of amount ${amt}`);
-      closeModal('disbursementModal');
-    }
-
-    // ---------- SETTINGS & TAX CONTROL LOGIC ----------
-    function updateCurrencySymbol(symbol) {
-      document.querySelectorAll('.curr').forEach(e => e.textContent = symbol);
-      logAudit(`System display currency changed to ${symbol}`);
-    }
-
-    function updateTaxRate(val) {
-      taxRatePercent = Number(val) || 0;
-      logAudit(`Tax/SSNIT deduction rate updated to ${taxRatePercent}%`);
-      loadApprovalWorkflow();
-    }
-
+    // Save Settings
     function saveSettings(e) {
       e.preventDefault();
-      logAudit('System profile and governance configuration saved');
-      alert('Settings saved successfully!');
+      const gateway = document.getElementById('defaultPaymentGateway').value;
+      localStorage.setItem('site_payment_gateway', gateway);
+
+      const gatewayLabels = {
+        momo: 'Mobile Money (MTN MoMo)',
+        paystack: 'Paystack Gateway',
+        flutterwave: 'Flutterwave Gateway',
+        bank: 'Direct Bank Transfer'
+      };
+
+      document.getElementById('activeGatewayBadge').innerText = gatewayLabels[gateway];
+      alert('Settings and Payment Gateway updated successfully!');
     }
 
-    function exportData() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage));
-      const anchor = document.createElement('a');
-      anchor.setAttribute("href", dataStr);
-      anchor.setAttribute("download", `${activeOrg}_financial_backup.json`);
-      document.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-      logAudit('Exported complete local ledger backup (JSON)');
+    function loadPaymentSettings() {
+      const savedGateway = localStorage.getItem('site_payment_gateway') || 'momo';
+      document.getElementById('defaultPaymentGateway').value = savedGateway;
+      toggleGatewayFields();
     }
 
-    function purgeSystem() {
-      if (confirm('Are you sure you want to clear all saved session data? You will be logged out.')) {
-        localStorage.clear();
-        window.location.href = 'finance-login.html';
+    // Sync Payment Options inside Fee Modal
+    function syncPaymentOptionsInModal() {
+      const select = document.getElementById('feePaymentMethod');
+      const activeGateway = localStorage.getItem('site_payment_gateway') || 'momo';
+
+      select.innerHTML = `
+        <option value="Mobile Money (MTN MoMo)" ${activeGateway === 'momo' ? 'selected' : ''}>Mobile Money (MTN MoMo)</option>
+        <option value="Paystack Gateway" ${activeGateway === 'paystack' ? 'selected' : ''}>Paystack Gateway</option>
+        <option value="Flutterwave" ${activeGateway === 'flutterwave' ? 'selected' : ''}>Flutterwave Gateway</option>
+        <option value="Bank Direct Deposit" ${activeGateway === 'bank' ? 'selected' : ''}>Bank Direct Deposit</option>
+      `;
+    }
+
+    // Record Student Fee Submit
+    function addStudentFee(e) {
+      e.preventDefault();
+      const id = document.getElementById('feeStudentId').value;
+      const name = document.getElementById('feeStudentName').value;
+      const category = document.getElementById('feeCategory').value;
+      const method = document.getElementById('feePaymentMethod').value;
+      const amount = parseFloat(document.getElementById('feeAmount').value).toFixed(2);
+
+      if(!id || !name) {
+        alert('Please select a valid student');
+        return;
       }
+
+      const receiptId = '#REC-2026-' + Math.floor(100 + Math.random() * 900);
+      const rowHtml = `
+        <tr>
+          <td>${receiptId}</td>
+          <td>${name}</td>
+          <td>${id}</td>
+          <td>${category}</td>
+          <td>${method}</td>
+          <td>${amount}</td>
+          <td><span class="badge success">Paid</span></td>
+        </tr>
+      `;
+
+      document.getElementById('studentFeeBody').insertAdjacentHTML('afterbegin', rowHtml);
+      closeModal('studentFeeModal');
+      document.getElementById('studentFeeForm').reset();
+      alert(`Payment of GHS ${amount} recorded via ${method} for ${name}`);
     }
-
-    // ---------- MODAL CONTROL ----------
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
-    document.getElementById('year').textContent = new Date().getFullYear();
-
-    // INIT
-    loadFinancials();
-    renderCharts();
   </script>
 </body>
 </html>
