@@ -44,6 +44,7 @@
       --radius-md: 12px;
       --success: #10B981;
       --danger: #EF4444;
+      --warning: #F59E0B;
       --input-bg: rgba(255, 255, 255, 0.7);
       --input-border: rgba(203, 213, 225, 0.8);
     }
@@ -158,6 +159,10 @@
     }
     .btn-action:hover { background: rgba(255, 255, 255, 0.18); }
     .btn-action.logout:hover { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #EF4444; }
+    .btn-action.success-btn { background: var(--success); border: none; }
+    .btn-action.success-btn:hover { background: #059669; }
+    .btn-action.danger-btn { background: var(--danger); border: none; }
+    .btn-action.danger-btn:hover { background: #DC2626; }
 
     /* LAYOUT */
     main { max-width: 1280px; margin: 32px auto; padding: 0 24px; width: 100%; flex: 1; }
@@ -233,7 +238,8 @@
       font-weight: 700;
     }
     .badge.success { background: rgba(16, 185, 129, 0.15); color: var(--success); }
-    .badge.pending { background: rgba(245, 158, 11, 0.15); color: #F59E0B; }
+    .badge.pending { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+    .badge.rejected { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
 
     /* MESSAGING LAYOUT */
     .chat-layout {
@@ -355,7 +361,7 @@
       font-size: 13px;
     }
 
-    /* SETTINGS FORM */
+    /* SETTINGS & FORM COMPONENTS */
     .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
     @media (max-width: 768px) { .settings-grid { grid-template-columns: 1fr; } }
 
@@ -371,6 +377,18 @@
       font-size: 13px;
       outline: none;
     }
+
+    /* AUDIT LOG LIST */
+    .audit-list { list-style: none; }
+    .audit-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+    .audit-item:last-child { border-bottom: none; }
 
     /* MODAL */
     .modal-overlay {
@@ -414,6 +432,7 @@
         <ul>
           <li><a id="navHome" href="welcome.html"><i class="fa-solid fa-house"></i> Home</a></li>
           <li><a id="navDashboard" class="active" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-pie"></i> Finance</a></li>
+          <li><a id="navApproval" onclick="switchTab('approval')"><i class="fa-solid fa-file-invoice-dollar"></i> Approvals</a></li>
           <li><a id="navMessaging" onclick="switchTab('messaging')"><i class="fa-solid fa-comments"></i> Messages</a></li>
           <li><a id="navSettings" onclick="switchTab('settings')"><i class="fa-solid fa-gear"></i> Settings</a></li>
         </ul>
@@ -456,16 +475,16 @@
         <div class="metric-card">
           <div class="metric-icon"><i class="fa-solid fa-users-gear"></i></div>
           <div class="metric-info">
-            <div class="label">Monthly Payroll</div>
+            <div class="label">Total Gross Payroll</div>
             <div class="val"><span class="curr">GHS</span> <span id="valPayroll">0</span></div>
           </div>
         </div>
 
         <div class="metric-card">
-          <div class="metric-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
+          <div class="metric-icon"><i class="fa-solid fa-circle-check"></i></div>
           <div class="metric-info">
-            <div class="label">OpEx Expenses</div>
-            <div class="val"><span class="curr">GHS</span> <span id="valOpEx">38,200</span></div>
+            <div class="label">Approved Salary Outlay</div>
+            <div class="val"><span class="curr">GHS</span> <span id="valApprovedPayroll">0</span></div>
           </div>
         </div>
 
@@ -545,7 +564,58 @@
       </div>
     </div>
 
-    <!-- 2. MESSAGING TAB -->
+    <!-- 2. SALARY APPROVAL TAB -->
+    <div id="tabApproval" class="tab-content">
+      <div class="page-title" data-aos="fade-down" data-aos-duration="600">
+        <div>
+          <h2>Salary Payment Approval Workflow</h2>
+          <div style="font-size:13px; color:var(--text-muted)">Authorize individual employee payouts or execute batch approvals</div>
+        </div>
+        <button class="btn-action success-btn" onclick="approveAllPayroll()"><i class="fa-solid fa-check-double"></i> Authorize Batch Disbursement</button>
+      </div>
+
+      <!-- APPROVAL METRICS -->
+      <div class="metrics-grid" data-aos="fade-up" data-aos-duration="600">
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fa-solid fa-clock"></i></div>
+          <div class="metric-info">
+            <div class="label">Pending Approval</div>
+            <div class="val"><span class="curr">GHS</span> <span id="valPendingPayroll">0</span></div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fa-solid fa-check-circle"></i></div>
+          <div class="metric-info">
+            <div class="label">Approved Sum</div>
+            <div class="val"><span class="curr">GHS</span> <span id="valApprovedSum">0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAYROLL TABLE -->
+      <div class="glass-card" data-aos="fade-up" data-aos-duration="700">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Employee Name</th>
+                <th>Department / Role</th>
+                <th>Gross Salary</th>
+                <th>Deductions (<span class="curr">GHS</span>)</th>
+                <th>Net Payable (<span class="curr">GHS</span>)</th>
+                <th>Approval Status</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="payrollApprovalBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. MESSAGING TAB -->
     <div id="tabMessaging" class="tab-content">
       <div class="glass-card" data-aos="fade-up" data-aos-duration="600">
         <div class="chat-layout">
@@ -610,7 +680,7 @@
       </div>
     </div>
 
-    <!-- 3. SETTINGS TAB -->
+    <!-- 4. SETTINGS TAB -->
     <div id="tabSettings" class="tab-content">
       <div class="glass-card" data-aos="fade-up" data-aos-duration="600">
         <h3 style="font-size:20px; font-weight:800; margin-bottom:20px;">System & Portal Settings</h3>
@@ -638,12 +708,8 @@
               </div>
 
               <div class="form-group">
-                <label class="form-label">Automatic Logout Timeout</label>
-                <select class="form-select" id="setTimeout">
-                  <option value="15">15 Minutes</option>
-                  <option value="30" selected>30 Minutes</option>
-                  <option value="60">1 Hour</option>
-                </select>
+                <label class="form-label">Tax / SSNIT Rate (%)</label>
+                <input type="number" class="form-input" id="setTaxRate" value="13.5" step="0.1" onchange="updateTaxRate(this.value)">
               </div>
             </div>
 
@@ -679,6 +745,17 @@
             <button type="submit" class="btn-action" style="background:var(--accent-gradient); padding:10px 24px; font-size:13px;">Save Configuration</button>
           </div>
         </form>
+      </div>
+
+      <!-- AUDIT LOG SECTION -->
+      <div class="glass-card" data-aos="fade-up" data-aos-duration="700">
+        <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;">System Activity & Audit Trail</h3>
+        <ul class="audit-list" id="auditList">
+          <li class="audit-item">
+            <span>System initialization completed successfully</span>
+            <span style="color:var(--text-muted); font-size:11px;">2026-08-20</span>
+          </li>
+        </ul>
       </div>
     </div>
 
@@ -740,6 +817,39 @@
   <script>
     AOS.init({ once: true });
 
+    // ---------- SYSTEM STATE & CONSTANTS ----------
+    const activeOrg = localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || 'Flawless Graphics';
+    const EMP_KEY = `${activeOrg}_employees`;
+    const APPROVAL_KEY = `${activeOrg}_payroll_approvals`;
+    const AUDIT_KEY = `${activeOrg}_audit_log`;
+
+    let taxRatePercent = 13.5;
+
+    function safeParse(s) { try { return JSON.parse(s); } catch(e) { return null; } }
+    function readKey(k) { return safeParse(localStorage.getItem(k)) || []; }
+    function writeKey(k, val) { localStorage.setItem(k, JSON.stringify(val)); }
+    function formatNum(n) { return Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+    function logAudit(action) {
+      const logs = readKey(AUDIT_KEY);
+      const entry = { action, date: new Date().toISOString().replace('T', ' ').substring(0, 19) };
+      logs.unshift(entry);
+      writeKey(AUDIT_KEY, logs);
+      renderAuditLog();
+    }
+
+    function renderAuditLog() {
+      const logs = readKey(AUDIT_KEY);
+      const container = document.getElementById('auditList');
+      if (logs.length === 0) return;
+      container.innerHTML = logs.map(l => `
+        <li class="audit-item">
+          <span>${l.action}</span>
+          <span style="color:var(--text-muted); font-size:11px;">${l.date}</span>
+        </li>
+      `).join('');
+    }
+
     // ---------- TAB SWITCHER LOGIC ----------
     function switchTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -749,12 +859,17 @@
         document.getElementById('tabDashboard').classList.add('active');
         document.getElementById('navDashboard').classList.add('active');
         if (window.cashFlowChart) renderCharts();
+      } else if (tabName === 'approval') {
+        document.getElementById('tabApproval').classList.add('active');
+        document.getElementById('navApproval').classList.add('active');
+        loadApprovalWorkflow();
       } else if (tabName === 'messaging') {
         document.getElementById('tabMessaging').classList.add('active');
         document.getElementById('navMessaging').classList.add('active');
       } else if (tabName === 'settings') {
         document.getElementById('tabSettings').classList.add('active');
         document.getElementById('navSettings').classList.add('active');
+        renderAuditLog();
       }
     }
 
@@ -789,23 +904,94 @@
     });
 
     // ---------- DATA READING & INITIALIZATION ----------
-    const activeOrg = localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || 'Flawless Graphics';
-    const EMP_KEY = `${activeOrg}_employees`;
-
-    function safeParse(s) { try { return JSON.parse(s); } catch(e) { return null; } }
-    function readKey(k) { return safeParse(localStorage.getItem(k)) || []; }
-    function formatNum(n) { return Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
-
     function loadFinancials() {
       document.getElementById('displayOrg').textContent = `Org: ${activeOrg}`;
       const emps = readKey(EMP_KEY);
       const totalPayroll = emps.reduce((s, e) => s + (Number(e.salary) || 0), 0);
 
-      document.getElementById('valPayroll').textContent = formatNum(totalPayroll);
-      document.getElementById('tablePayrollVal').textContent = formatNum(totalPayroll);
+      const approvalMap = readKey(APPROVAL_KEY);
+      let approvedOutlay = 0;
+      emps.forEach(e => {
+        if (approvalMap[e.id || e.name] === 'Approved') {
+          approvedOutlay += (Number(e.salary) || 0);
+        }
+      });
 
-      const netLiquidity = 450000 - totalPayroll - 38200;
+      document.getElementById('valPayroll').textContent = formatNum(totalPayroll);
+      document.getElementById('valApprovedPayroll').textContent = formatNum(approvedOutlay);
+      document.getElementById('tablePayrollVal').textContent = formatNum(approvedOutlay || totalPayroll);
+
+      const netLiquidity = 450000 - approvedOutlay - 38200;
       document.getElementById('valLiquidity').textContent = formatNum(netLiquidity);
+    }
+
+    // ---------- SALARY APPROVAL SYSTEM ----------
+    function loadApprovalWorkflow() {
+      const emps = readKey(EMP_KEY);
+      const approvalMap = readKey(APPROVAL_KEY);
+      const container = document.getElementById('payrollApprovalBody');
+
+      if (emps.length === 0) {
+        container.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:24px;">No employee payroll records found for ${activeOrg}.</td></tr>`;
+        return;
+      }
+
+      let pendingSum = 0;
+      let approvedSum = 0;
+
+      container.innerHTML = emps.map(e => {
+        const empId = e.id || e.name;
+        const gross = Number(e.salary) || 0;
+        const deductions = gross * (taxRatePercent / 100);
+        const net = gross - deductions;
+        const status = approvalMap[empId] || 'Pending';
+
+        if (status === 'Approved') approvedSum += net;
+        else if (status === 'Pending') pendingSum += net;
+
+        let badgeClass = 'pending';
+        if (status === 'Approved') badgeClass = 'success';
+        if (status === 'Rejected') badgeClass = 'rejected';
+
+        return `
+          <tr>
+            <td style="font-weight:700;">${e.name || 'Staff Member'}</td>
+            <td>${e.role || e.department || 'General'}</td>
+            <td>${formatNum(gross)}</td>
+            <td style="color:var(--danger)">${formatNum(deductions)}</td>
+            <td style="font-weight:700">${formatNum(net)}</td>
+            <td><span class="badge ${badgeClass}">${status}</span></td>
+            <td style="text-align:right;">
+              ${status !== 'Approved' ? `<button class="btn-action success-btn" style="padding:4px 10px; display:inline-flex;" onclick="updateApprovalStatus('${empId}', 'Approved')"><i class="fa-solid fa-check"></i> Approve</button>` : ''}
+              ${status !== 'Rejected' ? `<button class="btn-action danger-btn" style="padding:4px 10px; display:inline-flex; margin-left:6px;" onclick="updateApprovalStatus('${empId}', 'Rejected')"><i class="fa-solid fa-xmark"></i> Reject</button>` : ''}
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('valPendingPayroll').textContent = formatNum(pendingSum);
+      document.getElementById('valApprovedSum').textContent = formatNum(approvedSum);
+    }
+
+    function updateApprovalStatus(empId, status) {
+      const approvalMap = readKey(APPROVAL_KEY);
+      approvalMap[empId] = status;
+      writeKey(APPROVAL_KEY, approvalMap);
+      logAudit(`Updated salary payout status for employee (${empId}) to ${status}`);
+      loadApprovalWorkflow();
+      loadFinancials();
+    }
+
+    function approveAllPayroll() {
+      const emps = readKey(EMP_KEY);
+      const approvalMap = readKey(APPROVAL_KEY);
+      emps.forEach(e => {
+        approvalMap[e.id || e.name] = 'Approved';
+      });
+      writeKey(APPROVAL_KEY, approvalMap);
+      logAudit(`Batch authorization executed for all ${emps.length} payroll records`);
+      loadApprovalWorkflow();
+      loadFinancials();
     }
 
     // ---------- CHARTS ENGINE ----------
@@ -874,7 +1060,6 @@
       document.getElementById('activeChatName').textContent = name;
       document.getElementById('activeChatRole').textContent = role;
       
-      // Load saved messages for contact
       const savedMsgs = safeParse(localStorage.getItem(`chat_${name}`)) || [];
       const chatContainer = document.getElementById('chatMessages');
       
@@ -905,7 +1090,6 @@
       const msgHTML = `<div class="message-bubble outgoing">${text}<div class="message-time">${time}</div></div>`;
       chatContainer.insertAdjacentHTML('beforeend', msgHTML);
       
-      // Save
       const savedMsgs = safeParse(localStorage.getItem(`chat_${currentContact}`)) || [];
       savedMsgs.push({ type: 'outgoing', text, time });
       localStorage.setItem(`chat_${currentContact}`, JSON.stringify(savedMsgs));
@@ -963,16 +1147,25 @@
         </tr>`;
 
       document.getElementById('transactionBody').insertAdjacentHTML('afterbegin', rowHTML);
+      logAudit(`Added new ledger disbursement (${id}) for ${ben} of amount ${amt}`);
       closeModal('disbursementModal');
     }
 
-    // ---------- SETTINGS LOGIC ----------
+    // ---------- SETTINGS & TAX CONTROL LOGIC ----------
     function updateCurrencySymbol(symbol) {
       document.querySelectorAll('.curr').forEach(e => e.textContent = symbol);
+      logAudit(`System display currency changed to ${symbol}`);
+    }
+
+    function updateTaxRate(val) {
+      taxRatePercent = Number(val) || 0;
+      logAudit(`Tax/SSNIT deduction rate updated to ${taxRatePercent}%`);
+      loadApprovalWorkflow();
     }
 
     function saveSettings(e) {
       e.preventDefault();
+      logAudit('System profile and governance configuration saved');
       alert('Settings saved successfully!');
     }
 
@@ -984,6 +1177,7 @@
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
+      logAudit('Exported complete local ledger backup (JSON)');
     }
 
     function purgeSystem() {
@@ -993,7 +1187,7 @@
       }
     }
 
-    // ---------- MODAL CONTROLE ----------
+    // ---------- MODAL CONTROL ----------
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
