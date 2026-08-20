@@ -778,6 +778,43 @@
               </div>
             </div>
 
+<div class="settings-card">
+  <h3>Payment Settings</h3>
+  <form id="payment-settings-form">
+    <label for="payment-provider">Select Default Payment Gateway:</label>
+    <select id="payment-provider" name="provider" required>
+      <option value="">-- Choose Provider --</option>
+      <option value="stripe">Stripe</option>
+      <option value="paypal">PayPal</option>
+      <option value="paystack">Paystack / Mobile Money</option>
+    </select>
+
+    <div id="provider-credentials" style="margin-top: 15px;">
+      <label for="api-key">API Key / Public Key:</label>
+      <input type="text" id="api-key" placeholder="pk_test_..." required />
+    </div>
+
+    <button type="submit" style="margin-top: 15px;">Save Gateway</button>
+  </form>
+</div>
+
+<script>
+document.getElementById('payment-settings-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const provider = document.getElementById('payment-provider').value;
+  const apiKey = document.getElementById('api-key').value;
+
+  const response = await fetch('/api/settings/payment-method', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ provider, apiKey })
+  });
+
+  if (response.ok) {
+    alert('Payment method configured successfully!');
+  }
+});
+</script>
             <!-- SECURITY & AUDIT -->
             <div>
               <h4 style="font-size:14px; font-weight:700; margin-bottom:14px; color:var(--accent);">Security & Governance</h4>
