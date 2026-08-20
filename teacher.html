@@ -90,7 +90,7 @@
     .main-container {
         display: flex;
         flex-direction: row;
-        min-height: 580px;
+        min-height: 620px;
         position: relative;
     }
 
@@ -250,7 +250,7 @@
 
     .card {
         width: 100%;
-        max-width: 400px;
+        max-width: 420px;
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 16px;
@@ -267,7 +267,7 @@
     }
 
     .form-group {
-        margin-bottom: 18px;
+        margin-bottom: 16px;
     }
 
     label {
@@ -278,13 +278,98 @@
         margin-bottom: 6px;
     }
 
+    /* Profile Photo Upload Field Styles */
+    .photo-upload-container {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px dashed rgba(255, 255, 255, 0.25);
+        border-radius: 10px;
+        padding: 12px 14px;
+        transition: all 0.2s ease;
+    }
+
+    .photo-upload-container:hover {
+        border-color: #a2e8dd;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .photo-preview-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .photo-preview-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .photo-preview-box i {
+        font-size: 18px;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .photo-upload-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+    }
+
+    .btn-upload-trigger {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        width: fit-content;
+        transition: all 0.2s ease;
+    }
+
+    .btn-upload-trigger:hover {
+        background: rgba(255, 255, 255, 0.25);
+    }
+
+    .photo-hint {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .btn-remove-photo {
+        color: #ff9999;
+        font-size: 11px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        display: none;
+    }
+
     .input-wrapper {
         position: relative;
         display: flex;
         align-items: center;
     }
 
-    input {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
         width: 100%;
         padding: 12px 40px 12px 14px;
         background: rgba(255, 255, 255, 0.08);
@@ -458,6 +543,25 @@
                 <div id="msg" class="msg"></div>
 
                 <form id="registerForm" onsubmit="event.preventDefault(); registerTeacher();">
+                    
+                    <!-- Profile Photo Upload Field -->
+                    <div class="form-group">
+                        <label>Profile Photo (Optional)</label>
+                        <div class="photo-upload-container">
+                            <div class="photo-preview-box" id="photoPreviewBox">
+                                <i class="fa-regular fa-user" id="photoPlaceholderIcon"></i>
+                            </div>
+                            <div class="photo-upload-actions">
+                                <input type="file" id="teacherPhoto" accept="image/png, image/jpeg, image/webp" style="display: none;" onchange="handlePhotoChange(event)">
+                                <button type="button" class="btn-upload-trigger" onclick="document.getElementById('teacherPhoto').click()">
+                                    <i class="fa-solid fa-camera"></i> Upload Photo
+                                </button>
+                                <span class="photo-hint" id="photoHint">PNG or JPG (Max 2MB)</span>
+                                <button type="button" class="btn-remove-photo" id="removePhotoBtn" onclick="removePhoto()">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label for="fullName">Full Name</label>
                         <div class="input-wrapper">
@@ -495,6 +599,7 @@
 
 <script>
 const TEACHERS_KEY = "teachers";
+let currentPhotoBase64 = null;
 
 function getTeachers() {
     try {
@@ -531,6 +636,37 @@ function togglePass() {
     }
 }
 
+function handlePhotoChange(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+        showMessage("Photo size must be under 2MB.");
+        event.target.value = "";
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        currentPhotoBase64 = e.target.result;
+        
+        const previewBox = document.getElementById("photoPreviewBox");
+        previewBox.innerHTML = `<img src="${currentPhotoBase64}" alt="Profile Preview">`;
+        
+        document.getElementById("removePhotoBtn").style.display = "inline-block";
+        document.getElementById("photoHint").style.display = "none";
+    };
+    reader.readAsDataURL(file);
+}
+
+function removePhoto() {
+    currentPhotoBase64 = null;
+    document.getElementById("teacherPhoto").value = "";
+    document.getElementById("photoPreviewBox").innerHTML = `<i class="fa-regular fa-user" id="photoPlaceholderIcon"></i>`;
+    document.getElementById("removePhotoBtn").style.display = "none";
+    document.getElementById("photoHint").style.display = "inline";
+}
+
 async function registerTeacher() {
     const submitBtn = document.getElementById("submitBtn");
     const name = document.getElementById("fullName").value.trim();
@@ -565,6 +701,7 @@ async function registerTeacher() {
             name,
             email,
             pass: hashed,
+            photo: currentPhotoBase64,
             role: "teacher",
             createdAt: Date.now()
         };
@@ -573,7 +710,7 @@ async function registerTeacher() {
 
         localStorage.setItem(TEACHERS_KEY, JSON.stringify(list));
 
-        // Auto-login active session
+        // Auto-login active session with photo attached
         localStorage.setItem("active_teacher", JSON.stringify(newTeacher));
         localStorage.setItem("teacher_active_user", JSON.stringify(newTeacher));
 
