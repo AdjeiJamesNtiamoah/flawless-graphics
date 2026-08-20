@@ -49,7 +49,6 @@
       color: var(--text-main);
     }
 
-    /* Main Container Frame */
     .dashboard-container {
       width: 100%;
       max-width: 1380px;
@@ -61,7 +60,7 @@
       box-shadow: 0 20px 40px rgba(0,0,0,0.06);
     }
 
-    /* --- SIDEBAR --- */
+    /* SIDEBAR */
     .sidebar {
       width: 240px;
       background-color: var(--sidebar-bg);
@@ -79,6 +78,7 @@
       color: #fff;
       font-size: 20px;
       font-weight: 800;
+      cursor: pointer;
     }
 
     .brand-icon {
@@ -96,6 +96,7 @@
       text-align: center;
       margin-top: 24px;
       margin-bottom: 24px;
+      cursor: pointer;
     }
 
     .profile-img {
@@ -105,7 +106,9 @@
       object-fit: cover;
       margin-bottom: 12px;
       filter: grayscale(100%);
+      transition: filter 0.2s;
     }
+    .profile-card:hover .profile-img { filter: grayscale(0%); }
 
     .profile-card p {
       color: var(--text-sidebar);
@@ -138,10 +141,12 @@
       font-weight: 600;
       border-radius: var(--radius-sm);
       transition: all 0.2s;
+      cursor: pointer;
     }
 
     .nav-item:hover, .nav-item.active {
       color: #fff;
+      background: rgba(255,255,255,0.05);
     }
 
     .nav-item.active {
@@ -167,7 +172,7 @@
       margin-left: auto;
     }
 
-    /* --- CONTENT AREA --- */
+    /* CONTENT AREA */
     .content-grid {
       flex: 1;
       display: grid;
@@ -182,7 +187,6 @@
       gap: 24px;
     }
 
-    /* Top Bar */
     .top-bar {
       display: flex;
       justify-content: space-between;
@@ -233,6 +237,12 @@
       border-radius: var(--radius-md);
       padding: 20px;
       position: relative;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-2px);
     }
 
     .card-green { background-color: var(--card-green); }
@@ -291,9 +301,12 @@
       font-weight: 700;
       cursor: pointer;
       margin-top: 10px;
+      transition: background 0.2s;
     }
 
-    /* Main Bar Chart Section */
+    .purple-btn:hover { background-color: #2b2498; }
+
+    /* Chart Section */
     .chart-section {
       background-color: transparent;
       flex: 1;
@@ -308,16 +321,8 @@
       margin-bottom: 10px;
     }
 
-    .chart-header h2 {
-      font-size: 26px;
-      font-weight: 800;
-    }
-
-    .chart-header span {
-      font-size: 11px;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
+    .chart-header h2 { font-size: 26px; font-weight: 800; }
+    .chart-header span { font-size: 11px; color: var(--text-muted); font-weight: 600; cursor: pointer; }
 
     .chart-wrapper {
       position: relative;
@@ -326,11 +331,7 @@
     }
 
     /* Orders Section */
-    .orders-section h3 {
-      font-size: 14px;
-      font-weight: 800;
-      margin-bottom: 12px;
-    }
+    .orders-section h3 { font-size: 14px; font-weight: 800; margin-bottom: 12px; }
 
     .orders-header {
       display: flex;
@@ -352,6 +353,7 @@
       font-size: 10px;
       font-weight: 600;
       color: var(--text-muted);
+      cursor: pointer;
     }
 
     .orders-list {
@@ -368,7 +370,11 @@
       align-items: center;
       justify-content: space-between;
       font-size: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
     }
+
+    .order-row:hover { background-color: #fff; }
 
     .user-info {
       display: flex;
@@ -391,13 +397,9 @@
       font-weight: 600;
     }
 
-    .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-    }
+    .dot { width: 6px; height: 6px; border-radius: 50%; }
 
-    /* --- RIGHT PANEL --- */
+    /* RIGHT PANEL */
     .right-panel {
       padding: 30px 24px;
       border-left: 1px solid rgba(0,0,0,0.04);
@@ -412,15 +414,8 @@
       align-items: center;
     }
 
-    .panel-header h3 {
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    .panel-header span {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
+    .panel-header h3 { font-size: 14px; font-weight: 800; }
+    .panel-header span { font-size: 11px; color: var(--text-muted); }
 
     .icon-btn {
       width: 28px;
@@ -431,9 +426,9 @@
       align-items: center;
       justify-content: center;
       font-size: 10px;
+      cursor: pointer;
     }
 
-    /* Donut Legend */
     .donut-container {
       position: relative;
       width: 140px;
@@ -449,16 +444,8 @@
       text-align: center;
     }
 
-    .donut-center span {
-      font-size: 9px;
-      color: var(--text-muted);
-      display: block;
-    }
-
-    .donut-center strong {
-      font-size: 13px;
-      font-weight: 800;
-    }
+    .donut-center span { font-size: 9px; color: var(--text-muted); display: block; }
+    .donut-center strong { font-size: 13px; font-weight: 800; }
 
     .donut-legend {
       display: flex;
@@ -467,17 +454,10 @@
       text-align: center;
     }
 
-    .legend-item p {
-      font-size: 10px;
-      color: var(--text-muted);
-    }
+    .legend-item p { font-size: 10px; color: var(--text-muted); }
+    .legend-item h5 { font-size: 12px; font-weight: 800; }
 
-    .legend-item h5 {
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    /* Recent Sales List */
+    /* Recent Sales */
     .sales-list {
       display: flex;
       flex-direction: column;
@@ -491,7 +471,11 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      cursor: pointer;
+      transition: background 0.2s;
     }
+
+    .sales-item:hover { background-color: #fff; }
 
     .sales-user {
       display: flex;
@@ -499,19 +483,32 @@
       gap: 12px;
     }
 
-    .sales-user h4 {
-      font-size: 12px;
-      font-weight: 700;
+    .sales-user h4 { font-size: 12px; font-weight: 700; }
+    .sales-user p { font-size: 10px; color: var(--text-muted); }
+    .sales-amount { font-size: 12px; font-weight: 800; }
+
+    /* TOAST NOTIFICATION */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background-color: var(--sidebar-bg);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 1000;
     }
 
-    .sales-user p {
-      font-size: 10px;
-      color: var(--text-muted);
-    }
-
-    .sales-amount {
-      font-size: 12px;
-      font-weight: 800;
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
     }
   </style>
 </head>
@@ -522,52 +519,50 @@
     <!-- SIDEBAR -->
     <aside class="sidebar">
       <div>
-        <div class="brand">
+        <div class="brand" onclick="notify('Zarss Dashboard Home')">
           <div class="brand-icon"><i class="fa-solid fa-cube"></i></div>
           <span>Zarss</span>
         </div>
 
-        <div class="profile-card">
+        <div class="profile-card" onclick="notify('Opening Mark Johnson Profile')">
           <img class="profile-img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" alt="Mark Johnson">
           <p>Welcome Back,</p>
           <h4>Mark Johnson</h4>
         </div>
 
         <nav class="nav-menu">
-          <a href="#" class="nav-item active"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
-          <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i> Statistics</a>
-          <a href="#" class="nav-item"><i class="fa-regular fa-credit-card"></i> Payment</a>
-          <a href="#" class="nav-item"><i class="fa-solid fa-arrow-right-arrow-left"></i> Transactions</a>
-          <a href="#" class="nav-item"><i class="fa-solid fa-box"></i> Products</a>
-          <a href="#" class="nav-item"><i class="fa-regular fa-user"></i> Customer</a>
-          <a href="#" class="nav-item"><i class="fa-regular fa-comment"></i> Messages <span class="badge">5</span></a>
-          <a href="#" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
+          <a class="nav-item active" data-name="Dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+          <a class="nav-item" data-name="Statistics"><i class="fa-solid fa-chart-line"></i> Statistics</a>
+          <a class="nav-item" data-name="Payment"><i class="fa-regular fa-credit-card"></i> Payment</a>
+          <a class="nav-item" data-name="Transactions"><i class="fa-solid fa-arrow-right-arrow-left"></i> Transactions</a>
+          <a class="nav-item" data-name="Products"><i class="fa-solid fa-box"></i> Products</a>
+          <a class="nav-item" data-name="Customer"><i class="fa-regular fa-user"></i> Customer</a>
+          <a class="nav-item" data-name="Messages"><i class="fa-regular fa-comment"></i> Messages <span class="badge">5</span></a>
+          <a class="nav-item" data-name="Settings"><i class="fa-solid fa-sliders"></i> Settings</a>
         </nav>
       </div>
 
-      <a href="#" class="nav-item"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out</a>
+      <a class="nav-item" onclick="notify('Logging Out...')"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out</a>
     </aside>
 
-    <!-- MAIN DASHBOARD CONTENT -->
+    <!-- MAIN CONTENT -->
     <div class="content-grid">
       
       <main class="main-panel">
         
-        <!-- Top Search/Header -->
         <div class="top-bar">
           <div class="header-title">
-            <h1>Dashboard</h1>
+            <h1 id="pageTitle">Dashboard</h1>
             <p>Payments Updates</p>
           </div>
           <div class="search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" placeholder="Search">
+            <input type="text" id="searchInput" placeholder="Search orders, customers...">
           </div>
         </div>
 
-        <!-- Metric Cards -->
         <div class="metrics-row">
-          <div class="metric-card card-green">
+          <div class="metric-card card-green" onclick="notify('Opening Balance Breakdown')">
             <div class="metric-header">
               <i class="fa-solid fa-dollar-sign"></i>
               <span>Balance</span>
@@ -577,7 +572,7 @@
             <canvas id="sparkline1" class="sparkline"></canvas>
           </div>
 
-          <div class="metric-card card-yellow">
+          <div class="metric-card card-yellow" onclick="notify('Opening Sales Details')">
             <div class="metric-header">
               <i class="fa-solid fa-percent"></i>
               <span>Sales</span>
@@ -590,36 +585,34 @@
           <div class="metric-card card-purple">
             <h4 style="font-size: 14px; font-weight: 800;">Upgrade</h4>
             <p style="font-size: 10px; margin-top: 4px; opacity: 0.9;">Get more information and opportunities</p>
-            <button class="purple-btn">Go Pro</button>
+            <button class="purple-btn" onclick="notify('Opening Upgrade Pro Modal')">Go Pro</button>
           </div>
         </div>
 
-        <!-- Main Weekly Chart -->
         <div class="chart-section">
           <div class="chart-header">
             <div>
               <p style="font-size: 12px; font-weight: 700; color: var(--text-muted);">User in The Last Week</p>
               <h2>+ 3,2%</h2>
             </div>
-            <span>See statistics for all time</span>
+            <span onclick="notify('Loading full statistics...')">See statistics for all time</span>
           </div>
           <div class="chart-wrapper">
             <canvas id="barChart"></canvas>
           </div>
         </div>
 
-        <!-- Last Orders Table -->
         <div class="orders-section">
           <div class="orders-header">
             <h3>Last Orders</h3>
             <div class="order-controls">
-              <span class="tag-btn">Data Updates Every 3 Hours</span>
-              <span class="tag-btn" style="border:none; background:none;">View All Orders</span>
+              <span class="tag-btn" onclick="notify('Syncing fresh order data...')">Data Updates Every 3 Hours</span>
+              <span class="tag-btn" style="border:none; background:none;" onclick="notify('Opening all orders...')">View All Orders</span>
             </div>
           </div>
 
-          <div class="orders-list">
-            <div class="order-row">
+          <div class="orders-list" id="ordersList">
+            <div class="order-row" onclick="notify('Viewing Order: David Astee ($1,456)')">
               <div class="user-info">
                 <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80" class="user-avatar" alt="David">
                 <strong>David Astee</strong>
@@ -629,7 +622,7 @@
               <div style="color: var(--text-muted);">11 Sep 2022</div>
             </div>
 
-            <div class="order-row">
+            <div class="order-row" onclick="notify('Viewing Order: Maria Hulama ($42,4378)')">
               <div class="user-info">
                 <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=80&q=80" class="user-avatar" alt="Maria">
                 <strong>Maria Hulama</strong>
@@ -639,7 +632,7 @@
               <div style="color: var(--text-muted);">11 Sep 2022</div>
             </div>
 
-            <div class="order-row">
+            <div class="order-row" onclick="notify('Viewing Order: Arnold Swarz ($3,412)')">
               <div class="user-info">
                 <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=80&q=80" class="user-avatar" alt="Arnold">
                 <strong>Arnold Swarz</strong>
@@ -653,17 +646,15 @@
 
       </main>
 
-      <!-- RIGHT SIDE PANEL -->
+      <!-- RIGHT PANEL -->
       <aside class="right-panel">
-        
-        <!-- Monthly Profits Donut -->
         <div>
           <div class="panel-header" style="margin-bottom: 20px;">
             <div>
               <h3>Monthly Profits</h3>
               <span>Total Profit Growth of 26%</span>
             </div>
-            <div class="icon-btn"><i class="fa-solid fa-share-nodes"></i></div>
+            <div class="icon-btn" onclick="notify('Sharing monthly report...')"><i class="fa-solid fa-share-nodes"></i></div>
           </div>
 
           <div class="donut-container">
@@ -675,30 +666,29 @@
           </div>
 
           <div class="donut-legend">
-            <div class="legend-item">
+            <div class="legend-item" onclick="notify('Giveaway: $45,813')">
               <p>Giveaway</p>
               <h5>60%</h5>
             </div>
-            <div class="legend-item">
+            <div class="legend-item" onclick="notify('Affiliate: $18,325')">
               <p>Affiliate</p>
               <h5>24%</h5>
             </div>
-            <div class="legend-item">
+            <div class="legend-item" onclick="notify('Offline Sales: $12,216')">
               <p>Offline Sales</p>
               <h5>16%</h5>
             </div>
           </div>
         </div>
 
-        <!-- Recent Sales -->
         <div>
           <div class="panel-header" style="margin-bottom: 16px;">
             <h3>Recent Sales</h3>
-            <span style="cursor: pointer;">See All</span>
+            <span style="cursor: pointer;" onclick="notify('Loading recent sales list...')">See All</span>
           </div>
 
-          <div class="sales-list">
-            <div class="sales-item">
+          <div class="sales-list" id="salesList">
+            <div class="sales-item" onclick="notify('Sale details: Steven Summer (+$52.00)')">
               <div class="sales-user">
                 <img src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=80&q=80" class="user-avatar" alt="User">
                 <div>
@@ -709,7 +699,7 @@
               <span class="sales-amount">+ $52.00</span>
             </div>
 
-            <div class="sales-item">
+            <div class="sales-item" onclick="notify('Sale details: Jordan Maizee (+$83.00)')">
               <div class="sales-user">
                 <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=80&q=80" class="user-avatar" alt="User">
                 <div>
@@ -720,7 +710,7 @@
               <span class="sales-amount">+ $83.00</span>
             </div>
 
-            <div class="sales-item">
+            <div class="sales-item" onclick="notify('Sale details: Jessica Alba (+$61.60)')">
               <div class="sales-user">
                 <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=80&q=80" class="user-avatar" alt="User">
                 <div>
@@ -731,7 +721,7 @@
               <span class="sales-amount">+ $61.60</span>
             </div>
 
-            <div class="sales-item">
+            <div class="sales-item" onclick="notify('Sale details: Anna Armas (+$2,351.00)')">
               <div class="sales-user">
                 <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=80&q=80" class="user-avatar" alt="User">
                 <div>
@@ -742,7 +732,7 @@
               <span class="sales-amount">+ $2351.00</span>
             </div>
 
-            <div class="sales-item">
+            <div class="sales-item" onclick="notify('Sale details: Angelina Boo (+$152.00)')">
               <div class="sales-user">
                 <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=80&q=80" class="user-avatar" alt="User">
                 <div>
@@ -753,7 +743,7 @@
               <span class="sales-amount">+ $152.00</span>
             </div>
 
-            <div class="sales-item">
+            <div class="sales-item" onclick="notify('Sale details: Anastasia Koss (+$542.00)')">
               <div class="sales-user">
                 <img src="https://images.unsplash.com/photo-1554151228-14d9def656e4?auto=format&fit=crop&w=80&q=80" class="user-avatar" alt="User">
                 <div>
@@ -771,9 +761,48 @@
     </div>
   </div>
 
-  <!-- CHART INITIALIZATION SCRIPTS -->
+  <div class="toast" id="toast">Notification</div>
+
   <script>
-    // Sparkline 1
+    // Toast Notification System
+    let toastTimeout;
+    function notify(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    // Sidebar Navigation Active Handler
+    document.querySelectorAll('.nav-menu .nav-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        document.querySelectorAll('.nav-menu .nav-item').forEach(i => i.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        const tabName = e.currentTarget.getAttribute('data-name');
+        document.getElementById('pageTitle').textContent = tabName;
+        notify(`Switched view to ${tabName}`);
+      });
+    });
+
+    // Real-Time Search Filter for Orders and Sales lists
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      
+      document.querySelectorAll('.order-row').forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(query) ? 'flex' : 'none';
+      });
+
+      document.querySelectorAll('.sales-item').forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(query) ? 'flex' : 'none';
+      });
+    });
+
+    // Sparkline Charts Initialization
     new Chart(document.getElementById('sparkline1'), {
       type: 'line',
       data: {
@@ -789,7 +818,6 @@
       options: { plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
     });
 
-    // Sparkline 2
     new Chart(document.getElementById('sparkline2'), {
       type: 'line',
       data: {
@@ -805,7 +833,7 @@
       options: { plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
     });
 
-    // Main Weekly Stacked Bar Chart
+    // Main Bar Chart
     new Chart(document.getElementById('barChart'), {
       type: 'bar',
       data: {
@@ -843,7 +871,7 @@
       }
     });
 
-    // Monthly Profit Donut
+    // Profit Donut Chart
     new Chart(document.getElementById('profitDonut'), {
       type: 'doughnut',
       data: {
