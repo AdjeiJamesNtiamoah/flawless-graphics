@@ -160,6 +160,8 @@
     .btn-action.logout:hover { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #EF4444; }
     .btn-action.success-btn { background: var(--success); border: none; }
     .btn-action.success-btn:hover { background: #059669; }
+    .btn-action.danger-btn { background: var(--danger); border: none; }
+    .btn-action.danger-btn:hover { background: #DC2626; }
 
     /* LAYOUT */
     main { max-width: 1280px; margin: 32px auto; padding: 0 24px; width: 100%; flex: 1; }
@@ -225,6 +227,7 @@
     table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
     th { padding: 14px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); border-bottom: 1px solid var(--card-border); }
     td { padding: 16px; border-bottom: 1px solid var(--card-border); font-weight: 500; }
+    tr:last-child td { border-bottom: none; }
 
     .badge {
       display: inline-block;
@@ -235,6 +238,127 @@
     }
     .badge.success { background: rgba(16, 185, 129, 0.15); color: var(--success); }
     .badge.pending { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+    .badge.rejected { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+    /* MESSAGING LAYOUT */
+    .chat-layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+      height: 600px;
+    }
+    @media (max-width: 768px) { .chat-layout { grid-template-columns: 1fr; height: auto; } }
+
+    .chat-sidebar {
+      border-right: 1px solid var(--card-border);
+      padding-right: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-search {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text-main);
+      font-size: 13px;
+      margin-bottom: 14px;
+      outline: none;
+    }
+    .contact-list { list-style: none; overflow-y: auto; flex: 1; }
+    .contact-item {
+      padding: 12px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+      transition: background 0.2s ease;
+    }
+    .contact-item:hover, .contact-item.active { background: var(--glass-glow); }
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--accent-gradient);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      position: relative;
+    }
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--success);
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      border: 2px solid var(--bg-outer);
+    }
+    .contact-info .name { font-size: 13px; font-weight: 700; }
+    .contact-info .sub { font-size: 11px; color: var(--text-muted); }
+
+    .chat-window { display: flex; flex-direction: column; height: 100%; }
+    .chat-header {
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .message-bubble {
+      max-width: 70%;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .message-bubble.incoming {
+      background: rgba(0, 0, 0, 0.05);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+    .dark .message-bubble.incoming { background: rgba(255, 255, 255, 0.05); }
+    .message-bubble.outgoing {
+      background: var(--accent-gradient);
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .message-time { font-size: 10px; opacity: 0.7; margin-top: 4px; text-align: right; }
+
+    .chat-input-area {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--card-border);
+    }
+    .chat-input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 30px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text-main);
+      outline: none;
+      font-size: 13px;
+    }
 
     /* SETTINGS & FORM COMPONENTS */
     .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
@@ -252,6 +376,37 @@
       font-size: 13px;
       outline: none;
     }
+
+    /* AUDIT LOG LIST */
+    .audit-list { list-style: none; }
+    .audit-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+    .audit-item:last-child { border-bottom: none; }
+
+    /* CHECKLIST STYLE */
+    .employee-checklist {
+      max-height: 180px;
+      overflow-y: auto;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      border-radius: var(--radius-md);
+      padding: 10px;
+    }
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      font-size: 13px;
+      border-bottom: 1px dashed var(--card-border);
+    }
+    .checklist-item:last-child { border-bottom: none; }
 
     /* MODAL */
     .modal-overlay {
@@ -275,6 +430,14 @@
       box-shadow: var(--shadow-lg);
     }
 
+    /* PRINT RECEIPT STYLING */
+    @media print {
+      body * { visibility: hidden; }
+      #printableReceiptArea, #printableReceiptArea * { visibility: visible; }
+      #printableReceiptArea { position: absolute; left: 0; top: 0; width: 100%; color: #000; background: #fff; padding: 20px; }
+      .no-print { display: none !important; }
+    }
+
     footer { text-align: center; padding: 24px; font-size: 13px; color: var(--text-muted); border-top: 1px solid var(--card-border); }
   </style>
 </head>
@@ -296,15 +459,16 @@
           <li><a id="navHome" href="welcome.html"><i class="fa-solid fa-house"></i> Home</a></li>
           <li><a id="navDashboard" class="active" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-pie"></i> Finance</a></li>
           <li><a id="navApproval" onclick="switchTab('approval')"><i class="fa-solid fa-file-invoice-dollar"></i> Approvals</a></li>
+          <li><a id="navMessaging" onclick="switchTab('messaging')"><i class="fa-solid fa-comments"></i> Messages</a></li>
           <li><a id="navSettings" onclick="switchTab('settings')"><i class="fa-solid fa-gear"></i> Settings</a></li>
         </ul>
       </nav>
 
-      <button class="btn-action" id="themeBtn">
+      <button class="btn-action" id="themeBtn" onclick="toggleTheme()">
         <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
       </button>
 
-      <button class="btn-action logout" id="logoutBtn">
+      <button class="btn-action logout" id="logoutBtn" onclick="logout()">
         <i class="fa-solid fa-right-from-bracket"></i>
         <span>Logout</span>
       </button>
@@ -313,48 +477,85 @@
 
   <!-- MAIN CONTAINER -->
   <main>
-
+    
     <!-- 1. DASHBOARD TAB -->
     <div id="tabDashboard" class="tab-content active">
-      <div class="page-title">
+      <div class="page-title" data-aos="fade-down" data-aos-duration="600">
         <div>
           <h2>Finance & Payroll Control</h2>
-          <div style="font-size:13px; color:var(--text-muted)">Real-time ledger overview, student fees & payment options</div>
+          <div style="font-size:13px; color:var(--text-muted)">Real-time ledger overview, student fees & department distributions</div>
         </div>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <button class="btn-action success-btn" style="padding:10px 18px; font-size:13px;" onclick="openStudentFeeModal()">
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <button class="btn-action success-btn" style="padding:10px 18px; font-size:13px;" onclick="openModal('studentFeeModal')">
             <i class="fa-solid fa-graduation-cap"></i> Record Student Fee
           </button>
-          <div class="org-badge" id="displayOrg">Organization: Active</div>
+          <button class="btn-action" style="background:var(--accent-gradient); padding:10px 18px; font-size:13px;" onclick="openPrepareSalaryModal()">
+            <i class="fa-solid fa-hand-holding-dollar"></i> Prepare Salary Payment
+          </button>
+          <div class="org-badge" id="displayOrg">Organization: Loaded</div>
         </div>
       </div>
 
       <!-- METRICS -->
-      <div class="metrics-grid">
+      <div class="metrics-grid" data-aos="fade-up" data-aos-duration="600">
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fa-solid fa-wallet"></i></div>
+          <div class="metric-info">
+            <div class="label">Annual Budget</div>
+            <div class="val"><span class="curr">GHS</span> <span id="valBudget">450,000.00</span></div>
+          </div>
+        </div>
+
         <div class="metric-card">
           <div class="metric-icon"><i class="fa-solid fa-graduation-cap"></i></div>
           <div class="metric-info">
             <div class="label">Total Fees Collected</div>
-            <div class="val"><span class="curr">GHS</span> <span id="valTotalFees">12,500.00</span></div>
+            <div class="val"><span class="curr">GHS</span> <span id="valTotalFees">0.00</span></div>
           </div>
         </div>
+
         <div class="metric-card">
-          <div class="metric-icon"><i class="fa-solid fa-wallet"></i></div>
+          <div class="metric-icon"><i class="fa-solid fa-users-gear"></i></div>
           <div class="metric-info">
-            <div class="label">Active Gateway</div>
-            <div class="val" id="activeGatewayBadge" style="font-size:16px; color:var(--accent);">Mobile Money (MTN MoMo)</div>
+            <div class="label">Total Gross Payroll</div>
+            <div class="val"><span class="curr">GHS</span> <span id="valPayroll">0.00</span></div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fa-solid fa-piggy-bank"></i></div>
+          <div class="metric-info">
+            <div class="label">Net Liquidity</div>
+            <div class="val"><span class="curr">GHS</span> <span id="valLiquidity">312,800.00</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS -->
+      <div class="charts-grid">
+        <div class="glass-card" data-aos="fade-right" data-aos-duration="700">
+          <h3 style="font-size:16px; font-weight:800; margin-bottom:16px;">Cash Flow Analysis (2026)</h3>
+          <div style="position:relative; width:100%; height:260px;">
+            <canvas id="cashFlowChart"></canvas>
+          </div>
+        </div>
+
+        <div class="glass-card" data-aos="fade-left" data-aos-duration="700">
+          <h3 style="font-size:16px; font-weight:800; margin-bottom:16px;">Expense Allocation</h3>
+          <div style="position:relative; width:100%; height:260px;">
+            <canvas id="expenseAllocationChart"></canvas>
           </div>
         </div>
       </div>
 
       <!-- STUDENT FEES RECORD TABLE -->
-      <div class="glass-card">
+      <div class="glass-card" data-aos="fade-up" data-aos-duration="750">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
           <div>
             <h3 style="font-size:16px; font-weight:800;">Student Fee Payment Records</h3>
-            <div style="font-size:12px; color:var(--text-muted)">Recent tuition & fee payments</div>
+            <div style="font-size:12px; color:var(--text-muted)">Recent tuition & institutional fee transactions</div>
           </div>
-          <button class="btn-action success-btn" onclick="openStudentFeeModal()">+ Collect Student Fee</button>
+          <button class="btn-action success-btn" onclick="openModal('studentFeeModal')">+ Collect Student Fee</button>
         </div>
 
         <div class="table-container">
@@ -365,20 +566,62 @@
                 <th>Student Name</th>
                 <th>Student ID</th>
                 <th>Fee Category</th>
-                <th>Payment Method</th>
+                <th>Payment Date</th>
                 <th>Amount Paid (<span class="curr">GHS</span>)</th>
                 <th>Status</th>
+                <th style="text-align:right;">Receipt</th>
               </tr>
             </thead>
             <tbody id="studentFeeBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RECENT TRANSACTIONS TABLE -->
+      <div class="glass-card" data-aos="fade-up" data-aos-duration="800">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+          <h3 style="font-size:16px; font-weight:800;">Recent General Ledger Transactions</h3>
+          <button class="btn-action" style="background:var(--accent-gradient)" onclick="openModal('disbursementModal')">+ New Disbursement</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
               <tr>
-                <td>#REC-2026-001</td>
-                <td>Kwame Mensah</td>
-                <td>STU-2026-001</td>
-                <td>Tuition Fee</td>
-                <td>MTN Mobile Money</td>
-                <td>2,500.00</td>
-                <td><span class="badge success">Paid</span></td>
+                <th>Transaction ID</th>
+                <th>Category</th>
+                <th>Beneficiary</th>
+                <th>Date</th>
+                <th>Amount (<span class="curr">GHS</span>)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="transactionBody">
+              <tr>
+                <td>#TR-8921</td>
+                <td>Payroll Disbursement</td>
+                <td>All Active Staff</td>
+                <td>2026-08-01</td>
+                <td id="tablePayrollVal">0.00</td>
+                <td><span class="badge success">Processed</span></td>
+              </tr>
+              <tr>
+                <td>#TR-8920</td>
+                <td>Software Licenses</td>
+                <td>Adobe Creative Cloud</td>
+                <td>2026-08-05</td>
+                <td>4,200.00</td>
+                <td><span class="badge success">Processed</span></td>
+              </tr>
+              <tr>
+                <td>#TR-8919</td>
+                <td>Office Logistics</td>
+                <td>Accra Tech Hub</td>
+                <td>2026-08-12</td>
+                <td>1,850.00</td>
+                <td><span class="badge pending">Pending Approval</span></td>
               </tr>
             </tbody>
           </table>
@@ -386,271 +629,888 @@
       </div>
     </div>
 
-    <!-- 2. SETTINGS TAB WITH PAYMENT METHOD SETUP -->
-    <div id="tabSettings" class="tab-content">
-      <div class="glass-card">
-        <h3 style="font-size:20px; font-weight:800; margin-bottom:20px;">System & Payment Integration Settings</h3>
+    <!-- 2. SALARY APPROVAL TAB -->
+    <div id="tabApproval" class="tab-content">
+      <div class="page-title" data-aos="fade-down" data-aos-duration="600">
+        <div>
+          <h2>Salary Payment Approval Workflow</h2>
+          <div style="font-size:13px; color:var(--text-muted)">Authorize individual employee payouts or execute batch approvals</div>
+        </div>
+        <button class="btn-action success-btn" onclick="approveAllPayroll()"><i class="fa-solid fa-check-double"></i> Authorize Batch Disbursement</button>
+      </div>
 
+      <!-- APPROVAL METRICS -->
+      <div class="metrics-grid" data-aos="fade-up" data-aos-duration="600">
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fa-solid fa-clock"></i></div>
+          <div class="metric-info">
+            <div class="label">Pending Approval</div>
+            <div class="val"><span class="curr">GHS</span> <span id="valPendingPayroll">0.00</span></div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fa-solid fa-check-circle"></i></div>
+          <div class="metric-info">
+            <div class="label">Approved Sum</div>
+            <div class="val"><span class="curr">GHS</span> <span id="valApprovedSum">0.00</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAYROLL TABLE -->
+      <div class="glass-card" data-aos="fade-up" data-aos-duration="700">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Employee Name</th>
+                <th>Department / Role</th>
+                <th>Gross Salary</th>
+                <th>Deductions (<span class="curr">GHS</span>)</th>
+                <th>Net Payable (<span class="curr">GHS</span>)</th>
+                <th>Approval Status</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="payrollApprovalBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. MESSAGING TAB -->
+    <div id="tabMessaging" class="tab-content">
+      <div class="glass-card" data-aos="fade-up" data-aos-duration="600">
+        <div class="chat-layout">
+          
+          <!-- SIDEBAR CONTACTS -->
+          <div class="chat-sidebar">
+            <input type="text" class="chat-search" placeholder="Search team members..." id="searchContact" oninput="filterContacts()">
+            <ul class="contact-list" id="contactList">
+              <li class="contact-item active" onclick="selectContact(this, 'Kofi Mensah', 'Chief Accountant')">
+                <div class="avatar">KM <div class="status-dot"></div></div>
+                <div class="contact-info">
+                  <div class="name">Kofi Mensah</div>
+                  <div class="sub">Chief Accountant</div>
+                </div>
+              </li>
+              <li class="contact-item" onclick="selectContact(this, 'Ama Osei', 'Payroll Specialist')">
+                <div class="avatar" style="background:linear-gradient(135deg,#10B981,#059669)">AO <div class="status-dot"></div></div>
+                <div class="contact-info">
+                  <div class="name">Ama Osei</div>
+                  <div class="sub">Payroll Specialist</div>
+                </div>
+              </li>
+              <li class="contact-item" onclick="selectContact(this, 'Yaw Boateng', 'IT Admin')">
+                <div class="avatar" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9)">YB <div class="status-dot" style="background:#F59E0B"></div></div>
+                <div class="contact-info">
+                  <div class="name">Yaw Boateng</div>
+                  <div class="sub">IT Admin</div>
+                </div>
+              </li>
+            </ul>
+            <button class="btn-action" style="background:var(--accent-gradient); width:100%; justify-content:center; margin-top:12px;" onclick="openModal('newMessageModal')">+ New Direct Message</button>
+          </div>
+
+          <!-- CHAT WINDOW -->
+          <div class="chat-window">
+            <div class="chat-header">
+              <div>
+                <h3 id="activeChatName" style="font-size:16px; font-weight:800;">Kofi Mensah</h3>
+                <span id="activeChatRole" style="font-size:12px; color:var(--text-muted)">Chief Accountant</span>
+              </div>
+              <button class="btn-action" style="padding:6px 12px;" onclick="alert('Calling module integrated with VoIP.')"><i class="fa-solid fa-phone"></i></button>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+              <div class="message-bubble incoming">
+                Hello Admin! Have you approved the Q3 Software budget request yet?
+                <div class="message-time">10:14 AM</div>
+              </div>
+              <div class="message-bubble outgoing">
+                Hey Kofi, checking the ledger right now. Will approve in a few minutes.
+                <div class="message-time">10:16 AM</div>
+              </div>
+            </div>
+
+            <form class="chat-input-area" id="chatForm" onsubmit="sendMessage(event)">
+              <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." required>
+              <button type="submit" class="btn-action" style="background:var(--accent-gradient); border-radius:30px;"><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. SETTINGS TAB -->
+    <div id="tabSettings" class="tab-content">
+      <div class="glass-card" data-aos="fade-up" data-aos-duration="600">
+        <h3 style="font-size:20px; font-weight:800; margin-bottom:20px;">System & Portal Settings</h3>
+        
         <form id="settingsForm" onsubmit="saveSettings(event)">
           <div class="settings-grid">
-            <!-- GENERAL SETTINGS -->
+            
+            <!-- PROFILE / GENERAL -->
             <div>
-              <h4 style="font-size:14px; font-weight:700; margin-bottom:14px; color:var(--accent);">System Preferences</h4>
+              <h4 style="font-size:14px; font-weight:700; margin-bottom:14px; color:var(--accent);">Admin Profile Preferences</h4>
+              
               <div class="form-group">
                 <label class="form-label">Administrator Display Name</label>
                 <input type="text" class="form-input" id="setAdminName" value="Finance Admin">
               </div>
+
               <div class="form-group">
-                <label class="form-label">System Currency</label>
-                <select class="form-select" id="setCurrency">
+                <label class="form-label">System Currency Display</label>
+                <select class="form-select" id="setCurrency" onchange="updateCurrencySymbol(this.value)">
                   <option value="GHS">GHS (Ghanaian Cedi)</option>
                   <option value="USD">USD ($ - US Dollar)</option>
+                  <option value="EUR">EUR (€ - Euro)</option>
+                  <option value="GBP">GBP (£ - British Pound)</option>
                 </select>
               </div>
-            </div>
-
-            <!-- PAYMENT GATEWAY SETTINGS -->
-            <div>
-              <h4 style="font-size:14px; font-weight:700; margin-bottom:14px; color:var(--accent);">
-                <i class="fa-solid fa-credit-card"></i> Connected Payment Method
-              </h4>
 
               <div class="form-group">
-                <label class="form-label">Default Site Payment Gateway</label>
-                <select class="form-select" id="defaultPaymentGateway" onchange="toggleGatewayFields()">
-                  <option value="momo">MTN Mobile Money / Mobile Money</option>
-                  <option value="paystack">Paystack Gateway</option>
-                  <option value="flutterwave">Flutterwave Gateway</option>
-                  <option value="bank">Direct Bank Transfer</option>
+                <label class="form-label">Tax / SSNIT Rate (%)</label>
+                <input type="number" class="form-input" id="setTaxRate" value="13.5" step="0.1" onchange="updateTaxRate(this.value)">
+              </div>
+            </div>
+
+            <!-- SECURITY & AUDIT -->
+            <div>
+              <h4 style="font-size:14px; font-weight:700; margin-bottom:14px; color:var(--accent);">Security & Governance</h4>
+
+              <div class="form-group">
+                <label class="form-label">Two-Factor Authentication (2FA)</label>
+                <select class="form-select" id="set2FA">
+                  <option value="enabled">Enabled (Enforced)</option>
+                  <option value="disabled">Disabled</option>
                 </select>
               </div>
 
-              <div class="form-group" id="momoFields">
-                <label class="form-label">MoMo Merchant Phone Number</label>
-                <input type="text" class="form-input" id="momoNumber" placeholder="055XXXXXXX" value="0240001122">
+              <div class="form-group">
+                <label class="form-label">Data Backup Options</label>
+                <button type="button" class="btn-action" style="width:100%; justify-content:center; background:var(--glass-glow); border-color:var(--card-border);" onclick="exportData()">
+                  <i class="fa-solid fa-download"></i> Export Local Financial Ledger (JSON)
+                </button>
               </div>
 
-              <div class="form-group" id="apiKeyFields" style="display:none;">
-                <label class="form-label">Payment API Secret Key</label>
-                <input type="password" class="form-input" id="gatewayApiKey" placeholder="sk_live_xxxxxxxxxxxx">
-              </div>
-
-              <div class="form-group" id="bankFields" style="display:none;">
-                <label class="form-label">Bank Account Number / IBAN</label>
-                <input type="text" class="form-input" id="bankAccNo" placeholder="Account Number">
+              <div class="form-group" style="margin-top:28px;">
+                <button type="button" class="btn-action logout" style="width:100%; justify-content:center;" onclick="purgeSystem()">
+                  <i class="fa-solid fa-trash"></i> Reset All Saved Session Data
+                </button>
               </div>
             </div>
+
           </div>
 
           <div style="margin-top:24px; text-align:right;">
-            <button type="submit" class="btn-action" style="background:var(--accent-gradient); padding:10px 24px;">Save Settings & Payment Method</button>
+            <button type="submit" class="btn-action" style="background:var(--accent-gradient); padding:10px 24px; font-size:13px;">Save Configuration</button>
           </div>
         </form>
       </div>
+
+      <!-- AUDIT LOG SECTION -->
+      <div class="glass-card" data-aos="fade-up" data-aos-duration="700">
+        <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;">System Activity & Audit Trail</h3>
+        <ul class="audit-list" id="auditList">
+          <li class="audit-item">
+            <span>System initialization completed successfully</span>
+            <span style="color:var(--text-muted); font-size:11px;">2026-08-20</span>
+          </li>
+        </ul>
+      </div>
     </div>
+
   </main>
 
-  <!-- RECORD STUDENT FEE MODAL (WITH STUDENT FETCH DROPDOWN) -->
+  <!-- MODALS -->
+
+  <!-- RECORD STUDENT FEE MODAL -->
   <div class="modal-overlay" id="studentFeeModal">
     <div class="modal-card">
-      <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;">
-        <i class="fa-solid fa-graduation-cap"></i> Record Student Fee Payment
-      </h3>
+      <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;"><i class="fa-solid fa-graduation-cap"></i> Record Student Fee Payment</h3>
       <form id="studentFeeForm" onsubmit="addStudentFee(event)">
-
-        <div class="form-group">
-          <label class="form-label">Select Student (Fetched List)</label>
-          <select class="form-select" id="feeStudentSelect" onchange="autoFillStudentDetails()" required>
-            <option value="">-- Choose Student --</option>
-            <!-- Dynamically populated -->
-          </select>
-        </div>
-
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
           <div class="form-group">
             <label class="form-label">Student ID</label>
-            <input type="text" id="feeStudentId" class="form-input" readonly placeholder="Auto-filled">
+            <input type="text" id="feeStudentId" class="form-input" placeholder="e.g. STU-2026-001" required>
           </div>
           <div class="form-group">
             <label class="form-label">Student Full Name</label>
-            <input type="text" id="feeStudentName" class="form-input" readonly placeholder="Auto-filled">
+            <input type="text" id="feeStudentName" class="form-input" placeholder="e.g. Kwame Mensah" required>
           </div>
         </div>
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
           <div class="form-group">
-            <label class="form-label">Fee Category</label>
-            <select class="form-select" id="feeCategory" required>
-              <option value="Tuition Fee">Tuition Fee</option>
-              <option value="Registration Fee">Registration Fee</option>
-              <option value="Facility / Lab Fee">Facility / Lab Fee</option>
-            </select>
+            <label class="form-label">Class / Grade Level</label>
+            <input type="text" id="feeGrade" class="form-input" placeholder="e.g. Grade 11 / Level 200" required>
           </div>
           <div class="form-group">
-            <label class="form-label">Payment Method</label>
-            <select class="form-select" id="feePaymentMethod" required>
-              <!-- Auto syncs active setting method -->
+            <label class="form-label">Fee Category</label>
+            <select id="feeCategory" class="form-select" required>
+              <option value="Tuition Fee">Tuition Fee</option>
+              <option value="Facility & Lab Fee">Facility & Lab Fee</option>
+              <option value="Examination Fee">Examination Fee</option>
+              <option value="Library Fee">Library Fee</option>
+              <option value="Sports & Extra-curricular">Sports & Extra-curricular</option>
             </select>
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Amount Paid (GHS)</label>
-          <input type="number" id="feeAmount" class="form-input" placeholder="e.g. 1500" required>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label class="form-label">Amount Paid (<span class="curr">GHS</span>)</label>
+            <input type="number" id="feeAmount" class="form-input" step="0.01" min="1" placeholder="0.00" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Payment Method</label>
+            <select id="feeMethod" class="form-select">
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="Mobile Money (MoMo)">Mobile Money (MoMo)</option>
+              <option value="Credit / Debit Card">Credit / Debit Card</option>
+              <option value="Cash">Cash</option>
+            </select>
+          </div>
         </div>
 
         <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
           <button type="button" class="btn-action" onclick="closeModal('studentFeeModal')">Cancel</button>
-          <button type="submit" class="btn-action success-btn">Execute Payment</button>
+          <button type="submit" class="btn-action success-btn">Save Payment Record</button>
         </div>
       </form>
     </div>
   </div>
 
+  <!-- PREPARE SALARY PAYMENT MODAL -->
+  <div class="modal-overlay" id="prepareSalaryModal">
+    <div class="modal-card">
+      <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;"><i class="fa-solid fa-hand-holding-dollar"></i> Prepare Payroll Batch</h3>
+      <form id="prepareSalaryForm" onsubmit="processPreparedSalary(event)">
+        <div class="form-group">
+          <label class="form-label">Pay Period</label>
+          <input type="month" id="salaryPayPeriod" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Select Staff Members Included</label>
+          <div class="employee-checklist" id="salaryEmployeeList">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Applied Deduction/Tax Rate (%)</label>
+          <input type="number" id="salaryTaxRate" class="form-input" step="0.1" value="13.5" required>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+          <button type="button" class="btn-action" onclick="closeModal('prepareSalaryModal')">Cancel</button>
+          <button type="submit" class="btn-action" style="background:var(--accent-gradient);">Submit for Approval</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- GENERAL DISBURSEMENT MODAL -->
+  <div class="modal-overlay" id="disbursementModal">
+    <div class="modal-card">
+      <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Record Ledger Disbursement</h3>
+      <form id="disbursementForm" onsubmit="addDisbursement(event)">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <input type="text" id="disbCategory" class="form-input" placeholder="e.g. Office Supplies, Maintenance" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Beneficiary / Vendor</label>
+          <input type="text" id="disbBeneficiary" class="form-input" placeholder="e.g. Vendor Name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Amount (<span class="curr">GHS</span>)</label>
+          <input type="number" id="disbAmount" class="form-input" step="0.01" min="1" required>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+          <button type="button" class="btn-action" onclick="closeModal('disbursementModal')">Cancel</button>
+          <button type="submit" class="btn-action" style="background:var(--accent-gradient)">Record Expense</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- NEW DIRECT MESSAGE MODAL -->
+  <div class="modal-overlay" id="newMessageModal">
+    <div class="modal-card">
+      <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;"><i class="fa-solid fa-message"></i> New Direct Message</h3>
+      <form id="newMessageForm" onsubmit="startNewChat(event)">
+        <div class="form-group">
+          <label class="form-label">Recipient Name</label>
+          <input type="text" id="newRecipientName" class="form-input" placeholder="e.g. Sarah Connor" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Recipient Role</label>
+          <input type="text" id="newRecipientRole" class="form-input" placeholder="e.g. HR Manager" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Initial Message</label>
+          <input type="text" id="newInitialMessage" class="form-input" placeholder="Type message..." required>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+          <button type="button" class="btn-action" onclick="closeModal('newMessageModal')">Cancel</button>
+          <button type="submit" class="btn-action" style="background:var(--accent-gradient)">Start Conversation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- RECEIPT MODAL -->
+  <div class="modal-overlay" id="receiptModal">
+    <div class="modal-card" style="max-width: 480px;">
+      <div id="printableReceiptArea">
+        <div style="text-align:center; margin-bottom:16px; border-bottom:1px dashed #ccc; padding-bottom:12px;">
+          <h2 style="font-size:18px; font-weight:800; text-transform:uppercase;">FLAWLESS GRAPHICS</h2>
+          <div style="font-size:12px; color:#666;">Official Fee Collection Receipt</div>
+        </div>
+        <div style="font-size:13px; line-height:1.8;">
+          <div style="display:flex; justify-content:space-between;"><strong>Receipt No:</strong> <span id="rNum">-</span></div>
+          <div style="display:flex; justify-content:space-between;"><strong>Date:</strong> <span id="rDate">-</span></div>
+          <div style="display:flex; justify-content:space-between;"><strong>Student ID:</strong> <span id="rStuId">-</span></div>
+          <div style="display:flex; justify-content:space-between;"><strong>Student Name:</strong> <span id="rStuName">-</span></div>
+          <div style="display:flex; justify-content:space-between;"><strong>Category:</strong> <span id="rCat">-</span></div>
+          <div style="display:flex; justify-content:space-between; font-size:15px; margin-top:10px; border-top:1px solid #000; padding-top:6px;">
+            <strong>Amount Paid:</strong> <strong><span class="curr">GHS</span> <span id="rAmt">0.00</span></strong>
+          </div>
+        </div>
+      </div>
+      <div class="no-print" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button class="btn-action" onclick="closeModal('receiptModal')">Close</button>
+        <button class="btn-action success-btn" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Receipt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
   <footer>
-    &copy; 2026 FLAWLESS GRAPHICS. Financial Portal Systems. All rights reserved.
+    &copy; 2026 FLAWLESS GRAPHICS. Financial & HR ERP System. All Rights Reserved.
   </footer>
 
+  <!-- AOS ANIMATION SCRIPT -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+  <!-- APP JAVASCRIPT LOGIC -->
   <script>
-    // Sample fetched list of students
-    const fetchedStudents = [
-      { id: 'STU-2026-001', name: 'Kwame Mensah', course: 'Graphic Design' },
-      { id: 'STU-2026-002', name: 'Ama Serwaa', course: 'UI/UX Design' },
-      { id: 'STU-2026-003', name: 'Kofi Arhin', course: 'Motion Graphics' },
-      { id: 'STU-2026-004', name: 'Abena Osei', course: 'Fullstack Web' }
+    // GLOBAL STATE
+    let currentCurrency = 'GHS';
+    let currentTaxRate = 13.5;
+
+    // INITIAL MOCK DATA
+    let defaultEmployees = [
+      { id: 'EMP-01', name: 'Kwame Mensah', role: 'Lead Graphic Designer', gross: 8500, approved: false },
+      { id: 'EMP-02', name: 'Abena Appiah', role: 'Senior UX Researcher', gross: 9200, approved: false },
+      { id: 'EMP-03', name: 'Kofi Mensah', role: 'Chief Accountant', gross: 11000, approved: false },
+      { id: 'EMP-04', name: 'Ama Osei', role: 'Payroll Specialist', gross: 7500, approved: false }
     ];
 
-    // Initialize App & Dynamic Lists
+    let studentFees = [
+      { id: 'REC-1001', name: 'Ebenezer Addo', studentId: 'STU-2026-088', cat: 'Tuition Fee', date: '2026-08-18', amount: 3500, status: 'Completed' },
+      { id: 'REC-1002', name: 'Akosua Serwaa', studentId: 'STU-2026-042', cat: 'Facility & Lab Fee', date: '2026-08-19', amount: 850, status: 'Completed' }
+    ];
+
+    let auditLogs = [
+      { msg: 'System initialization completed successfully', date: '2026-08-20' }
+    ];
+
+    let cashFlowChartObj = null;
+    let expenseChartObj = null;
+
+    // INIT FUNCTION
     document.addEventListener('DOMContentLoaded', () => {
-      loadPaymentSettings();
-      populateStudentDropdown();
+      AOS.init({ duration: 600, once: true });
+
+      // Active Org Label
+      const activeOrg = localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || 'Flawless Graphics HQ';
+      document.getElementById('displayOrg').innerText = 'Organization: ' + activeOrg;
+
+      // Load Saved Payroll or Default
+      if (!localStorage.getItem('fg_payroll')) {
+        localStorage.setItem('fg_payroll', JSON.stringify(defaultEmployees));
+      }
+
+      // Load Saved Fees or Default
+      if (!localStorage.getItem('fg_student_fees')) {
+        localStorage.setItem('fg_student_fees', JSON.stringify(studentFees));
+      }
+
+      // Load Audit Logs
+      if (!localStorage.getItem('fg_audit')) {
+        localStorage.setItem('fg_audit', JSON.stringify(auditLogs));
+      }
+
+      // Set today for salary picker
+      const todayMonth = new Date().toISOString().slice(0, 7);
+      document.getElementById('salaryPayPeriod').value = todayMonth;
+
+      renderAll();
+      initCharts();
     });
 
-    // Tab Switching logic
+    // NAVIGATION SYSTEM
     function switchTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('nav a').forEach(el => el.classList.remove('active'));
 
-      if(tabName === 'dashboard') {
+      if (tabName === 'dashboard') {
         document.getElementById('tabDashboard').classList.add('active');
         document.getElementById('navDashboard').classList.add('active');
-      } else if(tabName === 'settings') {
+      } else if (tabName === 'approval') {
+        document.getElementById('tabApproval').classList.add('active');
+        document.getElementById('navApproval').classList.add('active');
+      } else if (tabName === 'messaging') {
+        document.getElementById('tabMessaging').classList.add('active');
+        document.getElementById('navMessaging').classList.add('active');
+      } else if (tabName === 'settings') {
         document.getElementById('tabSettings').classList.add('active');
         document.getElementById('navSettings').classList.add('active');
       }
     }
 
-    // Modal Control
-    function openStudentFeeModal() {
-      document.getElementById('studentFeeModal').classList.add('active');
-      syncPaymentOptionsInModal();
+    // THEME TOGGLE
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+      const isDark = document.body.classList.contains('dark');
+      document.getElementById('themeText').innerText = isDark ? 'Light' : 'Dark';
+      const icon = document.querySelector('#themeBtn i');
+      icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
     }
 
-    function closeModal(modalId) {
-      document.getElementById(modalId).classList.remove('active');
+    // LOGOUT
+    function logout() {
+      if (confirm('Are you sure you want to log out?')) {
+        window.location.href = 'finance-login.html';
+      }
     }
 
-    // Populate Students Dropdown
-    function populateStudentDropdown() {
-      const select = document.getElementById('feeStudentSelect');
-      select.innerHTML = '<option value="">-- Select Student from List --</option>';
-      fetchedStudents.forEach(stu => {
-        const option = document.createElement('option');
-        option.value = stu.id;
-        option.textContent = `${stu.name} (${stu.id}) - ${stu.course}`;
-        select.appendChild(option);
+    // RENDER SYSTEM
+    function renderAll() {
+      const payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];
+      const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
+      const auditData = JSON.parse(localStorage.getItem('fg_audit')) || [];
+
+      // Render Student Fees
+      const feeBody = document.getElementById('studentFeeBody');
+      feeBody.innerHTML = '';
+      let totalFeesSum = 0;
+
+      feeData.forEach((item, idx) => {
+        totalFeesSum += parseFloat(item.amount);
+        feeBody.innerHTML += `
+          <tr>
+            <td><strong>${item.id}</strong></td>
+            <td>${item.name}</td>
+            <td>${item.studentId}</td>
+            <td>${item.cat}</td>
+            <td>${item.date}</td>
+            <td>${parseFloat(item.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td><span class="badge success">${item.status}</span></td>
+            <td style="text-align:right;">
+              <button class="btn-action" style="padding:4px 10px; font-size:11px;" onclick="viewReceipt(${idx})"><i class="fa-solid fa-receipt"></i> View</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      // Render Payroll Approval
+      const payrollBody = document.getElementById('payrollApprovalBody');
+      payrollBody.innerHTML = '';
+      let grossTotal = 0;
+      let pendingTotal = 0;
+      let approvedTotal = 0;
+
+      payrollData.forEach((emp, i) => {
+        const gross = parseFloat(emp.gross);
+        const deductions = gross * (currentTaxRate / 100);
+        const net = gross - deductions;
+
+        grossTotal += gross;
+        if (emp.approved) {
+          approvedTotal += net;
+        } else {
+          pendingTotal += net;
+        }
+
+        payrollBody.innerHTML += `
+          <tr>
+            <td><strong>${emp.name}</strong></td>
+            <td>${emp.role}</td>
+            <td>${gross.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td>${deductions.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td><strong>${net.toLocaleString('en-US', {minimumFractionDigits: 2})}</strong></td>
+            <td>
+              <span class="badge ${emp.approved ? 'success' : 'pending'}">
+                ${emp.approved ? 'Approved' : 'Pending Authorization'}
+              </span>
+            </td>
+            <td style="text-align:right;">
+              ${!emp.approved 
+                ? `<button class="btn-action success-btn" style="padding:4px 10px; font-size:11px;" onclick="approveIndividualPayroll(${i})">Authorize</button>`
+                : `<span style="font-size:11px; color:var(--success); font-weight:700;"><i class="fa-solid fa-check"></i> Paid</span>`}
+            </td>
+          </tr>
+        `;
+      });
+
+      // Update Top Metrics
+      document.getElementById('valTotalFees').innerText = totalFeesSum.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('valPayroll').innerText = grossTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('tablePayrollVal').innerText = grossTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('valPendingPayroll').innerText = pendingTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('valApprovedSum').innerText = approvedTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      // Recalculate Liquidity (450,000 Budget + Total Fees - Total Payroll Approved)
+      const newLiquidity = 450000 + totalFeesSum - approvedTotal;
+      document.getElementById('valLiquidity').innerText = newLiquidity.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      // Render Audit Logs
+      const auditContainer = document.getElementById('auditList');
+      auditContainer.innerHTML = '';
+      auditData.slice(-5).reverse().forEach(log => {
+        auditContainer.innerHTML += `
+          <li class="audit-item">
+            <span>${log.msg}</span>
+            <span style="color:var(--text-muted); font-size:11px;">${log.date}</span>
+          </li>
+        `;
       });
     }
 
-    // Auto Fill Student Information upon selection
-    function autoFillStudentDetails() {
-      const selectedId = document.getElementById('feeStudentSelect').value;
-      const student = fetchedStudents.find(s => s.id === selectedId);
-
-      if (student) {
-        document.getElementById('feeStudentId').value = student.id;
-        document.getElementById('feeStudentName').value = student.name;
-      } else {
-        document.getElementById('feeStudentId').value = '';
-        document.getElementById('feeStudentName').value = '';
-      }
+    // ADD AUDIT LOG
+    function addAuditLog(msg) {
+      const logs = JSON.parse(localStorage.getItem('fg_audit')) || [];
+      logs.push({ msg, date: new Date().toISOString().split('T')[0] });
+      localStorage.setItem('fg_audit', JSON.stringify(logs));
     }
 
-    // Payment Gateway dynamic form toggles
-    function toggleGatewayFields() {
-      const selected = document.getElementById('defaultPaymentGateway').value;
-      document.getElementById('momoFields').style.display = selected === 'momo' ? 'block' : 'none';
-      document.getElementById('apiKeyFields').style.display = (selected === 'paystack' || selected === 'flutterwave') ? 'block' : 'none';
-      document.getElementById('bankFields').style.display = selected === 'bank' ? 'block' : 'none';
+    // MODAL CONTROL
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
     }
 
-    // Save Settings
-    function saveSettings(e) {
-      e.preventDefault();
-      const gateway = document.getElementById('defaultPaymentGateway').value;
-      localStorage.setItem('site_payment_gateway', gateway);
-
-      const gatewayLabels = {
-        momo: 'Mobile Money (MTN MoMo)',
-        paystack: 'Paystack Gateway',
-        flutterwave: 'Flutterwave Gateway',
-        bank: 'Direct Bank Transfer'
-      };
-
-      document.getElementById('activeGatewayBadge').innerText = gatewayLabels[gateway];
-      alert('Settings and Payment Gateway updated successfully!');
-    }
-
-    function loadPaymentSettings() {
-      const savedGateway = localStorage.getItem('site_payment_gateway') || 'momo';
-      document.getElementById('defaultPaymentGateway').value = savedGateway;
-      toggleGatewayFields();
-    }
-
-    // Sync Payment Options inside Fee Modal
-    function syncPaymentOptionsInModal() {
-      const select = document.getElementById('feePaymentMethod');
-      const activeGateway = localStorage.getItem('site_payment_gateway') || 'momo';
-
-      select.innerHTML = `
-        <option value="Mobile Money (MTN MoMo)" ${activeGateway === 'momo' ? 'selected' : ''}>Mobile Money (MTN MoMo)</option>
-        <option value="Paystack Gateway" ${activeGateway === 'paystack' ? 'selected' : ''}>Paystack Gateway</option>
-        <option value="Flutterwave" ${activeGateway === 'flutterwave' ? 'selected' : ''}>Flutterwave Gateway</option>
-        <option value="Bank Direct Deposit" ${activeGateway === 'bank' ? 'selected' : ''}>Bank Direct Deposit</option>
-      `;
-    }
-
-    // Record Student Fee Submit
+    // STUDENT FEE ACTIONS
     function addStudentFee(e) {
       e.preventDefault();
-      const id = document.getElementById('feeStudentId').value;
+      const studentId = document.getElementById('feeStudentId').value;
       const name = document.getElementById('feeStudentName').value;
-      const category = document.getElementById('feeCategory').value;
-      const method = document.getElementById('feePaymentMethod').value;
-      const amount = parseFloat(document.getElementById('feeAmount').value).toFixed(2);
+      const cat = document.getElementById('feeCategory').value;
+      const amount = parseFloat(document.getElementById('feeAmount').value);
 
-      if(!id || !name) {
-        alert('Please select a valid student');
-        return;
-      }
+      const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
+      const newRec = {
+        id: 'REC-' + Math.floor(1000 + Math.random() * 9000),
+        name,
+        studentId,
+        cat,
+        date: new Date().toISOString().split('T')[0],
+        amount,
+        status: 'Completed'
+      };
 
-      const receiptId = '#REC-2026-' + Math.floor(100 + Math.random() * 900);
-      const rowHtml = `
-        <tr>
-          <td>${receiptId}</td>
-          <td>${name}</td>
-          <td>${id}</td>
-          <td>${category}</td>
-          <td>${method}</td>
-          <td>${amount}</td>
-          <td><span class="badge success">Paid</span></td>
-        </tr>
-      `;
+      feeData.unshift(newRec);
+      localStorage.setItem('fg_student_fees', JSON.stringify(feeData));
+      addAuditLog(`Student Fee collected: ${name} (${amount} GHS)`);
 
-      document.getElementById('studentFeeBody').insertAdjacentHTML('afterbegin', rowHtml);
       closeModal('studentFeeModal');
       document.getElementById('studentFeeForm').reset();
-      alert(`Payment of GHS ${amount} recorded via ${method} for ${name}`);
+      renderAll();
+    }
+
+    function viewReceipt(index) {
+      const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
+      const rec = feeData[index];
+      if (!rec) return;
+
+      document.getElementById('rNum').innerText = rec.id;
+      document.getElementById('rDate').innerText = rec.date;
+      document.getElementById('rStuId').innerText = rec.studentId;
+      document.getElementById('rStuName').innerText = rec.name;
+      document.getElementById('rCat').innerText = rec.cat;
+      document.getElementById('rAmt').innerText = parseFloat(rec.amount).toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      openModal('receiptModal');
+    }
+
+    // SALARY PREPARATION
+    function openPrepareSalaryModal() {
+      const payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];
+      const container = document.getElementById('salaryEmployeeList');
+      container.innerHTML = '';
+
+      payrollData.forEach(emp => {
+        container.innerHTML += `
+          <div class="checklist-item">
+            <input type="checkbox" id="chk_${emp.id}" value="${emp.id}" checked>
+            <label for="chk_${emp.id}">${emp.name} — ${emp.role} (GHS ${emp.gross.toLocaleString()})</label>
+          </div>
+        `;
+      });
+
+      openModal('prepareSalaryModal');
+    }
+
+    function processPreparedSalary(e) {
+      e.preventDefault();
+      const period = document.getElementById('salaryPayPeriod').value;
+      const appliedTax = document.getElementById('salaryTaxRate').value;
+      
+      currentTaxRate = parseFloat(appliedTax);
+      document.getElementById('setTaxRate').value = currentTaxRate;
+
+      // Reset approvals so new payroll run can be authorized
+      let payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];
+      payrollData = payrollData.map(emp => {
+        const chk = document.getElementById('chk_' + emp.id);
+        if (chk && chk.checked) {
+          return { ...emp, approved: false };
+        }
+        return emp;
+      });
+
+      localStorage.setItem('fg_payroll', JSON.stringify(payrollData));
+      addAuditLog(`Salary batch prepared for period ${period} at ${appliedTax}% tax.`);
+
+      closeModal('prepareSalaryModal');
+      renderAll();
+      switchTab('approval');
+    }
+
+    // PAYROLL APPROVAL
+    function approveIndividualPayroll(index) {
+      let payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];
+      payrollData[index].approved = true;
+      localStorage.setItem('fg_payroll', JSON.stringify(payrollData));
+      addAuditLog(`Individual salary approved for ${payrollData[index].name}`);
+      renderAll();
+    }
+
+    function approveAllPayroll() {
+      let payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];
+      payrollData = payrollData.map(emp => ({ ...emp, approved: true }));
+      localStorage.setItem('fg_payroll', JSON.stringify(payrollData));
+      addAuditLog('Batch payroll disbursement authorized for all active staff');
+      renderAll();
+    }
+
+    // GENERAL DISBURSEMENT
+    function addDisbursement(e) {
+      e.preventDefault();
+      const cat = document.getElementById('disbCategory').value;
+      const ben = document.getElementById('disbBeneficiary').value;
+      const amt = parseFloat(document.getElementById('disbAmount').value);
+
+      const table = document.getElementById('transactionBody');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>#TR-${Math.floor(8000 + Math.random() * 1000)}</td>
+        <td>${cat}</td>
+        <td>${ben}</td>
+        <td>${new Date().toISOString().split('T')[0]}</td>
+        <td>${amt.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+        <td><span class="badge success">Processed</span></td>
+      `;
+      table.prepend(tr);
+
+      addAuditLog(`Ledger disbursement recorded: ${cat} to ${ben} (${amt} GHS)`);
+      closeModal('disbursementModal');
+      document.getElementById('disbursementForm').reset();
+    }
+
+    // MESSAGING SYSTEM
+    function sendMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const chatContainer = document.getElementById('chatMessages');
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      chatContainer.innerHTML += `
+        <div class="message-bubble outgoing">
+          ${text}
+          <div class="message-time">${timeStr}</div>
+        </div>
+      `;
+
+      input.value = '';
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+
+      // Simulated Auto Reply
+      setTimeout(() => {
+        chatContainer.innerHTML += `
+          <div class="message-bubble incoming">
+            Acknowledged. I will review this update shortly.
+            <div class="message-time">${timeStr}</div>
+          </div>
+        `;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }, 1200);
+    }
+
+    function selectContact(el, name, role) {
+      document.querySelectorAll('.contact-item').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('activeChatName').innerText = name;
+      document.getElementById('activeChatRole').innerText = role;
+    }
+
+    function filterContacts() {
+      const q = document.getElementById('searchContact').value.toLowerCase();
+      document.querySelectorAll('.contact-item').forEach(item => {
+        const name = item.querySelector('.name').innerText.toLowerCase();
+        item.style.display = name.includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    function startNewChat(e) {
+      e.preventDefault();
+      const name = document.getElementById('newRecipientName').value;
+      const role = document.getElementById('newRecipientRole').value;
+      const msg = document.getElementById('newInitialMessage').value;
+
+      const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+
+      const list = document.getElementById('contactList');
+      const li = document.createElement('li');
+      li.className = 'contact-item active';
+      li.onclick = function() { selectContact(this, name, role); };
+      li.innerHTML = `
+        <div class="avatar" style="background:var(--accent-gradient)">${initials} <div class="status-dot"></div></div>
+        <div class="contact-info">
+          <div class="name">${name}</div>
+          <div class="sub">${role}</div>
+        </div>
+      `;
+
+      document.querySelectorAll('.contact-item').forEach(c => c.classList.remove('active'));
+      list.prepend(li);
+
+      document.getElementById('activeChatName').innerText = name;
+      document.getElementById('activeChatRole').innerText = role;
+
+      const chatContainer = document.getElementById('chatMessages');
+      chatContainer.innerHTML = `
+        <div class="message-bubble outgoing">
+          ${msg}
+          <div class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+        </div>
+      `;
+
+      closeModal('newMessageModal');
+      document.getElementById('newMessageForm').reset();
+      switchTab('messaging');
+    }
+
+    // SETTINGS ACTIONS
+    function updateCurrencySymbol(val) {
+      currentCurrency = val;
+      document.querySelectorAll('.curr').forEach(el => el.innerText = val);
+    }
+
+    function updateTaxRate(val) {
+      currentTaxRate = parseFloat(val) || 0;
+      renderAll();
+    }
+
+    function saveSettings(e) {
+      e.preventDefault();
+      addAuditLog('System settings & configuration updated');
+      alert('Settings saved successfully.');
+    }
+
+    function exportData() {
+      const exportObj = {
+        payroll: JSON.parse(localStorage.getItem('fg_payroll')),
+        studentFees: JSON.parse(localStorage.getItem('fg_student_fees')),
+        audit: JSON.parse(localStorage.getItem('fg_audit'))
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "FG_Financial_Ledger_2026.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function purgeSystem() {
+      if (confirm('WARNING: This will clear all local session storage and reset the portal. Continue?')) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
+
+    // CHART INITIALIZATION
+    function initCharts() {
+      const ctx1 = document.getElementById('cashFlowChart').getContext('2d');
+      cashFlowChartObj = new Chart(ctx1, {
+        type: 'line',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+          datasets: [
+            {
+              label: 'Revenue / Fees',
+              data: [32000, 45000, 28000, 51000, 60000, 42000, 55000, 68000],
+              borderColor: '#10B981',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              fill: true,
+              tension: 0.4
+            },
+            {
+              label: 'Payroll & Expenses',
+              data: [25000, 29000, 31000, 30000, 35000, 34000, 36000, 35700],
+              borderColor: '#EF4444',
+              backgroundColor: 'rgba(239, 68, 68, 0.05)',
+              fill: true,
+              tension: 0.4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#64748B' } } },
+          scales: {
+            x: { ticks: { color: '#64748B' }, grid: { display: false } },
+            y: { ticks: { color: '#64748B' }, grid: { color: 'rgba(200,200,200,0.1)' } }
+          }
+        }
+      });
+
+      const ctx2 = document.getElementById('expenseAllocationChart').getContext('2d');
+      expenseChartObj = new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+          labels: ['Staff Payroll', 'Software & IT', 'Operations', 'Tax & SSNIT'],
+          datasets: [{
+            data: [55, 15, 18, 12],
+            backgroundColor: ['#2563EB', '#06B6D4', '#F59E0B', '#10B981'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom', labels: { color: '#64748B', font: { size: 11 } } } }
+        }
+      });
     }
   </script>
 </body>
