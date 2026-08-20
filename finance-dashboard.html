@@ -361,8 +361,7 @@
     }
 
     /* SETTINGS & FORM COMPONENTS */
-    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    @media (max-width: 768px) { .settings-grid { grid-template-columns: 1fr; } }
+    .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
 
     .form-group { margin-bottom: 18px; }
     .form-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
@@ -778,43 +777,26 @@
               </div>
             </div>
 
-<div class="settings-card">
-  <h3>Payment Settings</h3>
-  <form id="payment-settings-form">
-    <label for="payment-provider">Select Default Payment Gateway:</label>
-    <select id="payment-provider" name="provider" required>
-      <option value="">-- Choose Provider --</option>
-      <option value="stripe">Stripe</option>
-      <option value="paypal">PayPal</option>
-      <option value="paystack">Paystack / Mobile Money</option>
-    </select>
+            <!-- PAYMENT GATEWAY CONFIGURATION -->
+            <div>
+              <h4 style="font-size:14px; font-weight:700; margin-bottom:14px; color:var(--accent);">Payment Integration Setup</h4>
+              
+              <div class="form-group">
+                <label class="form-label">Default Payment Gateway</label>
+                <select class="form-select" id="payment-provider" required>
+                  <option value="">-- Choose Provider --</option>
+                  <option value="stripe">Stripe</option>
+                  <option value="paypal">PayPal</option>
+                  <option value="paystack">Paystack / Mobile Money</option>
+                </select>
+              </div>
 
-    <div id="provider-credentials" style="margin-top: 15px;">
-      <label for="api-key">API Key / Public Key:</label>
-      <input type="text" id="api-key" placeholder="pk_test_..." required />
-    </div>
+              <div class="form-group">
+                <label class="form-label">API Key / Public Key</label>
+                <input type="text" class="form-input" id="api-key" placeholder="pk_test_..." />
+              </div>
+            </div>
 
-    <button type="submit" style="margin-top: 15px;">Save Gateway</button>
-  </form>
-</div>
-
-<script>
-document.getElementById('payment-settings-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const provider = document.getElementById('payment-provider').value;
-  const apiKey = document.getElementById('api-key').value;
-
-  const response = await fetch('/api/settings/payment-method', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ provider, apiKey })
-  });
-
-  if (response.ok) {
-    alert('Payment method configured successfully!');
-  }
-});
-</script>
             <!-- SECURITY & AUDIT -->
             <div>
               <h4 style="font-size:14px; font-weight:700; margin-bottom:14px; color:var(--accent);">Security & Governance</h4>
@@ -870,6 +852,13 @@ document.getElementById('payment-settings-form').addEventListener('submit', asyn
     <div class="modal-card">
       <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;"><i class="fa-solid fa-graduation-cap"></i> Record Student Fee Payment</h3>
       <form id="studentFeeForm" onsubmit="addStudentFee(event)">
+        <div class="form-group">
+          <label class="form-label">Select Student</label>
+          <select id="studentSelect" class="form-select" onchange="handleStudentSelect(this)">
+            <option value="">Loading students...</option>
+          </select>
+        </div>
+
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
           <div class="form-group">
             <label class="form-label">Student ID</label>
@@ -880,70 +869,6 @@ document.getElementById('payment-settings-form').addEventListener('submit', asyn
             <input type="text" id="feeStudentName" class="form-input" placeholder="e.g. Kwame Mensah" required>
           </div>
         </div>
-<!-- finance-dashboard.html -->
-<div class="modal" id="record-fee-modal">
-  <h2>Record Student Fee Payment</h2>
-  <form id="record-fee-form">
-    <label for="student-select">Select Student:</label>
-    <select id="student-select" name="studentId" required>
-      <option value="">Loading students...</option>
-    </select>
-
-    <label for="amount">Amount Paid:</label>
-    <input type="number" id="amount" name="amount" step="0.01" required />
-
-    <label for="payment-method">Payment Method:</label>
-    <select id="payment-method" name="method" required>
-      <option value="cash">Cash</option>
-      <option value="gateway">Connected Gateway</option>
-    </select>
-
-    <button type="submit">Submit Payment</button>
-  </form>
-</div>
-
-<script>
-// Fetch and populate students when DOM loads
-document.addEventListener('DOMContentLoaded', fetchStudents);
-
-async function fetchStudents() {
-  const select = document.getElementById('student-select');
-  try {
-    const res = await fetch('/api/students');
-    const students = await res.json();
-
-    select.innerHTML = '<option value="">-- Select a Student --</option>';
-    students.forEach(student => {
-      const option = document.createElement('option');
-      option.value = student.id;
-      option.textContent = `${student.name} (${student.rollNumber || student.id})`;
-      select.appendChild(option);
-    });
-  } catch (err) {
-    select.innerHTML = '<option value="">Failed to load students</option>';
-  }
-}
-
-// Process Fee Payment Submission
-document.getElementById('record-fee-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const payload = {
-    studentId: document.getElementById('student-select').value,
-    amount: parseFloat(document.getElementById('amount').value),
-    method: document.getElementById('payment-method').value
-  };
-
-  const response = await fetch('/api/finance/payments', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-
-  if (response.ok) {
-    alert('Payment successfully recorded!');
-    document.getElementById('record-fee-form').reset();
-  }
-});
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
           <div class="form-group">
@@ -973,6 +898,7 @@ document.getElementById('record-fee-form').addEventListener('submit', async (e) 
               <option value="Bank Transfer">Bank Transfer</option>
               <option value="Mobile Money (MoMo)">Mobile Money (MoMo)</option>
               <option value="Credit / Debit Card">Credit / Debit Card</option>
+              <option value="Connected Gateway">Connected Gateway</option>
               <option value="Cash">Cash</option>
             </select>
           </div>
@@ -1107,6 +1033,7 @@ document.getElementById('record-fee-form').addEventListener('submit', async (e) 
     // GLOBAL STATE
     let currentCurrency = 'GHS';
     let currentTaxRate = 13.5;
+    let fetchedStudents = [];
 
     // INITIAL MOCK DATA
     let defaultEmployees = [
@@ -1157,7 +1084,38 @@ document.getElementById('record-fee-form').addEventListener('submit', async (e) 
 
       renderAll();
       initCharts();
+      fetchStudents();
     });
+
+    // FETCH STUDENTS FROM API
+    async function fetchStudents() {
+      const select = document.getElementById('studentSelect');
+      try {
+        const res = await fetch('/api/students');
+        if (!res.ok) throw new Error('API fetch error');
+        fetchedStudents = await res.json();
+
+        select.innerHTML = '<option value="">-- Select a Student (Optional) --</option>';
+        fetchedStudents.forEach(student => {
+          const option = document.createElement('option');
+          option.value = student.id;
+          option.textContent = `${student.name} (${student.rollNumber || student.id})`;
+          select.appendChild(option);
+        });
+      } catch (err) {
+        select.innerHTML = '<option value="">Manual Entry Mode</option>';
+      }
+    }
+
+    function handleStudentSelect(selectEl) {
+      const selectedId = selectEl.value;
+      const student = fetchedStudents.find(s => s.id == selectedId);
+      if (student) {
+        document.getElementById('feeStudentId').value = student.id || student.rollNumber || '';
+        document.getElementById('feeStudentName').value = student.name || '';
+        if (student.grade) document.getElementById('feeGrade').value = student.grade;
+      }
+    }
 
     // NAVIGATION SYSTEM
     function switchTab(tabName) {
@@ -1271,7 +1229,7 @@ document.getElementById('record-fee-form').addEventListener('submit', async (e) 
       document.getElementById('valPendingPayroll').innerText = pendingTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
       document.getElementById('valApprovedSum').innerText = approvedTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
 
-      // Recalculate Liquidity (450,000 Budget + Total Fees - Total Payroll Approved)
+      // Recalculate Liquidity
       const newLiquidity = 450000 + totalFeesSum - approvedTotal;
       document.getElementById('valLiquidity').innerText = newLiquidity.toLocaleString('en-US', {minimumFractionDigits: 2});
 
@@ -1304,12 +1262,24 @@ document.getElementById('record-fee-form').addEventListener('submit', async (e) 
     }
 
     // STUDENT FEE ACTIONS
-    function addStudentFee(e) {
+    async function addStudentFee(e) {
       e.preventDefault();
       const studentId = document.getElementById('feeStudentId').value;
       const name = document.getElementById('feeStudentName').value;
       const cat = document.getElementById('feeCategory').value;
+      const method = document.getElementById('feeMethod').value;
       const amount = parseFloat(document.getElementById('feeAmount').value);
+
+      // Try API POST if server exists, fallback locally
+      try {
+        await fetch('/api/finance/payments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ studentId, name, amount, method, cat })
+        });
+      } catch(err) {
+        // Fallback to local storage handling gracefully
+      }
 
       const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
       const newRec = {
@@ -1372,7 +1342,6 @@ document.getElementById('record-fee-form').addEventListener('submit', async (e) 
       currentTaxRate = parseFloat(appliedTax);
       document.getElementById('setTaxRate').value = currentTaxRate;
 
-      // Reset approvals so new payroll run can be authorized
       let payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];
       payrollData = payrollData.map(emp => {
         const chk = document.getElementById('chk_' + emp.id);
@@ -1452,7 +1421,6 @@ document.getElementById('record-fee-form').addEventListener('submit', async (e) 
       input.value = '';
       chatContainer.scrollTop = chatContainer.scrollHeight;
 
-      // Simulated Auto Reply
       setTimeout(() => {
         chatContainer.innerHTML += `
           <div class="message-bubble incoming">
@@ -1529,8 +1497,23 @@ document.getElementById('record-fee-form').addEventListener('submit', async (e) 
       renderAll();
     }
 
-    function saveSettings(e) {
+    async function saveSettings(e) {
       e.preventDefault();
+      const provider = document.getElementById('payment-provider').value;
+      const apiKey = document.getElementById('api-key').value;
+
+      if (provider && apiKey) {
+        try {
+          await fetch('/api/settings/payment-method', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider, apiKey })
+          });
+        } catch(err) {
+          // Ignores network failure if offline
+        }
+      }
+
       addAuditLog('System settings & configuration updated');
       alert('Settings saved successfully.');
     }
