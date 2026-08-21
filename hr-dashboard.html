@@ -643,8 +643,91 @@
 <script>
 /* APPLICATION LOGIC */
 function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
-function read(k){ return safeParse(localStorage.getItem(k)) || [] }
-function save(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
+// Fetch Employees from MySQL via PHP
+async function fetchEmployees() {
+  try {
+    const response = await fetch('get_employees.php');
+    const result = await response.json();
+    return result.status === 'success' ? result.data : [];
+  } catch (error) {
+    console.error('Error fetching employees:', error);
+    return [];
+  }
+}
+
+// Render Employees Table with PHP Data
+async function renderEmployees() {
+  const employees = await fetchEmployees();
+  const tbody = document.getElementById('employeeTable');
+  tbody.innerHTML = '';
+
+  employees.forEach(e => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="display:flex;align-items:center;gap:10px">
+        <img src="${e.photo}" class="profile-thumb" style="width:32px;height:32px;border-radius:8px">
+        <span style="font-weight:700">${e.name}</span>
+      </td>
+      <td>${e.role}</td>
+      <td>${e.dept}</td>
+      <td>${e.email}</td>
+      <td>$${Number(e.salary).toLocaleString()}</td>
+      <td><span class="badge-pill badge-green">Active</span></td>
+      <td>
+        <button class="btn ghost" style="padding:4px 8px" onclick="openEmpModalById('${e.id}')"><i class="fa-solid fa-pen"></i></button>
+        <button class="btn ghost" style="padding:4px 8px;color:var(--accent-red)" onclick="deleteEmp('${e.id}')"><i class="fa-solid fa-trash"></i></button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Save Employee to PHP
+document.getElementById('saveEmpBtn').addEventListener('click', async () => {
+  const formData = new FormData();
+  const editId = document.getElementById('saveEmpBtn').dataset.editId;
+
+  if (editId) formData.append('id', editId);
+  formData.append('name', document.getElementById('emp_name').value.trim());
+  formData.append('role', document.getElementById('emp_role').value.trim());
+  formData.append('dept', document.getElementById('emp_dept').value.trim());
+  formData.append('email', document.getElementById('emp_email').value.trim());
+  formData.append('salary', document.getElementById('emp_salary').value);
+  formData.append('photo', document.getElementById('emp_preview').src);
+
+  const response = await fetch('save_employee.php', {
+    method: 'POST',
+    body: formData
+  });
+
+  const result = await response.json();
+  if (result.status === 'success') {
+    closeEmpModal();
+    renderEmployees();
+    showToast(result.message);
+  } else {
+    alert('Save failed: ' + result.message);
+  }
+});
+
+// Delete Employee via PHP
+async function deleteEmp(id) {
+  if (!confirm('Delete employee?')) return;
+
+  const formData = new FormData();
+  formData.append('id', id);
+
+  const response = await fetch('delete_employee.php', {
+    method: 'POST',
+    body: formData
+  });
+
+  const result = await response.json();
+  if (result.status === 'success') {
+    renderEmployees();
+    showToast('Employee removed successfully');
+  }
+}
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=> t.classList.remove('show'), 3000) }
 
 const ORG_LIST_KEY = 'enterprise_orgs_v1';
