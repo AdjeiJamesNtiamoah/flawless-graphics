@@ -523,6 +523,58 @@
     </table>
   </section>
 
+<!-- Put this inside your HTML main section -->
+<section class="panel" id="studentsSection">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+    <h3>All Registered Students</h3>
+    <button class="btn ghost" onclick="loadHRStudents()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Student Name</th>
+        <th>Class</th>
+        <th>Assigned Teacher</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="studentTableBody">
+      <!-- Data injected dynamically -->
+    </tbody>
+  </table>
+</section>
+
+<script>
+async function loadHRStudents() {
+  try {
+    const res = await fetch('get_students.php');
+    const result = await res.json();
+    
+    if (result.status === 'success') {
+      const tbody = document.getElementById('studentTableBody');
+      tbody.innerHTML = result.data.map(s => `
+        <tr>
+          <td><strong>${s.enrollment_code}</strong></td>
+          <td>${s.student_name}</td>
+          <td>${s.class_name}</td>
+          <td>${s.teacher_name}</td>
+          <td><span class="badge-pill badge-green">${s.status}</span></td>
+        </tr>
+      `).join('');
+      
+      // Update KPI
+      document.getElementById('totalStudents').textContent = result.data.length;
+    }
+  } catch (err) {
+    console.error('Failed to load student records:', err);
+  }
+}
+
+// Fetch automatically when page loads
+document.addEventListener('DOMContentLoaded', loadHRStudents);
+</script>
+  
   <!-- MESSAGES SECTION -->
   <section class="panel" id="messagesSection" style="display:none">
     <h3 style="margin-top:0;margin-bottom:16px">Direct Messaging</h3>
