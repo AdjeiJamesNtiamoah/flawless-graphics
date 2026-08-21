@@ -240,6 +240,87 @@
   td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 13px; }
   tr:hover { background: var(--primary-light); }
 
+  /* --- MESSAGING COMPONENT STYLES --- */
+  .messaging-container {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    height: 520px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--card);
+  }
+  .msg-sidebar {
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+  }
+  .msg-search { padding: 12px; border-bottom: 1px solid var(--border); }
+  .msg-search input { width: 100%; }
+  .msg-list { flex: 1; overflow-y: auto; }
+  .msg-user-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    transition: var(--transition);
+  }
+  .msg-user-item:hover, .msg-user-item.active { background: var(--card); }
+  .msg-user-item .avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; }
+  .msg-user-info { flex: 1; overflow: hidden; }
+  .msg-user-name { font-weight: 700; font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+  .msg-user-role { font-size: 11px; color: var(--muted); }
+  
+  .msg-chat-area { display: flex; flex-direction: column; height: 100%; background: var(--card); }
+  .msg-chat-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 700;
+  }
+  .msg-chat-history {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .msg-bubble {
+    max-width: 70%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 13px;
+    line-height: 1.4;
+    word-break: break-word;
+  }
+  .msg-bubble.sent {
+    align-self: flex-end;
+    background: var(--primary);
+    color: white;
+    border-bottom-right-radius: 2px;
+  }
+  .msg-bubble.received {
+    align-self: flex-start;
+    background: var(--bg);
+    color: var(--text);
+    border-bottom-left-radius: 2px;
+    border: 1px solid var(--border);
+  }
+  .msg-time { font-size: 10px; opacity: 0.7; margin-top: 4px; text-align: right; }
+  .msg-input-area {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+  }
+  .msg-input-area input { flex: 1; }
+
   /* --- MODALS & OVERLAYS --- */
   .modal-backdrop {
     position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px);
@@ -307,6 +388,7 @@
     <button data-section="dashboard" class="active"><i class="fa-solid fa-chart-pie"></i> <span class="hide-collapsed">Dashboard</span></button>
     <button data-section="employees"><i class="fa-solid fa-users"></i> <span class="hide-collapsed">Employees</span></button>
     <button data-section="students"><i class="fa-solid fa-graduation-cap"></i> <span class="hide-collapsed">Students</span></button>
+    <button data-section="messages"><i class="fa-solid fa-comments"></i> <span class="hide-collapsed">Messages</span></button>
     <button data-section="attendance"><i class="fa-solid fa-calendar-check"></i> <span class="hide-collapsed">Attendance</span></button>
     <button data-section="payroll"><i class="fa-solid fa-file-invoice-dollar"></i> <span class="hide-collapsed">Payroll</span></button>
     <button data-section="analytics"><i class="fa-solid fa-chart-line"></i> <span class="hide-collapsed">Analytics</span></button>
@@ -439,6 +521,29 @@
       </thead>
       <tbody id="studentsTable"></tbody>
     </table>
+  </section>
+
+  <!-- MESSAGES SECTION -->
+  <section class="panel" id="messagesSection" style="display:none">
+    <h3 style="margin-top:0;margin-bottom:16px">Direct Messaging</h3>
+    <div class="messaging-container">
+      <div class="msg-sidebar">
+        <div class="msg-search">
+          <input type="text" id="msgSearchInput" class="select" placeholder="Search conversations..." oninput="renderMsgUsers()">
+        </div>
+        <div class="msg-list" id="msgUserList"></div>
+      </div>
+      <div class="msg-chat-area">
+        <div class="msg-chat-header" id="msgChatHeader">
+          <span style="color: var(--muted)">Select an employee to start chatting</span>
+        </div>
+        <div class="msg-chat-history" id="msgChatHistory"></div>
+        <div class="msg-input-area" id="msgInputArea" style="display:none">
+          <input type="text" id="msgInput" class="select" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendMessage()">
+          <button class="btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i> Send</button>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- ATTENDANCE SECTION -->
@@ -599,6 +704,7 @@ const EMP_KEY = key('employees');
 const STUDENT_KEY = key('students');
 const ACT_KEY = key('activity'); 
 const DEPT_KEY = key('departments');
+const MSG_KEY = key('messages');
 
 /* Initial Mock Data Setup */
 if(!localStorage.getItem(EMP_KEY)) {
@@ -686,6 +792,7 @@ const sections = {
   dashboard: document.getElementById('dashboardSection'),
   employees: document.getElementById('employeesSection'),
   students: document.getElementById('studentsSection'),
+  messages: document.getElementById('messagesSection'),
   attendance: document.getElementById('attendanceSectionPanel'),
   payroll: document.getElementById('payrollSection'),
   analytics: document.getElementById('analyticsSection'),
@@ -702,6 +809,7 @@ function showSection(name){
     btn.classList.add('active');
     document.getElementById('pageTitle').textContent = btn.querySelector('span')?.textContent || btn.textContent.trim();
   }
+  if(name === 'messages') renderMsgUsers();
 }
 document.querySelectorAll('#nav button').forEach(b=> b.addEventListener('click', ()=> showSection(b.dataset.section)));
 
@@ -760,239 +868,238 @@ document.getElementById('saveEmpBtn').addEventListener('click', ()=>{
   const editId = document.getElementById('saveEmpBtn').dataset.editId;
 
   if(editId){
-    const idx = employees.findIndex(e=> e.id === editId);
-    if(idx>=0){ 
-      employees[idx] = {...employees[idx], name, role, dept, email, salary, photo}; 
-      save(EMP_KEY, employees); 
-      pushActivity(`Modified record: ${name}`); 
-      showToast('Profile Updated'); 
+    const idx = employees.findIndex(e => e.id === editId);
+    if(idx !== -1){
+      employees[idx] = { ...employees[idx], name, role, dept, email, salary, photo };
     }
   } else {
-    const id = 'e_'+Date.now();
-    employees.push({ id, name, role, dept, email, salary, photo });
-    save(EMP_KEY, employees);
-    pushActivity(`Added new employee: ${name}`);
-    showToast('Employee Onboarded');
+    employees.push({ id: 'e' + Date.now(), name, role, dept, email, salary, photo });
   }
-  closeEmpModal(); 
-  renderAll();
+  save(EMP_KEY, employees);
+  closeEmpModal();
+  renderEmployees();
+  renderDashboard();
+  showToast(editId ? 'Employee Updated' : 'Employee Added');
 });
 
-/* AUDIT ACTIVITY LOG */
-function pushActivity(text){ 
-  const arr = read(ACT_KEY); 
-  arr.push({ text, time:new Date().toISOString() }); 
-  save(ACT_KEY, arr); 
-  renderActivity(); 
-}
-
-function renderActivity(){ 
-  const arr = read(ACT_KEY).slice().reverse(); 
-  const el = document.getElementById('activityFeed'); 
-  el.innerHTML = arr.slice(0,6).map(a=> `<div style="padding:8px 0;border-bottom:1px solid var(--border)"><strong>${new Date(a.time).toLocaleTimeString()}</strong> - ${a.text}</div>`).join(''); 
-}
-
-/* TABLE RENDERING: EMPLOYEES */
 function renderEmployees(){
-  const arr = read(EMP_KEY);
-  const employeeTable = document.getElementById('employeeTable');
-  employeeTable.innerHTML = '';
-
-  arr.forEach((e)=>{
+  const employees = read(EMP_KEY);
+  const tbody = document.getElementById('employeeTable');
+  tbody.innerHTML = '';
+  employees.forEach(e => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>
-        <div style="display:flex;align-items:center;gap:10px">
-          <img src="${e.photo}" style="width:32px;height:32px;border-radius:8px;object-fit:cover"/>
-          <div style="font-weight:700">${e.name}</div>
-        </div>
+      <td style="display:flex;align-items:center;gap:10px">
+        <img src="${e.photo}" class="profile-thumb" style="width:32px;height:32px;border-radius:8px">
+        <span style="font-weight:700">${e.name}</span>
       </td>
       <td>${e.role}</td>
       <td>${e.dept}</td>
       <td>${e.email}</td>
-      <td>$${Number(e.salary||0).toLocaleString()}</td>
+      <td>$${e.salary.toLocaleString()}</td>
       <td><span class="badge-pill badge-green">Active</span></td>
       <td>
-        <button class="btn ghost" style="padding:4px 10px;font-size:11px" onclick="openEdit('${e.id}')">Edit</button>
-      </td>`;
-    tr.addEventListener('dblclick', ()=> openEdit(e.id));
-    employeeTable.appendChild(tr);
-  });
-  
-  updateKPIs();
-  populatePayrollSelect();
-  renderAttendanceTable();
-}
-
-/* TABLE RENDERING: STUDENTS */
-function renderStudents(){
-  const arr = read(STUDENT_KEY);
-  const searchVal = document.getElementById('searchStudent').value.toLowerCase();
-  const feeFilter = document.getElementById('filterFeeStatus').value;
-  const tbody = document.getElementById('studentsTable');
-  tbody.innerHTML = '';
-
-  const filtered = arr.filter(s => {
-    const matchesSearch = s.name.toLowerCase().includes(searchVal) || s.classGrade.toLowerCase().includes(searchVal);
-    const matchesFee = feeFilter ? s.feeStatus === feeFilter : true;
-    return matchesSearch && matchesFee;
-  });
-
-  filtered.forEach(s => {
-    let feeBadgeClass = 'badge-green';
-    if (s.feeStatus === 'Owing') feeBadgeClass = 'badge-red';
-    if (s.feeStatus === 'Partial') feeBadgeClass = 'badge-orange';
-
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><strong>${s.name}</strong><br><span class="small">ID: ${s.id}</span></td>
-      <td>${s.classGrade}</td>
-      <td><span class="badge-pill badge-green"><i class="fa-solid fa-user-check"></i> ${s.teacherRecordedAttendance}</span></td>
-      <td>
-        <span class="badge-pill ${feeBadgeClass}">${s.feeStatus}</span><br>
-        <span class="small" style="display:inline-block;margin-top:4px">
-          Paid: $${s.feesPaid} | Owing: <strong style="color:var(--accent-red)">$${s.feesOwing}</strong>
-        </span>
+        <button class="btn ghost" style="padding:4px 8px" onclick="openEmpModalById('${e.id}')"><i class="fa-solid fa-pen"></i></button>
+        <button class="btn ghost" style="padding:4px 8px;color:var(--accent-red)" onclick="deleteEmp('${e.id}')"><i class="fa-solid fa-trash"></i></button>
+        <button class="btn ghost" style="padding:4px 8px" onclick="openChatWith('${e.id}')" title="Message"><i class="fa-solid fa-comment"></i></button>
       </td>
-      <td><strong>${s.academicGPA}</strong></td>
-      <td>
-        <button class="btn ghost" style="padding:4px 10px;font-size:11px" onclick="viewStudentDetails('${s.id}')">
-          <i class="fa-solid fa-eye"></i> View Details
-        </button>
-      </td>`;
+    `;
     tbody.appendChild(tr);
   });
 }
 
-function viewStudentDetails(studentId) {
-  const students = read(STUDENT_KEY);
-  const s = students.find(item => item.id === studentId);
-  if(!s) return;
-
-  document.getElementById('studentModalName').textContent = `${s.name} (${s.classGrade})`;
-
-  const modalContent = document.getElementById('studentModalContent');
-  modalContent.innerHTML = `
-    <div class="student-detail-grid">
-      <div class="student-card-box">
-        <h4 style="margin-top:0"><i class="fa-solid fa-graduation-cap"></i> Academic Performance</h4>
-        <div><strong>GPA:</strong> ${s.academicGPA}</div>
-        <hr style="border:0;border-top:1px solid var(--border);margin:10px 0"/>
-        <div style="font-weight:700;margin-bottom:6px" class="small">Subject Breakdown:</div>
-        ${s.academicRecords.map(r => `
-          <div style="display:flex;justify-content:space-between;" class="small">
-            <span>${r.subject}</span>
-            <span><strong>${r.grade}</strong> (${r.score}%)</span>
-          </div>
-        `).join('')}
-      </div>
-
-      <div class="student-card-box">
-        <h4 style="margin-top:0"><i class="fa-solid fa-file-invoice-dollar"></i> Fee Statement</h4>
-        <div class="small"><strong>Total Tuition:</strong> $${s.totalFees}</div>
-        <div class="small"><strong>Amount Paid:</strong> $${s.feesPaid}</div>
-        <div class="small" style="color:var(--accent-red)"><strong>Amount Balance:</strong> $${s.feesOwing}</div>
-        <div style="margin-top:8px">
-          <strong>Status:</strong> <span class="badge-pill ${s.feeStatus === 'Paid' ? 'badge-green' : 'badge-red'}">${s.feeStatus}</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="student-card-box" style="margin-top:16px">
-      <h4 style="margin-top:0"><i class="fa-solid fa-clipboard-user"></i> Teacher Attendance Records</h4>
-      <div class="small" style="margin-bottom:8px"><strong>Latest Reported Status:</strong> ${s.teacherRecordedAttendance}</div>
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Teacher</th>
-            <th>Attendance Record</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${s.attendanceLog.map(log => `
-            <tr>
-              <td>${log.date}</td>
-              <td>${log.teacher}</td>
-              <td><span class="badge-pill ${log.status === 'Present' ? 'badge-green' : 'badge-red'}">${log.status}</span></td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
-
-  document.getElementById('studentModalBackdrop').classList.add('show');
-}
-
-function closeStudentModal() {
-  document.getElementById('studentModalBackdrop').classList.remove('show');
-}
-
-function openEdit(id){
-  const emp = read(EMP_KEY).find(x=>x.id===id);
+function openEmpModalById(id){
+  const employees = read(EMP_KEY);
+  const emp = employees.find(e => e.id === id);
   if(emp) openEmpModal(emp);
 }
 
-function updateKPIs(){
-  const employees = read(EMP_KEY);
-  const students = read(STUDENT_KEY);
-  document.getElementById('totalEmployees').textContent = employees.length;
-  document.getElementById('totalStudents').textContent = students.length;
-  document.getElementById('absentToday').textContent = Math.floor(employees.length * 0.05);
-  const totalSal = employees.reduce((acc, e) => acc + Number(e.salary || 0), 0);
-  document.getElementById('payrollTotal').textContent = '$' + totalSal.toLocaleString();
+function deleteEmp(id){
+  if(!confirm('Delete employee?')) return;
+  let employees = read(EMP_KEY);
+  employees = employees.filter(e => e.id !== id);
+  save(EMP_KEY, employees);
+  renderEmployees();
+  renderDashboard();
+  showToast('Employee Removed');
 }
 
-function renderAttendanceTable(){
-  const arr = read(EMP_KEY);
-  const tbody = document.getElementById('attendanceTable');
-  tbody.innerHTML = '';
-  arr.forEach(e => {
-    tbody.innerHTML += `
-      <tr>
-        <td><strong>${e.name}</strong></td>
-        <td>${e.dept}</td>
-        <td><span class="badge-pill badge-green">On Time</span></td>
-        <td>08:58 AM</td>
-      </tr>`;
+/* MESSAGING FEATURE LOGIC */
+let activeChatEmpId = null;
+
+function renderMsgUsers() {
+  const employees = read(EMP_KEY);
+  const filter = (document.getElementById('msgSearchInput').value || '').toLowerCase();
+  const list = document.getElementById('msgUserList');
+  list.innerHTML = '';
+
+  const filtered = employees.filter(e => 
+    e.name.toLowerCase().includes(filter) || e.role.toLowerCase().includes(filter)
+  );
+
+  filtered.forEach(e => {
+    const item = document.createElement('div');
+    item.className = `msg-user-item ${e.id === activeChatEmpId ? 'active' : ''}`;
+    item.onclick = () => selectChatUser(e.id);
+    item.innerHTML = `
+      <img src="${e.photo}" class="avatar">
+      <div class="msg-user-info">
+        <div class="msg-user-name">${e.name}</div>
+        <div class="msg-user-role">${e.role}</div>
+      </div>
+    `;
+    list.appendChild(item);
   });
 }
 
-function populatePayrollSelect(){
-  const sel = document.getElementById('payEmployeeSelect'); 
-  sel.innerHTML = '<option value="">Select Employee for Compensation Calculation</option>';
-  read(EMP_KEY).forEach(e=> sel.appendChild(Object.assign(document.createElement('option'), { value:e.id, textContent: `${e.name} (${e.dept})` })));
+function selectChatUser(empId) {
+  activeChatEmpId = empId;
+  const employees = read(EMP_KEY);
+  const emp = employees.find(e => e.id === empId);
+
+  renderMsgUsers();
+  
+  const header = document.getElementById('msgChatHeader');
+  header.innerHTML = `
+    <img src="${emp.photo}" class="profile-thumb" style="width:32px;height:32px;border-radius:50%">
+    <div>
+      <div style="font-size:14px;font-weight:700">${emp.name}</div>
+      <div class="small">${emp.role} • ${emp.dept}</div>
+    </div>
+  `;
+
+  document.getElementById('msgInputArea').style.display = 'flex';
+  renderChatHistory();
 }
 
-/* PAYROLL CALCULATION */
-document.getElementById('calcPayrollBtn').addEventListener('click', ()=>{
-  const empId = document.getElementById('payEmployeeSelect').value;
-  if(!empId) return alert('Select an employee');
-  const emp = read(EMP_KEY).find(x=>x.id===empId);
-  const bonus = Number(document.getElementById('bonus').value) || 0;
-  const deductions = Number(document.getElementById('deductions').value) || 0;
-  
-  const base = Number(emp.salary) || 0;
-  const net = base + bonus - deductions;
+function openChatWith(empId) {
+  showSection('messages');
+  selectChatUser(empId);
+}
 
-  document.getElementById('payResult').innerHTML = `
-    <div style="line-height:1.8">
-      <div>Base Salary: <strong>$${base.toLocaleString()}</strong></div>
-      <div>Bonuses: <strong style="color:var(--accent-green)">+$${bonus.toLocaleString()}</strong></div>
-      <div>Deductions: <strong style="color:var(--accent-red)">-$${deductions.toLocaleString()}</strong></div>
-      <hr style="border:0;border-top:1px solid var(--border);margin:8px 0"/>
-      <div style="font-size:16px">Calculated Net: <strong>$${net.toLocaleString()}</strong></div>
-    </div>`;
+function getChatKey(empId) {
+  return `${MSG_KEY}_${empId}`;
+}
+
+function renderChatHistory() {
+  if(!activeChatEmpId) return;
+  const history = read(getChatKey(activeChatEmpId));
+  const container = document.getElementById('msgChatHistory');
+  container.innerHTML = '';
+
+  history.forEach(m => {
+    const bubble = document.createElement('div');
+    bubble.className = `msg-bubble ${m.sender === 'hr' ? 'sent' : 'received'}`;
+    bubble.innerHTML = `
+      <div>${m.text}</div>
+      <div class="msg-time">${m.time}</div>
+    `;
+    container.appendChild(bubble);
+  });
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendMessage() {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if(!text || !activeChatEmpId) return;
+
+  const chatKey = getChatKey(activeChatEmpId);
+  const history = read(chatKey);
+  const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  history.push({ sender: 'hr', text, time });
+  save(chatKey, history);
+  input.value = '';
+  renderChatHistory();
+
+  // Mock auto-reply for interactivity
+  setTimeout(() => {
+    const updatedHistory = read(chatKey);
+    updatedHistory.push({ sender: 'user', text: `Thanks for the update! I will check this shortly.`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+    save(chatKey, updatedHistory);
+    if(activeChatEmpId) renderChatHistory();
+  }, 1000);
+}
+
+/* DASHBOARD & RENDER INIT */
+function renderDashboard(){
+  const employees = read(EMP_KEY);
+  const students = read(STUDENT_KEY);
+  
+  document.getElementById('totalEmployees').textContent = employees.length;
+  document.getElementById('totalStudents').textContent = students.length;
+  document.getElementById('absentToday').textContent = Math.floor(employees.length * 0.1);
+
+  const payrollSum = employees.reduce((acc, curr) => acc + (curr.salary || 0), 0);
+  document.getElementById('payrollTotal').textContent = `$${payrollSum.toLocaleString()}`;
+}
+
+/* STUDENT SECTION LOGIC */
+function renderStudents(){
+  const students = read(STUDENT_KEY);
+  const search = (document.getElementById('searchStudent').value || '').toLowerCase();
+  const feeFilter = document.getElementById('filterFeeStatus').value;
+  const tbody = document.getElementById('studentsTable');
+  tbody.innerHTML = '';
+
+  students.filter(s => {
+    const matchesSearch = s.name.toLowerCase().includes(search) || s.classGrade.toLowerCase().includes(search) || s.id.toLowerCase().includes(search);
+    const matchesFee = !feeFilter || s.feeStatus === feeFilter;
+    return matchesSearch && matchesFee;
+  }).forEach(s => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="font-weight:700">${s.name} <div class="small">${s.id}</div></td>
+      <td>${s.classGrade}</td>
+      <td>${s.teacherRecordedAttendance}</td>
+      <td><span class="badge-pill ${s.feeStatus==='Paid'?'badge-green':s.feeStatus==='Owing'?'badge-red':'badge-orange'}">${s.feeStatus} ($${s.feesOwing} due)</span></td>
+      <td>${s.academicGPA}</td>
+      <td><button class="btn ghost" style="padding:4px 8px" onclick="openStudentModal('${s.id}')">View Details</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function openStudentModal(id){
+  const students = read(STUDENT_KEY);
+  const s = students.find(x => x.id === id);
+  if(!s) return;
+
+  document.getElementById('studentModalName').textContent = s.name + ' - Overview';
+  const content = document.getElementById('studentModalContent');
+  content.innerHTML = `
+    <div class="student-detail-grid">
+      <div class="student-card-box">
+        <h4>Academic Progress</h4>
+        <p><strong>GPA:</strong> ${s.academicGPA}</p>
+        <ul>${s.academicRecords.map(r=>`<li>${r.subject}: ${r.grade} (${r.score}%)</li>`).join('')}</ul>
+      </div>
+      <div class="student-card-box">
+        <h4>Tuition Breakdown</h4>
+        <p><strong>Total:</strong> $${s.totalFees}</p>
+        <p><strong>Paid:</strong> $${s.feesPaid}</p>
+        <p><strong>Owing:</strong> $${s.feesOwing}</p>
+      </div>
+    </div>
+  `;
+  document.getElementById('studentModalBackdrop').classList.add('show');
+}
+
+function closeStudentModal(){
+  document.getElementById('studentModalBackdrop').classList.remove('show');
+}
+
+/* LOGOUT HANDLER */
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  localStorage.removeItem('activeHR');
+  window.location.href = 'login.html';
 });
 
-function renderAll() {
-  renderEmployees();
-  renderStudents();
-  renderActivity();
-}
-
-renderAll();
+// Initial Setup Calls
+renderEmployees();
+renderStudents();
+renderDashboard();
 </script>
 </body>
 </html>
