@@ -3,9 +3,9 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
 $host = 'localhost';
-$db   = 'your_database_name'; // Replace with your phpMyAdmin DB name
-$user = 'root';               // Replace with your DB username
-$pass = '';                   // Replace with your DB password
+$db   = 'your_database_name'; // Change to your DB name
+$user = 'root';               // Change to your DB user
+$pass = '';                   // Change to your DB password
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass, [
