@@ -3,11 +3,10 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 
-// Database credentials
 $host = 'localhost';
-$db   = 'your_database_name'; // Replace with your phpMyAdmin DB name
-$user = 'root';               // Replace with your DB username
-$pass = '';                   // Replace with your DB password
+$db   = 'your_database_name'; // Change to your DB name
+$user = 'root';               // Change to your DB user
+$pass = '';                   // Change to your DB password
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass, [
@@ -15,23 +14,20 @@ try {
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
     ]);
 
-    // Read JSON payload from POST request
     $input = json_decode(file_get_contents('php://input'), true);
 
-    $class_id       = $input['class_id'] ?? null;
-    $student_name   = $input['student_name'] ?? null;
+    $class_id        = $input['class_id'] ?? null;
+    $student_name    = $input['student_name'] ?? null;
     $enrollment_code = $input['enrollment_code'] ?? null;
 
-    // Basic validation
     if (!$class_id || !$student_name || !$enrollment_code) {
         echo json_encode([
-            'status' => 'error', 
-            'message' => 'Missing required fields: class_id, student_name, and enrollment_code are required.'
+            'status'  => 'error', 
+            'message' => 'Missing required fields.'
         ]);
         exit;
     }
 
-    // Insert student into database
     $sql = "INSERT INTO students (class_id, student_name, enrollment_code, status) 
             VALUES (:class_id, :student_name, :enrollment_code, 'Active')";
             
@@ -49,7 +45,6 @@ try {
     ]);
 
 } catch (PDOException $e) {
-    // Handle duplicate enrollment codes or SQL errors
     if ($e->getCode() == 23000) {
         echo json_encode(['status' => 'error', 'message' => 'Enrollment code already exists.']);
     } else {
