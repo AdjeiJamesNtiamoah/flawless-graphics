@@ -1,7 +1,7 @@
 <?php
 // Configuration & Database Connection
 $db_host = 'localhost';
-$db_name = 'lucy_db';
+$db_name = 'flawless graphyx';
 $db_user = 'root';
 $db_pass = '';
 
@@ -216,13 +216,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="brand-logo">
                 <i class="fa-solid fa-elephant logo-icon"></i>
                 <div>
-                    <div class="brand-title">LUCY™</div>
+                    <div class="brand-title">FGraphyx</div>
                     <div class="brand-subtitle">Innovation Starts Here</div>
                 </div>
             </div>
 
             <div class="hero-text">
-                <h1>You will be registering your enterprise on <span>LUCY™</span> Core Network</h1>
+                <h1>You will be registering your enterprise on <span>FGraphyx</span> Core Network</h1>
             </div>
 
             <div class="hero-buttons">
@@ -270,7 +270,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-group">
                         <label for="fullName">Admin Full Name</label>
                         <div class="input-wrapper">
-                            <input type="text" name="fullName" id="fullName" placeholder="John Doe" value="<?= htmlspecialchars($_POST['fullName'] ?? '') ?>" required>
+                            <input type="text" name="fullName" id="fullName" placeholder="James Adjei" value="<?= htmlspecialchars($_POST['fullName'] ?? '') ?>" required>
                             <i class="fa-regular fa-user field-icon"></i>
                         </div>
                     </div>
