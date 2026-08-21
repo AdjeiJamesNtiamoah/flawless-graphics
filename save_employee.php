@@ -1,24 +1,28 @@
 <?php
+// save_employee.php
 header('Content-Type: application/json');
-$conn = new mysqli("localhost", "db_user", "db_password", "your_database_name");
+require_once 'db.php';
 
-if ($conn->connect_error) {
-    echo json_encode(["status" => "error", "message" => "Database connection failed"]);
-    exit();
-}
-
+$id = $_POST['id'] ?? null;
 $name = $_POST['name'] ?? '';
 $role = $_POST['role'] ?? '';
 $dept = $_POST['dept'] ?? '';
 $email = $_POST['email'] ?? '';
 $salary = $_POST['salary'] ?? 0;
-$org_id = $_POST['org_id'] ?? 1;
+$photo = $_POST['photo'] ?? '';
 
-$stmt = $conn->prepare("INSERT INTO employees (org_id, name, role, department, email, salary) VALUES (?, ?, ?, ?, ?, ?)");
-$stmt->bind_param("issssd", $org_id, $name, $role, $dept, $email, $salary);
+if ($id) {
+    // Update existing record
+    $stmt = $conn->prepare("UPDATE employees SET name=?, role=?, department=?, email=?, salary=?, photo_url=? WHERE emp_id=?");
+    $stmt->bind_param("ssssdsi", $name, $role, $dept, $email, $salary, $photo, $id);
+} else {
+    // Insert new record
+    $stmt = $conn->prepare("INSERT INTO employees (name, role, department, email, salary, photo_url) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssds", $name, $role, $dept, $email, $salary, $photo);
+}
 
 if ($stmt->execute()) {
-    echo json_encode(["status" => "success", "message" => "Record saved to MySQL"]);
+    echo json_encode(["status" => "success", "message" => "Employee saved successfully"]);
 } else {
     echo json_encode(["status" => "error", "message" => $stmt->error]);
 }
