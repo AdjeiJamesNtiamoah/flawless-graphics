@@ -119,5 +119,58 @@
 
   <script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
   <script src="teacher-dashboard.js"></script>
+
+<form id="addStudentForm" onsubmit="submitStudentForm(event)">
+  <div style="margin-bottom: 12px;">
+    <label>Student Full Name</label>
+    <input type="text" id="studentName" class="select" style="width:100%" placeholder="e.g. John Doe" required />
+  </div>
+
+  <div style="margin-bottom: 12px;">
+    <label>Enrollment Code / ID</label>
+    <input type="text" id="enrollmentCode" class="select" style="width:100%" placeholder="e.g. STU-3001" required />
+  </div>
+
+  <div style="margin-bottom: 12px;">
+    <label>Select Class</label>
+    <select id="classSelect" class="select" style="width:100%" required>
+      <option value="1">Grade 10 - Mathematics</option>
+      <option value="2">Grade 11 - Biology</option>
+    </select>
+  </div>
+
+  <button type="submit" class="btn">Add Student to Class</button>
+</form>
+  <script>
+  async function submitStudentForm(event) {
+  event.preventDefault();
+
+  const payload = {
+    student_name: document.getElementById('studentName').value,
+    enrollment_code: document.getElementById('enrollmentCode').value,
+    class_id: document.getElementById('classSelect').value
+  };
+
+  try {
+    const response = await fetch('add_student.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+
+    if (result.status === 'success') {
+      alert('Student registered! HR can now view this student instantly.');
+      document.getElementById('addStudentForm').reset();
+    } else {
+      alert('Error: ' + result.message);
+    }
+  } catch (error) {
+    console.error('Submission failed:', error);
+    alert('Failed to connect to backend server.');
+  }
+}
+  </script>
 </body>
 </html>
