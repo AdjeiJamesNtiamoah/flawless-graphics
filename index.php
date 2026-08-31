@@ -5,7 +5,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 $db_host = 'localhost';
-$db_name = 'flawless_graphyx'; // Recommended: use underscore instead of space
+$db_name = 'flawless graphyx'; // Recommended: use underscore instead of space
 $db_user = 'root';
 $db_pass = '';
 
