@@ -1,9 +1,9 @@
 <?php
-// Configuration & Database Connection
+// Database Connection Setup
 $db_host = 'localhost';
-$db_name = 'flawless graphyx';
-$db_user = 'root';
-$db_pass = '';
+$db_name = 'flawless graphyx'; // Your database name
+$db_user = 'root';              // Change if your MySQL user is different
+$db_pass = '';                  // Change if your MySQL password is set
 
 $message = '';
 $isError = false;
@@ -27,14 +27,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
             ]);
 
-            // Check duplicate email
+            // Check if email already exists
             $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
             $stmt->execute([$email]);
+            
             if ($stmt->fetch()) {
                 $message = "Email address is already registered.";
                 $isError = true;
             } else {
-                // File Upload Processing
+                // File Upload Handling
                 if (isset($_FILES['orgLogo']) && $_FILES['orgLogo']['error'] === UPLOAD_ERR_OK) {
                     $fileTmpPath = $_FILES['orgLogo']['tmp_name'];
                     $fileName    = $_FILES['orgLogo']['name'];
@@ -47,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $message = "Logo image size must be under 2MB.";
                         $isError = true;
                     } elseif (!in_array($ext, $allowedExts)) {
-                        $message = "Invalid image file type.";
+                        $message = "Invalid image file type. Allowed: PNG, JPG, WEBP, SVG.";
                         $isError = true;
                     } else {
                         $uploadDir = 'uploads/';
@@ -216,13 +217,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="brand-logo">
                 <i class="fa-solid fa-elephant logo-icon"></i>
                 <div>
-                    <div class="brand-title">FGraphyx</div>
+                    <div class="brand-title">LUCY™</div>
                     <div class="brand-subtitle">Innovation Starts Here</div>
                 </div>
             </div>
 
             <div class="hero-text">
-                <h1>You will be registering your enterprise on <span>FGraphyx</span> Core Network</h1>
+                <h1>You will be registering your enterprise on <span>LUCY™</span> Core Network</h1>
             </div>
 
             <div class="hero-buttons">
@@ -241,7 +242,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 <?php endif; ?>
 
-                <form id="registerForm" method="POST" action="register.php" enctype="multipart/form-data">
+                <form method="POST" action="register.php" enctype="multipart/form-data">
                     <div class="form-group">
                         <label>Organization Logo (Optional)</label>
                         <div class="logo-upload-container">
@@ -270,7 +271,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-group">
                         <label for="fullName">Admin Full Name</label>
                         <div class="input-wrapper">
-                            <input type="text" name="fullName" id="fullName" placeholder="James Adjei" value="<?= htmlspecialchars($_POST['fullName'] ?? '') ?>" required>
+                            <input type="text" name="fullName" id="fullName" placeholder="John Doe" value="<?= htmlspecialchars($_POST['fullName'] ?? '') ?>" required>
                             <i class="fa-regular fa-user field-icon"></i>
                         </div>
                     </div>
