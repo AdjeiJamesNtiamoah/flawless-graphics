@@ -1,13 +1,44 @@
 <?php
-// MySQL Database Connection Config
+// Enable error reporting to diagnose blank screens
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 $db_host = 'localhost';
-$db_name = 'flawless graphyx'; // Your exact MySQL database name
-$db_user = 'root';              // Default MySQL username
-$db_pass = '';                  // Default MySQL password (blank for local)
+$db_name = 'flawless_graphyx'; // Recommended: use underscore instead of space
+$db_user = 'root';
+$db_pass = '';
 
 $message = '';
 $isError = false;
 
+// 1. Automatically connect and build DB/Table if missing
+try {
+    $pdo = new PDO("mysql:host=$db_host;charset=utf8mb4", $db_user, $db_pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+    ]);
+    
+    // Create database if it does not exist
+    $pdo->exec("CREATE DATABASE IF NOT EXISTS `$db_name` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+    $pdo->exec("USE `$db_name`");
+    
+    // Create users table if missing
+    $pdo->exec("CREATE TABLE IF NOT EXISTS `users` (
+        `id` INT AUTO_INCREMENT PRIMARY KEY,
+        `org_name` VARCHAR(255) NOT NULL,
+        `full_name` VARCHAR(255) NOT NULL,
+        `email` VARCHAR(255) NOT NULL UNIQUE,
+        `password` VARCHAR(255) NOT NULL,
+        `logo_path` VARCHAR(255) NULL,
+        `role` VARCHAR(50) DEFAULT 'admin',
+        `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+} catch (PDOException $e) {
+    die("Database Initialization Failed: " . $e->getMessage());
+}
+
+// 2. Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $orgName  = trim($_POST['orgName'] ?? '');
     $fullName = trim($_POST['fullName'] ?? '');
@@ -23,11 +54,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $isError = true;
     } else {
         try {
-            $pdo = new PDO("mysql:host=$db_host;dbname=$db_name;charset=utf8mb4", $db_user, $db_pass, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-            ]);
-
-            // Check if email is already registered
             $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
             $stmt->execute([$email]);
 
@@ -35,7 +61,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $message = "Email address is already registered.";
                 $isError = true;
             } else {
-                // File Upload Processing
                 if (isset($_FILES['orgLogo']) && $_FILES['orgLogo']['error'] === UPLOAD_ERR_OK) {
                     $fileTmpPath = $_FILES['orgLogo']['tmp_name'];
                     $fileName    = $_FILES['orgLogo']['name'];
@@ -62,7 +87,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 if (!$isError) {
-                    // Hash Password & Insert Data into Database
                     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
                     $insertStmt = $pdo->prepare("INSERT INTO users (org_name, full_name, email, password, logo_path, role, created_at) VALUES (?, ?, ?, ?, ?, 'admin', NOW())");
@@ -75,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         } catch (PDOException $e) {
-            $message = "Database Error: " . $e->getMessage();
+            $message = "Registration Error: " . $e->getMessage();
             $isError = true;
         }
     }
@@ -242,7 +266,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 <?php endif; ?>
 
-                <form method="POST" action="register.php" enctype="multipart/form-data">
+                <form method="POST" action="index.php" enctype="multipart/form-data">
                     <div class="form-group">
                         <label>Organization Logo (Optional)</label>
                         <div class="logo-upload-container">
