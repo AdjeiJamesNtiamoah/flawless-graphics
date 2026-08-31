@@ -1,9 +1,9 @@
 <?php
-// Database Connection Setup
+// MySQL Database Connection Config
 $db_host = 'localhost';
-$db_name = 'flawless graphyx'; // Your database name
-$db_user = 'root';              // Change if your MySQL user is different
-$db_pass = '';                  // Change if your MySQL password is set
+$db_name = 'flawless graphyx'; // Your exact MySQL database name
+$db_user = 'root';              // Default MySQL username
+$db_pass = '';                  // Default MySQL password (blank for local)
 
 $message = '';
 $isError = false;
@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $logoPath = null;
 
     if (empty($orgName) || empty($fullName) || empty($email) || empty($password)) {
-        $message = "Please fill in all required fields.";
+        $message = "Please complete all required fields.";
         $isError = true;
     } elseif (strlen($password) < 8) {
         $message = "Password must be at least 8 characters.";
@@ -27,15 +27,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
             ]);
 
-            // Check if email already exists
+            // Check if email is already registered
             $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
             $stmt->execute([$email]);
-            
+
             if ($stmt->fetch()) {
                 $message = "Email address is already registered.";
                 $isError = true;
             } else {
-                // File Upload Handling
+                // File Upload Processing
                 if (isset($_FILES['orgLogo']) && $_FILES['orgLogo']['error'] === UPLOAD_ERR_OK) {
                     $fileTmpPath = $_FILES['orgLogo']['tmp_name'];
                     $fileName    = $_FILES['orgLogo']['name'];
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $message = "Logo image size must be under 2MB.";
                         $isError = true;
                     } elseif (!in_array($ext, $allowedExts)) {
-                        $message = "Invalid image file type. Allowed: PNG, JPG, WEBP, SVG.";
+                        $message = "Invalid image type. Allowed: JPG, PNG, WEBP, SVG.";
                         $isError = true;
                     } else {
                         $uploadDir = 'uploads/';
@@ -62,9 +62,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 if (!$isError) {
-                    // Hash Password & Save User/Org
+                    // Hash Password & Insert Data into Database
                     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-                    
+
                     $insertStmt = $pdo->prepare("INSERT INTO users (org_name, full_name, email, password, logo_path, role, created_at) VALUES (?, ?, ?, ?, ?, 'admin', NOW())");
                     $insertStmt->execute([$orgName, $fullName, $email, $hashedPassword, $logoPath]);
 
@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         } catch (PDOException $e) {
-            $message = "Database error: " . $e->getMessage();
+            $message = "Database Error: " . $e->getMessage();
             $isError = true;
         }
     }
