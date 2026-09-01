@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HR Dashboard | FLAWLESS GRAPHICS</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">
+        <img src="../../assets/images/logo.gif" alt="FLAWLESS GRAPHICS Logo" class="logo-img">
+        <div>
+          <h1>FLAWLESS GRAPHICS</h1>
+          <p class="tagline">TRUTH AND SERVICE</p>
+        </div>
+      </div>
+      <ul class="nav-links">
+        <li><a href="../../welcome.html">Hub</a></li>
+        <li><a href="../public/home.html">Home</a></li>
+        <li><a href="employee.html">Employee Portal</a></li>
+        <li><a href="hr-dashboard.html" class="active">HR Enterprise Portal</a></li>
+        <li><a href="../public/services.html">Services</a></li>
+        <li><a href="../public/contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="content" style="max-width: 1000px; margin: 40px auto; padding: 20px;">
+    <h1>HR Overview & Quick Access</h1>
+    <p>Welcome to the HR Dashboard. Access detailed employee records, view reports, and oversee attendance and payroll operations.</p>
+
+    <div class="dashboard-grid" style="margin-top: 24px;">
+      <div class="card" onclick="location.href='employee-reports.html'" style="cursor: pointer;">
+        <h3><i class="fa-solid fa-file-lines"></i> Employee Reports</h3>
+        <p class="small" style="margin-top: 8px;">View department headcounts and personnel records.</p>
+      </div>
+      <div class="card" onclick="location.href='attendance-summary.html'" style="cursor: pointer;">
+        <h3><i class="fa-solid fa-clipboard-user"></i> Attendance Summary</h3>
+        <p class="small" style="margin-top: 8px;">Monitor check-ins and time tracking.</p>
+      </div>
+      <div class="card" onclick="location.href='payroll.html'" style="cursor: pointer;">
+        <h3><i class="fa-solid fa-wallet"></i> Payroll Analytics</h3>
+        <p class="small" style="margin-top: 8px;">Salary disbursements and tax breakdowns.</p>
+      </div>
+      <div class="card" onclick="location.href='performance.html'" style="cursor: pointer;">
+        <h3><i class="fa-solid fa-chart-line"></i> Performance Overview</h3>
+        <p class="small" style="margin-top: 8px;">Appraisals, reviews, and KPI scores.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2026 FLAWLESS GRAPHICS. All rights reserved.</p>
+  </footer>
+</body>
+</html>

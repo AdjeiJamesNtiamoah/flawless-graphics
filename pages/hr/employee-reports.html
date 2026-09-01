@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Reports | FLAWLESS GRAPHICS</title>
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="../../assets/images/logo.gif" alt="FLAWLESS GRAPHICS Logo" class="logo-img">
+      <h1>FLAWLESS GRAPHICS</h1>
+    </div>
+    <nav>
+      <a href="../../welcome.html">Hub</a>
+      <a href="../public/home.html">Home</a>
+      <a href="employee.html">Employee Portal</a>
+      <a href="hr-dashboard.html">HR Dashboard</a>
+    </nav>
+  </header>
+
+  <main class="dashboard-layout">
+    <aside class="sidebar">
+      <h2>HR Navigation</h2>
+      <ul>
+        <li><a href="hr-dashboard.html">Main Dashboard</a></li>
+        <li><a href="employee-reports.html" class="active">Employee Reports</a></li>
+        <li><a href="attendance-summary.html">Attendance Summary</a></li>
+        <li><a href="payroll.html">Payroll Analytics</a></li>
+        <li><a href="payslip.html">Payslips</a></li>
+        <li><a href="performance.html">Performance Overview</a></li>
+      </ul>
+    </aside>
+
+    <section class="dashboard-main">
+      <h2>Employee Reports</h2>
+      <p>View and manage detailed employee records and department summaries here.</p>
+      <div class="card" style="margin-top: 20px; padding: 20px;">
+        <table id="empSummaryTable" style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 2px solid #ddd; text-align: left;">
+              <th style="padding: 10px;">Department</th>
+              <th style="padding: 10px;">Staff Count</th>
+              <th style="padding: 10px;">Status</th>
+            </tr>
+          </thead>
+          <tbody id="reportTableBody">
+            <tr>
+              <td style="padding: 10px;">Executive & Operations</td>
+              <td style="padding: 10px;">4</td>
+              <td style="padding: 10px;"><span style="color: #10b981; font-weight: 600;">Active</span></td>
+            </tr>
+            <tr>
+              <td style="padding: 10px;">Graphic Design & Media</td>
+              <td style="padding: 10px;">8</td>
+              <td style="padding: 10px;"><span style="color: #10b981; font-weight: 600;">Active</span></td>
+            </tr>
+            <tr>
+              <td style="padding: 10px;">Teaching & Academic Staff</td>
+              <td style="padding: 10px;">12</td>
+              <td style="padding: 10px;"><span style="color: #10b981; font-weight: 600;">Active</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 FLAWLESS GRAPHICS. All rights reserved.</p>
+  </footer>
+</body>
+</html>

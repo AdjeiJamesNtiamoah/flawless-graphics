@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Messages & Leave — Flawless Graphics</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  body{font-family:Poppins,Arial;background:#f7fafc;padding:18px;margin:0}
+  .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .card{background:#fff;padding:16px;border-radius:10px;margin-bottom:12px;box-shadow:0 6px 20px rgba(0,0,0,0.06)}
+  button{padding:8px 14px;border-radius:8px;border:0;background:#0b63a3;color:#fff;cursor:pointer}
+  button.btn-secondary{background:#475569}
+  input, textarea{box-sizing:border-box;border:1px solid #ddd;border-radius:6px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h2>Messages & Leave Requests</h2>
+  <div>
+    <button class="btn-secondary" onclick="location.href='teacher-dashboard.html'"><i class="fa-solid fa-arrow-left"></i> Dashboard</button>
+    <button class="btn-secondary" onclick="location.href='../../welcome.html'"><i class="fa-solid fa-house"></i> Hub</button>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Send Message to HR</h3>
+  <input id="msgSubject" placeholder="Subject" style="width:100%;padding:8px;margin-bottom:8px">
+  <textarea id="msgBody" placeholder="Message body" style="width:100%;height:100px;padding:8px"></textarea>
+  <div style="margin-top:8px"><button id="sendMsg">Send Message</button></div>
+</div>
+
+<div class="card">
+  <h3>Request Leave</h3>
+  <div style="display:flex;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+    <div>
+      <label style="font-size:12px;display:block">From Date:</label>
+      <input id="fromDate" type="date" style="padding:6px">
+    </div>
+    <div>
+      <label style="font-size:12px;display:block">To Date:</label>
+      <input id="toDate" type="date" style="padding:6px">
+    </div>
+  </div>
+  <input id="leaveReason" placeholder="Reason for leave" style="width:100%;height:80px;padding:8px;margin-top:8px">
+  <div style="margin-top:8px"><button id="reqLeave">Request Leave</button></div>
+</div>
+
+<div class="card">
+  <h3>Your Messages</h3>
+  <div id="msgList"></div>
+</div>
+
+<div class="card">
+  <h3>Your Leave Requests</h3>
+  <div id="leaveList"></div>
+</div>
+
+<script src="../../assets/js/teacher-extended.js"></script>
+<script>
+  const teacher = JSON.parse(localStorage.getItem('teacher_active_user')||'{}');
+  if(!teacher || !teacher.email) location.href='teacher-login.html';
+
+  function renderMessages(){
+    const arr = getMessages().filter(m => m.fromEmail === teacher.email || m.toEmail === teacher.email).slice().reverse();
+    const out = document.getElementById('msgList');
+    out.innerHTML = arr.length ? arr.map(m=>`<div style="padding:8px;border-bottom:1px solid #eee"><strong>${m.subject}</strong><div class="small">${m.body}</div><div class="small" style="font-size:11px;color:#888">${new Date(m.createdAt).toLocaleString()}</div></div>`).join('') : '<div class="small">No messages</div>';
+  }
+  function renderLeaves(){
+    const arr = getLeaves().filter(l=> l.teacherEmail === teacher.email).slice().reverse();
+    const out = document.getElementById('leaveList');
+    out.innerHTML = arr.length ? arr.map(l=>`<div style="padding:8px;border-bottom:1px solid #eee"><strong>${l.fromDate} → ${l.toDate}</strong><div class="small">${l.reason}</div><div class="small" style="font-size:11px;color:#888">Status: <span style="font-weight:600;color:#2563eb">${l.status}</span></div></div>`).join('') : '<div class="small">No leave requests</div>';
+  }
+
+  document.getElementById('sendMsg').addEventListener('click', ()=>{
+    const subj = document.getElementById('msgSubject').value.trim();
+    const body = document.getElementById('msgBody').value.trim();
+    if(!subj || !body) return alert('Please fill in both subject and body.');
+    const hrEmail = localStorage.getItem('org_hr_email')||'hr@flawlessgraphics.com';
+    sendMessage({ fromEmail: teacher.email, toEmail: hrEmail, subject: subj, body });
+    alert('Message sent successfully!');
+    document.getElementById('msgSubject').value = '';
+    document.getElementById('msgBody').value = '';
+    renderMessages();
+  });
+
+  document.getElementById('reqLeave').addEventListener('click', ()=>{
+    const fromDate = document.getElementById('fromDate').value;
+    const toDate = document.getElementById('toDate').value;
+    const reason = document.getElementById('leaveReason').value.trim();
+    if(!fromDate || !toDate || !reason) return alert('Please fill in all leave fields.');
+    requestLeave({ teacherEmail: teacher.email, fromDate, toDate, reason });
+    alert('Leave request submitted!');
+    document.getElementById('leaveReason').value = '';
+    renderLeaves();
+  });
+
+  renderMessages(); 
+  renderLeaves();
+</script>
+</body>
+</html>
