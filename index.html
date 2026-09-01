@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Register Organization</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: #9292db;
+        background-image: 
+            radial-gradient(at 0% 0%, #a5a6f6 0px, transparent 50%),
+            radial-gradient(at 100% 100%, #311868 0px, transparent 50%),
+            radial-gradient(at 50% 50%, #4c2882 0px, transparent 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        color: #ffffff;
+    }
+
+    /* Window Frame UI Container */
+    .app-window {
+        width: 100%;
+        max-width: 1100px;
+        background: #3c1e78;
+        border-radius: 20px;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Mock Mac Top Bar */
+    .window-header {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 12px 20px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+    .dot-1 { background: #9c8ce8; }
+    .dot-2 { background: #72efdd; }
+    .dot-3 { background: #92b0ff; }
+
+    /* Main Split Body Layout */
+    .main-container {
+        display: flex;
+        flex-direction: row;
+        min-height: 620px;
+        position: relative;
+    }
+
+    /* Left Hero Banner Section */
+    .hero-section {
+        flex: 1;
+        padding: 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Abstract 3D Ribbon Shapes Visual Component */
+    .ribbon-container {
+        position: absolute;
+        top: -40px;
+        left: -40px;
+        width: 320px;
+        height: 320px;
+        pointer-events: none;
+    }
+
+    .ribbon {
+        position: absolute;
+        border-radius: 50%;
+        border: 28px solid transparent;
+    }
+
+    .ribbon-1 {
+        width: 240px;
+        height: 240px;
+        border-top-color: #5ce1e6;
+        border-right-color: #5ce1e6;
+        transform: rotate(-25deg);
+        filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+    }
+
+    .ribbon-2 {
+        width: 200px;
+        height: 200px;
+        top: 30px;
+        left: 20px;
+        border-bottom-color: #8c52ff;
+        border-left-color: #8c52ff;
+        transform: rotate(15deg);
+        filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+    }
+
+    .brand-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 2;
+        margin-top: 140px;
+    }
+
+    .logo-icon {
+        font-size: 32px;
+        color: #ffffff;
+    }
+
+    .brand-title {
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .brand-subtitle {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.6);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .hero-text {
+        z-index: 2;
+        margin-top: 30px;
+        max-width: 360px;
+    }
+
+    .hero-text h1 {
+        font-size: 22px;
+        font-weight: 500;
+        line-height: 1.4;
+        color: #ffffff;
+    }
+
+    .hero-text span {
+        font-weight: 700;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        margin-top: 30px;
+        z-index: 2;
+    }
+
+    .btn-outline {
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-outline:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .link-subtle {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 12px;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .link-subtle:hover {
+        color: #ffffff;
+        text-decoration: underline;
+    }
+
+    /* Right Form Card Section */
+    .form-section {
+        flex: 1;
+        padding: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 420px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 32px;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .card h2 {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 24px;
+        color: #ffffff;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    label {
+        display: block;
+        font-size: 12px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 6px;
+    }
+
+    /* Logo Upload Styles */
+    .logo-upload-container {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px dashed rgba(255, 255, 255, 0.25);
+        border-radius: 10px;
+        padding: 12px 14px;
+        transition: all 0.2s ease;
+    }
+
+    .logo-upload-container:hover {
+        border-color: #a2e8dd;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .logo-preview-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .logo-preview-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .logo-preview-box i {
+        font-size: 18px;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .logo-upload-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+    }
+
+    .btn-upload-trigger {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        width: fit-content;
+        transition: all 0.2s ease;
+    }
+
+    .btn-upload-trigger:hover {
+        background: rgba(255, 255, 255, 0.25);
+    }
+
+    .logo-hint {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .btn-remove-logo {
+        color: #ff9999;
+        font-size: 11px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        display: none;
+    }
+
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+        width: 100%;
+        padding: 12px 40px 12px 14px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        color: #ffffff;
+        font-size: 13px;
+        font-family: inherit;
+        outline: none;
+        transition: all 0.2s ease;
+    }
+
+    input::placeholder {
+        color: rgba(255, 255, 255, 0.35);
+    }
+
+    input:focus {
+        border-color: #a2e8dd;
+        background: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 0 0 3px rgba(162, 232, 221, 0.2);
+    }
+
+    .field-icon {
+        position: absolute;
+        right: 14px;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 12px;
+        background: #a2e8dd;
+        border: none;
+        border-radius: 8px;
+        color: #1a0836;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: all 0.2s ease;
+    }
+
+    .btn-submit:hover {
+        background: #8ce2d5;
+        transform: translateY(-1px);
+    }
+
+    .btn-submit:disabled {
+        background: rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.4);
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .footer-text {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .footer-text a {
+        color: #ffffff;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .footer-text a:hover {
+        text-decoration: underline;
+    }
+
+    /* Notification Styling */
+    .msg {
+        padding: 10px 14px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        display: none;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .msg.error {
+        background: rgba(235, 87, 87, 0.2);
+        border: 1px solid #eb5757;
+        color: #ff9999;
+        display: block;
+    }
+
+    .msg.success {
+        background: rgba(39, 174, 96, 0.2);
+        border: 1px solid #27ae60;
+        color: #7bed9f;
+        display: block;
+    }
+
+    /* Responsive Design Adjustments */
+    @media (max-width: 850px) {
+        .main-container {
+            flex-direction: column;
+        }
+        .hero-section {
+            padding: 30px;
+        }
+        .ribbon-container {
+            transform: scale(0.7);
+            top: -60px;
+            left: -60px;
+        }
+        .brand-logo {
+            margin-top: 60px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="app-window">
+    <!-- Window Controls Header -->
+    <div class="window-header">
+        <div class="dot dot-1"></div>
+        <div class="dot dot-2"></div>
+        <div class="dot dot-3"></div>
+    </div>
+
+    <div class="main-container">
+        <!-- Left Banner -->
+        <div class="hero-section">
+            <div class="ribbon-container">
+                <div class="ribbon ribbon-1"></div>
+                <div class="ribbon ribbon-2"></div>
+            </div>
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-elephant logo-icon"></i>
+                <div>
+                    <div class="brand-title">LUCY™</div>
+                    <div class="brand-subtitle">Innovation Starts Here</div>
+                </div>
+            </div>
+
+            <div class="hero-text">
+                <h1>You will be registering your enterprise on <span>LUCY™</span> Core Network</h1>
+            </div>
+
+            <div class="hero-buttons">
+                <button class="btn-outline" type="button">What to Expect?</button>
+                <a href="#" class="link-subtle">Other Future Applications</a>
+            </div>
+        </div>
+
+        <!-- Right Form Box -->
+        <div class="form-section">
+            <div class="card">
+                <h2>Register Organization</h2>
+
+                <div id="msg" class="msg"></div>
+
+                <form id="registerForm" onsubmit="register(event)">
+                    
+                    <!-- Organization Logo Upload Field -->
+                    <div class="form-group">
+                        <label>Organization Logo (Optional)</label>
+                        <div class="logo-upload-container">
+                            <div class="logo-preview-box" id="logoPreviewBox">
+                                <i class="fa-regular fa-image" id="logoPlaceholderIcon"></i>
+                            </div>
+                            <div class="logo-upload-actions">
+                                <input type="file" id="orgLogo" accept="image/png, image/jpeg, image/svg+xml, image/webp" style="display: none;" onchange="handleLogoChange(event)">
+                                <button type="button" class="btn-upload-trigger" onclick="document.getElementById('orgLogo').click()">
+                                    <i class="fa-solid fa-upload"></i> Upload Logo
+                                </button>
+                                <span class="logo-hint" id="logoHint">PNG, JPG or SVG (Max 2MB)</span>
+                                <button type="button" class="btn-remove-logo" id="removeLogoBtn" onclick="removeLogo()">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="orgName">Organization Name</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="orgName" placeholder="Flawless Graphics Ltd" required>
+                            <i class="fa-regular fa-building field-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fullName">Admin Full Name</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="fullName" placeholder="John Doe" required>
+                            <i class="fa-regular fa-user field-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email (Login Username)</label>
+                        <div class="input-wrapper">
+                            <input type="email" id="email" placeholder="admin@company.com" required>
+                            <i class="fa-regular fa-envelope field-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="password" placeholder="Minimum 8 characters" required minlength="8">
+                            <i class="fa-regular fa-eye-slash field-icon" id="togglePassword" onclick="togglePasswordVisibility()"></i>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn-submit">Register</button>
+                </form>
+
+                <div class="footer-text">
+                    Already registered? <a href="site-login.html">Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const USERS_KEY = "organizations_users";
+let currentLogoBase64 = null;
+
+function readUsers() {
+    try {
+        return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+    } catch (e) {
+        return [];
+    }
+}
+
+async function sha256(text) {
+    const buf = new TextEncoder().encode(text);
+    const hash = await crypto.subtle.digest("SHA-256", buf);
+    return [...new Uint8Array(hash)].map(x => x.toString(16).padStart(2, "0")).join("");
+}
+
+function showMessage(text, isError = true) {
+    const msgEl = document.getElementById("msg");
+    msgEl.textContent = text;
+    msgEl.className = "msg " + (isError ? "error" : "success");
+}
+
+function togglePasswordVisibility() {
+    const passwordInput = document.getElementById("password");
+    const toggleIcon = document.getElementById("togglePassword");
+    
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        toggleIcon.classList.remove("fa-eye-slash");
+        toggleIcon.classList.add("fa-eye");
+    } else {
+        passwordInput.type = "password";
+        toggleIcon.classList.remove("fa-eye");
+        toggleIcon.classList.add("fa-eye-slash");
+    }
+}
+
+function handleLogoChange(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+        showMessage("Logo image size must be under 2MB.");
+        event.target.value = "";
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        currentLogoBase64 = e.target.result;
+        
+        const previewBox = document.getElementById("logoPreviewBox");
+        previewBox.innerHTML = `<img src="${currentLogoBase64}" alt="Logo Preview">`;
+        
+        document.getElementById("removeLogoBtn").style.display = "inline-block";
+        document.getElementById("logoHint").style.display = "none";
+    };
+    reader.readAsDataURL(file);
+}
+
+function removeLogo() {
+    currentLogoBase64 = null;
+    document.getElementById("orgLogo").value = "";
+    document.getElementById("logoPreviewBox").innerHTML = `<i class="fa-regular fa-image" id="logoPlaceholderIcon"></i>`;
+    document.getElementById("removeLogoBtn").style.display = "none";
+    document.getElementById("logoHint").style.display = "inline";
+}
+
+async function register(event) {
+    event.preventDefault();
+
+    const submitBtn = document.getElementById("submitBtn");
+    const org = document.getElementById("orgName").value.trim();
+    const name = document.getElementById("fullName").value.trim();
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    const pw = document.getElementById("password").value;
+    const role = "admin";
+
+    if (!org || !name || !email || !pw) {
+        return showMessage("Please complete all fields.");
+    }
+
+    if (pw.length < 8) {
+        return showMessage("Password must be at least 8 characters.");
+    }
+
+    submitBtn.disabled = true;
+
+    try {
+        let users = readUsers();
+
+        if (users.some(u => u.email === email)) {
+            submitBtn.disabled = false;
+            return showMessage("Email address is already registered.");
+        }
+
+        const hashed = await sha256(pw);
+
+        users.push({
+            org: org,
+            logo: currentLogoBase64,
+            name: name,
+            email: email,
+            pass: hashed,
+            role: role,
+            createdAt: Date.now()
+        });
+
+        localStorage.setItem(USERS_KEY, JSON.stringify(users));
+
+        showMessage("Registration successful! Redirecting to login...", false);
+
+        setTimeout(() => {
+            window.location.href = "site-login.html";
+        }, 1500);
+
+    } catch (err) {
+        console.error(err);
+        showMessage("An error occurred during registration.", true);
+        submitBtn.disabled = false;
+    }
+}
+</script>
+</body>
+</html>
