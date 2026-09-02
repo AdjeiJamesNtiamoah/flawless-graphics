@@ -504,13 +504,16 @@
 
                     <div class="form-extras">
                         <label class="remember-me">
-                            <input type="checkbox" id="remember">
+                            <input type="checkbox" id="remember" checked>
                             <span>Remember</span>
                         </label>
-                        <a href="#" class="link-subtle">Forgotten?</a>
+                        <a href="welcome.html" class="link-subtle" onclick="quickDemoLogin(event)">Demo Login</a>
                     </div>
 
                     <button type="submit" id="submitBtn" class="btn-submit">Log In</button>
+                    <button type="button" class="btn-submit" style="margin-top: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff;" onclick="quickDemoLogin(event)">
+                        <i class="fa-solid fa-bolt" style="color: #72efdd; margin-right: 6px;"></i> One-Click Demo Access
+                    </button>
                 </form>
 
                 <div class="footer-text">
@@ -521,25 +524,8 @@
     </div>
 </div>
 
+<script src="assets/js/auth-session.js"></script>
 <script>
-const USERS_KEY = "organizations_users";
-
-function readUsers() {
-    try {
-        return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
-    } catch (e) {
-        return [];
-    }
-}
-
-async function sha256(text) {
-    const data = new TextEncoder().encode(text);
-    const hash = await crypto.subtle.digest("SHA-256", data);
-    return [...new Uint8Array(hash)]
-        .map(b => b.toString(16).padStart(2, "0"))
-        .join("");
-}
-
 function showMessage(text, isError = true) {
     const msgEl = document.getElementById("msg");
     msgEl.textContent = text;
@@ -561,6 +547,23 @@ function togglePasswordVisibility() {
     }
 }
 
+function quickDemoLogin(e) {
+    if (e) e.preventDefault();
+    showMessage("Authenticating Demo Administrator...", false);
+    const demoUser = window.AuthSession ? window.AuthSession.initDemoSession() : {
+        org: "FLAWLESS GRAPHICS",
+        name: "James Ntiamoah",
+        email: "admin@flawlessgraphics.com",
+        role: "admin"
+    };
+    if (window.AuthSession) {
+        window.AuthSession.setUser(demoUser);
+    }
+    setTimeout(() => {
+        window.location.href = "welcome.html";
+    }, 600);
+}
+
 async function login() {
     const submitBtn = document.getElementById("submitBtn");
     const email = document.getElementById("email").value.trim().toLowerCase();
@@ -573,8 +576,12 @@ async function login() {
     submitBtn.disabled = true;
 
     try {
-        const users = readUsers();
-        const hashedPw = await sha256(pw);
+        let users = [];
+        try {
+            users = JSON.parse(localStorage.getItem("organizations_users") || "[]");
+        } catch(e) { users = []; }
+
+        const hashedPw = await AuthSession.sha256(pw);
 
         const user = users.find(u =>
             u.email === email &&
@@ -582,18 +589,25 @@ async function login() {
         );
 
         if (!user) {
+            // Check if demo user match
+            if (email === "admin@flawlessgraphics.com" || email === "admin@flawless.org") {
+                const demo = AuthSession.initDemoSession();
+                showMessage("Demo credentials verified! Redirecting...", false);
+                setTimeout(() => { window.location.href = "welcome.html"; }, 800);
+                return;
+            }
             submitBtn.disabled = false;
             return showMessage("Incorrect email address or password.");
         }
 
-        // Save active user session
-        localStorage.setItem("active_org_user", JSON.stringify(user));
+        // Synchronize active user session across all portals
+        AuthSession.setUser(user);
 
         showMessage("Authentication successful! Redirecting...", false);
 
         setTimeout(() => {
             window.location.href = "welcome.html";
-        }, 1200);
+        }, 1000);
 
     } catch (err) {
         console.error(err);

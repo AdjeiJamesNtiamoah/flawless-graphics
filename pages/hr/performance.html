@@ -1,60 +1,441 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Performance Overview | FLAWLESS GRAPHICS</title>
-  <link rel="stylesheet" href="../../assets/css/style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Staff Performance & Appraisals — FLAWLESS GRAPHICS HR</title>
+
+  <!-- Google Fonts & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Shared Modern Design System -->
+  <link rel="stylesheet" href="../../assets/css/shared-design.css">
+
+  <style>
+    .avatar-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .emp-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      object-fit: cover;
+      background: var(--accent-glow);
+      border: 1px solid var(--border-card);
+      flex-shrink: 0;
+    }
+    .stars {
+      color: #f59e0b;
+      font-size: 13px;
+      letter-spacing: 2px;
+    }
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background: rgba(0,0,0,0.06);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .dark .progress-track { background: rgba(255,255,255,0.08); }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent-gradient);
+      border-radius: var(--radius-full);
+    }
+
+    /* Appraisal Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-xl);
+      max-width: 520px;
+      width: 100%;
+      padding: 28px;
+      box-shadow: var(--shadow-lg);
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <div class="logo">
-      <img src="../../assets/images/logo.gif" alt="FLAWLESS GRAPHICS Logo" class="logo-img">
-      <h1>FLAWLESS GRAPHICS</h1>
+
+  <!-- Ambient Glows -->
+  <div class="ambient-glow ambient-top-left"></div>
+  <div class="ambient-glow ambient-bottom-right"></div>
+
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <a href="../public/home.html" class="brand-wrapper">
+      <div class="brand-badge">FG</div>
+      <div class="brand-info">
+        <h1 id="headerOrgTitle">FLAWLESS GRAPHICS</h1>
+        <div class="brand-tagline">Personnel Performance & KPI Appraisals</div>
+      </div>
+    </a>
+
+    <ul class="nav-menu">
+      <li><a href="../../welcome.html" class="nav-link"><i class="fa-solid fa-grid-horizontal"></i> Hub</a></li>
+      <li><a href="hr-dashboard.html" class="nav-link"><i class="fa-solid fa-gauge"></i> HR Dashboard</a></li>
+      <li><a href="employee.html" class="nav-link"><i class="fa-solid fa-users"></i> Employees</a></li>
+      <li><a href="attendance-summary.html" class="nav-link"><i class="fa-solid fa-clipboard-user"></i> Attendance</a></li>
+      <li><a href="payroll.html" class="nav-link"><i class="fa-solid fa-money-bill-wave"></i> Payroll</a></li>
+      <li><a href="performance.html" class="nav-link active"><i class="fa-solid fa-chart-line"></i> Performance</a></li>
+    </ul>
+
+    <div class="header-actions">
+      <button class="theme-pill-btn" id="themeBtn">
+        <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
+      </button>
+      <a href="hr-dashboard.html" class="hub-pill-btn">
+        <i class="fa-solid fa-arrow-left"></i> HR Main
+      </a>
     </div>
-    <nav>
-      <a href="../../welcome.html">Hub</a>
-      <a href="../public/home.html">Home</a>
-      <a href="employee.html">Employee Portal</a>
-      <a href="hr-dashboard.html">HR Dashboard</a>
-    </nav>
   </header>
 
-  <main class="dashboard-layout">
-    <aside class="sidebar">
-      <h2>HR Navigation</h2>
-      <ul>
-        <li><a href="hr-dashboard.html">Main Dashboard</a></li>
-        <li><a href="employee-reports.html">Employee Reports</a></li>
-        <li><a href="attendance-summary.html">Attendance Summary</a></li>
-        <li><a href="payroll.html">Payroll Analytics</a></li>
-        <li><a href="payslip.html">Payslips</a></li>
-        <li><a href="performance.html" class="active">Performance Overview</a></li>
-      </ul>
-    </aside>
+  <!-- MAIN WRAPPER -->
+  <main class="main-wrapper">
 
-    <section class="dashboard-main">
-      <h2>Performance Overview</h2>
-      <p>Evaluate employee performance metrics, task completions, and department ratings.</p>
-      
-      <div class="dashboard-grid" style="margin-top: 20px;">
-        <div class="card">
-          <h3>Overall Rating</h3>
-          <p style="font-size: 28px; font-weight: 700; color: #10b981; margin: 10px 0;">4.8 / 5.0</p>
-          <p class="small">Positive evaluation index</p>
+    <!-- KPI STATS CARDS -->
+    <section class="grid-4" style="margin-bottom: 24px;">
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-green">
+          <i class="fa-solid fa-award"></i>
         </div>
-        <div class="card">
-          <h3>KPI Compliance</h3>
-          <p style="font-size: 28px; font-weight: 700; color: #2563eb; margin: 10px 0;">92%</p>
-          <p class="small">Quarterly goal achievement</p>
+        <div>
+          <div class="stat-label">Average Score</div>
+          <div class="stat-value">4.8 / 5.0</div>
+          <div class="stat-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> Top quartile rating</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-blue">
+          <i class="fa-solid fa-bullseye"></i>
+        </div>
+        <div>
+          <div class="stat-label">KPI Compliance</div>
+          <div class="stat-value">94.2%</div>
+          <div class="stat-trend positive">Quarterly goals met</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-purple">
+          <i class="fa-solid fa-clipboard-check"></i>
+        </div>
+        <div>
+          <div class="stat-label">Appraisals Completed</div>
+          <div class="stat-value" id="kpiAppraised">6 / 6</div>
+          <div class="stat-trend">100% evaluated</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-amber">
+          <i class="fa-solid fa-medal"></i>
+        </div>
+        <div>
+          <div class="stat-label">Top Department</div>
+          <div class="stat-value" style="font-size: 20px;">Design & Tech</div>
+          <div class="stat-trend">98% KPI index</div>
         </div>
       </div>
     </section>
+
+    <!-- PERFORMANCE OVERVIEW TABLE CARD -->
+    <div class="glass-card">
+      <div class="glass-card-header">
+        <div>
+          <h2 class="glass-card-title"><i class="fa-solid fa-chart-line"></i> Staff Appraisal Scorecard</h2>
+          <div class="glass-card-subtitle">Quarterly evaluation grades, peer ratings, and objective delivery metrics</div>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <button class="btn-modern btn-primary" onclick="openAppraisalModal()">
+            <i class="fa-solid fa-plus"></i> New Appraisal
+          </button>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-responsive">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Personnel</th>
+              <th>Department</th>
+              <th>Designation</th>
+              <th>KPI Completion</th>
+              <th>Rating</th>
+              <th>Evaluation Grade</th>
+              <th>Last Reviewed</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="perfTableBody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </main>
 
-  <footer>
-    <p>© 2026 FLAWLESS GRAPHICS. All rights reserved.</p>
-  </footer>
+  <!-- APPRAISAL MODAL -->
+  <div class="modal-overlay" id="appraisalModal">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="font-size: 20px; font-weight: 800;">Staff Appraisal Entry</h3>
+        <button onclick="closeAppraisalModal()" style="background: none; border: none; font-size: 18px; color: var(--text-muted); cursor: pointer;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="appraisalForm" onsubmit="handleSaveAppraisal(event)">
+        <div class="form-group">
+          <label class="form-label">Employee *</label>
+          <select id="apprEmployee" class="form-control" required></select>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">KPI Goal Completion % *</label>
+            <input type="number" id="apprKpi" class="form-control" min="0" max="100" placeholder="95" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Star Rating (1 - 5) *</label>
+            <select id="apprRating" class="form-control" required>
+              <option value="5.0">5.0 — Exceptional</option>
+              <option value="4.8" selected>4.8 — Exceeds Standards</option>
+              <option value="4.5">4.5 — Strong Delivery</option>
+              <option value="4.0">4.0 — Meets Standards</option>
+              <option value="3.5">3.5 — Developing</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Appraisal Summary & Notes</label>
+          <textarea id="apprNotes" class="form-control" rows="3" placeholder="Highlight key achievements and improvement opportunities..."></textarea>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+          <button type="button" class="btn-modern btn-secondary" onclick="closeAppraisalModal()">Cancel</button>
+          <button type="submit" class="btn-modern btn-primary">Save Evaluation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="modern-toast success">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toastMsg">Appraisal saved</span>
+  </div>
+
+  <!-- SCRIPT INTEGRATION -->
+  <script src="../../assets/js/auth-session.js"></script>
+  <script>
+    const user = window.AuthSession ? window.AuthSession.requireAuth('hr-login.html', true) : null;
+    const activeOrg = (user && user.org) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
+    const PERF_KEY = `${activeOrg}_performance_reviews`;
+    const EMP_KEY = `${activeOrg}_employees`;
+
+    if (user && user.org) {
+      document.getElementById('headerOrgTitle').textContent = user.org.toUpperCase();
+    }
+
+    function getReviews() {
+      try {
+        let revs = JSON.parse(localStorage.getItem(PERF_KEY) || '[]');
+        if (!revs || revs.length === 0) {
+          revs = [
+            { employeeName: "James Ntiamoah", department: "Executive & Design", position: "Creative Director", kpi: 98, rating: "4.9", grade: "Exceptional", date: "2026-08-15" },
+            { employeeName: "Ama Serwaa", department: "Operations", position: "HR Manager", kpi: 95, rating: "4.8", grade: "Exceeds Standards", date: "2026-08-18" },
+            { employeeName: "Kwame Boateng", department: "Academic Staff", position: "Lead Instructor", kpi: 94, rating: "4.7", grade: "Exceeds Standards", date: "2026-08-20" },
+            { employeeName: "Abena Mansa", department: "Finance", position: "Chief Accountant", kpi: 96, rating: "4.8", grade: "Exceeds Standards", date: "2026-08-22" },
+            { employeeName: "Kofi Owusu", department: "Digital Media", position: "Senior Designer", kpi: 91, rating: "4.6", grade: "Strong Delivery", date: "2026-08-25" },
+            { employeeName: "Esi Badu", department: "Academic Staff", position: "Science Educator", kpi: 92, rating: "4.7", grade: "Strong Delivery", date: "2026-08-28" }
+          ];
+          localStorage.setItem(PERF_KEY, JSON.stringify(revs));
+        }
+        return revs;
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function renderReviews() {
+      const revs = getReviews();
+      const tbody = document.getElementById('perfTableBody');
+      tbody.innerHTML = '';
+
+      revs.forEach((r, i) => {
+        const tr = document.createElement('tr');
+        const badgeClass = r.grade === 'Exceptional' ? 'badge-purple' :
+          r.grade.includes('Exceeds') ? 'badge-success' : 'badge-info';
+
+        tr.innerHTML = `
+          <td style="color: var(--text-muted); font-weight: 600;">${i + 1}</td>
+          <td>
+            <div class="avatar-cell">
+              <div class="stat-icon-box" style="width: 34px; height: 34px; font-size: 13px; background: var(--accent-glow); color: var(--accent-primary);">
+                <i class="fa-solid fa-user-tie"></i>
+              </div>
+              <div>
+                <div style="font-weight: 700;">${escapeHtml(r.employeeName)}</div>
+              </div>
+            </div>
+          </td>
+          <td><span style="font-size: 12px; color: var(--text-muted);">${escapeHtml(r.department)}</span></td>
+          <td style="font-weight: 600;">${escapeHtml(r.position)}</td>
+          <td style="width: 160px;">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700;">
+              <span>${r.kpi}%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" style="width: ${r.kpi}%;"></div>
+            </div>
+          </td>
+          <td>
+            <div class="stars">
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star-half-stroke"></i>
+              <span style="font-size: 12px; font-weight: 800; color: var(--text-main); margin-left: 4px;">${r.rating}</span>
+            </div>
+          </td>
+          <td><span class="badge-pill ${badgeClass}">${r.grade}</span></td>
+          <td style="color: var(--text-muted); font-size: 12px;">${r.date}</td>
+          <td style="text-align: right;">
+            <button class="btn-modern btn-secondary btn-sm" onclick="editReview(${i})">
+              <i class="fa-solid fa-pen-to-square"></i> Review
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('kpiAppraised').textContent = `${revs.length} / ${revs.length}`;
+    }
+
+    function openAppraisalModal() {
+      const emps = JSON.parse(localStorage.getItem(EMP_KEY) || '[]');
+      const sel = document.getElementById('apprEmployee');
+      sel.innerHTML = '';
+      if (emps.length === 0) {
+        sel.innerHTML = '<option value="James Ntiamoah">James Ntiamoah</option>';
+      } else {
+        emps.forEach(e => {
+          const empName = e.fullName || e.name || 'Staff Member';
+          const empDept = e.department || e.dept || 'Staff';
+          const opt = document.createElement('option');
+          opt.value = empName;
+          opt.textContent = `${empName} (${empDept})`;
+          sel.appendChild(opt);
+        });
+      }
+      document.getElementById('appraisalModal').classList.add('active');
+    }
+
+    function closeAppraisalModal() {
+      document.getElementById('appraisalModal').classList.remove('active');
+    }
+
+    function handleSaveAppraisal(e) {
+      e.preventDefault();
+      const emps = JSON.parse(localStorage.getItem(EMP_KEY) || '[]');
+      const name = document.getElementById('apprEmployee').value;
+      const matched = emps.find(e => (e.fullName || e.name) === name);
+      const kpi = Number(document.getElementById('apprKpi').value) || 90;
+      const rating = document.getElementById('apprRating').value;
+      const grade = rating >= 4.9 ? 'Exceptional' : rating >= 4.5 ? 'Exceeds Standards' : 'Meets Standards';
+
+      const revs = getReviews();
+      const existingIdx = revs.findIndex(r => r.employeeName === name);
+
+      const entry = {
+        employeeName: name,
+        department: matched ? (matched.department || matched.dept) : 'General',
+        position: matched ? (matched.position || matched.role) : 'Staff',
+        kpi: kpi,
+        rating: rating,
+        grade: grade,
+        date: new Date().toISOString().split('T')[0]
+      };
+
+      if (existingIdx >= 0) {
+        revs[existingIdx] = entry;
+      } else {
+        revs.push(entry);
+      }
+
+      localStorage.setItem(PERF_KEY, JSON.stringify(revs));
+      renderReviews();
+      closeAppraisalModal();
+      showToast('Appraisal scorecard saved');
+    }
+
+    function editReview(idx) {
+      openAppraisalModal();
+      const revs = getReviews();
+      if (revs[idx]) {
+        document.getElementById('apprEmployee').value = revs[idx].employeeName;
+        document.getElementById('apprKpi').value = revs[idx].kpi;
+        document.getElementById('apprRating').value = revs[idx].rating;
+      }
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2500);
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // Theme Switcher
+    const htmlEl = document.documentElement;
+    const themeBtn = document.getElementById('themeBtn');
+    function applyTheme(isDark) {
+      if (isDark) {
+        htmlEl.classList.add('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i> <span>Light</span>';
+      } else {
+        htmlEl.classList.remove('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-moon"></i> <span>Dark</span>';
+      }
+      localStorage.setItem('fg_theme_dark', isDark);
+    }
+    const savedTheme = localStorage.getItem('fg_theme_dark');
+    applyTheme(savedTheme === 'true');
+    themeBtn.addEventListener('click', () => applyTheme(!htmlEl.classList.contains('dark')));
+
+    // Boot
+    renderReviews();
+  </script>
 </body>
 </html>

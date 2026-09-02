@@ -4,13 +4,24 @@
   function read(k){ return safeParse(localStorage.getItem(k)) || [] }
   function save(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
 
-  const ACTIVE_ORG = (localStorage.getItem('active_org') || '').trim();
-  if(!ACTIVE_ORG){ alert('No active org'); window.location.href='index.html'; return; }
+  const ACTIVE_ORG = (localStorage.getItem('active_org') || (window.AuthSession ? window.AuthSession.getOrg() : '') || 'FLAWLESS GRAPHICS').trim();
+  if(!localStorage.getItem('active_org')) localStorage.setItem('active_org', ACTIVE_ORG);
 
   const CLASSES_KEY = `${ACTIVE_ORG}_classes`;
   const SCHEDULE_KEY = `${ACTIVE_ORG}_class_schedule`;
 
-  function getClasses(){ return read(CLASSES_KEY) }
+  function getClasses(){
+    let arr = read(CLASSES_KEY);
+    if (!arr || arr.length === 0) {
+      arr = [
+        { name: "Class 1 - Visual Design", subject: "Graphic Arts", teacherName: "James Ntiamoah", students: [1, 2, 3, 4, 5] },
+        { name: "Class 2 - Web Systems", subject: "Frontend Architecture", teacherName: "Kwame Boateng", students: [1, 2, 3, 4] },
+        { name: "Class 3 - Animation & 3D", subject: "Motion Design", teacherName: "Kofi Owusu", students: [1, 2, 3] }
+      ];
+      save(CLASSES_KEY, arr);
+    }
+    return arr;
+  }
   function saveClasses(a){ save(CLASSES_KEY,a) }
   function getSchedule(){ return read(SCHEDULE_KEY) }
   function saveSchedule(a){ save(SCHEDULE_KEY,a) }

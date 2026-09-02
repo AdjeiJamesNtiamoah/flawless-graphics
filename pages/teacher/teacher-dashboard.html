@@ -315,7 +315,7 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
       </div>
       <div style="display:flex; gap:12px; align-items:center">
         <button class="btn ghost" id="themeBtn"><i class="fa-solid fa-moon"></i> Theme</button>
-        <a href="welcome.html" class="btn ghost" style="text-decoration:none"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="../../welcome.html" class="btn ghost" style="text-decoration:none"><i class="fa-solid fa-house"></i> Hub</a>
       </div>
     </div>
 
@@ -527,6 +527,7 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
 
 <div id="toast" class="toast"></div>
 
+<script src="../../assets/js/auth-session.js"></script>
 <script>
 /* -------------------------
   Utilities & Session Setup
@@ -542,11 +543,13 @@ const sessionCandidates = ['active_teacher','teacher_active_user','active_user',
 let teacher = null;
 for(const k of sessionCandidates){ const v = safeParse(localStorage.getItem(k)); if(v && (v.email || v.name)){ teacher = v; break; } }
 if(!teacher){ 
-  teacher = { name: 'Demo Teacher', email: 'teacher@flawless.org', org: 'FLAWLESS' };
-  localStorage.setItem('active_teacher', JSON.stringify(teacher));
+  teacher = { name: 'Demo Teacher', email: 'teacher@flawless.org', org: 'FLAWLESS GRAPHICS' };
 }
+localStorage.setItem('active_teacher', JSON.stringify(teacher));
+localStorage.setItem('teacher_active_user', JSON.stringify(teacher));
 
-const ORG = teacher.org || localStorage.getItem('active_org') || 'FLAWLESS';
+const ORG = teacher.org || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
+if (!localStorage.getItem('active_org')) localStorage.setItem('active_org', ORG);
 
 /* ORG Storage Keys */
 const CLASSES_KEY = `${ORG}_classes`;

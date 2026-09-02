@@ -1,145 +1,449 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contact Us | FLAWLESS GRAPHICS</title>
-  <link rel="stylesheet" href="../../assets/css/style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact Us — FLAWLESS GRAPHICS Enterprise Support</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Shared Modern Design System -->
+  <link rel="stylesheet" href="../../assets/css/shared-design.css">
+
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f5f7fa;
-      margin: 0;
-      padding: 0;
+    /* Contact Header Section */
+    .contact-hero {
+      text-align: center;
+      padding: 50px 20px 30px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: var(--radius-full);
+      background: var(--accent-glow);
+      color: var(--accent-primary);
+      border: 1px solid rgba(37, 99, 235, 0.25);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 16px;
+    }
+    .contact-hero h2 {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      margin-bottom: 14px;
+    }
+    .contact-hero h2 span {
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .contact-hero p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
     }
 
-    .contact-container {
-      max-width: 1100px;
-      margin: 60px auto;
+    /* Contact Info Boxes */
+    .contact-card-item {
       display: flex;
-      flex-wrap: wrap;
-      gap: 40px;
-      padding: 20px;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      margin-bottom: 14px;
+      transition: all var(--transition-base);
+    }
+    .contact-card-item:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-primary);
+    }
+    .contact-icon-box {
+      width: 46px;
+      height: 46px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      background: var(--accent-glow);
+      color: var(--accent-primary);
     }
 
-    .contact-info, .contact-form {
-      flex: 1 1 45%;
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    /* FAQ Items */
+    .faq-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: border-color var(--transition-fast);
     }
-
-    .contact-info h2, .contact-form h2 {
-      color: #003366;
-      margin-bottom: 15px;
-    }
-
-    .contact-info p {
-      line-height: 1.7;
-      color: #444;
-    }
-
-    .contact-info a {
-      color: #007bff;
-      text-decoration: none;
-    }
-
-    .contact-form input, .contact-form textarea {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+    .faq-question {
+      padding: 18px 22px;
+      font-weight: 700;
       font-size: 15px;
-      box-sizing: border-box;
-    }
-
-    .contact-form button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 12px 25px;
-      border-radius: 6px;
+      color: var(--text-main);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       cursor: pointer;
-      font-size: 15px;
-      font-weight: 600;
-      transition: background 0.3s ease;
+      user-select: none;
     }
-
-    .contact-form button:hover {
-      background-color: #0056b3;
+    .faq-question i {
+      transition: transform var(--transition-fast);
+      color: var(--accent-primary);
     }
-
-    .social-links a {
-      display: inline-block;
-      margin-right: 15px;
-      color: #007bff;
-      font-weight: bold;
-      text-decoration: none;
+    .faq-item.open .faq-question i {
+      transform: rotate(180deg);
     }
-
-    @media (max-width: 768px) {
-      .contact-info, .contact-form {
-        flex: 1 1 100%;
-      }
+    .faq-answer {
+      display: none;
+      padding: 0 22px 18px;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .faq-item.open .faq-answer {
+      display: block;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <nav class="navbar">
-      <div class="logo">
-        <img src="../../assets/images/logo.gif" alt="FLAWLESS GRAPHICS Logo" class="logo-img">
-        <div>
-          <h1>FLAWLESS GRAPHICS</h1>
-          <p class="tagline">TRUTH AND SERVICE</p>
-        </div>
+  <!-- Ambient Glows -->
+  <div class="ambient-glow ambient-top-left"></div>
+  <div class="ambient-glow ambient-bottom-right"></div>
+
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <a href="home.html" class="brand-wrapper">
+      <div class="brand-badge">FG</div>
+      <div class="brand-info">
+        <h1 id="headerOrgTitle">FLAWLESS GRAPHICS</h1>
+        <div class="brand-tagline">Truth and Service</div>
       </div>
-      <ul class="nav-links">
-        <li><a href="../../welcome.html">Hub</a></li>
-        <li><a href="home.html">Home</a></li>
-        <li><a href="../hr/employee.html">Employee Portal</a></li>
-        <li><a href="../hr/hr-dashboard.html">HR Dashboard</a></li>
-        <li><a href="services.html">Services</a></li>
-        <li><a class="active" href="contact.html">Contact</a></li>
-      </ul>
-    </nav>
+    </a>
+
+    <ul class="nav-menu">
+      <li><a href="../../welcome.html" class="nav-link"><i class="fa-solid fa-grid-horizontal"></i> Hub</a></li>
+      <li><a href="home.html" class="nav-link"><i class="fa-solid fa-house"></i> Home</a></li>
+      <li><a href="../hr/employee.html" class="nav-link"><i class="fa-solid fa-users"></i> Employee Portal</a></li>
+      <li><a href="services.html" class="nav-link"><i class="fa-solid fa-layer-group"></i> Services</a></li>
+      <li><a href="contact.html" class="nav-link active"><i class="fa-solid fa-envelope"></i> Contact</a></li>
+    </ul>
+
+    <div class="header-actions">
+      <a href="../../welcome.html" class="hub-pill-btn">
+        <i class="fa-solid fa-gauge"></i> Workspace
+      </a>
+      <button class="theme-pill-btn" id="themeBtn">
+        <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
+      </button>
+    </div>
   </header>
 
-  <div class="contact-container">
-    <div class="contact-info">
-      <h2>Contact Information</h2>
-      <p><strong>Email:</strong> info@flawlessgraphics.com</p>
-      <p><strong>Phone:</strong> +233 55 123 4567</p>
-      <p><strong>Address:</strong> Accra, Ghana</p>
-      <h3 style="margin-top: 20px;">Follow Us</h3>
-      <div class="social-links" style="margin-top: 10px;">
-        <a href="#">🌐 Website</a>
-        <a href="#">📘 Facebook</a>
-        <a href="#">🐦 Twitter</a>
-        <a href="#">💼 LinkedIn</a>
+  <!-- MAIN WRAPPER -->
+  <main class="main-wrapper">
+
+    <!-- HERO SECTION -->
+    <section class="contact-hero">
+      <div class="hero-badge">
+        <i class="fa-solid fa-headset"></i> Dedicated Support & Inquiries
       </div>
+      <h2>Let's Connect with <span>Our Team</span></h2>
+      <p>
+        Have questions about deploying FLAWLESS GRAPHICS in your school or business? Need assistance setting up roles, classroom timetables, or payroll schedules? We are here to help.
+      </p>
+    </section>
+
+    <!-- SPLIT CONTENT SECTION -->
+    <div class="grid-2" style="margin-top: 20px; align-items: stretch;">
+
+      <!-- LEFT: CONTACT INFORMATION & STATUS -->
+      <div class="glass-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div class="glass-card-header" style="margin-bottom: 24px;">
+            <div>
+              <h3 class="glass-card-title"><i class="fa-solid fa-building"></i> Headquarters & Channels</h3>
+              <div class="glass-card-subtitle">Connect with administrative and technical support</div>
+            </div>
+            <span class="badge-pill badge-success">
+              <i class="fa-solid fa-circle" style="font-size: 8px;"></i> Live Support
+            </span>
+          </div>
+
+          <div class="contact-card-item">
+            <div class="contact-icon-box">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+            <div>
+              <div style="font-weight: 700; font-size: 14px; margin-bottom: 2px;">Campus & Offices</div>
+              <div style="font-size: 13px; color: var(--text-muted);">
+                Flawless Graphics Technology Hub<br>
+                High Street Innovation Complex, Accra, Ghana
+              </div>
+            </div>
+          </div>
+
+          <div class="contact-card-item">
+            <div class="contact-icon-box" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
+              <i class="fa-solid fa-phone"></i>
+            </div>
+            <div>
+              <div style="font-weight: 700; font-size: 14px; margin-bottom: 2px;">Direct Lines</div>
+              <div style="font-size: 13px; color: var(--text-muted);">
+                Toll Free: +233 (0) 24 000 0000<br>
+                Technical Desk: +233 (0) 20 111 2222
+              </div>
+            </div>
+          </div>
+
+          <div class="contact-card-item">
+            <div class="contact-icon-box" style="background: rgba(168, 85, 247, 0.12); color: #a855f7;">
+              <i class="fa-solid fa-envelope-open-text"></i>
+            </div>
+            <div>
+              <div style="font-weight: 700; font-size: 14px; margin-bottom: 2px;">Electronic Mail</div>
+              <div style="font-size: 13px; color: var(--text-muted);">
+                Administration: support@flawlessgraphics.com<br>
+                Admissions & Classrooms: academics@flawlessgraphics.com
+              </div>
+            </div>
+          </div>
+
+          <div class="contact-card-item">
+            <div class="contact-icon-box" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
+              <i class="fa-solid fa-clock"></i>
+            </div>
+            <div>
+              <div style="font-weight: 700; font-size: 14px; margin-bottom: 2px;">Operating Schedule</div>
+              <div style="font-size: 13px; color: var(--text-muted);">
+                Monday – Friday: 08:00 – 17:30 GMT<br>
+                Emergency Dispatch: 24/7 Monitored Cloud
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Status Banner -->
+        <div style="padding: 16px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: var(--radius-md); display: flex; align-items: center; gap: 12px; margin-top: 20px;">
+          <i class="fa-solid fa-server" style="color: #10b981; font-size: 20px;"></i>
+          <div>
+            <div style="font-size: 12px; font-weight: 700; color: #10b981;">CLOUD INFRASTRUCTURE ONLINE</div>
+            <div style="font-size: 11px; color: var(--text-muted);">All database APIs, session bridges, and portals are operational with 99.98% uptime.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: INTERACTIVE CONTACT & INQUIRY FORM -->
+      <div class="glass-card">
+        <div class="glass-card-header" style="margin-bottom: 20px;">
+          <div>
+            <h3 class="glass-card-title"><i class="fa-solid fa-paper-plane"></i> Send Direct Inquiry</h3>
+            <div class="glass-card-subtitle">Our engineers and support staff typically respond within 2 hours</div>
+          </div>
+        </div>
+
+        <form id="inquiryForm" onsubmit="handleContactSubmit(event)">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" id="senderName" class="form-control" placeholder="e.g. John Mensah" required>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Official Email *</label>
+              <input type="email" id="senderEmail" class="form-control" placeholder="john@organization.com" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Contact Phone</label>
+              <input type="tel" id="senderPhone" class="form-control" placeholder="+233 ...">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Department / Inquiry Category *</label>
+            <select id="inquiryCategory" class="form-control" required>
+              <option value="General Administration">General Administration</option>
+              <option value="HR & Payroll Support">HR & Payroll Support</option>
+              <option value="Classroom & Timetable Module">Classroom & Timetable Module</option>
+              <option value="Finance & Budget Accounting">Finance & Budget Accounting</option>
+              <option value="Custom Enterprise Integration">Custom Enterprise Integration</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Message Details *</label>
+            <textarea id="senderMessage" class="form-control" rows="5" placeholder="Describe your inquiry, feature requirement, or support request..." required></textarea>
+          </div>
+
+          <button type="submit" id="sendBtn" class="btn-modern btn-primary" style="width: 100%;">
+            <i class="fa-solid fa-paper-plane"></i> Transmit Message
+          </button>
+        </form>
+      </div>
+
     </div>
 
-    <div class="contact-form">
-      <h2>Send Us a Message</h2>
-      <form onsubmit="event.preventDefault(); alert('Thank you! Your message has been received.'); this.reset();">
-        <input type="text" name="name" placeholder="Your Full Name" required>
-        <input type="email" name="email" placeholder="Your Email Address" required>
-        <input type="text" name="subject" placeholder="Subject" required>
-        <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
-        <button type="submit">Send Message</button>
-      </form>
-    </div>
+    <!-- FAQ ACCORDION SECTION -->
+    <section style="margin-top: 60px;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h3 style="font-size: 26px; font-weight: 800;">Frequently Answered Inquiries</h3>
+        <p style="color: var(--text-muted); font-size: 14px; margin-top: 6px;">Common questions regarding setup, access, and security</p>
+      </div>
+
+      <div style="max-width: 860px; margin: 0 auto;">
+        
+        <div class="faq-item open">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            <span>How does the multi-portal authentication (SSO) operate?</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-answer">
+            The platform utilizes a unified cryptographic session bridge. Once you register or sign in as an Administrator, the system automatically authorizes your session across the HR Portal, Teacher Portal, Finance Portal, and Public Site without requiring repetitive logins.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            <span>Can I customize the organization name and brand logo?</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-answer">
+            Yes. During organization registration on the homepage, you can input your unique organization name and upload a PNG, JPG, or SVG company emblem. The system dynamically updates the workspace titles, headers, and payslip headings to reflect your organization.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            <span>Does the platform support offline or client-only mode?</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-answer">
+            Yes. The front-end includes local storage persistence engines allowing complete standalone functionality. When connected to a MySQL/PHP backend, it synchronizes employee and student records automatically with your central database.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            <span>How are employee payslips and deductions computed?</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-answer">
+            The payroll engine handles basic salary computations, statutory tax withholdings (PAYE), pension contributions, and net pay disbursement calculations, generating print-ready digital statements for each staff member.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="contactToast" class="modern-toast success">
+    <i class="fa-solid fa-circle-check" style="font-size: 18px; color: #10b981;"></i>
+    <span id="toastMsg">Inquiry received successfully!</span>
   </div>
 
-  <footer>
-    <p>© 2026 FLAWLESS GRAPHICS. All rights reserved.</p>
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <p>&copy; <span id="footerYear"></span> FLAWLESS GRAPHICS. Truth and Service. All rights reserved.</p>
   </footer>
 
-  <script src="../../assets/js/theme.js"></script>
+  <!-- SCRIPT INTEGRATION -->
+  <script src="../../assets/js/auth-session.js"></script>
+  <script>
+    // 1. Theme Switcher
+    const htmlEl = document.documentElement;
+    const themeBtn = document.getElementById('themeBtn');
+    const themeText = document.getElementById('themeText');
+
+    function applyTheme(isDark) {
+      if (isDark) {
+        htmlEl.classList.add('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i> <span>Light</span>';
+      } else {
+        htmlEl.classList.remove('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-moon"></i> <span>Dark</span>';
+      }
+      localStorage.setItem('fg_theme_dark', isDark);
+    }
+
+    const savedTheme = localStorage.getItem('fg_theme_dark');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(savedTheme === null ? prefersDark : savedTheme === 'true');
+
+    themeBtn.addEventListener('click', () => {
+      applyTheme(!htmlEl.classList.contains('dark'));
+    });
+
+    // 2. Organization Brand Sync
+    const user = window.AuthSession ? window.AuthSession.getUser() : null;
+    if (user && user.org) {
+      document.getElementById('headerOrgTitle').textContent = user.org.toUpperCase();
+    }
+    document.getElementById('footerYear').textContent = new Date().getFullYear();
+
+    // 3. FAQ Accordion Toggle
+    function toggleFaq(btn) {
+      const item = btn.parentElement;
+      item.classList.toggle('open');
+    }
+
+    // 4. Contact Form Handler
+    function handleContactSubmit(e) {
+      e.preventDefault();
+      const sendBtn = document.getElementById('sendBtn');
+      sendBtn.disabled = true;
+      sendBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Transmitting...';
+
+      const inquiry = {
+        name: document.getElementById('senderName').value.trim(),
+        email: document.getElementById('senderEmail').value.trim(),
+        phone: document.getElementById('senderPhone').value.trim(),
+        category: document.getElementById('inquiryCategory').value,
+        message: document.getElementById('senderMessage').value.trim(),
+        submittedAt: new Date().toISOString()
+      };
+
+      try {
+        const storedInquiries = JSON.parse(localStorage.getItem('flawless_inquiries') || '[]');
+        storedInquiries.push(inquiry);
+        localStorage.setItem('flawless_inquiries', JSON.stringify(storedInquiries));
+      } catch (err) {
+        console.warn('Could not store inquiry:', err);
+      }
+
+      setTimeout(() => {
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Transmit Message';
+        document.getElementById('inquiryForm').reset();
+        showToast('Thank you! Your message has been sent to our team.');
+      }, 900);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('contactToast');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+  </script>
 </body>
 </html>

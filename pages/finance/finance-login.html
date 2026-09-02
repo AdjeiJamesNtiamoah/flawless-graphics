@@ -14,6 +14,9 @@
   <!-- AOS Animations -->
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
+  <!-- Unified AuthSession -->
+  <script src="../../assets/js/auth-session.js"></script>
+
   <style>
     :root {
       --bg-outer: #F4F7FB;
@@ -401,6 +404,18 @@
           <span>Sign In to Finance Dashboard</span>
           <i class="fa-solid fa-arrow-right"></i>
         </button>
+
+        <!-- Quick Demo Credentials Box -->
+        <div style="margin-top: 16px; padding: 12px; background: rgba(37,99,235,0.06); border: 1px dashed var(--accent); border-radius: 12px; text-align: center;">
+          <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">FAST EVALUATION DEMO</div>
+          <button type="button" onclick="fillFinanceDemo()" style="background: var(--accent-gradient); color: #fff; border: none; padding: 7px 18px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.25); display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-fill Demo Account
+          </button>
+        </div>
+        <button type="button" class="btn-submit" style="margin-top: 10px; background: rgba(37,99,235,0.1); border: 1px solid rgba(37,99,235,0.3); color: var(--text-main);" onclick="quickDemoFinance()">
+          <i class="fa-solid fa-bolt" style="color: var(--accent);"></i>
+          <span>One-Click Demo Finance Access</span>
+        </button>
       </form>
 
       <!-- CARD FOOTER RETURN LINK -->
@@ -416,8 +431,16 @@
 
   <!-- SCRIPT LOGIC -->
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="../../assets/js/auth-session.js"></script>
   <script>
     AOS.init({ once: true });
+
+    function quickDemoFinance() {
+      if (window.AuthSession) {
+        window.AuthSession.initDemoSession();
+      }
+      window.location.href = 'finance-dashboard.html';
+    }
 
     // ---------- THEME SWITCHER ----------
     const el = document.documentElement;
@@ -566,9 +589,25 @@
         }));
         localStorage.setItem('activeHR', 'true'); // Satisfies dashboard route guard
 
+        if (window.AuthSession) {
+          window.AuthSession.login({
+            org: orgName,
+            name: hrEmail.split('@')[0],
+            email: hrEmail,
+            role: 'Finance Officer'
+          });
+        }
+
         window.location.href = 'finance-dashboard.html';
       }
     });
+
+    function fillFinanceDemo() {
+      document.getElementById('orgName').value = 'Flawless Graphics HQ';
+      document.getElementById('hrEmail').value = 'bursar@flawlessgraphics.com';
+      document.getElementById('hrPassword').value = 'finance2026';
+      hideMessages();
+    }
 
     function showError(msg) {
       errorMessage.textContent = msg;

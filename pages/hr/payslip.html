@@ -1,49 +1,504 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Payslip | FLAWLESS GRAPHICS</title>
-  <link rel="stylesheet" href="../../assets/css/style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Official Payslip — FLAWLESS GRAPHICS HR</title>
+
+  <!-- Google Fonts & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Shared Modern Design System -->
+  <link rel="stylesheet" href="../../assets/css/shared-design.css">
+
+  <style>
+    /* Printable Payslip Styling */
+    .payslip-paper {
+      background: #ffffff;
+      color: #0f172a;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: var(--radius-xl);
+      padding: 40px;
+      box-shadow: var(--shadow-lg);
+      max-width: 820px;
+      margin: 0 auto 30px;
+      position: relative;
+    }
+    .dark .payslip-paper {
+      background: #0f172a;
+      color: #f8fafc;
+      border-color: rgba(255,255,255,0.12);
+    }
+
+    .payslip-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2px solid var(--accent-primary);
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+    }
+    .payslip-org-name {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent-primary);
+      letter-spacing: 0.5px;
+    }
+    .payslip-title-badge {
+      text-align: right;
+    }
+    .payslip-title-badge h2 {
+      font-size: 20px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .meta-box {
+      background: rgba(0, 0, 0, 0.02);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .dark .meta-box {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+    .meta-item-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+    .meta-item-val {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* Breakdown Grid */
+    .breakdown-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    .breakdown-box {
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .breakdown-box h4 {
+      background: rgba(37, 99, 235, 0.08);
+      padding: 10px 14px;
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: var(--accent-primary);
+      border-bottom: 1px solid var(--border-card);
+    }
+    .breakdown-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .breakdown-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-card);
+    }
+    .breakdown-table tr:last-child td {
+      border-bottom: none;
+      font-weight: 800;
+    }
+
+    /* Net Pay Banner */
+    .net-pay-banner {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.12) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: var(--radius-lg);
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .net-amount {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--success);
+    }
+
+    /* Print Styles */
+    @media print {
+      body { background: #fff !important; color: #000 !important; }
+      .site-header, .header-actions, .ambient-glow, .control-bar, .site-footer { display: none !important; }
+      .main-wrapper { margin: 0 !important; padding: 0 !important; }
+      .payslip-paper { border: none !important; box-shadow: none !important; padding: 0 !important; max-width: 100% !important; }
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <nav class="navbar">
-      <div class="logo">
-        <img src="../../assets/images/logo.gif" alt="FLAWLESS GRAPHICS Logo" class="logo-img">
-        <div>
-          <h1>FLAWLESS GRAPHICS</h1>
-          <p class="tagline">TRUTH AND SERVICE</p>
-        </div>
+
+  <!-- Ambient Glows -->
+  <div class="ambient-glow ambient-top-left"></div>
+  <div class="ambient-glow ambient-bottom-right"></div>
+
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <a href="../public/home.html" class="brand-wrapper">
+      <div class="brand-badge">FG</div>
+      <div class="brand-info">
+        <h1 id="headerOrgTitle">FLAWLESS GRAPHICS</h1>
+        <div class="brand-tagline">Personnel Compensation & Payslip Portal</div>
       </div>
-      <ul class="nav-links">
-        <li><a href="../../welcome.html">Hub</a></li>
-        <li><a href="../public/home.html">Home</a></li>
-        <li><a href="employee.html">Employee Portal</a></li>
-        <li><a href="hr-dashboard.html">HR Dashboard</a></li>
-        <li><a href="../public/services.html">Services</a></li>
-        <li><a href="../public/contact.html">Contact</a></li>
-      </ul>
-    </nav>
+    </a>
+
+    <ul class="nav-menu">
+      <li><a href="../../welcome.html" class="nav-link"><i class="fa-solid fa-grid-horizontal"></i> Hub</a></li>
+      <li><a href="hr-dashboard.html" class="nav-link"><i class="fa-solid fa-gauge"></i> HR Dashboard</a></li>
+      <li><a href="employee.html" class="nav-link"><i class="fa-solid fa-users"></i> Employees</a></li>
+      <li><a href="attendance-summary.html" class="nav-link"><i class="fa-solid fa-clipboard-user"></i> Attendance</a></li>
+      <li><a href="payroll.html" class="nav-link"><i class="fa-solid fa-money-bill-wave"></i> Payroll</a></li>
+      <li><a href="payslip.html" class="nav-link active"><i class="fa-solid fa-receipt"></i> Payslips</a></li>
+    </ul>
+
+    <div class="header-actions">
+      <button class="theme-pill-btn" id="themeBtn">
+        <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
+      </button>
+      <a href="payroll.html" class="hub-pill-btn">
+        <i class="fa-solid fa-arrow-left"></i> Payroll
+      </a>
+    </div>
   </header>
 
-  <main class="content" style="max-width: 900px; margin: 40px auto; padding: 20px;">
-    <h1>Payslip Summary</h1>
-    <p>This section allows staff and HR administrators to view and generate monthly payslips.</p>
+  <!-- MAIN WRAPPER -->
+  <main class="main-wrapper">
 
-    <div class="card" style="margin-top: 20px; padding: 24px; border-radius: 12px; background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.06);">
-      <h3>Latest Payslip Statement</h3>
-      <p style="margin: 12px 0;"><strong>Period:</strong> Active Billing Cycle</p>
-      <p style="margin: 12px 0;"><strong>Status:</strong> <span style="color: #10b981; font-weight: 600;">Disbursed</span></p>
-      <button class="btn" onclick="alert('Downloading payslip PDF...');" style="padding: 10px 18px; border-radius: 6px; background: #0078ff; color: #fff; border: 0; cursor: pointer;">
-        <i class="fa-solid fa-file-arrow-down"></i> Download PDF
-      </button>
+    <!-- TOP CONTROL & EMPLOYEE SELECTOR BAR -->
+    <div class="control-bar glass-card" style="margin-bottom: 24px; padding: 18px 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 280px;">
+          <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-muted);">
+            Employee:
+          </label>
+          <select id="employeeSelect" class="form-control" style="max-width: 320px;" onchange="loadSelectedPayslip()">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-modern btn-primary" onclick="window.print()">
+            <i class="fa-solid fa-print"></i> Print Payslip
+          </button>
+          <button class="btn-modern btn-secondary" onclick="downloadPayslipText()">
+            <i class="fa-solid fa-download"></i> Download Statement
+          </button>
+        </div>
+      </div>
     </div>
+
+    <!-- OFFICIAL PAYSLIP DOCUMENT PAPER -->
+    <div class="payslip-paper" id="payslipDocument">
+      
+      <!-- HEADER -->
+      <div class="payslip-header-bar">
+        <div>
+          <div class="payslip-org-name" id="slipOrgName">FLAWLESS GRAPHICS LTD</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+            Human Resources & Compensation Department • Enterprise Ledger
+          </div>
+        </div>
+
+        <div class="payslip-title-badge">
+          <h2>Official Payslip</h2>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+            Period: <strong id="slipPeriod">September 2026</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- EMPLOYEE METADATA GRID -->
+      <div class="meta-box">
+        <div>
+          <div class="meta-item-label">Employee Full Name</div>
+          <div class="meta-item-val" id="slipEmpName">James Ntiamoah</div>
+        </div>
+        <div>
+          <div class="meta-item-label">Staff Identification</div>
+          <div class="meta-item-val" id="slipEmpId">FG-EMP-001</div>
+        </div>
+        <div>
+          <div class="meta-item-label">Department</div>
+          <div class="meta-item-val" id="slipEmpDept">Executive & Design</div>
+        </div>
+        <div>
+          <div class="meta-item-label">Designation / Role</div>
+          <div class="meta-item-val" id="slipEmpRole">Creative Director</div>
+        </div>
+        <div>
+          <div class="meta-item-label">Payment Mode</div>
+          <div class="meta-item-val">Bank Direct Wire (GIP)</div>
+        </div>
+        <div>
+          <div class="meta-item-label">Disbursement Status</div>
+          <div class="meta-item-val" style="color: var(--success);">
+            <i class="fa-solid fa-circle-check"></i> Disbursed
+          </div>
+        </div>
+      </div>
+
+      <!-- BREAKDOWN GRID -->
+      <div class="breakdown-grid">
+        <!-- Earnings -->
+        <div class="breakdown-box">
+          <h4><i class="fa-solid fa-plus-circle"></i> Earnings Breakdown</h4>
+          <table class="breakdown-table">
+            <tr>
+              <td>Basic Gross Salary</td>
+              <td style="text-align: right;" id="valBasic">GHS 8,500.00</td>
+            </tr>
+            <tr>
+              <td>Responsibility & Housing Allowance</td>
+              <td style="text-align: right;" id="valAllowance">GHS 650.00</td>
+            </tr>
+            <tr>
+              <td>Overtime & Performance Bonus</td>
+              <td style="text-align: right;" id="valBonus">GHS 400.00</td>
+            </tr>
+            <tr style="background: rgba(0,0,0,0.02);">
+              <td><strong>Total Gross Earnings</strong></td>
+              <td style="text-align: right; color: var(--accent-primary);" id="valGrossTotal"><strong>GHS 9,550.00</strong></td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Deductions -->
+        <div class="breakdown-box">
+          <h4><i class="fa-solid fa-minus-circle"></i> Statutory Deductions</h4>
+          <table class="breakdown-table">
+            <tr>
+              <td>Income Tax (PAYE Statutory Tier)</td>
+              <td style="text-align: right; color: var(--danger);" id="valTax">- GHS 1,241.50</td>
+            </tr>
+            <tr>
+              <td>SSNIT Pension (Employee 5.5%)</td>
+              <td style="text-align: right; color: var(--warning);" id="valPension">- GHS 525.25</td>
+            </tr>
+            <tr>
+              <td>Staff Welfare & Medical Fund</td>
+              <td style="text-align: right; color: var(--text-muted);" id="valWelfare">- GHS 150.00</td>
+            </tr>
+            <tr style="background: rgba(0,0,0,0.02);">
+              <td><strong>Total Deductions</strong></td>
+              <td style="text-align: right; color: var(--danger);" id="valDeductionsTotal"><strong>- GHS 1,916.75</strong></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- NET PAY CALLOUT -->
+      <div class="net-pay-banner">
+        <div>
+          <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--success);">
+            Net Disbursed Take-Home Pay
+          </div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+            Wired to verified staff commercial bank account
+          </div>
+        </div>
+        <div class="net-amount" id="valNetPay">
+          GHS 7,633.25
+        </div>
+      </div>
+
+      <!-- SIGNATURE / VERIFICATION FOOTER -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px dashed rgba(0,0,0,0.15); padding-top: 18px; font-size: 11px; color: var(--text-muted);">
+        <div>
+          <div>Generated by: <strong>FLAWLESS GRAPHICS — LUCY™ System</strong></div>
+          <div>Cryptographic Record Hash: <span style="font-family: monospace;" id="slipHash">a7f92b...e481</span></div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Director of Human Resources</div>
+          <div style="border-top: 1px solid #94a3b8; width: 160px; display: inline-block;"></div>
+          <div>Authorized Signature</div>
+        </div>
+      </div>
+
+    </div>
+
   </main>
 
-  <footer>
-    <p>© 2026 FLAWLESS GRAPHICS. All rights reserved.</p>
-  </footer>
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="modern-toast success">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toastMsg">Payslip rendered</span>
+  </div>
+
+  <!-- SCRIPT INTEGRATION -->
+  <script src="../../assets/js/auth-session.js"></script>
+  <script>
+    const user = window.AuthSession ? window.AuthSession.requireAuth('hr-login.html', true) : null;
+    const activeOrg = (user && user.org) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
+    const EMP_KEY = `${activeOrg}_employees`;
+
+    if (user && user.org) {
+      document.getElementById('headerOrgTitle').textContent = user.org.toUpperCase();
+      document.getElementById('slipOrgName').textContent = user.org.toUpperCase();
+    }
+
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const now = new Date();
+    document.getElementById('slipPeriod').textContent = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+    document.getElementById('slipHash').textContent = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
+
+    function getEmployees() {
+      try {
+        let list = JSON.parse(localStorage.getItem(EMP_KEY) || '[]');
+        if (!list || list.length === 0) {
+          list = [
+            { fullName: "James Ntiamoah", department: "Executive & Design", position: "Creative Director", salary: 8500, email: "james@flawless.org" },
+            { fullName: "Ama Serwaa", department: "Operations", position: "HR Manager", salary: 6200, email: "ama@flawless.org" },
+            { fullName: "Kwame Boateng", department: "Academic Staff", position: "Lead Instructor", salary: 5400, email: "kwame@flawless.org" },
+            { fullName: "Abena Mansa", department: "Finance", position: "Chief Accountant", salary: 7100, email: "abena@flawless.org" },
+            { fullName: "Kofi Owusu", department: "Digital Media", position: "Senior Designer", salary: 5000, email: "kofi@flawless.org" },
+            { fullName: "Esi Badu", department: "Academic Staff", position: "Science Educator", salary: 4800, email: "esi@flawless.org" }
+          ];
+          localStorage.setItem(EMP_KEY, JSON.stringify(list));
+        }
+        return list;
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function initEmployeeSelect() {
+      const emps = getEmployees();
+      const select = document.getElementById('employeeSelect');
+      select.innerHTML = '';
+
+      // Check query param for pre-selection
+      const urlParams = new URLSearchParams(window.location.search);
+      const targetName = urlParams.get('name');
+
+      emps.forEach((emp, i) => {
+        const empName = emp.fullName || emp.name || 'Staff Member';
+        const empDept = emp.department || emp.dept || 'Staff';
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = `${empName} — ${empDept}`;
+        if (targetName && empName.toLowerCase() === targetName.toLowerCase()) {
+          opt.selected = true;
+        }
+        select.appendChild(opt);
+      });
+
+      loadSelectedPayslip();
+    }
+
+    function loadSelectedPayslip() {
+      const select = document.getElementById('employeeSelect');
+      const emps = getEmployees();
+      const idx = parseInt(select.value, 10) || 0;
+      const emp = emps[idx] || emps[0];
+      if (!emp) return;
+
+      const empName = emp.fullName || emp.name || 'Staff Member';
+      const salary = Number(emp.salary || 0);
+      const allowance = Math.round(salary * 0.08);
+      const bonus = Math.round(salary * 0.05);
+      const gross = salary + allowance + bonus;
+
+      const tax = Math.round(gross * 0.13);
+      const pension = Math.round(salary * 0.055);
+      const welfare = 150;
+      const totalDeductions = tax + pension + welfare;
+      const net = gross - totalDeductions;
+
+      document.getElementById('slipEmpName').textContent = empName;
+      document.getElementById('slipEmpId').textContent = emp.id ? emp.id.toUpperCase() : `FG-EMP-00${idx + 1}`;
+      document.getElementById('slipEmpDept').textContent = emp.department || emp.dept || 'General';
+      document.getElementById('slipEmpRole').textContent = emp.position || emp.role || 'Staff';
+
+      document.getElementById('valBasic').textContent = `GHS ${salary.toLocaleString()}.00`;
+      document.getElementById('valAllowance').textContent = `GHS ${allowance.toLocaleString()}.00`;
+      document.getElementById('valBonus').textContent = `GHS ${bonus.toLocaleString()}.00`;
+      document.getElementById('valGrossTotal').textContent = `GHS ${gross.toLocaleString()}.00`;
+
+      document.getElementById('valTax').textContent = `- GHS ${tax.toLocaleString()}.00`;
+      document.getElementById('valPension').textContent = `- GHS ${pension.toLocaleString()}.00`;
+      document.getElementById('valWelfare').textContent = `- GHS ${welfare.toLocaleString()}.00`;
+      document.getElementById('valDeductionsTotal').textContent = `- GHS ${totalDeductions.toLocaleString()}.00`;
+
+      document.getElementById('valNetPay').textContent = `GHS ${net.toLocaleString()}.00`;
+    }
+
+    function downloadPayslipText() {
+      const name = document.getElementById('slipEmpName').textContent;
+      const net = document.getElementById('valNetPay').textContent;
+      const period = document.getElementById('slipPeriod').textContent;
+
+      const txt = `=====================================================
+${activeOrg.toUpperCase()} — OFFICIAL PAYSLIP STATEMENT
+=====================================================
+Period: ${period}
+Employee: ${name}
+ID: ${document.getElementById('slipEmpId').textContent}
+Department: ${document.getElementById('slipEmpDept').textContent}
+Designation: ${document.getElementById('slipEmpRole').textContent}
+-----------------------------------------------------
+Basic Salary: ${document.getElementById('valBasic').textContent}
+Allowances:   ${document.getElementById('valAllowance').textContent}
+Gross Total:  ${document.getElementById('valGrossTotal').textContent}
+-----------------------------------------------------
+PAYE Tax:     ${document.getElementById('valTax').textContent}
+Pension Fund: ${document.getElementById('valPension').textContent}
+Deductions:   ${document.getElementById('valDeductionsTotal').textContent}
+-----------------------------------------------------
+NET TAKE-HOME PAY: ${net}
+=====================================================
+Cryptographic Reference: ${document.getElementById('slipHash').textContent}
+`;
+      const blob = new Blob([txt], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `payslip_${name.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${period.replace(/\s+/g, '_')}.txt`;
+      a.click();
+      showToast('Payslip statement downloaded');
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2500);
+    }
+
+    // Theme Switcher
+    const htmlEl = document.documentElement;
+    const themeBtn = document.getElementById('themeBtn');
+    function applyTheme(isDark) {
+      if (isDark) {
+        htmlEl.classList.add('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i> <span>Light</span>';
+      } else {
+        htmlEl.classList.remove('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-moon"></i> <span>Dark</span>';
+      }
+      localStorage.setItem('fg_theme_dark', isDark);
+    }
+    const savedTheme = localStorage.getItem('fg_theme_dark');
+    applyTheme(savedTheme === 'true');
+    themeBtn.addEventListener('click', () => applyTheme(!htmlEl.classList.contains('dark')));
+
+    initEmployeeSelect();
+  </script>
 </body>
 </html>

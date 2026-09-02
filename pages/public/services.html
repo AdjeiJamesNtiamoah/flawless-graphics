@@ -1,71 +1,464 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Services | FLAWLESS GRAPHICS</title>
-  <link rel="stylesheet" href="../../assets/css/style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Our Services — FLAWLESS GRAPHICS Enterprise Platform</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Shared Modern Design System -->
+  <link rel="stylesheet" href="../../assets/css/shared-design.css">
+
+  <style>
+    /* Hero Section */
+    .services-hero {
+      text-align: center;
+      padding: 60px 20px 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: var(--radius-full);
+      background: var(--accent-glow);
+      color: var(--accent-primary);
+      border: 1px solid rgba(37, 99, 235, 0.25);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 20px;
+    }
+    .services-hero h2 {
+      font-size: 40px;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+    }
+    .services-hero h2 span {
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .services-hero p {
+      font-size: 16px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    /* Service Feature Cards */
+    .service-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transition: all var(--transition-base);
+    }
+    .service-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(37, 99, 235, 0.35);
+      box-shadow: var(--shadow-lg);
+    }
+    .service-icon-wrap {
+      width: 58px;
+      height: 58px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+    }
+    .service-card h3 {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: var(--text-main);
+    }
+    .service-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .service-feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .service-feature-list li {
+      font-size: 13px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .service-feature-list li i {
+      color: var(--success);
+      font-size: 12px;
+    }
+
+    /* Comparison / Tier Section */
+    .pricing-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-xl);
+      padding: 36px 28px;
+      text-align: center;
+      transition: all var(--transition-base);
+      position: relative;
+    }
+    .pricing-card.featured {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 30px rgba(37, 99, 235, 0.2);
+    }
+    .pricing-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent-gradient);
+      color: #fff;
+      padding: 4px 14px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .pricing-price {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin: 16px 0 8px;
+    }
+    .pricing-price span {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    /* CTA Section */
+    .cta-banner {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+      border: 1px solid rgba(37, 99, 235, 0.2);
+      border-radius: var(--radius-xl);
+      padding: 50px 30px;
+      text-align: center;
+      margin: 60px 0 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-banner h3 {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: var(--text-main);
+    }
+    .cta-banner p {
+      font-size: 15px;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 24px;
+    }
+  </style>
 </head>
 <body>
 
-  <header>
-    <nav class="navbar">
-      <div class="logo">
-        <img src="../../assets/images/logo.gif" alt="FLAWLESS GRAPHICS Logo" class="logo-img">
-        <div>
-          <h1>FLAWLESS GRAPHICS</h1>
-          <p class="tagline">TRUTH AND SERVICE</p>
-        </div>
+  <!-- Ambient Glows -->
+  <div class="ambient-glow ambient-top-left"></div>
+  <div class="ambient-glow ambient-bottom-right"></div>
+
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <a href="home.html" class="brand-wrapper">
+      <div class="brand-badge">FG</div>
+      <div class="brand-info">
+        <h1 id="headerOrgTitle">FLAWLESS GRAPHICS</h1>
+        <div class="brand-tagline">Truth and Service</div>
       </div>
-      <ul>
-        <li><a href="../../welcome.html">Hub</a></li>
-        <li><a href="home.html">Home</a></li>
-        <li><a href="../hr/employee.html">Employee Portal</a></li>
-        <li><a href="../hr/hr-dashboard.html">HR Dashboard</a></li>
-        <li><a href="services.html" class="active">Services</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-    </nav>
+    </a>
+
+    <ul class="nav-menu">
+      <li><a href="../../welcome.html" class="nav-link"><i class="fa-solid fa-grid-horizontal"></i> Hub</a></li>
+      <li><a href="home.html" class="nav-link"><i class="fa-solid fa-house"></i> Home</a></li>
+      <li><a href="../hr/employee.html" class="nav-link"><i class="fa-solid fa-users"></i> Employee Portal</a></li>
+      <li><a href="services.html" class="nav-link active"><i class="fa-solid fa-layer-group"></i> Services</a></li>
+      <li><a href="contact.html" class="nav-link"><i class="fa-solid fa-envelope"></i> Contact</a></li>
+    </ul>
+
+    <div class="header-actions">
+      <a href="../../welcome.html" class="hub-pill-btn">
+        <i class="fa-solid fa-gauge"></i> Workspace
+      </a>
+      <button class="theme-pill-btn" id="themeBtn">
+        <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
+      </button>
+    </div>
   </header>
 
-  <main class="services-section">
-    <h2>Our Services</h2>
-    <p class="services-intro">
-      FLAWLESS GRAPHICS offers intelligent HR, classroom, and financial management tools to simplify organizational operations, improve transparency, and enhance performance.
-    </p>
+  <!-- MAIN WRAPPER -->
+  <main class="main-wrapper">
 
-    <div class="service-grid">
+    <!-- HERO SECTION -->
+    <section class="services-hero">
+      <div class="hero-badge">
+        <i class="fa-solid fa-sparkles"></i> Enterprise Suite Capabilities
+      </div>
+      <h2>Engineered for <span>Operational Excellence</span></h2>
+      <p>
+        FLAWLESS GRAPHICS integrates workforce logistics, automated payroll runs, real-time classroom scheduling, and enterprise financial records into a single unified cloud system.
+      </p>
+    </section>
+
+    <!-- 6 CORE SERVICES GRID -->
+    <section class="grid-3" style="margin-top: 20px;">
+      
+      <!-- 1. Employee Management -->
       <div class="service-card">
-        <img src="https://img.icons8.com/color/96/000000/employee-card.png" alt="Employee Management">
-        <h3>Employee Management</h3>
-        <p>Manage employee profiles, roles, and department details effortlessly from a unified dashboard.</p>
+        <div>
+          <div class="service-icon-wrap" style="background: rgba(37, 99, 235, 0.12); color: #2563eb;">
+            <i class="fa-solid fa-user-gear"></i>
+          </div>
+          <h3>Workforce & HR Management</h3>
+          <p>
+            Centralize staff directories, role hierarchies, dynamic departmental structures, and digital employee files with zero friction.
+          </p>
+          <ul class="service-feature-list">
+            <li><i class="fa-solid fa-circle-check"></i> Unified Employee Profiles & History</li>
+            <li><i class="fa-solid fa-circle-check"></i> Departmental Headcount Allocation</li>
+            <li><i class="fa-solid fa-circle-check"></i> Instant CRUD & Document Storage</li>
+          </ul>
+        </div>
+        <a href="../hr/employee.html" class="btn-modern btn-secondary" style="width: 100%;">Open Portal</a>
       </div>
 
+      <!-- 2. Attendance Tracking -->
       <div class="service-card">
-        <img src="../../assets/images/employee-attendance-tracking-and-payroll.jpg" alt="Attendance Tracking Photo" class="service-photo">
-        <h3>Attendance Tracking</h3>
-        <p>Monitor attendance and work hours automatically with real-time insights and reports.</p>
+        <div>
+          <div class="service-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
+            <i class="fa-solid fa-clipboard-user"></i>
+          </div>
+          <h3>Smart Attendance & Check-In</h3>
+          <p>
+            Monitor real-time clock-in/out, calculate automated punctuality scores, and capture daily workforce presence with one click.
+          </p>
+          <ul class="service-feature-list">
+            <li><i class="fa-solid fa-circle-check"></i> Real-Time Daily Attendance Log</li>
+            <li><i class="fa-solid fa-circle-check"></i> Automated Punctuality % Metrics</li>
+            <li><i class="fa-solid fa-circle-check"></i> Remote Check-in & Time Logging</li>
+          </ul>
+        </div>
+        <a href="../hr/attendance-summary.html" class="btn-modern btn-secondary" style="width: 100%;">View Attendance</a>
       </div>
 
+      <!-- 3. Payroll Automation -->
       <div class="service-card">
-        <img src="../../assets/images/Payroll automation.jpeg" alt="Payroll Automation Photo" class="service-photo">
-        <h3>Payroll Automation</h3>
-        <p>Automate salary computation and generate digital payslips seamlessly.</p>
+        <div>
+          <div class="service-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
+            <i class="fa-solid fa-money-bill-transfer"></i>
+          </div>
+          <h3>Automated Payroll & Payslips</h3>
+          <p>
+            Eliminate calculation errors. Run bulk monthly payrolls, compute tax withholdings, and disburse cryptographic digital payslips.
+          </p>
+          <ul class="service-feature-list">
+            <li><i class="fa-solid fa-circle-check"></i> Gross to Net Automated Calculations</li>
+            <li><i class="fa-solid fa-circle-check"></i> Digital PDF Printable Payslips</li>
+            <li><i class="fa-solid fa-circle-check"></i> Department Payroll Analytics</li>
+          </ul>
+        </div>
+        <a href="../hr/payroll.html" class="btn-modern btn-secondary" style="width: 100%;">Explore Payroll</a>
       </div>
 
+      <!-- 4. Classroom & Teacher Module -->
       <div class="service-card">
-        <img src="https://img.icons8.com/color/96/000000/graph.png" alt="Analytics Dashboard">
-        <h3>Analytics Dashboard</h3>
-        <p>Visualize workforce data, performance trends, and payroll reports for better decision-making.</p>
+        <div>
+          <div class="service-icon-wrap" style="background: rgba(168, 85, 247, 0.12); color: #a855f7;">
+            <i class="fa-solid fa-chalkboard-user"></i>
+          </div>
+          <h3>Classroom & Academic Suite</h3>
+          <p>
+            Equip educators with interactive class timetables, student roll calls, subject schedulers, and lesson note management.
+          </p>
+          <ul class="service-feature-list">
+            <li><i class="fa-solid fa-circle-check"></i> Weekly Timetable Grid Matrix</li>
+            <li><i class="fa-solid fa-circle-check"></i> Student Roster & Roll Marking</li>
+            <li><i class="fa-solid fa-circle-check"></i> Teacher-to-HR Messaging & Leave</li>
+          </ul>
+        </div>
+        <a href="../teacher/teacher-dashboard.html" class="btn-modern btn-secondary" style="width: 100%;">Teacher Portal</a>
       </div>
-    </div>
+
+      <!-- 5. Finance & Ledger -->
+      <div class="service-card">
+        <div>
+          <div class="service-icon-wrap" style="background: rgba(6, 182, 212, 0.12); color: #06b6d4;">
+            <i class="fa-solid fa-chart-pie"></i>
+          </div>
+          <h3>Financial Control & Ledger</h3>
+          <p>
+            Maintain complete visibility over organizational cashflow, departmental cost allocations, operational invoices, and audits.
+          </p>
+          <ul class="service-feature-list">
+            <li><i class="fa-solid fa-circle-check"></i> Real-time Expenditure Breakdown</li>
+            <li><i class="fa-solid fa-circle-check"></i> Department Budget Monitoring</li>
+            <li><i class="fa-solid fa-circle-check"></i> Financial Statement Auditing</li>
+          </ul>
+        </div>
+        <a href="../finance/finance-dashboard.html" class="btn-modern btn-secondary" style="width: 100%;">Finance Portal</a>
+      </div>
+
+      <!-- 6. Enterprise Security -->
+      <div class="service-card">
+        <div>
+          <div class="service-icon-wrap" style="background: rgba(239, 68, 68, 0.12); color: #ef4444;">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <h3>Enterprise Security & SSO</h3>
+          <p>
+            Safeguard your organization's records with SHA-256 password hashing, unified SSO tokens, and strict role-based access control.
+          </p>
+          <ul class="service-feature-list">
+            <li><i class="fa-solid fa-circle-check"></i> Unified Multi-Tenant SSO Bridge</li>
+            <li><i class="fa-solid fa-circle-check"></i> Granular Role-Based Permissions</li>
+            <li><i class="fa-solid fa-circle-check"></i> Full Session Persistence & Guard</li>
+          </ul>
+        </div>
+        <a href="../../site-login.html" class="btn-modern btn-secondary" style="width: 100%;">Access Control</a>
+      </div>
+
+    </section>
+
+    <!-- SERVICE PACKAGES / EDITIONS -->
+    <section style="margin-top: 60px;">
+      <div style="text-align: center; margin-bottom: 36px;">
+        <h2 style="font-size: 28px; font-weight: 800;">Modular Deployment Editions</h2>
+        <p style="color: var(--text-muted); font-size: 14px; margin-top: 6px;">Scale features dynamically as your workforce expands</p>
+      </div>
+
+      <div class="grid-3">
+        <!-- Starter -->
+        <div class="pricing-card">
+          <h3 style="font-size: 20px; font-weight: 700;">Essential Starter</h3>
+          <div class="pricing-price">Free <span>/ Open Source</span></div>
+          <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Ideal for small companies & pilot schools.</p>
+          <ul class="service-feature-list" style="text-align: left;">
+            <li><i class="fa-solid fa-check"></i> Up to 50 Employee Records</li>
+            <li><i class="fa-solid fa-check"></i> Basic Attendance Tracking</li>
+            <li><i class="fa-solid fa-check"></i> Standard Payslip Generation</li>
+            <li><i class="fa-solid fa-check"></i> Single Administrator Access</li>
+          </ul>
+          <a href="../../index.html" class="btn-modern btn-secondary" style="width: 100%;">Get Started</a>
+        </div>
+
+        <!-- Professional -->
+        <div class="pricing-card featured">
+          <div class="pricing-badge">Most Popular</div>
+          <h3 style="font-size: 20px; font-weight: 700;">Professional Suite</h3>
+          <div class="pricing-price">Enterprise <span>/ Complete</span></div>
+          <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">For expanding companies and multi-branch schools.</p>
+          <ul class="service-feature-list" style="text-align: left;">
+            <li><i class="fa-solid fa-check"></i> Unlimited Employee Directory</li>
+            <li><i class="fa-solid fa-check"></i> Advanced Automated Payroll & Tax</li>
+            <li><i class="fa-solid fa-check"></i> Classroom Timetables & Rosters</li>
+            <li><i class="fa-solid fa-check"></i> Finance Ledger & Chart Analytics</li>
+            <li><i class="fa-solid fa-check"></i> Unified Multi-Portal SSO</li>
+          </ul>
+          <a href="../../welcome.html" class="btn-modern btn-primary" style="width: 100%;">Launch Workspace</a>
+        </div>
+
+        <!-- Custom -->
+        <div class="pricing-card">
+          <h3 style="font-size: 20px; font-weight: 700;">Custom Dedicated</h3>
+          <div class="pricing-price">Custom <span>/ SLA</span></div>
+          <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Custom on-premise or cloud deployments.</p>
+          <ul class="service-feature-list" style="text-align: left;">
+            <li><i class="fa-solid fa-check"></i> Dedicated MySQL/PHP Integration</li>
+            <li><i class="fa-solid fa-check"></i> Custom KPI Dashboards</li>
+            <li><i class="fa-solid fa-check"></i> Biometric Device API Hooks</li>
+            <li><i class="fa-solid fa-check"></i> 24/7 Priority Support</li>
+          </ul>
+          <a href="contact.html" class="btn-modern btn-secondary" style="width: 100%;">Contact Engineers</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CALL TO ACTION BANNER -->
+    <section class="cta-banner">
+      <h3>Ready to Elevate Your Organization's Management?</h3>
+      <p>
+        Get instant access to the FLAWLESS GRAPHICS — LUCY™ platform today. No complex setup required.
+      </p>
+      <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+        <a href="../../welcome.html" class="btn-modern btn-primary"><i class="fa-solid fa-rocket"></i> Access Central Hub</a>
+        <a href="contact.html" class="btn-modern btn-secondary"><i class="fa-solid fa-headset"></i> Request Consultation</a>
+      </div>
+    </section>
+
   </main>
 
-  <footer>
-    <p>&copy; 2026 FLAWLESS GRAPHICS. All rights reserved.</p>
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <p>&copy; <span id="footerYear"></span> FLAWLESS GRAPHICS. Truth and Service. All rights reserved.</p>
   </footer>
 
-  <script src="../../assets/js/theme.js"></script>
+  <!-- SCRIPT INTEGRATION -->
+  <script src="../../assets/js/auth-session.js"></script>
+  <script>
+    // 1. Theme Switcher
+    const htmlEl = document.documentElement;
+    const themeBtn = document.getElementById('themeBtn');
+    const themeText = document.getElementById('themeText');
+
+    function applyTheme(isDark) {
+      if (isDark) {
+        htmlEl.classList.add('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i> <span>Light</span>';
+      } else {
+        htmlEl.classList.remove('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-moon"></i> <span>Dark</span>';
+      }
+      localStorage.setItem('fg_theme_dark', isDark);
+    }
+
+    const savedTheme = localStorage.getItem('fg_theme_dark');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(savedTheme === null ? prefersDark : savedTheme === 'true');
+
+    themeBtn.addEventListener('click', () => {
+      applyTheme(!htmlEl.classList.contains('dark'));
+    });
+
+    // 2. Organization Brand Name Sync
+    const user = window.AuthSession ? window.AuthSession.getUser() : null;
+    if (user && user.org) {
+      document.getElementById('headerOrgTitle').textContent = user.org.toUpperCase();
+    }
+    document.getElementById('footerYear').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>

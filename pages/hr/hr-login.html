@@ -342,11 +342,15 @@
           <span>Sign In to HR Dashboard</span>
           <i class="fa-solid fa-arrow-right"></i>
         </button>
+        <button type="button" class="btn-submit" style="margin-top: 10px; background: rgba(37,99,235,0.1); border: 1px solid rgba(37,99,235,0.3); color: var(--text-main);" onclick="quickDemoHRLogin()">
+          <i class="fa-solid fa-bolt" style="color: var(--accent);"></i>
+          <span>One-Click Demo HR Access</span>
+        </button>
       </form>
 
       <!-- CARD FOOTER RETURN LINK -->
       <div class="card-footer-link">
-        <a href="welcome.html"><i class="fa-solid fa-house"></i> Return to Welcome Page</a>
+        <a href="../../welcome.html"><i class="fa-solid fa-house"></i> Return to Central Hub</a>
       </div>
     </div>
   </main>
@@ -357,6 +361,7 @@
 
   <!-- SCRIPT LOGIC -->
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="../../assets/js/auth-session.js"></script>
   <script>
     AOS.init({ once: true });
 
@@ -392,13 +397,21 @@
       togglePassword.classList.toggle('fa-eye-slash');
     });
 
+    // Quick Demo HR Access
+    function quickDemoHRLogin() {
+      if (window.AuthSession) {
+        window.AuthSession.initDemoSession();
+      }
+      window.location.href = 'hr-dashboard.html';
+    }
+
     // ---------- LOGIN AUTH LOGIC ----------
     const loginForm = document.getElementById('hrLoginForm');
     const errorBox = document.getElementById('errorBox');
     const errorMessage = document.getElementById('errorMessage');
 
     // Pre-fill active org if available
-    const existingOrg = localStorage.getItem('active_org') || localStorage.getItem('activeOrg');
+    const existingOrg = (window.AuthSession ? window.AuthSession.getOrg() : null) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
     if (existingOrg) document.getElementById('orgName').value = existingOrg;
 
     loginForm.addEventListener('submit', (e) => {
@@ -418,13 +431,22 @@
         return;
       }
 
-      // Persist active session credentials for dashboard reading
-      localStorage.setItem('active_org', orgName);
-      localStorage.setItem('activeHR', JSON.stringify({
-        name: hrEmail.split('@')[0],
-        email: hrEmail,
-        role: 'HR Admin'
-      }));
+      // Persist active session credentials across all portals
+      if (window.AuthSession) {
+        window.AuthSession.setUser({
+          org: orgName,
+          name: hrEmail.split('@')[0],
+          email: hrEmail,
+          role: 'hr'
+        });
+      } else {
+        localStorage.setItem('active_org', orgName);
+        localStorage.setItem('activeHR', JSON.stringify({
+          name: hrEmail.split('@')[0],
+          email: hrEmail,
+          role: 'HR Admin'
+        }));
+      }
 
       // Redirect to the HR Dashboard
       window.location.href = 'hr-dashboard.html';

@@ -556,27 +556,27 @@
     </div>
 </div>
 
+<script src="assets/js/auth-session.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     try {
-        const activeUserRaw = localStorage.getItem("active_org_user");
-        if (activeUserRaw) {
-            const activeUser = JSON.parse(activeUserRaw);
-
+        // Auto-synchronize session across all portals (HR, Teacher, Finance, Public)
+        const user = window.AuthSession ? window.AuthSession.requireAuth('site-login.html', true) : null;
+        if (user) {
             // Display Active User Badge
-            if (activeUser.name) {
-                document.getElementById("userName").textContent = activeUser.name;
+            if (user.name) {
+                document.getElementById("userName").textContent = user.name;
                 document.getElementById("userBadge").style.display = "flex";
             }
 
             // Display Registered Organization Name if available
-            if (activeUser.org) {
-                document.getElementById("orgTitle").textContent = activeUser.org.toUpperCase();
+            if (user.org) {
+                document.getElementById("orgTitle").textContent = user.org.toUpperCase();
             }
 
             // Display Saved Organization Logo if uploaded
-            if (activeUser.logo) {
-                document.getElementById("orgLogoBox").innerHTML = `<img src="${activeUser.logo}" alt="Organization Logo">`;
+            if (user.logo) {
+                document.getElementById("orgLogoBox").innerHTML = `<img src="${user.logo}" alt="Organization Logo">`;
             }
         }
     } catch (e) {
@@ -585,7 +585,12 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function logout() {
-    localStorage.removeItem("active_org_user");
+    if (window.AuthSession) {
+        window.AuthSession.logout('site-login.html');
+    } else {
+        localStorage.clear();
+        window.location.href = "site-login.html";
+    }
 }
 </script>
 

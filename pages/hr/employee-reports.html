@@ -1,75 +1,368 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Employee Reports | FLAWLESS GRAPHICS</title>
-  <link rel="stylesheet" href="../../assets/css/style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Workforce & Department Reports — FLAWLESS GRAPHICS HR</title>
+
+  <!-- Google Fonts & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Shared Modern Design System -->
+  <link rel="stylesheet" href="../../assets/css/shared-design.css">
 </head>
 <body>
-  <header>
-    <div class="logo">
-      <img src="../../assets/images/logo.gif" alt="FLAWLESS GRAPHICS Logo" class="logo-img">
-      <h1>FLAWLESS GRAPHICS</h1>
+
+  <!-- Ambient Glows -->
+  <div class="ambient-glow ambient-top-left"></div>
+  <div class="ambient-glow ambient-bottom-right"></div>
+
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <a href="../public/home.html" class="brand-wrapper">
+      <div class="brand-badge">FG</div>
+      <div class="brand-info">
+        <h1 id="headerOrgTitle">FLAWLESS GRAPHICS</h1>
+        <div class="brand-tagline">Department Reports & Workforce Analytics</div>
+      </div>
+    </a>
+
+    <ul class="nav-menu">
+      <li><a href="../../welcome.html" class="nav-link"><i class="fa-solid fa-grid-horizontal"></i> Hub</a></li>
+      <li><a href="hr-dashboard.html" class="nav-link"><i class="fa-solid fa-gauge"></i> HR Dashboard</a></li>
+      <li><a href="employee.html" class="nav-link"><i class="fa-solid fa-users"></i> Employees</a></li>
+      <li><a href="attendance-summary.html" class="nav-link"><i class="fa-solid fa-clipboard-user"></i> Attendance</a></li>
+      <li><a href="payroll.html" class="nav-link"><i class="fa-solid fa-money-bill-wave"></i> Payroll</a></li>
+      <li><a href="employee-reports.html" class="nav-link active"><i class="fa-solid fa-file-lines"></i> Reports</a></li>
+    </ul>
+
+    <div class="header-actions">
+      <button class="theme-pill-btn" id="themeBtn">
+        <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
+      </button>
+      <a href="hr-dashboard.html" class="hub-pill-btn">
+        <i class="fa-solid fa-arrow-left"></i> HR Main
+      </a>
     </div>
-    <nav>
-      <a href="../../welcome.html">Hub</a>
-      <a href="../public/home.html">Home</a>
-      <a href="employee.html">Employee Portal</a>
-      <a href="hr-dashboard.html">HR Dashboard</a>
-    </nav>
   </header>
 
-  <main class="dashboard-layout">
-    <aside class="sidebar">
-      <h2>HR Navigation</h2>
-      <ul>
-        <li><a href="hr-dashboard.html">Main Dashboard</a></li>
-        <li><a href="employee-reports.html" class="active">Employee Reports</a></li>
-        <li><a href="attendance-summary.html">Attendance Summary</a></li>
-        <li><a href="payroll.html">Payroll Analytics</a></li>
-        <li><a href="payslip.html">Payslips</a></li>
-        <li><a href="performance.html">Performance Overview</a></li>
-      </ul>
-    </aside>
+  <!-- MAIN WRAPPER -->
+  <main class="main-wrapper">
 
-    <section class="dashboard-main">
-      <h2>Employee Reports</h2>
-      <p>View and manage detailed employee records and department summaries here.</p>
-      <div class="card" style="margin-top: 20px; padding: 20px;">
-        <table id="empSummaryTable" style="width: 100%; border-collapse: collapse;">
+    <!-- KPI STATS CARDS -->
+    <section class="grid-4" style="margin-bottom: 24px;">
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-blue">
+          <i class="fa-solid fa-people-roof"></i>
+        </div>
+        <div>
+          <div class="stat-label">Total Headcount</div>
+          <div class="stat-value" id="kpiTotalEmps">0</div>
+          <div class="stat-trend positive"><i class="fa-solid fa-check"></i> 100% active standing</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-purple">
+          <i class="fa-solid fa-network-wired"></i>
+        </div>
+        <div>
+          <div class="stat-label">Operational Units</div>
+          <div class="stat-value" id="kpiDeptCount">0</div>
+          <div class="stat-trend">Core departments</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-amber">
+          <i class="fa-solid fa-scale-balanced"></i>
+        </div>
+        <div>
+          <div class="stat-label">Avg Salary per Staff</div>
+          <div class="stat-value" id="kpiAvgSalary">GHS 0</div>
+          <div class="stat-trend">Competitive tier</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-green">
+          <i class="fa-solid fa-file-shield"></i>
+        </div>
+        <div>
+          <div class="stat-label">Annualized Run Rate</div>
+          <div class="stat-value" id="kpiAnnualRun">GHS 0</div>
+          <div class="stat-trend">12-month budget</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GRID WITH CHART & DEPARTMENT BREAKDOWN -->
+    <div class="grid-2" style="margin-bottom: 24px; align-items: stretch;">
+      <div class="glass-card">
+        <div class="glass-card-header">
+          <div>
+            <h3 class="glass-card-title"><i class="fa-solid fa-chart-pie"></i> Headcount Distribution</h3>
+            <div class="glass-card-subtitle">Staff allocation percentage by department</div>
+          </div>
+        </div>
+        <div style="height: 250px; position: relative;">
+          <canvas id="deptHeadcountChart"></canvas>
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <div class="glass-card-header">
+          <div>
+            <h3 class="glass-card-title"><i class="fa-solid fa-table-list"></i> Department Summary</h3>
+            <div class="glass-card-subtitle">Staff density and payroll weight</div>
+          </div>
+          <button class="btn-modern btn-secondary btn-sm" onclick="exportReportsCSV()">
+            <i class="fa-solid fa-file-csv"></i> Export CSV
+          </button>
+        </div>
+        <div class="table-responsive">
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th>Department</th>
+                <th>Staff Count</th>
+                <th>Share %</th>
+                <th>Total Payroll</th>
+              </tr>
+            </thead>
+            <tbody id="deptSummaryBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- FULL PERSONNEL REPORT REGISTER -->
+    <div class="glass-card">
+      <div class="glass-card-header">
+        <div>
+          <h2 class="glass-card-title"><i class="fa-solid fa-folder-open"></i> Complete Personnel Ledger</h2>
+          <div class="glass-card-subtitle">Detailed verification report for administration & auditing</div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-modern btn-primary btn-sm" onclick="window.print()">
+            <i class="fa-solid fa-print"></i> Print Report
+          </button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="modern-table">
           <thead>
-            <tr style="border-bottom: 2px solid #ddd; text-align: left;">
-              <th style="padding: 10px;">Department</th>
-              <th style="padding: 10px;">Staff Count</th>
-              <th style="padding: 10px;">Status</th>
+            <tr>
+              <th>#</th>
+              <th>Full Name</th>
+              <th>Department</th>
+              <th>Role</th>
+              <th>Email</th>
+              <th>Monthly Compensation</th>
+              <th>Status</th>
             </tr>
           </thead>
-          <tbody id="reportTableBody">
-            <tr>
-              <td style="padding: 10px;">Executive & Operations</td>
-              <td style="padding: 10px;">4</td>
-              <td style="padding: 10px;"><span style="color: #10b981; font-weight: 600;">Active</span></td>
-            </tr>
-            <tr>
-              <td style="padding: 10px;">Graphic Design & Media</td>
-              <td style="padding: 10px;">8</td>
-              <td style="padding: 10px;"><span style="color: #10b981; font-weight: 600;">Active</span></td>
-            </tr>
-            <tr>
-              <td style="padding: 10px;">Teaching & Academic Staff</td>
-              <td style="padding: 10px;">12</td>
-              <td style="padding: 10px;"><span style="color: #10b981; font-weight: 600;">Active</span></td>
-            </tr>
+          <tbody id="fullReportTableBody">
+            <!-- Rendered via JS -->
           </tbody>
         </table>
       </div>
-    </section>
+    </div>
+
   </main>
 
-  <footer>
-    <p>© 2026 FLAWLESS GRAPHICS. All rights reserved.</p>
-  </footer>
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="modern-toast success">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toastMsg">Report updated</span>
+  </div>
+
+  <!-- SCRIPT INTEGRATION -->
+  <script src="../../assets/js/auth-session.js"></script>
+  <script>
+    const user = window.AuthSession ? window.AuthSession.requireAuth('hr-login.html', true) : null;
+    const activeOrg = (user && user.org) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
+    const EMP_KEY = `${activeOrg}_employees`;
+
+    if (user && user.org) {
+      document.getElementById('headerOrgTitle').textContent = user.org.toUpperCase();
+    }
+
+    function getEmployees() {
+      try {
+        let list = JSON.parse(localStorage.getItem(EMP_KEY) || '[]');
+        if (!list || list.length === 0) {
+          list = [
+            { fullName: "James Ntiamoah", department: "Executive & Design", position: "Creative Director", salary: 8500, email: "james@flawless.org" },
+            { fullName: "Ama Serwaa", department: "Operations", position: "HR Manager", salary: 6200, email: "ama@flawless.org" },
+            { fullName: "Kwame Boateng", department: "Academic Staff", position: "Lead Instructor", salary: 5400, email: "kwame@flawless.org" },
+            { fullName: "Abena Mansa", department: "Finance", position: "Chief Accountant", salary: 7100, email: "abena@flawless.org" },
+            { fullName: "Kofi Owusu", department: "Digital Media", position: "Senior Designer", salary: 5000, email: "kofi@flawless.org" },
+            { fullName: "Esi Badu", department: "Academic Staff", position: "Science Educator", salary: 4800, email: "esi@flawless.org" }
+          ];
+          localStorage.setItem(EMP_KEY, JSON.stringify(list));
+        }
+        return list;
+      } catch (e) {
+        return [];
+      }
+    }
+
+    let chartInstance = null;
+
+    function renderReports() {
+      const emps = getEmployees();
+      const totalCount = emps.length;
+      const deptCounts = {};
+      const deptPayrolls = {};
+
+      let totalPayroll = 0;
+
+      emps.forEach(e => {
+        const d = (e.department || 'General').trim();
+        deptCounts[d] = (deptCounts[d] || 0) + 1;
+        const sal = Number(e.salary || 0);
+        deptPayrolls[d] = (deptPayrolls[d] || 0) + sal;
+        totalPayroll += sal;
+      });
+
+      const avgSalary = totalCount ? Math.round(totalPayroll / totalCount) : 0;
+      const annualRun = totalPayroll * 12;
+
+      document.getElementById('kpiTotalEmps').textContent = totalCount;
+      document.getElementById('kpiDeptCount').textContent = Object.keys(deptCounts).length;
+      document.getElementById('kpiAvgSalary').textContent = `GHS ${avgSalary.toLocaleString()}`;
+      document.getElementById('kpiAnnualRun').textContent = `GHS ${annualRun.toLocaleString()}`;
+
+      // Render Department Summary Table
+      const dBody = document.getElementById('deptSummaryBody');
+      dBody.innerHTML = '';
+      Object.keys(deptCounts).forEach(d => {
+        const count = deptCounts[d];
+        const pct = totalCount ? Math.round((count / totalCount) * 100) : 0;
+        const salSum = deptPayrolls[d] || 0;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${escapeHtml(d)}</strong></td>
+          <td><span class="badge-pill badge-info">${count} staff</span></td>
+          <td style="font-weight: 700;">${pct}%</td>
+          <td style="font-weight: 700; color: var(--accent-primary);">GHS ${salSum.toLocaleString()}</td>
+        `;
+        dBody.appendChild(tr);
+      });
+
+      // Render Full Personnel Table
+      const fBody = document.getElementById('fullReportTableBody');
+      fBody.innerHTML = '';
+      emps.forEach((e, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="color: var(--text-muted); font-weight: 600;">${i + 1}</td>
+          <td style="font-weight: 700;">${escapeHtml(e.fullName)}</td>
+          <td><span class="badge-pill badge-purple">${escapeHtml(e.department || 'General')}</span></td>
+          <td>${escapeHtml(e.position || 'Staff')}</td>
+          <td style="color: var(--text-muted); font-size: 12px;">${escapeHtml(e.email || '—')}</td>
+          <td style="font-weight: 700; color: var(--success);">GHS ${Number(e.salary || 0).toLocaleString()}</td>
+          <td><span class="badge-pill badge-success"><i class="fa-solid fa-circle" style="font-size: 7px;"></i> Active</span></td>
+        `;
+        fBody.appendChild(tr);
+      });
+
+      // Render Donut Chart
+      renderChart(deptCounts);
+    }
+
+    function renderChart(deptCounts) {
+      if (!window.Chart) return;
+      const canvas = document.getElementById('deptHeadcountChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      const labels = Object.keys(deptCounts);
+      const data = Object.values(deptCounts);
+      const isDark = document.documentElement.classList.contains('dark');
+      const textColor = isDark ? '#94A3B8' : '#64748B';
+
+      chartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: ['#2563EB', '#06B6D4', '#8B5CF6', '#10B981', '#F59E0B', '#EC4899'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: { color: textColor, font: { family: 'Plus Jakarta Sans', size: 11 } }
+            }
+          },
+          cutout: '65%'
+        }
+      });
+    }
+
+    function exportReportsCSV() {
+      const emps = getEmployees();
+      let csv = 'Personnel Name,Department,Position,Email,Salary,Status\n';
+      emps.forEach(e => {
+        csv += `"${e.fullName}","${e.department}","${e.position}","${e.email}","${e.salary}","Active"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `headcount_report_${activeOrg.toLowerCase().replace(/[^a-z0-9]/g, '_')}.csv`;
+      a.click();
+      showToast('Workforce report exported');
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2500);
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // Theme Switcher
+    const htmlEl = document.documentElement;
+    const themeBtn = document.getElementById('themeBtn');
+    function applyTheme(isDark) {
+      if (isDark) {
+        htmlEl.classList.add('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i> <span>Light</span>';
+      } else {
+        htmlEl.classList.remove('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-moon"></i> <span>Dark</span>';
+      }
+      localStorage.setItem('fg_theme_dark', isDark);
+      if (chartInstance) renderReports();
+    }
+    const savedTheme = localStorage.getItem('fg_theme_dark');
+    applyTheme(savedTheme === 'true');
+    themeBtn.addEventListener('click', () => applyTheme(!htmlEl.classList.contains('dark')));
+
+    renderReports();
+  </script>
 </body>
 </html>

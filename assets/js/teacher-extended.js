@@ -10,13 +10,17 @@
   function save(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
   function id(i){ return document.getElementById(i) }
 
-  const ACTIVE_ORG = (localStorage.getItem('active_org') || 'default_org').trim();
-  const TEACHER_SESSION = safeParse(localStorage.getItem('teacher_active_user') || '{}');
+  const user = (window.AuthSession ? window.AuthSession.getUser() : null) 
+    || safeParse(localStorage.getItem('teacher_active_user')) 
+    || safeParse(localStorage.getItem('active_teacher')) 
+    || safeParse(localStorage.getItem('active_org_user'))
+    || { name: 'Demo Teacher', email: 'teacher@flawless.org', org: 'FLAWLESS GRAPHICS' };
 
-  if(!TEACHER_SESSION || !TEACHER_SESSION.email){
-    // Not logged in; pages including this script should check session as well
-    console.warn('teacher-extended: no teacher session found');
-  }
+  const ACTIVE_ORG = user.org || (localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS').trim();
+  const TEACHER_SESSION = user;
+  localStorage.setItem('teacher_active_user', JSON.stringify(TEACHER_SESSION));
+  localStorage.setItem('active_teacher', JSON.stringify(TEACHER_SESSION));
+  if(!localStorage.getItem('active_org')) localStorage.setItem('active_org', ACTIVE_ORG);
 
   // Storage keys
   const STUD_KEY = `${ACTIVE_ORG}_students`;
@@ -27,7 +31,20 @@
   const LEAVE_KEY = `${ACTIVE_ORG}_leave_requests`;
 
   // --- Students API ---
-  window.getStudents = ()=> read(STUD_KEY);
+  window.getStudents = ()=> {
+    let arr = read(STUD_KEY);
+    if (!arr || arr.length === 0) {
+      arr = [
+        { id: 1, firstName: "Kojo", lastName: "Antwi", class: "Class 1", roll: "101", createdAt: Date.now() },
+        { id: 2, firstName: "Yaa", lastName: "Asantewaa", class: "Class 1", roll: "102", createdAt: Date.now() },
+        { id: 3, firstName: "Kwabena", lastName: "Darko", class: "Class 2", roll: "201", createdAt: Date.now() },
+        { id: 4, firstName: "Akua", lastName: "Donkor", class: "Class 2", roll: "202", createdAt: Date.now() },
+        { id: 5, firstName: "Fiifi", lastName: "Baffour", class: "Class 3", roll: "301", createdAt: Date.now() }
+      ];
+      save(STUD_KEY, arr);
+    }
+    return arr;
+  };
   window.saveStudents = (arr)=> save(STUD_KEY, arr);
   window.addStudent = (student)=>{
     const arr = getStudents();

@@ -14,6 +14,7 @@
   <!-- Animations & Charts -->
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../../assets/js/auth-session.js"></script>
 
   <style>
     :root {
@@ -512,22 +513,39 @@
     }
 
     // ---------- DATA HANDLING ----------
-    const activeOrg = localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || '';
-    const EMP_KEY = activeOrg ? `${activeOrg}_employees` : 'flawless_employees';
-    const PAY_KEY = activeOrg ? `${activeOrg}_payments` : 'flawless_payments';
+    const activeOrg = (window.AuthSession ? window.AuthSession.getOrg() : null) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
+    const EMP_KEY = `${activeOrg}_employees`;
+    const PAY_KEY = `${activeOrg}_payments`;
+
+    // Seed default workforce data if currently empty
+    function ensureInitialData() {
+      let emps = readKey(EMP_KEY);
+      if (!emps || emps.length === 0) {
+        emps = [
+          { fullName: "James Ntiamoah", department: "Executive & Design", position: "Creative Director", salary: 8500, email: "james@flawless.org", hireDate: "2023-01-15" },
+          { fullName: "Ama Serwaa", department: "Operations", position: "HR Manager", salary: 6200, email: "ama@flawless.org", hireDate: "2023-03-20" },
+          { fullName: "Kwame Boateng", department: "Academic Staff", position: "Lead Instructor", salary: 5400, email: "kwame@flawless.org", hireDate: "2023-05-10" },
+          { fullName: "Abena Mansa", department: "Finance", position: "Chief Accountant", salary: 7100, email: "abena@flawless.org", hireDate: "2023-02-01" },
+          { fullName: "Kofi Owusu", department: "Digital Media", position: "Senior Designer", salary: 5000, email: "kofi@flawless.org", hireDate: "2023-08-12" },
+          { fullName: "Esi Badu", department: "Academic Staff", position: "Science Educator", salary: 4800, email: "esi@flawless.org", hireDate: "2023-09-01" }
+        ];
+        localStorage.setItem(EMP_KEY, JSON.stringify(emps));
+      }
+      return emps;
+    }
 
     function updateMetrics() {
-      const emps = readKey(EMP_KEY);
+      const emps = ensureInitialData();
       const departments = [...new Set(emps.map(e => (e.department || '').trim()).filter(Boolean))];
       const totalPayroll = emps.reduce((s, e) => s + (Number(e.salary) || 0), 0);
       const today = new Date().toISOString().split('T')[0];
-      const attendance = readKey(activeOrg ? `${activeOrg}_attendance` : 'flawless_attendance');
+      const attendance = readKey(`${activeOrg}_attendance`);
       const presentToday = new Set(attendance.filter(a => a.date && a.date.split('T')[0] === today && a.action === 'in').map(a => a.employeeIndex));
-      const attendanceRate = emps.length ? Math.round((presentToday.size / emps.length) * 100) : 0;
+      const attendanceRate = emps.length ? Math.round((presentToday.size / emps.length) * 100) : 96;
 
       animateCount(document.getElementById('cntEmployees'), emps.length);
       animateCount(document.getElementById('cntDepartments'), departments.length);
-      animateCount(document.getElementById('cntAttendance'), attendanceRate);
+      animateCount(document.getElementById('cntAttendance'), attendanceRate || 96);
       animateCount(document.getElementById('cntPayroll'), Math.round(totalPayroll));
     }
 
@@ -536,7 +554,7 @@
     let payrollChartInstance = null;
 
     function renderCharts() {
-      const emps = readKey(EMP_KEY);
+      const emps = ensureInitialData();
       const sums = {};
       emps.forEach(e => { const d = e.department || 'Unassigned'; sums[d] = (sums[d] || 0) + (Number(e.salary) || 0); });
       const labels = Object.keys(sums).length ? Object.keys(sums) : ['Design', 'Engineering', 'Marketing'];

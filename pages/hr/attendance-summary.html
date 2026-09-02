@@ -1,60 +1,530 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Attendance Summary | FLAWLESS GRAPHICS</title>
-  <link rel="stylesheet" href="../../assets/css/style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Attendance Summary — FLAWLESS GRAPHICS HR</title>
+
+  <!-- Google Fonts & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Shared Modern Design System -->
+  <link rel="stylesheet" href="../../assets/css/shared-design.css">
+
+  <style>
+    .avatar-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .emp-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      object-fit: cover;
+      background: var(--accent-glow);
+      border: 1px solid var(--border-card);
+      flex-shrink: 0;
+    }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-xl);
+      max-width: 500px;
+      width: 100%;
+      padding: 28px;
+      box-shadow: var(--shadow-lg);
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <div class="logo">
-      <img src="../../assets/images/logo.gif" alt="FLAWLESS GRAPHICS Logo" class="logo-img">
-      <h1>FLAWLESS GRAPHICS</h1>
+
+  <!-- Ambient Glows -->
+  <div class="ambient-glow ambient-top-left"></div>
+  <div class="ambient-glow ambient-bottom-right"></div>
+
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <a href="../public/home.html" class="brand-wrapper">
+      <div class="brand-badge">FG</div>
+      <div class="brand-info">
+        <h1 id="headerOrgTitle">FLAWLESS GRAPHICS</h1>
+        <div class="brand-tagline">Attendance & Check-in Analytics</div>
+      </div>
+    </a>
+
+    <ul class="nav-menu">
+      <li><a href="../../welcome.html" class="nav-link"><i class="fa-solid fa-grid-horizontal"></i> Hub</a></li>
+      <li><a href="hr-dashboard.html" class="nav-link"><i class="fa-solid fa-gauge"></i> HR Dashboard</a></li>
+      <li><a href="employee.html" class="nav-link"><i class="fa-solid fa-users"></i> Employees</a></li>
+      <li><a href="attendance-summary.html" class="nav-link active"><i class="fa-solid fa-clipboard-user"></i> Attendance</a></li>
+      <li><a href="payroll.html" class="nav-link"><i class="fa-solid fa-money-bill-wave"></i> Payroll</a></li>
+      <li><a href="payslip.html" class="nav-link"><i class="fa-solid fa-receipt"></i> Payslips</a></li>
+    </ul>
+
+    <div class="header-actions">
+      <button class="theme-pill-btn" id="themeBtn">
+        <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
+      </button>
+      <a href="hr-dashboard.html" class="hub-pill-btn">
+        <i class="fa-solid fa-arrow-left"></i> HR Main
+      </a>
     </div>
-    <nav>
-      <a href="../../welcome.html">Hub</a>
-      <a href="../public/home.html">Home</a>
-      <a href="employee.html">Employee Portal</a>
-      <a href="hr-dashboard.html">HR Dashboard</a>
-    </nav>
   </header>
 
-  <main class="dashboard-layout">
-    <aside class="sidebar">
-      <h2>HR Navigation</h2>
-      <ul>
-        <li><a href="hr-dashboard.html">Main Dashboard</a></li>
-        <li><a href="employee-reports.html">Employee Reports</a></li>
-        <li><a href="attendance-summary.html" class="active">Attendance Summary</a></li>
-        <li><a href="payroll.html">Payroll Analytics</a></li>
-        <li><a href="payslip.html">Payslips</a></li>
-        <li><a href="performance.html">Performance Overview</a></li>
-      </ul>
-    </aside>
+  <!-- MAIN WRAPPER -->
+  <main class="main-wrapper">
 
-    <section class="dashboard-main">
-      <h2>Attendance Summary</h2>
-      <p>Monitor employee attendance records, check-in history, and daily punctuality.</p>
-      
-      <div class="dashboard-grid" style="margin-top: 20px;">
-        <div class="card">
-          <h3>Today's Attendance</h3>
-          <p style="font-size: 28px; font-weight: 700; color: #10b981; margin: 10px 0;">94%</p>
-          <p class="small">On-time check-ins today</p>
+    <!-- KPI STATS CARDS -->
+    <section class="grid-4" style="margin-bottom: 24px;">
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-green">
+          <i class="fa-solid fa-user-check"></i>
         </div>
-        <div class="card">
-          <h3>Average Monthly</h3>
-          <p style="font-size: 28px; font-weight: 700; color: #2563eb; margin: 10px 0;">96.5%</p>
-          <p class="small">Organization wide average</p>
+        <div>
+          <div class="stat-label">Present Today</div>
+          <div class="stat-value" id="kpiPresent">95%</div>
+          <div class="stat-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> High punctuality</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-blue">
+          <i class="fa-solid fa-stopwatch"></i>
+        </div>
+        <div>
+          <div class="stat-label">On-Time Checkins</div>
+          <div class="stat-value" id="kpiOnTime">92%</div>
+          <div class="stat-trend positive">Before 08:30 AM</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-amber">
+          <i class="fa-solid fa-business-time"></i>
+        </div>
+        <div>
+          <div class="stat-label">Late Arrivals</div>
+          <div class="stat-value" id="kpiLate">1</div>
+          <div class="stat-trend">Noted by desk</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-purple">
+          <i class="fa-solid fa-calendar-check"></i>
+        </div>
+        <div>
+          <div class="stat-label">Authorized Leave</div>
+          <div class="stat-value" id="kpiLeave">0</div>
+          <div class="stat-trend">Approved requests</div>
         </div>
       </div>
     </section>
+
+    <!-- ATTENDANCE LOG TABLE CARD -->
+    <div class="glass-card">
+      <div class="glass-card-header">
+        <div>
+          <h2 class="glass-card-title"><i class="fa-solid fa-clock-rotate-left"></i> Daily Attendance Register</h2>
+          <div class="glass-card-subtitle">Real-time check-in/out timestamps and duty compliance tracking</div>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <button class="btn-modern btn-success" onclick="markAllPresentToday()" style="background: var(--success); color: #fff;">
+            <i class="fa-solid fa-check-double"></i> Mark All Present
+          </button>
+          <button class="btn-modern btn-primary" onclick="openLogModal()">
+            <i class="fa-solid fa-plus"></i> Record Punch
+          </button>
+          <button class="btn-modern btn-secondary" onclick="exportAttendanceCSV()">
+            <i class="fa-solid fa-download"></i> Export Log
+          </button>
+        </div>
+      </div>
+
+      <!-- FILTER CONTROLS -->
+      <div style="display: flex; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;">
+        <div style="flex: 1; min-width: 220px;">
+          <input type="text" id="searchInput" class="form-control" placeholder="Search staff member..." oninput="filterLogs()">
+        </div>
+
+        <div style="width: 170px;">
+          <input type="date" id="dateFilter" class="form-control" onchange="filterLogs()">
+        </div>
+
+        <div style="width: 180px;">
+          <select id="statusFilter" class="form-control" onchange="filterLogs()">
+            <option value="">All Statuses</option>
+            <option value="Present">Present</option>
+            <option value="Late">Late Arrival</option>
+            <option value="On Leave">On Leave</option>
+            <option value="Absent">Absent</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- LOG TABLE -->
+      <div class="table-responsive">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Personnel</th>
+              <th>Department</th>
+              <th>Check In</th>
+              <th>Check Out</th>
+              <th>Total Hours</th>
+              <th>Status</th>
+              <th>Remarks</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="attendanceTableBody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </main>
 
-  <footer>
-    <p>© 2026 FLAWLESS GRAPHICS. All rights reserved.</p>
-  </footer>
+  <!-- LOG PUNCH MODAL -->
+  <div class="modal-overlay" id="punchModal">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="font-size: 20px; font-weight: 800;">Log Attendance Punch</h3>
+        <button onclick="closeLogModal()" style="background: none; border: none; font-size: 18px; color: var(--text-muted); cursor: pointer;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="punchForm" onsubmit="handleSavePunch(event)">
+        <div class="form-group">
+          <label class="form-label">Select Employee *</label>
+          <select id="punchEmployee" class="form-control" required></select>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Date *</label>
+            <input type="date" id="punchDate" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status *</label>
+            <select id="punchStatus" class="form-control" required>
+              <option value="Present">Present (On-Time)</option>
+              <option value="Late">Late Arrival</option>
+              <option value="On Leave">Authorized Leave</option>
+              <option value="Absent">Absent</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Check In Time</label>
+            <input type="time" id="punchIn" class="form-control" value="08:15">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Check Out Time</label>
+            <input type="time" id="punchOut" class="form-control" value="17:00">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Supervisor Remarks</label>
+          <input type="text" id="punchRemarks" class="form-control" placeholder="e.g. Duty desk checkin verified">
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+          <button type="button" class="btn-modern btn-secondary" onclick="closeLogModal()">Cancel</button>
+          <button type="submit" class="btn-modern btn-primary">Save Punch</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="modern-toast success">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toastMsg">Attendance recorded</span>
+  </div>
+
+  <!-- SCRIPT INTEGRATION -->
+  <script src="../../assets/js/auth-session.js"></script>
+  <script src="../../assets/js/supabase-config.js"></script>
+  <script src="../../assets/js/supabase-client.js"></script>
+  <script>
+    const user = window.AuthSession ? window.AuthSession.requireAuth('hr-login.html', true) : null;
+    const activeOrg = (user && user.org) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
+    const ATT_KEY = `${activeOrg}_attendance_records`;
+    const EMP_KEY = `${activeOrg}_employees`;
+
+    if (user && user.org) {
+      document.getElementById('headerOrgTitle').textContent = user.org.toUpperCase();
+    }
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    document.getElementById('dateFilter').value = todayStr;
+    document.getElementById('punchDate').value = todayStr;
+
+    // Seed sample attendance logs if empty
+    function getAttendanceRecords() {
+      try {
+        let logs = JSON.parse(localStorage.getItem(ATT_KEY) || '[]');
+        if (!logs || logs.length === 0) {
+          logs = [
+            { employeeName: "James Ntiamoah", department: "Executive & Design", date: todayStr, checkIn: "08:10", checkOut: "17:30", hours: "9h 20m", status: "Present", remarks: "On-time arrival" },
+            { employeeName: "Ama Serwaa", department: "Operations", date: todayStr, checkIn: "08:25", checkOut: "17:15", hours: "8h 50m", status: "Present", remarks: "Morning briefing ready" },
+            { employeeName: "Kwame Boateng", department: "Academic Staff", date: todayStr, checkIn: "08:05", checkOut: "16:45", hours: "8h 40m", status: "Present", remarks: "Class 1 readiness" },
+            { employeeName: "Abena Mansa", department: "Finance", date: todayStr, checkIn: "08:48", checkOut: "17:00", hours: "8h 12m", status: "Late", remarks: "Traffic delay reported" },
+            { employeeName: "Kofi Owusu", department: "Digital Media", date: todayStr, checkIn: "08:15", checkOut: "17:20", hours: "9h 05m", status: "Present", remarks: "Studio operations" },
+            { employeeName: "Esi Badu", department: "Academic Staff", date: todayStr, checkIn: "08:18", checkOut: "16:30", hours: "8h 12m", status: "Present", remarks: "Lab session prep" }
+          ];
+          localStorage.setItem(ATT_KEY, JSON.stringify(logs));
+        }
+        return logs;
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveAttendanceRecords(logs) {
+      localStorage.setItem(ATT_KEY, JSON.stringify(logs));
+      renderTable();
+    }
+
+    function renderTable(list = null) {
+      const records = list !== null ? list : getAttendanceRecords();
+      const tbody = document.getElementById('attendanceTableBody');
+      tbody.innerHTML = '';
+
+      if (records.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 32px; color: var(--text-muted);"><i class="fa-solid fa-calendar-xmark" style="font-size: 28px; margin-bottom: 8px; display:block;"></i>No attendance records found for this selection.</td></tr>`;
+        return;
+      }
+
+      records.forEach((rec, i) => {
+        const tr = document.createElement('tr');
+        const badgeClass = rec.status === 'Present' ? 'badge-success' :
+          rec.status === 'Late' ? 'badge-warning' :
+          rec.status === 'On Leave' ? 'badge-info' : 'badge-danger';
+
+        const recId = rec.id || ('att_' + i);
+
+        tr.innerHTML = `
+          <td style="color: var(--text-muted); font-weight: 600;">${i + 1}</td>
+          <td>
+            <div class="avatar-cell">
+              <div class="stat-icon-box" style="width: 32px; height: 32px; font-size: 13px; background: var(--accent-glow); color: var(--accent-primary);">
+                <i class="fa-solid fa-user"></i>
+              </div>
+              <div style="font-weight: 700;">${escapeHtml(rec.employeeName)}</div>
+            </div>
+          </td>
+          <td><span style="font-size: 12px; color: var(--text-muted);">${escapeHtml(rec.department || 'General')}</span></td>
+          <td style="font-weight: 600; color: var(--success);"><i class="fa-solid fa-arrow-right-to-bracket" style="font-size: 11px; margin-right: 4px;"></i>${rec.checkIn || '—'}</td>
+          <td style="font-weight: 600; color: var(--accent-primary);"><i class="fa-solid fa-arrow-right-from-bracket" style="font-size: 11px; margin-right: 4px;"></i>${rec.checkOut || 'Active'}</td>
+          <td style="font-weight: 600;">${rec.hours || 'In progress'}</td>
+          <td><span class="badge-pill ${badgeClass}">${rec.status}</span></td>
+          <td style="color: var(--text-muted); font-size: 12px;">${escapeHtml(rec.remarks || 'Standard')}</td>
+          <td style="text-align: right;">
+            <button class="btn-modern btn-danger btn-sm" onclick="deletePunch('${recId}')" title="Delete Punch"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      updateAttendanceKPIs(records);
+    }
+
+    function updateAttendanceKPIs(records) {
+      const emps = JSON.parse(localStorage.getItem(EMP_KEY) || '[]');
+      const totalStaff = emps.length || records.length;
+      const present = records.filter(r => r.status === 'Present').length;
+      const late = records.filter(r => r.status === 'Late').length;
+      const absent = records.filter(r => r.status === 'Absent' || r.status === 'On Leave').length;
+      const punctuality = totalStaff ? Math.round((present / totalStaff) * 100) : 95;
+
+      const pEl = document.getElementById('kpiPresent'); if (pEl) pEl.textContent = present;
+      const rEl = document.getElementById('kpiPunctuality'); if (rEl) rEl.textContent = `${punctuality}%`;
+      const lEl = document.getElementById('kpiLate'); if (lEl) lEl.textContent = late;
+      const aEl = document.getElementById('kpiAbsent'); if (aEl) aEl.textContent = absent;
+    }
+
+    function filterLogs() {
+      const term = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+      const status = document.getElementById('statusFilter').value;
+      const dateVal = document.getElementById('dateFilter').value;
+      const all = getAttendanceRecords();
+
+      const filtered = all.filter(r => {
+        const matchesTerm = (r.employeeName || '').toLowerCase().includes(term) || (r.department || '').toLowerCase().includes(term);
+        const matchesStatus = !status || r.status === status;
+        const matchesDate = !dateVal || r.date === dateVal;
+        return matchesTerm && matchesStatus && matchesDate;
+      });
+
+      renderTable(filtered);
+    }
+
+    function markAllPresentToday() {
+      const emps = JSON.parse(localStorage.getItem(EMP_KEY) || '[]');
+      const dateVal = document.getElementById('dateFilter').value || todayStr;
+      let logs = getAttendanceRecords();
+
+      emps.forEach(emp => {
+        const idx = logs.findIndex(r => r.employeeName === (emp.fullName || emp.name) && r.date === dateVal);
+        if (idx !== -1) {
+          logs[idx].status = 'Present';
+          logs[idx].checkIn = '08:00';
+          logs[idx].checkOut = '17:00';
+          logs[idx].hours = '9h 00m';
+        } else {
+          logs.unshift({
+            id: 'att_' + Date.now() + Math.random().toString(36).substring(2, 5),
+            employeeName: emp.fullName || emp.name,
+            department: emp.department || emp.dept || 'Staff',
+            date: dateVal,
+            checkIn: '08:00',
+            checkOut: '17:00',
+            hours: '9h 00m',
+            status: 'Present',
+            remarks: 'Bulk Check-in Verified'
+          });
+        }
+      });
+
+      saveAttendanceRecords(logs);
+      showToast('All personnel marked Present for ' + dateVal);
+    }
+
+    function openLogModal() {
+      // Populate employee selector
+      const emps = JSON.parse(localStorage.getItem(EMP_KEY) || '[]');
+      const sel = document.getElementById('punchEmployee');
+      sel.innerHTML = '';
+      if (emps.length === 0) {
+        sel.innerHTML = '<option value="James Ntiamoah">James Ntiamoah (Executive & Design)</option>';
+      } else {
+        emps.forEach(e => {
+          const opt = document.createElement('option');
+          opt.value = e.fullName || e.name;
+          opt.textContent = `${e.fullName || e.name} (${e.department || e.dept || 'Staff'})`;
+          sel.appendChild(opt);
+        });
+      }
+      document.getElementById('punchModal').classList.add('active');
+    }
+
+    function closeLogModal() {
+      document.getElementById('punchModal').classList.remove('active');
+    }
+
+    function handleSavePunch(e) {
+      e.preventDefault();
+      const emps = JSON.parse(localStorage.getItem(EMP_KEY) || '[]');
+      const name = document.getElementById('punchEmployee').value;
+      const matched = emps.find(e => (e.fullName || e.name) === name);
+      const date = document.getElementById('punchDate').value;
+      const status = document.getElementById('punchStatus').value;
+      const checkIn = document.getElementById('punchIn').value;
+      const checkOut = document.getElementById('punchOut').value;
+      const remarks = document.getElementById('punchRemarks').value.trim();
+
+      const newLog = {
+        id: 'att_' + Date.now(),
+        employeeName: name,
+        department: matched ? (matched.department || matched.dept) : 'General',
+        date: date,
+        checkIn: checkIn,
+        checkOut: checkOut,
+        hours: checkIn && checkOut ? '8h 30m' : 'Logged',
+        status: status,
+        remarks: remarks || 'Recorded by Admin'
+      };
+
+      const logs = getAttendanceRecords();
+      logs.unshift(newLog);
+      saveAttendanceRecords(logs);
+
+      // Cloud Sync
+      if (window.SupabaseService && window.SupabaseConfig && window.SupabaseConfig.isConfigured()) {
+        window.SupabaseService.saveAttendance(activeOrg, newLog).catch(console.warn);
+      }
+
+      closeLogModal();
+      showToast('Attendance punch logged successfully');
+    }
+
+    function deletePunch(punchId) {
+      let logs = getAttendanceRecords();
+      logs = logs.filter((r, i) => (r.id ? r.id !== punchId : ('att_' + i) !== punchId));
+      saveAttendanceRecords(logs);
+      showToast('Attendance entry removed');
+    }
+
+    function exportAttendanceCSV() {
+      const logs = getAttendanceRecords();
+      let csv = 'Personnel,Department,Date,Check In,Check Out,Total Hours,Status,Remarks\n';
+      logs.forEach(l => {
+        csv += `"${l.employeeName}","${l.department}","${l.date}","${l.checkIn}","${l.checkOut}","${l.hours}","${l.status}","${l.remarks}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `attendance_${activeOrg.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${todayStr}.csv`;
+      a.click();
+      showToast('Attendance report exported');
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2500);
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // Theme Switcher
+    const htmlEl = document.documentElement;
+    const themeBtn = document.getElementById('themeBtn');
+    function applyTheme(isDark) {
+      if (isDark) {
+        htmlEl.classList.add('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i> <span>Light</span>';
+      } else {
+        htmlEl.classList.remove('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-moon"></i> <span>Dark</span>';
+      }
+      localStorage.setItem('fg_theme_dark', isDark);
+    }
+    const savedTheme = localStorage.getItem('fg_theme_dark');
+    applyTheme(savedTheme === 'true');
+    themeBtn.addEventListener('click', () => applyTheme(!htmlEl.classList.contains('dark')));
+
+    // Boot
+    renderTable();
+  </script>
 </body>
 </html>

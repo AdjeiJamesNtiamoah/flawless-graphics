@@ -1,100 +1,184 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Classes & Students — Flawless Graphics</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Classroom & Students — FLAWLESS GRAPHICS</title>
+
+  <!-- Google Fonts & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <style>
-    body{font-family:Poppins,Arial;background:#f2f6fb;margin:0;padding:18px}
-    .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-    .card{background:#fff;padding:16px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.06);margin-bottom:12px}
-    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .input{padding:8px;border-radius:8px;border:1px solid #e8eef8}
-    button{padding:8px 12px;border-radius:8px;border:0;background:#0b63a3;color:#fff;cursor:pointer}
-    button.btn-secondary{background:#475569}
-  </style>
+  
+  <!-- Shared Modern Design System -->
+  <link rel="stylesheet" href="../../assets/css/shared-design.css">
 </head>
 <body>
 
-<div class="header">
-  <h2>Classroom & Student Management</h2>
-  <div>
-    <button class="btn-secondary" onclick="location.href='teacher-dashboard.html'"><i class="fa-solid fa-arrow-left"></i> Dashboard</button>
-    <button class="btn-secondary" onclick="location.href='../../welcome.html'"><i class="fa-solid fa-house"></i> Hub</button>
-  </div>
-</div>
+  <!-- Ambient Glows -->
+  <div class="ambient-glow ambient-top-left"></div>
+  <div class="ambient-glow ambient-bottom-right"></div>
 
-<div class="card">
-  <h3>Add Student</h3>
-  <div class="row">
-    <input id="s_first" class="input" placeholder="First name">
-    <input id="s_last" class="input" placeholder="Last name">
-    <input id="s_class" class="input" placeholder="Class e.g. JSS1">
-    <input id="s_roll" class="input" placeholder="Roll #">
-    <button id="saveStudentBtn">Save</button>
-  </div>
-</div>
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <a href="../public/home.html" class="brand-wrapper">
+      <div class="brand-badge">FG</div>
+      <div class="brand-info">
+        <h1 id="headerOrgTitle">FLAWLESS GRAPHICS</h1>
+        <div class="brand-tagline">Teacher & Student Administration</div>
+      </div>
+    </a>
 
-<div class="card">
-  <h3>Students</h3>
-  <div id="studentsContainer"></div>
-  <div style="margin-top:8px"><button id="exportCsvBtn">Export CSV</button></div>
-</div>
+    <ul class="nav-menu">
+      <li><a href="../../welcome.html" class="nav-link"><i class="fa-solid fa-grid-horizontal"></i> Hub</a></li>
+      <li><a href="teacher-dashboard.html" class="nav-link"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+      <li><a href="teacher-classes.html" class="nav-link"><i class="fa-solid fa-chalkboard"></i> Classes</a></li>
+      <li><a href="teacher-classes-extended.html" class="nav-link active"><i class="fa-solid fa-graduation-cap"></i> Students</a></li>
+      <li><a href="teacher-messaging-leave.html" class="nav-link"><i class="fa-solid fa-comments"></i> Messages & Leave</a></li>
+    </ul>
 
-<div class="card">
-  <h3>Quick Attendance</h3>
-  <select id="attClassSelect" class="input"></select>
-  <div id="classStudentsList" style="margin-top:8px"></div>
-</div>
+    <div class="header-actions">
+      <button class="theme-pill-btn" id="themeBtn">
+        <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
+      </button>
+      <a href="teacher-dashboard.html" class="hub-pill-btn">
+        <i class="fa-solid fa-arrow-left"></i> Dashboard
+      </a>
+    </div>
+  </header>
 
-<script src="../../assets/js/teacher-extended.js"></script>
-<script>
-  // require session
-  const teacher = JSON.parse(localStorage.getItem('teacher_active_user')||'{}');
-  if(!teacher || !teacher.email) location.href='teacher-login.html';
+  <main class="main-wrapper">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+      <div>
+        <h2 style="font-size: 26px; font-weight: 800;"><i class="fa-solid fa-graduation-cap" style="color: var(--accent-primary);"></i> Classroom Student Registry</h2>
+        <div style="color: var(--text-muted); font-size: 13px;">Manage student enrollment, roll call assignments, and quick attendance</div>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button id="exportCsvBtn" class="btn-modern btn-secondary"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+      </div>
+    </div>
 
-  function refreshStudents(){
-    renderStudentsTable('studentsContainer');
-    // populate class select
-    const classes = getClasses();
-    const sel = document.getElementById('attClassSelect'); sel.innerHTML = '<option value="">-- select class --</option>';
-    classes.forEach(c=> sel.appendChild(Object.assign(document.createElement('option'), { value:c.id, textContent:c.name||c.label||c.className })));
-  }
+    <!-- ENROLL STUDENT CARD -->
+    <div class="glass-card" style="margin-bottom: 24px;">
+      <h3 class="glass-card-title" style="font-size: 16px; margin-bottom: 16px;">
+        <i class="fa-solid fa-user-plus"></i> Enroll Student
+      </h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) 120px; gap: 12px; align-items: end;">
+        <div>
+          <label class="form-label">First Name</label>
+          <input id="s_first" class="form-control" placeholder="e.g. Kojo">
+        </div>
+        <div>
+          <label class="form-label">Last Name</label>
+          <input id="s_last" class="form-control" placeholder="e.g. Antwi">
+        </div>
+        <div>
+          <label class="form-label">Assigned Class</label>
+          <input id="s_class" class="form-control" placeholder="e.g. Class 1">
+        </div>
+        <div>
+          <label class="form-label">Roll / Index Number</label>
+          <input id="s_roll" class="form-control" placeholder="e.g. 101">
+        </div>
+        <button id="saveStudentBtn" class="btn-modern btn-primary" style="height: 42px;">
+          <i class="fa-solid fa-save"></i> Save
+        </button>
+      </div>
+    </div>
 
-  document.getElementById('saveStudentBtn').addEventListener('click', ()=>{
-    const s = { firstName: document.getElementById('s_first').value.trim(), lastName: document.getElementById('s_last').value.trim(), class: document.getElementById('s_class').value.trim(), roll: document.getElementById('s_roll').value.trim()};
-    if(!s.firstName) return alert('Provide name');
-    addStudent(s); refreshStudents();
-    document.getElementById('s_first').value=''; document.getElementById('s_last').value=''; document.getElementById('s_class').value=''; document.getElementById('s_roll').value='';
-  });
+    <!-- STUDENTS LIST CARD -->
+    <div class="glass-card" style="margin-bottom: 24px;">
+      <h3 class="glass-card-title" style="font-size: 16px; margin-bottom: 16px;">
+        <i class="fa-solid fa-list-check"></i> Enrolled Students Directory
+      </h3>
+      <div id="studentsContainer" class="table-responsive"></div>
+    </div>
 
-  document.getElementById('exportCsvBtn').addEventListener('click', ()=> exportStudentsCSV());
+    <!-- QUICK ATTENDANCE CARD -->
+    <div class="glass-card">
+      <h3 class="glass-card-title" style="font-size: 16px; margin-bottom: 16px;">
+        <i class="fa-solid fa-clipboard-check"></i> Classroom Roll Call & Attendance
+      </h3>
+      <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px;">
+        <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-muted);">Select Class:</label>
+        <select id="attClassSelect" class="form-control" style="max-width: 280px;"></select>
+      </div>
+      <div id="classStudentsList"></div>
+    </div>
+  </main>
 
-  document.getElementById('attClassSelect').addEventListener('change', (e)=>{
-    const classId = e.target.value;
-    const list = getStudents().filter(s => !classId || s.class === (document.querySelector('#attClassSelect option:checked')?.textContent || ''));
-    const wrap = document.getElementById('classStudentsList');
-    wrap.innerHTML = list.map(st => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><strong>${st.firstName} ${st.lastName}</strong><button onclick='record("${st.id}")'>Present</button></div>`).join('');
-  });
+  <footer class="site-footer">
+    <p>&copy; <span id="footerYear"></span> FLAWLESS GRAPHICS. Truth and Service. All rights reserved.</p>
+  </footer>
 
-  window.record = function(id){
-    recordStudentAttendance({ studentId: Number(id), classId: null, status:'present' });
-    alert('Recorded present');
-  };
+  <script src="../../assets/js/auth-session.js"></script>
+  <script src="../../assets/js/teacher-extended.js"></script>
+  <script>
+    const user = window.AuthSession ? window.AuthSession.requireAuth('teacher-login.html', true) : null;
+    if (user && user.org) {
+      document.getElementById('headerOrgTitle').textContent = user.org.toUpperCase();
+    }
+    document.getElementById('footerYear').textContent = new Date().getFullYear();
 
-  // edit handler: listen to global event
-  window.addEventListener('teacher-extended-edit-student', (ev)=>{
-    const s = ev.detail;
-    const first = prompt('First name', s.firstName);
-    if(first === null) return;
-    updateStudent(s.id, { firstName: first });
+    function refreshStudents(){
+      if (window.renderStudentsTable) {
+        renderStudentsTable('studentsContainer');
+      }
+      const classes = window.getClasses ? getClasses() : [];
+      const sel = document.getElementById('attClassSelect'); 
+      sel.innerHTML = '<option value="">-- select active class --</option>';
+      classes.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id || c.name;
+        opt.textContent = c.name || c.className || c.subject;
+        sel.appendChild(opt);
+      });
+    }
+
+    document.getElementById('saveStudentBtn').addEventListener('click', ()=>{
+      const firstName = document.getElementById('s_first').value.trim();
+      const lastName = document.getElementById('s_last').value.trim();
+      const sClass = document.getElementById('s_class').value.trim();
+      const roll = document.getElementById('s_roll').value.trim();
+
+      if(!firstName) return alert('Please provide student first name');
+      if (window.addStudent) {
+        addStudent({ firstName, lastName, class: sClass, roll });
+      }
+      refreshStudents();
+      document.getElementById('s_first').value = ''; 
+      document.getElementById('s_last').value = ''; 
+      document.getElementById('s_class').value = ''; 
+      document.getElementById('s_roll').value = '';
+    });
+
+    document.getElementById('exportCsvBtn').addEventListener('click', ()=>{
+      const studs = window.getStudents ? getStudents() : [];
+      let csv = 'ID,First Name,Last Name,Class,Roll\n';
+      studs.forEach(s => { csv += `"${s.id}","${s.firstName}","${s.lastName}","${s.class}","${s.roll}"\n`; });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'students.csv'; a.click();
+    });
+
+    // Theme Switcher
+    const htmlEl = document.documentElement;
+    const themeBtn = document.getElementById('themeBtn');
+    function applyTheme(isDark) {
+      if (isDark) {
+        htmlEl.classList.add('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i> <span>Light</span>';
+      } else {
+        htmlEl.classList.remove('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-moon"></i> <span>Dark</span>';
+      }
+      localStorage.setItem('fg_theme_dark', isDark);
+    }
+    const savedTheme = localStorage.getItem('fg_theme_dark');
+    applyTheme(savedTheme === 'true');
+    themeBtn.addEventListener('click', () => applyTheme(!htmlEl.classList.contains('dark')));
+
     refreshStudents();
-  });
-
-  // initial render
-  refreshStudents();
-</script>
-
+  </script>
 </body>
 </html>

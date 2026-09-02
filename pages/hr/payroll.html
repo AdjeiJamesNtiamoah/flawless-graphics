@@ -1,60 +1,395 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Payroll Analytics | FLAWLESS GRAPHICS</title>
-  <link rel="stylesheet" href="../../assets/css/style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Payroll Analytics — FLAWLESS GRAPHICS HR</title>
+
+  <!-- Google Fonts & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Shared Modern Design System -->
+  <link rel="stylesheet" href="../../assets/css/shared-design.css">
+
+  <style>
+    .payroll-summary-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 900px) {
+      .payroll-summary-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <div class="logo">
-      <img src="../../assets/images/logo.gif" alt="FLAWLESS GRAPHICS Logo" class="logo-img">
-      <h1>FLAWLESS GRAPHICS</h1>
+
+  <!-- Ambient Glows -->
+  <div class="ambient-glow ambient-top-left"></div>
+  <div class="ambient-glow ambient-bottom-right"></div>
+
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <a href="../public/home.html" class="brand-wrapper">
+      <div class="brand-badge">FG</div>
+      <div class="brand-info">
+        <h1 id="headerOrgTitle">FLAWLESS GRAPHICS</h1>
+        <div class="brand-tagline">Payroll & Salary Analytics</div>
+      </div>
+    </a>
+
+    <ul class="nav-menu">
+      <li><a href="../../welcome.html" class="nav-link"><i class="fa-solid fa-grid-horizontal"></i> Hub</a></li>
+      <li><a href="hr-dashboard.html" class="nav-link"><i class="fa-solid fa-gauge"></i> HR Dashboard</a></li>
+      <li><a href="employee.html" class="nav-link"><i class="fa-solid fa-users"></i> Employees</a></li>
+      <li><a href="attendance-summary.html" class="nav-link"><i class="fa-solid fa-clipboard-user"></i> Attendance</a></li>
+      <li><a href="payroll.html" class="nav-link active"><i class="fa-solid fa-money-bill-wave"></i> Payroll</a></li>
+      <li><a href="payslip.html" class="nav-link"><i class="fa-solid fa-receipt"></i> Payslips</a></li>
+    </ul>
+
+    <div class="header-actions">
+      <button class="theme-pill-btn" id="themeBtn">
+        <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
+      </button>
+      <a href="hr-dashboard.html" class="hub-pill-btn">
+        <i class="fa-solid fa-arrow-left"></i> HR Main
+      </a>
     </div>
-    <nav>
-      <a href="../../welcome.html">Hub</a>
-      <a href="../public/home.html">Home</a>
-      <a href="employee.html">Employee Portal</a>
-      <a href="hr-dashboard.html">HR Dashboard</a>
-    </nav>
   </header>
 
-  <main class="dashboard-layout">
-    <aside class="sidebar">
-      <h2>HR Navigation</h2>
-      <ul>
-        <li><a href="hr-dashboard.html">Main Dashboard</a></li>
-        <li><a href="employee-reports.html">Employee Reports</a></li>
-        <li><a href="attendance-summary.html">Attendance Summary</a></li>
-        <li><a href="payroll.html" class="active">Payroll Analytics</a></li>
-        <li><a href="payslip.html">Payslips</a></li>
-        <li><a href="performance.html">Performance Overview</a></li>
-      </ul>
-    </aside>
+  <!-- MAIN WRAPPER -->
+  <main class="main-wrapper">
 
-    <section class="dashboard-main">
-      <h2>Payroll Analytics</h2>
-      <p>Review payroll data, salary distribution, and payment disbursements.</p>
-      
-      <div class="dashboard-grid" style="margin-top: 20px;">
-        <div class="card">
-          <h3>Total Monthly Payroll</h3>
-          <p style="font-size: 28px; font-weight: 700; color: #2563eb; margin: 10px 0;">GHS 48,500</p>
-          <p class="small">Gross salary expenditure</p>
+    <!-- KPI STATS CARDS -->
+    <section class="grid-4" style="margin-bottom: 24px;">
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-blue">
+          <i class="fa-solid fa-sack-dollar"></i>
         </div>
-        <div class="card">
-          <h3>Processed Payments</h3>
-          <p style="font-size: 28px; font-weight: 700; color: #10b981; margin: 10px 0;">100%</p>
-          <p class="small">All disbursements up to date</p>
+        <div>
+          <div class="stat-label">Gross Payroll</div>
+          <div class="stat-value" id="kpiGross">GHS 0</div>
+          <div class="stat-trend">Total base expenditure</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-amber">
+          <i class="fa-solid fa-building-columns"></i>
+        </div>
+        <div>
+          <div class="stat-label">Estimated Tax (PAYE)</div>
+          <div class="stat-value" id="kpiTax">GHS 0</div>
+          <div class="stat-trend">Standard statutory tiers</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-purple">
+          <i class="fa-solid fa-shield-heart"></i>
+        </div>
+        <div>
+          <div class="stat-label">Social Security (5.5%)</div>
+          <div class="stat-value" id="kpiPension">GHS 0</div>
+          <div class="stat-trend">Pension fund reserve</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-green">
+          <i class="fa-solid fa-circle-dollar-to-slot"></i>
+        </div>
+        <div>
+          <div class="stat-label">Net Disbursed</div>
+          <div class="stat-value" id="kpiNet">GHS 0</div>
+          <div class="stat-trend positive"><i class="fa-solid fa-check-double"></i> Ready for batch wire</div>
         </div>
       </div>
     </section>
+
+    <!-- CHART & DEPARTMENT SUMMARY -->
+    <div class="payroll-summary-grid">
+      <div class="glass-card">
+        <div class="glass-card-header">
+          <div>
+            <h3 class="glass-card-title"><i class="fa-solid fa-chart-column"></i> Department Payroll Distribution</h3>
+            <div class="glass-card-subtitle">Monthly salary allocation across functional teams</div>
+          </div>
+        </div>
+        <div style="height: 250px; position: relative;">
+          <canvas id="payrollChart"></canvas>
+        </div>
+      </div>
+
+      <div class="glass-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div class="glass-card-header">
+            <div>
+              <h3 class="glass-card-title"><i class="fa-solid fa-sliders"></i> Payroll Control</h3>
+              <div class="glass-card-subtitle">Active Billing Cycle: <strong id="activeMonthStr">Month</strong></div>
+            </div>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;">
+            Verify statutory deduction tiers, generate employee digital slips, and disburse bank transfers in a single operation.
+          </p>
+        </div>
+
+        <div>
+          <button class="btn-modern btn-success" style="width: 100%; margin-bottom: 10px;" id="batchBtn" onclick="runPayrollBatch()">
+            <i class="fa-solid fa-bolt"></i> Process Batch Disbursement
+          </button>
+          <button class="btn-modern btn-secondary" style="width: 100%;" onclick="exportPayrollCSV()">
+            <i class="fa-solid fa-file-csv"></i> Export Payroll Ledger
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYROLL LEDGER TABLE CARD -->
+    <div class="glass-card">
+      <div class="glass-card-header">
+        <div>
+          <h2 class="glass-card-title"><i class="fa-solid fa-file-invoice-dollar"></i> Employee Payroll Ledger</h2>
+          <div class="glass-card-subtitle">Detailed breakdown of gross earnings, taxes, and net disbursements</div>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <a href="payslip.html" class="btn-modern btn-primary">
+            <i class="fa-solid fa-receipt"></i> View Payslip Generator
+          </a>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-responsive">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Personnel</th>
+              <th>Department</th>
+              <th>Gross Salary</th>
+              <th>Tax (PAYE ~13%)</th>
+              <th>Pension (5.5%)</th>
+              <th>Net Payout</th>
+              <th>Status</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="payrollTableBody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </main>
 
-  <footer>
-    <p>© 2026 FLAWLESS GRAPHICS. All rights reserved.</p>
-  </footer>
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="modern-toast success">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toastMsg">Action executed</span>
+  </div>
+
+  <!-- SCRIPT INTEGRATION -->
+  <script src="../../assets/js/auth-session.js"></script>
+  <script>
+    const user = window.AuthSession ? window.AuthSession.requireAuth('hr-login.html', true) : null;
+    const activeOrg = (user && user.org) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
+    const EMP_KEY = `${activeOrg}_employees`;
+
+    if (user && user.org) {
+      document.getElementById('headerOrgTitle').textContent = user.org.toUpperCase();
+    }
+
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const now = new Date();
+    document.getElementById('activeMonthStr').textContent = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+
+    function getEmployees() {
+      try {
+        let list = JSON.parse(localStorage.getItem(EMP_KEY) || '[]');
+        if (!list || list.length === 0) {
+          list = [
+            { fullName: "James Ntiamoah", department: "Executive & Design", position: "Creative Director", salary: 8500, email: "james@flawless.org" },
+            { fullName: "Ama Serwaa", department: "Operations", position: "HR Manager", salary: 6200, email: "ama@flawless.org" },
+            { fullName: "Kwame Boateng", department: "Academic Staff", position: "Lead Instructor", salary: 5400, email: "kwame@flawless.org" },
+            { fullName: "Abena Mansa", department: "Finance", position: "Chief Accountant", salary: 7100, email: "abena@flawless.org" },
+            { fullName: "Kofi Owusu", department: "Digital Media", position: "Senior Designer", salary: 5000, email: "kofi@flawless.org" },
+            { fullName: "Esi Badu", department: "Academic Staff", position: "Science Educator", salary: 4800, email: "esi@flawless.org" }
+          ];
+          localStorage.setItem(EMP_KEY, JSON.stringify(list));
+        }
+        return list;
+      } catch (e) {
+        return [];
+      }
+    }
+
+    let chartInstance = null;
+
+    function renderPayroll() {
+      const emps = getEmployees();
+      const tbody = document.getElementById('payrollTableBody');
+      tbody.innerHTML = '';
+
+      let totalGross = 0;
+      let totalTax = 0;
+      let totalPension = 0;
+      let totalNet = 0;
+      const deptSums = {};
+
+      emps.forEach((emp, i) => {
+        const gross = Number(emp.salary || 0);
+        const tax = Math.round(gross * 0.13); // Approx PAYE
+        const pension = Math.round(gross * 0.055); // Tier 1 & 2 Social Security
+        const net = gross - tax - pension;
+
+        totalGross += gross;
+        totalTax += tax;
+        totalPension += pension;
+        totalNet += net;
+
+        const dept = emp.department || 'General';
+        deptSums[dept] = (deptSums[dept] || 0) + gross;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="color: var(--text-muted); font-weight: 600;">${i + 1}</td>
+          <td>
+            <div style="font-weight: 700; color: var(--text-main);">${escapeHtml(emp.fullName)}</div>
+            <div style="font-size: 11px; color: var(--text-muted);">${escapeHtml(emp.email || '')}</div>
+          </td>
+          <td><span class="badge-pill badge-info">${escapeHtml(dept)}</span></td>
+          <td style="font-weight: 700;">GHS ${gross.toLocaleString()}</td>
+          <td style="color: var(--danger); font-weight: 600;">- GHS ${tax.toLocaleString()}</td>
+          <td style="color: var(--warning); font-weight: 600;">- GHS ${pension.toLocaleString()}</td>
+          <td style="font-weight: 800; color: var(--success);">GHS ${net.toLocaleString()}</td>
+          <td><span class="badge-pill badge-success"><i class="fa-solid fa-check"></i> Approved</span></td>
+          <td style="text-align: right;">
+            <a href="payslip.html?name=${encodeURIComponent(emp.fullName)}" class="btn-modern btn-secondary btn-sm">
+              <i class="fa-solid fa-receipt"></i> Payslip
+            </a>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Update KPIs
+      document.getElementById('kpiGross').textContent = `GHS ${totalGross.toLocaleString()}`;
+      document.getElementById('kpiTax').textContent = `GHS ${totalTax.toLocaleString()}`;
+      document.getElementById('kpiPension').textContent = `GHS ${totalPension.toLocaleString()}`;
+      document.getElementById('kpiNet').textContent = `GHS ${totalNet.toLocaleString()}`;
+
+      // Render Chart
+      renderChart(deptSums);
+    }
+
+    function renderChart(deptSums) {
+      if (!window.Chart) return;
+      const canvas = document.getElementById('payrollChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      const labels = Object.keys(deptSums);
+      const data = Object.values(deptSums);
+      const isDark = document.documentElement.classList.contains('dark');
+      const textColor = isDark ? '#94A3B8' : '#64748B';
+
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Department Expenditure (GHS)',
+            data: data,
+            backgroundColor: ['#2563EB', '#06B6D4', '#8B5CF6', '#10B981', '#F59E0B'],
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: textColor, font: { family: 'Plus Jakarta Sans' } } },
+            y: { grid: { color: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' }, ticks: { color: textColor, font: { family: 'Plus Jakarta Sans' } } }
+          }
+        }
+      });
+    }
+
+    function runPayrollBatch() {
+      const btn = document.getElementById('batchBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing Wire Transfers...';
+
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-check-double"></i> Batch Successfully Disbursed';
+        showToast('All employee net payrolls wired successfully!');
+      }, 1400);
+    }
+
+    function exportPayrollCSV() {
+      const emps = getEmployees();
+      let csv = 'Full Name,Email,Department,Gross Salary,Tax (PAYE),Pension (SSNIT),Net Payout,Status\n';
+      emps.forEach(emp => {
+        const gross = Number(emp.salary || 0);
+        const tax = Math.round(gross * 0.13);
+        const pension = Math.round(gross * 0.055);
+        const net = gross - tax - pension;
+        csv += `"${emp.fullName}","${emp.email}","${emp.department}","${gross}","${tax}","${pension}","${net}","Disbursed"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `payroll_${activeOrg.toLowerCase().replace(/[^a-z0-9]/g, '_')}_ledger.csv`;
+      a.click();
+      showToast('Payroll CSV exported');
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // Theme Switcher
+    const htmlEl = document.documentElement;
+    const themeBtn = document.getElementById('themeBtn');
+    function applyTheme(isDark) {
+      if (isDark) {
+        htmlEl.classList.add('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i> <span>Light</span>';
+      } else {
+        htmlEl.classList.remove('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-moon"></i> <span>Dark</span>';
+      }
+      localStorage.setItem('fg_theme_dark', isDark);
+      if (chartInstance) renderPayroll();
+    }
+    const savedTheme = localStorage.getItem('fg_theme_dark');
+    applyTheme(savedTheme === 'true');
+    themeBtn.addEventListener('click', () => applyTheme(!htmlEl.classList.contains('dark')));
+
+    // Boot
+    renderPayroll();
+  </script>
 </body>
 </html>

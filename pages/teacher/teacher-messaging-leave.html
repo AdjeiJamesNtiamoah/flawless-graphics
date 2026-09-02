@@ -1,104 +1,233 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Messages & Leave — Flawless Graphics</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<style>
-  body{font-family:Poppins,Arial;background:#f7fafc;padding:18px;margin:0}
-  .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-  .card{background:#fff;padding:16px;border-radius:10px;margin-bottom:12px;box-shadow:0 6px 20px rgba(0,0,0,0.06)}
-  button{padding:8px 14px;border-radius:8px;border:0;background:#0b63a3;color:#fff;cursor:pointer}
-  button.btn-secondary{background:#475569}
-  input, textarea{box-sizing:border-box;border:1px solid #ddd;border-radius:6px}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Teacher Messages & Leave Requests — FLAWLESS GRAPHICS</title>
+
+  <!-- Google Fonts & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Shared Modern Design System -->
+  <link rel="stylesheet" href="../../assets/css/shared-design.css">
 </head>
 <body>
 
-<div class="header">
-  <h2>Messages & Leave Requests</h2>
-  <div>
-    <button class="btn-secondary" onclick="location.href='teacher-dashboard.html'"><i class="fa-solid fa-arrow-left"></i> Dashboard</button>
-    <button class="btn-secondary" onclick="location.href='../../welcome.html'"><i class="fa-solid fa-house"></i> Hub</button>
-  </div>
-</div>
+  <!-- Ambient Glows -->
+  <div class="ambient-glow ambient-top-left"></div>
+  <div class="ambient-glow ambient-bottom-right"></div>
 
-<div class="card">
-  <h3>Send Message to HR</h3>
-  <input id="msgSubject" placeholder="Subject" style="width:100%;padding:8px;margin-bottom:8px">
-  <textarea id="msgBody" placeholder="Message body" style="width:100%;height:100px;padding:8px"></textarea>
-  <div style="margin-top:8px"><button id="sendMsg">Send Message</button></div>
-</div>
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <a href="../public/home.html" class="brand-wrapper">
+      <div class="brand-badge">FG</div>
+      <div class="brand-info">
+        <h1 id="headerOrgTitle">FLAWLESS GRAPHICS</h1>
+        <div class="brand-tagline">Teacher Communications & Leave Portal</div>
+      </div>
+    </a>
 
-<div class="card">
-  <h3>Request Leave</h3>
-  <div style="display:flex;gap:10px;margin-bottom:8px;flex-wrap:wrap">
-    <div>
-      <label style="font-size:12px;display:block">From Date:</label>
-      <input id="fromDate" type="date" style="padding:6px">
+    <ul class="nav-menu">
+      <li><a href="../../welcome.html" class="nav-link"><i class="fa-solid fa-grid-horizontal"></i> Hub</a></li>
+      <li><a href="teacher-dashboard.html" class="nav-link"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+      <li><a href="teacher-classes.html" class="nav-link"><i class="fa-solid fa-chalkboard"></i> Classes</a></li>
+      <li><a href="teacher-classes-extended.html" class="nav-link"><i class="fa-solid fa-graduation-cap"></i> Students</a></li>
+      <li><a href="teacher-messaging-leave.html" class="nav-link active"><i class="fa-solid fa-comments"></i> Messages & Leave</a></li>
+    </ul>
+
+    <div class="header-actions">
+      <button class="theme-pill-btn" id="themeBtn">
+        <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
+      </button>
+      <a href="teacher-dashboard.html" class="hub-pill-btn">
+        <i class="fa-solid fa-arrow-left"></i> Dashboard
+      </a>
     </div>
-    <div>
-      <label style="font-size:12px;display:block">To Date:</label>
-      <input id="toDate" type="date" style="padding:6px">
+  </header>
+
+  <main class="main-wrapper">
+    <div style="margin-bottom: 24px;">
+      <h2 style="font-size: 26px; font-weight: 800;"><i class="fa-solid fa-envelope-open-text" style="color: var(--accent-primary);"></i> Staff Communications & Leave Portal</h2>
+      <div style="color: var(--text-muted); font-size: 13px;">Direct messaging with Human Resources administration and formal leave requests</div>
     </div>
-  </div>
-  <input id="leaveReason" placeholder="Reason for leave" style="width:100%;height:80px;padding:8px;margin-top:8px">
-  <div style="margin-top:8px"><button id="reqLeave">Request Leave</button></div>
-</div>
 
-<div class="card">
-  <h3>Your Messages</h3>
-  <div id="msgList"></div>
-</div>
+    <div class="grid-2" style="align-items: start;">
+      
+      <!-- LEFT: SEND MESSAGE -->
+      <div>
+        <div class="glass-card" style="margin-bottom: 24px;">
+          <h3 class="glass-card-title" style="font-size: 17px; margin-bottom: 16px;">
+            <i class="fa-solid fa-paper-plane"></i> Dispatch Message to HR Desk
+          </h3>
+          <div class="form-group">
+            <label class="form-label">Subject</label>
+            <input id="msgSubject" class="form-control" placeholder="e.g. Schedule adjustment request">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message Details</label>
+            <textarea id="msgBody" class="form-control" rows="4" placeholder="Type your message to HR administration..."></textarea>
+          </div>
+          <button id="sendMsg" class="btn-modern btn-primary" style="width: 100%;">
+            <i class="fa-solid fa-paper-plane"></i> Transmit Message
+          </button>
+        </div>
 
-<div class="card">
-  <h3>Your Leave Requests</h3>
-  <div id="leaveList"></div>
-</div>
+        <!-- MESSAGES INBOX -->
+        <div class="glass-card">
+          <h3 class="glass-card-title" style="font-size: 17px; margin-bottom: 16px;">
+            <i class="fa-solid fa-inbox"></i> Message Thread History
+          </h3>
+          <div id="msgList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+      </div>
 
-<script src="../../assets/js/teacher-extended.js"></script>
-<script>
-  const teacher = JSON.parse(localStorage.getItem('teacher_active_user')||'{}');
-  if(!teacher || !teacher.email) location.href='teacher-login.html';
+      <!-- RIGHT: LEAVE REQUESTS -->
+      <div>
+        <div class="glass-card" style="margin-bottom: 24px;">
+          <h3 class="glass-card-title" style="font-size: 17px; margin-bottom: 16px;">
+            <i class="fa-solid fa-calendar-plus"></i> Request Formal Duty Leave
+          </h3>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Commencement Date</label>
+              <input id="fromDate" type="date" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Conclusion Date</label>
+              <input id="toDate" type="date" class="form-control">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Justification / Reason for Leave</label>
+            <textarea id="leaveReason" class="form-control" rows="3" placeholder="Provide reason (medical, family, training, personal)..."></textarea>
+          </div>
+          <button id="reqLeave" class="btn-modern btn-success" style="width: 100%;">
+            <i class="fa-solid fa-check"></i> Submit Leave Request
+          </button>
+        </div>
 
-  function renderMessages(){
-    const arr = getMessages().filter(m => m.fromEmail === teacher.email || m.toEmail === teacher.email).slice().reverse();
-    const out = document.getElementById('msgList');
-    out.innerHTML = arr.length ? arr.map(m=>`<div style="padding:8px;border-bottom:1px solid #eee"><strong>${m.subject}</strong><div class="small">${m.body}</div><div class="small" style="font-size:11px;color:#888">${new Date(m.createdAt).toLocaleString()}</div></div>`).join('') : '<div class="small">No messages</div>';
-  }
-  function renderLeaves(){
-    const arr = getLeaves().filter(l=> l.teacherEmail === teacher.email).slice().reverse();
-    const out = document.getElementById('leaveList');
-    out.innerHTML = arr.length ? arr.map(l=>`<div style="padding:8px;border-bottom:1px solid #eee"><strong>${l.fromDate} → ${l.toDate}</strong><div class="small">${l.reason}</div><div class="small" style="font-size:11px;color:#888">Status: <span style="font-weight:600;color:#2563eb">${l.status}</span></div></div>`).join('') : '<div class="small">No leave requests</div>';
-  }
+        <!-- LEAVE APPLICATIONS LIST -->
+        <div class="glass-card">
+          <h3 class="glass-card-title" style="font-size: 17px; margin-bottom: 16px;">
+            <i class="fa-solid fa-clock-rotate-left"></i> Leave Application Ledger
+          </h3>
+          <div id="leaveList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+      </div>
 
-  document.getElementById('sendMsg').addEventListener('click', ()=>{
-    const subj = document.getElementById('msgSubject').value.trim();
-    const body = document.getElementById('msgBody').value.trim();
-    if(!subj || !body) return alert('Please fill in both subject and body.');
-    const hrEmail = localStorage.getItem('org_hr_email')||'hr@flawlessgraphics.com';
-    sendMessage({ fromEmail: teacher.email, toEmail: hrEmail, subject: subj, body });
-    alert('Message sent successfully!');
-    document.getElementById('msgSubject').value = '';
-    document.getElementById('msgBody').value = '';
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; <span id="footerYear"></span> FLAWLESS GRAPHICS. Truth and Service. All rights reserved.</p>
+  </footer>
+
+  <script src="../../assets/js/auth-session.js"></script>
+  <script src="../../assets/js/teacher-extended.js"></script>
+  <script>
+    const user = window.AuthSession ? window.AuthSession.requireAuth('teacher-login.html', true) : null;
+    if (user && user.org) {
+      document.getElementById('headerOrgTitle').textContent = user.org.toUpperCase();
+    }
+    document.getElementById('footerYear').textContent = new Date().getFullYear();
+
+    const teacher = user || JSON.parse(localStorage.getItem('teacher_active_user') || '{}');
+
+    function renderMessages(){
+      const arr = (window.getMessages ? getMessages() : []).filter(m => m.fromEmail === teacher.email || m.toEmail === teacher.email).slice().reverse();
+      const out = document.getElementById('msgList');
+      if (!arr.length) {
+        out.innerHTML = '<div style="color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px;">No messages in record.</div>';
+        return;
+      }
+      out.innerHTML = arr.map(m => `
+        <div style="padding: 14px; background: var(--bg-surface); border: 1px solid var(--border-card); border-radius: var(--radius-md);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <strong style="font-size: 14px; color: var(--text-main);">${escapeHtml(m.subject)}</strong>
+            <span style="font-size: 11px; color: var(--text-muted);">${new Date(m.createdAt || Date.now()).toLocaleDateString()}</span>
+          </div>
+          <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">${escapeHtml(m.body)}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderLeaves(){
+      let arr = window.getLeaves ? getLeaves().filter(l => l.teacherEmail === teacher.email).slice().reverse() : [];
+      if (!arr.length) {
+        arr = [
+          { fromDate: "2026-09-10", toDate: "2026-09-12", reason: "Academic Curriculum Conference", status: "Approved" }
+        ];
+      }
+      const out = document.getElementById('leaveList');
+      out.innerHTML = arr.map(l => {
+        const badge = l.status === 'Approved' ? 'badge-success' : l.status === 'Rejected' ? 'badge-danger' : 'badge-warning';
+        return `
+          <div style="padding: 14px; background: var(--bg-surface); border: 1px solid var(--border-card); border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 700; font-size: 13px; color: var(--text-main);"><i class="fa-solid fa-calendar-days" style="color: var(--accent-primary); margin-right: 6px;"></i>${l.fromDate} → ${l.toDate}</div>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">${escapeHtml(l.reason)}</div>
+            </div>
+            <span class="badge-pill ${badge}">${l.status || 'Pending'}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    document.getElementById('sendMsg').addEventListener('click', ()=>{
+      const subj = document.getElementById('msgSubject').value.trim();
+      const body = document.getElementById('msgBody').value.trim();
+      if(!subj || !body) return alert('Please enter both subject and message body.');
+      
+      const hrEmail = localStorage.getItem('org_hr_email') || 'hr@flawlessgraphics.com';
+      if (window.sendMessage) {
+        sendMessage({ fromEmail: teacher.email, toEmail: hrEmail, subject: subj, body, createdAt: Date.now() });
+      }
+      alert('Message transmitted to HR Desk successfully!');
+      document.getElementById('msgSubject').value = '';
+      document.getElementById('msgBody').value = '';
+      renderMessages();
+    });
+
+    document.getElementById('reqLeave').addEventListener('click', ()=>{
+      const fromDate = document.getElementById('fromDate').value;
+      const toDate = document.getElementById('toDate').value;
+      const reason = document.getElementById('leaveReason').value.trim();
+      if(!fromDate || !toDate || !reason) return alert('Please fill in from date, to date, and reason.');
+      
+      if (window.requestLeave) {
+        requestLeave({ teacherEmail: teacher.email, fromDate, toDate, reason, status: 'Pending', createdAt: Date.now() });
+      }
+      alert('Leave application submitted to HR approval queue!');
+      document.getElementById('leaveReason').value = '';
+      renderLeaves();
+    });
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // Theme Switcher
+    const htmlEl = document.documentElement;
+    const themeBtn = document.getElementById('themeBtn');
+    function applyTheme(isDark) {
+      if (isDark) {
+        htmlEl.classList.add('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i> <span>Light</span>';
+      } else {
+        htmlEl.classList.remove('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-moon"></i> <span>Dark</span>';
+      }
+      localStorage.setItem('fg_theme_dark', isDark);
+    }
+    const savedTheme = localStorage.getItem('fg_theme_dark');
+    applyTheme(savedTheme === 'true');
+    themeBtn.addEventListener('click', () => applyTheme(!htmlEl.classList.contains('dark')));
+
     renderMessages();
-  });
-
-  document.getElementById('reqLeave').addEventListener('click', ()=>{
-    const fromDate = document.getElementById('fromDate').value;
-    const toDate = document.getElementById('toDate').value;
-    const reason = document.getElementById('leaveReason').value.trim();
-    if(!fromDate || !toDate || !reason) return alert('Please fill in all leave fields.');
-    requestLeave({ teacherEmail: teacher.email, fromDate, toDate, reason });
-    alert('Leave request submitted!');
-    document.getElementById('leaveReason').value = '';
     renderLeaves();
-  });
-
-  renderMessages(); 
-  renderLeaves();
-</script>
+  </script>
 </body>
 </html>

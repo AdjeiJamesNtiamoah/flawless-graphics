@@ -10,10 +10,12 @@ An integrated, modular web-based organizational management platform featuring mu
 flawless-graphics/
 ├── assets/                          # Static resources
 │   ├── css/                         # Global and modular stylesheets
-│   │   ├── style.css                # Primary brand stylesheet
+│   │   ├── shared-design.css        # Unified modern design tokens & glassmorphic system
+│   │   ├── style.css                # Legacy brand stylesheet
 │   │   ├── teacher-dashboard.css    # Teacher portal dashboard theme
 │   │   └── teacher-extended.css     # Extended classroom UI styles
 │   ├── js/                          # Client-side scripts
+│   │   ├── auth-session.js          # Centralized SSO authentication & session bridge
 │   │   ├── login.js                 # Unified authentication logic
 │   │   ├── site-register.js         # Organization onboarding script
 │   │   ├── teacher-classes.js       # Classroom & timetable UI logic

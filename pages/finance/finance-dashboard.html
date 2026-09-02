@@ -5,17 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>FLAWLESS GRAPHICS — Finance & Payroll Dashboard</title>
 
-  <!-- Route Guard Check (Must be at the top) -->
+  <!-- Route Guard Check via Unified AuthSession -->
+  <script src="../../assets/js/auth-session.js"></script>
   <script>
     (function() {
-      const activeOrg = localStorage.getItem('active_org') || localStorage.getItem('activeOrg');
-      const activeHR = localStorage.getItem('activeHR');
-      if (!activeOrg || !activeHR) {
-        alert('Access Denied. Please log in as HR/Finance Admin first.');
-        window.location.href = 'finance-login.html';
-      }
+      const user = window.AuthSession ? window.AuthSession.requireAuth('finance-login.html', true) : null;
     })();
   </script>
+
+  <!-- Supabase Cloud Integration -->
+  <script src="../../assets/js/supabase-config.js"></script>
+  <script src="../../assets/js/supabase-client.js"></script>
 
   <!-- Typography & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -76,11 +76,24 @@
       position: relative;
     }
 
+    @keyframes floatOrb {
+      0%, 100% { transform: translateY(0px) scale(1); }
+      50% { transform: translateY(-26px) scale(1.08); }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(37, 99, 235, 0.2); }
+      50% { box-shadow: 0 0 28px rgba(37, 99, 235, 0.45); }
+    }
+    @keyframes badgePulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
     body::before, body::after {
       content: '';
       position: absolute;
-      width: 500px;
-      height: 500px;
+      width: 520px;
+      height: 520px;
       border-radius: 50%;
       background: var(--accent-gradient);
       filter: blur(140px);
@@ -88,8 +101,8 @@
       z-index: -1;
       pointer-events: none;
     }
-    body::before { top: -100px; left: -100px; }
-    body::after { bottom: 0; right: -100px; }
+    body::before { top: -100px; left: -100px; animation: floatOrb 12s infinite ease-in-out; }
+    body::after { bottom: 0; right: -100px; animation: floatOrb 16s infinite ease-in-out reverse; }
 
     /* HEADER */
     header {
@@ -193,30 +206,115 @@
     }
 
     /* METRICS GRID */
-    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 28px; }
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 24px; }
     .metric-card {
-      background: rgba(255, 255, 255, 0.4);
+      background: var(--card-bg);
       border: 1px solid var(--card-border);
-      padding: 20px;
+      padding: 22px 20px;
       border-radius: var(--radius-lg);
       display: flex;
       align-items: center;
       gap: 16px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.03);
     }
-    .dark .metric-card { background: rgba(255, 255, 255, 0.02); }
+    .metric-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.12);
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+    .metric-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 3px;
+      background: var(--accent-gradient);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .metric-card:hover::after { opacity: 1; }
+    .dark .metric-card { background: rgba(17, 24, 39, 0.7); }
     .metric-icon {
-      width: 48px;
-      height: 48px;
+      width: 52px;
+      height: 52px;
       border-radius: var(--radius-md);
       background: var(--glass-glow);
       color: var(--accent);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 22px;
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
     }
-    .metric-info .label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
-    .metric-info .val { font-size: 22px; font-weight: 800; }
+    .metric-card:hover .metric-icon { transform: scale(1.1) rotate(4deg); }
+    .metric-info .label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .metric-info .val { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+
+    /* Budget Progress Bar */
+    .budget-progress-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 16px 22px;
+      margin-bottom: 26px;
+      backdrop-filter: blur(14px);
+    }
+    .budget-bar-track {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      margin-top: 10px;
+      position: relative;
+    }
+    .budget-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #10B981, #38BDF8, #6366F1);
+      width: 0%;
+      transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .live-pulse {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--success);
+      padding: 4px 10px;
+      background: rgba(16, 185, 129, 0.12);
+      border-radius: 9999px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: badgePulse 2s infinite ease-in-out;
+    }
+    .filter-pills { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+    .filter-pill {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .filter-pill:hover, .filter-pill.active {
+      background: var(--accent-gradient);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
 
     /* CHARTS GRID */
     .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 28px; }
@@ -453,9 +551,25 @@
     </a>
 
     <div class="header-actions">
+      <!-- Live Sync Status Badge -->
+      <button class="btn-action" id="cloudSyncBtn" onclick="openCloudModal()" title="Supabase Cloud Synchronization" style="border: 1px solid rgba(16, 185, 129, 0.4); color: #10b981; background: rgba(16, 185, 129, 0.08); border-radius: 9999px; padding: 6px 14px; font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; gap: 7px; cursor: pointer;">
+        <i class="fa-solid fa-cloud" id="cloudSyncIcon"></i> <span id="cloudSyncLabel">Connect Supabase</span>
+      </button>
+
+      <!-- Currency Switcher -->
+      <div style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; padding: 2px 8px;">
+        <span style="font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.6); margin-right: 4px;">CURR:</span>
+        <select id="currSelect" onchange="changeCurrency(this.value)" style="background: transparent; border: none; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; outline: none;">
+          <option value="GHS" style="background:#0b0f19; color:#fff;">GHS (GH₵)</option>
+          <option value="USD" style="background:#0b0f19; color:#fff;">USD ($)</option>
+          <option value="EUR" style="background:#0b0f19; color:#fff;">EUR (€)</option>
+          <option value="GBP" style="background:#0b0f19; color:#fff;">GBP (£)</option>
+        </select>
+      </div>
+
       <nav>
         <ul>
-          <li><a id="navHome" href="../../welcome.html"><i class="fa-solid fa-house"></i> Hub</a></li>
+          <li><a id="navHome" href="index.html"><i class="fa-solid fa-house"></i> Hub</a></li>
           <li><a id="navDashboard" class="active" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-pie"></i> Finance</a></li>
           <li><a id="navApproval" onclick="switchTab('approval')"><i class="fa-solid fa-file-invoice-dollar"></i> Approvals</a></li>
           <li><a id="navMessaging" onclick="switchTab('messaging')"><i class="fa-solid fa-comments"></i> Messages</a></li>
@@ -491,6 +605,9 @@
           <button class="btn-action" style="background:var(--accent-gradient); padding:10px 18px; font-size:13px;" onclick="openPrepareSalaryModal()">
             <i class="fa-solid fa-hand-holding-dollar"></i> Prepare Salary Payment
           </button>
+          <button class="btn-action" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #f59e0b; padding:10px 18px; font-size:13px;" onclick="openModal('invoiceModal')">
+            <i class="fa-solid fa-file-invoice"></i> Create Invoice
+          </button>
           <div class="org-badge" id="displayOrg">Organization: Loaded</div>
         </div>
       </div>
@@ -501,32 +618,49 @@
           <div class="metric-icon"><i class="fa-solid fa-wallet"></i></div>
           <div class="metric-info">
             <div class="label">Annual Budget</div>
-            <div class="val"><span class="curr">GHS</span> <span id="valBudget">450,000.00</span></div>
+            <div class="val"><span class="curr">GH₵</span> <span id="valBudget">450,000.00</span></div>
           </div>
         </div>
 
         <div class="metric-card">
-          <div class="metric-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+          <div class="metric-icon" style="color:#10B981; background:rgba(16,185,129,0.12)"><i class="fa-solid fa-graduation-cap"></i></div>
           <div class="metric-info">
             <div class="label">Total Fees Collected</div>
-            <div class="val"><span class="curr">GHS</span> <span id="valTotalFees">0.00</span></div>
+            <div class="val"><span class="curr">GH₵</span> <span id="valTotalFees">0.00</span></div>
           </div>
         </div>
 
         <div class="metric-card">
-          <div class="metric-icon"><i class="fa-solid fa-users-gear"></i></div>
+          <div class="metric-icon" style="color:#F59E0B; background:rgba(245,158,11,0.12)"><i class="fa-solid fa-users-gear"></i></div>
           <div class="metric-info">
             <div class="label">Total Gross Payroll</div>
-            <div class="val"><span class="curr">GHS</span> <span id="valPayroll">0.00</span></div>
+            <div class="val"><span class="curr">GH₵</span> <span id="valPayroll">0.00</span></div>
           </div>
         </div>
 
         <div class="metric-card">
-          <div class="metric-icon"><i class="fa-solid fa-piggy-bank"></i></div>
+          <div class="metric-icon" style="color:#06B6D4; background:rgba(6,182,212,0.12)"><i class="fa-solid fa-piggy-bank"></i></div>
           <div class="metric-info">
             <div class="label">Net Liquidity</div>
-            <div class="val"><span class="curr">GHS</span> <span id="valLiquidity">312,800.00</span></div>
+            <div class="val"><span class="curr">GH₵</span> <span id="valLiquidity">454,350.00</span></div>
           </div>
+        </div>
+      </div>
+
+      <!-- BUDGET UTILIZATION PROGRESS BAR -->
+      <div class="budget-progress-container" data-aos="fade-up" data-aos-duration="650">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="live-pulse"><span class="live-dot"></span> LIVE TREASURY</div>
+            <strong style="font-size: 14px;">Annual Operating Budget Utilization</strong>
+          </div>
+          <div style="font-size: 13px; color: var(--text-muted);">
+            Committed Outflow: <strong><span class="curr">GH₵</span> <span id="budgetSpentVal">36,200.00</span></strong> / <span class="curr">GH₵</span> <span id="budgetCapVal">450,000.00</span> 
+            (<span id="budgetPercentVal" style="color: var(--accent); font-weight: 800;">8.0%</span>)
+          </div>
+        </div>
+        <div class="budget-bar-track">
+          <div class="budget-bar-fill" id="budgetBarFill" style="width: 8%;"></div>
         </div>
       </div>
 
@@ -549,12 +683,24 @@
 
       <!-- STUDENT FEES RECORD TABLE -->
       <div class="glass-card" data-aos="fade-up" data-aos-duration="750">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px;">
           <div>
             <h3 style="font-size:16px; font-weight:800;">Student Fee Payment Records</h3>
             <div style="font-size:12px; color:var(--text-muted)">Recent tuition & institutional fee transactions</div>
           </div>
-          <button class="btn-action success-btn" onclick="openModal('studentFeeModal')">+ Collect Student Fee</button>
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <input type="text" id="feeSearchInput" placeholder="Search student or ID..." oninput="filterFeeRecords()" class="chat-search" style="margin-bottom:0; width:220px; padding:8px 14px; font-size:12px;">
+            <button class="btn-action" style="padding:8px 14px; font-size:12px;" onclick="exportFeeCSV()"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+            <button class="btn-action success-btn" style="padding:8px 16px; font-size:12px;" onclick="openModal('studentFeeModal')">+ Collect Student Fee</button>
+          </div>
+        </div>
+
+        <div class="filter-pills" style="margin-bottom:16px;">
+          <button class="filter-pill active" onclick="filterFeeCategory('All', this)">All Categories</button>
+          <button class="filter-pill" onclick="filterFeeCategory('Tuition Fee', this)">Tuition Fees</button>
+          <button class="filter-pill" onclick="filterFeeCategory('Facility & Lab Fee', this)">Facility & Lab</button>
+          <button class="filter-pill" onclick="filterFeeCategory('Examination Fee', this)">Examination</button>
+          <button class="filter-pill" onclick="filterFeeCategory('Library Fee', this)">Library</button>
         </div>
 
         <div class="table-container">
@@ -580,9 +726,15 @@
 
       <!-- RECENT TRANSACTIONS TABLE -->
       <div class="glass-card" data-aos="fade-up" data-aos-duration="800">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-          <h3 style="font-size:16px; font-weight:800;">Recent General Ledger Transactions</h3>
-          <button class="btn-action" style="background:var(--accent-gradient)" onclick="openModal('disbursementModal')">+ New Disbursement</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h3 style="font-size:16px; font-weight:800;">Recent General Ledger Transactions</h3>
+            <div style="font-size:12px; color:var(--text-muted)">Real-time institutional cash disbursements & accounts payable</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <button class="btn-action" style="padding:8px 14px; font-size:12px;" onclick="exportLedgerCSV()"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+            <button class="btn-action" style="background:var(--accent-gradient); padding:8px 16px; font-size:12px;" onclick="openModal('disbursementModal')">+ New Disbursement</button>
+          </div>
         </div>
 
         <div class="table-container">
@@ -994,29 +1146,168 @@
     </div>
   </div>
 
-  <!-- RECEIPT MODAL -->
+  <!-- LUXURY OFFICIAL RECEIPT MODAL -->
   <div class="modal-overlay" id="receiptModal">
-    <div class="modal-card" style="max-width: 480px;">
-      <div id="printableReceiptArea">
-        <div style="text-align:center; margin-bottom:16px; border-bottom:1px dashed #ccc; padding-bottom:12px;">
-          <h2 style="font-size:18px; font-weight:800; text-transform:uppercase;">FLAWLESS GRAPHICS</h2>
-          <div style="font-size:12px; color:#666;">Official Fee Collection Receipt</div>
+    <div class="modal-card" style="max-width: 520px; background: #fff; color: #1e293b; border-radius: 18px; box-shadow: 0 30px 60px rgba(0,0,0,0.4);">
+      <div id="printableReceiptArea" style="padding: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0f172a; padding-bottom: 14px; margin-bottom: 16px;">
+          <div>
+            <div style="font-size: 18px; font-weight: 900; letter-spacing: -0.5px; color: #0f172a;" id="receiptOrgTitle">FLAWLESS GRAPHICS</div>
+            <div style="font-size: 11px; color: #64748b; font-weight: 600;">Office of the Bursar &bull; Treasury Control</div>
+            <div style="font-size: 10px; color: #94a3b8;">Official Electronic Payment Voucher</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="background: #0f172a; color: #fff; padding: 4px 10px; font-size: 11px; font-weight: 800; border-radius: 6px; letter-spacing: 0.5px;">OFFICIAL RECEIPT</div>
+            <div style="font-size: 10px; color: #64748b; margin-top: 4px;">VERIFIED TRANSACTION</div>
+          </div>
         </div>
-        <div style="font-size:13px; line-height:1.8;">
-          <div style="display:flex; justify-content:space-between;"><strong>Receipt No:</strong> <span id="rNum">-</span></div>
-          <div style="display:flex; justify-content:space-between;"><strong>Date:</strong> <span id="rDate">-</span></div>
-          <div style="display:flex; justify-content:space-between;"><strong>Student ID:</strong> <span id="rStuId">-</span></div>
-          <div style="display:flex; justify-content:space-between;"><strong>Student Name:</strong> <span id="rStuName">-</span></div>
-          <div style="display:flex; justify-content:space-between;"><strong>Category:</strong> <span id="rCat">-</span></div>
-          <div style="display:flex; justify-content:space-between; font-size:15px; margin-top:10px; border-top:1px solid #000; padding-top:6px;">
-            <strong>Amount Paid:</strong> <strong><span class="curr">GHS</span> <span id="rAmt">0.00</span></strong>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f8fafc; border-radius: 10px; padding: 12px; margin-bottom: 16px; font-size: 12px; border: 1px solid #e2e8f0;">
+          <div><span style="color: #64748b;">Receipt Number:</span> <strong id="rNum" style="color: #0f172a;">-</strong></div>
+          <div><span style="color: #64748b;">Transaction Date:</span> <strong id="rDate" style="color: #0f172a;">-</strong></div>
+          <div><span style="color: #64748b;">Student ID:</span> <strong id="rStuId" style="color: #0f172a;">-</strong></div>
+          <div><span style="color: #64748b;">Student Name:</span> <strong id="rStuName" style="color: #0f172a;">-</strong></div>
+        </div>
+
+        <table style="width: 100%; font-size: 12px; margin-bottom: 16px; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 1px solid #cbd5e1; text-align: left;">
+              <th style="padding: 8px 4px; color: #64748b; font-weight: 700;">ITEM DESCRIPTION</th>
+              <th style="padding: 8px 4px; color: #64748b; font-weight: 700; text-align: right;">AMOUNT</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px dashed #e2e8f0;">
+              <td style="padding: 10px 4px;"><strong id="rCat">Tuition Fee</strong><br><small style="color: #64748b;">Term Payment</small></td>
+              <td style="padding: 10px 4px; text-align: right; font-weight: 700;"><span class="curr">GH₵</span> <span id="rAmt">0.00</span></td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr style="border-top: 2px solid #0f172a;">
+              <td style="padding: 10px 4px; font-size: 14px; font-weight: 800;">TOTAL AMOUNT PAID</td>
+              <td style="padding: 10px 4px; text-align: right; font-size: 16px; font-weight: 900; color: #0f172a;"><span class="curr">GH₵</span> <span id="rTotalAmt">0.00</span></td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px; padding-top: 10px;">
+          <div>
+            <div style="display: inline-block; padding: 4px 10px; border: 2px solid #10b981; color: #10b981; font-weight: 900; font-size: 11px; border-radius: 6px; text-transform: uppercase; transform: rotate(-3deg);">
+              PAID &bull; VERIFIED
+            </div>
+            <div style="font-size: 9px; color: #94a3b8; margin-top: 6px;">Authentication Hash: FG-TREASURY-SECURE-STAMP</div>
+          </div>
+          <div style="text-align: right; font-size: 10px; color: #64748b;">
+            <div style="border-bottom: 1px solid #94a3b8; width: 140px; margin-bottom: 4px;"></div>
+            Authorized Cashier Signature
           </div>
         </div>
       </div>
-      <div class="no-print" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-        <button class="btn-action" onclick="closeModal('receiptModal')">Close</button>
-        <button class="btn-action success-btn" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Receipt</button>
+
+      <div class="no-print" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+        <button class="btn-action" style="background: #e2e8f0; color: #0f172a; border: none;" onclick="closeModal('receiptModal')">Close</button>
+        <button class="btn-action success-btn" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Official Receipt</button>
       </div>
+    </div>
+  </div>
+
+  <!-- CREATE OFFICIAL INVOICE MODAL -->
+  <div class="modal-overlay" id="invoiceModal">
+    <div class="modal-card" style="max-width: 600px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 18px; font-weight: 800;"><i class="fa-solid fa-file-invoice"></i> Generate Client / Student Invoice</h3>
+        <button onclick="closeModal('invoiceModal')" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px;">&times;</button>
+      </div>
+      
+      <form id="invoiceForm" onsubmit="generateInvoice(event)">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label">Client / Student Name *</label>
+            <input type="text" id="invClient" class="form-input" placeholder="e.g. Kwame Mensah or Corporate Sponsor" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Client Email / Phone</label>
+            <input type="text" id="invContact" class="form-input" placeholder="e.g. client@flawless.org">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label">Invoice Date</label>
+            <input type="date" id="invDate" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Payment Due Date</label>
+            <input type="date" id="invDueDate" class="form-input" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Line Item Description *</label>
+          <input type="text" id="invDesc" class="form-input" placeholder="e.g. Semester 2 Graphic Design Studio & Lab Tuition" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label">Rate / Unit (<span class="curr">GH₵</span>)</label>
+            <input type="number" id="invRate" class="form-input" step="0.01" min="1" placeholder="4500.00" oninput="calcInvoiceTotal()" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Quantity</label>
+            <input type="number" id="invQty" class="form-input" min="1" value="1" oninput="calcInvoiceTotal()" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Total (<span class="curr">GH₵</span>)</label>
+            <input type="text" id="invTotal" class="form-input" style="font-weight: 800;" readonly value="4500.00">
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn-action" onclick="closeModal('invoiceModal')">Cancel</button>
+          <button type="submit" class="btn-action success-btn"><i class="fa-solid fa-print"></i> Generate & Print Invoice</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SUPABASE CLOUD SYNC MODAL -->
+  <div class="modal-overlay" id="cloudModalBackdrop">
+    <div class="modal-card" style="max-width: 520px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:38px;height:38px;border-radius:10px;background:rgba(16, 185, 129, 0.15);color:#10b981;display:flex;align-items:center;justify-content:center;font-size:18px">
+            <i class="fa-solid fa-cloud"></i>
+          </div>
+          <div>
+            <h3 style="margin:0;font-size:18px;font-weight:800">Supabase Cloud Sync</h3>
+            <div style="font-size:11px;color:var(--text-muted)">Target Project: <strong>AdjeiJamesNtiamoah</strong></div>
+          </div>
+        </div>
+        <button onclick="closeCloudModal()" style="background:none;border:none;font-size:18px;color:var(--text-muted);cursor:pointer">&times;</button>
+      </div>
+
+      <div style="background:var(--input-bg);border-radius:12px;padding:12px;border:1px solid var(--card-border);margin-bottom:16px;font-size:12px;color:var(--text-muted);line-height:1.5">
+        Synchronize fee records, disbursements, and payroll vouchers directly to your Supabase cloud PostgreSQL tables.
+        <div id="cloudStatusMsg" style="margin-top:8px;font-size:12px;font-weight:700;display:none"></div>
+      </div>
+
+      <form onsubmit="handleSaveCloudConfig(event)">
+        <div class="form-group">
+          <label class="form-label">Supabase Project URL *</label>
+          <input id="sb_url" class="form-input" placeholder="https://xxxxxxxxxxxxxxxxxxxx.supabase.co" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Supabase Anon Public API Key *</label>
+          <input id="sb_key" type="password" class="form-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." required>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-top:20px">
+          <button type="button" class="btn-action" id="testConnBtn" onclick="handleTestCloud()"><i class="fa-solid fa-plug"></i> Test</button>
+          <div style="display:flex;gap:8px">
+            <button type="button" class="btn-action" onclick="handleResetCloud()">Reset</button>
+            <button type="submit" class="btn-action success-btn"><i class="fa-solid fa-check"></i> Save & Connect</button>
+          </div>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -1034,6 +1325,11 @@
     let currentCurrency = 'GHS';
     let currentTaxRate = 13.5;
     let fetchedStudents = [];
+    let currentFeeFilter = 'All';
+    let feeSearchQuery = '';
+
+    const CURRENCY_SYMBOLS = { GHS: 'GH₵', USD: '$', EUR: '€', GBP: '£' };
+    const CURRENCY_RATES = { GHS: 1.0, USD: 0.065, EUR: 0.060, GBP: 0.052 };
 
     // INITIAL MOCK DATA
     let defaultEmployees = [
@@ -1045,51 +1341,104 @@
 
     let studentFees = [
       { id: 'REC-1001', name: 'Ebenezer Addo', studentId: 'STU-2026-088', cat: 'Tuition Fee', date: '2026-08-18', amount: 3500, status: 'Completed' },
-      { id: 'REC-1002', name: 'Akosua Serwaa', studentId: 'STU-2026-042', cat: 'Facility & Lab Fee', date: '2026-08-19', amount: 850, status: 'Completed' }
+      { id: 'REC-1002', name: 'Akosua Serwaa', studentId: 'STU-2026-042', cat: 'Facility & Lab Fee', date: '2026-08-19', amount: 850, status: 'Completed' },
+      { id: 'REC-1003', name: 'Kwabena Darko', studentId: 'STU-2026-105', cat: 'Examination Fee', date: '2026-08-20', amount: 450, status: 'Completed' },
+      { id: 'REC-1004', name: 'Yaa Asantewaa', studentId: 'STU-2026-061', cat: 'Tuition Fee', date: '2026-08-21', amount: 2800, status: 'Completed' },
+      { id: 'REC-1005', name: 'Osei Tutu', studentId: 'STU-2026-093', cat: 'Library Fee', date: '2026-08-22', amount: 200, status: 'Completed' }
     ];
 
     let auditLogs = [
-      { msg: 'System initialization completed successfully', date: '2026-08-20' }
+      { msg: 'Treasury system initialization completed successfully', date: '2026-08-20' },
+      { msg: 'Annual operating budget verified and allocated (GHS 450,000.00)', date: '2026-08-21' }
     ];
 
     let cashFlowChartObj = null;
     let expenseChartObj = null;
 
-    // INIT FUNCTION
-    document.addEventListener('DOMContentLoaded', () => {
-      AOS.init({ duration: 600, once: true });
+    // ANIMATED NUMERIC COUNTER
+    function animateValue(id, start, end, duration = 800) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const range = end - start;
+      const minTimer = 25;
+      let stepTime = Math.abs(Math.floor(duration / (Math.abs(range) || 1)));
+      stepTime = Math.max(stepTime, minTimer);
+      const startTime = Date.now();
+      const endTime = startTime + duration;
+      
+      function run() {
+        const now = Date.now();
+        const remaining = Math.max((endTime - now) / duration, 0);
+        const value = end - (remaining * range);
+        el.innerText = value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (now < endTime) {
+          requestAnimationFrame(run);
+        } else {
+          el.innerText = end.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+      }
+      requestAnimationFrame(run);
+    }
 
-      // Active Org Label
+    // MULTI-CURRENCY CONVERTER
+    function changeCurrency(curr) {
+      currentCurrency = curr;
+      const sym = CURRENCY_SYMBOLS[curr] || curr;
+      document.querySelectorAll('.curr').forEach(el => el.innerText = sym);
+      renderAll();
+    }
+
+    // INIT FUNCTION
+    function bootstrapFinance() {
+      if (window.AOS) {
+        AOS.init({ duration: 600, once: true });
+      }
+
       const activeOrg = localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || 'Flawless Graphics HQ';
       document.getElementById('displayOrg').innerText = 'Organization: ' + activeOrg;
+      const rOrg = document.getElementById('receiptOrgTitle');
+      if (rOrg) rOrg.innerText = activeOrg.toUpperCase();
 
-      // Load Saved Payroll or Default
       if (!localStorage.getItem('fg_payroll')) {
         localStorage.setItem('fg_payroll', JSON.stringify(defaultEmployees));
       }
-
-      // Load Saved Fees or Default
       if (!localStorage.getItem('fg_student_fees')) {
         localStorage.setItem('fg_student_fees', JSON.stringify(studentFees));
       }
-
-      // Load Audit Logs
       if (!localStorage.getItem('fg_audit')) {
         localStorage.setItem('fg_audit', JSON.stringify(auditLogs));
       }
 
-      // Set today for salary picker
       const todayMonth = new Date().toISOString().slice(0, 7);
-      document.getElementById('salaryPayPeriod').value = todayMonth;
+      const payPeriod = document.getElementById('salaryPayPeriod');
+      if (payPeriod) payPeriod.value = todayMonth;
 
+      const invDate = document.getElementById('invDate');
+      const invDueDate = document.getElementById('invDueDate');
+      const nowStr = new Date().toISOString().split('T')[0];
+      if (invDate) invDate.value = nowStr;
+      if (invDueDate) {
+        const due = new Date();
+        due.setDate(due.getDate() + 14);
+        invDueDate.value = due.toISOString().split('T')[0];
+      }
+
+      updateCloudSyncStatus();
       renderAll();
       initCharts();
       fetchStudents();
-    });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootstrapFinance);
+    } else {
+      bootstrapFinance();
+    }
 
     // FETCH STUDENTS FROM API
     async function fetchStudents() {
       const select = document.getElementById('studentSelect');
+      if (!select) return;
       try {
         const res = await fetch('/api/students');
         if (!res.ok) throw new Error('API fetch error');
@@ -1102,8 +1451,8 @@
           option.textContent = `${student.name} (${student.rollNumber || student.id})`;
           select.appendChild(option);
         });
-      } catch (err) {
-        select.innerHTML = '<option value="">Manual Entry Mode</option>';
+      } catch(err) {
+        select.innerHTML = '<option value="">-- Manual Entry Mode (Offline) --</option>';
       }
     }
 
@@ -1122,19 +1471,10 @@
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('nav a').forEach(el => el.classList.remove('active'));
 
-      if (tabName === 'dashboard') {
-        document.getElementById('tabDashboard').classList.add('active');
-        document.getElementById('navDashboard').classList.add('active');
-      } else if (tabName === 'approval') {
-        document.getElementById('tabApproval').classList.add('active');
-        document.getElementById('navApproval').classList.add('active');
-      } else if (tabName === 'messaging') {
-        document.getElementById('tabMessaging').classList.add('active');
-        document.getElementById('navMessaging').classList.add('active');
-      } else if (tabName === 'settings') {
-        document.getElementById('tabSettings').classList.add('active');
-        document.getElementById('navSettings').classList.add('active');
-      }
+      const tabEl = document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+      const navEl = document.getElementById('nav' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+      if (tabEl) tabEl.classList.add('active');
+      if (navEl) navEl.classList.add('active');
     }
 
     // THEME TOGGLE
@@ -1143,14 +1483,77 @@
       const isDark = document.body.classList.contains('dark');
       document.getElementById('themeText').innerText = isDark ? 'Light' : 'Dark';
       const icon = document.querySelector('#themeBtn i');
-      icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      if (icon) icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      if (cashFlowChartObj) {
+        cashFlowChartObj.destroy();
+        expenseChartObj.destroy();
+        initCharts();
+      }
     }
 
     // LOGOUT
     function logout() {
       if (confirm('Are you sure you want to log out?')) {
-        window.location.href = 'finance-login.html';
+        if (window.AuthSession && typeof window.AuthSession.logout === 'function') {
+          window.AuthSession.logout('finance-login.html');
+        } else {
+          window.location.href = 'finance-login.html';
+        }
       }
+    }
+
+    // FEE SEARCH & CATEGORY FILTERING
+    function filterFeeCategory(cat, btn) {
+      currentFeeFilter = cat;
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderFeeTable();
+    }
+
+    function filterFeeRecords() {
+      feeSearchQuery = (document.getElementById('feeSearchInput')?.value || '').toLowerCase().trim();
+      renderFeeTable();
+    }
+
+    function renderFeeTable() {
+      const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
+      const feeBody = document.getElementById('studentFeeBody');
+      if (!feeBody) return;
+      feeBody.innerHTML = '';
+      const rate = CURRENCY_RATES[currentCurrency] || 1.0;
+
+      const filtered = feeData.filter(item => {
+        const matchCat = (currentFeeFilter === 'All' || item.cat === currentFeeFilter);
+        const matchSearch = !feeSearchQuery || 
+          (item.name && item.name.toLowerCase().includes(feeSearchQuery)) || 
+          (item.studentId && item.studentId.toLowerCase().includes(feeSearchQuery)) || 
+          (item.id && item.id.toLowerCase().includes(feeSearchQuery)) ||
+          (item.cat && item.cat.toLowerCase().includes(feeSearchQuery));
+        return matchCat && matchSearch;
+      });
+
+      if (filtered.length === 0) {
+        feeBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:32px; color:var(--text-muted);"><i class="fa-solid fa-folder-open" style="font-size:24px; display:block; margin-bottom:8px; opacity:0.6;"></i> No fee payment records found matching criteria</td></tr>`;
+        return;
+      }
+
+      filtered.forEach((item) => {
+        const convertedAmt = (parseFloat(item.amount) * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+        feeBody.innerHTML += `
+          <tr>
+            <td><strong>${item.id}</strong></td>
+            <td>${item.name}</td>
+            <td><span style="font-family:monospace; background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:4px; font-size:12px;">${item.studentId}</span></td>
+            <td><span class="badge" style="background:rgba(37,99,235,0.15); color:var(--accent);">${item.cat}</span></td>
+            <td>${item.date}</td>
+            <td><strong>${convertedAmt}</strong></td>
+            <td><span class="badge success"><i class="fa-solid fa-check-circle"></i> ${item.status}</span></td>
+            <td style="text-align:right;">
+              <button class="btn-action" style="padding:4px 10px; font-size:11px;" onclick="viewReceiptById('${item.id}')"><i class="fa-solid fa-receipt"></i> View</button>
+            </td>
+          </tr>
+        `;
+      });
     }
 
     // RENDER SYSTEM
@@ -1158,31 +1561,17 @@
       const payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];
       const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
       const auditData = JSON.parse(localStorage.getItem('fg_audit')) || [];
+      const rate = CURRENCY_RATES[currentCurrency] || 1.0;
 
-      // Render Student Fees
-      const feeBody = document.getElementById('studentFeeBody');
-      feeBody.innerHTML = '';
+      // 1. Render Student Fees Table
+      renderFeeTable();
+
       let totalFeesSum = 0;
-
-      feeData.forEach((item, idx) => {
-        totalFeesSum += parseFloat(item.amount);
-        feeBody.innerHTML += `
-          <tr>
-            <td><strong>${item.id}</strong></td>
-            <td>${item.name}</td>
-            <td>${item.studentId}</td>
-            <td>${item.cat}</td>
-            <td>${item.date}</td>
-            <td>${parseFloat(item.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-            <td><span class="badge success">${item.status}</span></td>
-            <td style="text-align:right;">
-              <button class="btn-action" style="padding:4px 10px; font-size:11px;" onclick="viewReceipt(${idx})"><i class="fa-solid fa-receipt"></i> View</button>
-            </td>
-          </tr>
-        `;
+      feeData.forEach(item => {
+        totalFeesSum += parseFloat(item.amount || 0);
       });
 
-      // Render Payroll Approval
+      // 2. Render Payroll Approval
       const payrollBody = document.getElementById('payrollApprovalBody');
       payrollBody.innerHTML = '';
       let grossTotal = 0;
@@ -1201,49 +1590,75 @@
           pendingTotal += net;
         }
 
+        const convertedGross = (gross * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+        const convertedDed = (deductions * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+        const convertedNet = (net * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+
         payrollBody.innerHTML += `
           <tr>
             <td><strong>${emp.name}</strong></td>
             <td>${emp.role}</td>
-            <td>${gross.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-            <td>${deductions.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-            <td><strong>${net.toLocaleString('en-US', {minimumFractionDigits: 2})}</strong></td>
+            <td>${convertedGross}</td>
+            <td>${convertedDed}</td>
+            <td><strong>${convertedNet}</strong></td>
             <td>
               <span class="badge ${emp.approved ? 'success' : 'pending'}">
-                ${emp.approved ? 'Approved' : 'Pending Authorization'}
+                ${emp.approved ? '<i class="fa-solid fa-check"></i> Approved' : '<i class="fa-solid fa-clock"></i> Pending Authorization'}
               </span>
             </td>
             <td style="text-align:right;">
               ${!emp.approved 
                 ? `<button class="btn-action success-btn" style="padding:4px 10px; font-size:11px;" onclick="approveIndividualPayroll(${i})">Authorize</button>`
-                : `<span style="font-size:11px; color:var(--success); font-weight:700;"><i class="fa-solid fa-check"></i> Paid</span>`}
+                : `<span style="font-size:11px; color:var(--success); font-weight:700;"><i class="fa-solid fa-check-double"></i> Paid</span>`}
             </td>
           </tr>
         `;
       });
 
-      // Update Top Metrics
-      document.getElementById('valTotalFees').innerText = totalFeesSum.toLocaleString('en-US', {minimumFractionDigits: 2});
-      document.getElementById('valPayroll').innerText = grossTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
-      document.getElementById('tablePayrollVal').innerText = grossTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
-      document.getElementById('valPendingPayroll').innerText = pendingTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
-      document.getElementById('valApprovedSum').innerText = approvedTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
+      // 3. Update Top Metrics with Animation
+      const convertedBudget = 450000 * rate;
+      const convertedTotalFees = totalFeesSum * rate;
+      const convertedGross = grossTotal * rate;
+      const newLiquidity = (450000 + totalFeesSum - approvedTotal) * rate;
 
-      // Recalculate Liquidity
-      const newLiquidity = 450000 + totalFeesSum - approvedTotal;
-      document.getElementById('valLiquidity').innerText = newLiquidity.toLocaleString('en-US', {minimumFractionDigits: 2});
+      animateValue('valBudget', 0, convertedBudget, 600);
+      animateValue('valTotalFees', 0, convertedTotalFees, 600);
+      animateValue('valPayroll', 0, convertedGross, 600);
+      animateValue('valLiquidity', 0, newLiquidity, 600);
 
-      // Render Audit Logs
+      const tblPay = document.getElementById('tablePayrollVal');
+      if (tblPay) tblPay.innerText = convertedGross.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      const valPend = document.getElementById('valPendingPayroll');
+      if (valPend) valPend.innerText = (pendingTotal * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      const valApp = document.getElementById('valApprovedSum');
+      if (valApp) valApp.innerText = (approvedTotal * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      // 4. Update Budget Utilization Bar
+      const budgetPct = Math.min(((grossTotal / 450000) * 100), 100).toFixed(1);
+      const barFill = document.getElementById('budgetBarFill');
+      if (barFill) barFill.style.width = budgetPct + '%';
+      const pctEl = document.getElementById('budgetPercentVal');
+      if (pctEl) pctEl.innerText = budgetPct + '%';
+      const spentEl = document.getElementById('budgetSpentVal');
+      if (spentEl) spentEl.innerText = convertedGross.toLocaleString('en-US', {minimumFractionDigits: 2});
+      const capEl = document.getElementById('budgetCapVal');
+      if (capEl) capEl.innerText = convertedBudget.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      // 5. Render Audit Logs
       const auditContainer = document.getElementById('auditList');
-      auditContainer.innerHTML = '';
-      auditData.slice(-5).reverse().forEach(log => {
-        auditContainer.innerHTML += `
-          <li class="audit-item">
-            <span>${log.msg}</span>
-            <span style="color:var(--text-muted); font-size:11px;">${log.date}</span>
-          </li>
-        `;
-      });
+      if (auditContainer) {
+        auditContainer.innerHTML = '';
+        auditData.slice(-5).reverse().forEach(log => {
+          auditContainer.innerHTML += `
+            <li class="audit-item">
+              <span><i class="fa-solid fa-circle-info" style="color:var(--accent); margin-right:8px;"></i> ${log.msg}</span>
+              <span style="color:var(--text-muted); font-size:11px;">${log.date}</span>
+            </li>
+          `;
+        });
+      }
     }
 
     // ADD AUDIT LOG
@@ -1255,10 +1670,12 @@
 
     // MODAL CONTROL
     function openModal(id) {
-      document.getElementById(id).classList.add('active');
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active');
     }
     function closeModal(id) {
-      document.getElementById(id).classList.remove('active');
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('active');
     }
 
     // STUDENT FEE ACTIONS
@@ -1270,23 +1687,13 @@
       const method = document.getElementById('feeMethod').value;
       const amount = parseFloat(document.getElementById('feeAmount').value);
 
-      // Try API POST if server exists, fallback locally
-      try {
-        await fetch('/api/finance/payments', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ studentId, name, amount, method, cat })
-        });
-      } catch(err) {
-        // Fallback to local storage handling gracefully
-      }
-
       const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
       const newRec = {
         id: 'REC-' + Math.floor(1000 + Math.random() * 9000),
         name,
         studentId,
         cat,
+        method,
         date: new Date().toISOString().split('T')[0],
         amount,
         status: 'Completed'
@@ -1294,25 +1701,91 @@
 
       feeData.unshift(newRec);
       localStorage.setItem('fg_student_fees', JSON.stringify(feeData));
-      addAuditLog(`Student Fee collected: ${name} (${amount} GHS)`);
+      addAuditLog(`Student Fee collected: ${name} (${amount} GHS - ${cat})`);
 
       closeModal('studentFeeModal');
       document.getElementById('studentFeeForm').reset();
       renderAll();
+
+      // Show receipt immediately
+      viewReceiptById(newRec.id);
     }
 
-    function viewReceipt(index) {
+    function viewReceiptById(id) {
       const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
-      const rec = feeData[index];
+      const rec = feeData.find(r => r.id === id);
       if (!rec) return;
+
+      const rate = CURRENCY_RATES[currentCurrency] || 1.0;
+      const convertedAmt = (parseFloat(rec.amount) * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
 
       document.getElementById('rNum').innerText = rec.id;
       document.getElementById('rDate').innerText = rec.date;
       document.getElementById('rStuId').innerText = rec.studentId;
       document.getElementById('rStuName').innerText = rec.name;
       document.getElementById('rCat').innerText = rec.cat;
-      document.getElementById('rAmt').innerText = parseFloat(rec.amount).toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('rAmt').innerText = convertedAmt;
+      document.getElementById('rTotalAmt').innerText = convertedAmt;
 
+      openModal('receiptModal');
+    }
+
+    // EXPORT FUNCTIONS
+    function exportFeeCSV() {
+      const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
+      let csv = "Receipt ID,Student Name,Student ID,Fee Category,Payment Date,Amount,Status\n";
+      feeData.forEach(r => {
+        csv += `"${r.id}","${r.name}","${r.studentId}","${r.cat}","${r.date}","${r.amount}","${r.status}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `FG_Student_Fees_${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+    }
+
+    function exportLedgerCSV() {
+      const table = document.getElementById('transactionBody');
+      let csv = "Transaction ID,Category,Beneficiary,Date,Amount,Status\n";
+      table.querySelectorAll('tr').forEach(tr => {
+        const cells = tr.querySelectorAll('td');
+        if (cells.length >= 6) {
+          csv += `"${cells[0].innerText}","${cells[1].innerText}","${cells[2].innerText}","${cells[3].innerText}","${cells[4].innerText}","${cells[5].innerText}"\n`;
+        }
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `FG_General_Ledger_${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+    }
+
+    // INVOICE CALCULATION & PRINT
+    function calcInvoiceTotal() {
+      const rate = parseFloat(document.getElementById('invRate').value) || 0;
+      const qty = parseInt(document.getElementById('invQty').value) || 1;
+      const total = rate * qty;
+      document.getElementById('invTotal').value = total.toLocaleString('en-US', {minimumFractionDigits: 2});
+    }
+
+    function generateInvoice(e) {
+      e.preventDefault();
+      const client = document.getElementById('invClient').value.trim();
+      const desc = document.getElementById('invDesc').value.trim();
+      const date = document.getElementById('invDate').value;
+      const rate = parseFloat(document.getElementById('invRate').value) || 0;
+      const qty = parseInt(document.getElementById('invQty').value) || 1;
+      const total = rate * qty;
+
+      document.getElementById('rNum').innerText = 'INV-' + Math.floor(10000 + Math.random() * 90000);
+      document.getElementById('rDate').innerText = date;
+      document.getElementById('rStuId').innerText = 'CLI-CORP';
+      document.getElementById('rStuName').innerText = client;
+      document.getElementById('rCat').innerText = `${desc} (Qty: ${qty})`;
+      document.getElementById('rAmt').innerText = total.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('rTotalAmt').innerText = total.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      closeModal('invoiceModal');
       openModal('receiptModal');
     }
 
@@ -1340,7 +1813,8 @@
       const appliedTax = document.getElementById('salaryTaxRate').value;
       
       currentTaxRate = parseFloat(appliedTax);
-      document.getElementById('setTaxRate').value = currentTaxRate;
+      const setTax = document.getElementById('setTaxRate');
+      if (setTax) setTax.value = currentTaxRate;
 
       let payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];
       payrollData = payrollData.map(emp => {
@@ -1352,19 +1826,19 @@
       });
 
       localStorage.setItem('fg_payroll', JSON.stringify(payrollData));
-      addAuditLog(`Salary batch prepared for period ${period} at ${appliedTax}% tax.`);
+      addAuditLog(`Payroll prepared for period ${period} with tax rate ${currentTaxRate}%`);
 
       closeModal('prepareSalaryModal');
       renderAll();
       switchTab('approval');
     }
 
-    // PAYROLL APPROVAL
+    // APPROVAL ACTIONS
     function approveIndividualPayroll(index) {
-      let payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];
+      const payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];
       payrollData[index].approved = true;
       localStorage.setItem('fg_payroll', JSON.stringify(payrollData));
-      addAuditLog(`Individual salary approved for ${payrollData[index].name}`);
+      addAuditLog(`Salary authorized for ${payrollData[index].name}`);
       renderAll();
     }
 
@@ -1372,71 +1846,52 @@
       let payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];
       payrollData = payrollData.map(emp => ({ ...emp, approved: true }));
       localStorage.setItem('fg_payroll', JSON.stringify(payrollData));
-      addAuditLog('Batch payroll disbursement authorized for all active staff');
+      addAuditLog('Batch salary disbursement authorized for all active staff');
       renderAll();
+      alert('All pending staff salaries have been approved for bank wire transfer.');
     }
 
-    // GENERAL DISBURSEMENT
+    // DISBURSEMENT ACTIONS
     function addDisbursement(e) {
       e.preventDefault();
       const cat = document.getElementById('disbCategory').value;
       const ben = document.getElementById('disbBeneficiary').value;
-      const amt = parseFloat(document.getElementById('disbAmount').value);
+      const amount = parseFloat(document.getElementById('disbAmount').value);
 
       const table = document.getElementById('transactionBody');
       const tr = document.createElement('tr');
+      const rate = CURRENCY_RATES[currentCurrency] || 1.0;
+      const converted = (amount * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+
       tr.innerHTML = `
-        <td>#TR-${Math.floor(8000 + Math.random() * 1000)}</td>
+        <td>#TR-${Math.floor(1000 + Math.random() * 9000)}</td>
         <td>${cat}</td>
         <td>${ben}</td>
         <td>${new Date().toISOString().split('T')[0]}</td>
-        <td>${amt.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-        <td><span class="badge success">Processed</span></td>
+        <td>${converted}</td>
+        <td><span class="badge success"><i class="fa-solid fa-check"></i> Processed</span></td>
       `;
       table.prepend(tr);
 
-      addAuditLog(`Ledger disbursement recorded: ${cat} to ${ben} (${amt} GHS)`);
+      addAuditLog(`Disbursement processed: ${ben} (${amount} GHS) - ${cat}`);
       closeModal('disbursementModal');
       document.getElementById('disbursementForm').reset();
     }
 
     // MESSAGING SYSTEM
-    function sendMessage(e) {
-      e.preventDefault();
-      const input = document.getElementById('chatInput');
-      const text = input.value.trim();
-      if (!text) return;
-
-      const chatContainer = document.getElementById('chatMessages');
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-      chatContainer.innerHTML += `
-        <div class="message-bubble outgoing">
-          ${text}
-          <div class="message-time">${timeStr}</div>
-        </div>
-      `;
-
-      input.value = '';
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-
-      setTimeout(() => {
-        chatContainer.innerHTML += `
-          <div class="message-bubble incoming">
-            Acknowledged. I will review this update shortly.
-            <div class="message-time">${timeStr}</div>
-          </div>
-        `;
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-      }, 1200);
-    }
-
     function selectContact(el, name, role) {
       document.querySelectorAll('.contact-item').forEach(c => c.classList.remove('active'));
       el.classList.add('active');
       document.getElementById('activeChatName').innerText = name;
       document.getElementById('activeChatRole').innerText = role;
+
+      const chatContainer = document.getElementById('chatMessages');
+      chatContainer.innerHTML = `
+        <div class="message-bubble incoming">
+          Hello Admin! Please review the latest ledger balance when available.
+          <div class="message-time">09:15 AM</div>
+        </div>
+      `;
     }
 
     function filterContacts() {
@@ -1447,15 +1902,44 @@
       });
     }
 
+    function sendMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const chatContainer = document.getElementById('chatMessages');
+      const bubble = document.createElement('div');
+      bubble.className = 'message-bubble outgoing';
+      bubble.innerHTML = `
+        ${text}
+        <div class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+      `;
+      chatContainer.appendChild(bubble);
+      input.value = '';
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+
+      setTimeout(() => {
+        const reply = document.createElement('div');
+        reply.className = 'message-bubble incoming';
+        reply.innerHTML = `
+          Received and verified in finance communications ledger.
+          <div class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+        `;
+        chatContainer.appendChild(reply);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }, 1000);
+    }
+
     function startNewChat(e) {
       e.preventDefault();
       const name = document.getElementById('newRecipientName').value;
       const role = document.getElementById('newRecipientRole').value;
       const msg = document.getElementById('newInitialMessage').value;
 
-      const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
-
       const list = document.getElementById('contactList');
+      const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
       const li = document.createElement('li');
       li.className = 'contact-item active';
       li.onclick = function() { selectContact(this, name, role); };
@@ -1488,8 +1972,7 @@
 
     // SETTINGS ACTIONS
     function updateCurrencySymbol(val) {
-      currentCurrency = val;
-      document.querySelectorAll('.curr').forEach(el => el.innerText = val);
+      changeCurrency(val);
     }
 
     function updateTaxRate(val) {
@@ -1501,18 +1984,6 @@
       e.preventDefault();
       const provider = document.getElementById('payment-provider').value;
       const apiKey = document.getElementById('api-key').value;
-
-      if (provider && apiKey) {
-        try {
-          await fetch('/api/settings/payment-method', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ provider, apiKey })
-          });
-        } catch(err) {
-          // Ignores network failure if offline
-        }
-      }
 
       addAuditLog('System settings & configuration updated');
       alert('Settings saved successfully.');
@@ -1541,60 +2012,170 @@
       }
     }
 
+    // SUPABASE CLOUD SYNC UI CONTROLLERS
+    function updateCloudSyncStatus() {
+      const isConn = window.SupabaseConfig && window.SupabaseConfig.isConfigured();
+      const label = document.getElementById('cloudSyncLabel');
+      const icon = document.getElementById('cloudSyncIcon');
+      const btn = document.getElementById('cloudSyncBtn');
+      if (!label || !btn) return;
+
+      if (isConn) {
+        label.textContent = 'Supabase Cloud: Active';
+        icon.className = 'fa-solid fa-cloud-check';
+        btn.style.color = '#10b981';
+        btn.style.borderColor = '#10b981';
+        btn.style.background = 'rgba(16, 185, 129, 0.15)';
+      } else {
+        label.textContent = 'Connect Supabase';
+        icon.className = 'fa-solid fa-cloud';
+        btn.style.color = '#10b981';
+        btn.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        btn.style.background = 'rgba(16, 185, 129, 0.08)';
+      }
+    }
+
+    function openCloudModal() {
+      const modal = document.getElementById('cloudModalBackdrop');
+      if (window.SupabaseConfig) {
+        document.getElementById('sb_url').value = window.SupabaseConfig.getUrl();
+        document.getElementById('sb_key').value = window.SupabaseConfig.getAnonKey();
+      }
+      modal.classList.add('active');
+    }
+
+    function closeCloudModal() {
+      document.getElementById('cloudModalBackdrop').classList.remove('active');
+    }
+
+    async function handleTestCloud() {
+      const url = document.getElementById('sb_url').value.trim();
+      const key = document.getElementById('sb_key').value.trim();
+      const statusEl = document.getElementById('cloudStatusMsg');
+      const btn = document.getElementById('testConnBtn');
+      statusEl.style.display = 'block';
+      statusEl.style.color = 'var(--accent)';
+      statusEl.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Testing connection to Supabase...';
+      btn.disabled = true;
+
+      const res = await window.SupabaseConfig.testConnection(url, key);
+      btn.disabled = false;
+
+      if (res.success) {
+        statusEl.style.color = 'var(--success)';
+        statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + res.message;
+      } else {
+        statusEl.style.color = 'var(--danger)';
+        statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + (res.error || 'Connection failed');
+      }
+    }
+
+    function handleSaveCloudConfig(e) {
+      e.preventDefault();
+      const url = document.getElementById('sb_url').value.trim();
+      const key = document.getElementById('sb_key').value.trim();
+      window.SupabaseConfig.saveCredentials(url, key, true);
+      updateCloudSyncStatus();
+      closeCloudModal();
+      alert('Supabase cloud configuration saved!');
+    }
+
+    function handleResetCloud() {
+      if (confirm('Disconnect Supabase and revert to local storage?')) {
+        window.SupabaseConfig.resetCredentials();
+        document.getElementById('sb_url').value = '';
+        document.getElementById('sb_key').value = '';
+        updateCloudSyncStatus();
+      }
+    }
+
     // CHART INITIALIZATION
     function initCharts() {
-      const ctx1 = document.getElementById('cashFlowChart').getContext('2d');
-      cashFlowChartObj = new Chart(ctx1, {
-        type: 'line',
-        data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
-          datasets: [
-            {
-              label: 'Revenue / Fees',
-              data: [32000, 45000, 28000, 51000, 60000, 42000, 55000, 68000],
-              borderColor: '#10B981',
-              backgroundColor: 'rgba(16, 185, 129, 0.1)',
-              fill: true,
-              tension: 0.4
-            },
-            {
-              label: 'Payroll & Expenses',
-              data: [25000, 29000, 31000, 30000, 35000, 34000, 36000, 35700],
-              borderColor: '#EF4444',
-              backgroundColor: 'rgba(239, 68, 68, 0.05)',
-              fill: true,
-              tension: 0.4
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { labels: { color: '#64748B' } } },
-          scales: {
-            x: { ticks: { color: '#64748B' }, grid: { display: false } },
-            y: { ticks: { color: '#64748B' }, grid: { color: 'rgba(200,200,200,0.1)' } }
-          }
-        }
-      });
+      if (!window.Chart) return;
+      const isDark = document.body.classList.contains('dark');
+      const textColor = isDark ? '#94A3B8' : '#64748B';
+      const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
 
-      const ctx2 = document.getElementById('expenseAllocationChart').getContext('2d');
-      expenseChartObj = new Chart(ctx2, {
-        type: 'doughnut',
-        data: {
-          labels: ['Staff Payroll', 'Software & IT', 'Operations', 'Tax & SSNIT'],
-          datasets: [{
-            data: [55, 15, 18, 12],
-            backgroundColor: ['#2563EB', '#06B6D4', '#F59E0B', '#10B981'],
-            borderWidth: 0
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { position: 'bottom', labels: { color: '#64748B', font: { size: 11 } } } }
-        }
-      });
+      const ctx1 = document.getElementById('cashFlowChart');
+      if (ctx1) {
+        if (cashFlowChartObj) cashFlowChartObj.destroy();
+        const grad1 = ctx1.getContext('2d').createLinearGradient(0, 0, 0, 240);
+        grad1.addColorStop(0, 'rgba(16, 185, 129, 0.35)');
+        grad1.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
+        const grad2 = ctx1.getContext('2d').createLinearGradient(0, 0, 0, 240);
+        grad2.addColorStop(0, 'rgba(239, 68, 68, 0.25)');
+        grad2.addColorStop(1, 'rgba(239, 68, 68, 0.0)');
+
+        cashFlowChartObj = new Chart(ctx1.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+            datasets: [
+              {
+                label: 'Revenue & Fees',
+                data: [32000, 45000, 28000, 51000, 60000, 42000, 55000, 68000],
+                borderColor: '#10B981',
+                borderWidth: 3,
+                backgroundColor: grad1,
+                pointBackgroundColor: '#10B981',
+                pointBorderColor: '#fff',
+                pointHoverRadius: 6,
+                fill: true,
+                tension: 0.42
+              },
+              {
+                label: 'Payroll & Operations Outflow',
+                data: [25000, 29000, 31000, 30000, 35000, 34000, 36000, 35700],
+                borderColor: '#EF4444',
+                borderWidth: 3,
+                backgroundColor: grad2,
+                pointBackgroundColor: '#EF4444',
+                pointBorderColor: '#fff',
+                pointHoverRadius: 6,
+                fill: true,
+                tension: 0.42
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { color: textColor, font: { weight: '600', size: 12 } } }
+            },
+            scales: {
+              x: { ticks: { color: textColor }, grid: { display: false } },
+              y: { ticks: { color: textColor }, grid: { color: gridColor } }
+            }
+          }
+        });
+      }
+
+      const ctx2 = document.getElementById('expenseAllocationChart');
+      if (ctx2) {
+        if (expenseChartObj) expenseChartObj.destroy();
+        expenseChartObj = new Chart(ctx2.getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Staff Payroll (55%)', 'Software & IT (15%)', 'Operations (18%)', 'Tax & SSNIT (12%)'],
+            datasets: [{
+              data: [55, 15, 18, 12],
+              backgroundColor: ['#2563EB', '#06B6D4', '#F59E0B', '#10B981'],
+              borderWidth: 0,
+              hoverOffset: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { color: textColor, font: { size: 11, weight: '600' } } }
+            },
+            cutout: '68%'
+          }
+        });
+      }
     }
   </script>
 </body>

@@ -1,193 +1,596 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Flawless Graphics — Employee Portal</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<style>
-  :root{--bg:#f8fafc;--card:#fff;--accent:#003366;--muted:#333}
-  *{box-sizing:border-box;font-family:Poppins,system-ui,Arial}
-  body{margin:0;background:var(--bg);color:var(--muted)}
-  header{background:linear-gradient(90deg,var(--accent),#0056b3);color:#fff;padding:14px 24px;display:flex;justify-content:space-between;align-items:center}
-  header h1{font-size:20px;margin:0}
-  .nav-links{display:flex;gap:12px;align-items:center}
-  .nav-links a{color:#fff;text-decoration:none;font-size:13px;padding:6px 12px;border-radius:6px;background:rgba(255,255,255,0.15)}
-  .nav-links a:hover{background:rgba(255,255,255,0.25)}
-  .wrap{max-width:1000px;margin:18px auto;padding:12px}
-  .top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-  .card{background:var(--card);padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.05)}
-  table{width:100%;border-collapse:collapse;margin-top:12px}
-  th,td{padding:10px;border-bottom:1px solid #eee;text-align:left}
-  .actions img{width:20px;cursor:pointer}
-  input,select{padding:8px;border-radius:8px;border:1px solid #ddd}
-  .btn{padding:8px 12px;border-radius:8px;border:0;background:var(--accent);color:#fff;cursor:pointer}
-  .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);justify-content:center;align-items:center;z-index:999}
-  .box{width:100%;max-width:520px;background:#fff;padding:16px;border-radius:10px}
-  .toast{position:fixed;right:20px;bottom:20px;background:#222;color:#fff;padding:10px;border-radius:8px;opacity:0;transform:translateY(10px);transition:all .28s}
-  .toast.show{opacity:1;transform:none}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Personnel Directory — FLAWLESS GRAPHICS HR</title>
+
+  <!-- Google Fonts & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Shared Design System -->
+  <link rel="stylesheet" href="../../assets/css/shared-design.css">
+
+  <style>
+    .avatar-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .emp-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      object-fit: cover;
+      background: var(--accent-glow);
+      border: 1px solid var(--border-card);
+      flex-shrink: 0;
+    }
+    .emp-name-bold {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .emp-email-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Modal Overlay */
+    .custom-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    .custom-modal-overlay.active {
+      display: flex;
+    }
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-xl);
+      max-width: 640px;
+      width: 100%;
+      padding: 32px;
+      box-shadow: var(--shadow-lg);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+  </style>
 </head>
 <body>
-<header>
-  <h1>Flawless Graphics — Employee Portal</h1>
-  <div class="nav-links">
-    <a href="../../welcome.html"><i class="fa-solid fa-house"></i> Hub</a>
-    <a href="hr-dashboard.html"><i class="fa-solid fa-gauge"></i> HR Dashboard</a>
-  </div>
-</header>
-<div class="wrap">
-  <div class="top">
-    <div>
-      <button class="btn" id="addBtn">+ Add Employee</button>
-      <button class="btn" id="toggleView">Cards</button>
+
+  <!-- Ambient Glows -->
+  <div class="ambient-glow ambient-top-left"></div>
+  <div class="ambient-glow ambient-bottom-right"></div>
+
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <a href="../public/home.html" class="brand-wrapper">
+      <div class="brand-badge">FG</div>
+      <div class="brand-info">
+        <h1 id="headerOrgTitle">FLAWLESS GRAPHICS</h1>
+        <div class="brand-tagline">Personnel Records & Team Administration</div>
+      </div>
+    </a>
+
+    <ul class="nav-menu">
+      <li><a href="../../welcome.html" class="nav-link"><i class="fa-solid fa-grid-horizontal"></i> Hub</a></li>
+      <li><a href="hr-dashboard.html" class="nav-link"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+      <li><a href="employee.html" class="nav-link active"><i class="fa-solid fa-users"></i> Employees</a></li>
+      <li><a href="attendance-summary.html" class="nav-link"><i class="fa-solid fa-clipboard-user"></i> Attendance</a></li>
+      <li><a href="payroll.html" class="nav-link"><i class="fa-solid fa-money-bill-wave"></i> Payroll</a></li>
+      <li><a href="payslip.html" class="nav-link"><i class="fa-solid fa-receipt"></i> Payslips</a></li>
+      <li><a href="employee-reports.html" class="nav-link"><i class="fa-solid fa-file-lines"></i> Reports</a></li>
+    </ul>
+
+    <div class="header-actions">
+      <button class="theme-pill-btn" id="themeBtn" title="Toggle Light/Dark Theme">
+        <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
+      </button>
+      <a href="hr-dashboard.html" class="hub-pill-btn">
+        <i class="fa-solid fa-arrow-left"></i> HR Main
+      </a>
     </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <input id="search" placeholder="Search by name, phone, dept or position">
-      <select id="viewDept"><option value="">All depts</option></select>
+  </header>
+
+  <!-- MAIN WRAPPER -->
+  <main class="main-wrapper">
+
+    <!-- TOP KPI STATS -->
+    <section class="grid-4" style="margin-bottom: 24px;">
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-blue">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <div>
+          <div class="stat-label">Total Staff</div>
+          <div class="stat-value" id="kpiStaffCount">0</div>
+          <div class="stat-trend positive"><i class="fa-solid fa-check"></i> On record</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-green">
+          <i class="fa-solid fa-sitemap"></i>
+        </div>
+        <div>
+          <div class="stat-label">Departments</div>
+          <div class="stat-value" id="kpiDeptCount">0</div>
+          <div class="stat-trend">Functional units</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-purple">
+          <i class="fa-solid fa-user-check"></i>
+        </div>
+        <div>
+          <div class="stat-label">Active Duty</div>
+          <div class="stat-value" id="kpiActiveCount">0</div>
+          <div class="stat-trend positive">100% standing</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-amber">
+          <i class="fa-solid fa-sack-dollar"></i>
+        </div>
+        <div>
+          <div class="stat-label">Monthly Payroll</div>
+          <div class="stat-value" id="kpiTotalSalary">GHS 0</div>
+          <div class="stat-trend">Gross commitment</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EMPLOYEE DIRECTORY CARD -->
+    <div class="glass-card">
+      <div class="glass-card-header">
+        <div>
+          <h2 class="glass-card-title"><i class="fa-solid fa-id-card-clip"></i> Personnel Directory</h2>
+          <div class="glass-card-subtitle">Manage organization staff records, salary grades, and department assignments</div>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <button class="btn-modern btn-primary" id="openAddModalBtn" onclick="openAddModal()">
+            <i class="fa-solid fa-user-plus"></i> Add Employee
+          </button>
+          <button class="btn-modern btn-secondary" onclick="exportEmployeesCSV()">
+            <i class="fa-solid fa-file-csv"></i> Export CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- FILTER & SEARCH BAR -->
+      <div style="display: flex; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;">
+        <div style="flex: 1; min-width: 240px; position: relative;">
+          <input type="text" id="searchInput" class="form-control" placeholder="Search by name, role, email, or department..." oninput="filterEmployees()">
+          <i class="fa-solid fa-magnifying-glass" style="position: absolute; right: 14px; top: 13px; color: var(--text-muted); pointer-events: none;"></i>
+        </div>
+
+        <div style="width: 200px;">
+          <select id="deptFilter" class="form-control" onchange="filterEmployees()">
+            <option value="">All Departments</option>
+          </select>
+        </div>
+
+        <div style="width: 170px;">
+          <select id="statusFilter" class="form-control" onchange="filterEmployees()">
+            <option value="">All Statuses</option>
+            <option value="Active">Active</option>
+            <option value="On Leave">On Leave</option>
+            <option value="Probation">Probation</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-responsive">
+        <table class="modern-table" id="empTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Employee Details</th>
+              <th>Department</th>
+              <th>Designation</th>
+              <th>Contact Phone</th>
+              <th>Monthly Salary</th>
+              <th>Status</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="empTableBody">
+            <!-- Populated via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ADD / EDIT EMPLOYEE MODAL -->
+  <div class="custom-modal-overlay" id="employeeModal">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="font-size: 20px; font-weight: 800;" id="modalHeading">Add New Employee</h3>
+        <button onclick="closeModal()" style="background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="empForm" onsubmit="handleSaveEmployee(event)">
+        <input type="hidden" id="editEmpId" value="">
+
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input type="text" id="m_name" class="form-control" placeholder="e.g. Ama Serwaa" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Email Address *</label>
+            <input type="email" id="m_email" class="form-control" placeholder="staff@flawless.org" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" id="m_phone" class="form-control" placeholder="+233 24 000 0000">
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Department *</label>
+            <input type="text" id="m_dept" class="form-control" placeholder="e.g. Executive & Design" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Position / Designation *</label>
+            <input type="text" id="m_pos" class="form-control" placeholder="e.g. Lead Instructor" required>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Monthly Gross Salary (GHS) *</label>
+            <input type="number" id="m_salary" class="form-control" placeholder="5500" min="0" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Employment Status</label>
+            <select id="m_status" class="form-control">
+              <option value="Active">Active</option>
+              <option value="On Leave">On Leave</option>
+              <option value="Probation">Probation</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Staff Avatar Photo</label>
+          <div style="display: flex; gap: 14px; align-items: center;">
+            <img id="m_avatarPreview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border-card);">
+            <input type="file" id="m_avatarFile" accept="image/*" class="form-control" style="font-size: 12px;">
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+          <button type="button" class="btn-modern btn-secondary" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn-modern btn-primary"><i class="fa-solid fa-save"></i> Save Personnel</button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <div class="card" id="tableCard" style="margin-top:12px;overflow-x:auto;">
-    <table id="empTable">
-      <thead><tr><th>#</th><th>Photo</th><th>Full name</th><th>Dept</th><th>Position</th><th>Email</th><th>Phone</th><th>Salary</th><th>Hired</th><th>Actions</th></tr></thead>
-      <tbody></tbody>
-    </table>
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="modern-toast success">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toastMsg">Personnel updated successfully</span>
   </div>
 
-  <div class="card" id="cardsView" style="display:none;margin-top:12px"></div>
-</div>
+  <!-- SCRIPT INTEGRATION -->
+  <script src="../../assets/js/auth-session.js"></script>
+  <script src="../../assets/js/supabase-config.js"></script>
+  <script src="../../assets/js/supabase-client.js"></script>
+  <script>
+    // 1. Session Setup
+    const user = window.AuthSession ? window.AuthSession.requireAuth('hr-login.html', true) : null;
+    const activeOrg = (user && user.org) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
+    const EMP_KEY = `${activeOrg}_employees`;
 
-<!-- Modal -->
-<div class="modal" id="modal"><div class="box">
-  <h3 id="mTitle">Add Employee</h3>
-  <form id="form">
-    <input id="fullName" placeholder="Full name" required style="width:100%;margin-top:8px">
-    <input id="email" placeholder="Email" type="email" style="width:100%;margin-top:8px">
-    <input id="phone" placeholder="Phone" style="width:100%;margin-top:8px">
-    <input id="department" placeholder="Department" style="width:100%;margin-top:8px">
-    <input id="position" placeholder="Position" style="width:100%;margin-top:8px">
-    <input id="salary" type="number" placeholder="Salary" style="width:100%;margin-top:8px">
-    <input id="hireDate" type="date" style="width:100%;margin-top:8px">
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <button class="btn" type="submit">Save</button>
-      <button class="btn" type="button" id="cancel">Cancel</button>
-    </div>
-    <input type="hidden" id="idx">
-  </form>
-</div></div>
+    if (user && user.org) {
+      document.getElementById('headerOrgTitle').textContent = user.org.toUpperCase();
+    }
 
-<div id="toast" class="toast"></div>
+    // 2. Read & Save Data
+    function getEmployees() {
+      try {
+        let list = JSON.parse(localStorage.getItem(EMP_KEY) || '[]');
+        if (!list || list.length === 0) {
+          list = [
+            { id: 'emp_1', fullName: "James Ntiamoah", department: "Executive & Design", position: "Creative Director", salary: 8500, email: "james@flawless.org", phone: "+233 24 111 2233", status: "Active", photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80" },
+            { id: 'emp_2', fullName: "Ama Serwaa", department: "Operations", position: "HR Manager", salary: 6200, email: "ama@flawless.org", phone: "+233 20 222 3344", status: "Active", photo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80" },
+            { id: 'emp_3', fullName: "Kwame Boateng", department: "Academic Staff", position: "Lead Instructor", salary: 5400, email: "kwame@flawless.org", phone: "+233 55 333 4455", status: "Active", photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80" },
+            { id: 'emp_4', fullName: "Abena Mansa", department: "Finance", position: "Chief Accountant", salary: 7100, email: "abena@flawless.org", phone: "+233 27 444 5566", status: "Active", photo: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80" },
+            { id: 'emp_5', fullName: "Kofi Owusu", department: "Digital Media", position: "Senior Designer", salary: 5000, email: "kofi@flawless.org", phone: "+233 24 555 6677", status: "Active", photo: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=120&q=80" },
+            { id: 'emp_6', fullName: "Esi Badu", department: "Academic Staff", position: "Science Educator", salary: 4800, email: "esi@flawless.org", phone: "+233 50 666 7788", status: "Active", photo: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=120&q=80" }
+          ];
+          localStorage.setItem(EMP_KEY, JSON.stringify(list));
+        }
+        // Ensure every employee has an id
+        list.forEach((e, idx) => {
+          if (!e.id) e.id = 'emp_' + (idx + 1);
+          if (!e.fullName && e.name) e.fullName = e.name;
+          if (!e.position && e.role) e.position = e.role;
+          if (!e.department && e.dept) e.department = e.dept;
+          if (!e.status) e.status = 'Active';
+        });
+        return list;
+      } catch (e) {
+        return [];
+      }
+    }
 
-<script>
-const ORG = localStorage.getItem('active_org') || 'FLAWLESS_GRAPHICS';
-const EMP_KEY = `${ORG}_employees`;
-function read(k){ try{return JSON.parse(localStorage.getItem(k))||[] }catch(e){return []} }
-function save(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
-function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2000) }
+    function saveEmployees(list) {
+      localStorage.setItem(EMP_KEY, JSON.stringify(list));
+      filterEmployees();
+      updateDeptDropdown();
+      updateKPIs();
+    }
 
-let employees = read(EMP_KEY);
+    // 3. Render Table
+    function renderTable(list = null) {
+      const employees = list !== null ? list : getEmployees();
+      const tbody = document.getElementById('empTableBody');
+      tbody.innerHTML = '';
 
-function renderTable(list = employees){
-  const tbody = document.querySelector('#empTable tbody'); tbody.innerHTML='';
-  list.forEach((e,i)=> {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td><td><img src="${e.photo||'https://img.icons8.com/ios-filled/50/user.png'}" style="width:36px;border-radius:6px"></td>
-      <td>${e.fullName}</td><td>${e.department||''}</td><td>${e.position||''}</td><td>${e.email||''}</td><td>${e.phone||''}</td><td>GHS ${Number(e.salary||0).toLocaleString()}</td><td>${e.hireDate||''}</td>
-      <td><button class="btn" style="padding:4px 8px;font-size:11px" onclick="edit(${i})">Edit</button> <button class="btn" style="padding:4px 8px;font-size:11px;background:#ef4444" onclick="del(${i})">Delete</button></td>`;
-    tbody.appendChild(tr);
-  });
-  populateDept();
-}
+      if (employees.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 36px; color: var(--text-muted);"><i class="fa-solid fa-users-slash" style="font-size: 32px; margin-bottom: 12px; display:block;"></i>No employee records match your query.</td></tr>`;
+        return;
+      }
 
-function renderCards(list = employees){
-  const wrap = document.getElementById('cardsView'); wrap.innerHTML='';
-  list.forEach((e,i)=>{
-    const div = document.createElement('div'); div.className='card'; div.style.marginBottom='8px';
-    div.innerHTML = `<div style="display:flex;gap:12px;align-items:center"><img src="${e.photo||'https://img.icons8.com/ios-filled/50/user.png'}" style="width:64px;border-radius:8px"><div><div style="font-weight:700">${e.fullName}</div><div class="small">${e.position} — ${e.department}</div><div class="small">${e.email}</div></div></div>`;
-    wrap.appendChild(div);
-  });
-}
+      employees.forEach((emp, i) => {
+        const tr = document.createElement('tr');
+        const deptLower = (emp.department || '').toLowerCase();
+        const deptColorClass = deptLower.includes('design') ? 'badge-purple' :
+          deptLower.includes('finance') ? 'badge-warning' :
+          deptLower.includes('academic') ? 'badge-info' : 'badge-success';
 
-function populateDept(){
-  const sel = document.getElementById('viewDept');
-  const depts = [...new Set(employees.map(e=>e.department).filter(Boolean))];
-  sel.innerHTML = '<option value="">All depts</option>'+depts.map(d=>`<option value="${d}">${d}</option>`).join('');
-}
+        const statusClass = emp.status === 'On Leave' ? 'badge-warning' :
+          emp.status === 'Probation' ? 'badge-info' : 'badge-success';
 
-document.getElementById('addBtn').addEventListener('click', ()=>{
-  document.getElementById('mTitle').textContent='Add Employee';
-  document.getElementById('form').reset();
-  document.getElementById('idx').value='';
-  document.getElementById('modal').style.display='flex';
-});
-document.getElementById('cancel').addEventListener('click', ()=> document.getElementById('modal').style.display='none');
+        tr.innerHTML = `
+          <td style="color: var(--text-muted); font-weight: 600;">${i + 1}</td>
+          <td>
+            <div class="avatar-cell">
+              <img src="${emp.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'}" class="emp-avatar" alt="Avatar">
+              <div>
+                <div class="emp-name-bold">${escapeHtml(emp.fullName || emp.name)}</div>
+                <div class="emp-email-sub">${escapeHtml(emp.email || '')}</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge-pill ${deptColorClass}">${escapeHtml(emp.department || emp.dept || 'General')}</span></td>
+          <td style="font-weight: 600;">${escapeHtml(emp.position || emp.role || 'Staff')}</td>
+          <td>${escapeHtml(emp.phone || '—')}</td>
+          <td style="font-weight: 700; color: var(--accent-primary);">GHS ${Number(emp.salary || 0).toLocaleString()}</td>
+          <td><span class="badge-pill ${statusClass}"><i class="fa-solid fa-circle" style="font-size:7px"></i> ${escapeHtml(emp.status || 'Active')}</span></td>
+          <td style="text-align: right;">
+            <button class="btn-modern btn-secondary btn-sm" onclick="openEditModal('${emp.id}')" title="Edit Profile">
+              <i class="fa-solid fa-pen-to-square"></i> Edit
+            </button>
+            <button class="btn-modern btn-danger btn-sm" onclick="deleteEmployee('${emp.id}')" title="Delete Personnel">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
 
-document.getElementById('form').addEventListener('submit', (e)=>{
-  e.preventDefault();
-  const obj = {
-    fullName: document.getElementById('fullName').value.trim(),
-    email: document.getElementById('email').value.trim(),
-    phone: document.getElementById('phone').value.trim(),
-    department: document.getElementById('department').value.trim(),
-    position: document.getElementById('position').value.trim(),
-    salary: Number(document.getElementById('salary').value) || 0,
-    hireDate: document.getElementById('hireDate').value || ''
-  };
-  const idx = document.getElementById('idx').value;
-  if(idx===''){ employees.push(obj); toast('Employee saved'); }
-  else { employees[Number(idx)] = obj; toast('Employee updated'); }
-  save(EMP_KEY, employees);
-  document.getElementById('modal').style.display='none';
-  renderTable();
-  renderCards();
-});
+    // 4. Update KPIs
+    function updateKPIs() {
+      const emps = getEmployees();
+      document.getElementById('kpiStaffCount').textContent = emps.length;
+      
+      const depts = new Set(emps.map(e => (e.department || e.dept || '').trim()).filter(Boolean));
+      document.getElementById('kpiDeptCount').textContent = depts.size;
 
-window.edit = function(i){
-  const e = employees[i];
-  document.getElementById('mTitle').textContent='Edit Employee';
-  document.getElementById('fullName').value = e.fullName || '';
-  document.getElementById('email').value = e.email || '';
-  document.getElementById('phone').value = e.phone || '';
-  document.getElementById('department').value = e.department || '';
-  document.getElementById('position').value = e.position || '';
-  document.getElementById('salary').value = e.salary || '';
-  document.getElementById('hireDate').value = e.hireDate || '';
-  document.getElementById('idx').value = i;
-  document.getElementById('modal').style.display='flex';
-};
+      const activeCount = emps.filter(e => e.status !== 'On Leave').length;
+      document.getElementById('kpiActiveCount').textContent = activeCount;
 
-window.del = function(i){
-  if(!confirm('Delete?')) return;
-  employees.splice(i,1);
-  save(EMP_KEY, employees);
-  renderTable();
-  renderCards();
-  toast('Deleted');
-};
+      const totalSal = emps.reduce((acc, curr) => acc + (Number(curr.salary) || 0), 0);
+      document.getElementById('kpiTotalSalary').textContent = `GHS ${totalSal.toLocaleString()}`;
+    }
 
-document.getElementById('search').addEventListener('input',(e)=>{
-  const q = e.target.value.toLowerCase();
-  renderTable(employees.filter(emp => (emp.fullName||'').toLowerCase().includes(q) || (emp.department||'').toLowerCase().includes(q) || (emp.position||'').toLowerCase().includes(q) || (emp.phone||'').includes(q)));
-  renderCards(employees.filter(emp => (emp.fullName||'').toLowerCase().includes(q) || (emp.department||'').toLowerCase().includes(q)));
-});
+    // 5. Update Department Dropdown
+    function updateDeptDropdown() {
+      const emps = getEmployees();
+      const depts = [...new Set(emps.map(e => (e.department || e.dept || '').trim()).filter(Boolean))];
+      const select = document.getElementById('deptFilter');
+      const current = select.value;
+      select.innerHTML = '<option value="">All Departments</option>';
+      depts.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = d;
+        if (d === current) opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
 
-document.getElementById('viewDept').addEventListener('change',(e)=>{
-  const v=e.target.value; renderTable(v ? employees.filter(emp=>emp.department===v): employees); renderCards(v ? employees.filter(emp=>emp.department===v): employees);
-});
+    // 6. Filter Functionality
+    function filterEmployees() {
+      const term = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+      const dept = document.getElementById('deptFilter').value;
+      const status = document.getElementById('statusFilter').value;
+      const all = getEmployees();
 
-document.getElementById('toggleView').addEventListener('click', ()=>{
-  const t = document.getElementById('tableCard'); const c = document.getElementById('cardsView');
-  if(t.style.display==='none'){ t.style.display='block'; c.style.display='none'; } else { t.style.display='none'; c.style.display='block'; }
-});
+      const filtered = all.filter(e => {
+        const nameStr = (e.fullName || e.name || '').toLowerCase();
+        const emailStr = (e.email || '').toLowerCase();
+        const posStr = (e.position || e.role || '').toLowerCase();
+        const deptStr = (e.department || e.dept || '').toLowerCase();
+        const matchesTerm = nameStr.includes(term) || emailStr.includes(term) || posStr.includes(term) || deptStr.includes(term);
+        const matchesDept = !dept || (e.department === dept || e.dept === dept);
+        const matchesStatus = !status || e.status === status;
+        return matchesTerm && matchesDept && matchesStatus;
+      });
 
-/* storage sync */
-window.addEventListener('storage',(e)=>{ if(e.key===EMP_KEY){ employees=read(EMP_KEY); renderTable(); renderCards(); } });
+      renderTable(filtered);
+    }
 
-renderTable();
-renderCards();
-populateDept();
-</script>
+    // 7. Modal Controls
+    function openAddModal() {
+      document.getElementById('modalHeading').textContent = 'Add New Employee';
+      document.getElementById('editEmpId').value = '';
+      document.getElementById('empForm').reset();
+      document.getElementById('m_avatarPreview').src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80';
+      document.getElementById('employeeModal').classList.add('active');
+    }
+
+    function openEditModal(empId) {
+      const emps = getEmployees();
+      const emp = emps.find(e => e.id === empId);
+      if (!emp) return;
+
+      document.getElementById('modalHeading').textContent = 'Edit Employee Record';
+      document.getElementById('editEmpId').value = emp.id;
+      document.getElementById('m_name').value = emp.fullName || emp.name || '';
+      document.getElementById('m_email').value = emp.email || '';
+      document.getElementById('m_phone').value = emp.phone || '';
+      document.getElementById('m_dept').value = emp.department || emp.dept || '';
+      document.getElementById('m_pos').value = emp.position || emp.role || '';
+      document.getElementById('m_salary').value = emp.salary || '';
+      document.getElementById('m_status').value = emp.status || 'Active';
+      document.getElementById('m_avatarPreview').src = emp.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80';
+      document.getElementById('employeeModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('employeeModal').classList.remove('active');
+    }
+
+    // Avatar preview
+    document.getElementById('m_avatarFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          document.getElementById('m_avatarPreview').src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function handleSaveEmployee(e) {
+      e.preventDefault();
+      const editId = document.getElementById('editEmpId').value;
+      const emps = getEmployees();
+
+      const newRecord = {
+        fullName: document.getElementById('m_name').value.trim(),
+        name: document.getElementById('m_name').value.trim(),
+        email: document.getElementById('m_email').value.trim(),
+        phone: document.getElementById('m_phone').value.trim(),
+        department: document.getElementById('m_dept').value.trim(),
+        dept: document.getElementById('m_dept').value.trim(),
+        position: document.getElementById('m_pos').value.trim(),
+        role: document.getElementById('m_pos').value.trim(),
+        salary: Number(document.getElementById('m_salary').value) || 0,
+        status: document.getElementById('m_status').value,
+        photo: document.getElementById('m_avatarPreview').src
+      };
+
+      if (editId) {
+        const idx = emps.findIndex(x => x.id === editId);
+        if (idx >= 0) {
+          emps[idx] = Object.assign({}, emps[idx], newRecord);
+          showToast('Employee updated successfully');
+        }
+      } else {
+        newRecord.id = 'emp_' + Date.now();
+        emps.unshift(newRecord);
+        showToast('New employee enrolled successfully');
+      }
+
+      saveEmployees(emps);
+
+      // Push to Supabase Cloud
+      if (window.SupabaseService && window.SupabaseConfig && window.SupabaseConfig.isConfigured()) {
+        window.SupabaseService.saveEmployee(activeOrg, newRecord).catch(console.warn);
+      }
+
+      closeModal();
+    }
+
+    function deleteEmployee(empId) {
+      const emps = getEmployees();
+      const emp = emps.find(e => e.id === empId);
+      if (!emp) return;
+      if (confirm(`Are you sure you want to remove "${emp.fullName || emp.name}" from the employee directory?`)) {
+        if (window.SupabaseService && window.SupabaseConfig && window.SupabaseConfig.isConfigured()) {
+          window.SupabaseService.deleteEmployee(activeOrg, empId).catch(console.warn);
+        }
+        const updated = emps.filter(e => e.id !== empId);
+        saveEmployees(updated);
+        showToast('Employee record deleted');
+      }
+    }
+
+    function exportEmployeesCSV() {
+      const emps = getEmployees();
+      let csv = 'Full Name,Email,Phone,Department,Position,Salary,Status\n';
+      emps.forEach(e => {
+        csv += `"${e.fullName || e.name}","${e.email}","${e.phone || ''}","${e.department || e.dept}","${e.position || e.role}","${e.salary}","${e.status || 'Active'}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `employees_${activeOrg.toLowerCase().replace(/[^a-z0-9]/g, '_')}.csv`;
+      a.click();
+      showToast('CSV export downloaded');
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2600);
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // 8. Theme Switcher
+    const htmlEl = document.documentElement;
+    const themeBtn = document.getElementById('themeBtn');
+    function applyTheme(isDark) {
+      if (isDark) {
+        htmlEl.classList.add('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i> <span>Light</span>';
+      } else {
+        htmlEl.classList.remove('dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-moon"></i> <span>Dark</span>';
+      }
+      localStorage.setItem('fg_theme_dark', isDark);
+    }
+    const savedTheme = localStorage.getItem('fg_theme_dark');
+    applyTheme(savedTheme === 'true');
+    themeBtn.addEventListener('click', () => applyTheme(!htmlEl.classList.contains('dark')));
+
+    // Initialization
+    renderTable();
+    updateDeptDropdown();
+    updateKPIs();
+  </script>
 </body>
 </html>

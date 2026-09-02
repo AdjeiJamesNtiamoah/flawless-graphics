@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Finance & Treasury Hub — FLAWLESS GRAPHICS</title>
+
+  <!-- Google Fonts & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Shared Modern Design System -->
+  <link rel="stylesheet" href="../../assets/css/shared-design.css">
+
+  <!-- Unified AuthSession & Supabase Client -->
+  <script src="../../assets/js/auth-session.js"></script>
+  <script src="../../assets/js/supabase-config.js"></script>
+  <script src="../../assets/js/supabase-client.js"></script>
+  <script>
+    (function() {
+      if (window.AuthSession) {
+        window.AuthSession.requireAuth('finance-login.html', true);
+      }
+    })();
+  </script>
+
+  <style>
+    @keyframes floatOrb {
+      0%, 100% { transform: translateY(0px) scale(1); }
+      50% { transform: translateY(-24px) scale(1.08); }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(37, 99, 235, 0.2); }
+      50% { box-shadow: 0 0 28px rgba(37, 99, 235, 0.45); }
+    }
+    @keyframes badgePulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .ambient-orb-1 {
+      position: absolute;
+      top: -120px;
+      left: -120px;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, rgba(6, 182, 212, 0.05) 70%, transparent 100%);
+      filter: blur(120px);
+      z-index: -1;
+      pointer-events: none;
+      animation: floatOrb 12s infinite ease-in-out;
+    }
+    .ambient-orb-2 {
+      position: absolute;
+      bottom: -100px;
+      right: -100px;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, rgba(59, 130, 246, 0.05) 70%, transparent 100%);
+      filter: blur(140px);
+      z-index: -1;
+      pointer-events: none;
+      animation: floatOrb 16s infinite ease-in-out reverse;
+    }
+
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+      margin-top: 24px;
+    }
+    @media (max-width: 980px) {
+      .hub-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .hub-grid { grid-template-columns: 1fr; }
+    }
+
+    .hub-module-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-xl);
+      padding: 26px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all var(--transition-base);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    }
+    .hub-module-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent-primary);
+      box-shadow: var(--shadow-lg);
+    }
+    .hub-module-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 3px;
+      background: var(--accent-gradient);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .hub-module-card:hover::after { opacity: 1; }
+
+    .hub-icon-box {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 18px;
+      transition: transform 0.3s ease;
+    }
+    .hub-module-card:hover .hub-icon-box {
+      transform: scale(1.1) rotate(4deg);
+    }
+
+    /* Live pulse badge */
+    .live-pulse {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--success);
+      padding: 4px 10px;
+      background: rgba(16, 185, 129, 0.12);
+      border-radius: 9999px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: badgePulse 2s infinite ease-in-out;
+    }
+
+    /* Custom Modal */
+    .custom-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    .custom-modal-overlay.active { display: flex; }
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-xl);
+      max-width: 540px;
+      width: 100%;
+      padding: 30px;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Glows -->
+  <div class="ambient-orb-1"></div>
+  <div class="ambient-orb-2"></div>
+
+  <div class="app-layout">
+    
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+      <div class="navbar-left">
+        <a href="../../welcome.html" class="logo-box">
+          <div class="logo-icon"><i class="fa-solid fa-coins"></i></div>
+          <div class="logo-text">
+            <span class="logo-title">FLAWLESS GRAPHICS</span>
+            <span class="logo-subtitle">Finance & Treasury Operations</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="navbar-right">
+        <!-- Live Cloud Sync Indicator Button -->
+        <button class="nav-action-btn" id="cloudSyncBtn" onclick="openCloudModal()" title="Supabase Cloud Synchronization" style="border: 1px solid rgba(16, 185, 129, 0.4); color: #10b981; background: rgba(16, 185, 129, 0.08); border-radius: 9999px; padding: 6px 14px; font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; gap: 7px; cursor: pointer;">
+          <i class="fa-solid fa-cloud" id="cloudSyncIcon"></i> <span id="cloudSyncLabel">Connect Supabase</span>
+        </button>
+
+        <a href="finance-dashboard.html" class="nav-action-btn" title="Live Financial Dashboard">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Finance Control</span>
+        </a>
+        <a href="../hr/index.html" class="nav-action-btn" title="HR & Staff Operations">
+          <i class="fa-solid fa-users"></i>
+          <span>HR Operations</span>
+        </a>
+        <button class="nav-action-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button class="nav-action-btn" onclick="handleLogout()" title="Sign Out">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Welcome Hero Section -->
+      <section class="page-header" style="margin-bottom: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+              <span class="badge badge-accent"><i class="fa-solid fa-vault"></i> Enterprise Treasury Control</span>
+              <div class="live-pulse"><span class="live-dot"></span> LIVE ACCOUNTS ACTIVE</div>
+            </div>
+            <h1 class="page-title" style="font-size: 28px; margin-bottom: 4px;">Finance Operations Command Hub</h1>
+            <p class="text-secondary" style="font-size: 14px;">Institutional fee collections, payroll authorizations, audit logs, and Supabase cloud reconciliation</p>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn btn-secondary" onclick="openModal('quickFeeModal')">
+              <i class="fa-solid fa-graduation-cap"></i> Record Student Fee
+            </button>
+            <a href="finance-dashboard.html" class="btn btn-primary">
+              <i class="fa-solid fa-sliders"></i> Open Finance Control Suite
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Key Performance Indicators -->
+      <section class="metrics-grid" style="grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 28px;">
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">Annual Operating Budget</span>
+            <div class="metric-icon" style="background: rgba(37, 99, 235, 0.12); color: var(--accent-primary);"><i class="fa-solid fa-wallet"></i></div>
+          </div>
+          <div class="metric-value">GH₵ <span id="kpiBudget">450,000.00</span></div>
+          <div class="metric-trend text-secondary"><i class="fa-solid fa-check"></i> Fiscal Year 2026 Allocation</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">Student Fees Collected</span>
+            <div class="metric-icon" style="background: rgba(16, 185, 129, 0.12); color: var(--success);"><i class="fa-solid fa-graduation-cap"></i></div>
+          </div>
+          <div class="metric-value">GH₵ <span id="kpiFees">0.00</span></div>
+          <div class="metric-trend" style="color: var(--success);"><i class="fa-solid fa-arrow-trend-up"></i> Verified Bursar Receipts</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">Committed Gross Payroll</span>
+            <div class="metric-icon" style="background: rgba(245, 158, 11, 0.12); color: var(--warning);"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+          </div>
+          <div class="metric-value">GH₵ <span id="kpiPayroll">0.00</span></div>
+          <div class="metric-trend text-secondary"><i class="fa-solid fa-clock"></i> Department Monthly Payroll</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">Net Treasury Liquidity</span>
+            <div class="metric-icon" style="background: rgba(6, 182, 212, 0.12); color: #06B6D4;"><i class="fa-solid fa-piggy-bank"></i></div>
+          </div>
+          <div class="metric-value">GH₵ <span id="kpiLiquidity">454,350.00</span></div>
+          <div class="metric-trend text-secondary"><i class="fa-solid fa-shield-halved"></i> Runway Fully Solvent</div>
+        </div>
+      </section>
+
+      <!-- Operations Modules Grid -->
+      <section style="margin-bottom: 36px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <div>
+            <h2 style="font-size: 20px; font-weight: 800;">Treasury & Financial Modules</h2>
+            <div style="font-size: 13px; color: var(--text-muted);">Access dedicated functional desks and accounting tools</div>
+          </div>
+          <span class="badge badge-accent">6 Active Functional Desks</span>
+        </div>
+
+        <div class="hub-grid">
+          
+          <!-- Module 1: Finance & Cash Flow Suite -->
+          <a href="finance-dashboard.html" class="hub-module-card">
+            <div>
+              <div class="hub-icon-box" style="background: rgba(37, 99, 235, 0.12); color: #2563EB;">
+                <i class="fa-solid fa-chart-line"></i>
+              </div>
+              <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Cash Flow & Budget Control</h3>
+              <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">
+                Interactive 2026 cash flow splines, department expense allocations, and multi-currency converter (GHS, USD, EUR, GBP).
+              </p>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 700; color: #2563EB;">
+              <span>Open Dashboard</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </a>
+
+          <!-- Module 2: Salary Payment Approvals -->
+          <a href="finance-dashboard.html" class="hub-module-card">
+            <div>
+              <div class="hub-icon-box" style="background: rgba(245, 158, 11, 0.12); color: #F59E0B;">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+              </div>
+              <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Payroll & Authorization Desk</h3>
+              <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">
+                Review gross salaries, calculate automated GRA/SSNIT deductions (13.5%), authorize individual staff wires, or batch approve.
+              </p>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 700; color: #F59E0B;">
+              <span>Manage Approvals</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </a>
+
+          <!-- Module 3: Student Fee Desk -->
+          <div class="hub-module-card" style="cursor: pointer;" onclick="openModal('quickFeeModal')">
+            <div>
+              <div class="hub-icon-box" style="background: rgba(16, 185, 129, 0.12); color: #10B981;">
+                <i class="fa-solid fa-graduation-cap"></i>
+              </div>
+              <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Student Fee Collection</h3>
+              <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">
+                Accept tuition, laboratory, and exam payments with instant printable official corporate receipts featuring digital security seals.
+              </p>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 700; color: #10B981;">
+              <span>Collect Fee Record</span>
+              <i class="fa-solid fa-plus"></i>
+            </div>
+          </div>
+
+          <!-- Module 4: Corporate Invoicing Desk -->
+          <a href="finance-dashboard.html" class="hub-module-card">
+            <div>
+              <div class="hub-icon-box" style="background: rgba(139, 92, 246, 0.12); color: #8B5CF6;">
+                <i class="fa-solid fa-file-invoice"></i>
+              </div>
+              <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Commercial Invoicing</h3>
+              <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">
+                Generate customized itemized billing invoices for corporate design clients and student fee installments with 1-click PDF printing.
+              </p>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 700; color: #8B5CF6;">
+              <span>Generate Invoice</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </a>
+
+          <!-- Module 5: General Ledger Disbursements -->
+          <a href="finance-dashboard.html" class="hub-module-card">
+            <div>
+              <div class="hub-icon-box" style="background: rgba(6, 182, 212, 0.12); color: #06B6D4;">
+                <i class="fa-solid fa-receipt"></i>
+              </div>
+              <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Disbursement Vouchers</h3>
+              <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">
+                Log institutional operating expenses, utility payments, and vendor invoices with real-time CSV export and audit logging.
+              </p>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 700; color: #06B6D4;">
+              <span>View Ledger</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </a>
+
+          <!-- Module 6: Supabase Cloud Treasury Integration -->
+          <div class="hub-module-card" style="cursor: pointer;" onclick="openCloudModal()">
+            <div>
+              <div class="hub-icon-box" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
+                <i class="fa-solid fa-cloud-bolt"></i>
+              </div>
+              <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Supabase Cloud Database</h3>
+              <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">
+                Enterprise Postgres synchronization for financial ledgers, employee payroll records, and payment receipts with zero downtime.
+              </p>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 700; color: #10B981;">
+              <span>Sync Status & Settings</span>
+              <i class="fa-solid fa-gear"></i>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Recent Transactions Stream -->
+      <section class="card" style="margin-bottom: 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h3 style="font-size: 18px; font-weight: 800;">Recent Financial Activity</h3>
+            <div style="font-size: 12px; color: var(--text-secondary);">Live fee collections, salary disbursements, and audit events</div>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <a href="finance-dashboard.html" class="btn btn-secondary" style="font-size: 12px; padding: 6px 14px;">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Full Ledger
+            </a>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Receipt / Ref</th>
+                <th>Party / Student</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Amount (GH₵)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="hubActivityBody">
+              <!-- Loaded dynamically via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer" style="padding: 24px 32px; border-top: 1px solid var(--border-card); text-align: center; font-size: 12px; color: var(--text-muted);">
+      &copy; 2026 FLAWLESS GRAPHICS &bull; Finance & Treasury Operations ERP &bull; Connected to Cloud Postgres
+    </footer>
+  </div>
+
+  <!-- QUICK STUDENT FEE MODAL -->
+  <div class="custom-modal-overlay" id="quickFeeModal">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); color: #10B981; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <div>
+            <h3 style="font-size: 18px; font-weight: 800; margin: 0;">Record Student Fee</h3>
+            <div style="font-size: 12px; color: var(--text-muted);">Institutional tuition & laboratory desk</div>
+          </div>
+        </div>
+        <button onclick="closeModal('quickFeeModal')" style="background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer;">&times;</button>
+      </div>
+
+      <form id="quickFeeForm" onsubmit="handleQuickFeeSubmit(event)">
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label class="form-label" style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 6px;">Student Full Name *</label>
+          <input type="text" id="qFeeName" class="form-control" placeholder="e.g. Kwame Mensah" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-card); background: var(--bg-surface); color: inherit;">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+          <div class="form-group">
+            <label class="form-label" style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 6px;">Student ID *</label>
+            <input type="text" id="qFeeId" class="form-control" placeholder="e.g. STU-2026-088" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-card); background: var(--bg-surface); color: inherit;">
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 6px;">Category *</label>
+            <select id="qFeeCat" class="form-control" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-card); background: var(--bg-surface); color: inherit;">
+              <option value="Tuition Fee">Tuition Fee</option>
+              <option value="Facility & Lab Fee">Facility & Lab Fee</option>
+              <option value="Examination Fee">Examination Fee</option>
+              <option value="Library Fee">Library Fee</option>
+              <option value="Sports & Extra-curricular">Sports & Extra-curricular</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label class="form-label" style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 6px;">Amount Paid (GH₵) *</label>
+          <input type="number" id="qFeeAmt" step="0.01" min="1" class="form-control" placeholder="3500.00" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-card); background: var(--bg-surface); color: inherit;">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('quickFeeModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="background: var(--success); border-color: var(--success);">
+            <i class="fa-solid fa-check"></i> Save & Authorize Receipt
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SUPABASE CLOUD SYNC MODAL -->
+  <div class="custom-modal-overlay" id="cloudModalBackdrop">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); color: #10B981; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+            <i class="fa-solid fa-cloud"></i>
+          </div>
+          <div>
+            <h3 style="font-size: 18px; font-weight: 800; margin: 0;">Supabase Cloud Sync</h3>
+            <div style="font-size: 12px; color: var(--text-muted);">Target: <strong>AdjeiJamesNtiamoah</strong></div>
+          </div>
+        </div>
+        <button onclick="closeCloudModal()" style="background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer;">&times;</button>
+      </div>
+
+      <div style="background: var(--bg-card); border-radius: 12px; padding: 14px; border: 1px solid var(--border-card); margin-bottom: 18px; font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+        Synchronize financial records, payroll vouchers, and fees directly with your remote Supabase cloud database.
+        <div id="cloudStatusMsg" style="margin-top: 10px; font-weight: 700; display: none;"></div>
+      </div>
+
+      <form onsubmit="handleSaveCloudConfig(event)">
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label class="form-label" style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 6px;">Supabase Project URL *</label>
+          <input id="sb_url" class="form-control" placeholder="https://xxxxxxxxxxxxxxxxxxxx.supabase.co" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-card); background: var(--bg-surface); color: inherit;">
+        </div>
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label class="form-label" style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 6px;">Supabase Anon API Key *</label>
+          <input id="sb_key" type="password" class="form-control" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-card); background: var(--bg-surface); color: inherit;">
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <button type="button" class="btn btn-secondary" id="testConnBtn" onclick="handleTestCloud()"><i class="fa-solid fa-plug"></i> Test Connection</button>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-secondary" onclick="handleResetCloud()">Reset</button>
+            <button type="submit" class="btn btn-primary" style="background: var(--success); border-color: var(--success);">Save & Connect</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function animateValue(id, start, end, duration = 800) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const range = end - start;
+      const minTimer = 25;
+      let stepTime = Math.abs(Math.floor(duration / (Math.abs(range) || 1)));
+      stepTime = Math.max(stepTime, minTimer);
+      const startTime = Date.now();
+      const endTime = startTime + duration;
+      
+      function run() {
+        const now = Date.now();
+        const remaining = Math.max((endTime - now) / duration, 0);
+        const value = end - (remaining * range);
+        el.innerText = value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (now < endTime) {
+          requestAnimationFrame(run);
+        } else {
+          el.innerText = end.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+      }
+      requestAnimationFrame(run);
+    }
+
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active');
+    }
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('active');
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+      const isDark = document.body.classList.contains('dark');
+      const icon = document.querySelector('#themeToggleBtn i');
+      if (icon) icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      localStorage.setItem('fg_theme_dark', isDark ? 'true' : 'false');
+    }
+
+    function handleLogout() {
+      if (confirm('Are you sure you want to log out of Finance Operations?')) {
+        if (window.AuthSession && typeof window.AuthSession.logout === 'function') {
+          window.AuthSession.logout('finance-login.html');
+        } else {
+          window.location.href = 'finance-login.html';
+        }
+      }
+    }
+
+    // Refresh KPIs and Recent Activity
+    function refreshHubData() {
+      const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
+      const payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];
+
+      let totalFees = 0;
+      feeData.forEach(f => totalFees += parseFloat(f.amount || 0));
+
+      let totalGrossPayroll = 0;
+      let approvedPayroll = 0;
+      payrollData.forEach(p => {
+        const gross = parseFloat(p.gross || 0);
+        totalGrossPayroll += gross;
+        if (p.approved) approvedPayroll += gross * 0.865;
+      });
+
+      const netLiquidity = 450000 + totalFees - approvedPayroll;
+
+      animateValue('kpiBudget', 0, 450000, 600);
+      animateValue('kpiFees', 0, totalFees, 600);
+      animateValue('kpiPayroll', 0, totalGrossPayroll, 600);
+      animateValue('kpiLiquidity', 0, netLiquidity, 600);
+
+      // Render recent activity table
+      const tbody = document.getElementById('hubActivityBody');
+      tbody.innerHTML = '';
+
+      if (feeData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:24px; color:var(--text-muted);">No transactions recorded yet</td></tr>';
+        return;
+      }
+
+      feeData.slice(0, 6).forEach(item => {
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${item.id}</strong></td>
+            <td>${item.name} <small style="color:var(--text-muted); display:block;">${item.studentId}</small></td>
+            <td><span class="badge" style="background:rgba(37,99,235,0.12); color:#2563EB;">${item.cat}</span></td>
+            <td>${item.date}</td>
+            <td><strong>${parseFloat(item.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}</strong></td>
+            <td><span class="badge badge-success"><i class="fa-solid fa-check"></i> ${item.status || 'Verified'}</span></td>
+          </tr>
+        `;
+      });
+    }
+
+    function handleQuickFeeSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('qFeeName').value.trim();
+      const studentId = document.getElementById('qFeeId').value.trim();
+      const cat = document.getElementById('qFeeCat').value;
+      const amount = parseFloat(document.getElementById('qFeeAmt').value);
+
+      const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
+      const newRec = {
+        id: 'REC-' + Math.floor(1000 + Math.random() * 9000),
+        name,
+        studentId,
+        cat,
+        method: 'Bank Wire / Mobile Money',
+        date: new Date().toISOString().split('T')[0],
+        amount,
+        status: 'Completed'
+      };
+
+      feeData.unshift(newRec);
+      localStorage.setItem('fg_student_fees', JSON.stringify(feeData));
+
+      closeModal('quickFeeModal');
+      document.getElementById('quickFeeForm').reset();
+      refreshHubData();
+      alert(`Payment of GH₵ ${amount.toLocaleString()} for ${name} recorded successfully!`);
+    }
+
+    // Supabase Cloud Modal handlers
+    function updateCloudSyncStatus() {
+      const isConn = window.SupabaseConfig && window.SupabaseConfig.isConfigured();
+      const label = document.getElementById('cloudSyncLabel');
+      const icon = document.getElementById('cloudSyncIcon');
+      const btn = document.getElementById('cloudSyncBtn');
+      if (!label || !btn) return;
+
+      if (isConn) {
+        label.textContent = 'Supabase Cloud: Active';
+        icon.className = 'fa-solid fa-cloud-check';
+        btn.style.color = '#10b981';
+        btn.style.borderColor = '#10b981';
+        btn.style.background = 'rgba(16, 185, 129, 0.15)';
+      } else {
+        label.textContent = 'Connect Supabase';
+        icon.className = 'fa-solid fa-cloud';
+        btn.style.color = '#10b981';
+        btn.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        btn.style.background = 'rgba(16, 185, 129, 0.08)';
+      }
+    }
+
+    function openCloudModal() {
+      const modal = document.getElementById('cloudModalBackdrop');
+      if (window.SupabaseConfig) {
+        document.getElementById('sb_url').value = window.SupabaseConfig.getUrl();
+        document.getElementById('sb_key').value = window.SupabaseConfig.getAnonKey();
+      }
+      modal.classList.add('active');
+    }
+
+    function closeCloudModal() {
+      document.getElementById('cloudModalBackdrop').classList.remove('active');
+    }
+
+    async function handleTestCloud() {
+      const url = document.getElementById('sb_url').value.trim();
+      const key = document.getElementById('sb_key').value.trim();
+      const statusEl = document.getElementById('cloudStatusMsg');
+      const btn = document.getElementById('testConnBtn');
+      statusEl.style.display = 'block';
+      statusEl.style.color = 'var(--accent-primary)';
+      statusEl.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Testing connection to Supabase...';
+      btn.disabled = true;
+
+      const res = await window.SupabaseConfig.testConnection(url, key);
+      btn.disabled = false;
+
+      if (res.success) {
+        statusEl.style.color = 'var(--success)';
+        statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + res.message;
+      } else {
+        statusEl.style.color = 'var(--danger)';
+        statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + (res.error || 'Connection failed');
+      }
+    }
+
+    function handleSaveCloudConfig(e) {
+      e.preventDefault();
+      const url = document.getElementById('sb_url').value.trim();
+      const key = document.getElementById('sb_key').value.trim();
+      window.SupabaseConfig.saveCredentials(url, key, true);
+      updateCloudSyncStatus();
+      closeCloudModal();
+      alert('Supabase cloud configuration saved!');
+    }
+
+    function handleResetCloud() {
+      if (confirm('Disconnect Supabase and revert to local storage?')) {
+        window.SupabaseConfig.resetCredentials();
+        document.getElementById('sb_url').value = '';
+        document.getElementById('sb_key').value = '';
+        updateCloudSyncStatus();
+      }
+    }
+
+    function initHub() {
+      const savedTheme = localStorage.getItem('fg_theme_dark');
+      if (savedTheme === 'true') {
+        document.body.classList.add('dark');
+        const icon = document.querySelector('#themeToggleBtn i');
+        if (icon) icon.className = 'fa-solid fa-sun';
+      }
+      updateCloudSyncStatus();
+      refreshHubData();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initHub);
+    } else {
+      initHub();
+    }
+  </script>
+</body>
+</html>

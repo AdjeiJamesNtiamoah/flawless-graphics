@@ -500,16 +500,20 @@
                     </label>
 
                     <button type="submit" id="submitBtn" class="btn-submit">Sign In</button>
+                    <button type="button" class="btn-submit" style="margin-top: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff;" onclick="quickDemoTeacher()">
+                        <i class="fa-solid fa-bolt" style="color: #72efdd; margin-right: 6px;"></i> One-Click Demo Teacher Access
+                    </button>
                 </form>
 
                 <div class="footer-text">
-                    No account? <a href="teacher.html">Register Here</a>
+                    No account? <a href="teacher.html">Register Here</a> • <a href="../../welcome.html">Central Hub</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<script src="../../assets/js/auth-session.js"></script>
 <script>
 const TEACHERS_KEY = "teachers";
 
@@ -519,12 +523,6 @@ function getTeachers() {
     } catch (e) {
         return [];
     }
-}
-
-async function sha256(text) {
-    const data = new TextEncoder().encode(text);
-    const hash = await crypto.subtle.digest("SHA-256", data);
-    return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
 function showMessage(text, isError = true) {
@@ -548,6 +546,21 @@ function togglePass() {
     }
 }
 
+function quickDemoTeacher() {
+    showMessage("Setting up demo teacher session...", false);
+    const demoTeacher = {
+        name: "Demo Instructor",
+        email: "instructor@flawless.org",
+        org: (window.AuthSession ? window.AuthSession.getOrg() : '') || "FLAWLESS GRAPHICS",
+        role: "teacher"
+    };
+    localStorage.setItem("active_teacher", JSON.stringify(demoTeacher));
+    localStorage.setItem("teacher_active_user", JSON.stringify(demoTeacher));
+    setTimeout(() => {
+        window.location.href = "teacher-dashboard.html";
+    }, 600);
+}
+
 async function teacherLogin() {
     const submitBtn = document.getElementById("submitBtn");
     const email = document.getElementById("email").value.trim().toLowerCase();
@@ -561,17 +574,23 @@ async function teacherLogin() {
 
     try {
         const list = getTeachers();
-        const hashed = await sha256(pw);
+        const hashed = window.AuthSession ? await window.AuthSession.sha256(pw) : pw;
 
-        const teacher = list.find(t =>
+        let teacher = list.find(t =>
             t.email === email &&
             t.pass === hashed &&
             t.role === "teacher"
         );
 
         if (!teacher) {
-            submitBtn.disabled = false;
-            return showMessage("Incorrect email or password.");
+            // Allow general user or demo fallback
+            const activeUser = window.AuthSession ? window.AuthSession.getUser() : null;
+            if (activeUser && activeUser.email === email) {
+                teacher = activeUser;
+            } else {
+                submitBtn.disabled = false;
+                return showMessage("Incorrect email or password.");
+            }
         }
 
         // Save session keys
@@ -584,11 +603,11 @@ async function teacherLogin() {
             localStorage.removeItem("remember_teacher_email");
         }
 
-        showMessage("Authentication successful! Redirecting...", false);
+        showMessage("Authentication successful! Entering Teacher Portal...", false);
 
         setTimeout(() => {
-            window.location.href = "teacher-profile.html";
-        }, 1000);
+            window.location.href = "teacher-dashboard.html";
+        }, 800);
 
     } catch (err) {
         console.error(err);

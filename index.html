@@ -441,9 +441,85 @@
             top: -60px;
             left: -60px;
         }
-        .brand-logo {
-            margin-top: 60px;
-        }
+    }
+
+    /* Interactive Modals */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 4, 25, 0.75);
+        backdrop-filter: blur(8px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
+        opacity: 0;
+        transition: opacity 0.25s ease;
+    }
+    .modal-overlay.active {
+        display: flex;
+        opacity: 1;
+    }
+    .modal-box {
+        background: linear-gradient(135deg, #2a1458, #180933);
+        border: 1px solid rgba(162, 232, 221, 0.3);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+        border-radius: 18px;
+        max-width: 600px;
+        width: 100%;
+        max-height: 85vh;
+        overflow-y: auto;
+        padding: 30px;
+        color: #ffffff;
+        position: relative;
+        transform: translateY(15px);
+        transition: transform 0.25s ease;
+    }
+    .modal-overlay.active .modal-box {
+        transform: translateY(0);
+    }
+    .modal-close-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: #fff;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        transition: background 0.2s;
+    }
+    .modal-close-btn:hover {
+        background: rgba(235, 87, 87, 0.4);
+    }
+    .modal-feature-item {
+        display: flex;
+        gap: 14px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+        align-items: flex-start;
+    }
+    .modal-feature-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: rgba(162, 232, 221, 0.15);
+        color: #72efdd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
     }
 </style>
 </head>
@@ -478,8 +554,12 @@
             </div>
 
             <div class="hero-buttons">
-                <button class="btn-outline" type="button">What to Expect?</button>
-                <a href="#" class="link-subtle">Other Future Applications</a>
+                <button class="btn-outline" type="button" onclick="openExpectModal()">
+                    <i class="fa-solid fa-circle-info" style="margin-right: 6px;"></i> What to Expect?
+                </button>
+                <a href="javascript:void(0)" onclick="openRoadmapModal()" class="link-subtle">
+                    <i class="fa-solid fa-rocket" style="margin-right: 4px;"></i> Other Future Applications
+                </a>
             </div>
         </div>
 
@@ -542,39 +622,162 @@
                         </div>
                     </div>
 
-                    <button type="submit" id="submitBtn" class="btn-submit">Register</button>
+                    <button type="submit" id="submitBtn" class="btn-submit">Register Organization</button>
+                    <button type="button" class="btn-submit" style="margin-top: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff;" onclick="quickDemoAccess()">
+                        <i class="fa-solid fa-bolt" style="color: #72efdd; margin-right: 6px;"></i> Explore with Demo Workspace
+                    </button>
                 </form>
 
                 <div class="footer-text">
-                    Already registered? <a href="site-login.html">Login</a>
+                    Already registered? <a href="site-login.html">Login</a> &bull; <a href="pages/hr/hr-dashboard.html" style="color: #72efdd;">Direct HR Portal</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- MODAL 1: WHAT TO EXPECT -->
+<div class="modal-overlay" id="expectModal" onclick="if(event.target===this)closeExpectModal()">
+    <div class="modal-box">
+        <button class="modal-close-btn" onclick="closeExpectModal()"><i class="fa-solid fa-xmark"></i></button>
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+            <div class="modal-feature-icon" style="width: 44px; height: 44px; font-size: 20px;">
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <div>
+                <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">What to Expect on LUCY™</h3>
+                <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin: 0;">Enterprise Operations & Intelligent Core Suite</p>
+            </div>
+        </div>
+
+        <div class="modal-feature-item">
+            <div class="modal-feature-icon"><i class="fa-solid fa-users"></i></div>
+            <div>
+                <h4 style="font-size: 14px; margin-bottom: 4px; color: #a2e8dd;">Workforce & People Operations</h4>
+                <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">
+                    Complete employee directory, automated department structuring, attendance tracking, and performance evaluations.
+                </p>
+            </div>
+        </div>
+
+        <div class="modal-feature-item">
+            <div class="modal-feature-icon" style="background: rgba(114, 239, 221, 0.15); color: #72efdd;"><i class="fa-solid fa-coins"></i></div>
+            <div>
+                <h4 style="font-size: 14px; margin-bottom: 4px; color: #a2e8dd;">Payroll & Statutory Compliance</h4>
+                <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">
+                    Automated Ghana GRA PAYE, SSNIT Tier 1 & 2 deductions, one-click bank CSV exports, and printable PDF payslips.
+                </p>
+            </div>
+        </div>
+
+        <div class="modal-feature-item">
+            <div class="modal-feature-icon" style="background: rgba(99, 91, 252, 0.2); color: #8b5cf6;"><i class="fa-solid fa-cloud"></i></div>
+            <div>
+                <h4 style="font-size: 14px; margin-bottom: 4px; color: #a2e8dd;">Supabase Cloud Synchronization</h4>
+                <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">
+                    Connect seamlessly to your Supabase PostgreSQL cloud database for real-time multi-device synchronization and zero data loss.
+                </p>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end;">
+            <button class="btn-submit" style="width: auto; padding: 10px 20px; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2);" onclick="closeExpectModal()">Close</button>
+            <button class="btn-submit" style="width: auto; padding: 10px 24px;" onclick="closeExpectModal(); quickDemoAccess();">
+                <i class="fa-solid fa-bolt"></i> Launch Demo Workspace
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL 2: ROADMAP & FUTURE APPS -->
+<div class="modal-overlay" id="roadmapModal" onclick="if(event.target===this)closeRoadmapModal()">
+    <div class="modal-box">
+        <button class="modal-close-btn" onclick="closeRoadmapModal()"><i class="fa-solid fa-xmark"></i></button>
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+            <div class="modal-feature-icon" style="width: 44px; height: 44px; font-size: 20px; background: rgba(245, 158, 11, 0.2); color: #f59e0b;">
+                <i class="fa-solid fa-rocket"></i>
+            </div>
+            <div>
+                <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">Future Applications & Ecosystem</h3>
+                <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin: 0;">Upcoming modules on the LUCY™ product roadmap</p>
+            </div>
+        </div>
+
+        <div class="modal-feature-item">
+            <div class="modal-feature-icon"><i class="fa-solid fa-fingerprint"></i></div>
+            <div>
+                <h4 style="font-size: 14px; margin-bottom: 4px; color: #a2e8dd;">Biometric Timeclock & Facial Check-in</h4>
+                <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">
+                    Direct USB/network integration with ZKTeco biometric scanners for tamper-proof time-and-attendance logging.
+                </p>
+            </div>
+        </div>
+
+        <div class="modal-feature-item">
+            <div class="modal-feature-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+            <div>
+                <h4 style="font-size: 14px; margin-bottom: 4px; color: #a2e8dd;">Cross-Platform Mobile PWA</h4>
+                <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">
+                    Installable iOS and Android progressive web application for staff self-service and mobile leaves.
+                </p>
+            </div>
+        </div>
+
+        <div class="modal-feature-item">
+            <div class="modal-feature-icon"><i class="fa-solid fa-robot"></i></div>
+            <div>
+                <h4 style="font-size: 14px; margin-bottom: 4px; color: #a2e8dd;">AI Workforce Copilot</h4>
+                <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">
+                    Predictive retention analytics, auto-drafted performance reviews, and natural language query assistance.
+                </p>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end;">
+            <button class="btn-submit" style="width: auto; padding: 10px 24px;" onclick="closeRoadmapModal()">Got It</button>
+        </div>
+    </div>
+</div>
+
+<script src="assets/js/auth-session.js"></script>
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/supabase-client.js"></script>
 <script>
-const USERS_KEY = "organizations_users";
 let currentLogoBase64 = null;
-
-function readUsers() {
-    try {
-        return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
-    } catch (e) {
-        return [];
-    }
-}
-
-async function sha256(text) {
-    const buf = new TextEncoder().encode(text);
-    const hash = await crypto.subtle.digest("SHA-256", buf);
-    return [...new Uint8Array(hash)].map(x => x.toString(16).padStart(2, "0")).join("");
-}
 
 function showMessage(text, isError = true) {
     const msgEl = document.getElementById("msg");
     msgEl.textContent = text;
     msgEl.className = "msg " + (isError ? "error" : "success");
+}
+
+function openExpectModal() {
+    document.getElementById("expectModal").classList.add("active");
+}
+function closeExpectModal() {
+    document.getElementById("expectModal").classList.remove("active");
+}
+
+function openRoadmapModal() {
+    document.getElementById("roadmapModal").classList.add("active");
+}
+function closeRoadmapModal() {
+    document.getElementById("roadmapModal").classList.remove("active");
+}
+
+function quickDemoAccess() {
+    const btn = event?.currentTarget;
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Entering Demo Workspace...';
+    }
+    showMessage("Setting up demo organization session...", false);
+    if (window.AuthSession) {
+        window.AuthSession.initDemoSession();
+    }
+    setTimeout(() => {
+        window.location.href = "welcome.html";
+    }, 600);
 }
 
 function togglePasswordVisibility() {
@@ -644,16 +847,19 @@ async function register(event) {
     submitBtn.disabled = true;
 
     try {
-        let users = readUsers();
+        let users = [];
+        try {
+            users = JSON.parse(localStorage.getItem("organizations_users") || "[]");
+        } catch(e) { users = []; }
 
         if (users.some(u => u.email === email)) {
             submitBtn.disabled = false;
             return showMessage("Email address is already registered.");
         }
 
-        const hashed = await sha256(pw);
+        const hashed = await AuthSession.sha256(pw);
 
-        users.push({
+        const newUser = {
             org: org,
             logo: currentLogoBase64,
             name: name,
@@ -661,15 +867,16 @@ async function register(event) {
             pass: hashed,
             role: role,
             createdAt: Date.now()
-        });
+        };
 
-        localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        // Synchronize across all portals
+        AuthSession.setUser(newUser);
 
-        showMessage("Registration successful! Redirecting to login...", false);
+        showMessage("Organization registered successfully! Entering workspace...", false);
 
         setTimeout(() => {
-            window.location.href = "site-login.html";
-        }, 1500);
+            window.location.href = "welcome.html";
+        }, 1200);
 
     } catch (err) {
         console.error(err);
