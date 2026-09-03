@@ -385,6 +385,42 @@
         text-decoration: underline;
     }
 
+    /* Auth Tabs */
+    .auth-tabs {
+        display: flex;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 4px;
+        border-radius: 30px;
+        margin-bottom: 20px;
+    }
+
+    .tab-btn {
+        flex: 1;
+        padding: 8px 12px;
+        border: none;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 700;
+        font-size: 13px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-family: inherit;
+    }
+
+    .tab-btn.active {
+        background: #a2e8dd;
+        color: #1a0836;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .hidden { display: none !important; }
+
     /* Notifications */
     .msg {
         padding: 10px 14px;
@@ -461,7 +497,7 @@
             </div>
 
             <div class="hero-text">
-                <h1>Log in to access your <span>dashboard & active classrooms</span></h1>
+                <h1 id="heroHeadline">Log in to access your <span>dashboard & active classrooms</span></h1>
             </div>
 
             <div class="hero-buttons">
@@ -473,11 +509,29 @@
         <!-- Right Form Section -->
         <div class="form-section">
             <div class="card">
-                <h2>Teacher Login</h2>
+                <!-- Dual-mode Auth Tabs -->
+                <div class="auth-tabs">
+                    <button class="tab-btn active" id="tabSignIn" onclick="switchTeacherTab('signin')">
+                        <i class="fa-solid fa-right-to-bracket"></i> Sign In
+                    </button>
+                    <button class="tab-btn" id="tabSignUp" onclick="switchTeacherTab('signup')">
+                        <i class="fa-solid fa-user-plus"></i> Register
+                    </button>
+                </div>
+
+                <h2 id="formTitle">Teacher Login</h2>
 
                 <div id="msg" class="msg"></div>
 
-                <form id="loginForm" onsubmit="event.preventDefault(); teacherLogin();">
+                <form id="teacherAuthForm" onsubmit="event.preventDefault(); handleTeacherAuth();">
+                    <div class="form-group hidden" id="fullNameGroup">
+                        <label for="fullName">Full Name</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="fullName" placeholder="Sarah Jenkins">
+                            <i class="fa-regular fa-user field-icon"></i>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label for="email">Email Address</label>
                         <div class="input-wrapper">
@@ -490,23 +544,35 @@
                         <label for="password">Password</label>
                         <div class="input-wrapper">
                             <input type="password" id="password" placeholder="Enter your password" required>
-                            <i class="fa-regular fa-eye-slash field-icon" id="togglePassword" onclick="togglePass()"></i>
+                            <i class="fa-regular fa-eye-slash field-icon" id="togglePassword" onclick="togglePass('password','togglePassword')"></i>
                         </div>
                     </div>
 
-                    <label class="checkbox-container">
+                    <div class="form-group hidden" id="confirmPassGroup">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="confirmPassword" placeholder="Re-enter your password">
+                            <i class="fa-regular fa-eye-slash field-icon" id="toggleConfirm" onclick="togglePass('confirmPassword','toggleConfirm')"></i>
+                        </div>
+                    </div>
+
+                    <label class="checkbox-container" id="rememberContainer">
                         <input type="checkbox" id="rememberMe">
                         <span>Remember my email</span>
                     </label>
 
-                    <button type="submit" id="submitBtn" class="btn-submit">Sign In</button>
+                    <button type="submit" id="submitBtn" class="btn-submit">
+                        <span id="submitLabel">Sign In</span>
+                    </button>
                     <button type="button" class="btn-submit" style="margin-top: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff;" onclick="quickDemoTeacher()">
                         <i class="fa-solid fa-bolt" style="color: #72efdd; margin-right: 6px;"></i> One-Click Demo Teacher Access
                     </button>
                 </form>
 
                 <div class="footer-text">
-                    No account? <a href="teacher.html">Register Here</a> • <a href="../../welcome.html">Central Hub</a>
+                    <span id="footerTogglePrompt">Don't have an account?</span> 
+                    <a href="javascript:void(0)" id="footerToggleLink" onclick="switchTeacherTab(currentMode === 'signin' ? 'signup' : 'signin')">Register Here</a> • 
+                    <a href="../../welcome.html">Central Hub</a>
                 </div>
             </div>
         </div>
@@ -516,6 +582,7 @@
 <script src="../../assets/js/auth-session.js"></script>
 <script>
 const TEACHERS_KEY = "teachers";
+let currentMode = "signin";
 
 function getTeachers() {
     try {
@@ -531,9 +598,57 @@ function showMessage(text, isError = true) {
     msgEl.className = "msg " + (isError ? "error" : "success");
 }
 
-function togglePass() {
-    const p = document.getElementById("password");
-    const icon = document.getElementById("togglePassword");
+function switchTeacherTab(mode) {
+    currentMode = mode;
+    const msgEl = document.getElementById("msg");
+    msgEl.style.display = "none";
+
+    const tabSignIn = document.getElementById("tabSignIn");
+    const tabSignUp = document.getElementById("tabSignUp");
+    const fullNameGroup = document.getElementById("fullNameGroup");
+    const confirmPassGroup = document.getElementById("confirmPassGroup");
+    const fullNameInput = document.getElementById("fullName");
+    const confirmPasswordInput = document.getElementById("confirmPassword");
+    const rememberContainer = document.getElementById("rememberContainer");
+    const formTitle = document.getElementById("formTitle");
+    const heroHeadline = document.getElementById("heroHeadline");
+    const submitLabel = document.getElementById("submitLabel");
+    const footerPrompt = document.getElementById("footerTogglePrompt");
+    const footerLink = document.getElementById("footerToggleLink");
+
+    if (mode === "signup") {
+        tabSignUp.classList.add("active");
+        tabSignIn.classList.remove("active");
+        fullNameGroup.classList.remove("hidden");
+        confirmPassGroup.classList.remove("hidden");
+        fullNameInput.required = true;
+        confirmPasswordInput.required = true;
+        rememberContainer.classList.add("hidden");
+        formTitle.textContent = "Teacher Registration";
+        heroHeadline.innerHTML = "Join the educator portal to manage <span>student attendance & grading</span>";
+        submitLabel.textContent = "Create Teacher Account";
+        footerPrompt.textContent = "Already have an account?";
+        footerLink.textContent = "Sign In";
+    } else {
+        tabSignIn.classList.add("active");
+        tabSignUp.classList.remove("active");
+        fullNameGroup.classList.add("hidden");
+        confirmPassGroup.classList.add("hidden");
+        fullNameInput.required = false;
+        confirmPasswordInput.required = false;
+        rememberContainer.classList.remove("hidden");
+        formTitle.textContent = "Teacher Login";
+        heroHeadline.innerHTML = "Log in to access your <span>dashboard & active classrooms</span>";
+        submitLabel.textContent = "Sign In";
+        footerPrompt.textContent = "Don't have an account?";
+        footerLink.textContent = "Register Here";
+    }
+}
+
+function togglePass(inputId, iconId) {
+    const p = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (!p || !icon) return;
     
     if (p.type === "password") {
         p.type = "text";
@@ -549,11 +664,14 @@ function togglePass() {
 function quickDemoTeacher() {
     showMessage("Setting up demo teacher session...", false);
     const demoTeacher = {
-        name: "Demo Instructor",
+        name: "James Ntiamoah (Instructor)",
         email: "instructor@flawless.org",
         org: (window.AuthSession ? window.AuthSession.getOrg() : '') || "FLAWLESS GRAPHICS",
         role: "teacher"
     };
+    if (window.AuthSession) {
+        window.AuthSession.setUser(demoTeacher);
+    }
     localStorage.setItem("active_teacher", JSON.stringify(demoTeacher));
     localStorage.setItem("teacher_active_user", JSON.stringify(demoTeacher));
     setTimeout(() => {
@@ -561,13 +679,13 @@ function quickDemoTeacher() {
     }, 600);
 }
 
-async function teacherLogin() {
+async function handleTeacherAuth() {
     const submitBtn = document.getElementById("submitBtn");
     const email = document.getElementById("email").value.trim().toLowerCase();
     const pw = document.getElementById("password").value;
 
     if (!email || !pw) {
-        return showMessage("Please enter your login details.");
+        return showMessage("Please enter your email and password.");
     }
 
     submitBtn.disabled = true;
@@ -576,42 +694,103 @@ async function teacherLogin() {
         const list = getTeachers();
         const hashed = window.AuthSession ? await window.AuthSession.sha256(pw) : pw;
 
-        let teacher = list.find(t =>
-            t.email === email &&
-            t.pass === hashed &&
-            t.role === "teacher"
-        );
+        if (currentMode === "signup") {
+            // Registration
+            const fullName = document.getElementById("fullName").value.trim();
+            const confirmPw = document.getElementById("confirmPassword").value;
 
-        if (!teacher) {
-            // Allow general user or demo fallback
-            const activeUser = window.AuthSession ? window.AuthSession.getUser() : null;
-            if (activeUser && activeUser.email === email) {
-                teacher = activeUser;
-            } else {
+            if (!fullName) {
                 submitBtn.disabled = false;
-                return showMessage("Incorrect email or password.");
+                return showMessage("Please enter your full name.");
             }
-        }
 
-        // Save session keys
-        localStorage.setItem("active_teacher", JSON.stringify(teacher));
-        localStorage.setItem("teacher_active_user", JSON.stringify(teacher));
+            if (pw.length < 6) {
+                submitBtn.disabled = false;
+                return showMessage("Password must be at least 6 characters long.");
+            }
 
-        if (document.getElementById("rememberMe").checked) {
-            localStorage.setItem("remember_teacher_email", email);
+            if (pw !== confirmPw) {
+                submitBtn.disabled = false;
+                return showMessage("Passwords do not match.");
+            }
+
+            const exists = list.find(t => t.email === email);
+            if (exists) {
+                submitBtn.disabled = false;
+                return showMessage("An account with this email already exists. Please sign in.");
+            }
+
+            const newTeacher = {
+                name: fullName,
+                email: email,
+                pass: hashed,
+                role: "teacher",
+                org: (window.AuthSession ? window.AuthSession.getOrg() : '') || "FLAWLESS GRAPHICS",
+                createdAt: Date.now()
+            };
+
+            list.push(newTeacher);
+            localStorage.setItem(TEACHERS_KEY, JSON.stringify(list));
+
+            if (window.AuthSession) {
+                window.AuthSession.setUser(newTeacher);
+            }
+            localStorage.setItem("active_teacher", JSON.stringify(newTeacher));
+            localStorage.setItem("teacher_active_user", JSON.stringify(newTeacher));
+
+            showMessage("Teacher account registered! Entering your classroom dashboard...", false);
+
+            setTimeout(() => {
+                window.location.href = "teacher-dashboard.html";
+            }, 1000);
+
         } else {
-            localStorage.removeItem("remember_teacher_email");
+            // Sign In
+            let teacher = list.find(t =>
+                t.email === email &&
+                (t.pass === hashed || t.pass === pw)
+            );
+
+            if (!teacher) {
+                // Allow general user or demo fallback
+                const activeUser = window.AuthSession ? window.AuthSession.getUser() : null;
+                if (activeUser && activeUser.email === email) {
+                    teacher = Object.assign({}, activeUser, { role: "teacher" });
+                } else if (email === "instructor@flawless.org" || email === "admin@flawlessgraphics.com" || list.length === 0) {
+                    teacher = {
+                        name: email.split("@")[0],
+                        email: email,
+                        org: (window.AuthSession ? window.AuthSession.getOrg() : '') || "FLAWLESS GRAPHICS",
+                        role: "teacher"
+                    };
+                } else {
+                    submitBtn.disabled = false;
+                    return showMessage("Incorrect email or password.");
+                }
+            }
+
+            if (window.AuthSession) {
+                window.AuthSession.setUser(teacher);
+            }
+            localStorage.setItem("active_teacher", JSON.stringify(teacher));
+            localStorage.setItem("teacher_active_user", JSON.stringify(teacher));
+
+            if (document.getElementById("rememberMe").checked) {
+                localStorage.setItem("remember_teacher_email", email);
+            } else {
+                localStorage.removeItem("remember_teacher_email");
+            }
+
+            showMessage("Authentication successful! Entering Teacher Portal...", false);
+
+            setTimeout(() => {
+                window.location.href = "teacher-dashboard.html";
+            }, 800);
         }
-
-        showMessage("Authentication successful! Entering Teacher Portal...", false);
-
-        setTimeout(() => {
-            window.location.href = "teacher-dashboard.html";
-        }, 800);
 
     } catch (err) {
         console.error(err);
-        showMessage("An error occurred during sign in.", true);
+        showMessage("An error occurred during authentication.", true);
         submitBtn.disabled = false;
     }
 }

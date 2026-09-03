@@ -136,6 +136,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      font-family: inherit;
     }
     .dark .theme-toggle-btn { background: rgba(255, 255, 255, 0.05); }
 
@@ -156,17 +157,48 @@
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-lg);
       width: 100%;
-      max-width: 440px;
+      max-width: 460px;
       padding: 40px;
       position: relative;
     }
 
-    .login-header { text-align: center; margin-bottom: 28px; }
+    /* TAB TOGGLER */
+    .auth-tabs {
+      display: flex;
+      background: rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--input-border);
+      padding: 4px;
+      border-radius: 30px;
+      margin-bottom: 24px;
+    }
+    .dark .auth-tabs { background: rgba(255, 255, 255, 0.04); }
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 13px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-family: inherit;
+    }
+    .tab-btn.active {
+      background: var(--card-bg);
+      color: var(--accent);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .login-header { text-align: center; margin-bottom: 24px; }
     .login-header h2 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
     .login-header p { font-size: 13px; color: var(--text-muted); }
 
     /* FORM STYLES */
     .form-group { margin-bottom: 18px; }
+    .form-row { display: flex; gap: 12px; }
+    .form-row .form-group { flex: 1; margin-bottom: 18px; }
     .form-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
 
     .input-wrapper {
@@ -231,8 +263,40 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+      font-family: inherit;
     }
     .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 14px 24px -5px rgba(37, 99, 235, 0.5); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 14px 0;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--input-border); }
+
+    .btn-demo {
+      width: 100%;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--input-border);
+      background: rgba(37, 99, 235, 0.06);
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+    }
+    .btn-demo:hover { background: rgba(37, 99, 235, 0.12); border-color: var(--accent); }
 
     .card-footer-link {
       text-align: center;
@@ -248,15 +312,10 @@
       gap: 6px;
       transition: color 0.2s ease;
     }
-    .card-footer-link a:hover {
-      color: var(--accent);
-    }
+    .card-footer-link a:hover { color: var(--accent); }
 
-    /* ERROR FEEDBACK */
-    .alert-error {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: #EF4444;
+    /* FEEDBACK MESSAGES */
+    .alert-box {
       padding: 10px 14px;
       border-radius: var(--radius-md);
       font-size: 12px;
@@ -264,7 +323,14 @@
       display: none;
       align-items: center;
       gap: 8px;
+      animation: popIn 0.3s ease;
     }
+    @keyframes popIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+    .alert-box.show { display: flex; }
+    .alert-error   { background: rgba(239, 68, 68, 0.1);  border: 1px solid rgba(239, 68, 68, 0.3);  color: #EF4444; }
+    .alert-success { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #10B981; }
+
+    .hidden { display: none !important; }
 
     footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-muted); }
   </style>
@@ -277,15 +343,11 @@
       <div class="logo-circle">FG</div>
       <div class="brand-title">FLAWLESS GRAPHICS</div>
     </a>
-
     <div class="header-actions">
-      <!-- BACK TO WELCOME BUTTON -->
       <a href="../../welcome.html" class="btn-back">
         <i class="fa-solid fa-arrow-left"></i>
         <span>Back to Hub</span>
       </a>
-
-      <!-- THEME TOGGLE BUTTON -->
       <button class="theme-toggle-btn" id="themeBtn">
         <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
       </button>
@@ -295,60 +357,103 @@
   <!-- LOGIN CARD -->
   <main>
     <div class="login-card" data-aos="zoom-in" data-aos-duration="600">
+
+      <div class="auth-tabs">
+        <button class="tab-btn active" id="tabSignIn" onclick="switchTab('signin')">
+          <i class="fa-solid fa-right-to-bracket"></i> Sign In
+        </button>
+        <button class="tab-btn" id="tabSignUp" onclick="switchTab('signup')">
+          <i class="fa-solid fa-user-plus"></i> Register
+        </button>
+      </div>
+
       <div class="login-header">
-        <h2>HR Portal Login</h2>
-        <p>Access your organization's administrative tools</p>
+        <h2 id="formTitle">HR Portal Login</h2>
+        <p id="formSub">Access your organization's HR tools</p>
       </div>
 
-      <div class="alert-error" id="errorBox">
+      <div class="alert-box alert-error" id="alertError">
         <i class="fa-solid fa-circle-exclamation"></i>
-        <span id="errorMessage">Please complete all fields.</span>
+        <span id="alertErrorMsg">An error occurred.</span>
+      </div>
+      <div class="alert-box alert-success" id="alertSuccess">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="alertSuccessMsg">Success!</span>
       </div>
 
-      <form id="hrLoginForm">
+      <form id="hrAuthForm" onsubmit="handleSubmit(event)">
+
+        <div class="form-row hidden" id="nameRow">
+          <div class="form-group">
+            <label class="form-label">First Name</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-user icon"></i>
+              <input type="text" id="firstName" class="form-input" placeholder="James">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-user icon"></i>
+              <input type="text" id="lastName" class="form-input" placeholder="Ntiamoah">
+            </div>
+          </div>
+        </div>
+
         <div class="form-group">
-          <label class="form-label" for="orgName">Organization Code / Name</label>
+          <label class="form-label">Organization Name</label>
           <div class="input-wrapper">
             <i class="fa-solid fa-building icon"></i>
-            <input type="text" id="orgName" class="form-input" placeholder="e.g. FLAWLESS GRAPHICS" required />
+            <input type="text" id="orgName" class="form-input" placeholder="e.g. FLAWLESS GRAPHICS" required>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="hrEmail">HR Admin Email</label>
+          <label class="form-label">HR Email Address</label>
           <div class="input-wrapper">
             <i class="fa-solid fa-envelope icon"></i>
-            <input type="email" id="hrEmail" class="form-input" placeholder="admin@flawlessgraphics.com" required />
+            <input type="email" id="hrEmail" class="form-input" placeholder="admin@flawlessgraphics.com" required autocomplete="username">
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="hrPassword">Password</label>
+          <label class="form-label">Password</label>
           <div class="input-wrapper">
             <i class="fa-solid fa-lock icon"></i>
-            <input type="password" id="hrPassword" class="form-input" placeholder="••••••••" required />
-            <i class="fa-solid fa-eye toggle-password" id="togglePassword"></i>
+            <input type="password" id="hrPassword" class="form-input" placeholder="••••••••" required>
+            <i class="fa-solid fa-eye toggle-password" id="togglePass" onclick="togglePassword('hrPassword','togglePass')"></i>
           </div>
         </div>
 
-        <div class="form-options">
-          <label class="remember-me">
-            <input type="checkbox" id="rememberMe"> Remember active session
-          </label>
-          <a href="#" class="forgot-link" onclick="alert('Please contact System IT Support to reset credentials.')">Forgot password?</a>
+        <div class="form-group hidden" id="confirmRow">
+          <label class="form-label">Confirm Password</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-shield-halved icon"></i>
+            <input type="password" id="confirmPassword" class="form-input" placeholder="Re-enter password">
+            <i class="fa-solid fa-eye toggle-password" id="toggleConfirm" onclick="togglePassword('confirmPassword','toggleConfirm')"></i>
+          </div>
         </div>
 
-        <button type="submit" class="btn-submit">
-          <span>Sign In to HR Dashboard</span>
-          <i class="fa-solid fa-arrow-right"></i>
+        <div class="form-options" id="signInOpts">
+          <label class="remember-me">
+            <input type="checkbox" id="rememberMe"> Remember me
+          </label>
+          <a href="#" class="forgot-link" onclick="forgotPassword(event)">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <i class="fa-solid fa-right-to-bracket" id="submitIcon"></i>
+          <span id="submitLabel">Sign In to HR Dashboard</span>
         </button>
-        <button type="button" class="btn-submit" style="margin-top: 10px; background: rgba(37,99,235,0.1); border: 1px solid rgba(37,99,235,0.3); color: var(--text-main);" onclick="quickDemoHRLogin()">
+
+        <div class="divider">or</div>
+
+        <button type="button" class="btn-demo" onclick="quickDemoHRLogin()">
           <i class="fa-solid fa-bolt" style="color: var(--accent);"></i>
-          <span>One-Click Demo HR Access</span>
+          One-Click Demo HR Access
         </button>
       </form>
 
-      <!-- CARD FOOTER RETURN LINK -->
       <div class="card-footer-link">
         <a href="../../welcome.html"><i class="fa-solid fa-house"></i> Return to Central Hub</a>
       </div>
@@ -359,70 +464,151 @@
     © <span id="year"></span> Flawless Graphics — Enterprise HR Management System
   </footer>
 
-  <!-- SCRIPT LOGIC -->
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script src="../../assets/js/auth-session.js"></script>
   <script>
     AOS.init({ once: true });
+    document.getElementById('year').textContent = new Date().getFullYear();
 
-    // ---------- THEME SWITCHER ----------
+    // Theme Management
     const el = document.documentElement;
     const themeBtn = document.getElementById('themeBtn');
-
     function applyTheme(isDark) {
-      if (isDark) {
-        el.classList.add('dark');
-        themeBtn.innerHTML = `<i class="fa-solid fa-sun"></i> <span>Light</span>`;
-      } else {
-        el.classList.remove('dark');
-        themeBtn.innerHTML = `<i class="fa-solid fa-moon"></i> <span>Dark</span>`;
-      }
+      isDark ? el.classList.add('dark') : el.classList.remove('dark');
+      themeBtn.innerHTML = isDark ? `<i class="fa-solid fa-sun"></i> <span>Light</span>` : `<i class="fa-solid fa-moon"></i> <span>Dark</span>`;
       localStorage.setItem('fg_theme_dark', isDark);
     }
-
     const savedTheme = localStorage.getItem('fg_theme_dark');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    applyTheme(savedTheme === null ? prefersDark : savedTheme === 'true');
-
+    applyTheme(savedTheme === null ? (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) : savedTheme === 'true');
     themeBtn.addEventListener('click', () => applyTheme(!el.classList.contains('dark')));
-
-    // ---------- SHOW/HIDE PASSWORD ----------
-    const togglePassword = document.getElementById('togglePassword');
-    const hrPassword = document.getElementById('hrPassword');
-
-    togglePassword.addEventListener('click', () => {
-      const type = hrPassword.type === 'password' ? 'text' : 'password';
-      hrPassword.type = type;
-      togglePassword.classList.toggle('fa-eye');
-      togglePassword.classList.toggle('fa-eye-slash');
-    });
-
-    // Quick Demo HR Access
-    function quickDemoHRLogin() {
-      if (window.AuthSession) {
-        window.AuthSession.initDemoSession();
-      }
-      window.location.href = 'hr-dashboard.html';
-    }
-
-    // ---------- LOGIN AUTH LOGIC ----------
-    const loginForm = document.getElementById('hrLoginForm');
-    const errorBox = document.getElementById('errorBox');
-    const errorMessage = document.getElementById('errorMessage');
 
     // Pre-fill active org if available
     const existingOrg = (window.AuthSession ? window.AuthSession.getOrg() : null) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
     if (existingOrg) document.getElementById('orgName').value = existingOrg;
 
-    loginForm.addEventListener('submit', (e) => {
+    // Tabs Management
+    let currentMode = 'signin';
+    const tabSignIn = document.getElementById('tabSignIn');
+    const tabSignUp = document.getElementById('tabSignUp');
+    const nameRow = document.getElementById('nameRow');
+    const confirmRow = document.getElementById('confirmRow');
+    const signInOpts = document.getElementById('signInOpts');
+    const formTitle = document.getElementById('formTitle');
+    const formSub = document.getElementById('formSub');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitLabel = document.getElementById('submitLabel');
+    const submitIcon = document.getElementById('submitIcon');
+    const firstNameInput = document.getElementById('firstName');
+    const lastNameInput = document.getElementById('lastName');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+
+    function switchTab(mode) {
+      currentMode = mode;
+      hideAlerts();
+
+      if (mode === 'signup') {
+        tabSignUp.classList.add('active');
+        tabSignIn.classList.remove('active');
+        nameRow.classList.remove('hidden');
+        confirmRow.classList.remove('hidden');
+        signInOpts.classList.add('hidden');
+        firstNameInput.required = true;
+        lastNameInput.required = true;
+        confirmPasswordInput.required = true;
+
+        formTitle.textContent = 'HR Portal Registration';
+        formSub.textContent = 'Create an HR administrator account for your organization';
+        submitLabel.textContent = 'Create HR Account';
+        submitIcon.className = 'fa-solid fa-user-plus';
+      } else {
+        tabSignIn.classList.add('active');
+        tabSignUp.classList.remove('active');
+        nameRow.classList.add('hidden');
+        confirmRow.classList.add('hidden');
+        signInOpts.classList.remove('hidden');
+        firstNameInput.required = false;
+        lastNameInput.required = false;
+        confirmPasswordInput.required = false;
+
+        formTitle.textContent = 'HR Portal Login';
+        formSub.textContent = 'Access your organization\'s HR tools';
+        submitLabel.textContent = 'Sign In to HR Dashboard';
+        submitIcon.className = 'fa-solid fa-right-to-bracket';
+      }
+    }
+
+    // Password Visibility Toggle
+    function togglePassword(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (!input || !icon) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    }
+
+    // Alert Helpers
+    const alertError = document.getElementById('alertError');
+    const alertErrorMsg = document.getElementById('alertErrorMsg');
+    const alertSuccess = document.getElementById('alertSuccess');
+    const alertSuccessMsg = document.getElementById('alertSuccessMsg');
+
+    function showError(msg) {
+      hideAlerts();
+      alertErrorMsg.textContent = msg;
+      alertError.classList.add('show');
+    }
+
+    function showSuccess(msg) {
+      hideAlerts();
+      alertSuccessMsg.textContent = msg;
+      alertSuccess.classList.add('show');
+    }
+
+    function hideAlerts() {
+      alertError.classList.remove('show');
+      alertSuccess.classList.remove('show');
+    }
+
+    function forgotPassword(e) {
+      if (e) e.preventDefault();
+      showError('Please contact your System Administrator to reset HR credentials.');
+    }
+
+    // Quick Demo HR Access
+    function quickDemoHRLogin() {
+      showSuccess('Initializing verified HR session...');
+      if (window.AuthSession) {
+        window.AuthSession.initDemoSession();
+        window.AuthSession.setUser({
+          org: document.getElementById('orgName').value.trim() || 'FLAWLESS GRAPHICS',
+          name: 'James Ntiamoah (HR Admin)',
+          email: 'admin@flawlessgraphics.com',
+          role: 'hr'
+        });
+      }
+      setTimeout(() => {
+        window.location.href = 'hr-dashboard.html';
+      }, 600);
+    }
+
+    // Form Submission
+    async function handleSubmit(e) {
       e.preventDefault();
+      hideAlerts();
 
       const orgName = document.getElementById('orgName').value.trim();
-      const hrEmail = document.getElementById('hrEmail').value.trim();
-      const password = document.getElementById('hrPassword').value.trim();
+      const hrEmail = document.getElementById('hrEmail').value.trim().toLowerCase();
+      const password = document.getElementById('hrPassword').value;
 
       if (!orgName || !hrEmail || !password) {
-        showError('Please fill in all required fields.');
+        showError('Please complete all required fields.');
         return;
       }
 
@@ -431,33 +617,104 @@
         return;
       }
 
-      // Persist active session credentials across all portals
-      if (window.AuthSession) {
-        window.AuthSession.setUser({
+      let users = [];
+      try {
+        users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
+      } catch (err) { users = []; }
+
+      const hashedPw = window.AuthSession ? await window.AuthSession.sha256(password) : password;
+
+      if (currentMode === 'signup') {
+        // --- REGISTRATION ---
+        const firstName = firstNameInput.value.trim();
+        const lastName = lastNameInput.value.trim();
+        const confirmPw = confirmPasswordInput.value;
+
+        if (!firstName || !lastName) {
+          showError('Please enter your first and last name.');
+          return;
+        }
+
+        if (password !== confirmPw) {
+          showError('Passwords do not match.');
+          return;
+        }
+
+        const existing = users.find(u => u.email === hrEmail);
+        if (existing) {
+          showError('An account with this email address already exists. Please sign in.');
+          return;
+        }
+
+        const newUser = {
           org: orgName,
-          name: hrEmail.split('@')[0],
+          name: `${firstName} ${lastName}`,
+          email: hrEmail,
+          pass: hashedPw,
+          role: 'hr',
+          createdAt: Date.now()
+        };
+
+        users.push(newUser);
+        localStorage.setItem('organizations_users', JSON.stringify(users));
+
+        if (window.AuthSession) {
+          window.AuthSession.setUser(newUser);
+        }
+
+        showSuccess('Account successfully registered! Loading your HR Dashboard...');
+        submitBtn.disabled = true;
+
+        setTimeout(() => {
+          window.location.href = 'hr-dashboard.html';
+        }, 1200);
+
+      } else {
+        // --- SIGN IN ---
+        let matched = users.find(u => u.email === hrEmail && (u.pass === hashedPw || u.pass === password));
+
+        // Support demo fallback credentials if empty users or demo email
+        if (!matched && (hrEmail === 'admin@flawlessgraphics.com' || hrEmail === 'hr@flawlessgraphics.com' || users.length === 0)) {
+          matched = {
+            org: orgName,
+            name: hrEmail.split('@')[0].toUpperCase(),
+            email: hrEmail,
+            role: 'hr'
+          };
+        }
+
+        if (!matched) {
+          showError('Incorrect email or password.');
+          return;
+        }
+
+        const activeUser = {
+          org: orgName,
+          name: matched.name || hrEmail.split('@')[0],
           email: hrEmail,
           role: 'hr'
-        });
-      } else {
-        localStorage.setItem('active_org', orgName);
-        localStorage.setItem('activeHR', JSON.stringify({
-          name: hrEmail.split('@')[0],
-          email: hrEmail,
-          role: 'HR Admin'
-        }));
+        };
+
+        if (window.AuthSession) {
+          window.AuthSession.setUser(activeUser);
+        } else {
+          localStorage.setItem('active_org', orgName);
+          localStorage.setItem('activeHR', JSON.stringify({
+            name: activeUser.name,
+            email: activeUser.email,
+            role: 'HR Admin',
+            org: orgName
+          }));
+        }
+
+        showSuccess('Authentication successful! Redirecting to HR Dashboard...');
+        submitBtn.disabled = true;
+
+        setTimeout(() => {
+          window.location.href = 'hr-dashboard.html';
+        }, 900);
       }
-
-      // Redirect to the HR Dashboard
-      window.location.href = 'hr-dashboard.html';
-    });
-
-    function showError(msg) {
-      errorMessage.textContent = msg;
-      errorBox.style.display = 'flex';
     }
-
-    document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>

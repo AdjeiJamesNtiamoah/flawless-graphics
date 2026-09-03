@@ -12,6 +12,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
+  <!-- Pop-up Toaster & School Messenger Styles -->
+  <link rel="stylesheet" href="../../assets/css/toaster.css">
+  <link rel="stylesheet" href="../../assets/css/school-messenger.css">
+
   <!-- Central Authentication Bridge -->
   <script src="../../assets/js/auth-session.js"></script>
 
@@ -80,8 +84,126 @@
       z-index: 10;
       flex-shrink: 0;
     }
-    .sidebar.collapsed { width: 80px; }
+    .sidebar.collapsed { width: 78px; padding: 20px 10px; }
     .sidebar.collapsed .hide-collapsed { display: none !important; }
+    .sidebar.collapsed .brand { justify-content: center; padding: 0; }
+    .sidebar.collapsed .nav button {
+      justify-content: center;
+      padding: 12px;
+      position: relative;
+    }
+    .sidebar.collapsed .nav button i { margin: 0; font-size: 18px; }
+    .sidebar.collapsed .nav button:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: calc(100% + 14px);
+      top: 50%;
+      transform: translateY(-50%);
+      background: #0f172a;
+      color: #ffffff;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      z-index: 99999;
+      pointer-events: none;
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Topbar Search, Session Badge & Quick Actions */
+    .quick-search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .quick-search-box i {
+      position: absolute;
+      left: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .quick-search-input {
+      padding: 8px 14px 8px 34px !important;
+      border-radius: 20px !important;
+      font-size: 12px !important;
+      width: 240px;
+      background: var(--card) !important;
+      border: 1px solid var(--border) !important;
+      transition: width 0.3s ease, border-color 0.2s ease;
+    }
+    .quick-search-input:focus {
+      width: 310px;
+      border-color: var(--primary) !important;
+    }
+    .session-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* Classroom Assignment Cards & Tables */
+    .class-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .class-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: var(--transition);
+    }
+    .class-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary);
+    }
+    .teacher-badge-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .teacher-avatar-sm {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--primary-light);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    .capacity-bar {
+      height: 6px;
+      width: 100%;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .capacity-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent-green));
+      border-radius: 3px;
+    }
     
     .brand { display: flex; gap: 12px; align-items: center; padding: 0 8px; text-decoration: none; color: inherit; }
     .logo {
@@ -370,15 +492,16 @@
   </div>
 
   <nav class="nav" id="nav">
-    <button data-section="dashboard" class="active"><i class="fa-solid fa-chart-pie"></i> <span class="hide-collapsed">Dashboard</span></button>
-    <button data-section="employees"><i class="fa-solid fa-users"></i> <span class="hide-collapsed">Employees</span></button>
-    <button data-section="students"><i class="fa-solid fa-graduation-cap"></i> <span class="hide-collapsed">Students</span></button>
-    <button data-section="messages"><i class="fa-solid fa-comments"></i> <span class="hide-collapsed">Messages</span></button>
-    <button data-section="attendance"><i class="fa-solid fa-calendar-check"></i> <span class="hide-collapsed">Attendance</span></button>
-    <button data-section="payroll"><i class="fa-solid fa-file-invoice-dollar"></i> <span class="hide-collapsed">Payroll</span></button>
-    <button data-section="analytics"><i class="fa-solid fa-chart-line"></i> <span class="hide-collapsed">Analytics</span></button>
-    <button data-section="announcements"><i class="fa-solid fa-bullhorn"></i> <span class="hide-collapsed">Broadcasts</span></button>
-    <button data-section="settings"><i class="fa-solid fa-sliders"></i> <span class="hide-collapsed">Settings</span></button>
+    <button data-section="dashboard" data-tooltip="Dashboard" class="active"><i class="fa-solid fa-chart-pie"></i> <span class="hide-collapsed">Dashboard</span></button>
+    <button data-section="classes" data-tooltip="Classrooms & Teachers"><i class="fa-solid fa-chalkboard-user"></i> <span class="hide-collapsed">Class Assignment</span></button>
+    <button data-section="employees" data-tooltip="Staff Directory"><i class="fa-solid fa-users"></i> <span class="hide-collapsed">Employees</span></button>
+    <button data-section="students" data-tooltip="Students Roster"><i class="fa-solid fa-graduation-cap"></i> <span class="hide-collapsed">Students</span></button>
+    <button data-section="messages" data-tooltip="Direct Messages"><i class="fa-solid fa-comments"></i> <span class="hide-collapsed">Messages</span></button>
+    <button data-section="attendance" data-tooltip="Daily Attendance"><i class="fa-solid fa-calendar-check"></i> <span class="hide-collapsed">Attendance</span></button>
+    <button data-section="payroll" data-tooltip="Payroll Compensation"><i class="fa-solid fa-file-invoice-dollar"></i> <span class="hide-collapsed">Payroll</span></button>
+    <button data-section="analytics" data-tooltip="Workforce Analytics"><i class="fa-solid fa-chart-line"></i> <span class="hide-collapsed">Analytics</span></button>
+    <button data-section="announcements" data-tooltip="School Broadcasts"><i class="fa-solid fa-bullhorn"></i> <span class="hide-collapsed">Broadcasts</span></button>
+    <button data-section="settings" data-tooltip="System Settings"><i class="fa-solid fa-sliders"></i> <span class="hide-collapsed">Settings</span></button>
   </nav>
 
   <div class="hide-collapsed" style="display: flex; gap: 8px;">
@@ -390,18 +513,33 @@
     </button>
   </div>
 
-  <button class="collapse-btn" id="collapseBtn" title="Toggle Sidebar"><i class="fa-solid fa-angle-left"></i></button>
+  <button class="collapse-btn" id="collapseBtn" title="Toggle Sidebar (Auto-collapse enabled)"><i class="fa-solid fa-angle-left"></i></button>
 </aside>
 
 <!-- MAIN WORKSPACE -->
 <main>
   <div class="topbar">
-    <div>
-      <h2 id="pageTitle" style="margin:0;font-size:24px;font-weight:800;letter-spacing:-0.5px">Dashboard</h2>
-      <div class="small">Workforce Intelligence & Enterprise HR Controls</div>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <div>
+        <h2 id="pageTitle" style="margin:0;font-size:24px;font-weight:800;letter-spacing:-0.5px">Dashboard</h2>
+        <div class="small">Workforce Intelligence & School Administration</div>
+      </div>
+      <div class="session-pill">
+        <i class="fa-solid fa-graduation-cap" style="color:var(--primary)"></i>
+        <span>2026/2027 Academic Session • Term 2</span>
+      </div>
     </div>
 
     <div class="controls">
+      <div class="quick-search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" class="quick-search-input" id="globalQuickSearch" placeholder="Find staff, student, class... (Ctrl+K)">
+      </div>
+
+      <button class="btn ghost" onclick="window.SchoolMessenger && window.SchoolMessenger.open()" title="Open School Staff Chat">
+        <i class="fa-solid fa-comments"></i> <span class="hide-collapsed">Staff Chat</span>
+      </button>
+
       <button class="btn ghost" id="cloudSyncBtn" onclick="openCloudModal()" title="Supabase Cloud Synchronization" style="border: 1px solid rgba(16, 185, 129, 0.4); color: #10b981; background: rgba(16, 185, 129, 0.08); border-radius: 9999px; padding: 6px 14px; font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; gap: 7px; cursor: pointer;">
         <i class="fa-solid fa-cloud" id="cloudSyncIcon"></i> <span id="cloudSyncLabel">Connect Supabase</span>
       </button>
@@ -479,6 +617,56 @@
       <div id="activityFeed" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
   </div>
+
+  <!-- CLASS & TEACHER ASSIGNMENT SECTION -->
+  <section class="panel" id="classesSection" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:14px">
+      <div>
+        <h3 style="margin:0;font-size:18px"><i class="fa-solid fa-chalkboard-user" style="color:var(--primary);margin-right:6px"></i> Classroom & Teacher Assignments</h3>
+        <div class="small">Assign qualified faculty to classes, timetable rooms, and track student loads</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button class="btn" onclick="openAssignModal()"><i class="fa-solid fa-user-plus"></i> Assign Teacher</button>
+        <button class="btn ghost" onclick="openAddClassModal()"><i class="fa-solid fa-plus"></i> New Class</button>
+      </div>
+    </div>
+
+    <!-- Metric Summary Grid -->
+    <div class="class-grid" id="classMetricsSummary"></div>
+
+    <!-- Filters -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <input type="text" id="searchClassInput" class="select" placeholder="Search by class name, code, or subject..." style="min-width:240px" oninput="renderClassesSection()">
+        <select id="filterClassGrade" class="select" onchange="renderClassesSection()">
+          <option value="">All Grade Levels</option>
+        </select>
+        <select id="filterClassTeacher" class="select" onchange="renderClassesSection()">
+          <option value="">All Teachers</option>
+        </select>
+      </div>
+      <div class="small"><i class="fa-solid fa-circle-info"></i> Changes sync immediately to the Teacher Portal.</div>
+    </div>
+
+    <!-- Table -->
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Class Code & Title</th>
+            <th>Subject / Field</th>
+            <th>Grade</th>
+            <th>Assigned Teacher</th>
+            <th>Room & Schedule</th>
+            <th>Enrollment</th>
+            <th>Status</th>
+            <th style="text-align:right">Action</th>
+          </tr>
+        </thead>
+        <tbody id="classesTableBody"></tbody>
+      </table>
+    </div>
+  </section>
 
   <!-- 2. EMPLOYEES SECTION -->
   <section class="panel" id="employeesSection" style="display:none">
@@ -780,6 +968,123 @@
   </div>
 </div>
 
+<!-- MODAL: ASSIGN TEACHER TO CLASS -->
+<div class="modal-backdrop" id="assignTeacherModalBackdrop">
+  <div class="modal" style="max-width: 520px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:38px;height:38px;border-radius:10px;background:rgba(99, 91, 252, 0.15);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:18px">
+          <i class="fa-solid fa-chalkboard-user"></i>
+        </div>
+        <div>
+          <h3 style="margin:0;font-size:18px;font-weight:800">Assign Teacher to Class</h3>
+          <div class="small">Deploy certified educator to academic room</div>
+        </div>
+      </div>
+      <button onclick="closeAssignModal()" style="background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <form id="assignTeacherForm" onsubmit="event.preventDefault(); submitTeacherAssignment();">
+      <label class="small" style="font-weight:700">Academic Class *</label>
+      <select id="assign_class_select" class="select" style="width:100%;margin-bottom:12px" required></select>
+
+      <label class="small" style="font-weight:700">Assigned Teacher *</label>
+      <select id="assign_teacher_select" class="select" style="width:100%;margin-bottom:12px" required></select>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div>
+          <label class="small" style="font-weight:700">Room / Facility *</label>
+          <input id="assign_room" class="select" placeholder="e.g. Media Lab 201" style="width:100%" required>
+        </div>
+        <div>
+          <label class="small" style="font-weight:700">Timetable Schedule *</label>
+          <input id="assign_schedule" class="select" placeholder="e.g. Mon, Wed, Fri 09:00 AM" style="width:100%" required>
+        </div>
+      </div>
+
+      <label class="small" style="font-weight:700">Assignment Directives / Special Notes</label>
+      <textarea id="assign_notes" class="select" placeholder="e.g. Focus on digital portfolio project and weekly roll call..." style="width:100%;height:70px;margin-bottom:20px;resize:none;"></textarea>
+
+      <div style="display:flex;justify-content:flex-end;gap:10px">
+        <button type="button" class="btn ghost" onclick="closeAssignModal()">Cancel</button>
+        <button type="submit" class="btn"><i class="fa-solid fa-check"></i> Save Assignment & Notify</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: ADD NEW CLASS -->
+<div class="modal-backdrop" id="addClassModalBackdrop">
+  <div class="modal" style="max-width: 520px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:38px;height:38px;border-radius:10px;background:rgba(16, 185, 129, 0.15);color:#10b981;display:flex;align-items:center;justify-content:center;font-size:18px">
+          <i class="fa-solid fa-folder-plus"></i>
+        </div>
+        <div>
+          <h3 style="margin:0;font-size:18px;font-weight:800">Add Academic Classroom</h3>
+          <div class="small">Register new subject class into school database</div>
+        </div>
+      </div>
+      <button onclick="closeAddClassModal()" style="background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <form id="addClassForm" onsubmit="event.preventDefault(); submitAddClass();">
+      <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;margin-bottom:12px">
+        <div>
+          <label class="small" style="font-weight:700">Class Code *</label>
+          <input id="new_class_code" class="select" placeholder="CLS-11A" style="width:100%" required>
+        </div>
+        <div>
+          <label class="small" style="font-weight:700">Class Title *</label>
+          <input id="new_class_name" class="select" placeholder="e.g. Grade 11 - Web Engineering" style="width:100%" required>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div>
+          <label class="small" style="font-weight:700">Subject Field *</label>
+          <input id="new_class_subject" class="select" placeholder="Computer Science" style="width:100%" required>
+        </div>
+        <div>
+          <label class="small" style="font-weight:700">Grade Level *</label>
+          <select id="new_class_grade" class="select" style="width:100%" required>
+            <option value="Grade 9">Grade 9</option>
+            <option value="Grade 10" selected>Grade 10</option>
+            <option value="Grade 11">Grade 11</option>
+            <option value="Grade 12">Grade 12</option>
+            <option value="Advanced Lab">Advanced Lab</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 100px;gap:12px;margin-bottom:20px">
+        <div>
+          <label class="small" style="font-weight:700">Room</label>
+          <input id="new_class_room" class="select" placeholder="Room 101" style="width:100%">
+        </div>
+        <div>
+          <label class="small" style="font-weight:700">Schedule</label>
+          <input id="new_class_schedule" class="select" placeholder="Tue, Thu 10am" style="width:100%">
+        </div>
+        <div>
+          <label class="small" style="font-weight:700">Capacity</label>
+          <input id="new_class_capacity" type="number" class="select" value="30" style="width:100%">
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:10px">
+        <button type="button" class="btn ghost" onclick="closeAddClassModal()">Cancel</button>
+        <button type="submit" class="btn"><i class="fa-solid fa-plus"></i> Create Classroom</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- TOAST NOTIFICATION -->
 <div class="toast" id="toast">
   <i class="fa-solid fa-circle-check" style="color:#10b981"></i>
@@ -892,14 +1197,33 @@ orgSwitcher.addEventListener('change', () => {
 });
 
 // Sidebar Collapse
+// Sidebar Auto-Collapse & Responsive Controls
 const sidebar = document.getElementById('sidebar');
 const collapseBtn = document.getElementById('collapseBtn');
-let isCollapsed = false;
-collapseBtn.addEventListener('click', () => {
-  isCollapsed = !isCollapsed;
+let isCollapsed = localStorage.getItem('hr_sidebar_collapsed') === 'true';
+
+function setSidebarCollapsed(collapsed) {
+  isCollapsed = collapsed;
   sidebar.classList.toggle('collapsed', isCollapsed);
-  collapseBtn.innerHTML = isCollapsed ? '<i class="fa-solid fa-angle-right"></i>' : '<i class="fa-solid fa-angle-left"></i>';
+  if (collapseBtn) {
+    collapseBtn.innerHTML = isCollapsed ? '<i class="fa-solid fa-angle-right"></i>' : '<i class="fa-solid fa-angle-left"></i>';
+  }
+  localStorage.setItem('hr_sidebar_collapsed', isCollapsed);
+}
+
+if (isCollapsed) setSidebarCollapsed(true);
+
+collapseBtn?.addEventListener('click', () => {
+  setSidebarCollapsed(!isCollapsed);
 });
+
+function handleAutoCollapse() {
+  if (window.innerWidth < 1024) {
+    if (!isCollapsed) setSidebarCollapsed(true);
+  }
+}
+window.addEventListener('resize', handleAutoCollapse);
+handleAutoCollapse();
 
 // Dark Mode Toggle
 const themeToggle = document.getElementById('themeToggle');
@@ -921,7 +1245,11 @@ applyTheme(savedDark === 'true');
 themeToggle.addEventListener('click', () => {
   const willBeDark = !document.documentElement.classList.contains('dark');
   applyTheme(willBeDark);
-  showToast(`Theme switched to ${willBeDark ? 'Dark' : 'Light'}`);
+  if (window.Toaster) {
+    window.Toaster.info('Theme Adjusted', `Interface set to ${willBeDark ? 'Dark Mode' : 'Light Mode'}`);
+  } else {
+    showToast(`Theme switched to ${willBeDark ? 'Dark' : 'Light'}`);
+  }
 });
 
 // Logout
@@ -934,11 +1262,42 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
   }
 });
 
+// Global Quick Search (Ctrl+K)
+const quickSearchEl = document.getElementById('globalQuickSearch');
+if (quickSearchEl) {
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      quickSearchEl.focus();
+    }
+  });
+
+  quickSearchEl.addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    if (!q) return;
+
+    if (q.includes('class') || q.includes('teach') || q.includes('assign') || q.includes('room')) {
+      showSection('classes');
+      const ci = document.getElementById('searchClassInput');
+      if (ci) { ci.value = q; renderClassesSection(); }
+    } else if (q.includes('student') || q.includes('enroll') || q.includes('grade')) {
+      showSection('students');
+    } else if (q.includes('emp') || q.includes('staff')) {
+      showSection('employees');
+    } else if (q.includes('pay') || q.includes('salary')) {
+      showSection('payroll');
+    } else if (q.includes('chat') || q.includes('msg')) {
+      if (window.SchoolMessenger) window.SchoolMessenger.open();
+    }
+  });
+}
+
 /* -------------------------------------------------------------
    NAVIGATION & SECTION SWAPPING
 ------------------------------------------------------------- */
 const sections = {
   dashboard: document.getElementById('dashboardSection'),
+  classes: document.getElementById('classesSection'),
   employees: document.getElementById('employeesSection'),
   students: document.getElementById('studentsSection'),
   messages: document.getElementById('messagesSection'),
@@ -963,6 +1322,7 @@ function showSection(name) {
 
   // Section-specific activation triggers
   if (name === 'dashboard') { renderDashboard(); renderCharts(); }
+  if (name === 'classes') renderClassesSection();
   if (name === 'employees') renderEmployees();
   if (name === 'students') loadHRStudents();
   if (name === 'messages') renderMsgUsers();
@@ -975,6 +1335,355 @@ function showSection(name) {
 document.querySelectorAll('#nav button').forEach(b => {
   b.addEventListener('click', () => showSection(b.dataset.section));
 });
+
+/* -------------------------------------------------------------
+   CLASSROOM & TEACHER ASSIGNMENT ENGINE
+------------------------------------------------------------- */
+const CLASSES_STORAGE_KEY = `${ACTIVE_ORG}_classes`;
+
+function getClassesList() {
+  let classes = read(CLASSES_STORAGE_KEY);
+  if (!classes || classes.length === 0) {
+    classes = [
+      { id: 'cls_1', code: 'CLS-10A', name: 'Grade 10 - Graphic Arts & Visual Identity', subject: 'Graphic Design', grade: 'Grade 10', teacherName: 'Sarah Jenkins', teacherEmail: 's.jenkins@flawless.org', room: 'Media Studio 201', schedule: 'Mon, Wed, Fri • 08:30 AM', capacity: 30, enrolled: 28, status: 'Assigned' },
+      { id: 'cls_2', code: 'CLS-11B', name: 'Grade 11 - Web Systems & Client Architecture', subject: 'Frontend Dev', grade: 'Grade 11', teacherName: 'Kwame Boateng', teacherEmail: 'k.boateng@flawless.org', room: 'Computer Lab 3', schedule: 'Tue, Thu • 10:00 AM', capacity: 25, enrolled: 24, status: 'Assigned' },
+      { id: 'cls_3', code: 'CLS-12A', name: 'Grade 12 - Digital Animation & 3D Modeling', subject: '3D & VFX', grade: 'Grade 12', teacherName: 'Kofi Owusu', teacherEmail: 'k.owusu@flawless.org', room: 'Studio 105', schedule: 'Mon, Thu • 01:00 PM', capacity: 20, enrolled: 18, status: 'Assigned' },
+      { id: 'cls_4', code: 'CLS-09C', name: 'Grade 9 - Fundamental Design Principles', subject: 'Art Fundamentals', grade: 'Grade 9', teacherName: 'James Ntiamoah', teacherEmail: 'admin@flawlessgraphics.com', room: 'Room 102', schedule: 'Wed, Fri • 11:15 AM', capacity: 32, enrolled: 30, status: 'Assigned' },
+      { id: 'cls_5', code: 'CLS-10B', name: 'Grade 10 - UI/UX Interactive Prototyping', subject: 'User Experience', grade: 'Grade 10', teacherName: '', teacherEmail: '', room: 'Design Lab 4', schedule: 'Tue, Fri • 02:00 PM', capacity: 25, enrolled: 22, status: 'Unassigned' }
+    ];
+    save(CLASSES_STORAGE_KEY, classes);
+  }
+  return classes;
+}
+
+function saveClassesList(list) {
+  save(CLASSES_STORAGE_KEY, list);
+}
+
+function getAvailableTeachers() {
+  const registeredTeachers = read('teachers');
+  const defaults = [
+    { name: 'Sarah Jenkins', email: 's.jenkins@flawless.org', role: 'Teacher • Graphic Arts' },
+    { name: 'James Ntiamoah', email: 'admin@flawlessgraphics.com', role: 'HR Lead & Instructor' },
+    { name: 'Kwame Boateng', email: 'k.boateng@flawless.org', role: 'Teacher • Web Systems' },
+    { name: 'Kofi Owusu', email: 'k.owusu@flawless.org', role: 'Teacher • 3D Animation' }
+  ];
+
+  const map = new Map();
+  defaults.forEach(t => map.set(t.email.toLowerCase(), t));
+  if (Array.isArray(registeredTeachers)) {
+    registeredTeachers.forEach(t => {
+      if (t && t.email) {
+        map.set(t.email.toLowerCase(), {
+          name: t.name || t.fullName || t.email.split('@')[0],
+          email: t.email,
+          role: t.role ? `Teacher • ${t.role}` : 'Certified Educator'
+        });
+      }
+    });
+  }
+  return Array.from(map.values());
+}
+
+function renderClassesSection() {
+  const classes = getClassesList();
+  const search = (document.getElementById('searchClassInput')?.value || '').toLowerCase();
+  const gradeFilter = document.getElementById('filterClassGrade')?.value || '';
+  const teacherFilter = document.getElementById('filterClassTeacher')?.value || '';
+
+  const totalClasses = classes.length;
+  const totalStudents = classes.reduce((sum, c) => sum + Number(c.enrolled || 0), 0);
+  const assignedCount = classes.filter(c => c.teacherName && c.teacherName.trim() !== '').length;
+  const unassignedCount = totalClasses - assignedCount;
+
+  const summaryEl = document.getElementById('classMetricsSummary');
+  if (summaryEl) {
+    summaryEl.innerHTML = `
+      <div class="class-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span class="small" style="font-weight:700;">TOTAL CLASSROOMS</span>
+          <i class="fa-solid fa-chalkboard" style="color:var(--primary);"></i>
+        </div>
+        <div style="font-size:26px;font-weight:800;">${totalClasses}</div>
+        <div class="small" style="color:var(--muted);">Active curriculum modules</div>
+      </div>
+      <div class="class-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span class="small" style="font-weight:700;">STUDENTS ENROLLED</span>
+          <i class="fa-solid fa-user-graduate" style="color:#10b981;"></i>
+        </div>
+        <div style="font-size:26px;font-weight:800;color:#10b981;">${totalStudents}</div>
+        <div class="small" style="color:var(--muted);">Total student seats occupied</div>
+      </div>
+      <div class="class-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span class="small" style="font-weight:700;">FACULTY ALLOCATED</span>
+          <i class="fa-solid fa-user-check" style="color:var(--primary);"></i>
+        </div>
+        <div style="font-size:26px;font-weight:800;">${assignedCount} / ${totalClasses}</div>
+        <div class="small" style="color:var(--muted);">${Math.round((assignedCount/Math.max(1,totalClasses))*100)}% coverage rate</div>
+      </div>
+      <div class="class-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span class="small" style="font-weight:700;">PENDING ASSIGNMENT</span>
+          <i class="fa-solid fa-triangle-exclamation" style="color:#f59e0b;"></i>
+        </div>
+        <div style="font-size:26px;font-weight:800;color:${unassignedCount > 0 ? '#f59e0b' : '#10b981'};">${unassignedCount}</div>
+        <div class="small" style="color:var(--muted);">${unassignedCount > 0 ? 'Requires teacher allocation' : 'All classes staffed'}</div>
+      </div>
+    `;
+  }
+
+  const gradeSelect = document.getElementById('filterClassGrade');
+  if (gradeSelect && gradeSelect.options.length <= 1) {
+    const grades = [...new Set(classes.map(c => c.grade).filter(Boolean))];
+    grades.forEach(g => {
+      const opt = document.createElement('option');
+      opt.value = g;
+      opt.textContent = g;
+      gradeSelect.appendChild(opt);
+    });
+  }
+
+  const teacherSelect = document.getElementById('filterClassTeacher');
+  if (teacherSelect && teacherSelect.options.length <= 1) {
+    const teachers = [...new Set(classes.map(c => c.teacherName).filter(Boolean))];
+    teachers.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t;
+      opt.textContent = t;
+      teacherSelect.appendChild(opt);
+    });
+  }
+
+  const filtered = classes.filter(c => {
+    const matchSearch = !search || c.name.toLowerCase().includes(search) || c.code.toLowerCase().includes(search) || (c.subject && c.subject.toLowerCase().includes(search)) || (c.teacherName && c.teacherName.toLowerCase().includes(search));
+    const matchGrade = !gradeFilter || c.grade === gradeFilter;
+    const matchTeacher = !teacherFilter || c.teacherName === teacherFilter;
+    return matchSearch && matchGrade && matchTeacher;
+  });
+
+  const tbody = document.getElementById('classesTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--muted);">No matching classrooms found. Click <strong>Assign Teacher</strong> or <strong>New Class</strong> above.</td></tr>`;
+    return;
+  }
+
+  filtered.forEach(c => {
+    const isAssigned = Boolean(c.teacherName && c.teacherName.trim() !== '');
+    const enrolled = Number(c.enrolled || 0);
+    const capacity = Number(c.capacity || 30);
+    const pct = Math.min(100, Math.round((enrolled / capacity) * 100));
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div style="font-weight:700;font-size:13.5px;">${escapeHtml(c.name)}</div>
+        <div class="small" style="color:var(--muted);"><span class="badge-pill badge-purple" style="font-size:10px;padding:2px 6px;">${escapeHtml(c.code)}</span></div>
+      </td>
+      <td><strong>${escapeHtml(c.subject || 'General')}</strong></td>
+      <td><span class="badge-pill" style="background:rgba(99,91,252,0.1);color:var(--primary);">${escapeHtml(c.grade || 'Grade 10')}</span></td>
+      <td>
+        ${isAssigned ? `
+          <div class="teacher-badge-wrap">
+            <div class="teacher-avatar-sm">${escapeHtml((c.teacherName || 'T').substring(0,2).toUpperCase())}</div>
+            <div>
+              <div style="font-weight:700;font-size:13px;">${escapeHtml(c.teacherName)}</div>
+              <div class="small" style="color:var(--muted);">${escapeHtml(c.teacherEmail || '')}</div>
+            </div>
+          </div>
+        ` : `
+          <button class="btn" style="padding:6px 12px;font-size:11px;" onclick="openAssignModal('${c.id}')">
+            <i class="fa-solid fa-user-plus"></i> Assign Now
+          </button>
+        `}
+      </td>
+      <td>
+        <div style="font-weight:600;font-size:12.5px;"><i class="fa-solid fa-door-open" style="color:var(--muted);margin-right:4px;"></i> ${escapeHtml(c.room || 'TBD')}</div>
+        <div class="small" style="color:var(--muted);">${escapeHtml(c.schedule || 'Schedule pending')}</div>
+      </td>
+      <td style="min-width:120px;">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px;">
+          <span>${enrolled} / ${capacity}</span>
+          <span>${pct}%</span>
+        </div>
+        <div class="capacity-bar">
+          <div class="capacity-fill" style="width:${pct}%"></div>
+        </div>
+      </td>
+      <td>
+        <span class="badge-pill ${isAssigned ? 'badge-green' : 'badge-orange'}">
+          <i class="fa-solid ${isAssigned ? 'fa-circle-check' : 'fa-clock'}"></i>
+          ${isAssigned ? 'Assigned' : 'Unassigned'}
+        </span>
+      </td>
+      <td style="text-align:right;">
+        <div style="display:inline-flex;gap:6px;">
+          <button class="btn ghost" style="padding:6px 10px;font-size:11px;" title="Reassign / Change Teacher" onclick="openAssignModal('${c.id}')">
+            <i class="fa-solid fa-pencil"></i>
+          </button>
+          <button class="btn ghost" style="padding:6px 10px;font-size:11px;color:var(--accent-red);" title="Remove Class" onclick="deleteClassroom('${c.id}')">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function openAssignModal(preselectedClassId = null) {
+  const classes = getClassesList();
+  const teachers = getAvailableTeachers();
+
+  const classSelect = document.getElementById('assign_class_select');
+  const teacherSelect = document.getElementById('assign_teacher_select');
+  if (!classSelect || !teacherSelect) return;
+
+  classSelect.innerHTML = '';
+  classes.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = `${c.code} — ${c.name} (${c.teacherName ? 'Assigned: ' + c.teacherName : 'Unassigned'})`;
+    if (preselectedClassId && c.id === preselectedClassId) opt.selected = true;
+    classSelect.appendChild(opt);
+  });
+
+  teacherSelect.innerHTML = '';
+  teachers.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t.email;
+    opt.dataset.name = t.name;
+    opt.textContent = `${t.name} (${t.role})`;
+    teacherSelect.appendChild(opt);
+  });
+
+  const activeClass = classes.find(c => c.id === (preselectedClassId || classSelect.value));
+  if (activeClass) {
+    document.getElementById('assign_room').value = activeClass.room || 'Room 101';
+    document.getElementById('assign_schedule').value = activeClass.schedule || 'Mon, Wed, Fri 09:00 AM';
+    if (activeClass.teacherEmail) {
+      teacherSelect.value = activeClass.teacherEmail;
+    }
+  }
+
+  classSelect.onchange = () => {
+    const selClass = classes.find(c => c.id === classSelect.value);
+    if (selClass) {
+      document.getElementById('assign_room').value = selClass.room || 'Room 101';
+      document.getElementById('assign_schedule').value = selClass.schedule || 'Mon, Wed, Fri 09:00 AM';
+      if (selClass.teacherEmail) teacherSelect.value = selClass.teacherEmail;
+    }
+  };
+
+  document.getElementById('assignTeacherModalBackdrop').classList.add('show');
+}
+
+function closeAssignModal() {
+  document.getElementById('assignTeacherModalBackdrop')?.classList.remove('show');
+}
+
+function submitTeacherAssignment() {
+  const classId = document.getElementById('assign_class_select').value;
+  const teacherSelect = document.getElementById('assign_teacher_select');
+  const teacherEmail = teacherSelect.value;
+  const teacherName = teacherSelect.options[teacherSelect.selectedIndex]?.dataset.name || teacherSelect.options[teacherSelect.selectedIndex]?.text.split('(')[0].trim();
+  const room = document.getElementById('assign_room').value.trim();
+  const schedule = document.getElementById('assign_schedule').value.trim();
+  const notes = document.getElementById('assign_notes').value.trim();
+
+  const classes = getClassesList();
+  const idx = classes.findIndex(c => c.id === classId);
+  if (idx === -1) return;
+
+  classes[idx].teacherName = teacherName;
+  classes[idx].teacherEmail = teacherEmail;
+  classes[idx].room = room;
+  classes[idx].schedule = schedule;
+  classes[idx].status = 'Assigned';
+  classes[idx].assignmentNotes = notes;
+  classes[idx].assignedAt = Date.now();
+
+  saveClassesList(classes);
+  closeAssignModal();
+  renderClassesSection();
+
+  if (window.Toaster) {
+    window.Toaster.success(
+      'Teacher Assigned Successfully!',
+      `${teacherName} has been assigned to ${classes[idx].name} (${room}).`,
+      5000
+    );
+  } else {
+    showToast(`Assigned ${teacherName} to ${classes[idx].name}`);
+  }
+
+  if (window.SchoolMessenger) {
+    window.SchoolMessenger.sendSystemNotification(
+      'chan-teachers',
+      `Official HR Notice: ${teacherName} has been assigned to teach ${classes[idx].name} in ${room} (${schedule}).`
+    );
+  }
+}
+
+function openAddClassModal() {
+  document.getElementById('addClassModalBackdrop')?.classList.add('show');
+}
+
+function closeAddClassModal() {
+  document.getElementById('addClassModalBackdrop')?.classList.remove('show');
+}
+
+function submitAddClass() {
+  const code = document.getElementById('new_class_code').value.trim().toUpperCase();
+  const name = document.getElementById('new_class_name').value.trim();
+  const subject = document.getElementById('new_class_subject').value.trim();
+  const grade = document.getElementById('new_class_grade').value;
+  const room = document.getElementById('new_class_room').value.trim() || 'Room 101';
+  const schedule = document.getElementById('new_class_schedule').value.trim() || 'Mon, Wed 10:00 AM';
+  const capacity = Number(document.getElementById('new_class_capacity').value) || 30;
+
+  const classes = getClassesList();
+  const newClass = {
+    id: 'cls_' + Date.now(),
+    code: code,
+    name: name,
+    subject: subject,
+    grade: grade,
+    room: room,
+    schedule: schedule,
+    capacity: capacity,
+    enrolled: 0,
+    teacherName: '',
+    teacherEmail: '',
+    status: 'Unassigned',
+    createdAt: Date.now()
+  };
+
+  classes.push(newClass);
+  saveClassesList(classes);
+  closeAddClassModal();
+  renderClassesSection();
+
+  if (window.Toaster) {
+    window.Toaster.success('New Classroom Created!', `${name} (${code}) added to active curriculum.`, 4000);
+  }
+}
+
+function deleteClassroom(classId) {
+  if (confirm('Are you sure you want to remove this classroom module?')) {
+    let classes = getClassesList();
+    classes = classes.filter(c => c.id !== classId);
+    saveClassesList(classes);
+    renderClassesSection();
+    if (window.Toaster) {
+      window.Toaster.info('Class Removed', 'Classroom has been decommissioned.', 3000);
+    }
+  }
+}
 
 /* -------------------------------------------------------------
    SECTION 1: DASHBOARD & CHARTS

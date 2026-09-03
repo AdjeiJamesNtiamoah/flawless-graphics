@@ -438,7 +438,20 @@
     function quickDemoFinance() {
       if (window.AuthSession) {
         window.AuthSession.initDemoSession();
+        window.AuthSession.setUser({
+          org: (window.AuthSession.getOrg() || 'FLAWLESS GRAPHICS'),
+          name: 'James Ntiamoah (Finance Admin)',
+          email: 'bursar@flawlessgraphics.com',
+          role: 'finance'
+        });
       }
+      localStorage.setItem('active_org', 'FLAWLESS GRAPHICS');
+      localStorage.setItem('activeFinance', JSON.stringify({
+        name: 'James Ntiamoah (Finance Admin)',
+        email: 'bursar@flawlessgraphics.com',
+        role: 'Finance Officer'
+      }));
+      localStorage.setItem('activeHR', 'true');
       window.location.href = 'finance-dashboard.html';
     }
 
@@ -562,6 +575,15 @@
         // Save user
         users.push({ org: orgName, email: hrEmail, password: password });
         localStorage.setItem('fg_registered_users', JSON.stringify(users));
+
+        if (window.AuthSession) {
+          window.AuthSession.saveRegisteredUser({
+            org: orgName,
+            name: hrEmail.split('@')[0],
+            email: hrEmail,
+            role: 'finance'
+          });
+        }
 
         showSuccess('Account created successfully! Switching to sign in...');
         setTimeout(() => {
