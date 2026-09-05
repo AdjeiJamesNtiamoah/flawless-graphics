@@ -40,6 +40,18 @@ document.getElementById("registerForm")?.addEventListener("submit", async functi
     });
 
     localStorage.setItem("organizations_users", JSON.stringify(users));
+    if (window.AuthSession) {
+        window.AuthSession.setUser({ org, name, email, role: role.toLowerCase() });
+    }
+
+    if (window.SupabaseService && typeof window.SupabaseService.saveOrganization === 'function') {
+        window.SupabaseService.saveOrganization({
+            org_name: org,
+            admin_name: name,
+            email: email,
+            logo_path: null
+        }).catch(err => console.warn('Supabase org sync notice:', err));
+    }
 
     alert("Registration successful! You can now log in.");
     window.location.href = "site-login.html";

@@ -212,5 +212,25 @@
         AuthSession.setUser(existing);
     }
 
+    // Auto-sync active Supabase cloud session if available
+    window.addEventListener('DOMContentLoaded', () => {
+        if (window.SupabaseService && typeof window.SupabaseService.getSession === 'function') {
+            window.SupabaseService.getSession().then(session => {
+                if (session && session.user && session.user.email_confirmed_at) {
+                    const u = session.user;
+                    const current = AuthSession.getUser();
+                    if (!current || current.email !== u.email) {
+                        AuthSession.setUser({
+                            org: u.user_metadata?.org_name || 'FLAWLESS GRAPHICS',
+                            name: u.user_metadata?.admin_name || u.email.split('@')[0],
+                            email: u.email,
+                            role: 'admin'
+                        });
+                    }
+                }
+            }).catch(() => {});
+        }
+    });
+
     window.AuthSession = AuthSession;
 })(window);

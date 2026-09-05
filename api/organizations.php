@@ -1,14 +1,32 @@
 <?php
 // api/organizations.php
 require_once __DIR__ . '/config/db.php';
+if (file_exists(__DIR__ . '/config/supabase.php')) {
+    require_once __DIR__ . '/config/supabase.php';
+}
 
 $organizations = [];
-if ($pdo) {
+
+// 1. Fetch from Supabase Cloud if configured
+if (class_exists('SupabasePHP') && SupabasePHP::isConfigured()) {
+    $res = SupabasePHP::query('organizations?select=*&order=created_at.desc');
+    if (!empty($res['data']) && is_array($res['data'])) {
+        $organizations = $res['data'];
+    }
+}
+
+// 2. Query Database (Supabase Postgres or local MySQL)
+if (empty($organizations) && $pdo) {
     try {
-        $stmt = $pdo->query("SELECT id, org_name, full_name, email, logo_path, role, created_at FROM users ORDER BY id DESC");
+        $stmt = $pdo->query("SELECT id, org_name, admin_name, email, logo_path, created_at, updated_at FROM organizations ORDER BY created_at DESC");
         $organizations = $stmt ? $stmt->fetchAll() : [];
     } catch (PDOException $e) {
-        $organizations = [];
+        try {
+            $stmt = $pdo->query("SELECT id, org_name, full_name AS admin_name, email, logo_path, created_at, created_at AS updated_at FROM users ORDER BY id DESC");
+            $organizations = $stmt ? $stmt->fetchAll() : [];
+        } catch (PDOException $e2) {
+            $organizations = [];
+        }
     }
 }
 ?>
@@ -74,18 +92,26 @@ if ($pdo) {
                 </tr>
             <?php else: ?>
                 <?php foreach ($organizations as $org): ?>
+                    <?php 
+                        $logo = $org['logo_path'] ?? '';
+                        $hasLogo = !empty($logo) && (
+                            strpos($logo, 'http') === 0 || 
+                            strpos($logo, 'data:image') === 0 || 
+                            file_exists($logo)
+                        );
+                    ?>
                     <tr>
                         <td>
-                            <?php if (!empty($org['logo_path']) && file_exists($org['logo_path'])): ?>
-                                <img src="<?= htmlspecialchars($org['logo_path']) ?>" class="logo-img" alt="Logo">
+                            <?php if ($hasLogo): ?>
+                                <img src="<?= htmlspecialchars($logo) ?>" class="logo-img" alt="Logo">
                             <?php else: ?>
-                                <div class="no-logo"><i class="fa-regular fa-image"></i></div>
+                                <div class="no-logo"><i class="fa-regular fa-building"></i></div>
                             <?php endif; ?>
                         </td>
-                        <td><strong><?= htmlspecialchars($org['org_name'] ?? '') ?></strong></td>
-                        <td><?= htmlspecialchars($org['full_name'] ?? '') ?></td>
-                        <td><?= htmlspecialchars($org['email'] ?? '') ?></td>
-                        <td><?= htmlspecialchars($org['role'] ?? '') ?></td>
+                        <td><strong><?= htmlspecialchars($org['org_name'] ?? '—') ?></strong></td>
+                        <td><?= htmlspecialchars($org['admin_name'] ?? $org['full_name'] ?? 'Admin') ?></td>
+                        <td><?= htmlspecialchars($org['email'] ?? '—') ?></td>
+                        <td><span style="background: rgba(114, 239, 221, 0.15); color: #72efdd; padding: 3px 8px; border-radius: 6px; font-size: 11px;"><?= htmlspecialchars($org['role'] ?? 'Admin') ?></span></td>
                         <td><?= !empty($org['created_at']) ? date('M d, Y h:i A', strtotime($org['created_at'])) : '—' ?></td>
                     </tr>
                 <?php endforeach; ?>

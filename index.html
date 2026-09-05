@@ -521,6 +521,65 @@
         font-size: 16px;
         flex-shrink: 0;
     }
+    .verify-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(114, 239, 221, 0.12);
+        color: #72efdd;
+        border: 1px solid rgba(114, 239, 221, 0.3);
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        margin: 12px 0 20px 0;
+        word-break: break-all;
+    }
+    .otp-box {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 18px;
+        margin-bottom: 18px;
+    }
+    .otp-input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #fff;
+        font-size: 24px;
+        letter-spacing: 8px;
+        text-align: center;
+        padding: 12px;
+        border-radius: 8px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .otp-input:focus {
+        border-color: #72efdd;
+        box-shadow: 0 0 12px rgba(114, 239, 221, 0.3);
+    }
+    .verify-feedback {
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        margin-bottom: 14px;
+        display: none;
+    }
+    .verify-feedback.error {
+        background: rgba(235, 87, 87, 0.2);
+        border: 1px solid rgba(235, 87, 87, 0.4);
+        color: #ff9b9b;
+        display: block;
+    }
+    .verify-feedback.success {
+        background: rgba(114, 239, 221, 0.2);
+        border: 1px solid rgba(114, 239, 221, 0.4);
+        color: #a2e8dd;
+        display: block;
+    }
 </style>
 </head>
 <body>
@@ -739,6 +798,48 @@
     </div>
 </div>
 
+<!-- MODAL 3: EMAIL & OTP VERIFICATION -->
+<div class="modal-overlay" id="verificationModal">
+    <div class="modal-box" style="max-width: 480px; text-align: center;">
+        <div style="width: 58px; height: 58px; border-radius: 50%; background: rgba(114, 239, 221, 0.15); color: #72efdd; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 16px;">
+            <i class="fa-solid fa-envelope-circle-check"></i>
+        </div>
+        <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 6px;">Verify Your Organization</h3>
+        <p style="font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.5; margin-bottom: 6px;">
+            A confirmation email has been dispatched by Supabase to:
+        </p>
+        <div class="verify-badge" id="verifyEmailBadge">
+            <i class="fa-regular fa-envelope"></i> <span id="verifyEmailText">user@company.com</span>
+        </div>
+
+        <div id="verifyFeedback" class="verify-feedback"></div>
+
+        <div class="otp-box">
+            <div style="font-size: 13px; font-weight: 600; color: #a2e8dd; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <i class="fa-solid fa-key"></i> Instant Activation with 6-Digit Code
+            </div>
+            <input type="text" id="otpInput" class="otp-input" placeholder="------" maxlength="6" autocomplete="one-time-code">
+            <button type="button" class="btn-submit" id="btnVerifyOtp" onclick="submitOtpVerification()" style="margin-top: 4px;">
+                <i class="fa-solid fa-check"></i> Verify & Enter Workspace
+            </button>
+        </div>
+
+        <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 18px; line-height: 1.5;">
+            Alternatively, click the confirmation link sent directly to your email inbox to activate your account.
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: center; align-items: center;">
+            <button type="button" class="btn-outline" id="btnResend" onclick="resendVerificationEmail()" style="font-size: 12px; padding: 8px 16px;">
+                <i class="fa-solid fa-rotate-right"></i> Resend Email
+            </button>
+            <a href="site-login.html" class="link-subtle" style="font-size: 12px;">
+                Go to Login <i class="fa-solid fa-arrow-right" style="margin-left: 4px;"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/js/auth-session.js"></script>
 <script src="assets/js/supabase-config.js"></script>
 <script src="assets/js/supabase-client.js"></script>
@@ -826,6 +927,97 @@ function removeLogo() {
     document.getElementById("logoHint").style.display = "inline";
 }
 
+let pendingRegistrationEmail = '';
+let pendingUserData = null;
+
+function openVerificationModal(email, msg = '') {
+    pendingRegistrationEmail = email;
+    document.getElementById("verifyEmailText").textContent = email;
+    document.getElementById("otpInput").value = '';
+    showVerifyFeedback(msg || "Verification link & code dispatched. Check your inbox.", false);
+    document.getElementById("verificationModal").classList.add("active");
+}
+
+function closeVerificationModal() {
+    document.getElementById("verificationModal").classList.remove("active");
+}
+
+function showVerifyFeedback(text, isError = true) {
+    const el = document.getElementById("verifyFeedback");
+    if (!el) return;
+    el.textContent = text;
+    el.className = "verify-feedback " + (isError ? "error" : "success");
+    el.style.display = "block";
+}
+
+async function submitOtpVerification() {
+    const otpInput = document.getElementById("otpInput");
+    const code = otpInput.value.trim();
+    const btn = document.getElementById("btnVerifyOtp");
+
+    if (!code || code.length < 6) {
+        return showVerifyFeedback("Please enter the 6-digit verification code from your email.", true);
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying...';
+
+    try {
+        if (window.SupabaseService && typeof window.SupabaseService.verifyOtp === 'function') {
+            await window.SupabaseService.verifyOtp(pendingRegistrationEmail, code, 'signup');
+            showVerifyFeedback("Account verified successfully! Unlocking workspace...", false);
+
+            if (pendingUserData && window.AuthSession) {
+                window.AuthSession.setUser(pendingUserData);
+            }
+
+            setTimeout(() => {
+                window.location.href = "welcome.html";
+            }, 1000);
+            return;
+        } else {
+            showVerifyFeedback("Supabase service not ready.", true);
+        }
+    } catch (err) {
+        console.error("OTP verification error:", err);
+        showVerifyFeedback(err.message || "Invalid or expired verification code.", true);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Verify & Enter Workspace';
+    }
+}
+
+async function resendVerificationEmail() {
+    const btn = document.getElementById("btnResend");
+    if (!pendingRegistrationEmail) return;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Resending...';
+
+    try {
+        if (window.SupabaseService && typeof window.SupabaseService.resendVerification === 'function') {
+            await window.SupabaseService.resendVerification(pendingRegistrationEmail);
+            showVerifyFeedback("A fresh confirmation email has been sent to your inbox!", false);
+            
+            let cd = 30;
+            const timer = setInterval(() => {
+                cd--;
+                if (cd > 0) {
+                    btn.innerHTML = `<i class="fa-solid fa-clock"></i> Resend (${cd}s)`;
+                } else {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Email';
+                }
+            }, 1000);
+        }
+    } catch (err) {
+        showVerifyFeedback(err.message || "Could not resend email. Please try again shortly.", true);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Email';
+    }
+}
+
 async function register(event) {
     event.preventDefault();
 
@@ -845,20 +1037,10 @@ async function register(event) {
     }
 
     submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Registering Organization...';
 
     try {
-        let users = [];
-        try {
-            users = JSON.parse(localStorage.getItem("organizations_users") || "[]");
-        } catch(e) { users = []; }
-
-        if (users.some(u => u.email === email)) {
-            submitBtn.disabled = false;
-            return showMessage("Email address is already registered.");
-        }
-
         const hashed = await AuthSession.sha256(pw);
-
         const newUser = {
             org: org,
             logo: currentLogoBase64,
@@ -868,20 +1050,76 @@ async function register(event) {
             role: role,
             createdAt: Date.now()
         };
+        pendingUserData = newUser;
 
-        // Synchronize across all portals
+        // 1. If Supabase is configured, use Supabase Auth with Email Verification
+        if (window.SupabaseConfig && window.SupabaseConfig.isConfigured() && window.SupabaseService) {
+            try {
+                const authResult = await window.SupabaseService.signUp(email, pw, {
+                    org_name: org,
+                    admin_name: name,
+                    logo_path: currentLogoBase64 || null
+                });
+
+                // Also sync to public.organizations table
+                window.SupabaseService.saveOrganization({
+                    org_name: org,
+                    admin_name: name,
+                    email: email,
+                    logo_path: currentLogoBase64 || null
+                }).catch(e => console.warn("Supabase organization sync warning:", e));
+
+                // Cache locally so active session is established
+                AuthSession.setUser(newUser);
+
+                // Check if email confirmation is required
+                if (authResult.requiresVerification) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Register Organization';
+                    openVerificationModal(email, authResult.message);
+                    return;
+                }
+
+                // If already verified or immediate activation
+                showMessage("Organization registered successfully! Entering workspace...", false);
+                setTimeout(() => {
+                    window.location.href = "welcome.html";
+                }, 1000);
+                return;
+            } catch (supaErr) {
+                console.warn("Supabase Auth error:", supaErr);
+                if (supaErr.message && supaErr.message.toLowerCase().includes("already registered")) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Register Organization';
+                    return showMessage("This email is already registered. Please go to Login.");
+                }
+                throw supaErr;
+            }
+        }
+
+        // 2. Offline / Local fallback if Supabase is not configured
+        let users = [];
+        try {
+            users = JSON.parse(localStorage.getItem("organizations_users") || "[]");
+        } catch(e) { users = []; }
+
+        if (users.some(u => u.email === email)) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Register Organization';
+            return showMessage("Email address is already registered.");
+        }
+
         AuthSession.setUser(newUser);
-
         showMessage("Organization registered successfully! Entering workspace...", false);
-
         setTimeout(() => {
             window.location.href = "welcome.html";
         }, 1200);
 
     } catch (err) {
         console.error(err);
-        showMessage("An error occurred during registration.", true);
+        showMessage(err.message || "An error occurred during registration.", true);
         submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Register Organization';
     }
 }
 </script>

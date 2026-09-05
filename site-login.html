@@ -440,6 +440,119 @@
             margin-top: 40px;
         }
     }
+
+    /* Verification Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(18, 9, 41, 0.85);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
+    }
+    .modal-overlay.active {
+        display: flex;
+    }
+    .modal-box {
+        background: linear-gradient(135deg, #44218c 0%, #291258 100%);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 20px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        max-width: 480px;
+        width: 100%;
+        padding: 30px;
+        color: #ffffff;
+        position: relative;
+        text-align: center;
+        animation: modalPop 0.25s ease-out;
+    }
+    @keyframes modalPop {
+        from { transform: scale(0.92); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+    .modal-close-btn {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: #fff;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        transition: background 0.2s;
+    }
+    .modal-close-btn:hover {
+        background: rgba(235, 87, 87, 0.4);
+    }
+    .verify-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(114, 239, 221, 0.12);
+        color: #72efdd;
+        border: 1px solid rgba(114, 239, 221, 0.3);
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        margin: 12px 0 20px 0;
+        word-break: break-all;
+    }
+    .otp-box {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 18px;
+        margin-bottom: 18px;
+    }
+    .otp-input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #fff;
+        font-size: 24px;
+        letter-spacing: 8px;
+        text-align: center;
+        padding: 12px;
+        border-radius: 8px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .otp-input:focus {
+        border-color: #72efdd;
+        box-shadow: 0 0 12px rgba(114, 239, 221, 0.3);
+    }
+    .verify-feedback {
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        margin-bottom: 14px;
+        display: none;
+    }
+    .verify-feedback.error {
+        background: rgba(235, 87, 87, 0.2);
+        border: 1px solid rgba(235, 87, 87, 0.4);
+        color: #ff9b9b;
+        display: block;
+    }
+    .verify-feedback.success {
+        background: rgba(114, 239, 221, 0.2);
+        border: 1px solid rgba(114, 239, 221, 0.4);
+        color: #a2e8dd;
+        display: block;
+    }
 </style>
 </head>
 <body>
@@ -524,12 +637,152 @@
     </div>
 </div>
 
+<!-- MODAL: EMAIL & OTP VERIFICATION -->
+<div class="modal-overlay" id="verificationModal">
+    <div class="modal-box" style="max-width: 480px; text-align: center;">
+        <button class="modal-close-btn" onclick="closeVerificationModal()"><i class="fa-solid fa-xmark"></i></button>
+        <div style="width: 58px; height: 58px; border-radius: 50%; background: rgba(114, 239, 221, 0.15); color: #72efdd; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 16px;">
+            <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 6px;">Email Verification Required</h3>
+        <p style="font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.5; margin-bottom: 6px;">
+            Your account must be confirmed before accessing the workspace.
+        </p>
+        <div class="verify-badge" id="verifyEmailBadge">
+            <i class="fa-regular fa-envelope"></i> <span id="verifyEmailText">user@company.com</span>
+        </div>
+
+        <div id="verifyFeedback" class="verify-feedback"></div>
+
+        <div class="otp-box">
+            <div style="font-size: 13px; font-weight: 600; color: #a2e8dd; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <i class="fa-solid fa-key"></i> Enter 6-Digit Verification Code
+            </div>
+            <input type="text" id="otpInput" class="otp-input" placeholder="------" maxlength="6" autocomplete="one-time-code">
+            <button type="button" class="btn-submit" id="btnVerifyOtp" onclick="submitOtpVerification()" style="margin-top: 4px;">
+                <i class="fa-solid fa-check"></i> Verify & Enter Workspace
+            </button>
+        </div>
+
+        <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 18px; line-height: 1.5;">
+            Or click the link sent to your email inbox. Need another link?
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: center; align-items: center;">
+            <button type="button" class="btn-outline" id="btnResend" onclick="resendVerificationEmail()" style="font-size: 12px; padding: 8px 16px;">
+                <i class="fa-solid fa-rotate-right"></i> Resend Verification Email
+            </button>
+            <button type="button" class="btn-outline" onclick="closeVerificationModal()" style="font-size: 12px; padding: 8px 16px;">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/supabase-client.js"></script>
 <script src="assets/js/auth-session.js"></script>
 <script>
+let pendingLoginEmail = '';
+
 function showMessage(text, isError = true) {
     const msgEl = document.getElementById("msg");
     msgEl.textContent = text;
     msgEl.className = "msg " + (isError ? "error" : "success");
+}
+
+function openVerificationModal(email, msg = '') {
+    pendingLoginEmail = email;
+    document.getElementById("verifyEmailText").textContent = email;
+    document.getElementById("otpInput").value = '';
+    showVerifyFeedback(msg || "Your account requires verification. Enter the 6-digit code sent to your inbox.", true);
+    document.getElementById("verificationModal").classList.add("active");
+}
+
+function closeVerificationModal() {
+    document.getElementById("verificationModal").classList.remove("active");
+}
+
+function showVerifyFeedback(text, isError = true) {
+    const el = document.getElementById("verifyFeedback");
+    if (!el) return;
+    el.textContent = text;
+    el.className = "verify-feedback " + (isError ? "error" : "success");
+    el.style.display = "block";
+}
+
+async function submitOtpVerification() {
+    const otpInput = document.getElementById("otpInput");
+    const code = otpInput.value.trim();
+    const btn = document.getElementById("btnVerifyOtp");
+
+    if (!code || code.length < 6) {
+        return showVerifyFeedback("Please enter the 6-digit verification code.", true);
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying...';
+
+    try {
+        if (window.SupabaseService && typeof window.SupabaseService.verifyOtp === 'function') {
+            const res = await window.SupabaseService.verifyOtp(pendingLoginEmail, code, 'signup');
+            showVerifyFeedback("Account verified successfully! Entering workspace...", false);
+
+            const user = res.user;
+            if (window.AuthSession && user) {
+                window.AuthSession.setUser({
+                    org: user.user_metadata?.org_name || 'FLAWLESS GRAPHICS',
+                    name: user.user_metadata?.admin_name || user.email.split('@')[0],
+                    email: user.email,
+                    role: 'admin'
+                });
+            }
+
+            setTimeout(() => {
+                window.location.href = "welcome.html";
+            }, 900);
+        } else {
+            showVerifyFeedback("Supabase service is not initialized.", true);
+        }
+    } catch (err) {
+        console.error("OTP verification error:", err);
+        showVerifyFeedback(err.message || "Invalid or expired verification code.", true);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Verify & Enter Workspace';
+    }
+}
+
+async function resendVerificationEmail() {
+    const btn = document.getElementById("btnResend");
+    if (!pendingLoginEmail) return;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Sending...';
+
+    try {
+        if (window.SupabaseService && typeof window.SupabaseService.resendVerification === 'function') {
+            await window.SupabaseService.resendVerification(pendingLoginEmail);
+            showVerifyFeedback("A new verification email has been dispatched!", false);
+
+            let cd = 30;
+            const timer = setInterval(() => {
+                cd--;
+                if (cd > 0) {
+                    btn.innerHTML = `<i class="fa-solid fa-clock"></i> Resend (${cd}s)`;
+                } else {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Verification Email';
+                }
+            }, 1000);
+        }
+    } catch (err) {
+        showVerifyFeedback(err.message || "Could not resend email. Please try again shortly.", true);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Verification Email';
+    }
 }
 
 function togglePasswordVisibility() {
@@ -564,6 +817,38 @@ function quickDemoLogin(e) {
     }, 600);
 }
 
+// Auto-detect email verification redirect from Supabase
+window.addEventListener('DOMContentLoaded', () => {
+    // 1. Check if user clicked email confirmation link (query param ?verified=true)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('verified') === 'true') {
+        showMessage("Email verified successfully! Please log in to access your organization.", false);
+    }
+
+    // 2. Listen to Supabase Auth state changes from URL hash token exchange
+    if (window.SupabaseService && typeof window.SupabaseService.onAuthStateChange === 'function') {
+        window.SupabaseService.onAuthStateChange((event, session) => {
+            if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session && session.user) {
+                const u = session.user;
+                if (u.email_confirmed_at) {
+                    showMessage("Email verified & session unlocked! Redirecting...", false);
+                    if (window.AuthSession) {
+                        window.AuthSession.setUser({
+                            org: u.user_metadata?.org_name || 'FLAWLESS GRAPHICS',
+                            name: u.user_metadata?.admin_name || u.email.split('@')[0],
+                            email: u.email,
+                            role: 'admin'
+                        });
+                    }
+                    setTimeout(() => {
+                        window.location.href = "welcome.html";
+                    }, 800);
+                }
+            }
+        });
+    }
+});
+
 async function login() {
     const submitBtn = document.getElementById("submitBtn");
     const email = document.getElementById("email").value.trim().toLowerCase();
@@ -574,45 +859,84 @@ async function login() {
     }
 
     submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Signing In...';
 
     try {
+        // 1. If Supabase is configured, authenticate with Supabase Auth
+        if (window.SupabaseConfig && window.SupabaseConfig.isConfigured() && window.SupabaseService) {
+            try {
+                const res = await window.SupabaseService.signIn(email, pw);
+                const user = res.user;
+
+                // Check verification
+                if (user && !user.email_confirmed_at) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Log In';
+                    openVerificationModal(email, "Your email is unconfirmed. Please enter your 6-digit code or check your inbox.");
+                    return;
+                }
+
+                // Successful verified login
+                if (window.AuthSession && user) {
+                    window.AuthSession.setUser({
+                        org: user.user_metadata?.org_name || 'FLAWLESS GRAPHICS',
+                        name: user.user_metadata?.admin_name || user.email.split('@')[0],
+                        email: user.email,
+                        role: 'admin'
+                    });
+                }
+
+                showMessage("Authentication verified! Welcome to LUCY™...", false);
+                setTimeout(() => {
+                    window.location.href = "welcome.html";
+                }, 800);
+                return;
+
+            } catch (supaErr) {
+                const msg = (supaErr.message || '').toLowerCase();
+                if (msg.includes("email not confirmed") || msg.includes("unconfirmed")) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Log In';
+                    openVerificationModal(email, "Your email has not been verified yet. Check your inbox or enter your 6-digit code below.");
+                    return;
+                }
+                console.warn("Supabase login notice, checking local fallback:", supaErr);
+            }
+        }
+
+        // 2. Demo User or Local Storage fallback
+        if (email === "admin@flawlessgraphics.com" || email === "admin@flawless.org") {
+            const demo = AuthSession.initDemoSession();
+            showMessage("Demo credentials verified! Redirecting...", false);
+            setTimeout(() => { window.location.href = "welcome.html"; }, 800);
+            return;
+        }
+
         let users = [];
         try {
             users = JSON.parse(localStorage.getItem("organizations_users") || "[]");
         } catch(e) { users = []; }
 
         const hashedPw = await AuthSession.sha256(pw);
-
-        const user = users.find(u =>
-            u.email === email &&
-            u.pass === hashedPw
-        );
+        const user = users.find(u => u.email === email && u.pass === hashedPw);
 
         if (!user) {
-            // Check if demo user match
-            if (email === "admin@flawlessgraphics.com" || email === "admin@flawless.org") {
-                const demo = AuthSession.initDemoSession();
-                showMessage("Demo credentials verified! Redirecting...", false);
-                setTimeout(() => { window.location.href = "welcome.html"; }, 800);
-                return;
-            }
             submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Log In';
             return showMessage("Incorrect email address or password.");
         }
 
-        // Synchronize active user session across all portals
         AuthSession.setUser(user);
-
         showMessage("Authentication successful! Redirecting...", false);
-
         setTimeout(() => {
             window.location.href = "welcome.html";
-        }, 1000);
+        }, 800);
 
     } catch (err) {
         console.error(err);
         showMessage("An error occurred during sign in.", true);
         submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Log In';
     }
 }
 </script>

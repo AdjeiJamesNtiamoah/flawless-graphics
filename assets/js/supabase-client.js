@@ -343,6 +343,294 @@
 
       return results;
     }
+
+    /* -------------------------------------------------------------
+       4. ORGANIZATIONS CLOUD SYNC & REGISTRATION
+    ------------------------------------------------------------- */
+    async getOrganizations() {
+      if (!Config.isConfigured()) return [];
+      try {
+        const cloudData = await this.query('organizations?order=created_at.desc');
+        return Array.isArray(cloudData) ? cloudData : [];
+      } catch (err) {
+        console.warn('Could not fetch organizations from Supabase:', err.message);
+        return [];
+      }
+    }
+
+    async saveOrganization(orgData) {
+      if (!Config.isConfigured()) return null;
+
+      const payload = {
+        org_name: orgData.org_name || orgData.org || 'FLAWLESS GRAPHICS',
+        admin_name: orgData.admin_name || orgData.name || orgData.fullName || 'Admin',
+        email: (orgData.email || '').trim().toLowerCase(),
+        logo_path: orgData.logo_path || orgData.logo || null,
+        updated_at: new Date().toISOString()
+      };
+
+      try {
+        const res = await this.query('organizations', 'POST', payload, {
+          'Prefer': 'resolution=merge-duplicates,return=representation'
+        });
+        return res;
+      } catch (err) {
+        console.warn('Cloud sync error saving organization:', err.message);
+        return null;
+      }
+    }
+
+    /* -------------------------------------------------------------
+       5. AUTHENTICATION & USER VERIFICATION
+    ------------------------------------------------------------- */
+    getClient() {
+      if (!this.client && window.supabase && typeof window.supabase.createClient === 'function' && Config.isConfigured()) {
+        this.initClient();
+      }
+      return this.client;
+    }
+
+    /**
+     * Sign Up with Email & Password + metadata
+     * Triggers Supabase Auth signup and verification email
+     */
+    async signUp(email, password, metadata = {}, redirectTo = null) {
+      if (!Config.isConfigured()) {
+        throw new Error('Supabase is not configured. Please enter project URL and Anon Key.');
+      }
+
+      const client = this.getClient();
+      const cleanEmail = email.trim().toLowerCase();
+      const redirect = redirectTo || (window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + 'site-login.html?verified=true');
+
+      if (client) {
+        const { data, error } = await client.auth.signUp({
+          email: cleanEmail,
+          password: password,
+          options: {
+            data: metadata,
+            emailRedirectTo: redirect
+          }
+        });
+
+        if (error) throw error;
+
+        const emailConfirmed = Boolean(data.user && data.user.email_confirmed_at);
+        const requiresVerification = Boolean(data.user && !data.session && !emailConfirmed);
+
+        return {
+          user: data.user,
+          session: data.session,
+          requiresVerification,
+          message: requiresVerification 
+            ? `Verification email sent to ${cleanEmail}. Please check your inbox or spam folder.` 
+            : 'Account registered successfully!'
+        };
+      }
+
+      // REST Fallback if JS SDK is unavailable
+      const authUrl = `${Config.getUrl().replace(/\/$/, '')}/auth/v1/signup`;
+      const res = await fetch(authUrl, {
+        method: 'POST',
+        headers: {
+          'apikey': Config.getAnonKey(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: cleanEmail,
+          password: password,
+          data: metadata
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.msg || data.message || data.error_description || 'Signup failed');
+      }
+
+      const requiresVerification = !data.access_token;
+      return {
+        user: data.user || data,
+        session: data.access_token ? data : null,
+        requiresVerification,
+        message: requiresVerification
+          ? `Verification email sent to ${cleanEmail}. Please check your inbox.`
+          : 'Account registered successfully!'
+      };
+    }
+
+    /**
+     * Sign In with Email & Password
+     */
+    async signIn(email, password) {
+      if (!Config.isConfigured()) {
+        throw new Error('Supabase is not configured.');
+      }
+
+      const client = this.getClient();
+      const cleanEmail = email.trim().toLowerCase();
+
+      if (client) {
+        const { data, error } = await client.auth.signInWithPassword({
+          email: cleanEmail,
+          password: password
+        });
+
+        if (error) throw error;
+        return { user: data.user, session: data.session };
+      }
+
+      // REST Fallback
+      const authUrl = `${Config.getUrl().replace(/\/$/, '')}/auth/v1/token?grant_type=password`;
+      const res = await fetch(authUrl, {
+        method: 'POST',
+        headers: {
+          'apikey': Config.getAnonKey(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: cleanEmail,
+          password: password
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error_description || data.msg || data.message || 'Login failed');
+      }
+
+      return { user: data.user, session: data };
+    }
+
+    /**
+     * Verify OTP token (6-digit numeric code sent to email)
+     */
+    async verifyOtp(email, token, type = 'signup') {
+      if (!Config.isConfigured()) throw new Error('Supabase is not configured.');
+
+      const client = this.getClient();
+      const cleanEmail = email.trim().toLowerCase();
+      const cleanToken = token.trim();
+
+      if (client) {
+        const { data, error } = await client.auth.verifyOtp({
+          email: cleanEmail,
+          token: cleanToken,
+          type: type
+        });
+
+        if (error) throw error;
+        return { user: data.user, session: data.session };
+      }
+
+      // REST Fallback
+      const authUrl = `${Config.getUrl().replace(/\/$/, '')}/auth/v1/verify`;
+      const res = await fetch(authUrl, {
+        method: 'POST',
+        headers: {
+          'apikey': Config.getAnonKey(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          type: type,
+          token: cleanToken,
+          email: cleanEmail
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.msg || data.message || data.error_description || 'OTP verification failed');
+      }
+
+      return { user: data.user, session: data };
+    }
+
+    /**
+     * Resend verification email
+     */
+    async resendVerification(email) {
+      if (!Config.isConfigured()) throw new Error('Supabase is not configured.');
+
+      const client = this.getClient();
+      const cleanEmail = email.trim().toLowerCase();
+
+      if (client) {
+        const { data, error } = await client.auth.resend({
+          type: 'signup',
+          email: cleanEmail
+        });
+
+        if (error) throw error;
+        return { success: true, data };
+      }
+
+      // REST Fallback
+      const authUrl = `${Config.getUrl().replace(/\/$/, '')}/auth/v1/resend`;
+      const res = await fetch(authUrl, {
+        method: 'POST',
+        headers: {
+          'apikey': Config.getAnonKey(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          type: 'signup',
+          email: cleanEmail
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.msg || data.message || data.error_description || 'Failed to resend confirmation email');
+      }
+
+      return { success: true, data };
+    }
+
+    /**
+     * Sign Out
+     */
+    async signOut() {
+      const client = this.getClient();
+      if (client) {
+        await client.auth.signOut().catch(() => {});
+      }
+    }
+
+    /**
+     * Get Current Active Session
+     */
+    async getSession() {
+      const client = this.getClient();
+      if (client) {
+        const { data } = await client.auth.getSession();
+        return data ? data.session : null;
+      }
+      return null;
+    }
+
+    /**
+     * Get Current Authenticated User
+     */
+    async getCurrentUser() {
+      const client = this.getClient();
+      if (client) {
+        const { data } = await client.auth.getUser();
+        return data ? data.user : null;
+      }
+      return null;
+    }
+
+    /**
+     * Listen to Auth State Changes
+     */
+    onAuthStateChange(callback) {
+      const client = this.getClient();
+      if (client && typeof client.auth.onAuthStateChange === 'function') {
+        return client.auth.onAuthStateChange(callback);
+      }
+      return { data: { subscription: { unsubscribe: () => {} } } };
+    }
   }
 
   // Instantiate and export globally
