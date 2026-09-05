@@ -160,8 +160,16 @@ DO $$
 BEGIN
   -- Employees table updates
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'employees') THEN
-    ALTER TABLE public.employees ALTER COLUMN id DROP IDENTITY IF EXISTS;
-    ALTER TABLE public.employees ALTER COLUMN id TYPE TEXT USING id::text;
+    BEGIN
+      ALTER TABLE public.employees ALTER COLUMN id DROP IDENTITY IF EXISTS;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+
+    BEGIN
+      ALTER TABLE public.employees ALTER COLUMN id TYPE TEXT USING id::text;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+
     ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS org_id TEXT NOT NULL DEFAULT 'FLAWLESS GRAPHICS';
     ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS full_name TEXT;
     ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS department TEXT;
@@ -175,14 +183,24 @@ BEGIN
     ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
 
     -- Drop NOT NULL on legacy columns if they exist
-    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='employees' AND column_name='name') THEN
+    BEGIN
       ALTER TABLE public.employees ALTER COLUMN name DROP NOT NULL;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+    BEGIN
+      ALTER TABLE public.employees ALTER COLUMN role DROP NOT NULL;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+    BEGIN
+      ALTER TABLE public.employees ALTER COLUMN emp_id DROP NOT NULL;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='employees' AND column_name='name') THEN
+      EXECUTE 'UPDATE public.employees SET name = COALESCE(name, full_name), full_name = COALESCE(full_name, name);';
     END IF;
     IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='employees' AND column_name='role') THEN
-      ALTER TABLE public.employees ALTER COLUMN role DROP NOT NULL;
-    END IF;
-    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='employees' AND column_name='emp_id') THEN
-      ALTER TABLE public.employees ALTER COLUMN emp_id DROP NOT NULL;
+      EXECUTE 'UPDATE public.employees SET role = COALESCE(role, position), position = COALESCE(position, role);';
     END IF;
 
     UPDATE public.employees SET org_id = 'FLAWLESS GRAPHICS' WHERE org_id IS NULL;
@@ -190,8 +208,14 @@ BEGIN
 
   -- Attendance table updates
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'attendance_records') THEN
-    ALTER TABLE public.attendance_records ALTER COLUMN id DROP IDENTITY IF EXISTS;
-    ALTER TABLE public.attendance_records ALTER COLUMN id TYPE TEXT USING id::text;
+    BEGIN
+      ALTER TABLE public.attendance_records ALTER COLUMN id DROP IDENTITY IF EXISTS;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+    BEGIN
+      ALTER TABLE public.attendance_records ALTER COLUMN id TYPE TEXT USING id::text;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
     ALTER TABLE public.attendance_records ADD COLUMN IF NOT EXISTS org_id TEXT NOT NULL DEFAULT 'FLAWLESS GRAPHICS';
     ALTER TABLE public.attendance_records ADD COLUMN IF NOT EXISTS employee_name TEXT;
     ALTER TABLE public.attendance_records ADD COLUMN IF NOT EXISTS department TEXT;
@@ -207,8 +231,14 @@ BEGIN
 
   -- Payroll table updates
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'payroll_records') THEN
-    ALTER TABLE public.payroll_records ALTER COLUMN id DROP IDENTITY IF EXISTS;
-    ALTER TABLE public.payroll_records ALTER COLUMN id TYPE TEXT USING id::text;
+    BEGIN
+      ALTER TABLE public.payroll_records ALTER COLUMN id DROP IDENTITY IF EXISTS;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+    BEGIN
+      ALTER TABLE public.payroll_records ALTER COLUMN id TYPE TEXT USING id::text;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
     ALTER TABLE public.payroll_records ADD COLUMN IF NOT EXISTS org_id TEXT NOT NULL DEFAULT 'FLAWLESS GRAPHICS';
     ALTER TABLE public.payroll_records ADD COLUMN IF NOT EXISTS employee_id TEXT;
     ALTER TABLE public.payroll_records ADD COLUMN IF NOT EXISTS employee_name TEXT;
@@ -229,8 +259,14 @@ BEGIN
 
   -- Performance table updates
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'performance_reviews') THEN
-    ALTER TABLE public.performance_reviews ALTER COLUMN id DROP IDENTITY IF EXISTS;
-    ALTER TABLE public.performance_reviews ALTER COLUMN id TYPE TEXT USING id::text;
+    BEGIN
+      ALTER TABLE public.performance_reviews ALTER COLUMN id DROP IDENTITY IF EXISTS;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+    BEGIN
+      ALTER TABLE public.performance_reviews ALTER COLUMN id TYPE TEXT USING id::text;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
     ALTER TABLE public.performance_reviews ADD COLUMN IF NOT EXISTS org_id TEXT NOT NULL DEFAULT 'FLAWLESS GRAPHICS';
     ALTER TABLE public.performance_reviews ADD COLUMN IF NOT EXISTS employee_name TEXT;
     ALTER TABLE public.performance_reviews ADD COLUMN IF NOT EXISTS department TEXT;
@@ -246,8 +282,14 @@ BEGIN
 
   -- Announcements table updates
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'announcements') THEN
-    ALTER TABLE public.announcements ALTER COLUMN id DROP IDENTITY IF EXISTS;
-    ALTER TABLE public.announcements ALTER COLUMN id TYPE TEXT USING id::text;
+    BEGIN
+      ALTER TABLE public.announcements ALTER COLUMN id DROP IDENTITY IF EXISTS;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+    BEGIN
+      ALTER TABLE public.announcements ALTER COLUMN id TYPE TEXT USING id::text;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
     ALTER TABLE public.announcements ADD COLUMN IF NOT EXISTS org_id TEXT NOT NULL DEFAULT 'FLAWLESS GRAPHICS';
     ALTER TABLE public.announcements ADD COLUMN IF NOT EXISTS title TEXT;
     ALTER TABLE public.announcements ADD COLUMN IF NOT EXISTS text TEXT;
@@ -268,20 +310,30 @@ BEGIN
     ALTER TABLE public.organizations ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT now();
 
     -- Drop NOT NULL on legacy columns
-    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='organizations' AND column_name='name') THEN
+    BEGIN
       ALTER TABLE public.organizations ALTER COLUMN name DROP NOT NULL;
-      UPDATE public.organizations SET org_name = name WHERE org_name IS NULL;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+    BEGIN
+      ALTER TABLE public.organizations ALTER COLUMN owner_name DROP NOT NULL;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+    BEGIN
+      ALTER TABLE public.organizations ALTER COLUMN owner_email DROP NOT NULL;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='organizations' AND column_name='name') THEN
+      EXECUTE 'UPDATE public.organizations SET org_name = COALESCE(org_name, name) WHERE org_name IS NULL;';
     END IF;
     IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='organizations' AND column_name='owner_name') THEN
-      ALTER TABLE public.organizations ALTER COLUMN owner_name DROP NOT NULL;
-      UPDATE public.organizations SET admin_name = owner_name WHERE admin_name IS NULL;
+      EXECUTE 'UPDATE public.organizations SET admin_name = COALESCE(admin_name, owner_name) WHERE admin_name IS NULL;';
     END IF;
     IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='organizations' AND column_name='owner_email') THEN
-      ALTER TABLE public.organizations ALTER COLUMN owner_email DROP NOT NULL;
-      UPDATE public.organizations SET email = owner_email WHERE email IS NULL;
+      EXECUTE 'UPDATE public.organizations SET email = COALESCE(email, owner_email) WHERE email IS NULL;';
     END IF;
     IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='organizations' AND column_name='logo_url') THEN
-      UPDATE public.organizations SET logo_path = logo_url WHERE logo_path IS NULL;
+      EXECUTE 'UPDATE public.organizations SET logo_path = COALESCE(logo_path, logo_url) WHERE logo_path IS NULL;';
     END IF;
     UPDATE public.organizations SET org_id = COALESCE(org_name, id::text) WHERE org_id IS NULL;
   END IF;
@@ -291,26 +343,32 @@ END $$;
 DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='employees' AND column_name='name') THEN
-    CREATE OR REPLACE FUNCTION public.sync_employee_legacy_columns()
-    RETURNS TRIGGER AS $trg$
-    BEGIN
-      IF NEW.full_name IS NOT NULL THEN
-        NEW.name := NEW.full_name;
-      ELSIF NEW.name IS NOT NULL THEN
-        NEW.full_name := NEW.name;
-      END IF;
-
-      IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='employees' AND column_name='role') THEN
-        IF NEW.position IS NOT NULL THEN
-          NEW.role := NEW.position;
-        ELSIF NEW.role IS NOT NULL THEN
-          NEW.position := NEW.role;
+    EXECUTE $trg_func$
+      CREATE OR REPLACE FUNCTION public.sync_employee_legacy_columns()
+      RETURNS TRIGGER AS $body$
+      BEGIN
+        IF NEW.full_name IS NOT NULL AND (NEW.name IS NULL OR NEW.name = '') THEN
+          NEW.name := NEW.full_name;
+        ELSIF NEW.name IS NOT NULL AND (NEW.full_name IS NULL OR NEW.full_name = '') THEN
+          NEW.full_name := NEW.name;
+        ELSIF NEW.full_name IS NOT NULL THEN
+          NEW.name := NEW.full_name;
         END IF;
-      END IF;
 
-      RETURN NEW;
-    END;
-    $trg$ LANGUAGE plpgsql;
+        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='employees' AND column_name='role') THEN
+          IF NEW.position IS NOT NULL AND (NEW.role IS NULL OR NEW.role = '') THEN
+            NEW.role := NEW.position;
+          ELSIF NEW.role IS NOT NULL AND (NEW.position IS NULL OR NEW.position = '') THEN
+            NEW.position := NEW.role;
+          ELSIF NEW.position IS NOT NULL THEN
+            NEW.role := NEW.position;
+          END IF;
+        END IF;
+
+        RETURN NEW;
+      END;
+      $body$ LANGUAGE plpgsql;
+    $trg_func$;
 
     DROP TRIGGER IF EXISTS trg_sync_employee_columns ON public.employees;
     CREATE TRIGGER trg_sync_employee_columns
@@ -379,12 +437,53 @@ INSERT INTO public.organizations (org_name, admin_name, email, logo_path)
 VALUES ('FLAWLESS GRAPHICS', 'James Ntiamoah', 'admin@flawlessgraphics.com', NULL)
 ON CONFLICT (org_name) DO NOTHING;
 
-INSERT INTO public.employees (id, org_id, full_name, department, position, email, phone, salary, status)
-VALUES
-  ('emp_1', 'FLAWLESS GRAPHICS', 'James Ntiamoah', 'Executive & Design', 'Creative Director', 'james@flawless.org', '+233 24 111 2233', 8500.00, 'Active'),
-  ('emp_2', 'FLAWLESS GRAPHICS', 'Ama Serwaa', 'Operations', 'HR Manager', 'ama@flawless.org', '+233 20 222 3344', 6200.00, 'Active'),
-  ('emp_3', 'FLAWLESS GRAPHICS', 'Kwame Boateng', 'Academic Staff', 'Lead Instructor', 'kwame@flawless.org', '+233 55 333 4455', 5400.00, 'Active'),
-  ('emp_4', 'FLAWLESS GRAPHICS', 'Abena Mansa', 'Finance', 'Chief Accountant', 'abena@flawless.org', '+233 27 444 5566', 7100.00, 'Active'),
-  ('emp_5', 'FLAWLESS GRAPHICS', 'Kofi Owusu', 'Digital Media', 'Senior Designer', 'kofi@flawless.org', '+233 24 555 6677', 5000.00, 'Active'),
-  ('emp_6', 'FLAWLESS GRAPHICS', 'Esi Badu', 'Academic Staff', 'Science Educator', 'esi@flawless.org', '+233 50 666 7788', 4800.00, 'Active')
-ON CONFLICT (id) DO NOTHING;
+-- Seed employees safely: handles both legacy (name, role) and modern (full_name, position) schemas
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='employees' AND column_name='name') THEN
+    EXECUTE $seed$
+      INSERT INTO public.employees (id, org_id, full_name, name, department, position, email, phone, salary, status)
+      VALUES
+        ('emp_1', 'FLAWLESS GRAPHICS', 'James Ntiamoah', 'James Ntiamoah', 'Executive & Design', 'Creative Director', 'james@flawless.org', '+233 24 111 2233', 8500.00, 'Active'),
+        ('emp_2', 'FLAWLESS GRAPHICS', 'Ama Serwaa', 'Ama Serwaa', 'Operations', 'HR Manager', 'ama@flawless.org', '+233 20 222 3344', 6200.00, 'Active'),
+        ('emp_3', 'FLAWLESS GRAPHICS', 'Kwame Boateng', 'Kwame Boateng', 'Academic Staff', 'Lead Instructor', 'kwame@flawless.org', '+233 55 333 4455', 5400.00, 'Active'),
+        ('emp_4', 'FLAWLESS GRAPHICS', 'Abena Mansa', 'Abena Mansa', 'Finance', 'Chief Accountant', 'abena@flawless.org', '+233 27 444 5566', 7100.00, 'Active'),
+        ('emp_5', 'FLAWLESS GRAPHICS', 'Kofi Owusu', 'Kofi Owusu', 'Digital Media', 'Senior Designer', 'kofi@flawless.org', '+233 24 555 6677', 5000.00, 'Active'),
+        ('emp_6', 'FLAWLESS GRAPHICS', 'Esi Badu', 'Esi Badu', 'Academic Staff', 'Science Educator', 'esi@flawless.org', '+233 50 666 7788', 4800.00, 'Active')
+      ON CONFLICT (id) DO UPDATE SET
+        full_name = EXCLUDED.full_name,
+        name = EXCLUDED.name,
+        department = EXCLUDED.department,
+        position = EXCLUDED.position,
+        email = EXCLUDED.email,
+        phone = EXCLUDED.phone,
+        salary = EXCLUDED.salary,
+        status = EXCLUDED.status;
+    $seed$;
+  ELSE
+    EXECUTE $seed$
+      INSERT INTO public.employees (id, org_id, full_name, department, position, email, phone, salary, status)
+      VALUES
+        ('emp_1', 'FLAWLESS GRAPHICS', 'James Ntiamoah', 'Executive & Design', 'Creative Director', 'james@flawless.org', '+233 24 111 2233', 8500.00, 'Active'),
+        ('emp_2', 'FLAWLESS GRAPHICS', 'Ama Serwaa', 'Operations', 'HR Manager', 'ama@flawless.org', '+233 20 222 3344', 6200.00, 'Active'),
+        ('emp_3', 'FLAWLESS GRAPHICS', 'Kwame Boateng', 'Academic Staff', 'Lead Instructor', 'kwame@flawless.org', '+233 55 333 4455', 5400.00, 'Active'),
+        ('emp_4', 'FLAWLESS GRAPHICS', 'Abena Mansa', 'Finance', 'Chief Accountant', 'abena@flawless.org', '+233 27 444 5566', 7100.00, 'Active'),
+        ('emp_5', 'FLAWLESS GRAPHICS', 'Kofi Owusu', 'Digital Media', 'Senior Designer', 'kofi@flawless.org', '+233 24 555 6677', 5000.00, 'Active'),
+        ('emp_6', 'FLAWLESS GRAPHICS', 'Esi Badu', 'Academic Staff', 'Science Educator', 'esi@flawless.org', '+233 50 666 7788', 4800.00, 'Active')
+      ON CONFLICT (id) DO UPDATE SET
+        full_name = EXCLUDED.full_name,
+        department = EXCLUDED.department,
+        position = EXCLUDED.position,
+        email = EXCLUDED.email,
+        phone = EXCLUDED.phone,
+        salary = EXCLUDED.salary,
+        status = EXCLUDED.status;
+    $seed$;
+  END IF;
+
+  -- Ensure role column is populated if it exists
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='employees' AND column_name='role') THEN
+    EXECUTE 'UPDATE public.employees SET role = COALESCE(role, position) WHERE role IS NULL;';
+  END IF;
+END $$;
+

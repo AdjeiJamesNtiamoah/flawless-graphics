@@ -137,13 +137,17 @@
       const localKey = `${orgId}_employees`;
       let localData = safeParse(localStorage.getItem(localKey), []);
       
+      const empName = employee.fullName || employee.name || '';
+      const empRole = employee.position || employee.role || 'Staff';
+      const empDept = employee.department || employee.dept || 'General';
+
       const payload = {
-        id: employee.id || ('emp_' + Date.now()),
+        id: String(employee.id || ('emp_' + Date.now())),
         org_id: orgId,
-        full_name: employee.fullName || employee.name,
-        department: employee.department || employee.dept,
-        position: employee.position || employee.role,
-        email: employee.email,
+        full_name: empName,
+        department: empDept,
+        position: empRole,
+        email: employee.email || '',
         phone: employee.phone || '',
         salary: Number(employee.salary || 0),
         status: employee.status || 'Active',
@@ -159,14 +163,30 @@
       }
       localStorage.setItem(localKey, JSON.stringify(localData));
 
-      // 2. Cloud sync if configured
+      // 2. Cloud sync if configured (with adaptive schema fallbacks)
       if (Config.isConfigured()) {
         try {
           await this.query('employees', 'POST', payload, {
             'Prefer': 'resolution=merge-duplicates,return=representation'
           });
         } catch (err) {
-          console.warn('Cloud sync error saving employee:', err.message);
+          const msg = (err.message || '').toLowerCase();
+          // If the remote table requires legacy 'name' column or doesn't have 'full_name'
+          if (msg.includes('name') || msg.includes('not-null') || msg.includes('full_name') || msg.includes('role')) {
+            try {
+              const legacyPayload = Object.assign({}, payload, {
+                name: empName,
+                role: empRole
+              });
+              await this.query('employees', 'POST', legacyPayload, {
+                'Prefer': 'resolution=merge-duplicates,return=representation'
+              });
+            } catch (err2) {
+              console.warn('Cloud sync error saving employee (retry failed):', err2.message);
+            }
+          } else {
+            console.warn('Cloud sync error saving employee:', err.message);
+          }
         }
       }
 
@@ -191,9 +211,9 @@
     async migrateEmployees(orgId, employees) {
       if (!Config.isConfigured() || !Array.isArray(employees) || employees.length === 0) return;
       const rows = employees.map(e => ({
-        id: e.id || ('emp_' + Date.now() + Math.random().toString(36).substring(2, 5)),
+        id: String(e.id || ('emp_' + Date.now() + Math.random().toString(36).substring(2, 5))),
         org_id: orgId,
-        full_name: e.fullName || e.name,
+        full_name: e.fullName || e.name || '',
         department: e.department || e.dept || 'Staff',
         position: e.position || e.role || 'Personnel',
         email: e.email || '',
@@ -203,9 +223,28 @@
         photo_url: e.photo || null
       }));
 
-      await this.query('employees', 'POST', rows, {
-        'Prefer': 'resolution=merge-duplicates'
-      });
+      try {
+        await this.query('employees', 'POST', rows, {
+          'Prefer': 'resolution=merge-duplicates'
+        });
+      } catch (err) {
+        const msg = (err.message || '').toLowerCase();
+        if (msg.includes('name') || msg.includes('not-null') || msg.includes('full_name') || msg.includes('role')) {
+          try {
+            const legacyRows = rows.map(r => Object.assign({}, r, {
+              name: r.full_name,
+              role: r.position
+            }));
+            await this.query('employees', 'POST', legacyRows, {
+              'Prefer': 'resolution=merge-duplicates'
+            });
+          } catch (err2) {
+            console.warn('migrateEmployees retry failed:', err2.message);
+          }
+        } else {
+          console.warn('migrateEmployees error:', err.message);
+        }
+      }
     }
 
     /* -------------------------------------------------------------
@@ -375,6 +414,29 @@
         });
         return res;
       } catch (err) {
+        const msg = (err.message || '').toLowerCase();
+        if (msg.includes('name') || msg.includes('owner') || msg.includes('logo')) {
+          try {
+            const legacyPayload = {
+              org_name: payload.org_name,
+              name: payload.org_name,
+              admin_name: payload.admin_name,
+              owner_name: payload.admin_name,
+              email: payload.email,
+              owner_email: payload.email,
+              logo_path: payload.logo_path,
+              logo_url: payload.logo_path,
+              updated_at: payload.updated_at
+            };
+            const res2 = await this.query('organizations', 'POST', legacyPayload, {
+              'Prefer': 'resolution=merge-duplicates,return=representation'
+            });
+            return res2;
+          } catch (err2) {
+            console.warn('Cloud sync error saving organization (retry failed):', err2.message);
+            return null;
+          }
+        }
         console.warn('Cloud sync error saving organization:', err.message);
         return null;
       }
