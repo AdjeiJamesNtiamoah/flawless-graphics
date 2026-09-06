@@ -1,16 +1,16 @@
-/* ==============================
+﻿/* ==============================
    GLOBAL STYLES
 ============================== */
 :root {
   --primary-color: #0078ff;
   --secondary-color: #005fcc;
-  --light-bg: #f8fafc;
-  --dark-bg: #111827;
-  --light-text: #333;
+  --light-bg: #FAF7F2;
+  --dark-bg: #0B1120;
+  --light-text: #0F172A;
   --dark-text: #f9f9f9;
   --card-bg-light: #ffffff;
   --card-bg-dark: #1f2937;
-  --shadow: 0 2px 10px rgba(0,0,0,0.1);
+  --shadow: 0 2px 10px rgba(0,0,0,0.06);
 }
 
 * {
@@ -26,89 +26,111 @@ body {
   transition: background 0.3s, color 0.3s;
 }
 
-/* Dark mode auto-switch */
-@media (prefers-color-scheme: dark) {
-  body {
-    background: var(--dark-bg);
-    color: var(--dark-text);
-  }
-  header, footer {
-    background: var(--card-bg-dark);
-  }
-  .dashboard-card, .hidden-section {
-    background: var(--card-bg-dark);
-    color: var(--dark-text);
-  }
-  nav ul li a {
-    color: var(--dark-text);
-  }
-  nav ul li a.active {
-    border-bottom: 2px solid var(--primary-color);
-  }
-}
-
 /* ==============================
-   HEADER & NAVIGATION
-============================== */
+   HEADER & NAVIGATION (Vertical Left Sidebar)
+============================= */
 header {
-  background: var(--card-bg-light);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 10%;
-  box-shadow: var(--shadow);
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  bottom: 0;
+  width: 250px;
+  height: 100vh;
   z-index: 100;
+  background: #0B1120; /* Maintained dark color */
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 24px;
+  padding: 24px 18px;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.12);
+  overflow-y: auto;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  flex-shrink: 0;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .logo-img {
-  height: 45px;
-  width: 45px;
+  height: 42px;
+  width: 42px;
   border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+.logo:hover .logo-img {
+  transform: scale(1.08) rotate(-4deg);
 }
 
 header h1 {
-  color: var(--primary-color);
-  font-size: 1.4rem;
+  color: #38bdf8;
+  font-size: 1.1rem;
+}
+
+nav {
+  width: 100%;
 }
 
 nav ul {
   list-style: none;
   display: flex;
-  gap: 25px;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+nav ul li {
+  width: 100%;
 }
 
 nav ul li a {
   text-decoration: none;
-  color: var(--light-text);
+  color: rgba(255, 255, 255, 0.8);
   font-weight: 600;
-  transition: color 0.3s, transform 0.3s;
+  padding: 10px 14px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
 }
 
 nav ul li a:hover {
-  color: var(--primary-color);
-  transform: translateY(-2px);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.14);
+  transform: translateX(4px);
+  box-shadow: 0 4px 14px rgba(0, 120, 255, 0.3);
 }
 
 nav ul li a.active {
-  border-bottom: 2px solid var(--primary-color);
+  color: #ffffff;
+  background: linear-gradient(135deg, #0284c7 0%, #6366f1 100%);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+}
+nav ul li a.active:hover {
+  transform: translateX(4px);
 }
 
 /* ==============================
    DASHBOARD SECTION
 ============================== */
 .dashboard {
-  padding: 60px 10%;
+  margin-left: 250px;
+  padding: 40px 5%;
   text-align: center;
   background: var(--light-bg);
+  min-height: 100vh;
 }
 
 .dashboard-intro {
@@ -181,12 +203,31 @@ nav ul li a.active {
    FOOTER
 ============================== */
 footer {
+  margin-left: 250px;
   text-align: center;
   background: var(--card-bg-light);
   padding: 15px 10%;
   margin-top: 60px;
-  color: #555;
+  color: var(--light-text);
   box-shadow: var(--shadow);
+}
+
+@media (max-width: 900px) {
+  header {
+    position: static;
+    width: 100%;
+    height: auto;
+  }
+  nav ul {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  nav ul li {
+    width: auto;
+  }
+  .dashboard, footer {
+    margin-left: 0;
+  }
 }
 
 footer p {
@@ -401,8 +442,8 @@ footer p {
   text-decoration: underline;
 }
 
-/* Employee Portal Styles */
-.employee-portal {
+/* Teacher Portal Styles */
+.teacher-portal {
   padding: 40px;
   background: #f8faff;
   color: #333;
@@ -453,48 +494,48 @@ button:hover {
   background: #004c99;
 }
 
-#employeeList {
+#teacherList {
   list-style-type: none;
   padding: 0;
 }
 
-#employeeList li {
+#teacherList li {
   background: #e6f0ff;
   margin: 8px 0;
   padding: 10px;
   border-radius: 5px;
 }
 
-/* Employee Portal Layout */
+/* Teacher Portal Layout */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 15px;
 }
 
-#employeeTable {
+#teacherTable {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
   font-size: 0.95rem;
 }
 
-#employeeTable th, #employeeTable td {
+#teacherTable th, #teacherTable td {
   border: 1px solid #ccc;
   padding: 10px;
   text-align: left;
 }
 
-#employeeTable th {
+#teacherTable th {
   background-color: #003366;
   color: #fff;
 }
 
-#employeeTable tr:nth-child(even) {
+#teacherTable tr:nth-child(even) {
   background-color: #f2f6ff;
 }
 
-#employeeTable tr:hover {
+#teacherTable tr:hover {
   background-color: #dce9ff;
 }
 
@@ -549,7 +590,7 @@ button:hover {
   background-color: #0056b3;
 }
 
-.employee-tools {
+.teacher-tools {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -659,33 +700,33 @@ mark {
   border-radius: 3px;
   padding: 0 2px;
 }
-#employeeTable {
+#teacherTable {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
   font-size: 14px;
 }
 
-#employeeTable th, #employeeTable td {
+#teacherTable th, #teacherTable td {
   border: 1px solid #ddd;
   padding: 10px;
   text-align: left;
 }
 
-#employeeTable th {
+#teacherTable th {
   background-color: #1a3d6d;
   color: white;
 }
 
-#employeeTable tr:nth-child(even) {
+#teacherTable tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 
-#employeeTable tr:hover {
+#teacherTable tr:hover {
   background-color: #e8f0ff;
 }
 
-/* --- Add Employee Button --- */
+/* --- Add Teacher Button --- */
 .add-btn {
   background-color: #1a3d6d;
   color: #fff;
@@ -720,7 +761,7 @@ mark {
     transform: scale(1.07);
   }
 }
-#employee-report {
+#teacher-report {
   margin: 40px auto;
   max-width: 1000px;
   padding: 20px;
@@ -729,7 +770,7 @@ mark {
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
-#employee-report h2 {
+#teacher-report h2 {
   text-align: center;
   color: #1a3d6d;
   margin-bottom: 15px;
@@ -756,8 +797,8 @@ mark {
   background-color: #f2f2f2;
 }
 
-/* Hide the employee report table by default */
-#employeeReportSection {
+/* Hide the teacher report table by default */
+#teacherReportSection {
   display: none;
   opacity: 0;
   transform: translateY(10px);
@@ -765,7 +806,7 @@ mark {
 }
 
 /* When visible */
-#employeeReportSection.show {
+#teacherReportSection.show {
   display: block;
   opacity: 1;
   transform: translateY(0);
@@ -968,14 +1009,14 @@ mark {
   cursor: pointer;
 }
 
-.employee-actions {
+.teacher-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-bottom: 15px;
 }
 
-.employee-actions button {
+.teacher-actions button {
   background: #007bff;
   color: #fff;
   border: none;
@@ -985,7 +1026,7 @@ mark {
   font-weight: 500;
 }
 
-.employee-actions button:hover {
+.teacher-actions button:hover {
   background: #0056b3;
 }
 
@@ -998,25 +1039,25 @@ mark {
 }
 
 /* Sticky Header */
-#employeeTable thead th {
+#teacherTable thead th {
   position: sticky;
   top: 0;
   background: #f8f9fa;
   z-index: 2;
 }
 
-#employeeTable {
+#teacherTable {
   width: 100%;
   border-collapse: collapse;
 }
 
-#employeeTable th, #employeeTable td {
+#teacherTable th, #teacherTable td {
   padding: 10px;
   text-align: left;
   border-bottom: 1px solid #ddd;
 }
 
-#employeeTable tr:hover {
+#teacherTable tr:hover {
   background-color: #f1f1f1;
 }
 
@@ -1126,7 +1167,7 @@ mark {
   background-color: #0056b3;
 }
 
-/* --- Fixed Employee Report Modal Styling --- */
+/* --- Fixed Teacher Report Modal Styling --- */
 .modal {
   display: none;
   position: fixed;
@@ -1185,19 +1226,19 @@ mark {
   max-height: 500px;
 }
 
-#employeeTable {
+#teacherTable {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
 }
 
-#employeeTable th, #employeeTable td {
+#teacherTable th, #teacherTable td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
 }
 
-#employeeTable th {
+#teacherTable th {
   background-color: #004aad;
   color: white;
   position: sticky;
@@ -1205,7 +1246,7 @@ mark {
   z-index: 5;
 }
 
-/* === Employee Report Modal === */
+/* === Teacher Report Modal === */
 .modal {
   display: none;
   position: fixed;
@@ -1287,19 +1328,19 @@ mark {
   max-height: 500px;
 }
 
-#employeeTable {
+#teacherTable {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
 }
 
-#employeeTable th, #employeeTable td {
+#teacherTable th, #teacherTable td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
 }
 
-#employeeTable th {
+#teacherTable th {
   background-color: #004aad;
   color: white;
   position: sticky;
@@ -1307,7 +1348,7 @@ mark {
   z-index: 5;
 }
 
-/* === Employee Report Modal Enhancements === */
+/* === Teacher Report Modal Enhancements === */
 .modal-content.large {
   width: 90%;
   max-height: 90vh;
@@ -1334,7 +1375,7 @@ mark {
 }
 
 /* Fixed Table Header */
-#employeeTable thead th {
+#teacherTable thead th {
   position: sticky;
   top: 0;
   background-color: #007bff;
@@ -1344,13 +1385,13 @@ mark {
   padding: 8px;
 }
 
-#employeeTable {
+#teacherTable {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
 }
 
-#employeeTable td, #employeeTable th {
+#teacherTable td, #teacherTable th {
   border: 1px solid #ccc;
   padding: 8px;
 }
@@ -1623,20 +1664,20 @@ mark {
   color: #000;
 }
 
-/* Employee table inside modal */
-#employeeTable {
+/* Teacher table inside modal */
+#teacherTable {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
 }
 
-#employeeTable th, #employeeTable td {
+#teacherTable th, #teacherTable td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: center;
 }
 
-#employeeTable th {
+#teacherTable th {
   background-color: #004aad;
   color: white;
   position: sticky;
@@ -1832,14 +1873,14 @@ mark {
 }
 
 /* Table Styling */
-#employeeTable {
+#teacherTable {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
   font-size: 0.95em;
 }
 
-#employeeTable th {
+#teacherTable th {
   position: sticky;
   top: 0;
   background: #007bff;
@@ -1847,16 +1888,16 @@ mark {
   padding: 10px;
 }
 
-#employeeTable td {
+#teacherTable td {
   border: 1px solid #ddd;
   padding: 8px;
 }
 
-#employeeTable tr:nth-child(even) {
+#teacherTable tr:nth-child(even) {
   background: #f9f9f9;
 }
 
-#employeeTable tr:hover {
+#teacherTable tr:hover {
   background: #e9f3ff;
 }
 
@@ -1958,7 +1999,7 @@ mark {
   font-weight: 600;
 }
 
-#employeeSelect, #paymentAmount {
+#teacherSelect, #paymentAmount {
   width: 100%;
   padding: 8px;
   margin-top: 5px;
@@ -2000,7 +2041,7 @@ mark {
 
 
 /* Fix dropdown visibility */
-#employeeSelect {
+#teacherSelect {
   background-color: #fff;      /* Ensure white background */
   color: #000;                 /* Black text for visibility */
   border: 1px solid #ccc;
@@ -2011,7 +2052,7 @@ mark {
 }
 
 /* Style dropdown options */
-#employeeSelect option {
+#teacherSelect option {
   background-color: #fff;
   color: #000;
   padding: 8px;

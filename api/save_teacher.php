@@ -1,5 +1,5 @@
-<?php
-// api/save_employee.php
+﻿<?php
+// api/save_teacher.php
 header('Content-Type: application/json');
 require_once __DIR__ . '/config/db.php';
 
@@ -18,16 +18,16 @@ $photo = $_POST['photo'] ?? '';
 
 if ($id) {
     // Update existing record
-    $stmt = $conn->prepare("UPDATE employees SET name=?, role=?, department=?, email=?, salary=?, photo_url=? WHERE emp_id=?");
+    $stmt = $conn->prepare("UPDATE teachers SET name=?, role=?, department=?, email=?, salary=?, photo_url=? WHERE emp_id=?");
     $stmt->bind_param("ssssdsi", $name, $role, $dept, $email, $salary, $photo, $id);
 } else {
     // Insert new record
-    $stmt = $conn->prepare("INSERT INTO employees (name, role, department, email, salary, photo_url) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO teachers (name, role, department, email, salary, photo_url) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssds", $name, $role, $dept, $email, $salary, $photo);
 }
 
 if ($stmt && $stmt->execute()) {
-    echo json_encode(["status" => "success", "message" => "Employee saved successfully"]);
+    echo json_encode(["status" => "success", "message" => "Teacher saved successfully"]);
 } else {
     echo json_encode(["status" => "error", "message" => $stmt ? $stmt->error : "Query preparation failed"]);
 }

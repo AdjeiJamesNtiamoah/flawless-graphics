@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -170,6 +170,151 @@
       box-shadow: var(--shadow-lg);
       position: relative;
     }
+
+    .app-layout {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    /* Vertical Left Navigation Sidebar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 260px;
+      height: 100vh;
+      z-index: 1000;
+      background: var(--nav-bg, #0B1120);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: none;
+      padding: 24px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 20px;
+      overflow-y: auto;
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+    }
+    .navbar-left {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 20px;
+      width: 100%;
+    }
+    .logo-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #ffffff;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .logo-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-md, 12px);
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 18px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+      transition: transform 0.25s ease;
+      flex-shrink: 0;
+    }
+    .logo-box:hover .logo-icon {
+      transform: scale(1.05) rotate(-3deg);
+    }
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .logo-title {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      line-height: 1.2;
+      color: #ffffff;
+    }
+    .logo-subtitle {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.65);
+      font-weight: 600;
+    }
+    .nav-left {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+    .navbar-right {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+      margin-top: auto;
+      width: 100%;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .nav-action-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .nav-action-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+      transform: translateX(4px);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+    .main-content {
+      margin-left: 260px;
+      max-width: calc(100% - 260px);
+      width: calc(100% - 260px);
+      padding: 32px 36px;
+      flex: 1;
+      box-sizing: border-box;
+    }
+    @media (max-width: 900px) {
+      .app-layout { flex-direction: column; }
+      .navbar {
+        position: static;
+        width: 100%;
+        height: auto;
+      }
+      .navbar-left, .nav-left, .navbar-right {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .nav-action-btn { width: auto; }
+      .main-content {
+        margin-left: 0;
+        max-width: 100%;
+        width: 100%;
+        padding: 20px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -190,6 +335,18 @@
             <span class="logo-subtitle">Finance & Treasury Operations</span>
           </div>
         </a>
+
+        <!-- Left-Aligned Navigation Controls -->
+        <nav class="nav-left">
+          <a href="finance-dashboard.html" class="nav-action-btn" title="Live Financial Dashboard">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Finance Control</span>
+          </a>
+          <a href="../hr/index.html" class="nav-action-btn" title="HR & Staff Operations">
+            <i class="fa-solid fa-users"></i>
+            <span>HR Operations</span>
+          </a>
+        </nav>
       </div>
 
       <div class="navbar-right">
@@ -198,14 +355,6 @@
           <i class="fa-solid fa-cloud" id="cloudSyncIcon"></i> <span id="cloudSyncLabel">Connect Supabase</span>
         </button>
 
-        <a href="finance-dashboard.html" class="nav-action-btn" title="Live Financial Dashboard">
-          <i class="fa-solid fa-chart-pie"></i>
-          <span>Finance Control</span>
-        </a>
-        <a href="../hr/index.html" class="nav-action-btn" title="HR & Staff Operations">
-          <i class="fa-solid fa-users"></i>
-          <span>HR Operations</span>
-        </a>
         <button class="nav-action-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
           <i class="fa-solid fa-moon"></i>
         </button>
@@ -385,7 +534,7 @@
               </div>
               <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Supabase Cloud Database</h3>
               <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">
-                Enterprise Postgres synchronization for financial ledgers, employee payroll records, and payment receipts with zero downtime.
+                Enterprise Postgres synchronization for financial ledgers, teacher payroll records, and payment receipts with zero downtime.
               </p>
             </div>
             <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 700; color: #10B981;">

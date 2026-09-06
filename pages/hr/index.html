@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -114,11 +114,11 @@
     <ul class="nav-menu">
       <li><a href="../../welcome.html" class="nav-link"><i class="fa-solid fa-grid-horizontal"></i> Hub</a></li>
       <li><a href="hr-dashboard.html" class="nav-link"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
-      <li><a href="employee.html" class="nav-link"><i class="fa-solid fa-users"></i> Employees</a></li>
+      <li><a href="teacher.html" class="nav-link"><i class="fa-solid fa-users"></i> Teachers</a></li>
       <li><a href="attendance-summary.html" class="nav-link"><i class="fa-solid fa-clipboard-user"></i> Attendance</a></li>
       <li><a href="payroll.html" class="nav-link"><i class="fa-solid fa-money-bill-wave"></i> Payroll</a></li>
       <li><a href="payslip.html" class="nav-link"><i class="fa-solid fa-receipt"></i> Payslips</a></li>
-      <li><a href="employee-reports.html" class="nav-link"><i class="fa-solid fa-file-lines"></i> Reports</a></li>
+      <li><a href="teacher-reports.html" class="nav-link"><i class="fa-solid fa-file-lines"></i> Reports</a></li>
     </ul>
 
     <div class="header-actions">
@@ -195,7 +195,7 @@
       </div>
       <div style="display: flex; gap: 10px; flex-wrap: wrap;">
         <button class="btn-modern btn-primary btn-sm" onclick="openQuickAddModal()">
-          <i class="fa-solid fa-user-plus"></i> Add Employee
+          <i class="fa-solid fa-user-plus"></i> Add Teacher
         </button>
         <button class="btn-modern btn-secondary btn-sm" onclick="quickMarkAllPresent()">
           <i class="fa-solid fa-clipboard-check"></i> Mark All Present
@@ -227,13 +227,13 @@
         </div>
       </a>
 
-      <!-- 2. Employee Directory -->
-      <a href="employee.html" class="hub-module-card">
+      <!-- 2. Teacher Directory -->
+      <a href="teacher.html" class="hub-module-card">
         <div>
           <div class="hub-icon-box" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
             <i class="fa-solid fa-address-book"></i>
           </div>
-          <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Employee Directory</h3>
+          <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Teacher Directory</h3>
           <p style="color: var(--text-muted); font-size: 13px; line-height: 1.6;">
             Add, edit, search, filter, and maintain complete staff files, salary allocations, and departmental roles.
           </p>
@@ -315,7 +315,7 @@
           <h2 class="glass-card-title"><i class="fa-solid fa-users"></i> Organization Staff Roster</h2>
           <div class="glass-card-subtitle">Active team members registered under <span id="rosterOrgName">FLAWLESS GRAPHICS</span></div>
         </div>
-        <a href="employee.html" class="btn-modern btn-secondary btn-sm">
+        <a href="teacher.html" class="btn-modern btn-secondary btn-sm">
           <i class="fa-solid fa-arrow-up-right-from-square"></i> Full Directory
         </a>
       </div>
@@ -405,7 +405,7 @@
     // 1. Session Setup
     const user = window.AuthSession ? window.AuthSession.requireAuth('hr-login.html', true) : null;
     const activeOrg = (user && user.org) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
-    const EMP_KEY = `${activeOrg}_employees`;
+    const EMP_KEY = `${activeOrg}_teachers`;
     const ATT_KEY = `${activeOrg}_attendance_records`;
 
     document.getElementById('headerOrgTitle').textContent = activeOrg.toUpperCase();
@@ -413,7 +413,7 @@
     document.getElementById('footerYear').textContent = new Date().getFullYear();
 
     // 2. Data Access
-    function getEmployees() {
+    function getTeachers() {
       try {
         let list = JSON.parse(localStorage.getItem(EMP_KEY) || '[]');
         if (!list || list.length === 0) {
@@ -434,7 +434,7 @@
     }
 
     function renderHubData() {
-      const emps = getEmployees();
+      const emps = getTeachers();
       document.getElementById('kpiTotalStaff').textContent = emps.length;
       document.getElementById('kpiPresent').textContent = emps.length;
 
@@ -480,7 +480,7 @@
 
     function handleQuickAdd(e) {
       e.preventDefault();
-      const emps = getEmployees();
+      const emps = getTeachers();
       const newEmp = {
         id: 'emp_' + Date.now(),
         fullName: document.getElementById('qa_name').value.trim(),
@@ -503,19 +503,19 @@
     }
 
     function quickMarkAllPresent() {
-      const emps = getEmployees();
+      const emps = getTeachers();
       const todayStr = new Date().toISOString().split('T')[0];
       let logs = JSON.parse(localStorage.getItem(ATT_KEY) || '[]');
 
       emps.forEach(emp => {
         const empName = emp.fullName || emp.name;
-        const idx = logs.findIndex(r => r.employeeName === empName && r.date === todayStr);
+        const idx = logs.findIndex(r => r.teacherName === empName && r.date === todayStr);
         if (idx !== -1) {
           logs[idx].status = 'Present';
         } else {
           logs.unshift({
             id: 'att_' + Date.now() + Math.random().toString(36).substring(2, 5),
-            employeeName: empName,
+            teacherName: empName,
             department: emp.department || emp.dept || 'Staff',
             date: todayStr,
             checkIn: '08:00',

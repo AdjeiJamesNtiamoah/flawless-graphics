@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -93,7 +93,7 @@
     <ul class="nav-menu">
       <li><a href="../../welcome.html" class="nav-link"><i class="fa-solid fa-grid-horizontal"></i> Hub</a></li>
       <li><a href="hr-dashboard.html" class="nav-link"><i class="fa-solid fa-gauge"></i> HR Dashboard</a></li>
-      <li><a href="employee.html" class="nav-link"><i class="fa-solid fa-users"></i> Employees</a></li>
+      <li><a href="teacher.html" class="nav-link"><i class="fa-solid fa-users"></i> Teachers</a></li>
       <li><a href="attendance-summary.html" class="nav-link"><i class="fa-solid fa-clipboard-user"></i> Attendance</a></li>
       <li><a href="payroll.html" class="nav-link"><i class="fa-solid fa-money-bill-wave"></i> Payroll</a></li>
       <li><a href="performance.html" class="nav-link active"><i class="fa-solid fa-chart-line"></i> Performance</a></li>
@@ -211,8 +211,8 @@
 
       <form id="appraisalForm" onsubmit="handleSaveAppraisal(event)">
         <div class="form-group">
-          <label class="form-label">Employee *</label>
-          <select id="apprEmployee" class="form-control" required></select>
+          <label class="form-label">Teacher *</label>
+          <select id="apprTeacher" class="form-control" required></select>
         </div>
 
         <div class="grid-2">
@@ -257,7 +257,7 @@
     const user = window.AuthSession ? window.AuthSession.requireAuth('hr-login.html', true) : null;
     const activeOrg = (user && user.org) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
     const PERF_KEY = `${activeOrg}_performance_reviews`;
-    const EMP_KEY = `${activeOrg}_employees`;
+    const EMP_KEY = `${activeOrg}_teachers`;
 
     if (user && user.org) {
       document.getElementById('headerOrgTitle').textContent = user.org.toUpperCase();
@@ -268,12 +268,12 @@
         let revs = JSON.parse(localStorage.getItem(PERF_KEY) || '[]');
         if (!revs || revs.length === 0) {
           revs = [
-            { employeeName: "James Ntiamoah", department: "Executive & Design", position: "Creative Director", kpi: 98, rating: "4.9", grade: "Exceptional", date: "2026-08-15" },
-            { employeeName: "Ama Serwaa", department: "Operations", position: "HR Manager", kpi: 95, rating: "4.8", grade: "Exceeds Standards", date: "2026-08-18" },
-            { employeeName: "Kwame Boateng", department: "Academic Staff", position: "Lead Instructor", kpi: 94, rating: "4.7", grade: "Exceeds Standards", date: "2026-08-20" },
-            { employeeName: "Abena Mansa", department: "Finance", position: "Chief Accountant", kpi: 96, rating: "4.8", grade: "Exceeds Standards", date: "2026-08-22" },
-            { employeeName: "Kofi Owusu", department: "Digital Media", position: "Senior Designer", kpi: 91, rating: "4.6", grade: "Strong Delivery", date: "2026-08-25" },
-            { employeeName: "Esi Badu", department: "Academic Staff", position: "Science Educator", kpi: 92, rating: "4.7", grade: "Strong Delivery", date: "2026-08-28" }
+            { teacherName: "James Ntiamoah", department: "Executive & Design", position: "Creative Director", kpi: 98, rating: "4.9", grade: "Exceptional", date: "2026-08-15" },
+            { teacherName: "Ama Serwaa", department: "Operations", position: "HR Manager", kpi: 95, rating: "4.8", grade: "Exceeds Standards", date: "2026-08-18" },
+            { teacherName: "Kwame Boateng", department: "Academic Staff", position: "Lead Instructor", kpi: 94, rating: "4.7", grade: "Exceeds Standards", date: "2026-08-20" },
+            { teacherName: "Abena Mansa", department: "Finance", position: "Chief Accountant", kpi: 96, rating: "4.8", grade: "Exceeds Standards", date: "2026-08-22" },
+            { teacherName: "Kofi Owusu", department: "Digital Media", position: "Senior Designer", kpi: 91, rating: "4.6", grade: "Strong Delivery", date: "2026-08-25" },
+            { teacherName: "Esi Badu", department: "Academic Staff", position: "Science Educator", kpi: 92, rating: "4.7", grade: "Strong Delivery", date: "2026-08-28" }
           ];
           localStorage.setItem(PERF_KEY, JSON.stringify(revs));
         }
@@ -301,7 +301,7 @@
                 <i class="fa-solid fa-user-tie"></i>
               </div>
               <div>
-                <div style="font-weight: 700;">${escapeHtml(r.employeeName)}</div>
+                <div style="font-weight: 700;">${escapeHtml(r.teacherName)}</div>
               </div>
             </div>
           </td>
@@ -341,7 +341,7 @@
 
     function openAppraisalModal() {
       const emps = JSON.parse(localStorage.getItem(EMP_KEY) || '[]');
-      const sel = document.getElementById('apprEmployee');
+      const sel = document.getElementById('apprTeacher');
       sel.innerHTML = '';
       if (emps.length === 0) {
         sel.innerHTML = '<option value="James Ntiamoah">James Ntiamoah</option>';
@@ -365,17 +365,17 @@
     function handleSaveAppraisal(e) {
       e.preventDefault();
       const emps = JSON.parse(localStorage.getItem(EMP_KEY) || '[]');
-      const name = document.getElementById('apprEmployee').value;
+      const name = document.getElementById('apprTeacher').value;
       const matched = emps.find(e => (e.fullName || e.name) === name);
       const kpi = Number(document.getElementById('apprKpi').value) || 90;
       const rating = document.getElementById('apprRating').value;
       const grade = rating >= 4.9 ? 'Exceptional' : rating >= 4.5 ? 'Exceeds Standards' : 'Meets Standards';
 
       const revs = getReviews();
-      const existingIdx = revs.findIndex(r => r.employeeName === name);
+      const existingIdx = revs.findIndex(r => r.teacherName === name);
 
       const entry = {
-        employeeName: name,
+        teacherName: name,
         department: matched ? (matched.department || matched.dept) : 'General',
         position: matched ? (matched.position || matched.role) : 'Staff',
         kpi: kpi,
@@ -400,7 +400,7 @@
       openAppraisalModal();
       const revs = getReviews();
       if (revs[idx]) {
-        document.getElementById('apprEmployee').value = revs[idx].employeeName;
+        document.getElementById('apprTeacher').value = revs[idx].teacherName;
         document.getElementById('apprKpi').value = revs[idx].kpi;
         document.getElementById('apprRating').value = revs[idx].rating;
       }

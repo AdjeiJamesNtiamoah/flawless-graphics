@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -29,24 +29,24 @@
 
   <style>
     :root {
-      --bg-outer: #F4F7FB;
-      --card-bg: rgba(255, 255, 255, 0.75);
-      --card-border: rgba(255, 255, 255, 0.8);
+      --bg-outer: #FAF7F2;
+      --card-bg: rgba(255, 255, 255, 0.94);
+      --card-border: rgba(226, 221, 213, 0.9);
       --nav-bg: #0A192F;
       --text-main: #0F172A;
       --text-muted: #64748B;
       --accent: #2563EB;
       --accent-gradient: linear-gradient(135deg, #2563EB 0%, #06B6D4 100%);
       --glass-glow: rgba(37, 99, 235, 0.08);
-      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 16px 32px -4px rgba(0, 0, 0, 0.06);
       --radius-xl: 24px;
       --radius-lg: 16px;
       --radius-md: 12px;
       --success: #10B981;
       --danger: #EF4444;
       --warning: #F59E0B;
-      --input-bg: rgba(255, 255, 255, 0.7);
-      --input-border: rgba(203, 213, 225, 0.8);
+      --input-bg: #FFFFFF;
+      --input-border: rgba(203, 213, 225, 0.9);
     }
 
     .dark {
@@ -103,73 +103,127 @@
     }
     body::before { top: -100px; left: -100px; animation: floatOrb 12s infinite ease-in-out; }
     body::after { bottom: 0; right: -100px; animation: floatOrb 16s infinite ease-in-out reverse; }
-
-    /* HEADER */
+    
+    /* HEADER / VERTICAL LEFT SIDEBAR */
     header {
-      position: sticky;
+      position: fixed;
       top: 0;
-      z-index: 100;
+      left: 0;
+      bottom: 0;
+      width: 260px;
+      height: 100vh;
+      z-index: 1000;
       backdrop-filter: blur(16px);
-      background: rgba(10, 25, 47, 0.85);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 14px 40px;
+      background: var(--nav-bg);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 24px 18px;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 24px;
       color: #fff;
+      overflow-y: auto;
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
     }
 
-    .brand { display: flex; align-items: center; gap: 14px; text-decoration: none; color: inherit; }
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 24px;
+      width: 100%;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; width: 100%; }
+    .brand:hover .logo-circle { transform: scale(1.05) rotate(-3deg); }
     .logo-circle {
-      width: 44px;
-      height: 44px;
+      width: 42px;
+      height: 42px;
       border-radius: var(--radius-md);
       background: var(--accent-gradient);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 18px;
+      font-size: 16px;
       color: #fff;
       box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+      transition: transform 0.25s ease;
+      flex-shrink: 0;
     }
-    header h1 { font-size: 16px; font-weight: 800; letter-spacing: 0.5px; margin: 0; }
-    .brand-sub { font-size: 11px; color: rgba(255, 255, 255, 0.6); font-weight: 500; }
+    header h1 { font-size: 14px; font-weight: 800; letter-spacing: 0.5px; margin: 0; line-height: 1.2; }
+    .brand-sub { font-size: 10px; color: rgba(255, 255, 255, 0.6); font-weight: 500; }
 
-    nav ul { list-style: none; display: flex; gap: 8px; align-items: center; }
+    nav { width: 100%; }
+    nav ul { list-style: none; display: flex; flex-direction: column; gap: 6px; width: 100%; margin: 0; padding: 0; }
+    nav li { width: 100%; }
     nav a {
       color: rgba(255, 255, 255, 0.75);
       text-decoration: none;
-      padding: 8px 16px;
-      border-radius: 20px;
+      padding: 10px 14px;
+      border-radius: 12px;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
+      gap: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
     }
-    nav a:hover, nav a.active { color: #fff; background: rgba(255, 255, 255, 0.1); }
+    nav a:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.14);
+      transform: translateX(4px);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+    nav a.active {
+      color: #fff;
+      background: var(--accent-gradient);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+    }
+    nav a.active:hover {
+      transform: translateX(4px);
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.55);
+    }
 
-    .header-actions { display: flex; align-items: center; gap: 12px; }
+    .header-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+      margin-top: auto;
+      width: 100%;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
 
     .btn-action {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.15);
       color: #fff;
-      padding: 8px 16px;
-      border-radius: 30px;
+      padding: 9px 14px;
+      border-radius: 12px;
       cursor: pointer;
       font-size: 12px;
       font-weight: 600;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       text-decoration: none;
       transition: all 0.2s ease;
+      width: 100%;
+      box-sizing: border-box;
     }
-    .btn-action:hover { background: rgba(255, 255, 255, 0.18); }
+    .btn-action:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    }
     .btn-action.logout:hover { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #EF4444; }
     .btn-action.success-btn { background: var(--success); border: none; }
     .btn-action.success-btn:hover { background: #059669; }
@@ -177,7 +231,16 @@
     .btn-action.danger-btn:hover { background: #DC2626; }
 
     /* LAYOUT */
-    main { max-width: 1280px; margin: 32px auto; padding: 0 24px; width: 100%; flex: 1; }
+    main {
+      margin-left: 260px;
+      max-width: calc(100% - 260px);
+      width: calc(100% - 260px);
+      margin-top: 28px;
+      margin-bottom: 32px;
+      padding: 0 32px;
+      flex: 1;
+      box-sizing: border-box;
+    }
 
     .tab-content { display: none; }
     .tab-content.active { display: block; }
@@ -487,7 +550,7 @@
     .audit-item:last-child { border-bottom: none; }
 
     /* CHECKLIST STYLE */
-    .employee-checklist {
+    .teacher-checklist {
       max-height: 180px;
       overflow-y: auto;
       border: 1px solid var(--input-border);
@@ -535,20 +598,68 @@
       .no-print { display: none !important; }
     }
 
-    footer { text-align: center; padding: 24px; font-size: 13px; color: var(--text-muted); border-top: 1px solid var(--card-border); }
+    footer {
+      margin-left: 260px;
+      max-width: calc(100% - 260px);
+      width: calc(100% - 260px);
+      text-align: center;
+      padding: 24px;
+      font-size: 13px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--card-border);
+      box-sizing: border-box;
+    }
+
+    @media (max-width: 900px) {
+      header {
+        position: static;
+        width: 100%;
+        height: auto;
+      }
+      .header-left {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      nav ul {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      nav a { width: auto; }
+      .header-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      main, footer {
+        margin-left: 0;
+        max-width: 100%;
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
 
   <!-- HEADER -->
   <header>
-    <a href="../../welcome.html" class="brand">
-      <div class="logo-circle">FG</div>
-      <div>
-        <h1>FLAWLESS GRAPHICS</h1>
-        <div class="brand-sub">Financial Control System</div>
-      </div>
-    </a>
+    <div class="header-left">
+      <a href="../../welcome.html" class="brand">
+        <div class="logo-circle">FG</div>
+        <div>
+          <h1>FLAWLESS GRAPHICS</h1>
+          <div class="brand-sub">Financial Control System</div>
+        </div>
+      </a>
+
+      <nav>
+        <ul>
+          <li><a id="navHome" href="index.html"><i class="fa-solid fa-house"></i> Hub</a></li>
+          <li><a id="navDashboard" class="active" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-pie"></i> Finance</a></li>
+          <li><a id="navApproval" onclick="switchTab('approval')"><i class="fa-solid fa-file-invoice-dollar"></i> Approvals</a></li>
+          <li><a id="navMessaging" onclick="switchTab('messaging')"><i class="fa-solid fa-comments"></i> Messages</a></li>
+          <li><a id="navSettings" onclick="switchTab('settings')"><i class="fa-solid fa-gear"></i> Settings</a></li>
+        </ul>
+      </nav>
+    </div>
 
     <div class="header-actions">
       <!-- Live Sync Status Badge -->
@@ -566,16 +677,6 @@
           <option value="GBP" style="background:#0b0f19; color:#fff;">GBP (£)</option>
         </select>
       </div>
-
-      <nav>
-        <ul>
-          <li><a id="navHome" href="index.html"><i class="fa-solid fa-house"></i> Hub</a></li>
-          <li><a id="navDashboard" class="active" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-pie"></i> Finance</a></li>
-          <li><a id="navApproval" onclick="switchTab('approval')"><i class="fa-solid fa-file-invoice-dollar"></i> Approvals</a></li>
-          <li><a id="navMessaging" onclick="switchTab('messaging')"><i class="fa-solid fa-comments"></i> Messages</a></li>
-          <li><a id="navSettings" onclick="switchTab('settings')"><i class="fa-solid fa-gear"></i> Settings</a></li>
-        </ul>
-      </nav>
 
       <button class="btn-action" id="themeBtn" onclick="toggleTheme()">
         <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
@@ -785,7 +886,7 @@
       <div class="page-title" data-aos="fade-down" data-aos-duration="600">
         <div>
           <h2>Salary Payment Approval Workflow</h2>
-          <div style="font-size:13px; color:var(--text-muted)">Authorize individual employee payouts or execute batch approvals</div>
+          <div style="font-size:13px; color:var(--text-muted)">Authorize individual teacher payouts or execute batch approvals</div>
         </div>
         <button class="btn-action success-btn" onclick="approveAllPayroll()"><i class="fa-solid fa-check-double"></i> Authorize Batch Disbursement</button>
       </div>
@@ -814,7 +915,7 @@
           <table>
             <thead>
               <tr>
-                <th>Employee Name</th>
+                <th>Teacher Name</th>
                 <th>Department / Role</th>
                 <th>Gross Salary</th>
                 <th>Deductions (<span class="curr">GHS</span>)</th>
@@ -1076,7 +1177,7 @@
 
         <div class="form-group">
           <label class="form-label">Select Staff Members Included</label>
-          <div class="employee-checklist" id="salaryEmployeeList">
+          <div class="teacher-checklist" id="salaryTeacherList">
             <!-- Populated dynamically via JS -->
           </div>
         </div>
@@ -1332,7 +1433,7 @@
     const CURRENCY_RATES = { GHS: 1.0, USD: 0.065, EUR: 0.060, GBP: 0.052 };
 
     // INITIAL MOCK DATA
-    let defaultEmployees = [
+    let defaultTeachers = [
       { id: 'EMP-01', name: 'Kwame Mensah', role: 'Lead Graphic Designer', gross: 8500, approved: false },
       { id: 'EMP-02', name: 'Abena Appiah', role: 'Senior UX Researcher', gross: 9200, approved: false },
       { id: 'EMP-03', name: 'Kofi Mensah', role: 'Chief Accountant', gross: 11000, approved: false },
@@ -1400,7 +1501,7 @@
       if (rOrg) rOrg.innerText = activeOrg.toUpperCase();
 
       if (!localStorage.getItem('fg_payroll')) {
-        localStorage.setItem('fg_payroll', JSON.stringify(defaultEmployees));
+        localStorage.setItem('fg_payroll', JSON.stringify(defaultTeachers));
       }
       if (!localStorage.getItem('fg_student_fees')) {
         localStorage.setItem('fg_student_fees', JSON.stringify(studentFees));
@@ -1792,7 +1893,7 @@
     // SALARY PREPARATION
     function openPrepareSalaryModal() {
       const payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];
-      const container = document.getElementById('salaryEmployeeList');
+      const container = document.getElementById('salaryTeacherList');
       container.innerHTML = '';
 
       payrollData.forEach(emp => {

@@ -27,19 +27,19 @@
     :root {
       --primary: #635bfc;
       --primary-hover: #4f46e5;
-      --primary-light: #f0effe;
+      --primary-light: rgba(99, 91, 252, 0.12);
       --accent-green: #10b981;
       --accent-green-bg: #ecfdf5;
       --accent-red: #ef4444;
       --accent-red-bg: #fef2f2;
       --accent-orange: #f59e0b;
       --accent-orange-bg: #fffbeb;
-      --bg: #f8fafc;
+      --bg: #EEDEC5;
       --card: #ffffff;
       --text: #0f172a;
       --muted: #64748b;
-      --border: #e2e8f0;
-      --sidebar-bg: #ffffff;
+      --border: #e2ddd5;
+      --sidebar-bg: #0B1120;
       --radius: 16px;
       --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.03);
       --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.05);
@@ -47,18 +47,6 @@
       --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    html.dark, body.dark {
-      --bg: #0b0f19;
-      --card: #151c2c;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --border: #1e293b;
-      --sidebar-bg: #111827;
-      --primary-light: rgba(99, 91, 252, 0.15);
-      --accent-green-bg: rgba(16, 185, 129, 0.15);
-      --accent-red-bg: rgba(239, 68, 68, 0.15);
-      --accent-orange-bg: rgba(245, 158, 11, 0.15);
-    }
 
     * { box-sizing: border-box; }
     body {
@@ -75,7 +63,7 @@
     .sidebar {
       width: 260px;
       background: var(--sidebar-bg);
-      border-right: 1px solid var(--border);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       flex-direction: column;
       padding: 24px 16px;
@@ -83,6 +71,26 @@
       transition: var(--transition);
       z-index: 10;
       flex-shrink: 0;
+      color: #ffffff;
+    }
+    .sidebar .org-name { color: #ffffff; }
+    .sidebar .profile-row {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+    .sidebar .nav button {
+      color: rgba(255, 255, 255, 0.75);
+    }
+    .sidebar .nav button:hover {
+      background: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+      transform: translateX(4px);
+    }
+    .sidebar .collapse-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+      color: rgba(255, 255, 255, 0.7);
     }
     .sidebar.collapsed { width: 78px; padding: 20px 10px; }
     .sidebar.collapsed .hide-collapsed { display: none !important; }
@@ -247,14 +255,24 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      transition: var(--transition);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
       width: 100%;
+      position: relative;
     }
-    .nav button:hover { background: var(--primary-light); color: var(--primary); transform: translateX(3px); }
+    .nav button:hover {
+      background: var(--primary-light);
+      color: var(--primary);
+      transform: translateX(5px) translateY(-2px);
+      box-shadow: 0 4px 14px rgba(99, 91, 252, 0.2);
+    }
     .nav button.active {
       background: var(--primary);
       color: white;
       box-shadow: 0 6px 16px rgba(99, 91, 252, 0.25);
+    }
+    .nav button.active:hover {
+      transform: translateX(5px) translateY(-2px);
+      box-shadow: 0 8px 22px rgba(99, 91, 252, 0.4);
     }
     .nav button i { font-size: 16px; width: 20px; text-align: center; }
 
@@ -456,6 +474,39 @@
     .form-grid { display: grid; grid-template-columns: 1fr 220px; gap: 20px; }
     @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
 
+    /* --- FULL TEACHER MODAL (from teacher.html) --- */
+    .custom-modal-overlay {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+    }
+    .custom-modal-overlay.active { display: flex; }
+    .modal-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 24px;
+      max-width: 780px; width: 100%; padding: 36px; box-shadow: 0 20px 30px -10px rgba(0,0,0,0.08);
+      max-height: 92vh; overflow-y: auto;
+    }
+    .form-section-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px;
+      color: #2563eb; padding: 10px 0 6px; border-bottom: 1px solid var(--border);
+      margin-bottom: 14px; margin-top: 6px; display: flex; align-items: center; gap: 8px;
+    }
+    .form-section-title i { font-size: 12px; }
+    .teacher-form-group { margin-bottom: 18px; }
+    .teacher-form-label {
+      display: block; font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .teacher-form-control {
+      width: 100%; padding: 11px 14px; background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; color: var(--text); font-size: 13px; font-family: inherit; outline: none;
+      transition: all 0.15s ease;
+    }
+    .teacher-form-control:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+    .teacher-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .teacher-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    @media (max-width: 600px) { .teacher-grid-2, .teacher-grid-3 { grid-template-columns: 1fr; } }
+
     /* --- TOAST --- */
     .toast {
       position: fixed; right: 24px; bottom: 24px; background: #0f172a; color: #ffffff;
@@ -463,12 +514,111 @@
       transform: translateY(20px); transition: var(--transition); z-index: 200; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
       display: flex; align-items: center; gap: 10px;
     }
-    .dark .toast { background: #ffffff; color: #0f172a; }
     .toast.show { opacity: 1; transform: translateY(0); }
 
     .small { font-size: 12px; color: var(--muted); }
     .color-swatch { width: 34px; height: 34px; border-radius: 10px; display: inline-block; margin-right: 8px; cursor: pointer; transition: var(--transition); border: 2px solid transparent; }
     .color-swatch:hover, .color-swatch.active { transform: scale(1.15); border-color: var(--text); }
+
+    /* ── SHARED-DESIGN.CSS TOKEN BRIDGE (scoped to payroll section) ── */
+    #payrollSection {
+      --bg-card: var(--card);
+      --bg-surface: var(--card);
+      --border-card: var(--border);
+      --text-main: var(--text);
+      --text-muted: var(--muted);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+      --radius-full: 9999px;
+      --shadow-sm: 0 2px 6px rgba(0,0,0,0.04);
+      --shadow-md: 0 10px 25px -5px rgba(0,0,0,0.07);
+      --shadow-lg: 0 20px 30px -10px rgba(0,0,0,0.08);
+      --accent-primary: #2563eb;
+      --accent-gradient: linear-gradient(135deg,#2563eb 0%,#06b6d4 100%);
+      --accent-glow: rgba(37,99,235,0.12);
+      --success: #10b981;
+      --success-bg: rgba(16,185,129,0.12);
+      --warning: #f59e0b;
+      --warning-bg: rgba(245,158,11,0.12);
+      --danger: #ef4444;
+      --danger-bg: rgba(239,68,68,0.12);
+      --info: #3b82f6;
+      --info-bg: rgba(59,130,246,0.12);
+      --transition-base: 0.25s cubic-bezier(0.16,1,0.3,1);
+      --transition-fast: 0.15s ease;
+    }
+
+    /* stat-card (from shared-design.css) */
+    #payrollSection .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg, 18px);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+    }
+    #payrollSection .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: rgba(37,99,235,0.3); }
+    #payrollSection .stat-icon-box { width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0; }
+    #payrollSection .stat-icon-blue  { background:rgba(59,130,246,0.12); color:#2563eb; }
+    #payrollSection .stat-icon-amber { background:rgba(245,158,11,0.12); color:#f59e0b; }
+    #payrollSection .stat-icon-purple{ background:rgba(168,85,247,0.15);  color:#a855f7; }
+    #payrollSection .stat-icon-green { background:rgba(16,185,129,0.12);  color:#10b981; }
+    #payrollSection .stat-label { font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);margin-bottom:4px; }
+    #payrollSection .stat-value { font-size:26px;font-weight:800;color:var(--text);line-height:1.2; }
+    #payrollSection .stat-trend { font-size:11px;font-weight:600;margin-top:4px;display:flex;align-items:center;gap:4px; }
+    #payrollSection .stat-trend.positive { color:#10b981; }
+
+    /* glass-card (from shared-design.css) */
+    #payrollSection .glass-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl, 24px);
+      box-shadow: var(--shadow-md);
+      padding: 28px;
+      transition: border-color 0.25s ease;
+    }
+    #payrollSection .glass-card:hover { border-color: rgba(37,99,235,0.25); }
+    #payrollSection .glass-card-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:16px;flex-wrap:wrap; }
+    #payrollSection .glass-card-title { font-size:18px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:10px; }
+    #payrollSection .glass-card-subtitle { font-size:13px;color:var(--muted);margin-top:4px; }
+
+    /* payroll grid layout */
+    #payrollSection .payroll-kpi-row { display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:24px; }
+    @media(max-width:1100px){ #payrollSection .payroll-kpi-row{grid-template-columns:repeat(2,1fr);} }
+    @media(max-width:600px) { #payrollSection .payroll-kpi-row{grid-template-columns:1fr;} }
+    #payrollSection .payroll-summary-grid { display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-bottom:24px; }
+    @media(max-width:900px){ #payrollSection .payroll-summary-grid{grid-template-columns:1fr;} }
+
+    /* btn-modern (from shared-design.css) */
+    #payrollSection .btn-modern { padding:11px 20px;border-radius:12px;border:none;cursor:pointer;font-weight:700;font-size:13px;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:all 0.25s cubic-bezier(0.16,1,0.3,1); }
+    #payrollSection .btn-success { background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:#fff;box-shadow:0 4px 14px rgba(16,185,129,0.35);width:100%; }
+    #payrollSection .btn-success:hover { transform:translateY(-2px);box-shadow:0 8px 22px rgba(16,185,129,0.45); }
+    #payrollSection .btn-secondary { background:var(--card);border:1px solid var(--border);color:var(--text);width:100%; }
+    #payrollSection .btn-secondary:hover { background:rgba(0,0,0,0.04);transform:translateY(-2px);border-color:#2563eb; }
+    #payrollSection .btn-primary { background:linear-gradient(135deg,#2563eb 0%,#06b6d4 100%);color:#fff;box-shadow:0 4px 14px rgba(37,99,235,0.35); }
+    #payrollSection .btn-primary:hover { transform:translateY(-2px);box-shadow:0 8px 22px rgba(37,99,235,0.45); }
+    #payrollSection .btn-sm { padding:6px 12px;font-size:11px;border-radius:8px; }
+
+    /* badge-pill (from shared-design.css) */
+    #payrollSection .badge-pill { display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:9999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px; }
+    #payrollSection .badge-success { background:rgba(16,185,129,0.12);color:#10b981; }
+    #payrollSection .badge-warning { background:rgba(245,158,11,0.12);color:#f59e0b; }
+    #payrollSection .badge-info    { background:rgba(59,130,246,0.12);color:#3b82f6; }
+    #payrollSection .badge-purple  { background:rgba(168,85,247,0.15);color:#a855f7; }
+
+    /* modern-table (from shared-design.css) */
+    #payrollSection .table-responsive { width:100%;overflow-x:auto;border-radius:18px;border:1px solid var(--border); }
+    #payrollSection .modern-table { width:100%;border-collapse:collapse;text-align:left;font-size:13px;background:var(--card); }
+    #payrollSection .modern-table th { background:rgba(0,0,0,0.02);color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.6px;padding:14px 18px;border-bottom:1px solid var(--border); }
+    #payrollSection .modern-table td { padding:14px 18px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle; }
+    #payrollSection .modern-table tbody tr { transition:background 0.15s ease; }
+    #payrollSection .modern-table tbody tr:hover { background:rgba(37,99,235,0.04); }
+    #payrollSection .modern-table tbody tr:last-child td { border-bottom:none; }
   </style>
 </head>
 <body>
@@ -494,7 +644,7 @@
   <nav class="nav" id="nav">
     <button data-section="dashboard" data-tooltip="Dashboard" class="active"><i class="fa-solid fa-chart-pie"></i> <span class="hide-collapsed">Dashboard</span></button>
     <button data-section="classes" data-tooltip="Classrooms & Teachers"><i class="fa-solid fa-chalkboard-user"></i> <span class="hide-collapsed">Class Assignment</span></button>
-    <button data-section="employees" data-tooltip="Staff Directory"><i class="fa-solid fa-users"></i> <span class="hide-collapsed">Employees</span></button>
+    <button data-section="teachers" data-tooltip="Staff Directory"><i class="fa-solid fa-users"></i> <span class="hide-collapsed">Teachers</span></button>
     <button data-section="students" data-tooltip="Students Roster"><i class="fa-solid fa-graduation-cap"></i> <span class="hide-collapsed">Students</span></button>
     <button data-section="messages" data-tooltip="Direct Messages"><i class="fa-solid fa-comments"></i> <span class="hide-collapsed">Messages</span></button>
     <button data-section="attendance" data-tooltip="Daily Attendance"><i class="fa-solid fa-calendar-check"></i> <span class="hide-collapsed">Attendance</span></button>
@@ -544,14 +694,11 @@
         <i class="fa-solid fa-cloud" id="cloudSyncIcon"></i> <span id="cloudSyncLabel">Connect Supabase</span>
       </button>
       <select id="orgSwitcher" class="select" title="Active Organization"></select>
-      <button class="btn ghost" id="themeToggle" title="Toggle Light/Dark Theme">
-        <i class="fa-solid fa-moon"></i>
-      </button>
-      <a href="employee.html" class="btn ghost">
+      <a href="teacher.html" class="btn ghost">
         <i class="fa-solid fa-address-book"></i> Directory
       </a>
-      <button class="btn" id="addEmployeeBtn">
-        <i class="fa-solid fa-plus"></i> Add Employee
+      <button class="btn" id="addTeacherBtn">
+        <i class="fa-solid fa-plus"></i> Add Teacher
       </button>
     </div>
   </div>
@@ -562,7 +709,7 @@
       <div class="kpi-icon" style="background:var(--primary-light);color:var(--primary)"><i class="fa-solid fa-users"></i></div>
       <div>
         <h4>Total Headcount</h4>
-        <div class="val" id="totalEmployees">0</div>
+        <div class="val" id="totalTeachers">0</div>
         <div class="badge-pill badge-green"><i class="fa-solid fa-arrow-up"></i> Active Personnel</div>
       </div>
     </div>
@@ -669,10 +816,10 @@
   </section>
 
   <!-- 2. EMPLOYEES SECTION -->
-  <section class="panel" id="employeesSection" style="display:none">
+  <section class="panel" id="teachersSection" style="display:none">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px">
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <input id="searchEmployee" class="select" placeholder="Search team members by name or role..." style="min-width:240px"/>
+        <input id="searchTeacher" class="select" placeholder="Search team members by name or role..." style="min-width:240px"/>
         <select id="filterDept" class="select"><option value="">All Departments</option></select>
         <select id="filterRole" class="select"><option value="">All Positions</option></select>
       </div>
@@ -683,7 +830,7 @@
       <table>
         <thead>
           <tr>
-            <th>Employee</th>
+            <th>Teacher</th>
             <th>Role</th>
             <th>Department</th>
             <th>Email</th>
@@ -692,7 +839,7 @@
             <th style="text-align:right">Actions</th>
           </tr>
         </thead>
-        <tbody id="employeeTable"></tbody>
+        <tbody id="teacherTable"></tbody>
       </table>
     </div>
   </section>
@@ -724,7 +871,7 @@
   
   <!-- 4. MESSAGES SECTION -->
   <section class="panel" id="messagesSection" style="display:none">
-    <h3 style="margin-top:0;margin-bottom:16px"><i class="fa-solid fa-comments" style="color:var(--primary);margin-right:6px"></i> Direct Employee Communications</h3>
+    <h3 style="margin-top:0;margin-bottom:16px"><i class="fa-solid fa-comments" style="color:var(--primary);margin-right:6px"></i> Direct Teacher Communications</h3>
     <div class="messaging-container">
       <div class="msg-sidebar">
         <div class="msg-search">
@@ -734,11 +881,11 @@
       </div>
       <div class="msg-chat-area">
         <div class="msg-chat-header" id="msgChatHeader">
-          <span style="color: var(--muted)"><i class="fa-solid fa-hand-pointer"></i> Select an employee to open conversation</span>
+          <span style="color: var(--muted)"><i class="fa-solid fa-hand-pointer"></i> Select an teacher to open conversation</span>
         </div>
         <div class="msg-chat-history" id="msgChatHistory"></div>
         <div class="msg-input-area" id="msgInputArea" style="display:none">
-          <input type="text" id="msgInput" class="select" placeholder="Type a message to employee..." onkeydown="if(event.key==='Enter') sendMessage()">
+          <input type="text" id="msgInput" class="select" placeholder="Type a message to teacher..." onkeydown="if(event.key==='Enter') sendMessage()">
           <button class="btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i> Send</button>
         </div>
       </div>
@@ -759,43 +906,122 @@
     </div>
     <div style="overflow-x:auto">
       <table>
-        <thead><tr><th>Employee</th><th>Department</th><th>Status</th><th>Logged Time</th><th>Action</th></tr></thead>
+        <thead><tr><th>Teacher</th><th>Department</th><th>Status</th><th>Logged Time</th><th>Action</th></tr></thead>
         <tbody id="attendanceTable"></tbody>
       </table>
     </div>
   </section>
 
-  <!-- 6. PAYROLL SECTION -->
-  <section class="panel" id="payrollSection" style="display:none">
-    <h3 style="margin-top:0"><i class="fa-solid fa-file-invoice-dollar" style="color:var(--primary);margin-right:6px"></i> Compensation & Payroll Simulation</h3>
-    <div style="display:flex;gap:24px;margin-top:16px;flex-wrap:wrap">
-      <div style="flex:1;min-width:300px">
-        <label class="small" style="font-weight:700;margin-bottom:4px;display:block">Select Employee:</label>
-        <select id="payEmployeeSelect" class="select" style="width:100%"></select>
-        
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
-          <div>
-            <label class="small" style="font-weight:700;margin-bottom:4px;display:block">Incentives / Allowance (GHS)</label>
-            <input id="bonus" class="select" type="number" placeholder="e.g. 500" style="width:100%"/>
-          </div>
-          <div>
-            <label class="small" style="font-weight:700;margin-bottom:4px;display:block">Deductions / Advances (GHS)</label>
-            <input id="deductions" class="select" type="number" placeholder="e.g. 200" style="width:100%"/>
-          </div>
-        </div>
+  <!-- 6. PAYROLL SECTION — styled with shared-design.css classes -->
+  <section id="payrollSection" style="display:none; padding:0;">
 
-        <div style="margin-top:18px;display:flex;gap:10px">
-          <button class="btn" id="calcPayrollBtn"><i class="fa-solid fa-calculator"></i> Calculate Net Pay</button>
-          <button class="btn ghost" id="exportPayrollBtn"><i class="fa-solid fa-file-csv"></i> Export CSV Ledger</button>
-          <a href="payroll.html" class="btn ghost"><i class="fa-solid fa-arrow-up-right-from-square"></i> Full Analytics</a>
+    <!-- KPI Row: stat-card from shared-design.css -->
+    <div class="payroll-kpi-row" style="margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-blue"><i class="fa-solid fa-sack-dollar"></i></div>
+        <div>
+          <div class="stat-label">Gross Payroll</div>
+          <div class="stat-value" id="pay_kpiGross">GHS 0</div>
+          <div class="stat-trend">Total base expenditure</div>
         </div>
       </div>
-
-      <div style="width:360px;background:var(--bg);padding:22px;border-radius:14px;border:1px solid var(--border)">
-        <h4 style="margin-top:0;font-size:14px;font-weight:800;color:var(--primary)"><i class="fa-solid fa-receipt"></i> Compensation Breakdown</h4>
-        <div id="payResult" class="small" style="line-height:1.7;margin-top:12px">Select an employee and click Calculate Net Pay.</div>
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-amber"><i class="fa-solid fa-building-columns"></i></div>
+        <div>
+          <div class="stat-label">Estimated Tax (PAYE)</div>
+          <div class="stat-value" id="pay_kpiTax">GHS 0</div>
+          <div class="stat-trend">Standard statutory tiers</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-purple"><i class="fa-solid fa-shield-heart"></i></div>
+        <div>
+          <div class="stat-label">Social Security (5.5%)</div>
+          <div class="stat-value" id="pay_kpiPension">GHS 0</div>
+          <div class="stat-trend">Pension fund reserve</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon-box stat-icon-green"><i class="fa-solid fa-circle-dollar-to-slot"></i></div>
+        <div>
+          <div class="stat-label">Net Disbursed</div>
+          <div class="stat-value" id="pay_kpiNet">GHS 0</div>
+          <div class="stat-trend positive"><i class="fa-solid fa-check-double"></i> Ready for batch wire</div>
+        </div>
       </div>
     </div>
+
+    <!-- Chart + Control: glass-card from shared-design.css -->
+    <div class="payroll-summary-grid">
+      <div class="glass-card">
+        <div class="glass-card-header">
+          <div>
+            <h3 class="glass-card-title"><i class="fa-solid fa-chart-column"></i> Department Payroll Distribution</h3>
+            <div class="glass-card-subtitle">Monthly salary allocation across functional teams</div>
+          </div>
+        </div>
+        <div style="height:250px;position:relative;">
+          <canvas id="pay_payrollChart"></canvas>
+        </div>
+      </div>
+
+      <div class="glass-card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div class="glass-card-header" style="margin-bottom:12px;">
+            <div>
+              <h3 class="glass-card-title"><i class="fa-solid fa-sliders"></i> Payroll Control</h3>
+              <div class="glass-card-subtitle">Active Billing Cycle: <strong id="pay_activeMonthStr">Month</strong></div>
+            </div>
+          </div>
+          <p style="font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:24px;">
+            Verify statutory deduction tiers, generate teacher digital slips, and disburse bank transfers in a single operation.
+          </p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <button class="btn-modern btn-success" id="pay_batchBtn" onclick="runPayrollBatch()">
+            <i class="fa-solid fa-bolt"></i> Process Batch Disbursement
+          </button>
+          <button class="btn-modern btn-secondary" onclick="exportPayrollLedgerCSV()">
+            <i class="fa-solid fa-file-csv"></i> Export Payroll Ledger
+          </button>
+          <a href="payslip.html" class="btn-modern btn-secondary">
+            <i class="fa-solid fa-receipt"></i> View Payslip Generator
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ledger Table: glass-card + modern-table from shared-design.css -->
+    <div class="glass-card">
+      <div class="glass-card-header">
+        <div>
+          <h3 class="glass-card-title"><i class="fa-solid fa-file-invoice-dollar"></i> Teacher Payroll Ledger</h3>
+          <div class="glass-card-subtitle">Detailed breakdown of gross earnings, taxes, and net disbursements</div>
+        </div>
+        <a href="payslip.html" class="btn-modern btn-primary btn-sm">
+          <i class="fa-solid fa-receipt"></i> View Payslip Generator
+        </a>
+      </div>
+      <div class="table-responsive">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Personnel</th>
+              <th>Department</th>
+              <th>Gross Salary</th>
+              <th>Tax (PAYE ~13%)</th>
+              <th>Pension (5.5%)</th>
+              <th>Net Payout</th>
+              <th>Status</th>
+              <th style="text-align:right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="pay_payrollTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
   </section>
 
   <!-- 7. ANALYTICS SECTION -->
@@ -805,7 +1031,7 @@
         <h3 style="margin:0;font-size:18px"><i class="fa-solid fa-chart-line" style="color:var(--primary);margin-right:6px"></i> Monthly Workforce Analytics</h3>
         <div class="small">Headcount trajectory and attendance compliance rate</div>
       </div>
-      <a href="employee-reports.html" class="btn ghost"><i class="fa-solid fa-file-lines"></i> Full Reports</a>
+      <a href="teacher-reports.html" class="btn ghost"><i class="fa-solid fa-file-lines"></i> Full Reports</a>
     </div>
     <div style="height:320px;position:relative">
       <canvas id="attChart"></canvas>
@@ -872,44 +1098,187 @@
 </main>
 
 <!-- MODAL: ADD / EDIT EMPLOYEE -->
-<div class="modal-backdrop" id="modalBackdrop">
-  <div class="modal">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
-      <h3 id="modalTitle" style="margin:0;font-size:20px;font-weight:800">Add Team Member</h3>
-      <button id="modalCloseBtn" style="background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer">
+<!-- FULL TEACHER ADD/EDIT MODAL (from teacher.html) -->
+<div class="custom-modal-overlay" id="teacherModal">
+  <div class="modal-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+      <div>
+        <h3 style="font-size:20px;font-weight:800;margin:0 0 4px" id="modalHeading">Add New Teacher</h3>
+        <p style="font-size:12px;color:var(--muted);margin:0">Fill in all required fields to enrol a new staff member.</p>
+      </div>
+      <button onclick="closeTeacherModal()" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
 
-    <div class="form-grid">
-      <div>
-        <label class="small" style="font-weight:700">Full Name *</label>
-        <input id="emp_name" class="select" placeholder="e.g. James Ntiamoah" style="width:100%;margin-bottom:12px" required/>
-        
-        <label class="small" style="font-weight:700">Job Title / Role *</label>
-        <input id="emp_role" class="select" placeholder="e.g. Creative Director" style="width:100%;margin-bottom:12px" required/>
-        
-        <label class="small" style="font-weight:700">Department *</label>
-        <input id="emp_dept" class="select" placeholder="e.g. Executive & Design" style="width:100%;margin-bottom:12px" required/>
-        
-        <label class="small" style="font-weight:700">Work Email *</label>
-        <input id="emp_email" type="email" class="select" placeholder="james@flawless.org" style="width:100%;margin-bottom:12px" required/>
-        
-        <label class="small" style="font-weight:700">Monthly Salary (GHS) *</label>
-        <input id="emp_salary" type="number" class="select" placeholder="8500" style="width:100%;margin-bottom:20px" required/>
-        
-        <div style="display:flex;gap:10px">
-          <button class="btn" id="saveEmpBtn"><i class="fa-solid fa-check"></i> Save Personnel</button>
-          <button class="btn ghost" id="cancelEmpBtn">Cancel</button>
+    <form id="teacherForm" onsubmit="handleSaveTeacherFull(event)">
+      <input type="hidden" id="editTeacherId" value="">
+
+      <!-- SECTION 1: Personal Information -->
+      <div class="form-section-title"><i class="fa-solid fa-user"></i> Personal Information</div>
+      <div class="teacher-grid-2">
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Full Name *</label>
+          <input type="text" id="m_name" class="teacher-form-control" placeholder="e.g. Ama Serwaa" required>
+        </div>
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Date of Birth</label>
+          <input type="date" id="m_dob" class="teacher-form-control">
+        </div>
+      </div>
+      <div class="teacher-grid-3">
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Gender</label>
+          <select id="m_gender" class="teacher-form-control">
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Nationality</label>
+          <input type="text" id="m_nationality" class="teacher-form-control" placeholder="e.g. Ghanaian">
+        </div>
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">National ID / Ghana Card</label>
+          <input type="text" id="m_nationalId" class="teacher-form-control" placeholder="GHA-XXXXXXXX-X">
+        </div>
+      </div>
+      <div class="teacher-grid-2">
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Email Address *</label>
+          <input type="email" id="m_email" class="teacher-form-control" placeholder="staff@flawless.org" required>
+        </div>
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Phone Number</label>
+          <input type="tel" id="m_phone" class="teacher-form-control" placeholder="+233 24 000 0000">
+        </div>
+      </div>
+      <div class="teacher-form-group">
+        <label class="teacher-form-label">Residential Address</label>
+        <input type="text" id="m_address" class="teacher-form-control" placeholder="e.g. 14 Ring Road, Accra">
+      </div>
+
+      <!-- SECTION 2: Employment Details -->
+      <div class="form-section-title" style="margin-top:20px"><i class="fa-solid fa-briefcase"></i> Employment Details</div>
+      <div class="teacher-grid-2">
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Department *</label>
+          <input type="text" id="m_dept" class="teacher-form-control" placeholder="e.g. Academic Staff" required>
+        </div>
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Position / Designation *</label>
+          <input type="text" id="m_pos" class="teacher-form-control" placeholder="e.g. Lead Instructor" required>
+        </div>
+      </div>
+      <div class="teacher-grid-3">
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Employment Type</label>
+          <select id="m_empType" class="teacher-form-control">
+            <option value="Full-Time">Full-Time</option>
+            <option value="Part-Time">Part-Time</option>
+            <option value="Contract">Contract</option>
+            <option value="Volunteer">Volunteer</option>
+          </select>
+        </div>
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Employment Status</label>
+          <select id="m_status" class="teacher-form-control">
+            <option value="Active">Active</option>
+            <option value="On Leave">On Leave</option>
+            <option value="Probation">Probation</option>
+            <option value="Suspended">Suspended</option>
+            <option value="Terminated">Terminated</option>
+          </select>
+        </div>
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Hire / Start Date</label>
+          <input type="date" id="m_hireDate" class="teacher-form-control">
+        </div>
+      </div>
+      <div class="teacher-grid-2">
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Monthly Gross Salary (GHS) *</label>
+          <input type="number" id="m_salary" class="teacher-form-control" placeholder="5500" min="0" required>
+        </div>
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Social Security (SSNIT) No.</label>
+          <input type="text" id="m_ssnit" class="teacher-form-control" placeholder="e.g. G000123456">
         </div>
       </div>
 
-      <div style="text-align:center">
-        <label class="small" style="display:block;margin-bottom:8px;font-weight:700">Staff Photo Avatar</label>
-        <img id="emp_preview" class="profile-thumb" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" alt="preview" style="width:130px;height:130px;border-radius:18px;margin-bottom:12px;object-fit:cover;border:2px solid var(--border)">
-        <input id="emp_photo" type="file" accept="image/*" style="width:100%;font-size:11px">
+      <!-- SECTION 3: Academic & Professional -->
+      <div class="form-section-title" style="margin-top:20px"><i class="fa-solid fa-graduation-cap"></i> Academic &amp; Professional Info</div>
+      <div class="teacher-grid-2">
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Highest Qualification</label>
+          <select id="m_qualification" class="teacher-form-control">
+            <option value="">Select Qualification</option>
+            <option value="PhD">PhD / Doctorate</option>
+            <option value="Masters">Master's Degree</option>
+            <option value="Degree">Bachelor's Degree</option>
+            <option value="HND">HND</option>
+            <option value="Diploma">Diploma</option>
+            <option value="Certificate">Certificate</option>
+          </select>
+        </div>
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Subjects / Specialisation</label>
+          <input type="text" id="m_subjects" class="teacher-form-control" placeholder="e.g. Mathematics, Physics">
+        </div>
       </div>
-    </div>
+      <div class="teacher-grid-2">
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Teaching License No.</label>
+          <input type="text" id="m_licenseNo" class="teacher-form-control" placeholder="e.g. NTC/2023/00456">
+        </div>
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Years of Experience</label>
+          <input type="number" id="m_experience" class="teacher-form-control" placeholder="e.g. 8" min="0">
+        </div>
+      </div>
+
+      <!-- SECTION 4: Emergency Contact -->
+      <div class="form-section-title" style="margin-top:20px"><i class="fa-solid fa-phone-volume"></i> Emergency Contact</div>
+      <div class="teacher-grid-3">
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Contact Name</label>
+          <input type="text" id="m_emergencyName" class="teacher-form-control" placeholder="e.g. Kofi Mensah">
+        </div>
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Relationship</label>
+          <input type="text" id="m_emergencyRel" class="teacher-form-control" placeholder="e.g. Spouse">
+        </div>
+        <div class="teacher-form-group">
+          <label class="teacher-form-label">Contact Phone</label>
+          <input type="tel" id="m_emergencyPhone" class="teacher-form-control" placeholder="+233 20 000 0000">
+        </div>
+      </div>
+
+      <!-- SECTION 5: Staff Profile Photo -->
+      <div class="form-section-title" style="margin-top:20px"><i class="fa-solid fa-camera"></i> Staff Profile Photo</div>
+      <div class="teacher-form-group">
+        <div style="display:flex;gap:16px;align-items:center">
+          <img id="m_avatarPreview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" style="width:64px;height:64px;border-radius:14px;object-fit:cover;border:2px solid var(--border);flex-shrink:0">
+          <div style="flex:1">
+            <input type="file" id="m_avatarFile" accept="image/*" class="teacher-form-control" style="font-size:12px">
+            <div style="font-size:11px;color:var(--muted);margin-top:6px">Recommended: square photo, at least 200×200px (JPG/PNG)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTES -->
+      <div class="teacher-form-group" style="margin-top:10px">
+        <label class="teacher-form-label">Additional Notes</label>
+        <textarea id="m_notes" class="teacher-form-control" rows="3" placeholder="Any additional remarks, medical notes, or special considerations..."></textarea>
+      </div>
+
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:28px;padding-top:20px;border-top:1px solid var(--border)">
+        <button type="button" class="btn ghost" onclick="closeTeacherModal()">Cancel</button>
+        <button type="submit" class="btn"><i class="fa-solid fa-save"></i> Save Personnel</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -1118,7 +1487,7 @@ const user = window.AuthSession ? window.AuthSession.requireAuth('hr-login.html'
 const ACTIVE_ORG = (user && user.org) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
 
 // Canonical Storage Keys
-const EMP_KEY = `${ACTIVE_ORG}_employees`;
+const EMP_KEY = `${ACTIVE_ORG}_teachers`;
 const DEPT_KEY = `${ACTIVE_ORG}_departments`;
 const MSG_KEY = `${ACTIVE_ORG}_messages`;
 const ATT_KEY = `${ACTIVE_ORG}_attendance_records`;
@@ -1225,32 +1594,6 @@ function handleAutoCollapse() {
 window.addEventListener('resize', handleAutoCollapse);
 handleAutoCollapse();
 
-// Dark Mode Toggle
-const themeToggle = document.getElementById('themeToggle');
-function applyTheme(isDark) {
-  if (isDark) {
-    document.documentElement.classList.add('dark');
-    document.body.classList.add('dark');
-    themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
-  } else {
-    document.documentElement.classList.remove('dark');
-    document.body.classList.remove('dark');
-    themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
-  }
-  localStorage.setItem('fg_theme_dark', isDark);
-  if (overviewChartInstance) renderCharts();
-}
-const savedDark = localStorage.getItem('fg_theme_dark');
-applyTheme(savedDark === 'true');
-themeToggle.addEventListener('click', () => {
-  const willBeDark = !document.documentElement.classList.contains('dark');
-  applyTheme(willBeDark);
-  if (window.Toaster) {
-    window.Toaster.info('Theme Adjusted', `Interface set to ${willBeDark ? 'Dark Mode' : 'Light Mode'}`);
-  } else {
-    showToast(`Theme switched to ${willBeDark ? 'Dark' : 'Light'}`);
-  }
-});
 
 // Logout
 document.getElementById('logoutBtn').addEventListener('click', () => {
@@ -1283,7 +1626,7 @@ if (quickSearchEl) {
     } else if (q.includes('student') || q.includes('enroll') || q.includes('grade')) {
       showSection('students');
     } else if (q.includes('emp') || q.includes('staff')) {
-      showSection('employees');
+      showSection('teachers');
     } else if (q.includes('pay') || q.includes('salary')) {
       showSection('payroll');
     } else if (q.includes('chat') || q.includes('msg')) {
@@ -1298,7 +1641,7 @@ if (quickSearchEl) {
 const sections = {
   dashboard: document.getElementById('dashboardSection'),
   classes: document.getElementById('classesSection'),
-  employees: document.getElementById('employeesSection'),
+  teachers: document.getElementById('teachersSection'),
   students: document.getElementById('studentsSection'),
   messages: document.getElementById('messagesSection'),
   attendance: document.getElementById('attendanceSectionPanel'),
@@ -1323,7 +1666,7 @@ function showSection(name) {
   // Section-specific activation triggers
   if (name === 'dashboard') { renderDashboard(); renderCharts(); }
   if (name === 'classes') renderClassesSection();
-  if (name === 'employees') renderEmployees();
+  if (name === 'teachers') renderTeachers();
   if (name === 'students') loadHRStudents();
   if (name === 'messages') renderMsgUsers();
   if (name === 'attendance') renderAttendance();
@@ -1689,9 +2032,9 @@ function deleteClassroom(classId) {
    SECTION 1: DASHBOARD & CHARTS
 ------------------------------------------------------------- */
 function renderDashboard() {
-  const employees = read(EMP_KEY);
-  const headcount = employees.length;
-  document.getElementById('totalEmployees').textContent = headcount;
+  const teachers = read(EMP_KEY);
+  const headcount = teachers.length;
+  document.getElementById('totalTeachers').textContent = headcount;
 
   // Compute absent
   const attDate = document.getElementById('attDate')?.value || new Date().toISOString().split('T')[0];
@@ -1701,7 +2044,7 @@ function renderDashboard() {
   document.getElementById('absentToday').textContent = absentCount;
 
   // Monthly Payroll Commitment
-  const payrollSum = employees.reduce((acc, curr) => acc + Number(curr.salary || 0), 0);
+  const payrollSum = teachers.reduce((acc, curr) => acc + Number(curr.salary || 0), 0);
   document.getElementById('payrollTotal').textContent = `GHS ${payrollSum.toLocaleString()}`;
 
   // Populate Activity Feed
@@ -1727,9 +2070,9 @@ function renderDashboard() {
 
 function renderCharts() {
   if (!window.Chart) return;
-  const isDark = document.documentElement.classList.contains('dark');
-  const textColor = isDark ? '#94A3B8' : '#64748B';
-  const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  const textColor = '#64748B';
+  const gridColor = 'rgba(0,0,0,0.06)';
+
 
   // 1. Weekly Attendance Chart
   const ctx1 = document.getElementById('overviewChart');
@@ -1762,9 +2105,9 @@ function renderCharts() {
   const ctx2 = document.getElementById('deptChart');
   if (ctx2) {
     if (deptChartInstance) deptChartInstance.destroy();
-    const employees = read(EMP_KEY);
+    const teachers = read(EMP_KEY);
     const deptCounts = {};
-    employees.forEach(e => {
+    teachers.forEach(e => {
       const d = e.dept || e.department || 'General';
       deptCounts[d] = (deptCounts[d] || 0) + 1;
     });
@@ -1794,17 +2137,17 @@ function renderCharts() {
 /* -------------------------------------------------------------
    SECTION 2: EMPLOYEES DIRECTORY & MODAL
 ------------------------------------------------------------- */
-async function renderEmployees() {
-  let employees = read(EMP_KEY);
+async function renderTeachers() {
+  let teachers = read(EMP_KEY);
   if (window.SupabaseService && window.SupabaseConfig && window.SupabaseConfig.isConfigured()) {
     try {
-      employees = await window.SupabaseService.getEmployees(ACTIVE_ORG);
+      teachers = await window.SupabaseService.getTeachers(ACTIVE_ORG);
     } catch (_) {}
   }
-  const tbody = document.getElementById('employeeTable');
+  const tbody = document.getElementById('teacherTable');
   tbody.innerHTML = '';
 
-  const query = (document.getElementById('searchEmployee')?.value || '').toLowerCase().trim();
+  const query = (document.getElementById('searchTeacher')?.value || '').toLowerCase().trim();
   const deptFilter = document.getElementById('filterDept')?.value || '';
   const roleFilter = document.getElementById('filterRole')?.value || '';
 
@@ -1812,7 +2155,7 @@ async function renderEmployees() {
   const deptSet = new Set();
   const roleSet = new Set();
 
-  employees.forEach(e => {
+  teachers.forEach(e => {
     if (e.dept) deptSet.add(e.dept);
     if (e.role) roleSet.add(e.role);
   });
@@ -1838,7 +2181,7 @@ async function renderEmployees() {
     });
   }
 
-  const filtered = employees.filter(e => {
+  const filtered = teachers.filter(e => {
     const matchQ = (e.name || '').toLowerCase().includes(query) || (e.role || '').toLowerCase().includes(query) || (e.email || '').toLowerCase().includes(query);
     const matchD = !deptFilter || e.dept === deptFilter;
     const matchR = !roleFilter || e.role === roleFilter;
@@ -1877,118 +2220,143 @@ async function renderEmployees() {
 }
 
 // Live Search & Filter Handlers
-document.getElementById('searchEmployee')?.addEventListener('input', renderEmployees);
-document.getElementById('filterDept')?.addEventListener('change', renderEmployees);
-document.getElementById('filterRole')?.addEventListener('change', renderEmployees);
+document.getElementById('searchTeacher')?.addEventListener('input', renderTeachers);
+document.getElementById('filterDept')?.addEventListener('change', renderTeachers);
+document.getElementById('filterRole')?.addEventListener('change', renderTeachers);
 
-// Modal Controls
-const modalBackdrop = document.getElementById('modalBackdrop');
-document.getElementById('addEmployeeBtn').addEventListener('click', () => openEmpModal());
-document.getElementById('cancelEmpBtn').addEventListener('click', () => closeEmpModal());
-document.getElementById('modalCloseBtn').addEventListener('click', () => closeEmpModal());
+// ── FULL TEACHER MODAL CONTROLS (from teacher.html) ──
+document.getElementById('addTeacherBtn').addEventListener('click', () => openTeacherModal());
 
-function openEmpModal(emp) {
-  modalBackdrop.classList.add('show');
-  document.getElementById('modalTitle').textContent = emp ? 'Edit Employee Details' : 'Add New Team Member';
-  if (emp) {
-    document.getElementById('emp_name').value = emp.name || '';
-    document.getElementById('emp_role').value = emp.role || '';
-    document.getElementById('emp_dept').value = emp.dept || '';
-    document.getElementById('emp_email').value = emp.email || '';
-    document.getElementById('emp_salary').value = emp.salary || 0;
-    document.getElementById('emp_preview').src = emp.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80';
-    document.getElementById('saveEmpBtn').dataset.editId = emp.id;
-  } else {
-    document.getElementById('emp_name').value = '';
-    document.getElementById('emp_role').value = '';
-    document.getElementById('emp_dept').value = '';
-    document.getElementById('emp_email').value = '';
-    document.getElementById('emp_salary').value = '';
-    document.getElementById('emp_preview').src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80';
-    delete document.getElementById('saveEmpBtn').dataset.editId;
-  }
-}
-
-function closeEmpModal() { modalBackdrop.classList.remove('show'); }
-
-// Handle Photo File Upload Preview
-document.getElementById('emp_photo').addEventListener('change', (e) => {
+// Avatar preview
+document.getElementById('m_avatarFile')?.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (file) {
     const reader = new FileReader();
-    reader.onload = (ev) => {
-      document.getElementById('emp_preview').src = ev.target.result;
-    };
+    reader.onload = (ev) => { document.getElementById('m_avatarPreview').src = ev.target.result; };
     reader.readAsDataURL(file);
   }
 });
 
-// Save Personnel
-document.getElementById('saveEmpBtn').addEventListener('click', () => {
-  const name = document.getElementById('emp_name').value.trim();
-  if (!name) return alert('Employee name is required.');
-  const role = document.getElementById('emp_role').value.trim() || 'Staff';
-  const dept = document.getElementById('emp_dept').value.trim() || 'General';
-  const email = document.getElementById('emp_email').value.trim() || `${name.toLowerCase().replace(/\s+/g, '')}@flawless.org`;
-  const salary = Number(document.getElementById('emp_salary').value) || 4500;
-  const photo = document.getElementById('emp_preview').src;
+function openTeacherModal(emp) {
+  document.getElementById('modalHeading').textContent = emp ? 'Edit Teacher Record' : 'Add New Teacher';
+  document.getElementById('editTeacherId').value = emp ? emp.id : '';
+  document.getElementById('teacherForm').reset();
+  if (emp) {
+    document.getElementById('m_name').value = emp.fullName || emp.name || '';
+    document.getElementById('m_dob').value = emp.dob || '';
+    document.getElementById('m_gender').value = emp.gender || '';
+    document.getElementById('m_nationality').value = emp.nationality || '';
+    document.getElementById('m_nationalId').value = emp.nationalId || '';
+    document.getElementById('m_email').value = emp.email || '';
+    document.getElementById('m_phone').value = emp.phone || '';
+    document.getElementById('m_address').value = emp.address || '';
+    document.getElementById('m_dept').value = emp.department || emp.dept || '';
+    document.getElementById('m_pos').value = emp.position || emp.role || '';
+    document.getElementById('m_empType').value = emp.empType || 'Full-Time';
+    document.getElementById('m_status').value = emp.status || 'Active';
+    document.getElementById('m_hireDate').value = emp.hireDate || '';
+    document.getElementById('m_salary').value = emp.salary || '';
+    document.getElementById('m_ssnit').value = emp.ssnit || '';
+    document.getElementById('m_qualification').value = emp.qualification || '';
+    document.getElementById('m_subjects').value = emp.subjects || '';
+    document.getElementById('m_licenseNo').value = emp.licenseNo || '';
+    document.getElementById('m_experience').value = emp.experience || '';
+    document.getElementById('m_emergencyName').value = emp.emergencyName || '';
+    document.getElementById('m_emergencyRel').value = emp.emergencyRel || '';
+    document.getElementById('m_emergencyPhone').value = emp.emergencyPhone || '';
+    document.getElementById('m_notes').value = emp.notes || '';
+    document.getElementById('m_avatarPreview').src = emp.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80';
+  } else {
+    document.getElementById('m_avatarPreview').src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80';
+  }
+  document.getElementById('teacherModal').classList.add('active');
+}
 
-  const newEmp = {
-    id: editId || ('emp_' + Date.now()),
-    name,
-    fullName: name,
-    role,
-    position: role,
-    dept,
-    department: dept,
-    email,
-    salary,
-    photo
+function closeTeacherModal() {
+  document.getElementById('teacherModal').classList.remove('active');
+}
+
+function handleSaveTeacherFull(e) {
+  e.preventDefault();
+  const editId = document.getElementById('editTeacherId').value;
+  let teachers = read(EMP_KEY);
+
+  const newRecord = {
+    fullName: document.getElementById('m_name').value.trim(),
+    name: document.getElementById('m_name').value.trim(),
+    dob: document.getElementById('m_dob').value,
+    gender: document.getElementById('m_gender').value,
+    nationality: document.getElementById('m_nationality').value.trim(),
+    nationalId: document.getElementById('m_nationalId').value.trim(),
+    email: document.getElementById('m_email').value.trim(),
+    phone: document.getElementById('m_phone').value.trim(),
+    address: document.getElementById('m_address').value.trim(),
+    department: document.getElementById('m_dept').value.trim(),
+    dept: document.getElementById('m_dept').value.trim(),
+    position: document.getElementById('m_pos').value.trim(),
+    role: document.getElementById('m_pos').value.trim(),
+    empType: document.getElementById('m_empType').value,
+    status: document.getElementById('m_status').value,
+    hireDate: document.getElementById('m_hireDate').value,
+    salary: Number(document.getElementById('m_salary').value) || 0,
+    ssnit: document.getElementById('m_ssnit').value.trim(),
+    qualification: document.getElementById('m_qualification').value,
+    subjects: document.getElementById('m_subjects').value.trim(),
+    licenseNo: document.getElementById('m_licenseNo').value.trim(),
+    experience: document.getElementById('m_experience').value,
+    emergencyName: document.getElementById('m_emergencyName').value.trim(),
+    emergencyRel: document.getElementById('m_emergencyRel').value.trim(),
+    emergencyPhone: document.getElementById('m_emergencyPhone').value.trim(),
+    notes: document.getElementById('m_notes').value.trim(),
+    photo: document.getElementById('m_avatarPreview').src
   };
 
   if (editId) {
-    const idx = employees.findIndex(e => e.id === editId);
-    if (idx !== -1) {
-      employees[idx] = Object.assign({}, employees[idx], newEmp);
+    const idx = teachers.findIndex(x => x.id === editId);
+    if (idx >= 0) {
+      teachers[idx] = Object.assign({}, teachers[idx], newRecord);
     }
+    showToast('Teacher updated successfully');
   } else {
-    employees.push(newEmp);
+    newRecord.id = 'emp_' + Date.now();
+    teachers.unshift(newRecord);
+    showToast('New teacher enrolled successfully');
   }
 
-  save(EMP_KEY, employees);
+  save(EMP_KEY, teachers);
 
-  // Sync to Supabase Cloud if configured
   if (window.SupabaseService && window.SupabaseConfig && window.SupabaseConfig.isConfigured()) {
-    window.SupabaseService.saveEmployee(ACTIVE_ORG, newEmp).catch(console.warn);
+    window.SupabaseService.saveTeacher(ACTIVE_ORG, newRecord).catch(console.warn);
   }
 
-  closeEmpModal();
-  renderEmployees();
+  closeTeacherModal();
+  renderTeachers();
   renderDashboard();
   renderCharts();
-  showToast(editId ? 'Employee updated successfully' : 'Employee added to workforce');
-});
+  initPayrollSection();
+}
 
 function openEmpModalById(id) {
-  const employees = read(EMP_KEY);
-  const emp = employees.find(e => e.id === id);
-  if (emp) openEmpModal(emp);
+  const teachers = read(EMP_KEY);
+  const emp = teachers.find(e => e.id === id);
+  if (emp) openTeacherModal(emp);
 }
 
 function deleteEmp(id) {
-  if (!confirm('Are you sure you want to remove this employee from the directory?')) return;
-  
+  if (!confirm('Are you sure you want to remove this teacher from the directory?')) return;
+
   if (window.SupabaseService && window.SupabaseConfig && window.SupabaseConfig.isConfigured()) {
-    window.SupabaseService.deleteEmployee(ACTIVE_ORG, id).catch(console.warn);
+    window.SupabaseService.deleteTeacher(ACTIVE_ORG, id).catch(console.warn);
   }
 
-  let employees = read(EMP_KEY);
-  employees = employees.filter(e => e.id !== id);
-  save(EMP_KEY, employees);
-  renderEmployees();
+  let teachers = read(EMP_KEY);
+  teachers = teachers.filter(e => e.id !== id);
+  save(EMP_KEY, teachers);
+  renderTeachers();
   renderDashboard();
   renderCharts();
-  showToast('Employee record deleted');
+  initPayrollSection();
+  showToast('Teacher record deleted');
 }
 
 /* -------------------------------------------------------------
@@ -2027,12 +2395,12 @@ function loadHRStudents() {
 let activeChatEmpId = null;
 
 function renderMsgUsers() {
-  const employees = read(EMP_KEY);
+  const teachers = read(EMP_KEY);
   const filter = (document.getElementById('msgSearchInput')?.value || '').toLowerCase();
   const list = document.getElementById('msgUserList');
   list.innerHTML = '';
 
-  const filtered = employees.filter(e =>
+  const filtered = teachers.filter(e =>
     (e.name || '').toLowerCase().includes(filter) || (e.role || '').toLowerCase().includes(filter)
   );
 
@@ -2053,8 +2421,8 @@ function renderMsgUsers() {
 
 function selectChatUser(empId) {
   activeChatEmpId = empId;
-  const employees = read(EMP_KEY);
-  const emp = employees.find(e => e.id === empId);
+  const teachers = read(EMP_KEY);
+  const emp = teachers.find(e => e.id === empId);
   if (!emp) return;
 
   renderMsgUsers();
@@ -2144,12 +2512,12 @@ attDateInput?.addEventListener('change', renderAttendance);
 
 function renderAttendance() {
   const dateVal = attDateInput.value || new Date().toISOString().split('T')[0];
-  const employees = read(EMP_KEY);
+  const teachers = read(EMP_KEY);
   let records = read(ATT_KEY);
   const tbody = document.getElementById('attendanceTable');
   tbody.innerHTML = '';
 
-  employees.forEach(emp => {
+  teachers.forEach(emp => {
     let rec = records.find(r => r.empId === emp.id && r.date === dateVal);
     if (!rec) {
       rec = { empId: emp.id, date: dateVal, status: 'Present', time: '08:00 AM' };
@@ -2193,10 +2561,10 @@ function toggleAttendanceStatus(empId) {
 
 document.getElementById('markAllPresentBtn')?.addEventListener('click', () => {
   const dateVal = attDateInput.value;
-  const employees = read(EMP_KEY);
+  const teachers = read(EMP_KEY);
   let records = read(ATT_KEY);
 
-  employees.forEach(emp => {
+  teachers.forEach(emp => {
     const idx = records.findIndex(r => r.empId === emp.id && r.date === dateVal);
     if (idx !== -1) {
       records[idx].status = 'Present';
@@ -2214,66 +2582,141 @@ document.getElementById('markAllPresentBtn')?.addEventListener('click', () => {
 /* -------------------------------------------------------------
    SECTION 6: PAYROLL SIMULATOR
 ------------------------------------------------------------- */
-function initPayrollSection() {
-  const employees = read(EMP_KEY);
-  const select = document.getElementById('payEmployeeSelect');
-  select.innerHTML = '';
+/* ─── PAYROLL SECTION (merged from payroll.html) ─── */
+let payChartInstance = null;
 
-  employees.forEach(e => {
-    const opt = document.createElement('option');
-    opt.value = e.id;
-    opt.textContent = `${e.name} — ${e.dept} (GHS ${Number(e.salary || 0).toLocaleString()})`;
-    select.appendChild(opt);
+function initPayrollSection() {
+  // Set active month label
+  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const now = new Date();
+  const el = document.getElementById('pay_activeMonthStr');
+  if (el) el.textContent = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+
+  renderPayrollLedger();
+}
+
+function renderPayrollLedger() {
+  const teachers = read(EMP_KEY);
+  const tbody = document.getElementById('pay_payrollTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  let totalGross = 0, totalTax = 0, totalPension = 0, totalNet = 0;
+  const deptSums = {};
+
+  teachers.forEach((emp, i) => {
+    const gross   = Number(emp.salary || emp.fullSalary || 0);
+    const tax     = Math.round(gross * 0.13);
+    const pension = Math.round(gross * 0.055);
+    const net     = gross - tax - pension;
+
+    totalGross   += gross;
+    totalTax     += tax;
+    totalPension += pension;
+    totalNet     += net;
+
+    const dept = emp.department || emp.dept || 'General';
+    deptSums[dept] = (deptSums[dept] || 0) + gross;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--muted);font-weight:600">${i + 1}</td>
+      <td>
+        <div style="font-weight:700;color:var(--text)">${escapeHtml(emp.fullName || emp.name || '—')}</div>
+        <div style="font-size:11px;color:var(--muted)">${escapeHtml(emp.email || '')}</div>
+      </td>
+      <td><span class="badge-pill badge-info">${escapeHtml(dept)}</span></td>
+      <td style="font-weight:700;color:var(--text)">GHS ${gross.toLocaleString()}</td>
+      <td style="color:#ef4444;font-weight:600">- GHS ${tax.toLocaleString()}</td>
+      <td style="color:#f59e0b;font-weight:600">- GHS ${pension.toLocaleString()}</td>
+      <td style="font-weight:800;color:#10b981">GHS ${net.toLocaleString()}</td>
+      <td><span class="badge-pill badge-success"><i class="fa-solid fa-check"></i> Approved</span></td>
+      <td style="text-align:right">
+        <a href="payslip.html?name=${encodeURIComponent(emp.fullName || emp.name || '')}" class="btn-modern btn-secondary btn-sm">
+          <i class="fa-solid fa-receipt"></i> Payslip
+        </a>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Update KPIs
+  const kpis = { pay_kpiGross: totalGross, pay_kpiTax: totalTax, pay_kpiPension: totalPension, pay_kpiNet: totalNet };
+  Object.entries(kpis).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = `GHS ${val.toLocaleString()}`;
+  });
+
+  // Render chart
+  renderPayrollChart(deptSums);
+}
+
+function renderPayrollChart(deptSums) {
+  if (!window.Chart) return;
+  const canvas = document.getElementById('pay_payrollChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (payChartInstance) payChartInstance.destroy();
+
+  const textColor = '#64748B';
+
+
+  payChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(deptSums),
+      datasets: [{
+        label: 'Department Expenditure (GHS)',
+        data: Object.values(deptSums),
+        backgroundColor: ['#635bfc','#06B6D4','#8B5CF6','#10B981','#F59E0B','#EF4444'],
+        borderRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: textColor, font: { family: 'Plus Jakarta Sans' } } },
+        y: { grid: { color: 'rgba(0,0,0,0.06)' }, ticks: { color: textColor, font: { family: 'Plus Jakarta Sans' } } }
+      }
+    }
   });
 }
 
-document.getElementById('calcPayrollBtn')?.addEventListener('click', () => {
-  const select = document.getElementById('payEmployeeSelect');
-  const employees = read(EMP_KEY);
-  const emp = employees.find(e => e.id === select.value) || employees[0];
-  if (!emp) return;
+function runPayrollBatch() {
+  const btn = document.getElementById('pay_batchBtn');
+  if (!btn) return;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing Wire Transfers...';
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-check-double"></i> Batch Successfully Disbursed';
+    showToast('All teacher net payrolls wired successfully!');
+    setTimeout(() => {
+      btn.innerHTML = '<i class="fa-solid fa-bolt"></i> Process Batch Disbursement';
+    }, 4000);
+  }, 1400);
+}
 
-  const basic = Number(emp.salary || 0);
-  const bonus = Number(document.getElementById('bonus').value) || 0;
-  const deductions = Number(document.getElementById('deductions').value) || 0;
-  
-  const gross = basic + bonus;
-  const payeTax = Math.round(gross * 0.13); // 13% PAYE
-  const ssnitPension = Math.round(basic * 0.055); // 5.5% SSNIT
-  const totalDeductions = deductions + payeTax + ssnitPension;
-  const net = gross - totalDeductions;
-
-  const resDiv = document.getElementById('payResult');
-  resDiv.innerHTML = `
-    <div style="font-weight:800;font-size:15px;margin-bottom:8px">${escapeHtml(emp.name)}</div>
-    <div>Basic Salary: <strong>GHS ${basic.toLocaleString()}.00</strong></div>
-    <div>Bonus / Allowances: <span style="color:var(--accent-green)">+ GHS ${bonus.toLocaleString()}.00</span></div>
-    <div>PAYE Tax (13%): <span style="color:var(--accent-red)">- GHS ${payeTax.toLocaleString()}.00</span></div>
-    <div>Pension SSNIT (5.5%): <span style="color:var(--accent-orange)">- GHS ${ssnitPension.toLocaleString()}.00</span></div>
-    <div>Direct Deductions: <span style="color:var(--accent-red)">- GHS ${deductions.toLocaleString()}.00</span></div>
-    <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:16px;font-weight:800;color:var(--accent-green)">
-      Net Payout: GHS ${net.toLocaleString()}.00
-    </div>
-  `;
-  showToast('Net payout computed');
-});
-
-document.getElementById('exportPayrollBtn')?.addEventListener('click', () => {
-  const employees = read(EMP_KEY);
-  let csv = 'ID,Name,Department,Role,Basic Salary,Estimated Tax,Net Payout\n';
-  employees.forEach(e => {
-    const b = Number(e.salary || 0);
-    const tax = Math.round(b * 0.13);
-    const net = b - tax - Math.round(b * 0.055);
-    csv += `"${e.id}","${e.name}","${e.dept}","${e.role}","${b}","${tax}","${net}"\n`;
+function exportPayrollLedgerCSV() {
+  const teachers = read(EMP_KEY);
+  let csv = 'Full Name,Email,Department,Gross Salary,Tax (PAYE),Pension (SSNIT),Net Payout,Status\n';
+  teachers.forEach(emp => {
+    const gross = Number(emp.salary || 0);
+    const tax   = Math.round(gross * 0.13);
+    const pen   = Math.round(gross * 0.055);
+    const net   = gross - tax - pen;
+    const q = v => `"${String(v || '').replace(/"/g, '""')}"`;
+    csv += [emp.fullName||emp.name, emp.email, emp.department||emp.dept, gross, tax, pen, net, 'Disbursed'].map(q).join(',') + '\n';
   });
   const blob = new Blob([csv], { type: 'text/csv' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `payroll_ledger_${ACTIVE_ORG.toLowerCase().replace(/[^a-z0-9]/g, '_')}.csv`;
+  a.download = `payroll_${ACTIVE_ORG.toLowerCase().replace(/[^a-z0-9]/g, '_')}_ledger.csv`;
   a.click();
-  showToast('Payroll CSV ledger exported');
-});
+  showToast('Payroll ledger CSV exported');
+}
 
 /* -------------------------------------------------------------
    SECTION 7: ADVANCED ANALYTICS
@@ -2284,9 +2727,9 @@ function renderAnalytics() {
   if (!ctx) return;
   if (attChartInstance) attChartInstance.destroy();
 
-  const isDark = document.documentElement.classList.contains('dark');
-  const textColor = isDark ? '#94A3B8' : '#64748B';
-  const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  const textColor = '#64748B';
+  const gridColor = 'rgba(0,0,0,0.06)';
+
 
   attChartInstance = new Chart(ctx.getContext('2d'), {
     type: 'line',
@@ -2425,7 +2868,7 @@ document.getElementById('askAiBtn')?.addEventListener('click', () => {
   if (q.includes('leave') || q.includes('vacation')) {
     response = '<strong>Standard Leave Policy:</strong> Full-time staff members are entitled to 21 working days of paid annual leave, 10 certified medical leave days, and standard statutory public holidays upon formal submission via the portal.';
   } else if (q.includes('payroll') || q.includes('salary') || q.includes('pay')) {
-    response = '<strong>Payroll Processing Cycle:</strong> Monthly salary runs are finalized on the 25th of every month. Standard statutory PAYE tax (~13%) and employee pension contributions (5.5% Tier 1/2) are automatically withheld.';
+    response = '<strong>Payroll Processing Cycle:</strong> Monthly salary runs are finalized on the 25th of every month. Standard statutory PAYE tax (~13%) and teacher pension contributions (5.5% Tier 1/2) are automatically withheld.';
   } else if (q.includes('overtime') || q.includes('extra')) {
     response = '<strong>Overtime Standards:</strong> Authorized hours worked in excess of standard 40-hour workweeks are remunerated at 1.5x regular base hourly rate, or 2.0x on designated public holidays.';
   } else if (q.includes('probation')) {
@@ -2512,8 +2955,8 @@ async function handleSaveCloudConfig(e) {
   closeCloudModal();
   showToast('Supabase cloud configuration saved!');
 
-  // Refresh live employees and dashboard
-  renderEmployees();
+  // Refresh live teachers and dashboard
+  renderTeachers();
   renderDashboard();
 }
 
@@ -2538,10 +2981,10 @@ async function handleMigrateCloud() {
 
   try {
     const res = await window.SupabaseService.migrateAllLocalToCloud(ACTIVE_ORG);
-    showToast(`Uploaded ${res.employees} employees & ${res.attendance} attendance records to Supabase!`);
+    showToast(`Uploaded ${res.teachers} teachers & ${res.attendance} attendance records to Supabase!`);
     document.getElementById('cloudStatusMsg').style.display = 'block';
     document.getElementById('cloudStatusMsg').style.color = 'var(--accent-green)';
-    document.getElementById('cloudStatusMsg').innerHTML = `<i class="fa-solid fa-circle-check"></i> Sync Complete: ${res.employees} employees, ${res.attendance} attendance logs saved to cloud.`;
+    document.getElementById('cloudStatusMsg').innerHTML = `<i class="fa-solid fa-circle-check"></i> Sync Complete: ${res.teachers} teachers, ${res.attendance} attendance logs saved to cloud.`;
   } catch (err) {
     alert('Migration error: ' + err.message);
   } finally {
@@ -2558,7 +3001,7 @@ function bootstrapApp() {
     updateCloudSyncStatus();
     renderDashboard();
     renderCharts();
-    renderEmployees();
+    renderTeachers();
     loadHRStudents();
     initPayrollSection();
   } catch (err) {

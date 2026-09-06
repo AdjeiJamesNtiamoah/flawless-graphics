@@ -1,5 +1,5 @@
-<?php
-// api/get_employees.php
+﻿<?php
+// api/get_teachers.php
 header('Content-Type: application/json');
 require_once __DIR__ . '/config/db.php';
 
@@ -8,15 +8,15 @@ if (!$conn || $conn->connect_error) {
     exit;
 }
 
-$sql = "SELECT emp_id AS id, name, role, department AS dept, email, salary, photo_url AS photo FROM employees";
+$sql = "SELECT emp_id AS id, name, role, department AS dept, email, salary, photo_url AS photo FROM teachers";
 $result = $conn->query($sql);
 
-$employees = [];
+$teachers = [];
 if ($result) {
     while ($row = $result->fetch_assoc()) {
-        $employees[] = $row;
+        $teachers[] = $row;
     }
 }
 
-echo json_encode(["status" => "success", "data" => $employees]);
+echo json_encode(["status" => "success", "data" => $teachers]);
 ?>

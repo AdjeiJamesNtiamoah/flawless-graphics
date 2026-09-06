@@ -1,4 +1,4 @@
--- ============================================================================
+﻿-- ============================================================================
 -- Supabase Schema Migration: FLAWLESS GRAPHICS — LUCY™ Management System
 -- Project: AdjeiJamesNtiamoah
 -- Description: Sets up enterprise tables, indexes, and Row Level Security (RLS)
@@ -79,7 +79,7 @@ BEGIN
 END $$;
 
 -- 3. EMPLOYEES TABLE
-CREATE TABLE IF NOT EXISTS public.employees (
+CREATE TABLE IF NOT EXISTS public.teachers (
     id TEXT PRIMARY KEY,
     org_id TEXT NOT NULL DEFAULT 'FLAWLESS GRAPHICS',
     full_name TEXT NOT NULL,
@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS public.employees (
 CREATE TABLE IF NOT EXISTS public.attendance_records (
     id TEXT PRIMARY KEY,
     org_id TEXT NOT NULL DEFAULT 'FLAWLESS GRAPHICS',
-    employee_name TEXT NOT NULL,
+    teacher_name TEXT NOT NULL,
     department TEXT,
     date DATE NOT NULL DEFAULT CURRENT_DATE,
     check_in TIME,
@@ -113,8 +113,8 @@ CREATE TABLE IF NOT EXISTS public.attendance_records (
 CREATE TABLE IF NOT EXISTS public.payroll_records (
     id TEXT PRIMARY KEY,
     org_id TEXT NOT NULL DEFAULT 'FLAWLESS GRAPHICS',
-    employee_id TEXT,
-    employee_name TEXT NOT NULL,
+    teacher_id TEXT,
+    teacher_name TEXT NOT NULL,
     department TEXT,
     basic_salary NUMERIC(12, 2) DEFAULT 0.00,
     allowance NUMERIC(12, 2) DEFAULT 0.00,
@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS public.payroll_records (
 CREATE TABLE IF NOT EXISTS public.performance_reviews (
     id TEXT PRIMARY KEY,
     org_id TEXT NOT NULL DEFAULT 'FLAWLESS GRAPHICS',
-    employee_name TEXT NOT NULL,
+    teacher_name TEXT NOT NULL,
     department TEXT,
     position TEXT,
     kpi INTEGER DEFAULT 90,
@@ -158,52 +158,52 @@ CREATE TABLE IF NOT EXISTS public.announcements (
 -- 7.5. SCHEMA MIGRATION SAFETY: Ensure org_id & columns exist on pre-existing tables
 DO $$
 BEGIN
-  -- Employees table updates
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'employees') THEN
+  -- Teachers table updates
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'teachers') THEN
     BEGIN
-      ALTER TABLE public.employees ALTER COLUMN id DROP IDENTITY IF EXISTS;
+      ALTER TABLE public.teachers ALTER COLUMN id DROP IDENTITY IF EXISTS;
     EXCEPTION WHEN OTHERS THEN NULL;
     END;
 
     BEGIN
-      ALTER TABLE public.employees ALTER COLUMN id TYPE TEXT USING id::text;
+      ALTER TABLE public.teachers ALTER COLUMN id TYPE TEXT USING id::text;
     EXCEPTION WHEN OTHERS THEN NULL;
     END;
 
-    ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS org_id TEXT NOT NULL DEFAULT 'FLAWLESS GRAPHICS';
-    ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS full_name TEXT;
-    ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS department TEXT;
-    ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS position TEXT;
-    ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS email TEXT;
-    ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS phone TEXT;
-    ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS salary NUMERIC(12, 2) DEFAULT 0.00;
-    ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'Active';
-    ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS hire_date DATE DEFAULT CURRENT_DATE;
-    ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS photo_url TEXT;
-    ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
+    ALTER TABLE public.teachers ADD COLUMN IF NOT EXISTS org_id TEXT NOT NULL DEFAULT 'FLAWLESS GRAPHICS';
+    ALTER TABLE public.teachers ADD COLUMN IF NOT EXISTS full_name TEXT;
+    ALTER TABLE public.teachers ADD COLUMN IF NOT EXISTS department TEXT;
+    ALTER TABLE public.teachers ADD COLUMN IF NOT EXISTS position TEXT;
+    ALTER TABLE public.teachers ADD COLUMN IF NOT EXISTS email TEXT;
+    ALTER TABLE public.teachers ADD COLUMN IF NOT EXISTS phone TEXT;
+    ALTER TABLE public.teachers ADD COLUMN IF NOT EXISTS salary NUMERIC(12, 2) DEFAULT 0.00;
+    ALTER TABLE public.teachers ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'Active';
+    ALTER TABLE public.teachers ADD COLUMN IF NOT EXISTS hire_date DATE DEFAULT CURRENT_DATE;
+    ALTER TABLE public.teachers ADD COLUMN IF NOT EXISTS photo_url TEXT;
+    ALTER TABLE public.teachers ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
 
     -- Drop NOT NULL on legacy columns if they exist
     BEGIN
-      ALTER TABLE public.employees ALTER COLUMN name DROP NOT NULL;
+      ALTER TABLE public.teachers ALTER COLUMN name DROP NOT NULL;
     EXCEPTION WHEN OTHERS THEN NULL;
     END;
     BEGIN
-      ALTER TABLE public.employees ALTER COLUMN role DROP NOT NULL;
+      ALTER TABLE public.teachers ALTER COLUMN role DROP NOT NULL;
     EXCEPTION WHEN OTHERS THEN NULL;
     END;
     BEGIN
-      ALTER TABLE public.employees ALTER COLUMN emp_id DROP NOT NULL;
+      ALTER TABLE public.teachers ALTER COLUMN emp_id DROP NOT NULL;
     EXCEPTION WHEN OTHERS THEN NULL;
     END;
 
-    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='employees' AND column_name='name') THEN
-      EXECUTE 'UPDATE public.employees SET name = COALESCE(name, full_name), full_name = COALESCE(full_name, name);';
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='teachers' AND column_name='name') THEN
+      EXECUTE 'UPDATE public.teachers SET name = COALESCE(name, full_name), full_name = COALESCE(full_name, name);';
     END IF;
-    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='employees' AND column_name='role') THEN
-      EXECUTE 'UPDATE public.employees SET role = COALESCE(role, position), position = COALESCE(position, role);';
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='teachers' AND column_name='role') THEN
+      EXECUTE 'UPDATE public.teachers SET role = COALESCE(role, position), position = COALESCE(position, role);';
     END IF;
 
-    UPDATE public.employees SET org_id = 'FLAWLESS GRAPHICS' WHERE org_id IS NULL;
+    UPDATE public.teachers SET org_id = 'FLAWLESS GRAPHICS' WHERE org_id IS NULL;
   END IF;
 
   -- Attendance table updates
@@ -217,7 +217,7 @@ BEGIN
     EXCEPTION WHEN OTHERS THEN NULL;
     END;
     ALTER TABLE public.attendance_records ADD COLUMN IF NOT EXISTS org_id TEXT NOT NULL DEFAULT 'FLAWLESS GRAPHICS';
-    ALTER TABLE public.attendance_records ADD COLUMN IF NOT EXISTS employee_name TEXT;
+    ALTER TABLE public.attendance_records ADD COLUMN IF NOT EXISTS teacher_name TEXT;
     ALTER TABLE public.attendance_records ADD COLUMN IF NOT EXISTS department TEXT;
     ALTER TABLE public.attendance_records ADD COLUMN IF NOT EXISTS date DATE DEFAULT CURRENT_DATE;
     ALTER TABLE public.attendance_records ADD COLUMN IF NOT EXISTS check_in TIME;
@@ -240,8 +240,8 @@ BEGIN
     EXCEPTION WHEN OTHERS THEN NULL;
     END;
     ALTER TABLE public.payroll_records ADD COLUMN IF NOT EXISTS org_id TEXT NOT NULL DEFAULT 'FLAWLESS GRAPHICS';
-    ALTER TABLE public.payroll_records ADD COLUMN IF NOT EXISTS employee_id TEXT;
-    ALTER TABLE public.payroll_records ADD COLUMN IF NOT EXISTS employee_name TEXT;
+    ALTER TABLE public.payroll_records ADD COLUMN IF NOT EXISTS teacher_id TEXT;
+    ALTER TABLE public.payroll_records ADD COLUMN IF NOT EXISTS teacher_name TEXT;
     ALTER TABLE public.payroll_records ADD COLUMN IF NOT EXISTS department TEXT;
     ALTER TABLE public.payroll_records ADD COLUMN IF NOT EXISTS basic_salary NUMERIC(12, 2) DEFAULT 0.00;
     ALTER TABLE public.payroll_records ADD COLUMN IF NOT EXISTS allowance NUMERIC(12, 2) DEFAULT 0.00;
@@ -268,7 +268,7 @@ BEGIN
     EXCEPTION WHEN OTHERS THEN NULL;
     END;
     ALTER TABLE public.performance_reviews ADD COLUMN IF NOT EXISTS org_id TEXT NOT NULL DEFAULT 'FLAWLESS GRAPHICS';
-    ALTER TABLE public.performance_reviews ADD COLUMN IF NOT EXISTS employee_name TEXT;
+    ALTER TABLE public.performance_reviews ADD COLUMN IF NOT EXISTS teacher_name TEXT;
     ALTER TABLE public.performance_reviews ADD COLUMN IF NOT EXISTS department TEXT;
     ALTER TABLE public.performance_reviews ADD COLUMN IF NOT EXISTS position TEXT;
     ALTER TABLE public.performance_reviews ADD COLUMN IF NOT EXISTS kpi INTEGER DEFAULT 90;
@@ -342,9 +342,9 @@ END $$;
 -- 7.6. AUTO-SYNC LEGACY COLUMNS (Keeps name <-> full_name, role <-> position synchronized)
 DO $$
 BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='employees' AND column_name='name') THEN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='teachers' AND column_name='name') THEN
     EXECUTE $trg_func$
-      CREATE OR REPLACE FUNCTION public.sync_employee_legacy_columns()
+      CREATE OR REPLACE FUNCTION public.sync_teacher_legacy_columns()
       RETURNS TRIGGER AS $body$
       BEGIN
         IF NEW.full_name IS NOT NULL AND (NEW.name IS NULL OR NEW.name = '') THEN
@@ -355,7 +355,7 @@ BEGIN
           NEW.name := NEW.full_name;
         END IF;
 
-        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='employees' AND column_name='role') THEN
+        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='teachers' AND column_name='role') THEN
           IF NEW.position IS NOT NULL AND (NEW.role IS NULL OR NEW.role = '') THEN
             NEW.role := NEW.position;
           ELSIF NEW.role IS NOT NULL AND (NEW.position IS NULL OR NEW.position = '') THEN
@@ -370,15 +370,15 @@ BEGIN
       $body$ LANGUAGE plpgsql;
     $trg_func$;
 
-    DROP TRIGGER IF EXISTS trg_sync_employee_columns ON public.employees;
-    CREATE TRIGGER trg_sync_employee_columns
-      BEFORE INSERT OR UPDATE ON public.employees
-      FOR EACH ROW EXECUTE FUNCTION public.sync_employee_legacy_columns();
+    DROP TRIGGER IF EXISTS trg_sync_teacher_columns ON public.teachers;
+    CREATE TRIGGER trg_sync_teacher_columns
+      BEFORE INSERT OR UPDATE ON public.teachers
+      FOR EACH ROW EXECUTE FUNCTION public.sync_teacher_legacy_columns();
   END IF;
 END $$;
 
 -- 8. INDEXES FOR PERFORMANCE
-CREATE INDEX IF NOT EXISTS idx_employees_org ON public.employees(org_id);
+CREATE INDEX IF NOT EXISTS idx_teachers_org ON public.teachers(org_id);
 CREATE INDEX IF NOT EXISTS idx_attendance_org_date ON public.attendance_records(org_id, date);
 CREATE INDEX IF NOT EXISTS idx_payroll_org ON public.payroll_records(org_id);
 CREATE INDEX IF NOT EXISTS idx_performance_org ON public.performance_reviews(org_id);
@@ -386,7 +386,7 @@ CREATE INDEX IF NOT EXISTS idx_announcements_org ON public.announcements(org_id)
 
 -- 9. ROW LEVEL SECURITY (RLS) POLICIES
 ALTER TABLE public.organizations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.employees ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.teachers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.attendance_records ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.payroll_records ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.performance_reviews ENABLE ROW LEVEL SECURITY;
@@ -402,11 +402,11 @@ CREATE POLICY "Allow anon insert organizations" ON public.organizations FOR INSE
 DROP POLICY IF EXISTS "Allow anon update organizations" ON public.organizations;
 CREATE POLICY "Allow anon update organizations" ON public.organizations FOR UPDATE USING (true);
 
-DROP POLICY IF EXISTS "Allow anon read employees" ON public.employees;
-CREATE POLICY "Allow anon read employees" ON public.employees FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Allow anon read teachers" ON public.teachers;
+CREATE POLICY "Allow anon read teachers" ON public.teachers FOR SELECT USING (true);
 
-DROP POLICY IF EXISTS "Allow anon write employees" ON public.employees;
-CREATE POLICY "Allow anon write employees" ON public.employees FOR ALL USING (true);
+DROP POLICY IF EXISTS "Allow anon write teachers" ON public.teachers;
+CREATE POLICY "Allow anon write teachers" ON public.teachers FOR ALL USING (true);
 
 DROP POLICY IF EXISTS "Allow anon read attendance" ON public.attendance_records;
 CREATE POLICY "Allow anon read attendance" ON public.attendance_records FOR SELECT USING (true);
@@ -437,12 +437,12 @@ INSERT INTO public.organizations (org_name, admin_name, email, logo_path)
 VALUES ('FLAWLESS GRAPHICS', 'James Ntiamoah', 'admin@flawlessgraphics.com', NULL)
 ON CONFLICT (org_name) DO NOTHING;
 
--- Seed employees safely: handles both legacy (name, role) and modern (full_name, position) schemas
+-- Seed teachers safely: handles both legacy (name, role) and modern (full_name, position) schemas
 DO $$
 BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='employees' AND column_name='name') THEN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='teachers' AND column_name='name') THEN
     EXECUTE $seed$
-      INSERT INTO public.employees (id, org_id, full_name, name, department, position, email, phone, salary, status)
+      INSERT INTO public.teachers (id, org_id, full_name, name, department, position, email, phone, salary, status)
       VALUES
         ('emp_1', 'FLAWLESS GRAPHICS', 'James Ntiamoah', 'James Ntiamoah', 'Executive & Design', 'Creative Director', 'james@flawless.org', '+233 24 111 2233', 8500.00, 'Active'),
         ('emp_2', 'FLAWLESS GRAPHICS', 'Ama Serwaa', 'Ama Serwaa', 'Operations', 'HR Manager', 'ama@flawless.org', '+233 20 222 3344', 6200.00, 'Active'),
@@ -462,7 +462,7 @@ BEGIN
     $seed$;
   ELSE
     EXECUTE $seed$
-      INSERT INTO public.employees (id, org_id, full_name, department, position, email, phone, salary, status)
+      INSERT INTO public.teachers (id, org_id, full_name, department, position, email, phone, salary, status)
       VALUES
         ('emp_1', 'FLAWLESS GRAPHICS', 'James Ntiamoah', 'Executive & Design', 'Creative Director', 'james@flawless.org', '+233 24 111 2233', 8500.00, 'Active'),
         ('emp_2', 'FLAWLESS GRAPHICS', 'Ama Serwaa', 'Operations', 'HR Manager', 'ama@flawless.org', '+233 20 222 3344', 6200.00, 'Active'),
@@ -482,8 +482,8 @@ BEGIN
   END IF;
 
   -- Ensure role column is populated if it exists
-  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='employees' AND column_name='role') THEN
-    EXECUTE 'UPDATE public.employees SET role = COALESCE(role, position) WHERE role IS NULL;';
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='teachers' AND column_name='role') THEN
+    EXECUTE 'UPDATE public.teachers SET role = COALESCE(role, position) WHERE role IS NULL;';
   END IF;
 END $$;
 

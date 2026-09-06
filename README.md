@@ -1,4 +1,4 @@
-# FLAWLESS GRAPHICS — LUCY™ Enterprise Management System
+﻿# FLAWLESS GRAPHICS — LUCY™ Enterprise Management System
 
 An integrated, modular web-based organizational management platform featuring multi-tenant registration, human resources administration, teacher and classroom management, and financial control.
 
@@ -28,17 +28,17 @@ flawless-graphics/
 │       ├── icons8-rhombus-loader.gif
 │       ├── icons8-laptop-closing.gif
 │       ├── payroll-automation.jpeg
-│       └── employee-attendance-tracking.jpg
+│       └── teacher-attendance-tracking.jpg
 ├── api/                             # PHP Backend REST Endpoints & Database
 │   ├── config/
 │   │   └── db.php                   # Centralized MySQLi & PDO Database connection
 │   ├── add_student.php              # Student registration API
-│   ├── delete_employee.php          # Employee removal API
-│   ├── get_employees.php            # Employee query endpoint
+│   ├── delete_teacher.php          # Teacher removal API
+│   ├── get_teachers.php            # Teacher query endpoint
 │   ├── get_students.php             # Live classroom student listing API
 │   ├── login.php                    # Server-side authentication
 │   ├── organizations.php            # Registered organization ledger view
-│   └── save_employee.php            # Employee create & update endpoint
+│   └── save_teacher.php            # Teacher create & update endpoint
 ├── pages/                           # Modular Application Portals
 │   ├── public/                      # Public Facing Website
 │   │   ├── home.html                # Enterprise landing & KPI preview
@@ -47,11 +47,11 @@ flawless-graphics/
 │   ├── hr/                          # Human Resources Management Portal
 │   │   ├── hr-dashboard.html        # Enterprise HR dashboard & analytics
 │   │   ├── hr-login.html            # HR administration authentication
-│   │   ├── employee.html            # Employee directory & CRUD portal
-│   │   ├── employee-reports.html    # Headcount & department reports
+│   │   ├── teacher.html            # Teacher directory & CRUD portal
+│   │   ├── teacher-reports.html    # Headcount & department reports
 │   │   ├── attendance-summary.html  # Daily attendance & check-in analytics
 │   │   ├── payroll.html             # Payroll distribution & summaries
-│   │   ├── payslip.html             # Downloadable employee payslips
+│   │   ├── payslip.html             # Downloadable teacher payslips
 │   │   ├── performance.html         # Staff appraisals & KPI ratings
 │   │   └── hr.html                  # HR module overview & hub
 │   ├── teacher/                     # Teacher & Classroom Portal
@@ -85,7 +85,7 @@ flawless-graphics/
 - Modern, animated responsive website showcasing company services, live KPI counters, department payroll summaries, and contact channels.
 
 ### 3. HR Management System (`pages/hr/`)
-- Comprehensive dashboard with Chart.js analytics, employee directory management, live MySQL sync, attendance tracking, and performance evaluations.
+- Comprehensive dashboard with Chart.js analytics, teacher directory management, live MySQL sync, attendance tracking, and performance evaluations.
 
 ### 4. Teacher & Classroom System (`pages/teacher/`)
 - Classroom timetable management, student enrollment with instant HR database sync, leave request submission, and internal messaging.

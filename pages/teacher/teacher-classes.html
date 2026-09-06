@@ -6,16 +6,70 @@
   <title>Classroom Module — Flawless Graphics</title>
   <link href="../../assets/css/teacher-dashboard.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 20px;
+      width: 100%;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .nav-left {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+    .nav-btn {
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      background: rgba(255, 255, 255, 0.08) !important;
+      color: #ffffff !important;
+      padding: 10px 14px !important;
+      border-radius: 12px !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+    }
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.18) !important;
+      border-color: rgba(2, 132, 199, 0.5) !important;
+      color: #38bdf8 !important;
+      transform: translateX(4px) !important;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+    }
+    .tab.view-tab {
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .tab.view-tab:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+    }
+  </style>
 </head>
 <body>
   <header class="header">
-    <div class="brand">
-      <div class="logo">FG</div>
-      <div><h1>Classroom Module</h1><div class="small">Manage classes & timetable</div></div>
-    </div>
-    <div class="controls">
-      <button class="btn" onclick="window.location.href='teacher-dashboard.html'">Back to Dashboard</button>
-      <button class="btn" onclick="window.location.href='../../welcome.html'">Hub</button>
+    <div class="header-left">
+      <div class="brand">
+        <div class="logo">FG</div>
+        <div><h1>Classroom Module</h1><div class="small">Manage classes & timetable</div></div>
+      </div>
+      <nav class="nav-left">
+        <button class="nav-btn" onclick="window.location.href='teacher-dashboard.html'"><i class="fa-solid fa-gauge"></i> Dashboard</button>
+        <button class="nav-btn" onclick="window.location.href='../../welcome.html'"><i class="fa-solid fa-house"></i> Hub</button>
+      </nav>
     </div>
   </header>
 

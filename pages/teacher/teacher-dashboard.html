@@ -13,14 +13,14 @@
 
 <style>
 :root {
-  --bg: #071027;
-  --card-bg: rgba(255, 255, 255, 0.04);
-  --card-border: rgba(255, 255, 255, 0.08);
-  --text-main: #f0f6fc;
-  --text-muted: #8b949e;
-  --accent1: #5ce1e6;
-  --accent2: #8c52ff;
-  --accent-gradient: linear-gradient(135deg, var(--accent1), var(--accent2));
+  --bg: #FAF7F2;
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --card-border: rgba(0, 0, 0, 0.08);
+  --text-main: #0F172A;
+  --text-muted: #64748B;
+  --accent1: #0284c7;
+  --accent2: #6366f1;
+  --accent-gradient: linear-gradient(135deg, #0284c7, #6366f1);
   --radius: 14px;
   --success: #10b981;
   --danger: #ef4444;
@@ -28,12 +28,12 @@
 }
 
 body.light-theme {
-  --bg: #f4f6fb;
+  --bg: #FAF7F2;
   --card-bg: #ffffff;
   --card-border: rgba(0, 0, 0, 0.08);
-  --text-main: #1e293b;
+  --text-main: #0F172A;
   --text-muted: #64748b;
-  --accent-gradient: linear-gradient(135deg, #4f46e5, #7c3aed);
+  --accent-gradient: linear-gradient(135deg, #0284c7, #6366f1);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -42,8 +42,8 @@ body {
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   background-color: var(--bg);
   background-image: 
-    radial-gradient(at 0% 0%, rgba(92, 225, 230, 0.08) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(140, 82, 255, 0.08) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, rgba(2, 132, 199, 0.06) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.06) 0px, transparent 50%);
   background-attachment: fixed;
   color: var(--text-main);
   min-height: 100vh;
@@ -53,22 +53,43 @@ body {
 
 .app { display: flex; min-height: 100vh; }
 
-/* Sidebar */
+/* Sidebar - Maintained Dark Navigation */
 .sidebar {
   width: 270px;
   padding: 24px;
-  background: rgba(15, 23, 42, 0.6);
+  background: #0B1120;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-right: 1px solid var(--card-border);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
   gap: 20px;
   z-index: 10;
+  color: #ffffff;
 }
 
 body.light-theme .sidebar {
-  background: rgba(255, 255, 255, 0.8);
+  background: #0B1120;
+  color: #ffffff;
+}
+
+.sidebar .brand, .sidebar .brand h3 { color: #ffffff; }
+.sidebar .profile-row {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+.sidebar .profile-row div div:last-child { color: rgba(255, 255, 255, 0.6) !important; }
+.sidebar .tab {
+  color: rgba(255, 255, 255, 0.75);
+}
+.sidebar .tab:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+.sidebar .tab.active {
+  background: var(--accent-gradient);
+  color: #ffffff;
 }
 
 .brand { display: flex; gap: 14px; align-items: center; }
@@ -119,17 +140,23 @@ body.light-theme .sidebar {
   display: flex;
   align-items: center;
   gap: 12px;
-  transition: var(--transition);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
 }
 .tab:hover {
   background: var(--card-bg);
   color: var(--text-main);
-  transform: translateX(4px);
+  transform: translateX(5px) translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 209, 255, 0.2);
 }
 .tab.active {
   background: var(--accent-gradient);
   color: #fff;
   box-shadow: 0 4px 12px rgba(92, 225, 230, 0.2);
+}
+.tab.active:hover {
+  transform: translateX(5px) translateY(-2px);
+  box-shadow: 0 6px 18px rgba(92, 225, 230, 0.4);
 }
 
 /* Main Area */
@@ -247,16 +274,140 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
 /* Custom Modal */
 .modal-overlay {
   position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+  background: rgba(0,0,0,0.65); backdrop-filter: blur(6px);
   display: flex; justify-content: center; align-items: center;
   opacity: 0; pointer-events: none; transition: var(--transition); z-index: 900;
+  padding: 16px; box-sizing: border-box;
 }
 .modal-overlay.active { opacity: 1; pointer-events: all; }
 .modal {
-  background: #0f172a; border: 1px solid var(--card-border); border-radius: 16px;
+  background: var(--card-bg, #ffffff); border: 1px solid var(--card-border); border-radius: 16px;
   width: 100%; max-width: 420px; padding: 24px; transform: scale(0.95); transition: var(--transition);
+  color: var(--text-main, #0F172A);
 }
 .modal-overlay.active .modal { transform: scale(1); }
+
+/* Detailed Student Modal Styles */
+.student-modal-card {
+  max-width: 760px !important;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px !important;
+  background: var(--card-bg, #ffffff) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25) !important;
+}
+.modal-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--card-border, rgba(0, 0, 0, 0.08));
+}
+.modal-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--accent-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.3);
+  flex-shrink: 0;
+}
+.modal-close-x {
+  border: none;
+  background: rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  color: var(--text-muted);
+}
+.modal-close-x:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+.form-section-title {
+  font-size: 12.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--accent1, #0284c7);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 18px 0 10px 0;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--card-border, rgba(0, 0, 0, 0.08));
+}
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+@media (max-width: 640px) {
+  .form-grid-3, .form-grid-2 { grid-template-columns: 1fr; }
+}
+.field-label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-muted, #64748B);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.field-label .req {
+  color: #ef4444;
+  margin-left: 2px;
+}
+.modal-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--card-border, rgba(0, 0, 0, 0.12));
+  background: var(--card-bg, #ffffff);
+  color: var(--text-main, #0F172A);
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.modal-input:focus {
+  border-color: var(--accent1, #0284c7);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+.modal-footer-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--card-border, rgba(0, 0, 0, 0.08));
+}
+.student-badge-status {
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-block;
+}
+.status-active { background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+.status-probation { background: rgba(245, 158, 11, 0.12); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+.status-pending { background: rgba(59, 130, 246, 0.12); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
+.status-scholarship { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.3); }
 
 @media(max-width: 1100px) {
   .kpis { grid-template-columns: repeat(2, 1fr); }
@@ -381,33 +532,19 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
           <button class="btn prim" id="newStudentBtn"><i class="fa-solid fa-user-plus"></i> Add Student</button>
         </div>
       </div>
-      
-      <!-- Live Add Student Form -->
-      <form id="addStudentForm" onsubmit="submitStudentForm(event)" style="margin-bottom:20px; background:var(--card-bg); padding:16px; border-radius:10px; border:1px solid var(--card-border);">
-        <h4 style="margin-bottom:12px;">Quick Student Registration (Backend Sync)</h4>
-        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
-          <div>
-            <label class="tiny">Student Name</label>
-            <input type="text" id="studentName" placeholder="e.g. John Doe" required />
-          </div>
-          <div>
-            <label class="tiny">Enrollment Code / ID</label>
-            <input type="text" id="enrollmentCode" placeholder="e.g. STU-3001" required />
-          </div>
-          <div>
-            <label class="tiny">Select Class</label>
-            <select id="classSelect" required>
-              <option value="1">Grade 10 - Mathematics</option>
-              <option value="2">Grade 11 - Biology</option>
-            </select>
-          </div>
-        </div>
-        <button type="submit" class="btn prim"><i class="fa-solid fa-paper-plane"></i> Submit to Server</button>
-      </form>
-
       <div class="table-scroll">
         <table id="studentsTable">
-          <thead><tr><th>#</th><th>Name</th><th>Roll</th><th>Phone</th><th>Actions</th></tr></thead>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Student Name</th>
+              <th>ID / Roll</th>
+              <th>Gender</th>
+              <th>Guardian & Contact</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
           <tbody></tbody>
         </table>
       </div>
@@ -521,6 +658,184 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
     <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
       <button class="btn ghost" id="modalCancelBtn">Cancel</button>
       <button class="btn prim" id="modalConfirmBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Detailed Student Registration & Edit Modal -->
+<div class="modal-overlay" id="studentModal">
+  <div class="modal student-modal-card">
+    <div class="modal-header-row">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="modal-icon-circle"><i class="fa-solid fa-graduation-cap"></i></div>
+        <div>
+          <h3 id="studentModalTitle" style="margin:0; font-size:18px; font-weight:800;">Register Student Profile</h3>
+          <div class="tiny" style="color:var(--text-muted);">Enter comprehensive academic, personal, and guardian details</div>
+        </div>
+      </div>
+      <button class="modal-close-x" onclick="closeStudentModal()" title="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <form id="studentDetailForm" onsubmit="saveStudentDetailForm(event)">
+      <input type="hidden" id="sm_studentId">
+      
+      <!-- Section 1: Personal Information -->
+      <div class="form-section-title"><i class="fa-solid fa-id-card"></i> 1. Personal & Demographics</div>
+      <div class="form-grid-3">
+        <div>
+          <label class="field-label">First Name <span class="req">*</span></label>
+          <input type="text" id="sm_firstName" class="modal-input" placeholder="e.g. Samuel" required>
+        </div>
+        <div>
+          <label class="field-label">Middle Name</label>
+          <input type="text" id="sm_middleName" class="modal-input" placeholder="e.g. Kofi">
+        </div>
+        <div>
+          <label class="field-label">Last Name / Surname <span class="req">*</span></label>
+          <input type="text" id="sm_lastName" class="modal-input" placeholder="e.g. Mensah" required>
+        </div>
+      </div>
+
+      <div class="form-grid-3">
+        <div>
+          <label class="field-label">Gender <span class="req">*</span></label>
+          <select id="sm_gender" class="modal-input" required>
+            <option value="">-- Select Gender --</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Date of Birth</label>
+          <input type="date" id="sm_dob" class="modal-input">
+        </div>
+        <div>
+          <label class="field-label">Blood Group</label>
+          <select id="sm_bloodGroup" class="modal-input">
+            <option value="Unknown">Not Specified</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Section 2: Academic Placement -->
+      <div class="form-section-title"><i class="fa-solid fa-chalkboard-user"></i> 2. Academic Placement & Enrollment</div>
+      <div class="form-grid-3">
+        <div>
+          <label class="field-label">Student ID / Roll No <span class="req">*</span></label>
+          <input type="text" id="sm_roll" class="modal-input" placeholder="e.g. STU-2026-001" required>
+        </div>
+        <div>
+          <label class="field-label">Assign Class / Grade <span class="req">*</span></label>
+          <select id="sm_classId" class="modal-input" required></select>
+        </div>
+        <div>
+          <label class="field-label">Enrollment Status</label>
+          <select id="sm_status" class="modal-input">
+            <option value="Active">Active Student</option>
+            <option value="Probation">On Probation</option>
+            <option value="Pending">Pending Approval</option>
+            <option value="Scholarship">Scholarship Recipient</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div>
+          <label class="field-label">Academic Term / Semester</label>
+          <input type="text" id="sm_term" class="modal-input" placeholder="e.g. 2026 / Term 1">
+        </div>
+        <div>
+          <label class="field-label">Enrollment / Admission Date</label>
+          <input type="date" id="sm_enrollmentDate" class="modal-input">
+        </div>
+      </div>
+
+      <!-- Section 3: Parent / Guardian & Contact -->
+      <div class="form-section-title"><i class="fa-solid fa-users"></i> 3. Parent / Guardian & Contacts</div>
+      <div class="form-grid-3">
+        <div>
+          <label class="field-label">Guardian Full Name <span class="req">*</span></label>
+          <input type="text" id="sm_guardianName" class="modal-input" placeholder="e.g. Mary Mensah" required>
+        </div>
+        <div>
+          <label class="field-label">Relationship <span class="req">*</span></label>
+          <select id="sm_guardianRel" class="modal-input" required>
+            <option value="Mother">Mother</option>
+            <option value="Father">Father</option>
+            <option value="Guardian">Legal Guardian</option>
+            <option value="Sponsor">Sponsor / Relative</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Primary Phone <span class="req">*</span></label>
+          <input type="tel" id="sm_phone" class="modal-input" placeholder="e.g. +233 24 123 4567" required>
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div>
+          <label class="field-label">Guardian Email</label>
+          <input type="email" id="sm_guardianEmail" class="modal-input" placeholder="e.g. parent@example.com">
+        </div>
+        <div>
+          <label class="field-label">Residential Address</label>
+          <input type="text" id="sm_address" class="modal-input" placeholder="e.g. House No. 24, Ring Road, Accra">
+        </div>
+      </div>
+
+      <!-- Section 4: Emergency & Health / Special Notes -->
+      <div class="form-section-title"><i class="fa-solid fa-notes-medical"></i> 4. Emergency & Special Notes</div>
+      <div class="form-grid-2">
+        <div>
+          <label class="field-label">Emergency Contact Phone</label>
+          <input type="tel" id="sm_emergencyPhone" class="modal-input" placeholder="e.g. +233 20 987 6543">
+        </div>
+        <div>
+          <label class="field-label">Known Allergies / Medical Conditions</label>
+          <input type="text" id="sm_medicalNotes" class="modal-input" placeholder="e.g. Penicillin allergy, Asthma, None">
+        </div>
+      </div>
+
+      <div>
+        <label class="field-label">Teacher Remarks / Special Educational Needs</label>
+        <textarea id="sm_notes" class="modal-input" rows="2" placeholder="e.g. Prefers visual aids, assigned front desk, advanced in mathematics..."></textarea>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div class="modal-footer-row">
+        <button type="button" class="btn ghost" onclick="closeStudentModal()"><i class="fa-solid fa-xmark"></i> Cancel</button>
+        <button type="submit" class="btn prim" id="sm_saveBtn"><i class="fa-solid fa-check"></i> Save Student Record</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- View Student Profile Modal -->
+<div class="modal-overlay" id="viewStudentModal">
+  <div class="modal student-modal-card" style="max-width: 620px !important;">
+    <div class="modal-header-row">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="modal-icon-circle" id="vs_avatar"><i class="fa-solid fa-user"></i></div>
+        <div>
+          <h3 id="vs_fullName" style="margin:0; font-size:18px; font-weight:800;">Student Profile</h3>
+          <div class="tiny" id="vs_classRoll" style="color:var(--text-muted);">Class & Roll</div>
+        </div>
+      </div>
+      <button class="modal-close-x" onclick="closeViewStudentModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="vs_content" style="display:flex; flex-direction:column; gap:14px;"></div>
+    <div class="modal-footer-row">
+      <button type="button" class="btn ghost" onclick="closeViewStudentModal()">Close</button>
+      <button type="button" class="btn prim" id="vs_editBtn"><i class="fa-solid fa-pen"></i> Edit Record</button>
     </div>
   </div>
 </div>
@@ -736,79 +1051,303 @@ function populateClassSelects(){
 function renderStudentsForClass(classId){
   const arr = getClasses(); const cls = arr.find(c=>c.id===classId);
   const tbody = document.querySelector('#studentsTable tbody'); tbody.innerHTML = '';
-  if(!cls){ tbody.innerHTML = '<tr><td colspan="5" class="tiny">Select a class to view enrollment</td></tr>'; return; }
-  (cls.students||[]).forEach((s,i)=>{
+  if(!cls){ tbody.innerHTML = '<tr><td colspan="7" class="tiny" style="text-align:center; padding:18px;">Select a class to view enrollment</td></tr>'; return; }
+  const students = cls.students || [];
+  if(students.length === 0){
+    tbody.innerHTML = '<tr><td colspan="7" class="tiny" style="text-align:center; padding:24px; color:var(--text-muted);"><i class="fa-solid fa-user-graduate" style="font-size:26px; margin-bottom:8px; display:block; opacity:0.5;"></i>No students registered in this class yet. Click "Add Student" to register.</td></tr>';
+    updateKPIs(); renderClassPreview(); return;
+  }
+  students.forEach((s,i)=>{
+    const fullName = escapeHtml([s.firstName, s.middleName, s.lastName].filter(Boolean).join(' '));
+    const status = s.status || 'Active';
+    const statusClass = status.toLowerCase();
+    const guardianInfo = s.guardianName ? `${escapeHtml(s.guardianName)} (${escapeHtml(s.phone||'No phone')})` : escapeHtml(s.phone||'—');
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(s.firstName + ' ' + (s.lastName||''))}</td><td>${escapeHtml(s.roll||'—')}</td><td>${escapeHtml(s.phone||'—')}</td>
-    <td>
-      <button class="btn ghost" style="padding:4px 8px;" onclick="editStudent('${classId}','${s.id}')"><i class="fa-solid fa-pen"></i></button>
-      <button class="btn ghost" style="padding:4px 8px; color:var(--danger)" onclick="deleteStudent('${classId}','${s.id}')"><i class="fa-solid fa-trash"></i></button>
-    </td>`;
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:34px; height:34px; border-radius:50%; background:var(--accent-gradient); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex-shrink:0;">
+            ${escapeHtml((s.firstName?.[0]||'S') + (s.lastName?.[0]||''))}
+          </div>
+          <div>
+            <div style="font-weight:700;">${fullName}</div>
+            <div class="tiny" style="color:var(--text-muted);">${escapeHtml(s.guardianRel ? s.guardianRel + "'s Child" : 'Student')}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="badge" style="font-family:monospace; font-weight:700;">${escapeHtml(s.roll||'—')}</span></td>
+      <td>${escapeHtml(s.gender||'—')}</td>
+      <td>
+        <div>${guardianInfo}</div>
+        ${s.guardianEmail ? `<div class="tiny" style="color:var(--text-muted);">${escapeHtml(s.guardianEmail)}</div>` : ''}
+      </td>
+      <td><span class="student-badge-status status-${statusClass}">${escapeHtml(status)}</span></td>
+      <td>
+        <div style="display:flex; gap:4px;">
+          <button class="btn ghost" style="padding:4px 8px;" title="View Full Details" onclick="viewStudentDetails('${classId}','${s.id}')"><i class="fa-solid fa-eye"></i></button>
+          <button class="btn ghost" style="padding:4px 8px;" title="Edit Student" onclick="openStudentModal('${classId}','${s.id}')"><i class="fa-solid fa-pen"></i></button>
+          <button class="btn ghost" style="padding:4px 8px; color:var(--danger)" title="Delete Student" onclick="deleteStudent('${classId}','${s.id}')"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </td>`;
     tbody.appendChild(tr);
   });
   updateKPIs();
   renderClassPreview();
 }
 
-async function submitStudentForm(event) {
-  event.preventDefault();
-  const payload = {
-    student_name: document.getElementById('studentName').value,
-    enrollment_code: document.getElementById('enrollmentCode').value,
-    class_id: document.getElementById('classSelect').value
+/* Comprehensive Student Registration Modal Logic */
+function openStudentModal(classId, studentId = null) {
+  const arr = getClasses();
+  if (!classId) {
+    classId = document.getElementById('selectClassForStudents').value || (arr[0] && arr[0].id);
+  }
+  if (!classId) return toast('Please create and select a class first');
+
+  // Populate class dropdown in modal
+  const classSelect = document.getElementById('sm_classId');
+  classSelect.innerHTML = '';
+  arr.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = c.name + (c.subject ? ` (${c.subject})` : '');
+    if (c.id === classId) opt.selected = true;
+    classSelect.appendChild(opt);
+  });
+
+  const form = document.getElementById('studentDetailForm');
+  form.reset();
+
+  if (studentId) {
+    // Edit Mode
+    const cls = arr.find(c => c.id === classId);
+    const s = cls ? (cls.students || []).find(x => x.id === studentId) : null;
+    if (!s) return toast('Student not found');
+
+    document.getElementById('studentModalTitle').textContent = 'Edit Student Profile';
+    document.getElementById('sm_studentId').value = s.id;
+    document.getElementById('sm_firstName').value = s.firstName || '';
+    document.getElementById('sm_middleName').value = s.middleName || '';
+    document.getElementById('sm_lastName').value = s.lastName || '';
+    document.getElementById('sm_gender').value = s.gender || '';
+    document.getElementById('sm_dob').value = s.dob || '';
+    document.getElementById('sm_bloodGroup').value = s.bloodGroup || 'Unknown';
+    document.getElementById('sm_roll').value = s.roll || '';
+    document.getElementById('sm_classId').value = classId;
+    document.getElementById('sm_status').value = s.status || 'Active';
+    document.getElementById('sm_term').value = s.term || '';
+    document.getElementById('sm_enrollmentDate').value = s.enrollmentDate || '';
+    document.getElementById('sm_guardianName').value = s.guardianName || '';
+    document.getElementById('sm_guardianRel').value = s.guardianRel || 'Mother';
+    document.getElementById('sm_phone').value = s.phone || '';
+    document.getElementById('sm_guardianEmail').value = s.guardianEmail || '';
+    document.getElementById('sm_address').value = s.address || '';
+    document.getElementById('sm_emergencyPhone').value = s.emergencyPhone || '';
+    document.getElementById('sm_medicalNotes').value = s.medicalNotes || '';
+    document.getElementById('sm_notes').value = s.notes || '';
+    document.getElementById('sm_saveBtn').innerHTML = '<i class="fa-solid fa-check"></i> Update Student Profile';
+  } else {
+    // Add Mode
+    document.getElementById('studentModalTitle').textContent = 'Register Student Profile';
+    document.getElementById('sm_studentId').value = '';
+    const existingCount = (arr.find(c => c.id === classId)?.students || []).length;
+    document.getElementById('sm_roll').value = 'STU-' + new Date().getFullYear() + '-' + String(existingCount + 1).padStart(3, '0');
+    document.getElementById('sm_enrollmentDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('sm_term').value = new Date().getFullYear() + ' - Term 1';
+    document.getElementById('sm_saveBtn').innerHTML = '<i class="fa-solid fa-check"></i> Save & Enroll Student';
+  }
+
+  document.getElementById('studentModal').classList.add('active');
+  setTimeout(() => document.getElementById('sm_firstName').focus(), 100);
+}
+
+function closeStudentModal() {
+  document.getElementById('studentModal').classList.remove('active');
+}
+
+function saveStudentDetailForm(e) {
+  e.preventDefault();
+  const classId = document.getElementById('sm_classId').value;
+  if (!classId) return toast('Please select an assigned class');
+
+  const studentId = document.getElementById('sm_studentId').value;
+  const firstName = document.getElementById('sm_firstName').value.trim();
+  const middleName = document.getElementById('sm_middleName').value.trim();
+  const lastName = document.getElementById('sm_lastName').value.trim();
+  const gender = document.getElementById('sm_gender').value;
+  const dob = document.getElementById('sm_dob').value;
+  const bloodGroup = document.getElementById('sm_bloodGroup').value;
+  const roll = document.getElementById('sm_roll').value.trim();
+  const status = document.getElementById('sm_status').value;
+  const term = document.getElementById('sm_term').value.trim();
+  const enrollmentDate = document.getElementById('sm_enrollmentDate').value;
+  const guardianName = document.getElementById('sm_guardianName').value.trim();
+  const guardianRel = document.getElementById('sm_guardianRel').value;
+  const phone = document.getElementById('sm_phone').value.trim();
+  const guardianEmail = document.getElementById('sm_guardianEmail').value.trim();
+  const address = document.getElementById('sm_address').value.trim();
+  const emergencyPhone = document.getElementById('sm_emergencyPhone').value.trim();
+  const medicalNotes = document.getElementById('sm_medicalNotes').value.trim();
+  const notes = document.getElementById('sm_notes').value.trim();
+
+  if (!firstName || !lastName) return toast('First and Last names are required');
+  if (!roll) return toast('Roll number is required');
+
+  const studentData = {
+    firstName,
+    middleName,
+    lastName,
+    gender,
+    dob,
+    bloodGroup,
+    roll,
+    status,
+    term,
+    enrollmentDate,
+    guardianName,
+    guardianRel,
+    phone,
+    guardianEmail,
+    address,
+    emergencyPhone,
+    medicalNotes,
+    notes,
+    updatedAt: Date.now()
   };
 
-  try {
-    const response = await fetch('../../api/add_student.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+  const arr = getClasses();
+  const cls = arr.find(c => c.id === classId);
+  if (!cls) return toast('Class not found');
+  cls.students = cls.students || [];
 
-    const result = await response.json();
-
-    if (result.status === 'success') {
-      toast('Student registered! HR can now view this student instantly.');
-      document.getElementById('addStudentForm').reset();
+  if (studentId) {
+    // Update existing student
+    const idx = cls.students.findIndex(s => s.id === studentId);
+    if (idx !== -1) {
+      cls.students[idx] = { ...cls.students[idx], ...studentData };
     } else {
-      toast('Error: ' + result.message);
+      for (const otherClass of arr) {
+        const otherIdx = (otherClass.students || []).findIndex(s => s.id === studentId);
+        if (otherIdx !== -1) {
+          const [movedStudent] = otherClass.students.splice(otherIdx, 1);
+          cls.students.push({ ...movedStudent, ...studentData });
+          break;
+        }
+      }
     }
-  } catch (error) {
-    console.error('Submission failed:', error);
-    toast('Failed to connect to backend server.');
+    toast(`Student ${firstName} ${lastName} updated successfully`);
+  } else {
+    // New Student
+    studentData.id = 's_' + Date.now();
+    studentData.createdAt = Date.now();
+    cls.students.push(studentData);
+    toast(`Student ${firstName} ${lastName} enrolled in ${cls.name}`);
+    pushActivity(`Enrolled student ${firstName} ${lastName} in ${cls.name}`);
   }
+
+  saveClasses(arr);
+  closeStudentModal();
+  document.getElementById('selectClassForStudents').value = classId;
+  renderStudentsForClass(classId);
+}
+
+function viewStudentDetails(classId, studentId) {
+  const arr = getClasses();
+  const cls = arr.find(c => c.id === classId);
+  if (!cls) return toast('Class not found');
+  const s = (cls.students || []).find(x => x.id === studentId);
+  if (!s) return toast('Student record not found');
+
+  const fullName = escapeHtml([s.firstName, s.middleName, s.lastName].filter(Boolean).join(' '));
+  document.getElementById('vs_fullName').textContent = fullName;
+  document.getElementById('vs_classRoll').textContent = `${cls.name} • Roll: ${s.roll || '—'} • Status: ${s.status || 'Active'}`;
+  document.getElementById('vs_avatar').innerHTML = `<span style="font-weight:800; font-size:16px;">${escapeHtml((s.firstName?.[0]||'S') + (s.lastName?.[0]||''))}</span>`;
+
+  const container = document.getElementById('vs_content');
+  container.innerHTML = `
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; background:rgba(0,0,0,0.03); padding:16px; border-radius:12px; border:1px solid var(--card-border);">
+      <div>
+        <div class="tiny" style="color:var(--text-muted); font-weight:700;">GENDER & D.O.B</div>
+        <div style="font-weight:600; font-size:13px; margin-top:2px;">${escapeHtml(s.gender || '—')} • ${escapeHtml(s.dob || 'Not provided')}</div>
+      </div>
+      <div>
+        <div class="tiny" style="color:var(--text-muted); font-weight:700;">BLOOD GROUP</div>
+        <div style="font-weight:600; font-size:13px; margin-top:2px;"><span class="badge">${escapeHtml(s.bloodGroup || 'Unknown')}</span></div>
+      </div>
+      <div>
+        <div class="tiny" style="color:var(--text-muted); font-weight:700;">ACADEMIC TERM</div>
+        <div style="font-weight:600; font-size:13px; margin-top:2px;">${escapeHtml(s.term || 'Current Term')}</div>
+      </div>
+      <div>
+        <div class="tiny" style="color:var(--text-muted); font-weight:700;">ENROLLMENT DATE</div>
+        <div style="font-weight:600; font-size:13px; margin-top:2px;">${escapeHtml(s.enrollmentDate || '—')}</div>
+      </div>
+    </div>
+
+    <div style="background:rgba(0,0,0,0.03); padding:16px; border-radius:12px; border:1px solid var(--card-border);">
+      <div class="tiny" style="color:var(--accent1); font-weight:800; text-transform:uppercase; margin-bottom:8px;"><i class="fa-solid fa-users"></i> Guardian Information</div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <div>
+          <div class="tiny" style="color:var(--text-muted);">Name & Relation:</div>
+          <div style="font-weight:700; font-size:13px;">${escapeHtml(s.guardianName || '—')} (${escapeHtml(s.guardianRel || 'Guardian')})</div>
+        </div>
+        <div>
+          <div class="tiny" style="color:var(--text-muted);">Primary Phone:</div>
+          <div style="font-weight:700; font-size:13px;"><a href="tel:${escapeHtml(s.phone||'')}" style="color:var(--accent1); text-decoration:none;"><i class="fa-solid fa-phone"></i> ${escapeHtml(s.phone || '—')}</a></div>
+        </div>
+        <div>
+          <div class="tiny" style="color:var(--text-muted);">Email:</div>
+          <div style="font-size:12px;">${escapeHtml(s.guardianEmail || '—')}</div>
+        </div>
+        <div>
+          <div class="tiny" style="color:var(--text-muted);">Residential Address:</div>
+          <div style="font-size:12px;">${escapeHtml(s.address || '—')}</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:rgba(0,0,0,0.03); padding:16px; border-radius:12px; border:1px solid var(--card-border);">
+      <div class="tiny" style="color:var(--accent1); font-weight:800; text-transform:uppercase; margin-bottom:8px;"><i class="fa-solid fa-notes-medical"></i> Medical & Special Instructions</div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <div>
+          <div class="tiny" style="color:var(--text-muted);">Emergency Phone:</div>
+          <div style="font-weight:700; font-size:13px;">${escapeHtml(s.emergencyPhone || '—')}</div>
+        </div>
+        <div>
+          <div class="tiny" style="color:var(--text-muted);">Allergies / Conditions:</div>
+          <div style="font-size:12px; color:#ef4444; font-weight:600;">${escapeHtml(s.medicalNotes || 'None recorded')}</div>
+        </div>
+      </div>
+      ${s.notes ? `<div style="margin-top:8px; border-top:1px dashed var(--card-border); padding-top:8px;"><div class="tiny" style="color:var(--text-muted);">Teacher Remarks:</div><div style="font-size:12px; font-style:italic;">${escapeHtml(s.notes)}</div></div>` : ''}
+    </div>
+  `;
+
+  document.getElementById('vs_editBtn').onclick = () => {
+    closeViewStudentModal();
+    openStudentModal(classId, studentId);
+  };
+
+  document.getElementById('viewStudentModal').classList.add('active');
+}
+
+function closeViewStudentModal() {
+  document.getElementById('viewStudentModal').classList.remove('active');
 }
 
 document.getElementById('newStudentBtn').addEventListener('click', ()=>{
   const classId = document.getElementById('selectClassForStudents').value;
-  if(!classId) return toast('Select a class first');
-  openModal('Add Student', [{name:'firstName', label:'First Name'}, {name:'lastName', label:'Last Name'}, {name:'roll', label:'Roll No'}, {name:'phone', label:'Phone'}], (data)=>{
-    if(!data.firstName) return toast('First name required');
-    const arr = getClasses(); const c = arr.find(x=>x.id===classId);
-    c.students = c.students||[];
-    c.students.push({ id:'s_'+Date.now(), ...data });
-    saveClasses(arr); renderStudentsForClass(classId); pushActivity(`Added student ${data.firstName} to ${c.name}`); toast('Student added');
-  });
+  openStudentModal(classId);
 });
 
 function editStudent(classId, studentId){
-  const arr = getClasses(); const c = arr.find(x=>x.id===classId); if(!c) return;
-  const s = c.students.find(x=>x.id===studentId); if(!s) return;
-  openModal('Edit Student', [
-    {name:'firstName', label:'First Name', value:s.firstName},
-    {name:'lastName', label:'Last Name', value:s.lastName},
-    {name:'roll', label:'Roll No', value:s.roll},
-    {name:'phone', label:'Phone', value:s.phone}
-  ], (data)=>{
-    Object.assign(s, data);
-    saveClasses(arr); renderStudentsForClass(classId); toast('Student details updated');
-  });
+  openStudentModal(classId, studentId);
 }
 
 function deleteStudent(classId, studentId){
-  if(!confirm('Delete student?')) return;
-  const arr=getClasses(); const c = arr.find(x=>x.id===classId);
-  c.students = c.students.filter(s=>s.id!==studentId);
+  if(!confirm('Are you sure you want to remove this student from the class?')) return;
+  const arr = getClasses(); const c = arr.find(x=>x.id===classId);
+  if(!c) return;
+  c.students = (c.students||[]).filter(s=>s.id!==studentId);
   saveClasses(arr); renderStudentsForClass(classId); toast('Student deleted');
 }
 

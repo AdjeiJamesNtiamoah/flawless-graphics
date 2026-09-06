@@ -1,4 +1,4 @@
-/**
+﻿/**
  * supabase-client.js
  * Centralized Supabase Integration & Bi-Directional Cloud Sync Bridge
  * FLAWLESS GRAPHICS — LUCY™ Management System
@@ -91,8 +91,8 @@
     /* -------------------------------------------------------------
        1. EMPLOYEES CLOUD SYNC
     ------------------------------------------------------------- */
-    async getEmployees(orgId = 'FLAWLESS GRAPHICS') {
-      const localKey = `${orgId}_employees`;
+    async getTeachers(orgId = 'FLAWLESS GRAPHICS') {
+      const localKey = `${orgId}_teachers`;
       const localData = safeParse(localStorage.getItem(localKey), []);
 
       if (!Config.isConfigured()) {
@@ -100,7 +100,7 @@
       }
 
       try {
-        const cloudData = await this.query(`employees?org_id=eq.${encodeURIComponent(orgId)}&order=created_at.desc`);
+        const cloudData = await this.query(`teachers?org_id=eq.${encodeURIComponent(orgId)}&order=created_at.desc`);
         if (Array.isArray(cloudData) && cloudData.length > 0) {
           // Normalize column names
           const normalized = cloudData.map(e => ({
@@ -123,50 +123,50 @@
           return normalized;
         } else if (localData.length > 0 && Config.isAutoSync()) {
           // Push initial local seed to cloud
-          this.migrateEmployees(orgId, localData).catch(console.warn);
+          this.migrateTeachers(orgId, localData).catch(console.warn);
           return localData;
         }
         return localData;
       } catch (err) {
-        console.warn('Could not fetch cloud employees, falling back to local storage:', err.message);
+        console.warn('Could not fetch cloud teachers, falling back to local storage:', err.message);
         return localData;
       }
     }
 
-    async saveEmployee(orgId, employee) {
-      const localKey = `${orgId}_employees`;
+    async saveTeacher(orgId, teacher) {
+      const localKey = `${orgId}_teachers`;
       let localData = safeParse(localStorage.getItem(localKey), []);
       
-      const empName = employee.fullName || employee.name || '';
-      const empRole = employee.position || employee.role || 'Staff';
-      const empDept = employee.department || employee.dept || 'General';
+      const empName = teacher.fullName || teacher.name || '';
+      const empRole = teacher.position || teacher.role || 'Staff';
+      const empDept = teacher.department || teacher.dept || 'General';
 
       const payload = {
-        id: String(employee.id || ('emp_' + Date.now())),
+        id: String(teacher.id || ('emp_' + Date.now())),
         org_id: orgId,
         full_name: empName,
         department: empDept,
         position: empRole,
-        email: employee.email || '',
-        phone: employee.phone || '',
-        salary: Number(employee.salary || 0),
-        status: employee.status || 'Active',
-        photo_url: employee.photo || null
+        email: teacher.email || '',
+        phone: teacher.phone || '',
+        salary: Number(teacher.salary || 0),
+        status: teacher.status || 'Active',
+        photo_url: teacher.photo || null
       };
 
       // 1. Update local cache immediately
       const existingIdx = localData.findIndex(e => e.id === payload.id);
       if (existingIdx >= 0) {
-        localData[existingIdx] = Object.assign({}, localData[existingIdx], employee);
+        localData[existingIdx] = Object.assign({}, localData[existingIdx], teacher);
       } else {
-        localData.unshift(employee);
+        localData.unshift(teacher);
       }
       localStorage.setItem(localKey, JSON.stringify(localData));
 
       // 2. Cloud sync if configured (with adaptive schema fallbacks)
       if (Config.isConfigured()) {
         try {
-          await this.query('employees', 'POST', payload, {
+          await this.query('teachers', 'POST', payload, {
             'Prefer': 'resolution=merge-duplicates,return=representation'
           });
         } catch (err) {
@@ -178,39 +178,39 @@
                 name: empName,
                 role: empRole
               });
-              await this.query('employees', 'POST', legacyPayload, {
+              await this.query('teachers', 'POST', legacyPayload, {
                 'Prefer': 'resolution=merge-duplicates,return=representation'
               });
             } catch (err2) {
-              console.warn('Cloud sync error saving employee (retry failed):', err2.message);
+              console.warn('Cloud sync error saving teacher (retry failed):', err2.message);
             }
           } else {
-            console.warn('Cloud sync error saving employee:', err.message);
+            console.warn('Cloud sync error saving teacher:', err.message);
           }
         }
       }
 
-      return employee;
+      return teacher;
     }
 
-    async deleteEmployee(orgId, employeeId) {
-      const localKey = `${orgId}_employees`;
+    async deleteTeacher(orgId, teacherId) {
+      const localKey = `${orgId}_teachers`;
       let localData = safeParse(localStorage.getItem(localKey), []);
-      localData = localData.filter(e => e.id !== employeeId);
+      localData = localData.filter(e => e.id !== teacherId);
       localStorage.setItem(localKey, JSON.stringify(localData));
 
       if (Config.isConfigured()) {
         try {
-          await this.query(`employees?id=eq.${encodeURIComponent(employeeId)}&org_id=eq.${encodeURIComponent(orgId)}`, 'DELETE');
+          await this.query(`teachers?id=eq.${encodeURIComponent(teacherId)}&org_id=eq.${encodeURIComponent(orgId)}`, 'DELETE');
         } catch (err) {
-          console.warn('Cloud sync error deleting employee:', err.message);
+          console.warn('Cloud sync error deleting teacher:', err.message);
         }
       }
     }
 
-    async migrateEmployees(orgId, employees) {
-      if (!Config.isConfigured() || !Array.isArray(employees) || employees.length === 0) return;
-      const rows = employees.map(e => ({
+    async migrateTeachers(orgId, teachers) {
+      if (!Config.isConfigured() || !Array.isArray(teachers) || teachers.length === 0) return;
+      const rows = teachers.map(e => ({
         id: String(e.id || ('emp_' + Date.now() + Math.random().toString(36).substring(2, 5))),
         org_id: orgId,
         full_name: e.fullName || e.name || '',
@@ -224,7 +224,7 @@
       }));
 
       try {
-        await this.query('employees', 'POST', rows, {
+        await this.query('teachers', 'POST', rows, {
           'Prefer': 'resolution=merge-duplicates'
         });
       } catch (err) {
@@ -235,14 +235,14 @@
               name: r.full_name,
               role: r.position
             }));
-            await this.query('employees', 'POST', legacyRows, {
+            await this.query('teachers', 'POST', legacyRows, {
               'Prefer': 'resolution=merge-duplicates'
             });
           } catch (err2) {
-            console.warn('migrateEmployees retry failed:', err2.message);
+            console.warn('migrateTeachers retry failed:', err2.message);
           }
         } else {
-          console.warn('migrateEmployees error:', err.message);
+          console.warn('migrateTeachers error:', err.message);
         }
       }
     }
@@ -266,7 +266,7 @@
         if (Array.isArray(cloudData) && cloudData.length > 0) {
           const normalized = cloudData.map(r => ({
             id: r.id,
-            employeeName: r.employee_name,
+            teacherName: r.teacher_name,
             department: r.department,
             date: r.date,
             checkIn: r.check_in,
@@ -295,7 +295,7 @@
       const payload = {
         id: record.id || ('att_' + Date.now()),
         org_id: orgId,
-        employee_name: record.employeeName,
+        teacher_name: record.teacherName,
         department: record.department,
         date: record.date,
         check_in: record.checkIn,
@@ -305,7 +305,7 @@
         remarks: record.remarks || ''
       };
 
-      const idx = localData.findIndex(r => r.id === payload.id || (r.employeeName === payload.employee_name && r.date === payload.date));
+      const idx = localData.findIndex(r => r.id === payload.id || (r.teacherName === payload.teacher_name && r.date === payload.date));
       if (idx >= 0) {
         localData[idx] = Object.assign({}, localData[idx], record);
       } else {
@@ -334,13 +334,13 @@
         throw new Error('Supabase is not configured. Please enter your project credentials first.');
       }
 
-      const results = { employees: 0, attendance: 0, performance: 0 };
+      const results = { teachers: 0, attendance: 0, performance: 0 };
 
-      // 1. Employees
-      const emps = safeParse(localStorage.getItem(`${orgId}_employees`), []);
+      // 1. Teachers
+      const emps = safeParse(localStorage.getItem(`${orgId}_teachers`), []);
       if (emps.length > 0) {
-        await this.migrateEmployees(orgId, emps);
-        results.employees = emps.length;
+        await this.migrateTeachers(orgId, emps);
+        results.teachers = emps.length;
       }
 
       // 2. Attendance
@@ -349,7 +349,7 @@
         const attRows = atts.map(r => ({
           id: r.id || ('att_' + Date.now() + Math.random().toString(36).substring(2, 5)),
           org_id: orgId,
-          employee_name: r.employeeName,
+          teacher_name: r.teacherName,
           department: r.department || 'Staff',
           date: r.date,
           check_in: r.checkIn || null,
@@ -368,7 +368,7 @@
         const perfRows = perfs.map(p => ({
           id: p.id || ('perf_' + Date.now() + Math.random().toString(36).substring(2, 5)),
           org_id: orgId,
-          employee_name: p.employeeName,
+          teacher_name: p.teacherName,
           department: p.department || 'Staff',
           position: p.position || 'Staff',
           kpi: Number(p.kpi || 90),

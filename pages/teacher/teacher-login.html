@@ -20,19 +20,18 @@
 
     body {
         font-family: 'Plus Jakarta Sans', sans-serif;
-        background-color: #9292db;
+        background-color: #FAF7F2;
         background-image: 
-            radial-gradient(at 0% 0%, #a5a6f6 0px, transparent 50%),
-            radial-gradient(at 100% 100%, #311868 0px, transparent 50%),
-            radial-gradient(at 50% 50%, #4c2882 0px, transparent 100%);
+            radial-gradient(at 0% 0%, #f4ede4 0px, transparent 50%),
+            radial-gradient(at 100% 100%, #e8decb 0px, transparent 50%),
+            radial-gradient(at 50% 50%, #fbf9f5 0px, transparent 100%);
         background-size: 140% 140%;
-        animation: gradientGlow 12s ease infinite alternate;
         min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
         padding: 20px;
-        color: #ffffff;
+        color: #0F172A;
         overflow-x: hidden;
     }
 
@@ -71,10 +70,14 @@
         background: rgba(255, 255, 255, 0.05);
         padding: 12px 20px;
         display: flex;
-        justify-content: flex-end;
+        justify-content: space-between;
         align-items: center;
-        gap: 8px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .window-dots {
+        display: flex;
+        gap: 8px;
     }
 
     .dot {
@@ -85,6 +88,33 @@
     .dot-1 { background: #9c8ce8; }
     .dot-2 { background: #72efdd; }
     .dot-3 { background: #92b0ff; }
+
+    .window-quick-nav {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .window-nav-link {
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 11px;
+        font-weight: 600;
+        text-decoration: none;
+        padding: 5px 12px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .window-nav-link:hover {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.16);
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 4px 14px rgba(114, 239, 221, 0.3);
+        border-color: rgba(114, 239, 221, 0.4);
+    }
 
     /* Main Split Body Layout */
     .main-container {
@@ -218,13 +248,17 @@
         font-size: 12px;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        text-decoration: none;
     }
 
     .btn-outline:hover {
-        background: rgba(255, 255, 255, 0.15);
-        border-color: rgba(255, 255, 255, 0.5);
-        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.18);
+        border-color: #72efdd;
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25), 0 0 14px rgba(114, 239, 221, 0.25);
     }
 
     .link-subtle {
@@ -232,11 +266,16 @@
         font-size: 12px;
         text-decoration: none;
         font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.25s ease;
     }
 
     .link-subtle:hover {
-        color: #ffffff;
-        text-decoration: underline;
+        color: #72efdd;
+        transform: translateY(-2px);
+        text-decoration: none;
     }
 
     /* Right Form Card */
@@ -475,9 +514,22 @@
 <div class="app-window">
     <!-- Window Controls Header -->
     <div class="window-header">
-        <div class="dot dot-1"></div>
-        <div class="dot dot-2"></div>
-        <div class="dot dot-3"></div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <div class="window-dots">
+                <div class="dot dot-1"></div>
+                <div class="dot dot-2"></div>
+                <div class="dot dot-3"></div>
+            </div>
+            <nav class="window-quick-nav">
+                <a href="../../welcome.html" class="window-nav-link"><i class="fa-solid fa-grid-horizontal"></i> Hub</a>
+                <a href="../public/home.html" class="window-nav-link"><i class="fa-solid fa-house"></i> Main Site</a>
+                <a href="../../index.html" class="window-nav-link"><i class="fa-solid fa-building"></i> Register Org</a>
+                <a href="../hr/hr-dashboard.html" class="window-nav-link"><i class="fa-solid fa-users-gear"></i> HR Portal</a>
+            </nav>
+        </div>
+        <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.5); letter-spacing: 0.5px;">
+            TEACHER PORTAL
+        </div>
     </div>
 
     <div class="main-container">

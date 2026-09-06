@@ -1,4 +1,4 @@
-/**
+﻿/**
  * school-messenger.js
  * Centralized Cross-User School Communication Engine
  * FLAWLESS GRAPHICS — LUCY™ Management System
@@ -35,7 +35,7 @@
     'user-james': [
       "Noted. HR records and classroom assignments have been verified and updated in the system.",
       "Confirmed. Please let me know if any additional staffing or schedule changes are needed.",
-      "Thank you. Active employee attendance and payroll calculations have been synced."
+      "Thank you. Active teacher attendance and payroll calculations have been synced."
     ],
     'user-kwame': [
       "Received! The lab workstations for Web Architecture 101 are all prepared for the upcoming session.",

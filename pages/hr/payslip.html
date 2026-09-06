@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -163,7 +163,7 @@
     <ul class="nav-menu">
       <li><a href="../../welcome.html" class="nav-link"><i class="fa-solid fa-grid-horizontal"></i> Hub</a></li>
       <li><a href="hr-dashboard.html" class="nav-link"><i class="fa-solid fa-gauge"></i> HR Dashboard</a></li>
-      <li><a href="employee.html" class="nav-link"><i class="fa-solid fa-users"></i> Employees</a></li>
+      <li><a href="teacher.html" class="nav-link"><i class="fa-solid fa-users"></i> Teachers</a></li>
       <li><a href="attendance-summary.html" class="nav-link"><i class="fa-solid fa-clipboard-user"></i> Attendance</a></li>
       <li><a href="payroll.html" class="nav-link"><i class="fa-solid fa-money-bill-wave"></i> Payroll</a></li>
       <li><a href="payslip.html" class="nav-link active"><i class="fa-solid fa-receipt"></i> Payslips</a></li>
@@ -187,9 +187,9 @@
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
         <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 280px;">
           <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-muted);">
-            Employee:
+            Teacher:
           </label>
-          <select id="employeeSelect" class="form-control" style="max-width: 320px;" onchange="loadSelectedPayslip()">
+          <select id="teacherSelect" class="form-control" style="max-width: 320px;" onchange="loadSelectedPayslip()">
             <!-- Populated via JS -->
           </select>
         </div>
@@ -228,7 +228,7 @@
       <!-- EMPLOYEE METADATA GRID -->
       <div class="meta-box">
         <div>
-          <div class="meta-item-label">Employee Full Name</div>
+          <div class="meta-item-label">Teacher Full Name</div>
           <div class="meta-item-val" id="slipEmpName">James Ntiamoah</div>
         </div>
         <div>
@@ -289,7 +289,7 @@
               <td style="text-align: right; color: var(--danger);" id="valTax">- GHS 1,241.50</td>
             </tr>
             <tr>
-              <td>SSNIT Pension (Employee 5.5%)</td>
+              <td>SSNIT Pension (Teacher 5.5%)</td>
               <td style="text-align: right; color: var(--warning);" id="valPension">- GHS 525.25</td>
             </tr>
             <tr>
@@ -347,7 +347,7 @@
   <script>
     const user = window.AuthSession ? window.AuthSession.requireAuth('hr-login.html', true) : null;
     const activeOrg = (user && user.org) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
-    const EMP_KEY = `${activeOrg}_employees`;
+    const EMP_KEY = `${activeOrg}_teachers`;
 
     if (user && user.org) {
       document.getElementById('headerOrgTitle').textContent = user.org.toUpperCase();
@@ -359,7 +359,7 @@
     document.getElementById('slipPeriod').textContent = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
     document.getElementById('slipHash').textContent = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
 
-    function getEmployees() {
+    function getTeachers() {
       try {
         let list = JSON.parse(localStorage.getItem(EMP_KEY) || '[]');
         if (!list || list.length === 0) {
@@ -379,9 +379,9 @@
       }
     }
 
-    function initEmployeeSelect() {
-      const emps = getEmployees();
-      const select = document.getElementById('employeeSelect');
+    function initTeacherSelect() {
+      const emps = getTeachers();
+      const select = document.getElementById('teacherSelect');
       select.innerHTML = '';
 
       // Check query param for pre-selection
@@ -404,8 +404,8 @@
     }
 
     function loadSelectedPayslip() {
-      const select = document.getElementById('employeeSelect');
-      const emps = getEmployees();
+      const select = document.getElementById('teacherSelect');
+      const emps = getTeachers();
       const idx = parseInt(select.value, 10) || 0;
       const emp = emps[idx] || emps[0];
       if (!emp) return;
@@ -449,7 +449,7 @@
 ${activeOrg.toUpperCase()} — OFFICIAL PAYSLIP STATEMENT
 =====================================================
 Period: ${period}
-Employee: ${name}
+Teacher: ${name}
 ID: ${document.getElementById('slipEmpId').textContent}
 Department: ${document.getElementById('slipEmpDept').textContent}
 Designation: ${document.getElementById('slipEmpRole').textContent}
@@ -498,7 +498,7 @@ Cryptographic Reference: ${document.getElementById('slipHash').textContent}
     applyTheme(savedTheme === 'true');
     themeBtn.addEventListener('click', () => applyTheme(!htmlEl.classList.contains('dark')));
 
-    initEmployeeSelect();
+    initTeacherSelect();
   </script>
 </body>
 </html>

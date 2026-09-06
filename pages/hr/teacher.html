@@ -58,12 +58,35 @@
       background: var(--bg-surface);
       border: 1px solid var(--border-card);
       border-radius: var(--radius-xl);
-      max-width: 640px;
+      max-width: 780px;
       width: 100%;
-      padding: 32px;
+      padding: 36px;
       box-shadow: var(--shadow-lg);
-      max-height: 90vh;
+      max-height: 92vh;
       overflow-y: auto;
+    }
+    .form-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--accent-primary);
+      padding: 10px 0 6px;
+      border-bottom: 1px solid var(--border-card);
+      margin-bottom: 14px;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .form-section-title i { font-size: 12px; }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 600px) {
+      .grid-3 { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -86,11 +109,11 @@
     <ul class="nav-menu">
       <li><a href="../../welcome.html" class="nav-link"><i class="fa-solid fa-grid-horizontal"></i> Hub</a></li>
       <li><a href="hr-dashboard.html" class="nav-link"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
-      <li><a href="employee.html" class="nav-link active"><i class="fa-solid fa-users"></i> Employees</a></li>
+      <li><a href="teacher.html" class="nav-link active"><i class="fa-solid fa-users"></i> Teachers</a></li>
       <li><a href="attendance-summary.html" class="nav-link"><i class="fa-solid fa-clipboard-user"></i> Attendance</a></li>
       <li><a href="payroll.html" class="nav-link"><i class="fa-solid fa-money-bill-wave"></i> Payroll</a></li>
       <li><a href="payslip.html" class="nav-link"><i class="fa-solid fa-receipt"></i> Payslips</a></li>
-      <li><a href="employee-reports.html" class="nav-link"><i class="fa-solid fa-file-lines"></i> Reports</a></li>
+      <li><a href="teacher-reports.html" class="nav-link"><i class="fa-solid fa-file-lines"></i> Reports</a></li>
     </ul>
 
     <div class="header-actions">
@@ -163,9 +186,9 @@
 
         <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
           <button class="btn-modern btn-primary" id="openAddModalBtn" onclick="openAddModal()">
-            <i class="fa-solid fa-user-plus"></i> Add Employee
+            <i class="fa-solid fa-user-plus"></i> Add Teacher
           </button>
-          <button class="btn-modern btn-secondary" onclick="exportEmployeesCSV()">
+          <button class="btn-modern btn-secondary" onclick="exportTeachersCSV()">
             <i class="fa-solid fa-file-csv"></i> Export CSV
           </button>
         </div>
@@ -174,18 +197,18 @@
       <!-- FILTER & SEARCH BAR -->
       <div style="display: flex; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;">
         <div style="flex: 1; min-width: 240px; position: relative;">
-          <input type="text" id="searchInput" class="form-control" placeholder="Search by name, role, email, or department..." oninput="filterEmployees()">
+          <input type="text" id="searchInput" class="form-control" placeholder="Search by name, role, email, or department..." oninput="filterTeachers()">
           <i class="fa-solid fa-magnifying-glass" style="position: absolute; right: 14px; top: 13px; color: var(--text-muted); pointer-events: none;"></i>
         </div>
 
         <div style="width: 200px;">
-          <select id="deptFilter" class="form-control" onchange="filterEmployees()">
+          <select id="deptFilter" class="form-control" onchange="filterTeachers()">
             <option value="">All Departments</option>
           </select>
         </div>
 
         <div style="width: 170px;">
-          <select id="statusFilter" class="form-control" onchange="filterEmployees()">
+          <select id="statusFilter" class="form-control" onchange="filterTeachers()">
             <option value="">All Statuses</option>
             <option value="Active">Active</option>
             <option value="On Leave">On Leave</option>
@@ -200,7 +223,7 @@
           <thead>
             <tr>
               <th>#</th>
-              <th>Employee Details</th>
+              <th>Teacher Details</th>
               <th>Department</th>
               <th>Designation</th>
               <th>Contact Phone</th>
@@ -217,23 +240,54 @@
     </div>
 
   </main>
-
-  <!-- ADD / EDIT EMPLOYEE MODAL -->
-  <div class="custom-modal-overlay" id="employeeModal">
+  <!-- ADD / EDIT TEACHER MODAL -->
+  <div class="custom-modal-overlay" id="teacherModal">
     <div class="modal-card">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h3 style="font-size: 20px; font-weight: 800;" id="modalHeading">Add New Employee</h3>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div>
+          <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;" id="modalHeading">Add New Teacher</h3>
+          <p style="font-size: 12px; color: var(--text-muted); margin: 0;">Fill in all required fields to enrol a new staff member.</p>
+        </div>
         <button onclick="closeModal()" style="background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer;">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <form id="empForm" onsubmit="handleSaveEmployee(event)">
+      <form id="empForm" onsubmit="handleSaveTeacher(event)">
         <input type="hidden" id="editEmpId" value="">
 
-        <div class="form-group">
-          <label class="form-label">Full Name *</label>
-          <input type="text" id="m_name" class="form-control" placeholder="e.g. Ama Serwaa" required>
+        <!-- SECTION 1: Personal Information -->
+        <div class="form-section-title"><i class="fa-solid fa-user"></i> Personal Information</div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" id="m_name" class="form-control" placeholder="e.g. Ama Serwaa" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date of Birth</label>
+            <input type="date" id="m_dob" class="form-control">
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="form-group">
+            <label class="form-label">Gender</label>
+            <select id="m_gender" class="form-control">
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nationality</label>
+            <input type="text" id="m_nationality" class="form-control" placeholder="e.g. Ghanaian">
+          </div>
+          <div class="form-group">
+            <label class="form-label">National ID / Ghana Card</label>
+            <input type="text" id="m_nationalId" class="form-control" placeholder="GHA-XXXXXXXX-X">
+          </div>
         </div>
 
         <div class="grid-2">
@@ -247,14 +301,48 @@
           </div>
         </div>
 
+        <div class="form-group">
+          <label class="form-label">Residential Address</label>
+          <input type="text" id="m_address" class="form-control" placeholder="e.g. 14 Ring Road, Accra">
+        </div>
+
+        <!-- SECTION 2: Employment Details -->
+        <div class="form-section-title" style="margin-top:20px;"><i class="fa-solid fa-briefcase"></i> Employment Details</div>
+
         <div class="grid-2">
           <div class="form-group">
             <label class="form-label">Department *</label>
-            <input type="text" id="m_dept" class="form-control" placeholder="e.g. Executive & Design" required>
+            <input type="text" id="m_dept" class="form-control" placeholder="e.g. Academic Staff" required>
           </div>
           <div class="form-group">
             <label class="form-label">Position / Designation *</label>
             <input type="text" id="m_pos" class="form-control" placeholder="e.g. Lead Instructor" required>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="form-group">
+            <label class="form-label">Employment Type</label>
+            <select id="m_empType" class="form-control">
+              <option value="Full-Time">Full-Time</option>
+              <option value="Part-Time">Part-Time</option>
+              <option value="Contract">Contract</option>
+              <option value="Volunteer">Volunteer</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Employment Status</label>
+            <select id="m_status" class="form-control">
+              <option value="Active">Active</option>
+              <option value="On Leave">On Leave</option>
+              <option value="Probation">Probation</option>
+              <option value="Suspended">Suspended</option>
+              <option value="Terminated">Terminated</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Hire / Start Date</label>
+            <input type="date" id="m_hireDate" class="form-control">
           </div>
         </div>
 
@@ -264,24 +352,82 @@
             <input type="number" id="m_salary" class="form-control" placeholder="5500" min="0" required>
           </div>
           <div class="form-group">
-            <label class="form-label">Employment Status</label>
-            <select id="m_status" class="form-control">
-              <option value="Active">Active</option>
-              <option value="On Leave">On Leave</option>
-              <option value="Probation">Probation</option>
+            <label class="form-label">Social Security (SSNIT) No.</label>
+            <input type="text" id="m_ssnit" class="form-control" placeholder="e.g. G000123456">
+          </div>
+        </div>
+
+        <!-- SECTION 3: Academic / Professional Info -->
+        <div class="form-section-title" style="margin-top:20px;"><i class="fa-solid fa-graduation-cap"></i> Academic &amp; Professional Info</div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Highest Qualification</label>
+            <select id="m_qualification" class="form-control">
+              <option value="">Select Qualification</option>
+              <option value="PhD">PhD / Doctorate</option>
+              <option value="Masters">Master's Degree</option>
+              <option value="Degree">Bachelor's Degree</option>
+              <option value="HND">HND</option>
+              <option value="Diploma">Diploma</option>
+              <option value="Certificate">Certificate</option>
             </select>
           </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Staff Avatar Photo</label>
-          <div style="display: flex; gap: 14px; align-items: center;">
-            <img id="m_avatarPreview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border-card);">
-            <input type="file" id="m_avatarFile" accept="image/*" class="form-control" style="font-size: 12px;">
+          <div class="form-group">
+            <label class="form-label">Subjects / Specialisation</label>
+            <input type="text" id="m_subjects" class="form-control" placeholder="e.g. Mathematics, Physics">
           </div>
         </div>
 
-        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Teaching License No.</label>
+            <input type="text" id="m_licenseNo" class="form-control" placeholder="e.g. NTC/2023/00456">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Years of Experience</label>
+            <input type="number" id="m_experience" class="form-control" placeholder="e.g. 8" min="0">
+          </div>
+        </div>
+
+        <!-- SECTION 4: Emergency Contact -->
+        <div class="form-section-title" style="margin-top:20px;"><i class="fa-solid fa-phone-volume"></i> Emergency Contact</div>
+
+        <div class="grid-3">
+          <div class="form-group">
+            <label class="form-label">Contact Name</label>
+            <input type="text" id="m_emergencyName" class="form-control" placeholder="e.g. Kofi Mensah">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Relationship</label>
+            <input type="text" id="m_emergencyRel" class="form-control" placeholder="e.g. Spouse">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contact Phone</label>
+            <input type="tel" id="m_emergencyPhone" class="form-control" placeholder="+233 20 000 0000">
+          </div>
+        </div>
+
+        <!-- SECTION 5: Profile Photo -->
+        <div class="form-section-title" style="margin-top:20px;"><i class="fa-solid fa-camera"></i> Staff Profile Photo</div>
+
+        <div class="form-group">
+          <div style="display: flex; gap: 16px; align-items: center;">
+            <img id="m_avatarPreview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" style="width: 64px; height: 64px; border-radius: 14px; object-fit: cover; border: 2px solid var(--border-card); flex-shrink:0;">
+            <div style="flex:1;">
+              <input type="file" id="m_avatarFile" accept="image/*" class="form-control" style="font-size: 12px;">
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">Recommended: square photo, at least 200×200px (JPG/PNG)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NOTES -->
+        <div class="form-group" style="margin-top: 10px;">
+          <label class="form-label">Additional Notes</label>
+          <textarea id="m_notes" class="form-control" rows="3" placeholder="Any additional remarks, medical notes, or special considerations..."></textarea>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border-card);">
           <button type="button" class="btn-modern btn-secondary" onclick="closeModal()">Cancel</button>
           <button type="submit" class="btn-modern btn-primary"><i class="fa-solid fa-save"></i> Save Personnel</button>
         </div>
@@ -303,14 +449,14 @@
     // 1. Session Setup
     const user = window.AuthSession ? window.AuthSession.requireAuth('hr-login.html', true) : null;
     const activeOrg = (user && user.org) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
-    const EMP_KEY = `${activeOrg}_employees`;
+    const EMP_KEY = `${activeOrg}_teachers`;
 
     if (user && user.org) {
       document.getElementById('headerOrgTitle').textContent = user.org.toUpperCase();
     }
 
     // 2. Read & Save Data
-    function getEmployees() {
+    function getTeachers() {
       try {
         let list = JSON.parse(localStorage.getItem(EMP_KEY) || '[]');
         if (!list || list.length === 0) {
@@ -324,7 +470,7 @@
           ];
           localStorage.setItem(EMP_KEY, JSON.stringify(list));
         }
-        // Ensure every employee has an id
+        // Ensure every teacher has an id
         list.forEach((e, idx) => {
           if (!e.id) e.id = 'emp_' + (idx + 1);
           if (!e.fullName && e.name) e.fullName = e.name;
@@ -338,25 +484,25 @@
       }
     }
 
-    function saveEmployees(list) {
+    function saveTeachers(list) {
       localStorage.setItem(EMP_KEY, JSON.stringify(list));
-      filterEmployees();
+      filterTeachers();
       updateDeptDropdown();
       updateKPIs();
     }
 
     // 3. Render Table
     function renderTable(list = null) {
-      const employees = list !== null ? list : getEmployees();
+      const teachers = list !== null ? list : getTeachers();
       const tbody = document.getElementById('empTableBody');
       tbody.innerHTML = '';
 
-      if (employees.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 36px; color: var(--text-muted);"><i class="fa-solid fa-users-slash" style="font-size: 32px; margin-bottom: 12px; display:block;"></i>No employee records match your query.</td></tr>`;
+      if (teachers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 36px; color: var(--text-muted);"><i class="fa-solid fa-users-slash" style="font-size: 32px; margin-bottom: 12px; display:block;"></i>No teacher records match your query.</td></tr>`;
         return;
       }
 
-      employees.forEach((emp, i) => {
+      teachers.forEach((emp, i) => {
         const tr = document.createElement('tr');
         const deptLower = (emp.department || '').toLowerCase();
         const deptColorClass = deptLower.includes('design') ? 'badge-purple' :
@@ -386,7 +532,7 @@
             <button class="btn-modern btn-secondary btn-sm" onclick="openEditModal('${emp.id}')" title="Edit Profile">
               <i class="fa-solid fa-pen-to-square"></i> Edit
             </button>
-            <button class="btn-modern btn-danger btn-sm" onclick="deleteEmployee('${emp.id}')" title="Delete Personnel">
+            <button class="btn-modern btn-danger btn-sm" onclick="deleteTeacher('${emp.id}')" title="Delete Personnel">
               <i class="fa-solid fa-trash"></i>
             </button>
           </td>
@@ -397,7 +543,7 @@
 
     // 4. Update KPIs
     function updateKPIs() {
-      const emps = getEmployees();
+      const emps = getTeachers();
       document.getElementById('kpiStaffCount').textContent = emps.length;
       
       const depts = new Set(emps.map(e => (e.department || e.dept || '').trim()).filter(Boolean));
@@ -412,7 +558,7 @@
 
     // 5. Update Department Dropdown
     function updateDeptDropdown() {
-      const emps = getEmployees();
+      const emps = getTeachers();
       const depts = [...new Set(emps.map(e => (e.department || e.dept || '').trim()).filter(Boolean))];
       const select = document.getElementById('deptFilter');
       const current = select.value;
@@ -427,11 +573,11 @@
     }
 
     // 6. Filter Functionality
-    function filterEmployees() {
+    function filterTeachers() {
       const term = (document.getElementById('searchInput').value || '').toLowerCase().trim();
       const dept = document.getElementById('deptFilter').value;
       const status = document.getElementById('statusFilter').value;
-      const all = getEmployees();
+      const all = getTeachers();
 
       const filtered = all.filter(e => {
         const nameStr = (e.fullName || e.name || '').toLowerCase();
@@ -449,33 +595,49 @@
 
     // 7. Modal Controls
     function openAddModal() {
-      document.getElementById('modalHeading').textContent = 'Add New Employee';
+      document.getElementById('modalHeading').textContent = 'Add New Teacher';
       document.getElementById('editEmpId').value = '';
       document.getElementById('empForm').reset();
       document.getElementById('m_avatarPreview').src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80';
-      document.getElementById('employeeModal').classList.add('active');
+      document.getElementById('teacherModal').classList.add('active');
     }
 
     function openEditModal(empId) {
-      const emps = getEmployees();
+      const emps = getTeachers();
       const emp = emps.find(e => e.id === empId);
       if (!emp) return;
 
-      document.getElementById('modalHeading').textContent = 'Edit Employee Record';
+      document.getElementById('modalHeading').textContent = 'Edit Teacher Record';
       document.getElementById('editEmpId').value = emp.id;
       document.getElementById('m_name').value = emp.fullName || emp.name || '';
+      document.getElementById('m_dob').value = emp.dob || '';
+      document.getElementById('m_gender').value = emp.gender || '';
+      document.getElementById('m_nationality').value = emp.nationality || '';
+      document.getElementById('m_nationalId').value = emp.nationalId || '';
       document.getElementById('m_email').value = emp.email || '';
       document.getElementById('m_phone').value = emp.phone || '';
+      document.getElementById('m_address').value = emp.address || '';
       document.getElementById('m_dept').value = emp.department || emp.dept || '';
       document.getElementById('m_pos').value = emp.position || emp.role || '';
-      document.getElementById('m_salary').value = emp.salary || '';
+      document.getElementById('m_empType').value = emp.empType || 'Full-Time';
       document.getElementById('m_status').value = emp.status || 'Active';
+      document.getElementById('m_hireDate').value = emp.hireDate || '';
+      document.getElementById('m_salary').value = emp.salary || '';
+      document.getElementById('m_ssnit').value = emp.ssnit || '';
+      document.getElementById('m_qualification').value = emp.qualification || '';
+      document.getElementById('m_subjects').value = emp.subjects || '';
+      document.getElementById('m_licenseNo').value = emp.licenseNo || '';
+      document.getElementById('m_experience').value = emp.experience || '';
+      document.getElementById('m_emergencyName').value = emp.emergencyName || '';
+      document.getElementById('m_emergencyRel').value = emp.emergencyRel || '';
+      document.getElementById('m_emergencyPhone').value = emp.emergencyPhone || '';
+      document.getElementById('m_notes').value = emp.notes || '';
       document.getElementById('m_avatarPreview').src = emp.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80';
-      document.getElementById('employeeModal').classList.add('active');
+      document.getElementById('teacherModal').classList.add('active');
     }
 
     function closeModal() {
-      document.getElementById('employeeModal').classList.remove('active');
+      document.getElementById('teacherModal').classList.remove('active');
     }
 
     // Avatar preview
@@ -490,22 +652,43 @@
       }
     });
 
-    function handleSaveEmployee(e) {
+    function handleSaveTeacher(e) {
       e.preventDefault();
       const editId = document.getElementById('editEmpId').value;
-      const emps = getEmployees();
+      const emps = getTeachers();
 
       const newRecord = {
+        // Personal
         fullName: document.getElementById('m_name').value.trim(),
         name: document.getElementById('m_name').value.trim(),
+        dob: document.getElementById('m_dob').value,
+        gender: document.getElementById('m_gender').value,
+        nationality: document.getElementById('m_nationality').value.trim(),
+        nationalId: document.getElementById('m_nationalId').value.trim(),
         email: document.getElementById('m_email').value.trim(),
         phone: document.getElementById('m_phone').value.trim(),
+        address: document.getElementById('m_address').value.trim(),
+        // Employment
         department: document.getElementById('m_dept').value.trim(),
         dept: document.getElementById('m_dept').value.trim(),
         position: document.getElementById('m_pos').value.trim(),
         role: document.getElementById('m_pos').value.trim(),
-        salary: Number(document.getElementById('m_salary').value) || 0,
+        empType: document.getElementById('m_empType').value,
         status: document.getElementById('m_status').value,
+        hireDate: document.getElementById('m_hireDate').value,
+        salary: Number(document.getElementById('m_salary').value) || 0,
+        ssnit: document.getElementById('m_ssnit').value.trim(),
+        // Academic
+        qualification: document.getElementById('m_qualification').value,
+        subjects: document.getElementById('m_subjects').value.trim(),
+        licenseNo: document.getElementById('m_licenseNo').value.trim(),
+        experience: document.getElementById('m_experience').value,
+        // Emergency
+        emergencyName: document.getElementById('m_emergencyName').value.trim(),
+        emergencyRel: document.getElementById('m_emergencyRel').value.trim(),
+        emergencyPhone: document.getElementById('m_emergencyPhone').value.trim(),
+        // Misc
+        notes: document.getElementById('m_notes').value.trim(),
         photo: document.getElementById('m_avatarPreview').src
       };
 
@@ -513,48 +696,49 @@
         const idx = emps.findIndex(x => x.id === editId);
         if (idx >= 0) {
           emps[idx] = Object.assign({}, emps[idx], newRecord);
-          showToast('Employee updated successfully');
+          showToast('Teacher updated successfully');
         }
       } else {
         newRecord.id = 'emp_' + Date.now();
         emps.unshift(newRecord);
-        showToast('New employee enrolled successfully');
+        showToast('New teacher enrolled successfully');
       }
 
-      saveEmployees(emps);
+      saveTeachers(emps);
 
       // Push to Supabase Cloud
       if (window.SupabaseService && window.SupabaseConfig && window.SupabaseConfig.isConfigured()) {
-        window.SupabaseService.saveEmployee(activeOrg, newRecord).catch(console.warn);
+        window.SupabaseService.saveTeacher(activeOrg, newRecord).catch(console.warn);
       }
 
       closeModal();
     }
 
-    function deleteEmployee(empId) {
-      const emps = getEmployees();
+    function deleteTeacher(empId) {
+      const emps = getTeachers();
       const emp = emps.find(e => e.id === empId);
       if (!emp) return;
-      if (confirm(`Are you sure you want to remove "${emp.fullName || emp.name}" from the employee directory?`)) {
+      if (confirm(`Are you sure you want to remove "${emp.fullName || emp.name}" from the teacher directory?`)) {
         if (window.SupabaseService && window.SupabaseConfig && window.SupabaseConfig.isConfigured()) {
-          window.SupabaseService.deleteEmployee(activeOrg, empId).catch(console.warn);
+          window.SupabaseService.deleteTeacher(activeOrg, empId).catch(console.warn);
         }
         const updated = emps.filter(e => e.id !== empId);
-        saveEmployees(updated);
-        showToast('Employee record deleted');
+        saveTeachers(updated);
+        showToast('Teacher record deleted');
       }
     }
 
-    function exportEmployeesCSV() {
-      const emps = getEmployees();
-      let csv = 'Full Name,Email,Phone,Department,Position,Salary,Status\n';
+    function exportTeachersCSV() {
+      const emps = getTeachers();
+      let csv = 'Full Name,Gender,DOB,Nationality,National ID,Email,Phone,Address,Department,Position,Employment Type,Status,Hire Date,Salary (GHS),SSNIT No,Qualification,Subjects,License No,Experience (Yrs),Emergency Name,Emergency Rel,Emergency Phone,Notes\n';
       emps.forEach(e => {
-        csv += `"${e.fullName || e.name}","${e.email}","${e.phone || ''}","${e.department || e.dept}","${e.position || e.role}","${e.salary}","${e.status || 'Active'}"\n`;
+        const q = v => `"${String(v || '').replace(/"/g, '""')}"`;
+        csv += [e.fullName||e.name, e.gender, e.dob, e.nationality, e.nationalId, e.email, e.phone, e.address, e.department||e.dept, e.position||e.role, e.empType, e.status||'Active', e.hireDate, e.salary, e.ssnit, e.qualification, e.subjects, e.licenseNo, e.experience, e.emergencyName, e.emergencyRel, e.emergencyPhone, e.notes].map(q).join(',') + '\n';
       });
       const blob = new Blob([csv], { type: 'text/csv' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `employees_${activeOrg.toLowerCase().replace(/[^a-z0-9]/g, '_')}.csv`;
+      a.download = `teachers_${activeOrg.toLowerCase().replace(/[^a-z0-9]/g, '_')}.csv`;
       a.click();
       showToast('CSV export downloaded');
     }

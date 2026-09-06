@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FLAWLESS GRAPHICS — Enterprise Employee Portal</title>
+  <title>FLAWLESS GRAPHICS — Enterprise Teacher Portal</title>
 
   <!-- Typography & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,36 +18,36 @@
 
   <style>
     :root {
-      --bg-outer: #F4F7FB;
-      --card-bg: rgba(255, 255, 255, 0.75);
-      --card-border: rgba(255, 255, 255, 0.8);
-      --nav-bg: #0A192F;
+      --bg-outer: #FAF7F2; /* Luxury Cream */
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --card-border: rgba(0, 0, 0, 0.08);
+      --nav-bg: #0A192F; /* Preserved dark navy sidebar */
       --text-main: #0F172A;
       --text-muted: #64748B;
       --accent: #2563EB;
       --accent-gradient: linear-gradient(135deg, #2563EB 0%, #06B6D4 100%);
       --accent-hover: linear-gradient(135deg, #1D4ED8 0%, #0891B2 100%);
       --glass-glow: rgba(37, 99, 235, 0.08);
-      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.04);
+      --shadow-lg: 0 20px 30px -10px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
       --radius-xl: 24px;
       --radius-lg: 16px;
       --radius-md: 12px;
     }
 
     .dark {
-      --bg-outer: #030712;
-      --card-bg: rgba(17, 24, 39, 0.65);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --nav-bg: #0B0F19;
-      --text-main: #F8FAFC;
-      --text-muted: #94A3B8;
-      --accent: #38BDF8;
+      --bg-outer: #F5F0E6; /* Cream warm tone */
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --card-border: rgba(0, 0, 0, 0.1);
+      --nav-bg: #070D19;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --accent: #0284C7;
       --accent-gradient: linear-gradient(135deg, #0284C7 0%, #6366F1 100%);
       --accent-hover: linear-gradient(135deg, #0369A1 0%, #4F46E5 100%);
       --glass-glow: rgba(56, 189, 248, 0.1);
-      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-      --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease, color 0.3s ease; }
@@ -57,7 +57,7 @@
       color: var(--text-main);
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       overflow-x: hidden;
       position: relative;
     }
@@ -71,77 +71,179 @@
       border-radius: 50%;
       background: var(--accent-gradient);
       filter: blur(140px);
-      opacity: 0.12;
+      opacity: 0.06;
       z-index: -1;
       pointer-events: none;
     }
-    body::before { top: -100px; left: -100px; }
+    body::before { top: -100px; left: 100px; }
     body::after { bottom: 0; right: -100px; }
 
-    /* HEADER */
+    /* VERTICAL LEFT SIDEBAR HEADER */
     header {
-      position: sticky;
+      position: fixed;
       top: 0;
-      z-index: 100;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      background: rgba(10, 25, 47, 0.85);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 14px 40px;
+      left: 0;
+      bottom: 0;
+      width: 260px;
+      height: 100vh;
+      z-index: 1000;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: var(--nav-bg); /* Preserves dark navigation color */
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 24px 18px;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 20px;
       color: #fff;
+      overflow-y: auto;
+      box-shadow: 4px 0 25px rgba(0, 0, 0, 0.2);
     }
 
-    .brand { display: flex; align-items: center; gap: 14px; }
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 20px;
+      width: 100%;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+      flex-shrink: 0;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
     .logo-circle {
-      width: 44px;
-      height: 44px;
+      width: 42px;
+      height: 42px;
       border-radius: var(--radius-md);
       background: var(--accent-gradient);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 18px;
+      font-size: 17px;
       color: #fff;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+      transition: transform 0.25s ease;
+      flex-shrink: 0;
+    }
+    .brand:hover .logo-circle { transform: scale(1.05) rotate(-3deg); }
+    header h1 { font-size: 15px; font-weight: 800; letter-spacing: 0.5px; margin: 0; }
+    .brand-sub { font-size: 10.5px; color: rgba(255, 255, 255, 0.65); font-weight: 600; }
+
+    nav {
+      width: 100%;
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: stretch;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+    }
+    nav a {
+      color: rgba(255, 255, 255, 0.78);
+      text-decoration: none;
+      padding: 11px 16px;
+      border-radius: var(--radius-md);
+      font-size: 13.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      width: 100%;
+    }
+    nav a i {
+      width: 18px;
+      text-align: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    nav a:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.14);
+      transform: translateX(4px) translateY(-1px);
       box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
     }
-    header h1 { font-size: 16px; font-weight: 800; letter-spacing: 0.5px; margin: 0; }
-    .brand-sub { font-size: 11px; color: rgba(255, 255, 255, 0.6); font-weight: 500; }
-
-    nav ul { list-style: none; display: flex; gap: 8px; align-items: center; }
-    nav a {
-      color: rgba(255, 255, 255, 0.75);
-      text-decoration: none;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      transition: all 0.2s ease;
+    nav a.active {
+      color: #fff;
+      background: var(--accent-gradient);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
     }
-    nav a:hover, nav a.active { color: #fff; background: rgba(255, 255, 255, 0.1); }
+    nav a.active:hover {
+      transform: translateX(4px) translateY(-1px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.55);
+    }
+
+    .header-right {
+      margin-top: auto;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      width: 100%;
+    }
 
     /* Theme Pill Switcher */
     .theme-toggle-btn {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.15);
       color: #fff;
-      padding: 6px 14px;
-      border-radius: 30px;
+      padding: 9px 16px;
+      border-radius: var(--radius-md);
       cursor: pointer;
       font-size: 12px;
       font-weight: 600;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       transition: all 0.2s ease;
+      width: 100%;
     }
-    .theme-toggle-btn:hover { background: rgba(255, 255, 255, 0.18); }
+    .theme-toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    }
 
-    /* LAYOUT CONTAINER */
-    main { max-width: 1280px; margin: 32px auto; padding: 0 24px; width: 100%; flex: 1; }
+    /* LAYOUT CONTAINER - Cream Offset */
+    main {
+      margin-left: 260px;
+      max-width: calc(100% - 260px);
+      width: calc(100% - 260px);
+      padding: 36px 40px;
+      min-height: 100vh;
+      flex: 1;
+    }
+
+    @media (max-width: 900px) {
+      body { flex-direction: column; }
+      header {
+        position: static;
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      main {
+        margin-left: 0;
+        max-width: 100%;
+        width: 100%;
+        padding: 24px 18px;
+      }
+    }
 
     /* GLASS CARDS */
     .glass-card {
@@ -154,6 +256,7 @@
       padding: 28px;
       position: relative;
       overflow: hidden;
+      color: var(--text-main);
     }
 
     /* HERO SECTION */
@@ -277,25 +380,27 @@
 
   <!-- HEADER -->
   <header>
-    <div class="brand">
-      <div class="logo-circle">FG</div>
-      <div>
-        <h1>FLAWLESS GRAPHICS</h1>
-        <div class="brand-sub">Truth and Service</div>
+    <div class="header-left">
+      <div class="brand">
+        <div class="logo-circle">FG</div>
+        <div>
+          <h1>FLAWLESS GRAPHICS</h1>
+          <div class="brand-sub">Truth and Service</div>
+        </div>
       </div>
-    </div>
 
-    <div style="display:flex;align-items:center;gap:16px">
       <nav>
         <ul>
-          <li><a href="../../welcome.html">Hub</a></li>
-          <li><a href="home.html" class="active">Home</a></li>
-          <li><a href="../hr/employee.html">Employee Portal</a></li>
-          <li><a href="services.html">Services</a></li>
-          <li><a href="contact.html">Contact</a></li>
+          <li><a href="../../welcome.html"><i class="fa-solid fa-grid-horizontal"></i> Hub</a></li>
+          <li><a href="home.html" class="active"><i class="fa-solid fa-house"></i> Home</a></li>
+          <li><a href="../hr/teacher.html"><i class="fa-solid fa-users"></i> Teacher Portal</a></li>
+          <li><a href="services.html"><i class="fa-solid fa-layer-group"></i> Services</a></li>
+          <li><a href="contact.html"><i class="fa-solid fa-envelope"></i> Contact</a></li>
         </ul>
       </nav>
+    </div>
 
+    <div class="header-right">
       <button class="theme-toggle-btn" id="themeBtn">
         <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
       </button>
@@ -309,20 +414,20 @@
     <section class="hero">
       <div class="glass-card hero-card" data-aos="fade-right" data-aos-duration="800">
         <div>
-          <h2>Employee Management Tool — Simplified</h2>
-          <p>FLAWLESS GRAPHICS provides an integrated workspace to manage employee profiles, real-time attendance, payroll, and HR workflows securely and efficiently.</p>
+          <h2>Teacher Management Tool — Simplified</h2>
+          <p>FLAWLESS GRAPHICS provides an integrated workspace to manage teacher profiles, real-time attendance, payroll, and HR workflows securely and efficiently.</p>
 
           <div class="cta-row">
             <button class="btn primary" id="openDashboardBtn"><i class="fa-solid fa-gauge"></i> Open Dashboard</button>
-            <button class="btn ghost" id="openEmployeeBtn"><i class="fa-solid fa-user-gear"></i> Employee Portal</button>
+            <button class="btn ghost" id="openTeacherBtn"><i class="fa-solid fa-user-gear"></i> Teacher Portal</button>
           </div>
         </div>
 
         <div>
           <div class="metrics">
             <div class="metric">
-              <div class="label">Employees</div>
-              <div class="value"><span id="cntEmployees" class="count">0</span></div>
+              <div class="label">Teachers</div>
+              <div class="value"><span id="cntTeachers" class="count">0</span></div>
             </div>
 
             <div class="metric">
@@ -387,7 +492,7 @@
         </div>
 
         <div style="display:flex;gap:10px;">
-          <button class="btn primary" style="flex:1; justify-content:center;" id="addEmpShortcutBtn">+ Employee</button>
+          <button class="btn primary" style="flex:1; justify-content:center;" id="addEmpShortcutBtn">+ Teacher</button>
           <button class="btn ghost" style="flex:1; justify-content:center;" id="reportShortcutBtn">Report</button>
         </div>
       </aside>
@@ -400,7 +505,7 @@
         <div class="service">
           <div class="service-icon-wrapper"><i class="fa-solid fa-calendar-check"></i></div>
           <h3>Attendance Tracking</h3>
-          <p>Monitor real-time employee attendance and work hours with quick check-in analytics.</p>
+          <p>Monitor real-time teacher attendance and work hours with quick check-in analytics.</p>
         </div>
 
         <div class="service">
@@ -411,8 +516,8 @@
 
         <div class="service">
           <div class="service-icon-wrapper"><i class="fa-solid fa-folder-tree"></i></div>
-          <h3>Employee Records</h3>
-          <p>Secure digital depository for employee documentation, history, and structural organization.</p>
+          <h3>Teacher Records</h3>
+          <p>Secure digital depository for teacher documentation, history, and structural organization.</p>
         </div>
       </div>
     </section>
@@ -456,7 +561,7 @@
     </section>
 
     <footer>
-      © <span id="year"></span> Flawless Graphics — Enterprise Employee Management System
+      © <span id="year"></span> Flawless Graphics — Enterprise Teacher Management System
     </footer>
 
   </main>
@@ -514,7 +619,7 @@
 
     // ---------- DATA HANDLING ----------
     const activeOrg = (window.AuthSession ? window.AuthSession.getOrg() : null) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
-    const EMP_KEY = `${activeOrg}_employees`;
+    const EMP_KEY = `${activeOrg}_teachers`;
     const PAY_KEY = `${activeOrg}_payments`;
 
     // Seed default workforce data if currently empty
@@ -540,10 +645,10 @@
       const totalPayroll = emps.reduce((s, e) => s + (Number(e.salary) || 0), 0);
       const today = new Date().toISOString().split('T')[0];
       const attendance = readKey(`${activeOrg}_attendance`);
-      const presentToday = new Set(attendance.filter(a => a.date && a.date.split('T')[0] === today && a.action === 'in').map(a => a.employeeIndex));
+      const presentToday = new Set(attendance.filter(a => a.date && a.date.split('T')[0] === today && a.action === 'in').map(a => a.teacherIndex));
       const attendanceRate = emps.length ? Math.round((presentToday.size / emps.length) * 100) : 96;
 
-      animateCount(document.getElementById('cntEmployees'), emps.length);
+      animateCount(document.getElementById('cntTeachers'), emps.length);
       animateCount(document.getElementById('cntDepartments'), departments.length);
       animateCount(document.getElementById('cntAttendance'), attendanceRate || 96);
       animateCount(document.getElementById('cntPayroll'), Math.round(totalPayroll));
@@ -631,8 +736,8 @@
     document.getElementById('reportShortcut').addEventListener('click', navHR);
     document.getElementById('reportShortcutBtn').addEventListener('click', navHR);
 
-    document.getElementById('openEmployeeBtn').addEventListener('click', () => {
-      window.location.href = '../hr/employee.html';
+    document.getElementById('openTeacherBtn').addEventListener('click', () => {
+      window.location.href = '../hr/teacher.html';
     });
 
     // Populate Organization Profile

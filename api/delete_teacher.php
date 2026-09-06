@@ -1,5 +1,5 @@
-<?php
-// api/delete_employee.php
+﻿<?php
+// api/delete_teacher.php
 header('Content-Type: application/json');
 require_once __DIR__ . '/config/db.php';
 
@@ -11,7 +11,7 @@ if (!$conn || $conn->connect_error) {
 $id = $_POST['id'] ?? null;
 
 if ($id) {
-    $stmt = $conn->prepare("DELETE FROM employees WHERE emp_id = ?");
+    $stmt = $conn->prepare("DELETE FROM teachers WHERE emp_id = ?");
     if ($stmt) {
         $stmt->bind_param("i", $id);
         if ($stmt->execute()) {

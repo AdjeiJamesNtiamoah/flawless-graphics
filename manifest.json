@@ -1,7 +1,7 @@
-{
+﻿{
   "name": "FLAWLESS GRAPHICS — LUCY™ Management System",
   "short_name": "FlawlessGraphics",
-  "description": "Enterprise Employee, Classroom, and Financial Management System",
+  "description": "Enterprise Teacher, Classroom, and Financial Management System",
   "version": "2.0.0",
   "start_url": "./index.html",
   "display": "standalone",
@@ -18,7 +18,7 @@
     "root": ["index.html", "site-login.html", "welcome.html", "manifest.json", "README.md"],
     "pages": {
       "public": ["pages/public/home.html", "pages/public/services.html", "pages/public/contact.html"],
-      "hr": ["pages/hr/hr-dashboard.html", "pages/hr/hr-login.html", "pages/hr/employee.html", "pages/hr/employee-reports.html", "pages/hr/attendance-summary.html", "pages/hr/payroll.html", "pages/hr/payslip.html", "pages/hr/performance.html", "pages/hr/hr.html"],
+      "hr": ["pages/hr/hr-dashboard.html", "pages/hr/hr-login.html", "pages/hr/teacher.html", "pages/hr/teacher-reports.html", "pages/hr/attendance-summary.html", "pages/hr/payroll.html", "pages/hr/payslip.html", "pages/hr/performance.html", "pages/hr/hr.html"],
       "teacher": ["pages/teacher/teacher-dashboard.html", "pages/teacher/teacher-login.html", "pages/teacher/teacher.html", "pages/teacher/teacher-profile.html", "pages/teacher/teacher-classes.html", "pages/teacher/teacher-classes-extended.html", "pages/teacher/teacher-messaging-leave.html"],
       "finance": ["pages/finance/finance-dashboard.html", "pages/finance/finance-login.html"]
     },
