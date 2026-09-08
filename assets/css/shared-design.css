@@ -55,7 +55,7 @@
 
 /* Dark Theme Overrides - Page maintains cream/warm contrast while preserving dark navigation */
 .dark, [data-theme="dark"] {
-  --bg-main: #F5F0E6;
+  --bg-main: #FAF7F2;
   --bg-surface: #FFFFFF;
   --bg-card: rgba(255, 255, 255, 0.95);
   --border-card: rgba(0, 0, 0, 0.1);

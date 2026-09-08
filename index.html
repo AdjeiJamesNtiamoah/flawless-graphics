@@ -1,1189 +1,1577 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>Register Organization</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Google Fonts: Plus Jakarta Sans -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- Font Awesome Icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta charset="UTF-8">
+    <title>Register Organization</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Short Skeletal Loading Stylesheet -->
+    <link rel="stylesheet" href="assets/css/skeleton.css">
 
-<style>
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    body {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        background-color: #FAF7F2;
-        background-image: 
-            linear-gradient(135deg, rgba(250, 247, 242, 0.65) 0%, rgba(245, 240, 230, 0.72) 100%),
-            url('assets/images/education-bg.jpg');
-        background-size: cover;
-        background-position: center center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-        color: #0F172A;
-    }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FAF7F2;
+            background: #FAF7F2;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px 16px;
+            color: #0F172A;
+        }
 
-    /* Window Frame UI Container */
-    .app-window {
-        width: 100%;
-        max-width: 1100px;
-        background: rgba(55, 25, 110, 0.94);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-radius: 20px;
-        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.15);
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-    }
-
-    /* Mock Mac Top Bar */
-    .window-header {
-        background: rgba(255, 255, 255, 0.05);
-        padding: 12px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .window-dots {
-        display: flex;
-        gap: 8px;
-    }
-
-    .dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-    }
-    .dot-1 { background: #9c8ce8; }
-    .dot-2 { background: #72efdd; }
-    .dot-3 { background: #92b0ff; }
-
-    .window-quick-nav {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .window-nav-link {
-        color: rgba(255, 255, 255, 0.75);
-        font-size: 11px;
-        font-weight: 600;
-        text-decoration: none;
-        padding: 5px 12px;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .window-nav-link:hover {
-        color: #ffffff;
-        background: rgba(255, 255, 255, 0.16);
-        transform: translateY(-2px) scale(1.02);
-        box-shadow: 0 4px 14px rgba(114, 239, 221, 0.3);
-        border-color: rgba(114, 239, 221, 0.4);
-    }
-
-    /* Main Split Body Layout */
-    .main-container {
-        display: flex;
-        flex-direction: row;
-        min-height: 620px;
-        position: relative;
-    }
-
-    /* Left Hero Banner Section */
-    .hero-section {
-        flex: 1;
-        padding: 50px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        position: relative;
-        overflow: hidden;
-    }
-
-    /* Abstract 3D Ribbon Shapes Visual Component */
-    .ribbon-container {
-        position: absolute;
-        top: -40px;
-        left: -40px;
-        width: 320px;
-        height: 320px;
-        pointer-events: none;
-    }
-
-    .ribbon {
-        position: absolute;
-        border-radius: 50%;
-        border: 28px solid transparent;
-    }
-
-    .ribbon-1 {
-        width: 240px;
-        height: 240px;
-        border-top-color: #5ce1e6;
-        border-right-color: #5ce1e6;
-        transform: rotate(-25deg);
-        filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
-    }
-
-    .ribbon-2 {
-        width: 200px;
-        height: 200px;
-        top: 30px;
-        left: 20px;
-        border-bottom-color: #8c52ff;
-        border-left-color: #8c52ff;
-        transform: rotate(15deg);
-        filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
-    }
-
-    .brand-logo {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        z-index: 2;
-        margin-top: 140px;
-    }
-
-    .logo-icon {
-        font-size: 32px;
-        color: #ffffff;
-    }
-
-    .brand-title {
-        font-size: 24px;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-    }
-
-    .brand-subtitle {
-        font-size: 11px;
-        color: rgba(255, 255, 255, 0.6);
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    .hero-text {
-        z-index: 2;
-        margin-top: 30px;
-        max-width: 360px;
-    }
-
-    .hero-text h1 {
-        font-size: 22px;
-        font-weight: 500;
-        line-height: 1.4;
-        color: #ffffff;
-    }
-
-    .hero-text span {
-        font-weight: 700;
-    }
-
-    .hero-buttons {
-        display: flex;
-        gap: 15px;
-        align-items: center;
-        margin-top: 30px;
-        z-index: 2;
-    }
-
-    .btn-outline {
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        background: rgba(255, 255, 255, 0.05);
-        color: #fff;
-        padding: 10px 18px;
-        border-radius: 8px;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-        text-decoration: none;
-    }
-
-    .btn-outline:hover {
-        background: rgba(255, 255, 255, 0.18);
-        border-color: #72efdd;
-        transform: translateY(-3px) scale(1.02);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25), 0 0 14px rgba(114, 239, 221, 0.25);
-    }
-
-    .link-subtle {
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 12px;
-        text-decoration: none;
-        font-weight: 500;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        transition: all 0.25s ease;
-    }
-
-    .link-subtle:hover {
-        color: #72efdd;
-        transform: translateY(-2px);
-        text-decoration: none;
-    }
-
-    /* Right Form Card Section */
-    .form-section {
-        flex: 1;
-        padding: 40px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .card {
-        width: 100%;
-        max-width: 420px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        padding: 32px;
-        backdrop-filter: blur(20px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-
-    .card h2 {
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 24px;
-        color: #ffffff;
-    }
-
-    .form-group {
-        margin-bottom: 16px;
-    }
-
-    label {
-        display: block;
-        font-size: 12px;
-        font-weight: 500;
-        color: rgba(255, 255, 255, 0.8);
-        margin-bottom: 6px;
-    }
-
-    /* Logo Upload Styles */
-    .logo-upload-container {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px dashed rgba(255, 255, 255, 0.25);
-        border-radius: 10px;
-        padding: 12px 14px;
-        transition: all 0.2s ease;
-    }
-
-    .logo-upload-container:hover {
-        border-color: #a2e8dd;
-        background: rgba(255, 255, 255, 0.1);
-    }
-
-    .logo-preview-box {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        flex-shrink: 0;
-    }
-
-    .logo-preview-box img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .logo-preview-box i {
-        font-size: 18px;
-        color: rgba(255, 255, 255, 0.5);
-    }
-
-    .logo-upload-actions {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        flex: 1;
-    }
-
-    .btn-upload-trigger {
-        background: rgba(255, 255, 255, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: #ffffff;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 11px;
-        font-weight: 600;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        width: fit-content;
-        transition: all 0.2s ease;
-    }
-
-    .btn-upload-trigger:hover {
-        background: rgba(255, 255, 255, 0.25);
-    }
-
-    .logo-hint {
-        font-size: 10px;
-        color: rgba(255, 255, 255, 0.5);
-    }
-
-    .btn-remove-logo {
-        color: #ff9999;
-        font-size: 11px;
-        background: none;
-        border: none;
-        cursor: pointer;
-        text-align: left;
-        display: none;
-    }
-
-    .input-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="password"] {
-        width: 100%;
-        padding: 12px 40px 12px 14px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 8px;
-        color: #ffffff;
-        font-size: 13px;
-        font-family: inherit;
-        outline: none;
-        transition: all 0.2s ease;
-    }
-
-    input::placeholder {
-        color: rgba(255, 255, 255, 0.35);
-    }
-
-    input:focus {
-        border-color: #a2e8dd;
-        background: rgba(255, 255, 255, 0.12);
-        box-shadow: 0 0 0 3px rgba(162, 232, 221, 0.2);
-    }
-
-    .field-icon {
-        position: absolute;
-        right: 14px;
-        color: rgba(255, 255, 255, 0.5);
-        font-size: 14px;
-        cursor: pointer;
-    }
-
-    .btn-submit {
-        width: 100%;
-        padding: 12px;
-        background: #a2e8dd;
-        border: none;
-        border-radius: 8px;
-        color: #1a0836;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-        margin-top: 10px;
-        transition: all 0.2s ease;
-    }
-
-    .btn-submit:hover {
-        background: #8ce2d5;
-        transform: translateY(-1px);
-    }
-
-    .btn-submit:disabled {
-        background: rgba(255, 255, 255, 0.2);
-        color: rgba(255, 255, 255, 0.4);
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    .footer-text {
-        text-align: center;
-        margin-top: 20px;
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.7);
-    }
-
-    .footer-text a {
-        color: #ffffff;
-        font-weight: 600;
-        text-decoration: none;
-    }
-
-    .footer-text a:hover {
-        text-decoration: underline;
-    }
-
-    /* Notification Styling */
-    .msg {
-        padding: 10px 14px;
-        border-radius: 8px;
-        margin-bottom: 16px;
-        display: none;
-        font-size: 12px;
-        font-weight: 500;
-    }
-
-    .msg.error {
-        background: rgba(235, 87, 87, 0.2);
-        border: 1px solid #eb5757;
-        color: #ff9999;
-        display: block;
-    }
-
-    .msg.success {
-        background: rgba(39, 174, 96, 0.2);
-        border: 1px solid #27ae60;
-        color: #7bed9f;
-        display: block;
-    }
-
-    /* Responsive Design Adjustments */
-    @media (max-width: 850px) {
-        .main-container {
+        /* Window Frame UI Container */
+        .app-window {
+            width: 100%;
+            max-width: 1060px;
+            max-height: calc(100vh - 20px);
+            background: rgba(55, 25, 110, 0.94);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 18px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+            display: flex;
             flex-direction: column;
         }
-        .hero-section {
-            padding: 30px;
-        }
-        .ribbon-container {
-            transform: scale(0.7);
-            top: -60px;
-            left: -60px;
-        }
-    }
 
-    /* Interactive Modals */
-    .modal-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(10, 4, 25, 0.75);
-        backdrop-filter: blur(8px);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        padding: 20px;
-        opacity: 0;
-        transition: opacity 0.25s ease;
-    }
-    .modal-overlay.active {
-        display: flex;
-        opacity: 1;
-    }
-    .modal-box {
-        background: linear-gradient(135deg, #2a1458, #180933);
-        border: 1px solid rgba(162, 232, 221, 0.3);
-        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
-        border-radius: 18px;
-        max-width: 600px;
-        width: 100%;
-        max-height: 85vh;
-        overflow-y: auto;
-        padding: 30px;
-        color: #ffffff;
-        position: relative;
-        transform: translateY(15px);
-        transition: transform 0.25s ease;
-    }
-    .modal-overlay.active .modal-box {
-        transform: translateY(0);
-    }
-    .modal-close-btn {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        background: rgba(255, 255, 255, 0.1);
-        border: none;
-        color: #fff;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-        transition: background 0.2s;
-    }
-    .modal-close-btn:hover {
-        background: rgba(235, 87, 87, 0.4);
-    }
-    .modal-feature-item {
-        display: flex;
-        gap: 14px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 14px 16px;
-        margin-bottom: 12px;
-        align-items: flex-start;
-    }
-    .modal-feature-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        background: rgba(162, 232, 221, 0.15);
-        color: #72efdd;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        flex-shrink: 0;
-    }
-    .verify-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(114, 239, 221, 0.12);
-        color: #72efdd;
-        border: 1px solid rgba(114, 239, 221, 0.3);
-        padding: 8px 14px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 14px;
-        margin: 12px 0 20px 0;
-        word-break: break-all;
-    }
-    .otp-box {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 18px;
-        margin-bottom: 18px;
-    }
-    .otp-input {
-        width: 100%;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: #fff;
-        font-size: 24px;
-        letter-spacing: 8px;
-        text-align: center;
-        padding: 12px;
-        border-radius: 8px;
-        font-weight: 700;
-        margin-bottom: 12px;
-        outline: none;
-        transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .otp-input:focus {
-        border-color: #72efdd;
-        box-shadow: 0 0 12px rgba(114, 239, 221, 0.3);
-    }
-    .verify-feedback {
-        padding: 10px 14px;
-        border-radius: 8px;
-        font-size: 13px;
-        margin-bottom: 14px;
-        display: none;
-    }
-    .verify-feedback.error {
-        background: rgba(235, 87, 87, 0.2);
-        border: 1px solid rgba(235, 87, 87, 0.4);
-        color: #ff9b9b;
-        display: block;
-    }
-    .verify-feedback.success {
-        background: rgba(114, 239, 221, 0.2);
-        border: 1px solid rgba(114, 239, 221, 0.4);
-        color: #a2e8dd;
-        display: block;
-    }
-</style>
+        /* Mock Mac Top Bar */
+        .window-header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            flex-shrink: 0;
+        }
+
+        .window-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot-1 {
+            background: #9c8ce8;
+        }
+
+        .dot-2 {
+            background: #72efdd;
+        }
+
+        .dot-3 {
+            background: #92b0ff;
+        }
+
+        .window-quick-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .window-nav-link {
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 11px;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 5px 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .window-nav-link:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.16);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 4px 14px rgba(114, 239, 221, 0.3);
+            border-color: rgba(114, 239, 221, 0.4);
+        }
+
+        /* Main Split Body Layout */
+        .main-container {
+            display: flex;
+            flex-direction: row;
+            min-height: 480px;
+            position: relative;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+        }
+
+        .main-container::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .main-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        /* Left Hero Banner Section */
+        .hero-section {
+            flex: 1;
+            padding: 24px 32px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Abstract 3D Ribbon Shapes Visual Component */
+        .ribbon-container {
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            width: 220px;
+            height: 220px;
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        .ribbon {
+            position: absolute;
+            border-radius: 50%;
+            border: 20px solid transparent;
+        }
+
+        .ribbon-1 {
+            width: 170px;
+            height: 170px;
+            border-top-color: #5ce1e6;
+            border-right-color: #5ce1e6;
+            transform: rotate(-25deg);
+            filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.25));
+        }
+
+        .ribbon-2 {
+            width: 140px;
+            height: 140px;
+            top: 20px;
+            left: 15px;
+            border-bottom-color: #8c52ff;
+            border-left-color: #8c52ff;
+            transform: rotate(15deg);
+            filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.25));
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 2;
+            margin-top: 10px;
+        }
+
+        .logo-icon {
+            font-size: 26px;
+            color: #ffffff;
+        }
+
+        .brand-title {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .brand-subtitle {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hero-text {
+            z-index: 2;
+            margin-top: 18px;
+            max-width: 340px;
+        }
+
+        .hero-text h1 {
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 1.35;
+            color: #ffffff;
+        }
+
+        .hero-text span {
+            font-weight: 700;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 16px;
+            z-index: 2;
+        }
+
+        .btn-outline {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 11.5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-decoration: none;
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: #72efdd;
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 0 10px rgba(114, 239, 221, 0.25);
+        }
+
+        .link-subtle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 11px;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.25s ease;
+        }
+
+        .link-subtle:hover {
+            color: #72efdd;
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+        /* Right Form Card Section */
+        .form-section {
+            flex: 1;
+            padding: 14px 28px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 430px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 16px 20px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .form-group {
+            margin-bottom: 7px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 3px;
+        }
+
+        /* Logo Upload Styles */
+        .logo-upload-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px dashed rgba(255, 255, 255, 0.25);
+            border-radius: 8px;
+            padding: 5px 12px;
+            transition: all 0.2s ease;
+        }
+
+        .logo-upload-container:hover {
+            border-color: #a2e8dd;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-preview-box {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .logo-preview-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-preview-box i {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .logo-upload-actions {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .btn-upload-trigger {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10.5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            width: fit-content;
+            transition: all 0.2s ease;
+        }
+
+        .btn-upload-trigger:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .logo-hint {
+            font-size: 9.5px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-remove-logo {
+            color: #ff9999;
+            font-size: 10.5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            display: none;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 7px 34px 7px 11px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 7px;
+            color: #ffffff;
+            font-size: 12px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        input:focus {
+            border-color: #a2e8dd;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 2px rgba(162, 232, 221, 0.2);
+        }
+
+        .field-icon {
+            position: absolute;
+            right: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 8px 14px;
+            background: #a2e8dd;
+            border: none;
+            border-radius: 7px;
+            color: #1a0836;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-submit:hover {
+            background: #8ce2d5;
+            transform: translateY(-1px);
+        }
+
+        .btn-submit:disabled {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.4);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .footer-text a {
+            color: #ffffff;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* Two-Step Form Stepper */
+        .stepper-nav {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 9px;
+            padding: 3px;
+            margin-bottom: 12px;
+            gap: 4px;
+        }
+
+        .step-pill {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 6px 10px;
+            border-radius: 7px;
+            background: transparent;
+            border: 1px solid transparent;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 11px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.22s ease;
+        }
+
+        .step-pill.active {
+            background: rgba(162, 232, 221, 0.18);
+            border-color: rgba(114, 239, 221, 0.4);
+            color: #72efdd;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .step-pill.completed {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .step-badge {
+            width: 17px;
+            height: 17px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.16);
+            color: #ffffff;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .step-pill.active .step-badge {
+            background: #72efdd;
+            color: #1a0836;
+        }
+
+        .step-pill.completed .step-badge {
+            background: rgba(114, 239, 221, 0.35);
+            color: #72efdd;
+        }
+
+        /* Step Panels with Smooth Slide */
+        .step-panel {
+            display: none;
+            animation: stepFade 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .step-panel.active {
+            display: block;
+        }
+
+        @keyframes stepFade {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-subheading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 9px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .step-title {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .step-title i {
+            color: #72efdd;
+            font-size: 13px;
+        }
+
+        .step-counter-tag {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.55);
+            background: rgba(255, 255, 255, 0.08);
+            padding: 2px 7px;
+            border-radius: 8px;
+        }
+
+        /* Step 2 Org Summary Bar */
+        .org-summary-pill {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(114, 239, 221, 0.08);
+            border: 1px solid rgba(114, 239, 221, 0.25);
+            border-radius: 8px;
+            padding: 6px 10px;
+            margin-bottom: 9px;
+            font-size: 11px;
+        }
+
+        .org-summary-info {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: #ffffff;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .org-summary-info i {
+            color: #72efdd;
+            font-size: 12px;
+        }
+
+        .org-summary-slug {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 10px;
+            font-weight: 400;
+        }
+
+        .org-summary-edit-btn {
+            background: none;
+            border: none;
+            color: #72efdd;
+            font-size: 10.5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .org-summary-edit-btn:hover {
+            background: rgba(114, 239, 221, 0.18);
+            text-decoration: underline;
+        }
+
+        /* Back Button */
+        .btn-step-back {
+            padding: 7px 13px;
+            background: rgba(255, 255, 255, 0.09);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 7px;
+            color: #ffffff;
+            font-size: 11.5px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-step-back:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.35);
+        }
+
+        .btn-step-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        /* Notification Styling */
+        .msg {
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: none;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .msg.error {
+            background: rgba(235, 87, 87, 0.2);
+            border: 1px solid #eb5757;
+            color: #ff9999;
+            display: block;
+        }
+
+        .msg.success {
+            background: rgba(39, 174, 96, 0.2);
+            border: 1px solid #27ae60;
+            color: #7bed9f;
+            display: block;
+        }
+
+        /* Responsive Design Adjustments */
+        @media (max-width: 850px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .hero-section {
+                padding: 30px;
+            }
+
+            .ribbon-container {
+                transform: scale(0.7);
+                top: -60px;
+                left: -60px;
+            }
+        }
+
+        /* Interactive Modals */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 4, 25, 0.75);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-box {
+            background: linear-gradient(135deg, #2a1458, #180933);
+            border: 1px solid rgba(162, 232, 221, 0.3);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+            border-radius: 18px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 30px;
+            color: #ffffff;
+            position: relative;
+            transform: translateY(15px);
+            transition: transform 0.25s ease;
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: translateY(0);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(235, 87, 87, 0.4);
+        }
+
+        .modal-feature-item {
+            display: flex;
+            gap: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            align-items: flex-start;
+        }
+
+        .modal-feature-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(162, 232, 221, 0.15);
+            color: #72efdd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .verify-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(114, 239, 221, 0.12);
+            color: #72efdd;
+            border: 1px solid rgba(114, 239, 221, 0.3);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            margin: 12px 0 20px 0;
+            word-break: break-all;
+        }
+
+        .otp-box {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .otp-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 24px;
+            letter-spacing: 8px;
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .otp-input:focus {
+            border-color: #72efdd;
+            box-shadow: 0 0 12px rgba(114, 239, 221, 0.3);
+        }
+
+        .verify-feedback {
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 14px;
+            display: none;
+        }
+
+        .verify-feedback.error {
+            background: rgba(235, 87, 87, 0.2);
+            border: 1px solid rgba(235, 87, 87, 0.4);
+            color: #ff9b9b;
+            display: block;
+        }
+
+        .verify-feedback.success {
+            background: rgba(114, 239, 221, 0.2);
+            border: 1px solid rgba(114, 239, 221, 0.4);
+            color: #a2e8dd;
+            display: block;
+        }
+    </style>
 </head>
+
 <body>
 
-<div class="app-window">
-    <!-- Window Controls Header -->
-    <div class="window-header">
-        <div style="display: flex; align-items: center; gap: 16px;">
-            <div class="window-dots">
-                <div class="dot dot-1"></div>
-                <div class="dot dot-2"></div>
-                <div class="dot dot-3"></div>
+    <!-- Short Skeletal Loading Placeholder -->
+    <div id="skeletonLoader" class="skeleton-overlay">
+        <div class="skeleton-window">
+            <div class="skeleton-header">
+                <div class="skeleton-dots">
+                    <span class="skeleton-dot"></span>
+                    <span class="skeleton-dot"></span>
+                    <span class="skeleton-dot"></span>
+                </div>
+                <div class="skeleton-shimmer" style="width: 140px; height: 16px; border-radius: 6px;"></div>
             </div>
-            <nav class="window-quick-nav">
-                <a href="welcome.html" class="window-nav-link"><i class="fa-solid fa-grid-horizontal"></i> Hub</a>
-                <a href="pages/public/home.html" class="window-nav-link"><i class="fa-solid fa-house"></i> Main Site</a>
-                <a href="site-login.html" class="window-nav-link"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
-                <a href="pages/hr/hr-dashboard.html" class="window-nav-link"><i class="fa-solid fa-users-gear"></i> HR Portal</a>
-            </nav>
-        </div>
-        <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.5); letter-spacing: 0.5px;">
-            LUCY™ ENTERPRISE
+            <div class="skeleton-body">
+                <div class="skeleton-hero">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="skeleton-shimmer" style="width: 36px; height: 36px; border-radius: 8px;"></div>
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                            <div class="skeleton-shimmer" style="width: 90px; height: 16px; border-radius: 4px;"></div>
+                            <div class="skeleton-shimmer" style="width: 130px; height: 10px; border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-shimmer" style="width: 82%; height: 22px; margin-top: 14px; border-radius: 6px;"></div>
+                    <div class="skeleton-shimmer" style="width: 58%; height: 16px; border-radius: 6px;"></div>
+                    <div style="display: flex; gap: 10px; margin-top: 14px;">
+                        <div class="skeleton-shimmer" style="width: 110px; height: 28px; border-radius: 6px;"></div>
+                        <div class="skeleton-shimmer" style="width: 130px; height: 28px; border-radius: 6px;"></div>
+                    </div>
+                </div>
+                <div class="skeleton-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <div class="skeleton-shimmer" style="width: 130px; height: 16px; border-radius: 5px;"></div>
+                        <div class="skeleton-shimmer" style="width: 48px; height: 11px; border-radius: 4px;"></div>
+                    </div>
+                    <div style="display: flex; gap: 5px; margin-bottom: 6px;">
+                        <div class="skeleton-shimmer" style="flex: 1; height: 24px; border-radius: 6px;"></div>
+                        <div class="skeleton-shimmer" style="flex: 1; height: 24px; border-radius: 6px;"></div>
+                    </div>
+                    <div class="skeleton-shimmer" style="height: 36px; border-radius: 7px;"></div>
+                    <div class="skeleton-shimmer" style="height: 28px; border-radius: 6px;"></div>
+                    <div class="skeleton-shimmer" style="height: 28px; border-radius: 6px;"></div>
+                    <div class="skeleton-shimmer" style="height: 30px; border-radius: 6px; margin-top: 4px;"></div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="main-container">
-        <!-- Left Banner -->
-        <div class="hero-section">
-            <div class="ribbon-container">
-                <div class="ribbon ribbon-1"></div>
-                <div class="ribbon ribbon-2"></div>
+    <div class="app-window">
+        <!-- Window Controls Header -->
+        <div class="window-header">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div class="window-dots">
+                    <div class="dot dot-1"></div>
+                    <div class="dot dot-2"></div>
+                    <div class="dot dot-3"></div>
+                </div>
+                <nav class="window-quick-nav">
+                    <a href="welcome.html" class="window-nav-link"><i class="fa-solid fa-grid-horizontal"></i> Hub</a>
+                    <a href="pages/public/home.html" class="window-nav-link"><i class="fa-solid fa-house"></i> Main
+                        Site</a>
+                    <a href="site-login.html" class="window-nav-link"><i class="fa-solid fa-right-to-bracket"></i>
+                        Login</a>
+                    <a href="pages/hr/hr-dashboard.html" class="window-nav-link"><i class="fa-solid fa-users-gear"></i>
+                        HR Portal</a>
+                </nav>
             </div>
+            <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.5); letter-spacing: 0.5px;">
+                LUCY™ ENTERPRISE
+            </div>
+        </div>
 
-            <div class="brand-logo">
-                <i class="fa-solid fa-elephant logo-icon"></i>
-                <div>
-                    <div class="brand-title">LUCY™</div>
-                    <div class="brand-subtitle">Innovation Starts Here</div>
+        <div class="main-container">
+            <!-- Left Banner -->
+            <div class="hero-section">
+                <div class="ribbon-container">
+                    <div class="ribbon ribbon-1"></div>
+                    <div class="ribbon ribbon-2"></div>
+                </div>
+
+                <div class="brand-logo">
+                    <i class="fa-solid fa-elephant logo-icon"></i>
+                    <div>
+                        <div class="brand-title">LUCY™</div>
+                        <div class="brand-subtitle">Innovation Starts Here</div>
+                    </div>
+                </div>
+
+                <div class="hero-text">
+                    <h1>You will be registering your enterprise on <span>LUCY™</span> Core Network</h1>
+                </div>
+
+                <div class="hero-buttons">
+                    <button class="btn-outline" type="button" onclick="openExpectModal()">
+                        <i class="fa-solid fa-circle-info" style="margin-right: 6px;"></i> What to Expect?
+                    </button>
+                    <button class="btn-outline" type="button"
+                        onclick="window.SupabaseConfig && window.SupabaseConfig.openConfigModal()"
+                        style="border-color: rgba(114, 239, 221, 0.4); color: #72efdd;"
+                        title="Configure Supabase Cloud URL & API Key">
+                        <i class="fa-solid fa-cloud" style="margin-right: 6px;"></i> Connect Supabase
+                    </button>
+                    <a href="javascript:void(0)" onclick="openRoadmapModal()" class="link-subtle">
+                        <i class="fa-solid fa-rocket" style="margin-right: 4px;"></i> Other Future Applications
+                    </a>
                 </div>
             </div>
 
-            <div class="hero-text">
-                <h1>You will be registering your enterprise on <span>LUCY™</span> Core Network</h1>
+            <!-- Right Form Box -->
+            <div class="form-section">
+                <div class="card">
+                    <h2>Register Organization</h2>
+
+                    <div id="msg" class="msg"></div>
+
+                    <form id="registerForm" onsubmit="register(event)">
+
+                        <!-- Organization Logo Upload Field -->
+                        <div class="form-group">
+                            <label>Organization Logo (Optional)</label>
+                            <div class="logo-upload-container">
+                                <div class="logo-preview-box" id="logoPreviewBox">
+                                    <i class="fa-regular fa-image" id="logoPlaceholderIcon"></i>
+                                </div>
+                                <div class="logo-upload-actions">
+                                    <input type="file" id="orgLogo"
+                                        accept="image/png, image/jpeg, image/svg+xml, image/webp" style="display: none;"
+                                        onchange="handleLogoChange(event)">
+                                    <button type="button" class="btn-upload-trigger"
+                                        onclick="document.getElementById('orgLogo').click()">
+                                        <i class="fa-solid fa-upload"></i> Upload Logo
+                                    </button>
+                                    <span class="logo-hint" id="logoHint">PNG, JPG or SVG (Max 2MB)</span>
+                                    <button type="button" class="btn-remove-logo" id="removeLogoBtn"
+                                        onclick="removeLogo()">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="orgName">Organization Name</label>
+                            <div class="input-wrapper">
+                                <input type="text" id="orgName" placeholder="Flawless Graphics Ltd" required>
+                                <i class="fa-regular fa-building field-icon"></i>
+                            </div>
+                        </div>
+
+                        <!-- Organization ID Slug Field -->
+                        <div class="form-group">
+                            <label for="orgId">Organization ID (Subdomain / Slug)</label>
+                            <div class="input-wrapper">
+                                <input type="text" id="orgId" placeholder="flawless-graphics" required
+                                    pattern="^[a-z0-9-]{3,30}$"
+                                    title="3-30 characters, lowercase alphanumeric and hyphens only">
+                                <i class="fa-solid fa-link field-icon"></i>
+                            </div>
+                            <span class="logo-hint" style="display: block; margin-top: 4px; line-height: 1.3;">Used for
+                                your unique portal workspace url. Lowercase letters, numbers, and hyphens only.</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fullName">Admin Full Name</label>
+                            <div class="input-wrapper">
+                                <input type="text" id="fullName" placeholder="John Doe" required>
+                                <i class="fa-regular fa-user field-icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email (Login Username)</label>
+                            <div class="input-wrapper">
+                                <input type="email" id="email" placeholder="admin@company.com" required>
+                                <i class="fa-regular fa-envelope field-icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <div class="input-wrapper">
+                                <input type="password" id="password" placeholder="Minimum 8 characters" required
+                                    minlength="8">
+                                <i class="fa-regular fa-eye-slash field-icon" id="togglePassword"
+                                    onclick="togglePasswordVisibility()"></i>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="submitBtn" class="btn-submit">Register Organization</button>
+                        <button type="button" class="btn-submit"
+                            style="margin-top: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff;"
+                            onclick="quickDemoAccess()">
+                            <i class="fa-solid fa-bolt" style="color: #72efdd; margin-right: 6px;"></i> Explore with
+                            Demo Workspace
+                        </button>
+                    </form>
+
+                    <div class="footer-text">
+                        Already registered? <a href="site-login.html">Login</a> &bull; <a
+                            href="pages/hr/hr-dashboard.html" style="color: #72efdd;">Direct HR Portal</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 1: WHAT TO EXPECT -->
+    <div class="modal-overlay" id="expectModal" onclick="if(event.target===this)closeExpectModal()">
+        <div class="modal-box">
+            <button class="modal-close-btn" onclick="closeExpectModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                <div class="modal-feature-icon" style="width: 44px; height: 44px; font-size: 20px;">
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <div>
+                    <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">What to Expect on LUCY™</h3>
+                    <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin: 0;">Enterprise Operations &
+                        Intelligent Core Suite</p>
+                </div>
             </div>
 
-            <div class="hero-buttons">
-                <button class="btn-outline" type="button" onclick="openExpectModal()">
-                    <i class="fa-solid fa-circle-info" style="margin-right: 6px;"></i> What to Expect?
+            <div class="modal-feature-item">
+                <div class="modal-feature-icon"><i class="fa-solid fa-users"></i></div>
+                <div>
+                    <h4 style="font-size: 14px; margin-bottom: 4px; color: #a2e8dd;">Workforce & People Operations</h4>
+                    <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">
+                        Complete teacher directory, automated department structuring, attendance tracking, and
+                        performance evaluations.
+                    </p>
+                </div>
+            </div>
+
+            <div class="modal-feature-item">
+                <div class="modal-feature-icon" style="background: rgba(114, 239, 221, 0.15); color: #72efdd;"><i
+                        class="fa-solid fa-coins"></i></div>
+                <div>
+                    <h4 style="font-size: 14px; margin-bottom: 4px; color: #a2e8dd;">Payroll & Statutory Compliance</h4>
+                    <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">
+                        Automated Ghana GRA PAYE, SSNIT Tier 1 & 2 deductions, one-click bank CSV exports, and printable
+                        PDF payslips.
+                    </p>
+                </div>
+            </div>
+
+            <div class="modal-feature-item">
+                <div class="modal-feature-icon" style="background: rgba(99, 91, 252, 0.2); color: #8b5cf6;"><i
+                        class="fa-solid fa-cloud"></i></div>
+                <div>
+                    <h4 style="font-size: 14px; margin-bottom: 4px; color: #a2e8dd;">Supabase Cloud Synchronization</h4>
+                    <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">
+                        Connect seamlessly to your Supabase PostgreSQL cloud database for real-time multi-device
+                        synchronization and zero data loss.
+                    </p>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end;">
+                <button class="btn-submit"
+                    style="width: auto; padding: 10px 20px; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2);"
+                    onclick="closeExpectModal()">Close</button>
+                <button class="btn-submit" style="width: auto; padding: 10px 24px;"
+                    onclick="closeExpectModal(); quickDemoAccess();">
+                    <i class="fa-solid fa-bolt"></i> Launch Demo Workspace
                 </button>
-                <button class="btn-outline" type="button" onclick="window.SupabaseConfig && window.SupabaseConfig.openConfigModal()" style="border-color: rgba(114, 239, 221, 0.4); color: #72efdd;" title="Configure Supabase Cloud URL & API Key">
-                    <i class="fa-solid fa-cloud" style="margin-right: 6px;"></i> Connect Supabase
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: ROADMAP & FUTURE APPS -->
+    <div class="modal-overlay" id="roadmapModal" onclick="if(event.target===this)closeRoadmapModal()">
+        <div class="modal-box">
+            <button class="modal-close-btn" onclick="closeRoadmapModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                <div class="modal-feature-icon"
+                    style="width: 44px; height: 44px; font-size: 20px; background: rgba(245, 158, 11, 0.2); color: #f59e0b;">
+                    <i class="fa-solid fa-rocket"></i>
+                </div>
+                <div>
+                    <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">Future Applications & Ecosystem
+                    </h3>
+                    <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin: 0;">Upcoming modules on the LUCY™
+                        product roadmap</p>
+                </div>
+            </div>
+
+            <div class="modal-feature-item">
+                <div class="modal-feature-icon"><i class="fa-solid fa-fingerprint"></i></div>
+                <div>
+                    <h4 style="font-size: 14px; margin-bottom: 4px; color: #a2e8dd;">Biometric Timeclock & Facial
+                        Check-in</h4>
+                    <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">
+                        Direct USB/network integration with ZKTeco biometric scanners for tamper-proof
+                        time-and-attendance logging.
+                    </p>
+                </div>
+            </div>
+
+            <div class="modal-feature-item">
+                <div class="modal-feature-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+                <div>
+                    <h4 style="font-size: 14px; margin-bottom: 4px; color: #a2e8dd;">Cross-Platform Mobile PWA</h4>
+                    <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">
+                        Installable iOS and Android progressive web application for staff self-service and mobile
+                        leaves.
+                    </p>
+                </div>
+            </div>
+
+            <div class="modal-feature-item">
+                <div class="modal-feature-icon"><i class="fa-solid fa-robot"></i></div>
+                <div>
+                    <h4 style="font-size: 14px; margin-bottom: 4px; color: #a2e8dd;">AI Workforce Copilot</h4>
+                    <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">
+                        Predictive retention analytics, auto-drafted performance reviews, and natural language query
+                        assistance.
+                    </p>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end;">
+                <button class="btn-submit" style="width: auto; padding: 10px 24px;" onclick="closeRoadmapModal()">Got
+                    It</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: EMAIL & OTP VERIFICATION -->
+    <div class="modal-overlay" id="verificationModal">
+        <div class="modal-box" style="max-width: 480px; text-align: center;">
+            <div
+                style="width: 58px; height: 58px; border-radius: 50%; background: rgba(114, 239, 221, 0.15); color: #72efdd; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 16px;">
+                <i class="fa-solid fa-envelope-circle-check"></i>
+            </div>
+            <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 6px;">Verify Your Organization</h3>
+            <p style="font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.5; margin-bottom: 6px;">
+                A confirmation email has been dispatched by Supabase to:
+            </p>
+            <div class="verify-badge" id="verifyEmailBadge">
+                <i class="fa-regular fa-envelope"></i> <span id="verifyEmailText">user@company.com</span>
+            </div>
+
+            <div id="verifyFeedback" class="verify-feedback"></div>
+
+            <div class="otp-box">
+                <div
+                    style="font-size: 13px; font-weight: 600; color: #a2e8dd; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <i class="fa-solid fa-key"></i> Instant Activation with 6-Digit Code
+                </div>
+                <input type="text" id="otpInput" class="otp-input" placeholder="------" maxlength="6"
+                    autocomplete="one-time-code">
+                <button type="button" class="btn-submit" id="btnVerifyOtp" onclick="submitOtpVerification()"
+                    style="margin-top: 4px;">
+                    <i class="fa-solid fa-check"></i> Verify & Enter Workspace
                 </button>
-                <a href="javascript:void(0)" onclick="openRoadmapModal()" class="link-subtle">
-                    <i class="fa-solid fa-rocket" style="margin-right: 4px;"></i> Other Future Applications
+            </div>
+
+            <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 18px; line-height: 1.5;">
+                Alternatively, click the confirmation link sent directly to your email inbox to activate your account.
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: center; align-items: center;">
+                <button type="button" class="btn-outline" id="btnResend" onclick="resendVerificationEmail()"
+                    style="font-size: 12px; padding: 8px 16px;">
+                    <i class="fa-solid fa-rotate-right"></i> Resend Email
+                </button>
+                <a href="site-login.html" class="link-subtle" style="font-size: 12px;">
+                    Go to Login <i class="fa-solid fa-arrow-right" style="margin-left: 4px;"></i>
                 </a>
             </div>
         </div>
-
-        <!-- Right Form Box -->
-        <div class="form-section">
-            <div class="card">
-                <h2>Register Organization</h2>
-
-                <div id="msg" class="msg"></div>
-
-                <form id="registerForm" onsubmit="register(event)">
-                    
-                    <!-- Organization Logo Upload Field -->
-                    <div class="form-group">
-                        <label>Organization Logo (Optional)</label>
-                        <div class="logo-upload-container">
-                            <div class="logo-preview-box" id="logoPreviewBox">
-                                <i class="fa-regular fa-image" id="logoPlaceholderIcon"></i>
-                            </div>
-                            <div class="logo-upload-actions">
-                                <input type="file" id="orgLogo" accept="image/png, image/jpeg, image/svg+xml, image/webp" style="display: none;" onchange="handleLogoChange(event)">
-                                <button type="button" class="btn-upload-trigger" onclick="document.getElementById('orgLogo').click()">
-                                    <i class="fa-solid fa-upload"></i> Upload Logo
-                                </button>
-                                <span class="logo-hint" id="logoHint">PNG, JPG or SVG (Max 2MB)</span>
-                                <button type="button" class="btn-remove-logo" id="removeLogoBtn" onclick="removeLogo()">Remove</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="orgName">Organization Name</label>
-                        <div class="input-wrapper">
-                            <input type="text" id="orgName" placeholder="Flawless Graphics Ltd" required>
-                            <i class="fa-regular fa-building field-icon"></i>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="fullName">Admin Full Name</label>
-                        <div class="input-wrapper">
-                            <input type="text" id="fullName" placeholder="John Doe" required>
-                            <i class="fa-regular fa-user field-icon"></i>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email">Email (Login Username)</label>
-                        <div class="input-wrapper">
-                            <input type="email" id="email" placeholder="admin@company.com" required>
-                            <i class="fa-regular fa-envelope field-icon"></i>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <div class="input-wrapper">
-                            <input type="password" id="password" placeholder="Minimum 8 characters" required minlength="8">
-                            <i class="fa-regular fa-eye-slash field-icon" id="togglePassword" onclick="togglePasswordVisibility()"></i>
-                        </div>
-                    </div>
-
-                    <button type="submit" id="submitBtn" class="btn-submit">Register Organization</button>
-                    <button type="button" class="btn-submit" style="margin-top: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff;" onclick="quickDemoAccess()">
-                        <i class="fa-solid fa-bolt" style="color: #72efdd; margin-right: 6px;"></i> Explore with Demo Workspace
-                    </button>
-                </form>
-
-                <div class="footer-text">
-                    Already registered? <a href="site-login.html">Login</a> &bull; <a href="pages/hr/hr-dashboard.html" style="color: #72efdd;">Direct HR Portal</a>
-                </div>
-            </div>
-        </div>
     </div>
-</div>
 
-<!-- MODAL 1: WHAT TO EXPECT -->
-<div class="modal-overlay" id="expectModal" onclick="if(event.target===this)closeExpectModal()">
-    <div class="modal-box">
-        <button class="modal-close-btn" onclick="closeExpectModal()"><i class="fa-solid fa-xmark"></i></button>
-        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-            <div class="modal-feature-icon" style="width: 44px; height: 44px; font-size: 20px;">
-                <i class="fa-solid fa-layer-group"></i>
-            </div>
-            <div>
-                <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">What to Expect on LUCY™</h3>
-                <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin: 0;">Enterprise Operations & Intelligent Core Suite</p>
-            </div>
-        </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/auth-session.js"></script>
+    <script src="assets/js/supabase-config.js"></script>
+    <script src="assets/js/supabase-client.js"></script>
+    <script>
+        let currentLogoBase64 = null;
+        let isOrgIdManuallyEdited = false;
 
-        <div class="modal-feature-item">
-            <div class="modal-feature-icon"><i class="fa-solid fa-users"></i></div>
-            <div>
-                <h4 style="font-size: 14px; margin-bottom: 4px; color: #a2e8dd;">Workforce & People Operations</h4>
-                <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">
-                    Complete teacher directory, automated department structuring, attendance tracking, and performance evaluations.
-                </p>
-            </div>
-        </div>
-
-        <div class="modal-feature-item">
-            <div class="modal-feature-icon" style="background: rgba(114, 239, 221, 0.15); color: #72efdd;"><i class="fa-solid fa-coins"></i></div>
-            <div>
-                <h4 style="font-size: 14px; margin-bottom: 4px; color: #a2e8dd;">Payroll & Statutory Compliance</h4>
-                <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">
-                    Automated Ghana GRA PAYE, SSNIT Tier 1 & 2 deductions, one-click bank CSV exports, and printable PDF payslips.
-                </p>
-            </div>
-        </div>
-
-        <div class="modal-feature-item">
-            <div class="modal-feature-icon" style="background: rgba(99, 91, 252, 0.2); color: #8b5cf6;"><i class="fa-solid fa-cloud"></i></div>
-            <div>
-                <h4 style="font-size: 14px; margin-bottom: 4px; color: #a2e8dd;">Supabase Cloud Synchronization</h4>
-                <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">
-                    Connect seamlessly to your Supabase PostgreSQL cloud database for real-time multi-device synchronization and zero data loss.
-                </p>
-            </div>
-        </div>
-
-        <div style="display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end;">
-            <button class="btn-submit" style="width: auto; padding: 10px 20px; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2);" onclick="closeExpectModal()">Close</button>
-            <button class="btn-submit" style="width: auto; padding: 10px 24px;" onclick="closeExpectModal(); quickDemoAccess();">
-                <i class="fa-solid fa-bolt"></i> Launch Demo Workspace
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL 2: ROADMAP & FUTURE APPS -->
-<div class="modal-overlay" id="roadmapModal" onclick="if(event.target===this)closeRoadmapModal()">
-    <div class="modal-box">
-        <button class="modal-close-btn" onclick="closeRoadmapModal()"><i class="fa-solid fa-xmark"></i></button>
-        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-            <div class="modal-feature-icon" style="width: 44px; height: 44px; font-size: 20px; background: rgba(245, 158, 11, 0.2); color: #f59e0b;">
-                <i class="fa-solid fa-rocket"></i>
-            </div>
-            <div>
-                <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">Future Applications & Ecosystem</h3>
-                <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin: 0;">Upcoming modules on the LUCY™ product roadmap</p>
-            </div>
-        </div>
-
-        <div class="modal-feature-item">
-            <div class="modal-feature-icon"><i class="fa-solid fa-fingerprint"></i></div>
-            <div>
-                <h4 style="font-size: 14px; margin-bottom: 4px; color: #a2e8dd;">Biometric Timeclock & Facial Check-in</h4>
-                <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">
-                    Direct USB/network integration with ZKTeco biometric scanners for tamper-proof time-and-attendance logging.
-                </p>
-            </div>
-        </div>
-
-        <div class="modal-feature-item">
-            <div class="modal-feature-icon"><i class="fa-solid fa-mobile-screen"></i></div>
-            <div>
-                <h4 style="font-size: 14px; margin-bottom: 4px; color: #a2e8dd;">Cross-Platform Mobile PWA</h4>
-                <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">
-                    Installable iOS and Android progressive web application for staff self-service and mobile leaves.
-                </p>
-            </div>
-        </div>
-
-        <div class="modal-feature-item">
-            <div class="modal-feature-icon"><i class="fa-solid fa-robot"></i></div>
-            <div>
-                <h4 style="font-size: 14px; margin-bottom: 4px; color: #a2e8dd;">AI Workforce Copilot</h4>
-                <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; margin: 0;">
-                    Predictive retention analytics, auto-drafted performance reviews, and natural language query assistance.
-                </p>
-            </div>
-        </div>
-
-        <div style="display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end;">
-            <button class="btn-submit" style="width: auto; padding: 10px 24px;" onclick="closeRoadmapModal()">Got It</button>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL 3: EMAIL & OTP VERIFICATION -->
-<div class="modal-overlay" id="verificationModal">
-    <div class="modal-box" style="max-width: 480px; text-align: center;">
-        <div style="width: 58px; height: 58px; border-radius: 50%; background: rgba(114, 239, 221, 0.15); color: #72efdd; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 16px;">
-            <i class="fa-solid fa-envelope-circle-check"></i>
-        </div>
-        <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 6px;">Verify Your Organization</h3>
-        <p style="font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.5; margin-bottom: 6px;">
-            A confirmation email has been dispatched by Supabase to:
-        </p>
-        <div class="verify-badge" id="verifyEmailBadge">
-            <i class="fa-regular fa-envelope"></i> <span id="verifyEmailText">user@company.com</span>
-        </div>
-
-        <div id="verifyFeedback" class="verify-feedback"></div>
-
-        <div class="otp-box">
-            <div style="font-size: 13px; font-weight: 600; color: #a2e8dd; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                <i class="fa-solid fa-key"></i> Instant Activation with 6-Digit Code
-            </div>
-            <input type="text" id="otpInput" class="otp-input" placeholder="------" maxlength="6" autocomplete="one-time-code">
-            <button type="button" class="btn-submit" id="btnVerifyOtp" onclick="submitOtpVerification()" style="margin-top: 4px;">
-                <i class="fa-solid fa-check"></i> Verify & Enter Workspace
-            </button>
-        </div>
-
-        <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 18px; line-height: 1.5;">
-            Alternatively, click the confirmation link sent directly to your email inbox to activate your account.
-        </div>
-
-        <div style="display: flex; gap: 10px; justify-content: center; align-items: center;">
-            <button type="button" class="btn-outline" id="btnResend" onclick="resendVerificationEmail()" style="font-size: 12px; padding: 8px 16px;">
-                <i class="fa-solid fa-rotate-right"></i> Resend Email
-            </button>
-            <a href="site-login.html" class="link-subtle" style="font-size: 12px;">
-                Go to Login <i class="fa-solid fa-arrow-right" style="margin-left: 4px;"></i>
-            </a>
-        </div>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="assets/js/auth-session.js"></script>
-<script src="assets/js/supabase-config.js"></script>
-<script src="assets/js/supabase-client.js"></script>
-<script>
-let currentLogoBase64 = null;
-
-function showMessage(text, isError = true) {
-    const msgEl = document.getElementById("msg");
-    msgEl.textContent = text;
-    msgEl.className = "msg " + (isError ? "error" : "success");
-}
-
-function openExpectModal() {
-    document.getElementById("expectModal").classList.add("active");
-}
-function closeExpectModal() {
-    document.getElementById("expectModal").classList.remove("active");
-}
-
-function openRoadmapModal() {
-    document.getElementById("roadmapModal").classList.add("active");
-}
-function closeRoadmapModal() {
-    document.getElementById("roadmapModal").classList.remove("active");
-}
-
-function quickDemoAccess() {
-    const btn = event?.currentTarget;
-    if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Entering Demo Workspace...';
-    }
-    showMessage("Setting up demo organization session...", false);
-    if (window.AuthSession) {
-        window.AuthSession.initDemoSession();
-    }
-    setTimeout(() => {
-        window.location.href = "welcome.html";
-    }, 600);
-}
-
-function togglePasswordVisibility() {
-    const passwordInput = document.getElementById("password");
-    const toggleIcon = document.getElementById("togglePassword");
-    
-    if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-        toggleIcon.classList.remove("fa-eye-slash");
-        toggleIcon.classList.add("fa-eye");
-    } else {
-        passwordInput.type = "password";
-        toggleIcon.classList.remove("fa-eye");
-        toggleIcon.classList.add("fa-eye-slash");
-    }
-}
-
-function handleLogoChange(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    if (file.size > 2 * 1024 * 1024) {
-        showMessage("Logo image size must be under 2MB.");
-        event.target.value = "";
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        currentLogoBase64 = e.target.result;
-        
-        const previewBox = document.getElementById("logoPreviewBox");
-        previewBox.innerHTML = `<img src="${currentLogoBase64}" alt="Logo Preview">`;
-        
-        document.getElementById("removeLogoBtn").style.display = "inline-block";
-        document.getElementById("logoHint").style.display = "none";
-    };
-    reader.readAsDataURL(file);
-}
-
-function removeLogo() {
-    currentLogoBase64 = null;
-    document.getElementById("orgLogo").value = "";
-    document.getElementById("logoPreviewBox").innerHTML = `<i class="fa-regular fa-image" id="logoPlaceholderIcon"></i>`;
-    document.getElementById("removeLogoBtn").style.display = "none";
-    document.getElementById("logoHint").style.display = "inline";
-}
-
-let pendingRegistrationEmail = '';
-let pendingUserData = null;
-
-function openVerificationModal(email, msg = '') {
-    pendingRegistrationEmail = email;
-    document.getElementById("verifyEmailText").textContent = email;
-    document.getElementById("otpInput").value = '';
-    showVerifyFeedback(msg || "Verification link & code dispatched. Check your inbox.", false);
-    document.getElementById("verificationModal").classList.add("active");
-}
-
-function closeVerificationModal() {
-    document.getElementById("verificationModal").classList.remove("active");
-}
-
-function showVerifyFeedback(text, isError = true) {
-    const el = document.getElementById("verifyFeedback");
-    if (!el) return;
-    el.textContent = text;
-    el.className = "verify-feedback " + (isError ? "error" : "success");
-    el.style.display = "block";
-}
-
-async function submitOtpVerification() {
-    const otpInput = document.getElementById("otpInput");
-    const code = otpInput.value.trim();
-    const btn = document.getElementById("btnVerifyOtp");
-
-    if (!code || code.length < 6) {
-        return showVerifyFeedback("Please enter the 6-digit verification code from your email.", true);
-    }
-
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying...';
-
-    try {
-        if (window.SupabaseService && typeof window.SupabaseService.verifyOtp === 'function') {
-            await window.SupabaseService.verifyOtp(pendingRegistrationEmail, code, 'signup');
-            showVerifyFeedback("Account verified successfully! Unlocking workspace...", false);
-
-            if (pendingUserData && window.AuthSession) {
-                window.AuthSession.setUser(pendingUserData);
+        // Real-time Organization ID Slug Generator 
+        document.getElementById("orgName").addEventListener("input", function (e) {
+            if (!isOrgIdManuallyEdited) {
+                const slug = e.target.value
+                    .toLowerCase()
+                    .replace(/[^a-z0-9\s-]/g, '')  // strip characters that aren't letters, numbers, or spaces
+                    .replace(/\s+/g, '-')          // swap spaces with hyphens
+                    .replace(/-+/g, '-')           // remove multiple concurrent hyphens
+                    .replace(/^-+|-+$/g, '');      // trim leading/trailing hyphens
+                document.getElementById("orgId").value = slug;
             }
+        });
 
+        // Lock auto-generation once the user types inside the Organization ID field manually
+        document.getElementById("orgId").addEventListener("input", function (e) {
+            isOrgIdManuallyEdited = true;
+
+            // Dynamic sanitization (force lowercase and strip illegal URI characters on the fly)
+            const sanitized = e.target.value
+                .toLowerCase()
+                .replace(/[^a-z0-9-]/g, '');
+            e.target.value = sanitized;
+        });
+
+        function showMessage(text, isError = true) {
+            const msgEl = document.getElementById("msg");
+            msgEl.textContent = text;
+            msgEl.className = "msg " + (isError ? "error" : "success");
+        }
+
+        function openExpectModal() {
+            document.getElementById("expectModal").classList.add("active");
+        }
+        function closeExpectModal() {
+            document.getElementById("expectModal").classList.remove("active");
+        }
+
+        function openRoadmapModal() {
+            document.getElementById("roadmapModal").classList.add("active");
+        }
+        function closeRoadmapModal() {
+            document.getElementById("roadmapModal").classList.remove("active");
+        }
+
+        function quickDemoAccess() {
+            const btn = event?.currentTarget;
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Entering Demo Workspace...';
+            }
+            showMessage("Setting up demo organization session...", false);
+            if (window.AuthSession) {
+                window.AuthSession.initDemoSession();
+            }
             setTimeout(() => {
                 window.location.href = "welcome.html";
-            }, 1000);
-            return;
-        } else {
-            showVerifyFeedback("Supabase service not ready.", true);
+            }, 600);
         }
-    } catch (err) {
-        console.error("OTP verification error:", err);
-        showVerifyFeedback(err.message || "Invalid or expired verification code.", true);
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> Verify & Enter Workspace';
-    }
-}
 
-async function resendVerificationEmail() {
-    const btn = document.getElementById("btnResend");
-    if (!pendingRegistrationEmail) return;
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById("password");
+            const toggleIcon = document.getElementById("togglePassword");
 
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Resending...';
-
-    try {
-        if (window.SupabaseService && typeof window.SupabaseService.resendVerification === 'function') {
-            await window.SupabaseService.resendVerification(pendingRegistrationEmail);
-            showVerifyFeedback("A fresh confirmation email has been sent to your inbox!", false);
-            
-            let cd = 30;
-            const timer = setInterval(() => {
-                cd--;
-                if (cd > 0) {
-                    btn.innerHTML = `<i class="fa-solid fa-clock"></i> Resend (${cd}s)`;
-                } else {
-                    clearInterval(timer);
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Email';
-                }
-            }, 1000);
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleIcon.classList.remove("fa-eye-slash");
+                toggleIcon.classList.add("fa-eye");
+            } else {
+                passwordInput.type = "password";
+                toggleIcon.classList.remove("fa-eye");
+                toggleIcon.classList.add("fa-eye-slash");
+            }
         }
-    } catch (err) {
-        showVerifyFeedback(err.message || "Could not resend email. Please try again shortly.", true);
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Email';
-    }
-}
 
-async function register(event) {
-    event.preventDefault();
+        function handleLogoChange(event) {
+            const file = event.target.files[0];
+            if (!file) return;
 
-    const submitBtn = document.getElementById("submitBtn");
-    const org = document.getElementById("orgName").value.trim();
-    const name = document.getElementById("fullName").value.trim();
-    const email = document.getElementById("email").value.trim().toLowerCase();
-    const pw = document.getElementById("password").value;
-    const role = "admin";
+            if (file.size > 2 * 1024 * 1024) {
+                showMessage("Logo image size must be under 2MB.");
+                event.target.value = "";
+                return;
+            }
 
-    if (!org || !name || !email || !pw) {
-        return showMessage("Please complete all fields.");
-    }
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                currentLogoBase64 = e.target.result;
 
-    if (pw.length < 8) {
-        return showMessage("Password must be at least 8 characters.");
-    }
+                const previewBox = document.getElementById("logoPreviewBox");
+                previewBox.innerHTML = `<img src="${currentLogoBase64}" alt="Logo Preview">`;
 
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Registering Organization...';
+                document.getElementById("removeLogoBtn").style.display = "inline-block";
+                document.getElementById("logoHint").style.display = "none";
+            };
+            reader.readAsDataURL(file);
+        }
 
-    try {
-        const hashed = await AuthSession.sha256(pw);
-        const newUser = {
-            org: org,
-            logo: currentLogoBase64,
-            name: name,
-            email: email,
-            pass: hashed,
-            role: role,
-            createdAt: Date.now()
-        };
-        pendingUserData = newUser;
+        function removeLogo() {
+            currentLogoBase64 = null;
+            document.getElementById("orgLogo").value = "";
+            document.getElementById("logoPreviewBox").innerHTML = `<i class="fa-regular fa-image" id="logoPlaceholderIcon"></i>`;
+            document.getElementById("removeLogoBtn").style.display = "none";
+            document.getElementById("logoHint").style.display = "inline";
+        }
 
-        // 1. If Supabase is configured, use Supabase Auth with Email Verification
-        if (window.SupabaseConfig && window.SupabaseConfig.isConfigured() && window.SupabaseService) {
+        let pendingRegistrationEmail = '';
+        let pendingUserData = null;
+
+        function openVerificationModal(email, msg = '') {
+            pendingRegistrationEmail = email;
+            document.getElementById("verifyEmailText").textContent = email;
+            document.getElementById("otpInput").value = '';
+            showVerifyFeedback(msg || "Verification link & code dispatched. Check your inbox.", false);
+            document.getElementById("verificationModal").classList.add("active");
+        }
+
+        function closeVerificationModal() {
+            document.getElementById("verificationModal").classList.remove("active");
+        }
+
+        function showVerifyFeedback(text, isError = true) {
+            const el = document.getElementById("verifyFeedback");
+            if (!el) return;
+            el.textContent = text;
+            el.className = "verify-feedback " + (isError ? "error" : "success");
+            el.style.display = "block";
+        }
+
+        async function submitOtpVerification() {
+            const otpInput = document.getElementById("otpInput");
+            const code = otpInput.value.trim();
+            const btn = document.getElementById("btnVerifyOtp");
+
+            if (!code || code.length < 6) {
+                return showVerifyFeedback("Please enter the 6-digit verification code from your email.", true);
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying...';
+
             try {
-                const authResult = await window.SupabaseService.signUp(email, pw, {
-                    org_name: org,
-                    admin_name: name,
-                    logo_path: currentLogoBase64 || null
-                });
+                if (window.SupabaseService && typeof window.SupabaseService.verifyOtp === 'function') {
+                    await window.SupabaseService.verifyOtp(pendingRegistrationEmail, code, 'signup');
+                    showVerifyFeedback("Account verified successfully! Unlocking workspace...", false);
 
-                // Also sync to public.organizations table
-                window.SupabaseService.saveOrganization({
-                    org_name: org,
-                    admin_name: name,
+                    if (pendingUserData && window.AuthSession) {
+                        window.AuthSession.setUser(pendingUserData);
+                    }
+
+                    setTimeout(() => {
+                        window.location.href = "welcome.html";
+                    }, 1000);
+                    return;
+                } else {
+                    showVerifyFeedback("Supabase service not ready.", true);
+                }
+            } catch (err) {
+                console.error("OTP verification error:", err);
+                showVerifyFeedback(err.message || "Invalid or expired verification code.", true);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Verify & Enter Workspace';
+            }
+        }
+
+        async function resendVerificationEmail() {
+            const btn = document.getElementById("btnResend");
+            if (!pendingRegistrationEmail) return;
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Resending...';
+
+            try {
+                if (window.SupabaseService && typeof window.SupabaseService.resendVerification === 'function') {
+                    await window.SupabaseService.resendVerification(pendingRegistrationEmail);
+                    showVerifyFeedback("A fresh confirmation email has been sent to your inbox!", false);
+
+                    let cd = 30;
+                    const timer = setInterval(() => {
+                        cd--;
+                        if (cd > 0) {
+                            btn.innerHTML = `<i class="fa-solid fa-clock"></i> Resend (${cd}s)`;
+                        } else {
+                            clearInterval(timer);
+                            btn.disabled = false;
+                            btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Email';
+                        }
+                    }, 1000);
+                }
+            } catch (err) {
+                showVerifyFeedback(err.message || "Could not resend email. Please try again shortly.", true);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Email';
+            }
+        }
+
+        async function register(event) {
+            event.preventDefault();
+
+            const submitBtn = document.getElementById("submitBtn");
+            const org = document.getElementById("orgName").value.trim();
+            const orgId = document.getElementById("orgId").value.trim().toLowerCase();
+            const name = document.getElementById("fullName").value.trim();
+            const email = document.getElementById("email").value.trim().toLowerCase();
+            const pw = document.getElementById("password").value;
+            const role = "admin";
+
+            if (!org || !orgId || !name || !email || !pw) {
+                return showMessage("Please complete all fields.");
+            }
+
+            // Validate Org ID formatting explicitly in Javascript
+            const orgIdRegex = /^[a-z0-9-]{3,30}$/;
+            if (!orgIdRegex.test(orgId)) {
+                return showMessage("Organization ID must be between 3 and 30 characters and contain lowercase letters, numbers, or hyphens only.");
+            }
+
+            if (pw.length < 8) {
+                return showMessage("Password must be at least 8 characters.");
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Registering Organization...';
+
+            try {
+                const hashed = await AuthSession.sha256(pw);
+                const newUser = {
+                    org: org,
+                    orgId: orgId,
+                    logo: currentLogoBase64,
+                    name: name,
                     email: email,
-                    logo_path: currentLogoBase64 || null
-                }).catch(e => console.warn("Supabase organization sync warning:", e));
+                    pass: hashed,
+                    role: role,
+                    createdAt: Date.now()
+                };
+                pendingUserData = newUser;
 
-                // Cache locally so active session is established
-                AuthSession.setUser(newUser);
+                // 1. If Supabase is configured, register with complete metadata properties
+                if (window.SupabaseConfig && window.SupabaseConfig.isConfigured() && window.SupabaseService) {
+                    try {
+                        const authResult = await window.SupabaseService.signUp(email, pw, {
+                            org_name: org,
+                            org_id: orgId,
+                            admin_name: name,
+                            logo_path: currentLogoBase64 || null
+                        });
 
-                // Check if email confirmation is required
-                if (authResult.requiresVerification) {
+                        // Sync organization parameters down to table structures
+                        window.SupabaseService.saveOrganization({
+                            org_name: org,
+                            org_id: orgId,
+                            admin_name: name,
+                            email: email,
+                            logo_path: currentLogoBase64 || null
+                        }).catch(e => console.warn("Supabase organization sync warning:", e));
+
+                        // Cache active auth session locally
+                        AuthSession.setUser(newUser);
+
+                        // Verify with OTP or redirect based on verification config
+                        if (authResult.requiresVerification) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = 'Register Organization';
+                            openVerificationModal(email, authResult.message);
+                            return;
+                        }
+
+                        showMessage("Organization registered successfully! Entering workspace...", false);
+                        setTimeout(() => {
+                            window.location.href = "welcome.html";
+                        }, 1000);
+                        return;
+                    } catch (supaErr) {
+                        console.warn("Supabase Auth error:", supaErr);
+                        if (supaErr.message && supaErr.message.toLowerCase().includes("already registered")) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = 'Register Organization';
+                            return showMessage("This email is already registered. Please go to Login.");
+                        }
+                        throw supaErr;
+                    }
+                }
+
+                // 2. Offline / Local fallback routine
+                let users = [];
+                try {
+                    users = JSON.parse(localStorage.getItem("organizations_users") || "[]");
+                } catch (e) { users = []; }
+
+                // Uniqueness validation on offline LocalStorage fallback dataset
+                if (users.some(u => u.email === email)) {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = 'Register Organization';
-                    openVerificationModal(email, authResult.message);
-                    return;
+                    return showMessage("Email address is already registered.");
                 }
 
-                // If already verified or immediate activation
+                if (users.some(u => u.orgId === orgId)) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Register Organization';
+                    return showMessage("Organization ID is already taken. Please choose another.");
+                }
+
+                // Save payload inside fallback database
+                users.push(newUser);
+                localStorage.setItem("organizations_users", JSON.stringify(users));
+
+                AuthSession.setUser(newUser);
                 showMessage("Organization registered successfully! Entering workspace...", false);
                 setTimeout(() => {
                     window.location.href = "welcome.html";
-                }, 1000);
-                return;
-            } catch (supaErr) {
-                console.warn("Supabase Auth error:", supaErr);
-                if (supaErr.message && supaErr.message.toLowerCase().includes("already registered")) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = 'Register Organization';
-                    return showMessage("This email is already registered. Please go to Login.");
-                }
-                throw supaErr;
+                }, 1200);
+
+            } catch (err) {
+                console.error(err);
+                showMessage(err.message || "An error occurred during registration.", true);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Register Organization';
             }
         }
-
-        // 2. Offline / Local fallback if Supabase is not configured
-        let users = [];
-        try {
-            users = JSON.parse(localStorage.getItem("organizations_users") || "[]");
-        } catch(e) { users = []; }
-
-        if (users.some(u => u.email === email)) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Register Organization';
-            return showMessage("Email address is already registered.");
-        }
-
-        AuthSession.setUser(newUser);
-        showMessage("Organization registered successfully! Entering workspace...", false);
-        setTimeout(() => {
-            window.location.href = "welcome.html";
-        }, 1200);
-
-    } catch (err) {
-        console.error(err);
-        showMessage(err.message || "An error occurred during registration.", true);
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = 'Register Organization';
-    }
-}
-</script>
+    </script>
+    <script src="assets/js/skeleton-loader.js"></script>
 </body>
+
 </html>
