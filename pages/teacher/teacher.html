@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Teacher Registration | LUCY Portal</title>
+<title>Teacher Registration & Onboarding — FLAWLESS GRAPHICS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Google Fonts: Plus Jakarta Sans -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,6 +12,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <!-- Short Skeletal Loading Stylesheet -->
 <link rel="stylesheet" href="../../assets/css/skeleton.css">
+<!-- Floating Quick Assistant Stylesheet -->
+<link rel="stylesheet" href="../../assets/css/quick-assistant.css">
 
 <style>
     * {
@@ -780,9 +782,11 @@
             </div>
 
             <div class="brand-logo">
-                <i class="fa-solid fa-chalkboard-user logo-icon"></i>
+                <div id="orgLogoBox" style="width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 10px; overflow: hidden; background: rgba(255,255,255,0.1);">
+                    <i class="fa-solid fa-chalkboard-user logo-icon" style="font-size: 20px;"></i>
+                </div>
                 <div>
-                    <div class="brand-title">TEACHER PORTAL</div>
+                    <div class="brand-title" id="orgTitle">TEACHER PORTAL</div>
                     <div class="brand-subtitle">Classroom & Educator Network</div>
                 </div>
             </div>
@@ -916,6 +920,7 @@
     </div>
 </div>
 
+<script src="../../assets/js/auth-session.js"></script>
 <script>
 const TEACHERS_KEY = "teachers";
 let currentPhotoBase64 = null;
@@ -1089,8 +1094,12 @@ function submitOtpVerification() {
     list.push(pendingTeacherData);
     localStorage.setItem(TEACHERS_KEY, JSON.stringify(list));
 
-    localStorage.setItem("active_teacher", JSON.stringify(pendingTeacherData));
-    localStorage.setItem("teacher_active_user", JSON.stringify(pendingTeacherData));
+    if (window.AuthSession) {
+        window.AuthSession.setUser(pendingTeacherData);
+    } else {
+        localStorage.setItem("active_teacher", JSON.stringify(pendingTeacherData));
+        localStorage.setItem("teacher_active_user", JSON.stringify(pendingTeacherData));
+    }
 
     setTimeout(() => {
         window.location.href = "teacher-profile.html";
@@ -1172,5 +1181,7 @@ async function registerTeacher() {
 
 <!-- Short Skeletal Loading Script -->
 <script src="../../assets/js/skeleton-loader.js"></script>
+<!-- Floating Quick Assistant Script -->
+<script src="../../assets/js/quick-assistant.js"></script>
 </body>
 </html>

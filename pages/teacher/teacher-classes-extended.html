@@ -95,7 +95,7 @@
       <h3 class="glass-card-title" style="font-size: 16px; margin-bottom: 16px;">
         <i class="fa-solid fa-user-plus"></i> Enroll Student
       </h3>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) 120px; gap: 12px; align-items: end;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) 120px; gap: 12px; align-items: end;">
         <div>
           <label class="form-label">First Name</label>
           <input id="s_first" class="form-control" placeholder="e.g. Kojo">
@@ -111,6 +111,10 @@
         <div>
           <label class="form-label">Roll / Index Number</label>
           <input id="s_roll" class="form-control" placeholder="e.g. 101">
+        </div>
+        <div>
+          <label class="form-label">Photo (Optional)</label>
+          <input type="file" id="s_photo" accept="image/*" class="form-control" style="padding: 6px;" onchange="handleExtStudentPhoto(event)">
         </div>
         <button id="saveStudentBtn" class="btn-modern btn-primary" style="height: 42px;">
           <i class="fa-solid fa-save"></i> Save
@@ -167,6 +171,20 @@
       });
     }
 
+    let currentExtStudentPhoto = null;
+    function handleExtStudentPhoto(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) {
+        alert('Photo must be under 2MB');
+        e.target.value = '';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = evt => { currentExtStudentPhoto = evt.target.result; };
+      reader.readAsDataURL(file);
+    }
+
     document.getElementById('saveStudentBtn').addEventListener('click', ()=>{
       const firstName = document.getElementById('s_first').value.trim();
       const lastName = document.getElementById('s_last').value.trim();
@@ -175,8 +193,11 @@
 
       if(!firstName) return alert('Please provide student first name');
       if (window.addStudent) {
-        addStudent({ firstName, lastName, class: sClass, roll });
+        addStudent({ firstName, lastName, class: sClass, roll, photo: currentExtStudentPhoto });
       }
+      currentExtStudentPhoto = null;
+      const pInput = document.getElementById('s_photo');
+      if (pInput) pInput.value = '';
       refreshStudents();
       document.getElementById('s_first').value = ''; 
       document.getElementById('s_last').value = ''; 

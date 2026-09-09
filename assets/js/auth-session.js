@@ -81,17 +81,141 @@
         },
 
         /**
+         * Get active organization logo (Base64 or URL)
+         */
+        getLogo: function() {
+            const user = this.getUser();
+            return (user && user.logo)
+                || localStorage.getItem('active_org_logo')
+                || localStorage.getItem('org_logo')
+                || null;
+        },
+
+        /**
+         * Update and persist organization logo
+         */
+        setOrgLogo: function(logoBase64) {
+            if (logoBase64) {
+                localStorage.setItem('active_org_logo', logoBase64);
+                localStorage.setItem('org_logo', logoBase64);
+            } else {
+                localStorage.removeItem('active_org_logo');
+                localStorage.removeItem('org_logo');
+            }
+            const user = this.getUser();
+            if (user) {
+                user.logo = logoBase64 || null;
+                this.setUser(user);
+            }
+            this.applyGlobalBranding();
+        },
+
+        /**
+         * Update and persist organization name
+         */
+        setOrgName: function(orgName) {
+            if (!orgName) return;
+            const clean = orgName.trim();
+            localStorage.setItem(ACTIVE_ORG_KEY, clean);
+            localStorage.setItem('activeOrg', clean);
+            const user = this.getUser();
+            if (user) {
+                user.org = clean;
+                this.setUser(user);
+            }
+            this.applyGlobalBranding();
+        },
+
+        /**
+         * Get user profile photo
+         */
+        getUserPhoto: function() {
+            const user = this.getUser();
+            return (user && (user.photo || user.photoBase64)) || null;
+        },
+
+        /**
+         * Set user profile photo
+         */
+        setUserPhoto: function(photoBase64) {
+            const user = this.getUser();
+            if (user) {
+                user.photo = photoBase64 || null;
+                user.photoBase64 = photoBase64 || null;
+                this.setUser(user);
+            }
+        },
+
+        /**
+         * Dynamically apply organization branding across current page
+         */
+        applyGlobalBranding: function() {
+            const org = this.getOrg();
+            const logo = this.getLogo();
+
+            // 1. Text branding targets
+            const textSelectors = [
+                '#orgTitle', '#headerOrgTitle', '#orgNameDisplay', '#summaryOrgName', '#orgName',
+                '.brand-title', '.org-title-text', '.header-org-title'
+            ];
+            textSelectors.forEach(sel => {
+                document.querySelectorAll(sel).forEach(el => {
+                    if (el && org) {
+                        el.textContent = org.toUpperCase();
+                    }
+                });
+            });
+
+            // Specific header checks where brand names are displayed
+            document.querySelectorAll('.brand, .brand-wrapper, .brand-logo-container').forEach(brandEl => {
+                const title = brandEl.querySelector('h1, h2, .brand-title, #orgName, #headerOrgTitle, #orgTitle, span.org-name');
+                if (title && !title.getAttribute('data-preserve-title') && org) {
+                    title.textContent = org.toUpperCase();
+                }
+            });
+
+            // 2. Logo branding targets
+            if (logo) {
+                const logoSelectors = [
+                    '#orgLogoBox', '#headerOrgLogo', '.logo-circle', '.org-logo-preview',
+                    '.brand .logo', '.header-left .logo', '.brand-logo-container .org-logo-preview',
+                    '.brand-icon', '.brand-badge'
+                ];
+
+                logoSelectors.forEach(sel => {
+                    document.querySelectorAll(sel).forEach(el => {
+                        if (!el) return;
+                        if (el.id === 'orgLogoBox') {
+                            el.innerHTML = `<img src="${logo}" alt="${org}" style="width:100%; height:100%; object-fit:contain; border-radius:inherit; display:block;">`;
+                        } else {
+                            // Check if image already exists
+                            let img = el.querySelector('img.org-brand-logo');
+                            if (!img) {
+                                el.setAttribute('data-original-html', el.innerHTML);
+                                el.innerHTML = `<img src="${logo}" alt="${org}" class="org-brand-logo" style="width:100%; height:100%; object-fit:contain; border-radius:inherit; display:block; padding:2px;">`;
+                            } else {
+                                img.src = logo;
+                            }
+                        }
+                    });
+                });
+            }
+        },
+
+        /**
          * Set and synchronize session across all system portals
          */
         setUser: function(user) {
             if (!user || typeof user !== 'object') return;
 
+            const existingLogo = this.getLogo();
             const normalizedUser = {
                 org: (user.org || user.organization || 'FLAWLESS GRAPHICS').trim(),
                 name: (user.name || user.fullName || 'Admin User').trim(),
                 email: (user.email || 'admin@flawlessgraphics.com').trim().toLowerCase(),
                 role: (user.role || 'admin').toLowerCase(),
-                logo: user.logo || null,
+                logo: user.logo || existingLogo || null,
+                photo: user.photo || user.photoBase64 || null,
                 createdAt: user.createdAt || Date.now()
             };
 
@@ -102,13 +226,18 @@
             // 2. Organization namespace
             localStorage.setItem(ACTIVE_ORG_KEY, normalizedUser.org);
             localStorage.setItem('activeOrg', normalizedUser.org);
+            if (normalizedUser.logo) {
+                localStorage.setItem('active_org_logo', normalizedUser.logo);
+                localStorage.setItem('org_logo', normalizedUser.logo);
+            }
 
             // 3. HR portal session
             localStorage.setItem(ACTIVE_HR_KEY, JSON.stringify({
                 name: normalizedUser.name,
                 email: normalizedUser.email,
                 role: normalizedUser.role === 'hr' ? 'HR Admin' : 'Super Admin',
-                org: normalizedUser.org
+                org: normalizedUser.org,
+                photo: normalizedUser.photo || normalizedUser.logo || null
             }));
 
             // 4. Teacher portal sessions
@@ -117,13 +246,16 @@
                 email: normalizedUser.email,
                 org: normalizedUser.org,
                 role: 'teacher',
-                photoBase64: normalizedUser.logo || ''
+                photoBase64: normalizedUser.photo || normalizedUser.logo || ''
             };
             localStorage.setItem(ACTIVE_TEACHER_KEY, JSON.stringify(teacherSession));
             localStorage.setItem(TEACHER_USER_KEY, JSON.stringify(teacherSession));
 
             // Ensure registered users array contains this user
             this.saveRegisteredUser(normalizedUser);
+
+            // Dynamically refresh branding
+            this.applyGlobalBranding();
 
             return normalizedUser;
         },
@@ -214,6 +346,9 @@
 
     // Auto-sync active Supabase cloud session if available
     window.addEventListener('DOMContentLoaded', () => {
+        // Automatically apply branding across document
+        AuthSession.applyGlobalBranding();
+
         if (window.SupabaseService && typeof window.SupabaseService.getSession === 'function') {
             window.SupabaseService.getSession().then(session => {
                 if (session && session.user && session.user.email_confirmed_at) {
@@ -229,6 +364,13 @@
                     }
                 }
             }).catch(() => {});
+        }
+    });
+
+    // Auto-sync branding across browser tabs
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'active_org' || e.key === 'active_org_logo' || e.key === 'active_org_user' || e.key === 'active_user') {
+            AuthSession.applyGlobalBranding();
         }
     });
 

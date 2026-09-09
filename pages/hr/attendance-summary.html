@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Attendance Summary — FLAWLESS GRAPHICS HR</title>
 
+  <!-- Auto-Detect Embedded Panel Mode -->
+  <script>
+    if (window.self !== window.top || window.location.search.includes('embedded') || window.location.search.includes('panel')) {
+      document.documentElement.classList.add('is-embedded');
+    }
+  </script>
+
   <!-- Google Fonts & Font Awesome -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,6 +59,31 @@
       width: 100%;
       padding: 28px;
       box-shadow: var(--shadow-lg);
+    }
+
+    /* Embedded Panel Mode: Completely clear internal navigation bar and expand to full panel */
+    html.is-embedded body,
+    body.embedded-mode {
+      display: block !important;
+      padding-left: 0 !important;
+      background: transparent !important;
+      overflow-x: hidden !important;
+      min-height: auto !important;
+    }
+    html.is-embedded .site-header,
+    body.embedded-mode .site-header {
+      display: none !important;
+    }
+    html.is-embedded .ambient-glow,
+    body.embedded-mode .ambient-glow {
+      display: none !important;
+    }
+    html.is-embedded .main-wrapper,
+    body.embedded-mode .main-wrapper {
+      margin-left: 0 !important;
+      padding: 20px 24px !important;
+      width: 100% !important;
+      max-width: 100% !important;
     }
   </style>
 </head>
@@ -558,6 +590,10 @@
     themeBtn.addEventListener('click', () => applyTheme(!htmlEl.classList.contains('dark')));
 
     // Boot
+    if (window.self !== window.top || window.location.search.includes('embedded') || window.location.search.includes('panel')) {
+      document.documentElement.classList.add('is-embedded');
+      document.body.classList.add('embedded-mode');
+    }
     renderTable();
   </script>
   <!-- Short Skeletal Loading Script -->

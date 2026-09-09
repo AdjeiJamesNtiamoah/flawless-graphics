@@ -76,17 +76,23 @@
       z-index: 10;
       flex-shrink: 0;
       color: #ffffff;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
+    .sidebar::-webkit-scrollbar { display: none; width: 0; height: 0; }
     .sidebar .org-name { color: #ffffff; }
     .sidebar .profile-row {
       background: rgba(255, 255, 255, 0.06);
       border-color: rgba(255, 255, 255, 0.1);
       color: #ffffff;
     }
-    .sidebar .nav button {
+    .sidebar .nav button,
+    .sidebar .nav a {
       color: rgba(255, 255, 255, 0.75);
+      text-decoration: none;
     }
-    .sidebar .nav button:hover {
+    .sidebar .nav button:hover,
+    .sidebar .nav a:hover {
       background: rgba(255, 255, 255, 0.14);
       color: #ffffff;
       transform: translateX(4px);
@@ -99,13 +105,18 @@
     .sidebar.collapsed { width: 78px; padding: 20px 10px; }
     .sidebar.collapsed .hide-collapsed { display: none !important; }
     .sidebar.collapsed .brand { justify-content: center; padding: 0; }
-    .sidebar.collapsed .nav button {
+    .sidebar.collapsed .nav-category-header,
+    .sidebar.collapsed .nav-sub-menu,
+    .sidebar.collapsed .nav-chevron { display: none !important; }
+    .sidebar.collapsed .nav-group-header {
       justify-content: center;
       padding: 12px;
       position: relative;
     }
-    .sidebar.collapsed .nav button i { margin: 0; font-size: 18px; }
-    .sidebar.collapsed .nav button:hover::after {
+    .sidebar.collapsed .nav-group-header-left { gap: 0; }
+    .sidebar.collapsed .nav-group-header-left span { display: none !important; }
+    .sidebar.collapsed .nav-group-header i.group-icon { margin: 0; font-size: 18px; }
+    .sidebar.collapsed .nav-group-header:hover::after {
       content: attr(data-tooltip);
       position: absolute;
       left: calc(100% + 14px);
@@ -245,40 +256,343 @@
     }
     .profile-thumb { width: 38px; height: 38px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
 
-    .nav { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; flex: 1; overflow-y: auto; }
-    .nav button {
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 6px;
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .nav::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    /* --- MODERN ACCORDION & CATEGORY SIDEBAR NAV (Matches UI Mockup) --- */
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      flex: 1;
+      padding-right: 2px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .nav::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+    .nav-category-header {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.9px;
+      text-transform: uppercase;
+      color: #64748b;
+      padding: 14px 10px 4px;
+      user-select: none;
+    }
+
+    .nav-group {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .nav-group-header {
       background: transparent;
       border: 0;
-      color: var(--muted);
+      color: #94a3b8;
       text-align: left;
-      padding: 11px 14px;
-      border-radius: 12px;
+      padding: 9px 10px;
+      border-radius: 10px;
       cursor: pointer;
       font-weight: 600;
       font-size: 13.5px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      justify-content: space-between;
+      gap: 10px;
       width: 100%;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .nav-group-header:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+    }
+    .nav-group-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .nav-group-header i.group-icon {
+      font-size: 15px;
+      width: 18px;
+      text-align: center;
+      color: #94a3b8;
+      transition: color 0.2s ease;
+    }
+    .nav-group-header:hover i.group-icon {
+      color: #ffffff;
+    }
+    .nav-chevron {
+      font-size: 10.5px;
+      color: #64748b;
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .nav-group.open > .nav-group-header {
+      color: #ffffff;
+    }
+    .nav-group.open > .nav-group-header .nav-chevron {
+      transform: rotate(90deg);
+      color: #94a3b8;
+    }
+    .nav-group-header.active {
+      background: rgba(99, 91, 252, 0.22);
+      color: #ffffff;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(99, 91, 252, 0.25);
+    }
+    .nav-group-header.active i.group-icon {
+      color: #818cf8;
+    }
+
+    .nav-sub-menu {
+      display: none;
+      flex-direction: column;
+      gap: 2px;
+      padding: 2px 0 6px 14px;
       position: relative;
     }
-    .nav button:hover {
-      background: var(--primary-light);
-      color: var(--primary);
-      transform: translateX(5px) translateY(-2px);
-      box-shadow: 0 4px 14px rgba(99, 91, 252, 0.2);
+    .nav-group.open > .nav-sub-menu {
+      display: flex;
     }
-    .nav button.active {
-      background: var(--primary);
-      color: white;
-      box-shadow: 0 6px 16px rgba(99, 91, 252, 0.25);
+    .nav-sub-menu::before {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 4px;
+      bottom: 6px;
+      width: 1px;
+      background: rgba(255, 255, 255, 0.1);
     }
-    .nav button.active:hover {
-      transform: translateX(5px) translateY(-2px);
-      box-shadow: 0 8px 22px rgba(99, 91, 252, 0.4);
+
+    .nav-sub-item {
+      background: transparent;
+      border: 0;
+      color: #8fa0be;
+      text-align: left;
+      padding: 6.5px 10px 6.5px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 12.5px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      width: 100%;
+      box-sizing: border-box;
+      transition: all 0.18s ease;
+      text-decoration: none;
+      position: relative;
     }
-    .nav button i { font-size: 16px; width: 20px; text-align: center; }
+    .nav-sub-item:hover {
+      background: rgba(255, 255, 255, 0.07);
+      color: #ffffff;
+      padding-left: 23px;
+    }
+    .nav-bullet {
+      font-size: 7px;
+      color: #5c7099;
+      transition: all 0.2s ease;
+      display: inline-block;
+      line-height: 1;
+    }
+    .nav-sub-item:hover .nav-bullet {
+      color: #818cf8;
+      transform: scale(1.25);
+    }
+    .nav-sub-item.active {
+      background: rgba(99, 91, 252, 0.22);
+      color: #ffffff;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(99, 91, 252, 0.25);
+    }
+    .nav-sub-item.active .nav-bullet {
+      color: #818cf8;
+      transform: scale(1.35);
+    }
+
+    /* --- FLOATING 3-DOTS QUICK DOCK (Middle Bottom of Page) --- */
+    .floating-quick-dock {
+      position: fixed;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+    }
+
+    .quick-dock-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5.5px;
+      width: 58px;
+      height: 32px;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 9999px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(99, 91, 252, 0.18);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 0;
+      outline: none;
+    }
+    .quick-dock-trigger:hover {
+      background: rgba(26, 35, 60, 0.95);
+      border-color: rgba(99, 91, 252, 0.5);
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45), 0 0 16px rgba(99, 91, 252, 0.35);
+    }
+    .quick-dock-trigger .dot {
+      width: 5px;
+      height: 5px;
+      background: #cbd5e1;
+      border-radius: 50%;
+      transition: all 0.25s ease;
+    }
+    .quick-dock-trigger:hover .dot {
+      background: #818cf8;
+      box-shadow: 0 0 6px rgba(129, 140, 248, 0.8);
+    }
+    .floating-quick-dock.open .quick-dock-trigger {
+      background: rgba(99, 91, 252, 0.9);
+      border-color: #a5b4fc;
+      box-shadow: 0 0 20px rgba(99, 91, 252, 0.6);
+    }
+    .floating-quick-dock.open .quick-dock-trigger .dot {
+      background: #ffffff;
+    }
+    .floating-quick-dock.open .quick-dock-trigger .dot:nth-child(1) {
+      transform: translateX(3px) scale(0.8);
+    }
+    .floating-quick-dock.open .quick-dock-trigger .dot:nth-child(2) {
+      transform: scale(1.35);
+    }
+    .floating-quick-dock.open .quick-dock-trigger .dot:nth-child(3) {
+      transform: translateX(-3px) scale(0.8);
+    }
+
+    .quick-dock-menu {
+      position: absolute;
+      bottom: calc(100% + 12px);
+      left: 50%;
+      transform: translateX(-50%) translateY(10px) scale(0.95);
+      width: 260px;
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 16px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55), 0 0 1px rgba(255, 255, 255, 0.2);
+      padding: 8px;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .floating-quick-dock.open .quick-dock-menu {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+    .quick-dock-header {
+      padding: 8px 10px 6px;
+    }
+    .quick-dock-title {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #94a3b8;
+    }
+    .quick-dock-sub {
+      display: block;
+      font-size: 10px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .quick-dock-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      margin: 4px 6px;
+    }
+    .quick-dock-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 10px;
+      background: transparent;
+      border: 0;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: left;
+      color: #e2e8f0;
+      transition: all 0.18s ease;
+      box-sizing: border-box;
+    }
+    .quick-dock-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      transform: translateX(3px);
+    }
+    .dock-item-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13.5px;
+      flex-shrink: 0;
+    }
+    .dock-item-icon.hub-icon {
+      background: rgba(99, 91, 252, 0.18);
+      color: #818cf8;
+    }
+    .dock-item-icon.chat-icon {
+      background: rgba(56, 189, 248, 0.18);
+      color: #38bdf8;
+    }
+    .dock-item-icon.logout-icon {
+      background: rgba(239, 68, 68, 0.18);
+      color: #f87171;
+    }
+    .dock-item-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .dock-item-desc {
+      font-size: 10.5px;
+      color: #64748b;
+      margin-top: 1px;
+    }
+    .quick-dock-item.logout:hover {
+      background: rgba(239, 68, 68, 0.14);
+    }
+    .quick-dock-item.logout:hover .dock-item-title {
+      color: #f87171;
+    }
 
     .collapse-btn {
       padding: 10px;
@@ -484,6 +798,10 @@
       backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
       display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
     }
+    .custom-modal-overlay.active {
+      display: flex !important;
+      animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
     .modal-card {
       background: var(--card); border: 1px solid var(--border); border-radius: 24px;
       max-width: 780px; width: 100%; padding: 0; box-shadow: 0 20px 30px -10px rgba(0,0,0,0.08);
@@ -629,6 +947,44 @@
     #payrollSection .modern-table tbody tr { transition:background 0.15s ease; }
     #payrollSection .modern-table tbody tr:hover { background:rgba(37,99,235,0.04); }
     #payrollSection .modern-table tbody tr:last-child td { border-bottom:none; }
+
+    /* ── EMBEDDED WORKSPACE FRAME SECTION ── */
+    #embeddedFrameSection {
+      display: none;
+      width: 100%;
+      height: calc(100vh - 120px);
+      min-height: 600px;
+      flex-direction: column;
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .embedded-frame-bar {
+      padding: 10px 18px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .embedded-frame-content {
+      flex: 1;
+      width: 100%;
+      height: calc(100% - 50px);
+      position: relative;
+      background: #ffffff;
+    }
+    .embedded-frame-content iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -727,7 +1083,7 @@
 
 <!-- SIDEBAR NAVIGATION -->
 <aside class="sidebar" id="sidebar">
-  <a href="../public/home.html" class="brand">
+  <a href="javascript:void(0)" onclick="showSection('dashboard')" class="brand" title="FLAWLESS GRAPHICS — HR Dashboard">
     <div class="logo"><i class="fa-solid fa-layer-group"></i></div>
     <div class="hide-collapsed">
       <div class="org-name" id="sideOrg">FLAWLESS GRAPHICS</div>
@@ -744,26 +1100,222 @@
   </div>
 
   <nav class="nav" id="nav">
-    <button data-section="dashboard" data-tooltip="Dashboard" class="active"><i class="fa-solid fa-chart-pie"></i> <span class="hide-collapsed">Dashboard</span></button>
-    <button data-section="classes" data-tooltip="Classrooms & Teachers"><i class="fa-solid fa-chalkboard-user"></i> <span class="hide-collapsed">Class Assignment</span></button>
-    <button data-section="teachers" data-tooltip="Staff Directory"><i class="fa-solid fa-users"></i> <span class="hide-collapsed">Teachers</span></button>
-    <button data-section="students" data-tooltip="Students Roster"><i class="fa-solid fa-graduation-cap"></i> <span class="hide-collapsed">Students</span></button>
-    <button data-section="messages" data-tooltip="Direct Messages"><i class="fa-solid fa-comments"></i> <span class="hide-collapsed">Messages</span></button>
-    <button data-section="attendance" data-tooltip="Daily Attendance"><i class="fa-solid fa-calendar-check"></i> <span class="hide-collapsed">Attendance</span></button>
-    <button data-section="payroll" data-tooltip="Payroll Compensation"><i class="fa-solid fa-file-invoice-dollar"></i> <span class="hide-collapsed">Payroll</span></button>
-    <button data-section="analytics" data-tooltip="Workforce Analytics"><i class="fa-solid fa-chart-line"></i> <span class="hide-collapsed">Analytics</span></button>
-    <button data-section="announcements" data-tooltip="School Broadcasts"><i class="fa-solid fa-bullhorn"></i> <span class="hide-collapsed">Broadcasts</span></button>
-    <button data-section="settings" data-tooltip="System Settings"><i class="fa-solid fa-sliders"></i> <span class="hide-collapsed">Settings</span></button>
-  </nav>
+    <!-- DASHBOARD TOP-LEVEL ITEM (Direct navigation) -->
+    <div class="nav-group">
+      <button type="button" class="nav-group-header active" data-section="dashboard" onclick="showSection('dashboard')" data-tooltip="Dashboard Overview">
+        <div class="nav-group-header-left">
+          <i class="fa-solid fa-table-cells-large group-icon"></i>
+          <span class="hide-collapsed">Dashboard</span>
+        </div>
+      </button>
+    </div>
 
-  <div class="hide-collapsed" style="display: flex; gap: 8px;">
-    <a href="../../welcome.html" class="btn ghost" style="flex: 1; font-size: 11px; padding: 8px 10px; justify-content: center;">
-      <i class="fa-solid fa-house"></i> Hub
-    </a>
-    <button class="btn ghost" id="logoutBtn" style="font-size: 11px; padding: 8px 12px;" title="Logout">
-      <i class="fa-solid fa-right-from-bracket"></i>
-    </button>
-  </div>
+    <!-- APPS ACCORDION -->
+    <div class="nav-group">
+      <button type="button" class="nav-group-header" onclick="toggleNavGroup(this)" data-tooltip="Apps & Communications">
+        <div class="nav-group-header-left">
+          <i class="fa-solid fa-layer-group group-icon"></i>
+          <span class="hide-collapsed">Apps</span>
+        </div>
+        <i class="fa-solid fa-chevron-right nav-chevron hide-collapsed"></i>
+      </button>
+      <div class="nav-sub-menu">
+        <button type="button" class="nav-sub-item" data-section="messages" data-tooltip="Staff Chat & Messages">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">Messages</span>
+        </button>
+        <button type="button" class="nav-sub-item" onclick="openEmbeddedPage('hr.html', 'HR Operations Hub', 'fa-grid-horizontal')" data-tooltip="HR Hub Operations">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">HR Hub</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- SECTION: COMPONENTS & UI -->
+    <div class="nav-category-header hide-collapsed">COMPONENTS &amp; UI</div>
+
+    <div class="nav-group">
+      <button type="button" class="nav-group-header" onclick="toggleNavGroup(this)" data-tooltip="UI Elements & Staff">
+        <div class="nav-group-header-left">
+          <i class="fa-solid fa-pen-to-square group-icon"></i>
+          <span class="hide-collapsed">UI Elements</span>
+        </div>
+        <i class="fa-solid fa-chevron-right nav-chevron hide-collapsed"></i>
+      </button>
+      <div class="nav-sub-menu">
+        <button type="button" class="nav-sub-item" data-section="teachers" data-tooltip="Staff Directory">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">Staff Directory</span>
+        </button>
+        <button type="button" class="nav-sub-item" onclick="openTeacherModal()" data-tooltip="Add Teacher Record">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">+ New Teacher</span>
+        </button>
+        <button type="button" class="nav-sub-item" data-section="appraisals" onclick="openAppraisalsPanel()" data-tooltip="Staff Appraisals">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">Appraisals</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <button type="button" class="nav-group-header" onclick="toggleNavGroup(this)" data-tooltip="Forms & Tables">
+        <div class="nav-group-header-left">
+          <i class="fa-solid fa-table-list group-icon"></i>
+          <span class="hide-collapsed">Forms &amp; Tables</span>
+        </div>
+        <i class="fa-solid fa-chevron-right nav-chevron hide-collapsed"></i>
+      </button>
+      <div class="nav-sub-menu">
+        <button type="button" class="nav-sub-item" data-section="classes" data-tooltip="Class Allocations">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">Class Allocations</span>
+        </button>
+        <button type="button" class="nav-sub-item" data-section="students" data-tooltip="Students Register">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">Student Roster</span>
+        </button>
+        <button type="button" class="nav-sub-item" data-section="attendance" data-tooltip="Daily Attendance Operations">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">Daily Attendance</span>
+        </button>
+        <button type="button" class="nav-sub-item" data-section="attendance-log" onclick="openAttendanceLogPanel()" data-tooltip="Attendance Logs">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">Attendance Log</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <button type="button" class="nav-group-header" onclick="toggleNavGroup(this)" data-tooltip="Charts & Analytics">
+        <div class="nav-group-header-left">
+          <i class="fa-solid fa-chart-pie group-icon"></i>
+          <span class="hide-collapsed">Charts</span>
+        </div>
+        <i class="fa-solid fa-chevron-right nav-chevron hide-collapsed"></i>
+      </button>
+      <div class="nav-sub-menu">
+        <button type="button" class="nav-sub-item" data-section="analytics" data-tooltip="Workforce Analytics">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">Workforce Metrics</span>
+        </button>
+        <button type="button" class="nav-sub-item" data-section="reports" onclick="openReportsPanel()" data-tooltip="Department Reports">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">Reports</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- SECTION: COLLECTIONS -->
+    <div class="nav-category-header hide-collapsed">COLLECTIONS</div>
+
+    <div class="nav-group">
+      <button type="button" class="nav-group-header" onclick="toggleNavGroup(this)" data-tooltip="Payroll & Widgets">
+        <div class="nav-group-header-left">
+          <i class="fa-solid fa-book-bookmark group-icon"></i>
+          <span class="hide-collapsed">Widgets</span>
+        </div>
+        <i class="fa-solid fa-chevron-right nav-chevron hide-collapsed"></i>
+      </button>
+      <div class="nav-sub-menu">
+        <button type="button" class="nav-sub-item" data-section="payroll" data-tooltip="Payroll Compensation">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">Payroll Ledger</span>
+        </button>
+        <button type="button" class="nav-sub-item" data-section="payslips" onclick="openPayslipGeneratorPanel()" data-tooltip="Generate Payslips">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">Payslip Generator</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <button type="button" class="nav-group-header" onclick="toggleNavGroup(this)" data-tooltip="Ecommerce & Finance">
+        <div class="nav-group-header-left">
+          <i class="fa-solid fa-basket-shopping group-icon"></i>
+          <span class="hide-collapsed">Ecommerce</span>
+        </div>
+        <i class="fa-solid fa-chevron-right nav-chevron hide-collapsed"></i>
+      </button>
+      <div class="nav-sub-menu">
+        <button type="button" class="nav-sub-item" onclick="window.location.href='../finance/finance-login.html'" data-tooltip="Finance & Treasury Portal">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">Finance Portal</span>
+        </button>
+        <button type="button" class="nav-sub-item" data-section="salary-schedules" onclick="openSalarySchedulesPanel()" data-tooltip="Salary Schedules">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">Salary Schedules</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <button type="button" class="nav-group-header" onclick="toggleNavGroup(this)" data-tooltip="Pages & Broadcasts">
+        <div class="nav-group-header-left">
+          <i class="fa-solid fa-file-lines group-icon"></i>
+          <span class="hide-collapsed">Pages</span>
+        </div>
+        <i class="fa-solid fa-chevron-right nav-chevron hide-collapsed"></i>
+      </button>
+      <div class="nav-sub-menu">
+        <button type="button" class="nav-sub-item" data-section="announcements" data-tooltip="School Broadcasts">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">Broadcasts</span>
+        </button>
+        <button type="button" class="nav-sub-item" onclick="openEmbeddedPage('hr.html', 'HR Hub', 'fa-grid-horizontal')" data-tooltip="HR Management Hub">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">HR Hub Window</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- SECTION: LOGIN & ERROR -->
+    <div class="nav-category-header hide-collapsed">LOGIN &amp; ERROR</div>
+
+    <div class="nav-group">
+      <button type="button" class="nav-group-header" onclick="toggleNavGroup(this)" data-tooltip="Authentication & Portals">
+        <div class="nav-group-header-left">
+          <i class="fa-solid fa-circle-user group-icon"></i>
+          <span class="hide-collapsed">Authentication</span>
+        </div>
+        <i class="fa-solid fa-chevron-right nav-chevron hide-collapsed"></i>
+      </button>
+      <div class="nav-sub-menu">
+        <button type="button" class="nav-sub-item" onclick="window.location.href='../../welcome.html'" data-tooltip="Workspace Hub">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">Workspace Hub</span>
+        </button>
+        <button type="button" class="nav-sub-item" onclick="window.location.href='../teacher/teacher-login.html'" data-tooltip="Teacher Portal">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">Teacher Portal</span>
+        </button>
+        <button type="button" class="nav-sub-item" onclick="window.location.href='../finance/finance-login.html'" data-tooltip="Finance Portal">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">Finance Portal</span>
+        </button>
+        <button type="button" class="nav-sub-item" onclick="window.location.href='hr-login.html'" data-tooltip="HR Portal Sign In">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">HR Sign In</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <button type="button" class="nav-group-header" onclick="toggleNavGroup(this)" data-tooltip="Miscellaneous & Settings">
+        <div class="nav-group-header-left">
+          <i class="fa-solid fa-sliders group-icon"></i>
+          <span class="hide-collapsed">Miscellaneous</span>
+        </div>
+        <i class="fa-solid fa-chevron-right nav-chevron hide-collapsed"></i>
+      </button>
+      <div class="nav-sub-menu">
+        <button type="button" class="nav-sub-item" data-section="settings" data-tooltip="System Settings">
+          <span class="nav-bullet">◆</span>
+          <span class="nav-label hide-collapsed">System Settings</span>
+        </button>
+      </div>
+    </div>
+  </nav>
 
   <button class="collapse-btn" id="collapseBtn" title="Toggle Sidebar (Auto-collapse enabled)"><i class="fa-solid fa-angle-left"></i></button>
 </aside>
@@ -788,17 +1340,12 @@
         <input type="text" class="quick-search-input" id="globalQuickSearch" placeholder="Find staff, student, class... (Ctrl+K)">
       </div>
 
-      <button class="btn ghost" onclick="window.SchoolMessenger && window.SchoolMessenger.open()" title="Open School Staff Chat">
-        <i class="fa-solid fa-comments"></i> <span class="hide-collapsed">Staff Chat</span>
-      </button>
-
       <button class="btn ghost" id="cloudSyncBtn" onclick="openCloudModal()" title="Supabase Cloud Synchronization" style="border: 1px solid rgba(16, 185, 129, 0.4); color: #10b981; background: rgba(16, 185, 129, 0.08); border-radius: 9999px; padding: 6px 14px; font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; gap: 7px; cursor: pointer;">
         <i class="fa-solid fa-cloud" id="cloudSyncIcon"></i> <span id="cloudSyncLabel">Connect Supabase</span>
       </button>
+
       <select id="orgSwitcher" class="select" title="Active Organization"></select>
-      <a href="teacher.html" class="btn ghost">
-        <i class="fa-solid fa-address-book"></i> Directory
-      </a>
+
       <button class="btn" id="addTeacherBtn">
         <i class="fa-solid fa-plus"></i> Add Teacher
       </button>
@@ -1086,9 +1633,9 @@
           <button class="btn-modern btn-secondary" onclick="exportPayrollLedgerCSV()">
             <i class="fa-solid fa-file-csv"></i> Export Payroll Ledger
           </button>
-          <a href="payslip.html" class="btn-modern btn-secondary">
+          <button type="button" class="btn-modern btn-secondary" onclick="openPayslipGeneratorPanel()">
             <i class="fa-solid fa-receipt"></i> View Payslip Generator
-          </a>
+          </button>
         </div>
       </div>
     </div>
@@ -1100,9 +1647,6 @@
           <h3 class="glass-card-title"><i class="fa-solid fa-file-invoice-dollar"></i> Teacher Payroll Ledger</h3>
           <div class="glass-card-subtitle">Detailed breakdown of gross earnings, taxes, and net disbursements</div>
         </div>
-        <a href="payslip.html" class="btn-modern btn-primary btn-sm">
-          <i class="fa-solid fa-receipt"></i> View Payslip Generator
-        </a>
       </div>
       <div class="table-responsive">
         <table class="modern-table">
@@ -1133,7 +1677,7 @@
         <h3 style="margin:0;font-size:18px"><i class="fa-solid fa-chart-line" style="color:var(--primary);margin-right:6px"></i> Monthly Workforce Analytics</h3>
         <div class="small">Headcount trajectory and attendance compliance rate</div>
       </div>
-      <a href="teacher-reports.html" class="btn ghost"><i class="fa-solid fa-file-lines"></i> Full Reports</a>
+      <button type="button" class="btn ghost" onclick="openReportsPanel()"><i class="fa-solid fa-file-lines"></i> Full Reports</button>
     </div>
     <div style="height:320px;position:relative">
       <canvas id="attChart"></canvas>
@@ -1175,9 +1719,8 @@
         <div style="margin-top:24px">
           <label class="small" style="display:block;font-weight:700;margin-bottom:6px">Quick Workspace Links</label>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <a href="performance.html" class="btn ghost"><i class="fa-solid fa-chart-simple"></i> Appraisals</a>
-            <a href="payslip.html" class="btn ghost"><i class="fa-solid fa-receipt"></i> Payslips</a>
-            <a href="hr.html" class="btn ghost"><i class="fa-solid fa-grid-horizontal"></i> HR Hub</a>
+            <button type="button" class="btn ghost" onclick="openAppraisalsPanel()"><i class="fa-solid fa-chart-simple"></i> Appraisals</button>
+            <button type="button" class="btn ghost" onclick="openEmbeddedPage('hr.html', 'HR Hub', 'fa-grid-horizontal')"><i class="fa-solid fa-grid-horizontal"></i> HR Hub</button>
           </div>
         </div>
       </div>
@@ -1197,11 +1740,38 @@
       </div>
     </div>
   </section>
+
+  <!-- EMBEDDED WORKSPACE FRAME (Stay Directly Inside HR Dashboard) -->
+  <section id="embeddedFrameSection" style="display:none;">
+    <div class="embedded-frame-bar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button type="button" class="btn ghost btn-sm" onclick="closeEmbeddedFrame()" style="padding:6px 14px; font-weight:700; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
+          <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+        </button>
+        <div style="height:18px; width:1px; background:var(--border);"></div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <i id="embeddedFrameIcon" class="fa-solid fa-window-maximize" style="color:var(--primary); font-size:14px;"></i>
+          <span id="embeddedFrameTitle" style="font-weight:700; font-size:14px; color:var(--text);">Internal View</span>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button type="button" class="btn ghost btn-sm" onclick="refreshEmbeddedFrame()" title="Reload Frame" style="padding:6px 10px; border-radius:8px;">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+        <button type="button" class="btn ghost btn-sm" onclick="closeEmbeddedFrame()" title="Close Frame" style="padding:6px 10px; border-radius:8px;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+    <div class="embedded-frame-content">
+      <iframe id="embeddedPageFrame" name="embeddedPageFrame" src="about:blank" title="Embedded Workspace Frame"></iframe>
+    </div>
+  </section>
 </main>
 
 <!-- MODAL: ADD / EDIT EMPLOYEE -->
 <!-- FULL TEACHER ADD/EDIT MODAL (from teacher.html) -->
-<div class="custom-modal-overlay" id="teacherModal">
+<div class="custom-modal-overlay" id="teacherModal" onclick="if(event.target===this)closeTeacherModal()">
   <div class="modal-card">
     <div class="modal-header-stagnant">
       <div>
@@ -1362,10 +1932,18 @@
       <div class="form-section-title" style="margin-top:20px"><i class="fa-solid fa-camera"></i> Staff Profile Photo</div>
       <div class="teacher-form-group">
         <div style="display:flex;gap:16px;align-items:center">
-          <img id="m_avatarPreview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" style="width:64px;height:64px;border-radius:14px;object-fit:cover;border:2px solid var(--border);flex-shrink:0">
-          <div style="flex:1">
-            <input type="file" id="m_avatarFile" accept="image/*" class="teacher-form-control" style="font-size:12px">
-            <div style="font-size:11px;color:var(--muted);margin-top:6px">Recommended: square photo, at least 200×200px (JPG/PNG)</div>
+          <img id="m_avatarPreview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" style="width:68px;height:68px;border-radius:14px;object-fit:cover;border:2px solid var(--border);flex-shrink:0;box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+          <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <input type="file" id="m_avatarFile" accept="image/png, image/jpeg, image/webp" style="display:none;" onchange="handleTeacherModalPhoto(event)">
+              <button type="button" class="btn ghost" style="padding:6px 14px; font-size:12px; font-weight:700;" onclick="document.getElementById('m_avatarFile').click()">
+                <i class="fa-solid fa-camera"></i> Choose Photo
+              </button>
+              <button type="button" id="m_removePhotoBtn" class="btn ghost" style="padding:6px 10px; font-size:12px; color:var(--accent-red); display:none;" onclick="removeTeacherModalPhoto()">
+                Remove
+              </button>
+            </div>
+            <div style="font-size:11px;color:var(--muted)">PNG, JPG or WebP (Max 2MB). Recommended square photo.</div>
           </div>
         </div>
       </div>
@@ -1738,7 +2316,7 @@ if (quickSearchEl) {
 }
 
 /* -------------------------------------------------------------
-   NAVIGATION & SECTION SWAPPING
+   NAVIGATION & SECTION SWAPPING (All pages remain directly inside)
 ------------------------------------------------------------- */
 const sections = {
   dashboard: document.getElementById('dashboardSection'),
@@ -1750,22 +2328,138 @@ const sections = {
   payroll: document.getElementById('payrollSection'),
   analytics: document.getElementById('analyticsSection'),
   announcements: document.getElementById('announcementsSection'),
-  settings: document.getElementById('settingsSectionPanel')
+  settings: document.getElementById('settingsSectionPanel'),
+  embedded: document.getElementById('embeddedFrameSection')
 };
 
-function showSection(name) {
-  Object.values(sections).forEach(s => { if (s) s.style.display = 'none'; });
-  if (sections[name]) sections[name].style.display = 'block';
+let lastActiveSection = 'dashboard';
 
-  document.querySelectorAll('#nav button').forEach(b => b.classList.remove('active'));
-  const activeBtn = document.querySelector(`#nav button[data-section="${name}"]`);
+function openAppraisalsPanel() {
+  openEmbeddedPage('performance.html?embedded=true', 'Staff Appraisals', 'fa-chart-simple');
+}
+
+function openAttendanceLogPanel() {
+  openEmbeddedPage('attendance-summary.html?embedded=true', 'Attendance Logs & Summary', 'fa-calendar-check');
+}
+
+function openReportsPanel() {
+  openEmbeddedPage('teacher-reports.html?embedded=true', 'Teacher Reports & Workforce Analytics', 'fa-file-lines');
+}
+
+function openPayslipGeneratorPanel() {
+  openEmbeddedPage('payslip.html?embedded=true', 'Staff Payslip Generator', 'fa-receipt');
+}
+
+function openSalarySchedulesPanel() {
+  openEmbeddedPage('payroll.html?embedded=true', 'Salary Schedules & Review', 'fa-money-bill-wave');
+}
+
+function openEmbeddedPage(url, title = 'Workspace View', iconClass = 'fa-window-maximize') {
+  if (!url) return;
+
+  let finalUrl = url;
+  if (!finalUrl.includes('embedded=true') && !finalUrl.includes('welcome.html') && !finalUrl.startsWith('http')) {
+    finalUrl += (finalUrl.includes('?') ? '&' : '?') + 'embedded=true';
+  }
+
+  const currentActiveBtn = document.querySelector('#nav button.active, #nav .nav-sub-item.active');
+  if (currentActiveBtn && currentActiveBtn.dataset.section && currentActiveBtn.dataset.section !== 'embedded') {
+    lastActiveSection = currentActiveBtn.dataset.section;
+  }
+
+  // Hide all sections
+  Object.values(sections).forEach(s => { if (s) s.style.display = 'none'; });
+
+  const frameSection = document.getElementById('embeddedFrameSection');
+  const frame = document.getElementById('embeddedPageFrame');
+  const titleEl = document.getElementById('embeddedFrameTitle');
+  const iconEl = document.getElementById('embeddedFrameIcon');
+  const pageTitleEl = document.getElementById('pageTitle');
+
+  if (frameSection && frame) {
+    frameSection.style.display = 'flex';
+    frame.src = finalUrl;
+    if (titleEl) titleEl.textContent = title;
+    if (pageTitleEl) pageTitleEl.textContent = title;
+    if (iconEl) iconEl.className = `fa-solid ${iconClass}`;
+
+    // Deselect sidebar nav active highlights
+    document.querySelectorAll('#nav .nav-sub-item, #nav button, #nav a').forEach(b => b.classList.remove('active'));
+
+    const mainEl = document.querySelector('main');
+    if (mainEl) mainEl.scrollTop = 0;
+  }
+}
+
+function openEmbeddedPayslip(employeeName) {
+  const safeName = employeeName || 'Staff';
+  openEmbeddedPage(`payslip.html?name=${encodeURIComponent(safeName)}`, `Payslip — ${safeName}`, 'fa-receipt');
+}
+
+function closeEmbeddedFrame() {
+  const frameSection = document.getElementById('embeddedFrameSection');
+  const frame = document.getElementById('embeddedPageFrame');
+  if (frameSection) frameSection.style.display = 'none';
+  if (frame) frame.src = 'about:blank';
+  showSection(lastActiveSection || 'dashboard');
+}
+
+function refreshEmbeddedFrame() {
+  const frame = document.getElementById('embeddedPageFrame');
+  if (frame && frame.src && frame.src !== 'about:blank') {
+    try {
+      frame.contentWindow.location.reload();
+    } catch(e) {
+      frame.src = frame.src;
+    }
+  }
+}
+
+function showSection(name) {
+  if (name !== 'embedded') {
+    const frameSection = document.getElementById('embeddedFrameSection');
+    const frame = document.getElementById('embeddedPageFrame');
+    if (frameSection) frameSection.style.display = 'none';
+    if (frame) frame.src = 'about:blank';
+    lastActiveSection = name;
+  }
+
+  Object.values(sections).forEach(s => { if (s) s.style.display = 'none'; });
+  if (sections[name]) {
+    sections[name].style.display = (name === 'embedded') ? 'flex' : 'block';
+  }
+
+  document.querySelectorAll('#nav .nav-sub-item, #nav button, #nav a').forEach(b => b.classList.remove('active'));
+  const activeBtn = document.querySelector(`#nav [data-section="${name}"]`);
   if (activeBtn) {
     activeBtn.classList.add('active');
-    const spanText = activeBtn.querySelector('span')?.textContent;
+    const spanText = activeBtn.querySelector('.nav-label')?.textContent || activeBtn.querySelector('span')?.textContent;
     document.getElementById('pageTitle').textContent = spanText || 'HR Portal';
+    const parentGroup = activeBtn.closest('.nav-group');
+    if (parentGroup) parentGroup.classList.add('open');
   }
 
   // Section-specific activation triggers
+  if (name === 'appraisals') {
+    openAppraisalsPanel();
+    return;
+  }
+  if (name === 'attendance-log' || name === 'attendance-summary') {
+    openAttendanceLogPanel();
+    return;
+  }
+  if (name === 'reports' || name === 'teacher-reports') {
+    openReportsPanel();
+    return;
+  }
+  if (name === 'payslips' || name === 'payslip-generator') {
+    openPayslipGeneratorPanel();
+    return;
+  }
+  if (name === 'salary-schedules') {
+    openSalarySchedulesPanel();
+    return;
+  }
   if (name === 'dashboard') { renderDashboard(); renderCharts(); }
   if (name === 'classes') renderClassesSection();
   if (name === 'teachers') renderTeachers();
@@ -1777,9 +2471,49 @@ function showSection(name) {
   if (name === 'announcements') renderAnnouncements();
 }
 
-document.querySelectorAll('#nav button').forEach(b => {
+window.toggleNavGroup = function(headerBtn) {
+  const group = headerBtn.closest('.nav-group');
+  if (group) {
+    group.classList.toggle('open');
+  }
+};
+
+document.querySelectorAll('#nav [data-section]').forEach(b => {
   b.addEventListener('click', () => showSection(b.dataset.section));
 });
+
+// Intercept all link clicks inside hr-dashboard.html to ensure NO new tab or page reload occurs
+document.addEventListener('click', function(e) {
+  const anchor = e.target.closest('a');
+  if (!anchor) return;
+
+  if (anchor.target === '_blank') {
+    anchor.removeAttribute('target');
+  }
+
+  const href = anchor.getAttribute('href');
+  if (!href || href === '#' || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) {
+    return;
+  }
+
+  // Do not open Hub directly inside embedded frame; navigate normally
+  if (href.includes('welcome.html')) {
+    return;
+  }
+
+  e.preventDefault();
+  const linkTitle = anchor.getAttribute('title') || anchor.textContent.trim() || 'Internal Workspace View';
+  openEmbeddedPage(href, linkTitle);
+}, true);
+
+// Failsafe: intercept window.open to keep everything inside embedded frame
+window.open = function(url, target, features) {
+  if (url && typeof url === 'string') {
+    openEmbeddedPage(url, 'Internal Workspace View');
+    return window;
+  }
+  return null;
+};
 
 /* -------------------------------------------------------------
    CLASSROOM & TEACHER ASSIGNMENT ENGINE
@@ -2149,6 +2883,17 @@ function renderDashboard() {
   const payrollSum = teachers.reduce((acc, curr) => acc + Number(curr.salary || 0), 0);
   document.getElementById('payrollTotal').textContent = `GHS ${payrollSum.toLocaleString()}`;
 
+  // Update Live Features Dropdown Mini-Metrics (Merged from pages/public/home.html)
+  const depts = new Set(teachers.map(t => t.department || t.dept).filter(Boolean));
+  const deptCount = Math.max(depts.size, 4);
+  const presentCount = Math.max(0, headcount - absentCount);
+  const attRate = headcount > 0 ? Math.round((presentCount / headcount) * 100) : 96;
+
+  document.querySelectorAll('.f-metric-teachers').forEach(el => { el.textContent = headcount; });
+  document.querySelectorAll('.f-metric-depts').forEach(el => { el.textContent = deptCount; });
+  document.querySelectorAll('.f-metric-attendance').forEach(el => { el.textContent = `${attRate}%`; });
+  document.querySelectorAll('.f-metric-payroll').forEach(el => { el.textContent = `GHS ${payrollSum.toLocaleString()}`; });
+
   // Populate Activity Feed
   const feed = document.getElementById('activityFeed');
   feed.innerHTML = `
@@ -2327,22 +3072,46 @@ document.getElementById('filterDept')?.addEventListener('change', renderTeachers
 document.getElementById('filterRole')?.addEventListener('change', renderTeachers);
 
 // ── FULL TEACHER MODAL CONTROLS (from teacher.html) ──
-document.getElementById('addTeacherBtn').addEventListener('click', () => openTeacherModal());
+document.getElementById('addTeacherBtn')?.addEventListener('click', () => openTeacherModal());
 
-// Avatar preview
-document.getElementById('m_avatarFile')?.addEventListener('change', (e) => {
+let currentTeacherModalPhoto = null;
+const DEFAULT_TEACHER_PHOTO = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80';
+
+function handleTeacherModalPhoto(e) {
   const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (ev) => { document.getElementById('m_avatarPreview').src = ev.target.result; };
-    reader.readAsDataURL(file);
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    showToast('Staff photo size must be under 2MB');
+    e.target.value = '';
+    return;
   }
-});
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    currentTeacherModalPhoto = ev.target.result;
+    document.getElementById('m_avatarPreview').src = currentTeacherModalPhoto;
+    const remBtn = document.getElementById('m_removePhotoBtn');
+    if (remBtn) remBtn.style.display = 'inline-block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeTeacherModalPhoto() {
+  currentTeacherModalPhoto = null;
+  const fileInput = document.getElementById('m_avatarFile');
+  if (fileInput) fileInput.value = '';
+  document.getElementById('m_avatarPreview').src = DEFAULT_TEACHER_PHOTO;
+  const remBtn = document.getElementById('m_removePhotoBtn');
+  if (remBtn) remBtn.style.display = 'none';
+}
 
 function openTeacherModal(emp) {
   document.getElementById('modalHeading').textContent = emp ? 'Edit Teacher Record' : 'Add New Teacher';
   document.getElementById('editTeacherId').value = emp ? emp.id : '';
   document.getElementById('teacherForm').reset();
+  const fileInput = document.getElementById('m_avatarFile');
+  if (fileInput) fileInput.value = '';
+  const remBtn = document.getElementById('m_removePhotoBtn');
+
   if (emp) {
     document.getElementById('m_name').value = emp.fullName || emp.name || '';
     document.getElementById('m_dob').value = emp.dob || '';
@@ -2367,9 +3136,13 @@ function openTeacherModal(emp) {
     document.getElementById('m_emergencyRel').value = emp.emergencyRel || '';
     document.getElementById('m_emergencyPhone').value = emp.emergencyPhone || '';
     document.getElementById('m_notes').value = emp.notes || '';
-    document.getElementById('m_avatarPreview').src = emp.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80';
+    currentTeacherModalPhoto = emp.photo || null;
+    document.getElementById('m_avatarPreview').src = emp.photo || DEFAULT_TEACHER_PHOTO;
+    if (remBtn) remBtn.style.display = emp.photo ? 'inline-block' : 'none';
   } else {
-    document.getElementById('m_avatarPreview').src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80';
+    currentTeacherModalPhoto = null;
+    document.getElementById('m_avatarPreview').src = DEFAULT_TEACHER_PHOTO;
+    if (remBtn) remBtn.style.display = 'none';
   }
   document.getElementById('teacherModal').classList.add('active');
 }
@@ -2410,7 +3183,7 @@ function handleSaveTeacherFull(e) {
     emergencyRel: document.getElementById('m_emergencyRel').value.trim(),
     emergencyPhone: document.getElementById('m_emergencyPhone').value.trim(),
     notes: document.getElementById('m_notes').value.trim(),
-    photo: document.getElementById('m_avatarPreview').src
+    photo: currentTeacherModalPhoto || document.getElementById('m_avatarPreview').src
   };
 
   if (editId) {
@@ -2734,9 +3507,9 @@ function renderPayrollLedger() {
       <td style="font-weight:800;color:#10b981">GHS ${net.toLocaleString()}</td>
       <td><span class="badge-pill badge-success"><i class="fa-solid fa-check"></i> Approved</span></td>
       <td style="text-align:right">
-        <a href="payslip.html?name=${encodeURIComponent(emp.fullName || emp.name || '')}" class="btn-modern btn-secondary btn-sm">
+        <button type="button" onclick="openEmbeddedPayslip('${escapeHtml(emp.fullName || emp.name || '').replace(/'/g, "\\'")}')" class="btn-modern btn-secondary btn-sm">
           <i class="fa-solid fa-receipt"></i> Payslip
-        </a>
+        </button>
       </td>
     `;
     tbody.appendChild(tr);

@@ -15,6 +15,8 @@
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <!-- Short Skeletal Loading Stylesheet -->
   <link rel="stylesheet" href="../../assets/css/skeleton.css">
+  <!-- Floating Quick Assistant Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
 
   <style>
     :root {
@@ -342,6 +344,196 @@
 
     .hidden { display: none !important; }
 
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 4, 25, 0.78);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      display: flex;
+      animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-box {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: var(--radius-xl);
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+      position: relative;
+      color: var(--text-main);
+      text-align: center;
+    }
+    .dark .modal-box {
+      background: #111827;
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+    }
+    .modal-close-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(0, 0, 0, 0.05);
+      border: none;
+      color: var(--text-muted);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .dark .modal-close-btn { background: rgba(255, 255, 255, 0.1); color: #fff; }
+    .modal-close-btn:hover { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    .verify-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(37, 99, 235, 0.08);
+      border: 1px solid rgba(37, 99, 235, 0.2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 600;
+      margin: 10px 0 14px 0;
+      word-break: break-all;
+    }
+    .verify-feedback {
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .verify-feedback.error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid #ef4444;
+      color: #ef4444;
+      display: block;
+    }
+    .verify-feedback.success {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid #10b981;
+      color: #10b981;
+      display: block;
+    }
+    .otp-box {
+      background: rgba(0, 0, 0, 0.02);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .dark .otp-box {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+    .otp-input {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--text-main);
+      font-size: 24px;
+      letter-spacing: 8px;
+      text-align: center;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      padding: 10px;
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+      outline: none;
+      box-sizing: border-box;
+      transition: all 0.2s;
+    }
+    .otp-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
+    /* Instant Code Display & Countdown Timer */
+    .instant-code-card {
+      background: rgba(37, 99, 235, 0.06);
+      border: 1px dashed rgba(37, 99, 235, 0.35);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      margin: 10px 0 14px;
+      text-align: center;
+    }
+    .instant-code-header {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .instant-code-display {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .instant-code-value {
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 4px;
+      color: var(--accent);
+      background: rgba(37, 99, 235, 0.08);
+      padding: 3px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(37, 99, 235, 0.2);
+    }
+    .btn-copy-code {
+      background: var(--accent);
+      border: 1px solid var(--accent);
+      color: #ffffff;
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-copy-code:hover {
+      background: #1d4ed8;
+    }
+    .otp-timer-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+      background: rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 20px;
+      padding: 3px 12px;
+      margin-bottom: 12px;
+    }
+    .otp-timer-badge.expired {
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
     footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-muted); }
   </style>
 </head>
@@ -431,6 +623,23 @@
 
       <form id="hrAuthForm" onsubmit="handleSubmit(event)">
 
+        <div class="form-group hidden" id="photoRow">
+          <label class="form-label">Profile Photo (Optional)</label>
+          <div class="photo-upload-box" style="display: flex; align-items: center; gap: 12px; background: var(--input-bg); border: 1px dashed var(--input-border); border-radius: var(--radius-md); padding: 8px 14px;">
+            <div id="hrPhotoPreview" style="width: 42px; height: 42px; border-radius: 50%; background: rgba(37,99,235,0.1); border: 1px solid var(--input-border); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+              <i class="fa-solid fa-user" style="color: var(--text-muted); font-size: 16px;"></i>
+            </div>
+            <div style="flex: 1; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <input type="file" id="hrPhotoFile" accept="image/png, image/jpeg, image/webp" style="display: none;" onchange="handleHrPhotoUpload(event)">
+              <button type="button" class="btn-demo" style="padding: 6px 12px; font-size: 12px; width: auto;" onclick="document.getElementById('hrPhotoFile').click()">
+                <i class="fa-solid fa-camera"></i> Upload Photo
+              </button>
+              <button type="button" id="btnRemoveHrPhoto" style="display: none; background: none; border: none; color: #ef4444; font-size: 12px; cursor: pointer;" onclick="removeHrPhoto()">Remove</button>
+              <span id="hrPhotoHint" style="font-size: 11px; color: var(--text-muted);">PNG, JPG (Max 2MB)</span>
+            </div>
+          </div>
+        </div>
+
         <div class="form-row hidden" id="nameRow">
           <div class="form-group">
             <label class="form-label">First Name</label>
@@ -508,6 +717,63 @@
     </div>
   </main>
 
+  <!-- MODAL: HR EMAIL & OTP VERIFICATION -->
+  <div class="modal-overlay" id="hrOtpModal">
+    <div class="modal-box">
+      <button class="modal-close-btn" type="button" onclick="closeHrOtpModal()"><i class="fa-solid fa-xmark"></i></button>
+      <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(37, 99, 235, 0.12); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 14px;">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px; color: var(--text-main);">Verify HR Administrator</h3>
+      <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 6px;">
+        A 6-digit confirmation code has been generated for:
+      </p>
+      <div class="verify-badge" id="hrVerifyEmailBadge">
+        <i class="fa-regular fa-envelope"></i> <span id="hrVerifyEmailText">hr@school.com</span>
+      </div>
+
+      <div id="hrVerifyFeedback" class="verify-feedback"></div>
+
+      <!-- Instant Code Card for users who didn't receive email -->
+      <div class="instant-code-card" id="instantCodeCard">
+        <div class="instant-code-header">
+          <i class="fa-solid fa-envelope-open-text"></i>
+          <span>Didn't receive code? Instant authentication code:</span>
+        </div>
+        <div class="instant-code-display">
+          <span class="instant-code-value" id="instantHrCodeValue">------</span>
+          <button type="button" class="btn-copy-code" id="btnAutoFillHrCode" onclick="autoFillHrOtpCode()">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-fill Code
+          </button>
+        </div>
+      </div>
+
+      <!-- OTP Expiration Countdown Timer -->
+      <div class="otp-timer-badge" id="hrOtpTimerBadge">
+        <i class="fa-regular fa-clock"></i> Code expires in: <span id="hrOtpTimerText" style="font-weight: 700; font-family: monospace; font-size: 13.5px; margin-left: 4px;">05:00</span>
+      </div>
+
+      <div class="otp-box">
+        <div style="font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <i class="fa-solid fa-key"></i> Enter 6-Digit Code
+        </div>
+        <input type="text" id="hrOtpInput" class="otp-input" placeholder="------" maxlength="6" autocomplete="one-time-code">
+        <button type="button" class="btn-submit" id="btnVerifyHrOtp" onclick="submitHrOtpVerification()" style="margin-top: 4px;">
+          <i class="fa-solid fa-check"></i> Verify & Enter HR Dashboard
+        </button>
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: center; align-items: center; margin-top: 8px;">
+        <button type="button" class="btn-submit" id="btnResendHrOtp" onclick="resendHrOtpEmail()" style="font-size: 11.5px; padding: 7px 16px; width: auto; background: rgba(0,0,0,0.06); color: var(--text-main); border: 1px solid var(--input-border); box-shadow: none;">
+          <i class="fa-solid fa-rotate-right"></i> Resend Code
+        </button>
+        <button type="button" class="btn-submit" onclick="closeHrOtpModal()" style="font-size: 11.5px; padding: 7px 16px; width: auto; background: rgba(0,0,0,0.06); color: var(--text-main); border: 1px solid var(--input-border); box-shadow: none;">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
   <footer>
     © <span id="year"></span> Flawless Graphics — Enterprise HR Management System
   </footer>
@@ -538,6 +804,7 @@
     let currentMode = 'signin';
     const tabSignIn = document.getElementById('tabSignIn');
     const tabSignUp = document.getElementById('tabSignUp');
+    const photoRow = document.getElementById('photoRow');
     const nameRow = document.getElementById('nameRow');
     const confirmRow = document.getElementById('confirmRow');
     const signInOpts = document.getElementById('signInOpts');
@@ -550,6 +817,43 @@
     const lastNameInput = document.getElementById('lastName');
     const confirmPasswordInput = document.getElementById('confirmPassword');
 
+    let currentHrPhotoBase64 = null;
+
+    function handleHrPhotoUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) {
+        showError('Profile photo size must be under 2MB.');
+        e.target.value = '';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        currentHrPhotoBase64 = evt.target.result;
+        const preview = document.getElementById('hrPhotoPreview');
+        if (preview) {
+          preview.innerHTML = `<img src="${currentHrPhotoBase64}" alt="HR Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        }
+        const removeBtn = document.getElementById('btnRemoveHrPhoto');
+        if (removeBtn) removeBtn.style.display = 'inline-block';
+        const hint = document.getElementById('hrPhotoHint');
+        if (hint) hint.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeHrPhoto() {
+      currentHrPhotoBase64 = null;
+      const fileInput = document.getElementById('hrPhotoFile');
+      if (fileInput) fileInput.value = '';
+      const preview = document.getElementById('hrPhotoPreview');
+      if (preview) preview.innerHTML = `<i class="fa-solid fa-user" style="color: var(--text-muted); font-size: 16px;"></i>`;
+      const removeBtn = document.getElementById('btnRemoveHrPhoto');
+      if (removeBtn) removeBtn.style.display = 'none';
+      const hint = document.getElementById('hrPhotoHint');
+      if (hint) hint.style.display = 'inline';
+    }
+
     function switchTab(mode) {
       currentMode = mode;
       hideAlerts();
@@ -557,6 +861,7 @@
       if (mode === 'signup') {
         tabSignUp.classList.add('active');
         tabSignIn.classList.remove('active');
+        if (photoRow) photoRow.classList.remove('hidden');
         nameRow.classList.remove('hidden');
         confirmRow.classList.remove('hidden');
         signInOpts.classList.add('hidden');
@@ -571,6 +876,7 @@
       } else {
         tabSignIn.classList.add('active');
         tabSignUp.classList.remove('active');
+        if (photoRow) photoRow.classList.add('hidden');
         nameRow.classList.add('hidden');
         confirmRow.classList.add('hidden');
         signInOpts.classList.remove('hidden');
@@ -698,24 +1004,14 @@
           org: orgName,
           name: `${firstName} ${lastName}`,
           email: hrEmail,
+          photo: currentHrPhotoBase64,
           pass: hashedPw,
           role: 'hr',
           createdAt: Date.now()
         };
 
-        users.push(newUser);
-        localStorage.setItem('organizations_users', JSON.stringify(users));
-
-        if (window.AuthSession) {
-          window.AuthSession.setUser(newUser);
-        }
-
-        showSuccess('Account successfully registered! Loading your HR Dashboard...');
-        submitBtn.disabled = true;
-
-        setTimeout(() => {
-          window.location.href = 'hr-dashboard.html';
-        }, 1200);
+        // Trigger Instant OTP Verification
+        openHrOtpModal(newUser);
 
       } else {
         // --- SIGN IN ---
@@ -763,8 +1059,151 @@
         }, 900);
       }
     }
+
+    // ==========================================
+    // HR OTP VERIFICATION CONTROLLER
+    // ==========================================
+    let pendingHrUser = null;
+    let currentHrOtpCode = '';
+    let hrOtpCountdownInterval = null;
+    let hrOtpTimeRemaining = 300;
+    let isHrOtpExpired = false;
+
+    function startHrOtpCountdown(duration = 300) {
+      if (hrOtpCountdownInterval) clearInterval(hrOtpCountdownInterval);
+      hrOtpTimeRemaining = duration;
+      isHrOtpExpired = false;
+
+      const timerBadge = document.getElementById('hrOtpTimerBadge');
+      const timerText = document.getElementById('hrOtpTimerText');
+      if (timerBadge) timerBadge.classList.remove('expired');
+
+      function updateDisplay() {
+        const minutes = Math.floor(hrOtpTimeRemaining / 60);
+        const seconds = hrOtpTimeRemaining % 60;
+        if (timerText) {
+          timerText.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+        if (hrOtpTimeRemaining <= 0) {
+          clearInterval(hrOtpCountdownInterval);
+          isHrOtpExpired = true;
+          if (timerBadge) timerBadge.classList.add('expired');
+          if (timerText) timerText.textContent = 'Expired';
+          showHrVerifyFeedback('Confirmation code has expired. Please click "Resend Code".', true);
+        }
+        hrOtpTimeRemaining--;
+      }
+
+      updateDisplay();
+      hrOtpCountdownInterval = setInterval(updateDisplay, 1000);
+    }
+
+    function openHrOtpModal(user) {
+      pendingHrUser = user;
+      currentHrOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+      const modal = document.getElementById('hrOtpModal');
+      const emailText = document.getElementById('hrVerifyEmailText');
+      const codeVal = document.getElementById('instantHrCodeValue');
+      const input = document.getElementById('hrOtpInput');
+      const feedback = document.getElementById('hrVerifyFeedback');
+
+      if (emailText) emailText.textContent = user.email;
+      if (codeVal) codeVal.textContent = currentHrOtpCode;
+      if (input) { input.value = ''; input.disabled = false; }
+      if (feedback) feedback.style.display = 'none';
+
+      startHrOtpCountdown(300);
+
+      if (modal) modal.classList.add('active');
+      setTimeout(() => { if (input) input.focus(); }, 150);
+    }
+
+    function closeHrOtpModal() {
+      const modal = document.getElementById('hrOtpModal');
+      if (modal) modal.classList.remove('active');
+      if (hrOtpCountdownInterval) clearInterval(hrOtpCountdownInterval);
+      pendingHrUser = null;
+    }
+
+    function autoFillHrOtpCode() {
+      const input = document.getElementById('hrOtpInput');
+      if (input && currentHrOtpCode) {
+        input.value = currentHrOtpCode;
+        showHrVerifyFeedback('Instant authentication code automatically pasted!', false);
+        setTimeout(submitHrOtpVerification, 350);
+      }
+    }
+
+    function showHrVerifyFeedback(msg, isErr) {
+      const fb = document.getElementById('hrVerifyFeedback');
+      if (!fb) return;
+      fb.textContent = msg;
+      fb.className = 'verify-feedback ' + (isErr ? 'error' : 'success');
+      fb.style.display = 'block';
+    }
+
+    async function submitHrOtpVerification() {
+      if (isHrOtpExpired) {
+        return showHrVerifyFeedback('Code expired. Please click "Resend Code".', true);
+      }
+      const input = document.getElementById('hrOtpInput');
+      const enteredCode = (input?.value || '').trim();
+
+      if (!enteredCode || enteredCode.length !== 6) {
+        return showHrVerifyFeedback('Please enter the 6-digit confirmation code.', true);
+      }
+
+      if (enteredCode !== currentHrOtpCode) {
+        return showHrVerifyFeedback('Invalid code. Please re-check or use "Auto-fill Code".', true);
+      }
+
+      showHrVerifyFeedback('Code verified successfully! Saving account and redirecting...', false);
+
+      const btn = document.getElementById('btnVerifyHrOtp');
+      if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Initializing...'; }
+
+      setTimeout(() => {
+        let users = [];
+        try {
+          users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
+        } catch (e) { users = []; }
+
+        if (pendingHrUser) {
+          users.push(pendingHrUser);
+          localStorage.setItem('organizations_users', JSON.stringify(users));
+
+          if (window.AuthSession) {
+            window.AuthSession.setUser(pendingHrUser);
+          } else {
+            localStorage.setItem('active_org', pendingHrUser.org);
+            localStorage.setItem('activeHR', JSON.stringify({
+              name: pendingHrUser.name,
+              email: pendingHrUser.email,
+              role: 'HR Admin',
+              org: pendingHrUser.org
+            }));
+          }
+        }
+
+        window.location.href = 'hr-dashboard.html';
+      }, 700);
+    }
+
+    function resendHrOtpEmail() {
+      currentHrOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const codeVal = document.getElementById('instantHrCodeValue');
+      if (codeVal) codeVal.textContent = currentHrOtpCode;
+
+      startHrOtpCountdown(300);
+      showHrVerifyFeedback('Fresh 6-digit confirmation code generated!', false);
+      const input = document.getElementById('hrOtpInput');
+      if (input) { input.value = ''; input.disabled = false; input.focus(); }
+    }
   </script>
   <!-- Short Skeletal Loading Script -->
   <script src="../../assets/js/skeleton-loader.js"></script>
+  <!-- Floating Quick Assistant Script -->
+  <script src="../../assets/js/quick-assistant.js"></script>
 </body>
 </html>

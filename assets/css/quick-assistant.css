@@ -589,36 +589,214 @@ body.has-messenger .quick-assistant-fab {
   background: rgba(0, 0, 0, 0.05);
 }
 
-/* Interactive Tour Spotlight Overlay */
+/* Interactive Button-Pointing Spotlight Tour */
 .tour-spotlight-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(2px);
-  z-index: 10000;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 99990;
   display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
+  opacity: 0;
+  pointer-events: auto;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .tour-spotlight-overlay.active {
-  display: flex;
+  display: block;
+  opacity: 1;
 }
 
-.tour-modal-card {
+/* Glowing Spotlight Beacon around target button */
+.tour-spotlight-beacon {
+  position: fixed;
+  z-index: 99995;
+  border-radius: 12px;
+  pointer-events: none;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 0 3px #2563eb, 0 0 0 8px rgba(37, 99, 235, 0.35), 0 0 35px rgba(37, 99, 235, 0.6);
+  animation: beaconPulse 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  display: none;
+}
+
+.tour-spotlight-beacon.active {
+  display: block;
+}
+
+@keyframes beaconPulse {
+  0% {
+    box-shadow: 0 0 0 3px #2563eb, 0 0 0 6px rgba(37, 99, 235, 0.4), 0 0 25px rgba(37, 99, 235, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 0 5px #06b6d4, 0 0 0 14px rgba(6, 182, 212, 0.25), 0 0 45px rgba(6, 182, 212, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 0 3px #2563eb, 0 0 0 6px rgba(37, 99, 235, 0.4), 0 0 25px rgba(37, 99, 235, 0.6);
+  }
+}
+
+/* Target Pointer Badge / Arrow Pin on Target Button */
+.tour-target-pin {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  background: linear-gradient(135deg, #2563eb, #06b6d4);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.5);
+  animation: pinBounce 1.2s infinite ease-in-out alternate;
+}
+
+@keyframes pinBounce {
+  from { transform: translateY(0) scale(1); }
+  to { transform: translateY(-4px) scale(1.1); }
+}
+
+/* Dynamic Floating Popover Card Pointing at Target Button */
+.tour-popover-card {
+  position: fixed;
   background: #ffffff;
   border-radius: 18px;
-  max-width: 500px;
-  width: 100%;
-  padding: 24px;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+  max-width: 440px;
+  width: calc(100vw - 40px);
+  padding: 22px 24px;
+  box-shadow: 0 25px 60px -10px rgba(15, 23, 42, 0.45), 0 0 0 1px rgba(37, 99, 235, 0.2);
   color: #0f172a;
-  animation: stepFade 0.25s ease;
+  z-index: 100000;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  display: none;
+  opacity: 0;
+  transform: scale(0.96);
+  pointer-events: auto;
 }
 
-[data-theme="dark"] .tour-modal-card,
-.dark .tour-modal-card {
-  background: #1e1b4b;
+.tour-popover-card.active {
+  display: block;
+  opacity: 1;
+  transform: scale(1);
+}
+
+[data-theme="dark"] .tour-popover-card,
+.dark .tour-popover-card {
+  background: #111827;
+  color: #ffffff;
+  border-color: rgba(6, 182, 212, 0.35);
+  box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(6, 182, 212, 0.25);
+}
+
+/* Pointer Arrow on Popover pointing at target button */
+.tour-pointer-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.15));
+}
+
+.tour-pointer-arrow.arrow-left {
+  left: -11px;
+  top: 26px;
+  border-width: 10px 11px 10px 0;
+  border-color: transparent #ffffff transparent transparent;
+}
+[data-theme="dark"] .tour-pointer-arrow.arrow-left,
+.dark .tour-pointer-arrow.arrow-left {
+  border-color: transparent #111827 transparent transparent;
+}
+
+.tour-pointer-arrow.arrow-right {
+  right: -11px;
+  top: 26px;
+  border-width: 10px 0 10px 11px;
+  border-color: transparent transparent transparent #ffffff;
+}
+[data-theme="dark"] .tour-pointer-arrow.arrow-right,
+.dark .tour-pointer-arrow.arrow-right {
+  border-color: transparent transparent transparent #111827;
+}
+
+.tour-pointer-arrow.arrow-top {
+  top: -11px;
+  left: 36px;
+  border-width: 0 10px 11px 10px;
+  border-color: transparent transparent #ffffff transparent;
+}
+[data-theme="dark"] .tour-pointer-arrow.arrow-top,
+.dark .tour-pointer-arrow.arrow-top {
+  border-color: transparent transparent #111827 transparent;
+}
+
+.tour-pointer-arrow.arrow-bottom {
+  bottom: -11px;
+  left: 36px;
+  border-width: 11px 10px 0 10px;
+  border-color: #ffffff transparent transparent transparent;
+}
+[data-theme="dark"] .tour-pointer-arrow.arrow-bottom,
+.dark .tour-pointer-arrow.arrow-bottom {
+  border-color: #111827 transparent transparent transparent;
+}
+
+/* Auto-Roll Progress Bar */
+.tour-roll-progress-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 16px;
+}
+[data-theme="dark"] .tour-roll-progress-track,
+.dark .tour-roll-progress-track {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.tour-roll-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #2563eb, #06b6d4);
+  transition: width 0.1s linear;
+}
+
+/* Auto-Roll Play/Pause Button */
+.tour-autoroll-btn {
+  background: rgba(37, 99, 235, 0.1);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  color: #2563eb;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s;
+}
+
+[data-theme="dark"] .tour-autoroll-btn,
+.dark .tour-autoroll-btn {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: rgba(6, 182, 212, 0.35);
+  color: #72efdd;
+}
+
+.tour-autoroll-btn:hover {
+  background: #2563eb;
   color: #ffffff;
 }
+[data-theme="dark"] .tour-autoroll-btn:hover,
+.dark .tour-autoroll-btn:hover {
+  background: #06b6d4;
+  color: #111827;
+}
+

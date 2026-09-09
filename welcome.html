@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Welcome | Flawless Graphics</title>
+<title>Workspace Hub — FLAWLESS GRAPHICS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Google Fonts: Plus Jakarta Sans -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -661,6 +661,16 @@ document.addEventListener("DOMContentLoaded", function() {
             if (user.logo) {
                 document.getElementById("orgLogoBox").innerHTML = `<img src="${user.logo}" alt="Organization Logo">`;
             }
+
+            // Direct route to active dashboards for seamless authenticated navigation
+            const hrLink = document.getElementById("portalHrLink");
+            if (hrLink) hrLink.href = "pages/hr/hr-dashboard.html";
+
+            const teacherLink = document.getElementById("portalTeacherLink");
+            if (teacherLink) teacherLink.href = "pages/teacher/teacher-dashboard.html";
+
+            const financeLink = document.getElementById("portalFinanceLink");
+            if (financeLink) financeLink.href = "pages/finance/finance-dashboard.html";
         }
     } catch (e) {
         console.warn("Could not parse user session details:", e);

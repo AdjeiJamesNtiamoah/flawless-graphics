@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Teacher Login | LUCY Portal</title>
+<title>Teacher Portal Sign In — FLAWLESS GRAPHICS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Google Fonts: Plus Jakarta Sans -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,6 +12,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <!-- Short Skeletal Loading Stylesheet -->
 <link rel="stylesheet" href="../../assets/css/skeleton.css">
+<!-- Floating Quick Assistant Stylesheet -->
+<link rel="stylesheet" href="../../assets/css/quick-assistant.css">
 
 <style>
     * {
@@ -763,9 +765,11 @@
             </div>
 
             <div class="brand-logo">
-                <i class="fa-solid fa-chalkboard-user logo-icon"></i>
+                <div id="orgLogoBox" style="width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 10px; overflow: hidden; background: rgba(255,255,255,0.1);">
+                    <i class="fa-solid fa-chalkboard-user logo-icon" style="font-size: 20px;"></i>
+                </div>
                 <div>
-                    <div class="brand-title">TEACHER PORTAL</div>
+                    <div class="brand-title" id="orgTitle">TEACHER PORTAL</div>
                     <div class="brand-subtitle">Classroom & Educator Network</div>
                 </div>
             </div>
@@ -803,6 +807,27 @@
                         <div class="input-wrapper">
                             <input type="text" id="fullName" placeholder="Sarah Jenkins">
                             <i class="fa-regular fa-user field-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group hidden" id="teacherPhotoGroup">
+                        <label>Educator Profile Photo (Optional)</label>
+                        <div style="display: flex; align-items: center; gap: 14px; margin-top: 6px; padding: 10px 14px; background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.2); border-radius: 12px;">
+                            <div id="teacherPhotoPreview" style="width: 50px; height: 50px; border-radius: 50%; background: rgba(114, 239, 221, 0.15); border: 2px solid #72efdd; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                                <i class="fa-solid fa-user-tie" style="font-size: 20px; color: #72efdd;"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="display: flex; gap: 8px;">
+                                    <button type="button" class="btn-outline" style="padding: 6px 12px; font-size: 11px; border-radius: 8px;" onclick="document.getElementById('teacherPhotoFile').click()">
+                                        <i class="fa-solid fa-camera"></i> Choose Photo
+                                    </button>
+                                    <button type="button" id="removeTeacherPhotoBtn" class="btn-outline" style="padding: 6px 10px; font-size: 11px; border-radius: 8px; display: none; color: #ff9b9b; border-color: rgba(235,87,87,0.4);" onclick="removeTeacherPhoto()">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                                <input type="file" id="teacherPhotoFile" accept="image/*" style="display: none;" onchange="handleTeacherPhotoUpload(event)">
+                                <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px;">PNG, JPG or WebP (Max 2MB)</div>
+                            </div>
                         </div>
                     </div>
 
@@ -1065,6 +1090,40 @@ function showMessage(text, isError = true) {
     msgEl.className = "msg " + (isError ? "error" : "success");
 }
 
+let currentTeacherPhotoBase64 = null;
+
+function handleTeacherPhotoUpload(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+        showMessage("Teacher photo must be smaller than 2MB.");
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        currentTeacherPhotoBase64 = evt.target.result;
+        const preview = document.getElementById("teacherPhotoPreview");
+        if (preview) {
+            preview.innerHTML = `<img src="${currentTeacherPhotoBase64}" alt="Photo" style="width:100%; height:100%; object-fit:cover; display:block;">`;
+        }
+        const removeBtn = document.getElementById("removeTeacherPhotoBtn");
+        if (removeBtn) removeBtn.style.display = "inline-flex";
+    };
+    reader.readAsDataURL(file);
+}
+
+function removeTeacherPhoto() {
+    currentTeacherPhotoBase64 = null;
+    const preview = document.getElementById("teacherPhotoPreview");
+    if (preview) {
+        preview.innerHTML = `<i class="fa-solid fa-user-tie" style="font-size: 20px; color: #72efdd;"></i>`;
+    }
+    const fileInput = document.getElementById("teacherPhotoFile");
+    if (fileInput) fileInput.value = "";
+    const removeBtn = document.getElementById("removeTeacherPhotoBtn");
+    if (removeBtn) removeBtn.style.display = "none";
+}
+
 function switchTeacherTab(mode) {
     currentMode = mode;
     const msgEl = document.getElementById("msg");
@@ -1073,6 +1132,7 @@ function switchTeacherTab(mode) {
     const tabSignIn = document.getElementById("tabSignIn");
     const tabSignUp = document.getElementById("tabSignUp");
     const fullNameGroup = document.getElementById("fullNameGroup");
+    const teacherPhotoGroup = document.getElementById("teacherPhotoGroup");
     const confirmPassGroup = document.getElementById("confirmPassGroup");
     const fullNameInput = document.getElementById("fullName");
     const confirmPasswordInput = document.getElementById("confirmPassword");
@@ -1087,6 +1147,7 @@ function switchTeacherTab(mode) {
         tabSignUp.classList.add("active");
         tabSignIn.classList.remove("active");
         fullNameGroup.classList.remove("hidden");
+        if (teacherPhotoGroup) teacherPhotoGroup.classList.remove("hidden");
         confirmPassGroup.classList.remove("hidden");
         fullNameInput.required = true;
         confirmPasswordInput.required = true;
@@ -1100,6 +1161,7 @@ function switchTeacherTab(mode) {
         tabSignIn.classList.add("active");
         tabSignUp.classList.remove("active");
         fullNameGroup.classList.add("hidden");
+        if (teacherPhotoGroup) teacherPhotoGroup.classList.add("hidden");
         confirmPassGroup.classList.add("hidden");
         fullNameInput.required = false;
         confirmPasswordInput.required = false;
@@ -1192,6 +1254,7 @@ async function handleTeacherAuth() {
                 email: email,
                 pass: hashed,
                 role: "teacher",
+                photo: currentTeacherPhotoBase64 || null,
                 org: (window.AuthSession ? window.AuthSession.getOrg() : '') || "FLAWLESS GRAPHICS",
                 createdAt: Date.now()
             };
@@ -1262,5 +1325,7 @@ window.onload = () => {
 
 <!-- Short Skeletal Loading Script -->
 <script src="../../assets/js/skeleton-loader.js"></script>
+<!-- Floating Quick Assistant Script -->
+<script src="../../assets/js/quick-assistant.js"></script>
 </body>
 </html>

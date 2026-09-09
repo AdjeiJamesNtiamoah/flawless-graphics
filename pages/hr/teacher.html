@@ -467,10 +467,18 @@
 
         <div class="form-group">
           <div style="display: flex; gap: 16px; align-items: center;">
-            <img id="m_avatarPreview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" style="width: 64px; height: 64px; border-radius: 14px; object-fit: cover; border: 2px solid var(--border-card); flex-shrink:0;">
-            <div style="flex:1;">
-              <input type="file" id="m_avatarFile" accept="image/*" class="form-control" style="font-size: 12px;">
-              <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">Recommended: square photo, at least 200×200px (JPG/PNG)</div>
+            <img id="m_avatarPreview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" style="width: 68px; height: 68px; border-radius: 14px; object-fit: cover; border: 2px solid var(--border-card); flex-shrink:0; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+            <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <input type="file" id="m_avatarFile" accept="image/png, image/jpeg, image/webp" style="display: none;" onchange="handleTeacherPagePhoto(event)">
+                <button type="button" class="btn-modern btn-secondary" style="padding: 6px 14px; font-size: 12px; font-weight: 700;" onclick="document.getElementById('m_avatarFile').click()">
+                  <i class="fa-solid fa-camera"></i> Choose Photo
+                </button>
+                <button type="button" id="m_removePhotoBtn" class="btn-modern btn-secondary" style="padding: 6px 10px; font-size: 12px; color: var(--danger, #ef4444); display: none;" onclick="removeTeacherPagePhoto()">
+                  Remove
+                </button>
+              </div>
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">PNG, JPG or WebP (Max 2MB). Recommended square photo.</div>
             </div>
           </div>
         </div>
@@ -647,12 +655,47 @@
       renderTable(filtered);
     }
 
+    let currentTeacherPagePhoto = null;
+    const DEFAULT_TEACHER_PAGE_PHOTO = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80';
+
+    function handleTeacherPagePhoto(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) {
+        showToast('Photo size must be under 2MB');
+        e.target.value = '';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        currentTeacherPagePhoto = ev.target.result;
+        document.getElementById('m_avatarPreview').src = currentTeacherPagePhoto;
+        const remBtn = document.getElementById('m_removePhotoBtn');
+        if (remBtn) remBtn.style.display = 'inline-block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeTeacherPagePhoto() {
+      currentTeacherPagePhoto = null;
+      const fileInput = document.getElementById('m_avatarFile');
+      if (fileInput) fileInput.value = '';
+      document.getElementById('m_avatarPreview').src = DEFAULT_TEACHER_PAGE_PHOTO;
+      const remBtn = document.getElementById('m_removePhotoBtn');
+      if (remBtn) remBtn.style.display = 'none';
+    }
+
     // 7. Modal Controls
     function openAddModal() {
       document.getElementById('modalHeading').textContent = 'Add New Teacher';
       document.getElementById('editEmpId').value = '';
       document.getElementById('empForm').reset();
-      document.getElementById('m_avatarPreview').src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80';
+      currentTeacherPagePhoto = null;
+      const fileInput = document.getElementById('m_avatarFile');
+      if (fileInput) fileInput.value = '';
+      document.getElementById('m_avatarPreview').src = DEFAULT_TEACHER_PAGE_PHOTO;
+      const remBtn = document.getElementById('m_removePhotoBtn');
+      if (remBtn) remBtn.style.display = 'none';
       document.getElementById('teacherModal').classList.add('active');
     }
 
@@ -686,25 +729,16 @@
       document.getElementById('m_emergencyRel').value = emp.emergencyRel || '';
       document.getElementById('m_emergencyPhone').value = emp.emergencyPhone || '';
       document.getElementById('m_notes').value = emp.notes || '';
-      document.getElementById('m_avatarPreview').src = emp.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80';
+      currentTeacherPagePhoto = emp.photo || null;
+      document.getElementById('m_avatarPreview').src = emp.photo || DEFAULT_TEACHER_PAGE_PHOTO;
+      const remBtn = document.getElementById('m_removePhotoBtn');
+      if (remBtn) remBtn.style.display = emp.photo ? 'inline-block' : 'none';
       document.getElementById('teacherModal').classList.add('active');
     }
 
     function closeModal() {
       document.getElementById('teacherModal').classList.remove('active');
     }
-
-    // Avatar preview
-    document.getElementById('m_avatarFile').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          document.getElementById('m_avatarPreview').src = ev.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
 
     function handleSaveTeacher(e) {
       e.preventDefault();
@@ -743,7 +777,7 @@
         emergencyPhone: document.getElementById('m_emergencyPhone').value.trim(),
         // Misc
         notes: document.getElementById('m_notes').value.trim(),
-        photo: document.getElementById('m_avatarPreview').src
+        photo: currentTeacherPagePhoto || document.getElementById('m_avatarPreview').src
       };
 
       if (editId) {

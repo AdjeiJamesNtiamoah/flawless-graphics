@@ -3,11 +3,13 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Classroom Module — Flawless Graphics</title>
+  <title>Classroom Module — FLAWLESS GRAPHICS</title>
   <link href="../../assets/css/teacher-dashboard.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Short Skeletal Loading Stylesheet -->
   <link rel="stylesheet" href="../../assets/css/skeleton.css">
+  <!-- Floating Quick Assistant Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
   <style>
     .header-left {
       display: flex;
@@ -102,8 +104,8 @@
   <header class="header">
     <div class="header-left">
       <div class="brand">
-        <div class="logo">FG</div>
-        <div><h1>Classroom Module</h1><div class="small">Manage classes & timetable</div></div>
+        <div class="logo" id="orgLogoBox">FG</div>
+        <div><h1 id="headerOrgTitle">Classroom Module</h1><div class="small">Manage classes & timetable</div></div>
       </div>
       <nav class="nav-left">
         <button class="nav-btn" onclick="window.location.href='teacher-dashboard.html'"><i class="fa-solid fa-gauge"></i> Dashboard</button>
@@ -156,9 +158,9 @@
 
         <div id="timetableEditorGrid" class="timetable"></div>
 
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button id="exportClassesBtn" class="btn">Export</button>
-          <button id="importClassesBtn" class="btn">Import</button>
+        <div style="display:flex;gap:10px;margin-top:16px">
+          <button id="exportClassesBtn" class="btn"><i class="fa-solid fa-file-export"></i> Export</button>
+          <button id="importClassesBtn" class="btn"><i class="fa-solid fa-file-import"></i> Import</button>
         </div>
       </div>
 
@@ -166,7 +168,10 @@
   </div>
 
   <script src="../../assets/js/teacher-classes.js"></script>
+  <script src="../../assets/js/auth-session.js"></script>
   <!-- Short Skeletal Loading Script -->
   <script src="../../assets/js/skeleton-loader.js"></script>
+  <!-- Floating Quick Assistant Script -->
+  <script src="../../assets/js/quick-assistant.js"></script>
 </body>
 </html>

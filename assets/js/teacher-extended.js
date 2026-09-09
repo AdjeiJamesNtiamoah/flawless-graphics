@@ -126,10 +126,13 @@
     const container = id(containerId);
     if(!container) return;
     const data = getStudents();
-    if(!data.length){ container.innerHTML = '<div class="small">No students yet</div>'; return; }
-    let html = '<table style="width:100%;border-collapse:collapse"><thead><tr><th>#</th><th>Name</th><th>Class</th><th>Roll</th><th>Phone</th><th>Action</th></tr></thead><tbody>';
+    if(!data.length){ container.innerHTML = '<div class="small" style="padding:16px; text-align:center; color:var(--text-muted);">No students enrolled yet</div>'; return; }
+    let html = '<table style="width:100%;border-collapse:collapse;" class="modern-table"><thead><tr><th>#</th><th>Student Name</th><th>Class</th><th>Roll</th><th>Phone</th><th>Action</th></tr></thead><tbody>';
     data.forEach((s,i)=>{
-      html += `<tr><td>${i+1}</td><td>${(s.firstName||'')+' '+(s.lastName||'')}</td><td>${s.class||''}</td><td>${s.roll||''}</td><td>${s.phone||''}</td><td><button onclick="window.__openEditStudent(${s.id})">Edit</button></td></tr>`;
+      const avatar = s.photo 
+        ? `<img src="${s.photo}" alt="${s.firstName}" style="width:32px; height:32px; border-radius:50%; object-fit:cover; margin-right:10px; border:1px solid rgba(0,0,0,0.1); vertical-align:middle;">`
+        : `<div style="display:inline-flex; width:32px; height:32px; border-radius:50%; background:var(--accent-primary, #6366f1); color:#fff; align-items:center; justify-content:center; font-size:11px; font-weight:700; margin-right:10px; vertical-align:middle;">${(s.firstName?.[0]||'S')+(s.lastName?.[0]||'')}</div>`;
+      html += `<tr><td>${i+1}</td><td><div style="display:flex; align-items:center;">${avatar} <span style="font-weight:600;">${(s.firstName||'')+' '+(s.lastName||'')}</span></div></td><td>${s.class||''}</td><td><span class="badge">${s.roll||'—'}</span></td><td>${s.phone||'—'}</td><td><button class="btn-modern btn-secondary" style="padding:4px 10px; font-size:12px;" onclick="window.__openEditStudent(${s.id})"><i class="fa-solid fa-pen"></i> Edit</button></td></tr>`;
     });
     html += '</tbody></table>';
     container.innerHTML = html;

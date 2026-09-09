@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Register Organization</title>
+    <title>Register Organization — FLAWLESS GRAPHICS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1162,6 +1162,28 @@
                                 </button>
                             </div>
 
+                            <!-- Administrator Profile Photo Upload Field -->
+                            <div class="form-group">
+                                <label>Admin Profile Photo (Optional)</label>
+                                <div class="logo-upload-container">
+                                    <div class="logo-preview-box" id="adminPhotoPreviewBox">
+                                        <i class="fa-regular fa-user" id="adminPhotoPlaceholderIcon"></i>
+                                    </div>
+                                    <div class="logo-upload-actions">
+                                        <input type="file" id="adminPhoto"
+                                            accept="image/png, image/jpeg, image/webp" style="display: none;"
+                                            onchange="handleAdminPhotoChange(event)">
+                                        <button type="button" class="btn-upload-trigger"
+                                            onclick="document.getElementById('adminPhoto').click()">
+                                            <i class="fa-solid fa-camera"></i> Upload Photo
+                                        </button>
+                                        <span class="logo-hint" id="adminPhotoHint">PNG, JPG (Max 2MB)</span>
+                                        <button type="button" class="btn-remove-logo" id="removeAdminPhotoBtn"
+                                            onclick="removeAdminPhoto()">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="form-group">
                                 <label for="fullName">Admin Full Name</label>
                                 <div class="input-wrapper">
@@ -1399,6 +1421,7 @@
     <script src="assets/js/supabase-client.js"></script>
     <script>
         let currentLogoBase64 = null;
+        let currentAdminPhotoBase64 = null;
         let isOrgIdManuallyEdited = false;
 
         // Real-time Organization ID Slug Generator 
@@ -1504,6 +1527,45 @@
             document.getElementById("logoPreviewBox").innerHTML = `<i class="fa-regular fa-image" id="logoPlaceholderIcon"></i>`;
             document.getElementById("removeLogoBtn").style.display = "none";
             document.getElementById("logoHint").style.display = "inline";
+        }
+
+        function handleAdminPhotoChange(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 2 * 1024 * 1024) {
+                showMessage("Profile photo size must be under 2MB.");
+                event.target.value = "";
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                currentAdminPhotoBase64 = e.target.result;
+
+                const previewBox = document.getElementById("adminPhotoPreviewBox");
+                if (previewBox) {
+                    previewBox.innerHTML = `<img src="${currentAdminPhotoBase64}" alt="Admin Photo">`;
+                }
+
+                const removeBtn = document.getElementById("removeAdminPhotoBtn");
+                if (removeBtn) removeBtn.style.display = "inline-block";
+                const hint = document.getElementById("adminPhotoHint");
+                if (hint) hint.style.display = "none";
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeAdminPhoto() {
+            currentAdminPhotoBase64 = null;
+            const input = document.getElementById("adminPhoto");
+            if (input) input.value = "";
+            const previewBox = document.getElementById("adminPhotoPreviewBox");
+            if (previewBox) previewBox.innerHTML = `<i class="fa-regular fa-user" id="adminPhotoPlaceholderIcon"></i>`;
+            const removeBtn = document.getElementById("removeAdminPhotoBtn");
+            if (removeBtn) removeBtn.style.display = "none";
+            const hint = document.getElementById("adminPhotoHint");
+            if (hint) hint.style.display = "inline";
         }
 
         let pendingRegistrationEmail = '';
@@ -1830,6 +1892,7 @@
                     org: org,
                     orgId: orgId,
                     logo: currentLogoBase64,
+                    photo: currentAdminPhotoBase64,
                     name: name,
                     email: email,
                     pass: hashed,

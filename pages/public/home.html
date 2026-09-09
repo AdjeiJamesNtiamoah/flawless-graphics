@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FLAWLESS GRAPHICS — Enterprise Teacher Portal</title>
+  <title>Enterprise Portal & Home — FLAWLESS GRAPHICS</title>
 
   <!-- Typography & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,6 +15,8 @@
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <!-- Short Skeletal Loading Stylesheet -->
   <link rel="stylesheet" href="../../assets/css/skeleton.css">
+  <!-- Floating Quick Assistant Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="../../assets/js/auth-session.js"></script>
 
@@ -434,9 +436,9 @@
   <header>
     <div class="header-left">
       <div class="brand">
-        <div class="logo-circle">FG</div>
+        <div class="logo-circle" id="orgLogoBox">FG</div>
         <div>
-          <h1>FLAWLESS GRAPHICS</h1>
+          <h1 id="headerOrgTitle">FLAWLESS GRAPHICS</h1>
           <div class="brand-sub">Truth and Service</div>
         </div>
       </div>
@@ -445,7 +447,7 @@
         <ul>
           <li><a href="../../welcome.html"><i class="fa-solid fa-grid-horizontal"></i> Hub</a></li>
           <li><a href="home.html" class="active"><i class="fa-solid fa-house"></i> Home</a></li>
-          <li><a href="../hr/teacher.html"><i class="fa-solid fa-users"></i> Teacher Portal</a></li>
+          <li><a href="../teacher/teacher-login.html"><i class="fa-solid fa-users"></i> Teacher Portal</a></li>
           <li><a href="services.html"><i class="fa-solid fa-layer-group"></i> Services</a></li>
           <li><a href="contact.html"><i class="fa-solid fa-envelope"></i> Contact</a></li>
         </ul>
@@ -620,6 +622,7 @@
 
   <!-- ANIMATIONS INIT -->
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="../../assets/js/auth-session.js"></script>
   <script>
     AOS.init({ once: true, offset: 50 });
 
@@ -789,7 +792,11 @@
     document.getElementById('reportShortcutBtn').addEventListener('click', navHR);
 
     document.getElementById('openTeacherBtn').addEventListener('click', () => {
-      window.location.href = '../hr/teacher.html';
+      if (localStorage.getItem('active_teacher') || localStorage.getItem('teacher_active_user')) {
+        window.location.href = '../teacher/teacher-dashboard.html';
+      } else {
+        window.location.href = '../teacher/teacher-login.html';
+      }
     });
 
     // Populate Organization Profile
@@ -810,5 +817,7 @@
   </script>
   <!-- Short Skeletal Loading Script -->
   <script src="../../assets/js/skeleton-loader.js"></script>
+  <!-- Floating Quick Assistant Script -->
+  <script src="../../assets/js/quick-assistant.js"></script>
 </body>
 </html>

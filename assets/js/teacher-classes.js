@@ -37,7 +37,7 @@
     tableBody.innerHTML = '';
     list.forEach((c,i)=>{
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${i+1}</td><td>${c.name}</td><td>${c.subject||''}</td><td>${(c.teacherName||'')}</td><td>${(c.students||[]).length}</td><td><button class="btn" onclick="editClass(${i})">Edit</button></td>`;
+      tr.innerHTML = `<td>${i+1}</td><td><strong>${c.name}</strong></td><td>${c.subject||''}</td><td>${(c.teacherName||'')}</td><td>${(c.students||[]).length}</td><td><button class="btn" onclick="editClass(${i})"><i class="fa-solid fa-pen-to-square"></i> Edit</button></td>`;
       tableBody.appendChild(tr);
     });
   }

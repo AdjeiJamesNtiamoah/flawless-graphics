@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Login | Organization Portal</title>
+<title>Organization Sign In — FLAWLESS GRAPHICS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Google Fonts: Plus Jakarta Sans -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,6 +12,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <!-- Short Skeletal Loading Stylesheet -->
 <link rel="stylesheet" href="assets/css/skeleton.css">
+<!-- Floating Quick Assistant Stylesheet -->
+<link rel="stylesheet" href="assets/css/quick-assistant.css">
 
 <style>
     * {
@@ -749,9 +751,11 @@
             </div>
 
             <div class="brand-logo">
-                <i class="fa-solid fa-elephant logo-icon"></i>
+                <div class="org-logo-preview" id="orgLogoBox" style="width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+                    <i class="fa-solid fa-elephant logo-icon" style="font-size:18px;"></i>
+                </div>
                 <div>
-                    <div class="brand-title">FLAWLESS GRAPHYX</div>
+                    <div class="brand-title" id="orgTitle">FLAWLESS GRAPHICS</div>
                     <div class="brand-subtitle">Innovation Starts Here</div>
                 </div>
             </div>
@@ -771,7 +775,7 @@
         <!-- Right Form Section -->
         <div class="form-section">
             <div class="card">
-                <h2>Log In to FLAWLESS GRAPHYX</h2>
+                <h2>Log In to FLAWLESS GRAPHICS</h2>
 
                 <div id="msg" class="msg"></div>
 
@@ -1058,12 +1062,6 @@ async function resendVerificationEmail() {
             btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Verification Email';
         }
     }, 1000);
-        }
-    } catch (err) {
-        showVerifyFeedback(err.message || "Could not resend email. Please try again shortly.", true);
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Verification Email';
-    }
 }
 
 function togglePasswordVisibility() {
@@ -1224,5 +1222,7 @@ async function login() {
 
 <!-- Short Skeletal Loading Script -->
 <script src="assets/js/skeleton-loader.js"></script>
+<!-- Floating Quick Assistant Script -->
+<script src="assets/js/quick-assistant.js"></script>
 </body>
 </html>

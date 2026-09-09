@@ -141,6 +141,30 @@ body {
   box-shadow: 4px 0 25px rgba(0, 0, 0, 0.2);
 }
 
+/* Embedded Panel Mode: Completely clear internal navigation bar and expand to full panel */
+html.is-embedded body,
+body.embedded-mode {
+  display: block !important;
+  padding-left: 0 !important;
+  background: transparent !important;
+  overflow-x: hidden !important;
+}
+html.is-embedded .site-header,
+body.embedded-mode .site-header {
+  display: none !important;
+}
+html.is-embedded .ambient-glow,
+body.embedded-mode .ambient-glow {
+  display: none !important;
+}
+html.is-embedded .main-wrapper,
+body.embedded-mode .main-wrapper {
+  margin-left: 0 !important;
+  padding: 20px 24px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
 .brand-wrapper {
   display: flex;
   align-items: center;

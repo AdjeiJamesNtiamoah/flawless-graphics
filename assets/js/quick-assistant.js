@@ -40,10 +40,10 @@
         <!-- Header -->
         <div class="assistant-header">
           <div class="assistant-header-title">
-            <div class="brand-icon"><i class="fa-solid fa-shapes"></i></div>
+            <div class="brand-icon" id="assistantBrandIcon"><i class="fa-solid fa-shapes"></i></div>
             <div>
               <h3 id="assistantHeaderTitle">LUCY™ Quick Assistant</h3>
-              <p><span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#10b981; margin-right:4px;"></span>Enterprise Hub • Operational</p>
+              <p id="assistantSubTitle"><span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#10b981; margin-right:4px;"></span>Enterprise Hub • Operational</p>
             </div>
           </div>
           <button type="button" class="assistant-close-btn" id="quickAssistantCloseBtn" title="Close (Esc)">
@@ -253,6 +253,31 @@
               </a>
             </div>
 
+            <div style="font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#64748b; margin:14px 0 8px;">Organization Identity & Logo</div>
+            <div style="padding:14px; border-radius:12px; background:rgba(0,0,0,0.02); border:1px solid rgba(0,0,0,0.08); margin-bottom:12px;">
+              <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+                <div id="qaBrandingLogoPreview" style="width:46px; height:46px; border-radius:10px; background:rgba(37,99,235,0.08); border:1px solid rgba(0,0,0,0.1); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+                  <i class="fa-solid fa-building" style="color:#2563eb; font-size:20px;"></i>
+                </div>
+                <div style="flex:1;">
+                  <div style="font-size:12px; font-weight:700; color:#0f172a;" id="qaBrandingOrgNameDisplay">FLAWLESS GRAPHICS</div>
+                  <div style="font-size:11px; color:#64748b;">Uploaded logo reflects on all portals & pages</div>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <input type="text" id="qaInputOrgName" placeholder="Enter Organization Name" style="padding:7px 10px; font-size:12px; border:1px solid rgba(0,0,0,0.14); border-radius:8px; width:100%; box-sizing:border-box;">
+                <input type="file" id="qaInputOrgLogo" accept="image/*" style="display:none;" onchange="window.QuickAssistant.handleLogoUpload(event)">
+                <div style="display:flex; gap:6px;">
+                  <button type="button" class="assistant-btn-outline" style="font-size:11px; padding:6px 10px; margin-top:0; flex:1;" onclick="document.getElementById('qaInputOrgLogo').click()">
+                    <i class="fa-solid fa-camera"></i> Change Logo
+                  </button>
+                  <button type="button" class="assistant-btn-primary" style="font-size:11px; padding:6px 10px; margin-top:0; flex:1;" onclick="window.QuickAssistant.saveBranding()">
+                    <i class="fa-solid fa-check"></i> Save Branding
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <div style="font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#64748b; margin:14px 0 8px;">System Health & Cloud Ping</div>
             <div style="padding:12px; border-radius:12px; background:rgba(0,0,0,0.02); border:1px solid rgba(0,0,0,0.08); margin-bottom:12px;">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -281,28 +306,45 @@
         </div>
       </div>
 
-      <!-- Spotlight Guided Tour Modal -->
-      <div class="tour-spotlight-overlay" id="tourSpotlightOverlay">
-        <div class="tour-modal-card">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span id="tourStepBadge" style="background:#2563eb; color:#fff; font-size:11px; font-weight:800; padding:2px 8px; border-radius:12px;">Step 1 of 5</span>
-              <h4 id="tourStepTitle" style="margin:0; font-size:16px; font-weight:800;">Executive Central Hub</h4>
-            </div>
-            <button type="button" onclick="window.QuickAssistant.stopProjectTour()" style="border:none; background:none; font-size:18px; color:#64748b; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
-          </div>
+      <!-- Spotlight Guided Tour Backdrop -->
+      <div class="tour-spotlight-overlay" id="tourSpotlightOverlay" onclick="window.QuickAssistant.stopProjectTour()"></div>
 
-          <div id="tourStepContent" style="font-size:13px; line-height:1.6; color:#475569; margin-bottom:20px;">
-            The Welcome Portal provides a centralized gateway into the Academic, HR Operations, and Treasury applications with single sign-on and instant profile synchronization.
-          </div>
+      <!-- Glowing Spotlight Beacon over Target Button -->
+      <div class="tour-spotlight-beacon" id="tourSpotlightBeacon">
+        <div class="tour-target-pin" title="Active Focus Target">
+          <i class="fa-solid fa-location-crosshairs"></i>
+        </div>
+      </div>
 
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <button type="button" class="assistant-btn-outline" id="tourPrevBtn" style="width:auto; margin-top:0;" onclick="window.QuickAssistant.prevTourStep()">Previous</button>
-            <div style="display:flex; gap:8px;">
-              <button type="button" class="assistant-btn-outline" style="width:auto; margin-top:0;" onclick="window.QuickAssistant.stopProjectTour()">Skip Tour</button>
-              <button type="button" class="assistant-btn-primary" id="tourNextBtn" style="width:auto;" onclick="window.QuickAssistant.nextTourStep()">Next Step <i class="fa-solid fa-arrow-right"></i></button>
-            </div>
+      <!-- Dynamic Popover Card Pointing at Target Button -->
+      <div class="tour-popover-card" id="tourPopoverCard">
+        <div class="tour-pointer-arrow" id="tourPointerArrow"></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span id="tourStepBadge" style="background:#2563eb; color:#fff; font-size:11px; font-weight:800; padding:2px 8px; border-radius:12px;">Step 1</span>
+            <h4 id="tourStepTitle" style="margin:0; font-size:15px; font-weight:800;">Target Button</h4>
           </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button type="button" class="tour-autoroll-btn" id="tourAutoRollBtn" onclick="window.QuickAssistant.toggleAutoRoll()" title="Toggle Auto-Roll Through Buttons">
+              <i class="fa-solid fa-play" id="tourRollIcon"></i> <span id="tourRollLabel">Auto-Roll</span>
+            </button>
+            <button type="button" onclick="window.QuickAssistant.stopProjectTour()" style="border:none; background:none; font-size:18px; color:#64748b; cursor:pointer;" title="Exit Tour"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+        </div>
+
+        <div id="tourStepContent" style="font-size:13px; line-height:1.55; color:#475569; margin-bottom:14px;"></div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <button type="button" class="assistant-btn-outline" id="tourPrevBtn" style="width:auto; margin-top:0;" onclick="window.QuickAssistant.prevTourStep()">Previous</button>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="assistant-btn-outline" style="width:auto; margin-top:0;" onclick="window.QuickAssistant.stopProjectTour()">Skip</button>
+            <button type="button" class="assistant-btn-primary" id="tourNextBtn" style="width:auto;" onclick="window.QuickAssistant.nextTourStep()">Next Button <i class="fa-solid fa-arrow-right"></i></button>
+          </div>
+        </div>
+
+        <!-- Auto-Roll Countdown Progress -->
+        <div class="tour-roll-progress-track">
+          <div class="tour-roll-progress-fill" id="tourRollProgressFill"></div>
         </div>
       </div>
     `;
@@ -310,36 +352,208 @@
     document.body.appendChild(container);
   }
 
-  // Tour Steps Configuration
-  const tourSteps = [
-    {
-      title: 'Executive Central Hub',
-      content: 'The Central Welcome Hub bridges all organizational departments. Select your role to enter the Classroom, Human Resources, or Treasury portals with zero friction.',
-      actionUrl: rootPrefix + 'welcome.html'
-    },
-    {
-      title: 'Teacher & Student Management',
-      content: 'Teachers can register student profiles with pinned form headers that never scroll out of view. Includes comprehensive academic, medical, and guardian records.',
-      actionUrl: rootPrefix + 'pages/teacher/teacher-dashboard.html'
-    },
-    {
-      title: 'Workforce & Ghana GRA Compliance',
-      content: 'The HR suite automates Ghanaian payroll rules (SSNIT Tier 1 & 2, Ghana Revenue Authority PAYE tax brackets) with one-click printable payslips and staff appraisals.',
-      actionUrl: rootPrefix + 'pages/hr/hr-dashboard.html'
-    },
-    {
-      title: 'School Fees & Treasury Ledger',
-      content: 'Track fee receivables, record payments, auto-generate student receipts, and monitor financial liquidity in real time.',
-      actionUrl: rootPrefix + 'pages/finance/finance-dashboard.html'
-    },
-    {
-      title: 'Instant Code Verification & Resiliency',
-      content: 'Authentication is frictionless with an Instant Code display card, auto-fill capabilities, and live 5-minute expiration countdown timers so users never get locked out.',
-      actionUrl: rootPrefix + 'index.html'
-    }
-  ];
-
+  // Dynamic Tour Step State & Providers
   let currentTourIndex = 0;
+  let activeTourSteps = [];
+  let isAutoRolling = false;
+  let autoRollTimer = null;
+  let autoRollAnimFrame = null;
+  const AUTO_ROLL_DURATION = 4200; // 4.2 seconds per button
+
+  function getContextTourSteps() {
+    // 1. HR Dashboard context (checks for HR navigation or controls)
+    if (document.getElementById('addTeacherBtn') || document.querySelector('#nav button[data-section="dashboard"]')) {
+      return [
+        {
+          selector: '#nav button[data-section="dashboard"]',
+          title: 'Workforce Dashboard',
+          badge: 'Overview',
+          placement: 'right',
+          content: 'Central command panel tracking staff headcount, real-time attendance averages, departmental staffing distributions, and gross payroll.'
+        },
+        {
+          selector: '#topbarFeaturesDropdown, .features-btn',
+          title: 'All Integrated Features',
+          badge: 'Services Hub',
+          placement: 'bottom',
+          content: 'Hover here anytime to reveal the consolidated services suite merged from the public portal: Attendance, Payroll, Directory, Analytics, and Treasury.'
+        },
+        {
+          selector: '#nav button[data-section="classes"]',
+          title: 'Classroom & Teacher Allocation',
+          badge: 'Academics',
+          placement: 'right',
+          content: 'Assign lead instructors to classrooms, manage student capacities, and schedule weekly class slots across subjects.'
+        },
+        {
+          selector: '#nav button[data-section="teachers"]',
+          title: 'Staff Directory & Personnel',
+          badge: 'Workforce',
+          placement: 'right',
+          content: 'Comprehensive staff database with Ghana Card identification, contact details, designations, and academic qualifications.'
+        },
+        {
+          selector: '#nav button[data-section="students"]',
+          title: 'Students Roster & Profiles',
+          badge: 'Students',
+          placement: 'right',
+          content: 'Enrolled student profiles with pinned form headers that never scroll out of view, guardian details, and photo avatars.'
+        },
+        {
+          selector: '#nav button[data-section="attendance"]',
+          title: 'Attendance Analytics & Logs',
+          badge: 'Operations',
+          placement: 'right',
+          content: 'Track daily staff clock-ins, monitor punctuality rates, and analyze monthly attendance compliance.'
+        },
+        {
+          selector: '#nav button[data-section="payroll"]',
+          title: 'Ghana SSNIT & GRA Payroll',
+          badge: 'Treasury',
+          placement: 'right',
+          content: 'Automates Ghanaian payroll compliance: SSNIT Tier 1 & 2 contributions, GRA PAYE progressive tax brackets, and printable payslips.'
+        },
+        {
+          selector: '#nav button[data-section="analytics"]',
+          title: 'Workforce Performance Scoring',
+          badge: 'Appraisals',
+          placement: 'right',
+          content: 'Conduct teacher appraisals, track departmental productivity, and review workforce performance indicators.'
+        },
+        {
+          selector: '#nav button[data-section="announcements"]',
+          title: 'Broadcasts & Circulars',
+          badge: 'Communications',
+          placement: 'right',
+          content: 'Publish school-wide circulars, emergency announcements, and term notices with instant staff visibility.'
+        },
+        {
+          selector: '#addTeacherBtn',
+          title: '+ Add Teacher Enrolment',
+          badge: 'Action Button',
+          placement: 'bottom',
+          content: 'Click here anytime to enrol a new teacher using the professional 5-section form with photo upload and credential management.'
+        },
+        {
+          selector: '#cloudSyncBtn',
+          title: 'Live Supabase Cloud Sync',
+          badge: 'Cloud Sync',
+          placement: 'bottom',
+          content: 'Connect to Supabase to enable real-time multi-device cloud synchronization for workforce and student records.'
+        },
+        {
+          selector: '[onclick*="SchoolMessenger"]',
+          title: 'Staff Messenger & Chat',
+          badge: 'Messaging',
+          placement: 'bottom',
+          content: 'Open the dedicated school staff chat to message instructors, departments, and administrators in real time.'
+        }
+      ];
+    }
+
+    // 2. Teacher Dashboard context
+    if (document.getElementById('teacherProfile') || document.querySelector('.nav .tab[data-section="classes"]')) {
+      return [
+        {
+          selector: '.tab[data-section="overview"]',
+          title: 'Teacher Academic Hub',
+          badge: 'Overview',
+          placement: 'right',
+          content: 'Your primary instructor command center showing active student counts, today’s classes, and urgent notes.'
+        },
+        {
+          selector: '.tab[data-section="classes"]',
+          title: 'My Classes & Timetable',
+          badge: 'Classroom',
+          placement: 'right',
+          content: 'View enrolled student rosters, schedule slots, and lesson timetables for your assigned subjects.'
+        },
+        {
+          selector: '.tab[data-section="students"]',
+          title: 'Enrolled Students & Photos',
+          badge: 'Roster',
+          placement: 'right',
+          content: 'Comprehensive student roster with uploaded student avatars, medical remarks, and guardian contacts.'
+        },
+        {
+          selector: '.tab[data-section="attendance"]',
+          title: 'Daily Class Attendance',
+          badge: 'Attendance',
+          placement: 'right',
+          content: 'Mark and submit daily classroom attendance with single-click present/absent registers.'
+        },
+        {
+          selector: '#btnNewStudent, #addStudentBtn, .btn-primary',
+          title: '+ Add Student Record',
+          badge: 'Action',
+          placement: 'bottom',
+          content: 'Enrol students using the pinned-header detail modal with photo upload and emergency contacts.'
+        }
+      ];
+    }
+
+    // 3. Public Home context
+    if (document.getElementById('openDashboardBtn') || document.getElementById('addEmpShortcut')) {
+      return [
+        {
+          selector: '#orgLogoBox, .brand',
+          title: 'Organization Identity',
+          badge: 'Branding',
+          placement: 'bottom',
+          content: 'Central enterprise brand reflection showcasing your uploaded organization logo and name across the portal.'
+        },
+        {
+          selector: '#openDashboardBtn',
+          title: 'Launch HR Workspace',
+          badge: 'Dashboard',
+          placement: 'bottom',
+          content: 'One-click gateway into the workforce management portal, payroll analytics, and staff directory.'
+        },
+        {
+          selector: '#openTeacherBtn',
+          title: 'Teacher & Classroom Portal',
+          badge: 'Academics',
+          placement: 'bottom',
+          content: 'Direct entry for educators to access student rosters, lesson plans, and daily roll calls.'
+        },
+        {
+          selector: '#addEmpShortcut, #addEmpShortcutBtn',
+          title: 'Quick Personnel Enrolment',
+          badge: 'Quick Action',
+          placement: 'top',
+          content: 'Instant shortcut to register teachers and team members with photo verification.'
+        },
+        {
+          selector: '.shortcuts div:nth-child(2)',
+          title: 'Payroll Analytics Review',
+          badge: 'Compensation',
+          placement: 'top',
+          content: 'Deep-dive into departmental salary distributions, SSNIT contributions, and financial trends.'
+        }
+      ];
+    }
+
+    // 4. Default fallback: query prominent navigation and action buttons
+    const buttons = Array.from(document.querySelectorAll('button:not(#quickAssistantFab):not(.assistant-btn-primary):not(.assistant-btn-outline), nav a, .btn'));
+    if (buttons.length > 0) {
+      return buttons.slice(0, 6).map((btn, idx) => ({
+        element: btn,
+        title: btn.textContent.trim().slice(0, 30) || 'Portal Control',
+        badge: `Control ${idx + 1}`,
+        placement: 'bottom',
+        content: `Interactive button: ${btn.getAttribute('title') || btn.textContent.trim() || 'Access this system feature.'}`
+      }));
+    }
+
+    return [
+      {
+        title: 'Executive Central Hub',
+        badge: 'Hub',
+        content: 'The Central Welcome Hub bridges all organizational departments with zero friction.',
+        placement: 'center'
+      }
+    ];
+  }
 
   // Assistant Controller Object
   window.QuickAssistant = {
@@ -351,6 +565,10 @@
       this.bindEvents();
       this.checkMessengerOffset();
       this.testDiagnostics();
+      this.syncBrandingDisplay();
+      if (window.AuthSession && typeof window.AuthSession.applyGlobalBranding === 'function') {
+        window.AuthSession.applyGlobalBranding();
+      }
     },
 
     bindEvents: function () {
@@ -497,17 +715,23 @@
       }
     },
 
-    // Interactive Project Tour Logic
+    // Interactive Project Tour Logic (Dynamic Button-Pointing & Auto-Roll)
     startProjectTour: function () {
       this.close();
+      activeTourSteps = getContextTourSteps();
       currentTourIndex = 0;
-      this.renderTourStep();
       const overlay = document.getElementById('tourSpotlightOverlay');
       if (overlay) overlay.classList.add('active');
+
+      this.renderTourStep();
+      this.bindTourKeyEvents();
     },
 
     renderTourStep: function () {
-      const step = tourSteps[currentTourIndex];
+      if (!activeTourSteps || activeTourSteps.length === 0) {
+        activeTourSteps = getContextTourSteps();
+      }
+      const step = activeTourSteps[currentTourIndex];
       if (!step) return;
 
       const badge = document.getElementById('tourStepBadge');
@@ -516,38 +740,205 @@
       const prevBtn = document.getElementById('tourPrevBtn');
       const nextBtn = document.getElementById('tourNextBtn');
 
-      if (badge) badge.textContent = `Step ${currentTourIndex + 1} of ${tourSteps.length}`;
+      if (badge) badge.textContent = `Step ${currentTourIndex + 1} of ${activeTourSteps.length} • ${step.badge || 'Button'}`;
       if (title) title.textContent = step.title;
       if (content) {
         content.innerHTML = `
-          <p style="margin-bottom:12px;">${step.content}</p>
-          <div style="padding:8px 12px; background:rgba(37,99,235,0.08); border-radius:8px; font-size:12px; color:#2563eb;">
-            <i class="fa-solid fa-compass"></i> Recommended Destination: <strong>${step.title}</strong>
+          <p style="margin:0 0 10px; font-size:13.5px; line-height:1.55; color:inherit;">${step.content}</p>
+          <div style="display:inline-flex; align-items:center; gap:6px; padding:5px 10px; background:rgba(37,99,235,0.08); border:1px solid rgba(37,99,235,0.2); border-radius:8px; font-size:11.5px; font-weight:600; color:#2563eb;">
+            <i class="fa-solid fa-arrow-pointer"></i> Pointing at: <strong>${step.title}</strong>
           </div>
         `;
       }
 
       if (prevBtn) prevBtn.style.visibility = currentTourIndex === 0 ? 'hidden' : 'visible';
       if (nextBtn) {
-        if (currentTourIndex === tourSteps.length - 1) {
-          nextBtn.innerHTML = '<i class="fa-solid fa-check"></i> Complete Tour';
+        if (currentTourIndex === activeTourSteps.length - 1) {
+          nextBtn.innerHTML = '<i class="fa-solid fa-check"></i> Finish Tour';
         } else {
-          nextBtn.innerHTML = 'Next Step <i class="fa-solid fa-arrow-right"></i>';
+          nextBtn.innerHTML = 'Next Button <i class="fa-solid fa-arrow-right"></i>';
         }
+      }
+
+      // Locate target element on page
+      let targetEl = null;
+      if (step.element && document.body.contains(step.element)) {
+        targetEl = step.element;
+      } else if (step.selector) {
+        try {
+          targetEl = document.querySelector(step.selector);
+        } catch (e) {
+          targetEl = null;
+        }
+      }
+
+      this.positionTourAtElement(targetEl, step.placement || 'right');
+
+      // If auto-rolling, trigger next countdown
+      if (isAutoRolling) {
+        this.startAutoRollTimer();
       }
     },
 
+    positionTourAtElement: function (targetEl, preferredPlacement = 'right') {
+      const beacon = document.getElementById('tourSpotlightBeacon');
+      const card = document.getElementById('tourPopoverCard');
+      const arrow = document.getElementById('tourPointerArrow');
+
+      if (!targetEl || !targetEl.offsetParent) {
+        // Target element not visible or not found on this view; center the card
+        if (beacon) beacon.classList.remove('active');
+        if (arrow) arrow.className = 'tour-pointer-arrow';
+        if (card) {
+          card.classList.add('active');
+          card.style.top = '50%';
+          card.style.left = '50%';
+          card.style.transform = 'translate(-50%, -50%)';
+        }
+        return;
+      }
+
+      // Smoothly scroll target button into center view
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+
+      setTimeout(() => {
+        const rect = targetEl.getBoundingClientRect();
+        const pad = 6;
+
+        // Position glowing beacon over target button
+        if (beacon) {
+          beacon.style.top = Math.max(0, rect.top - pad) + 'px';
+          beacon.style.left = Math.max(0, rect.left - pad) + 'px';
+          beacon.style.width = (rect.width + pad * 2) + 'px';
+          beacon.style.height = (rect.height + pad * 2) + 'px';
+          beacon.style.borderRadius = (window.getComputedStyle(targetEl).borderRadius || '12px');
+          beacon.classList.add('active');
+        }
+
+        if (!card) return;
+        card.style.transform = 'none';
+        card.classList.add('active');
+
+        const cardWidth = Math.min(440, window.innerWidth - 30);
+        const cardHeight = card.offsetHeight || 220;
+        const margin = 18;
+
+        let placement = preferredPlacement;
+        const spaceRight = window.innerWidth - rect.right;
+        const spaceLeft = rect.left;
+        const spaceBottom = window.innerHeight - rect.bottom;
+        const spaceTop = rect.top;
+
+        // Smart placement fallback based on available viewport space
+        if (placement === 'right' && spaceRight < cardWidth + margin) {
+          placement = spaceLeft > cardWidth + margin ? 'left' : (spaceBottom > cardHeight + margin ? 'bottom' : 'top');
+        } else if (placement === 'bottom' && spaceBottom < cardHeight + margin) {
+          placement = spaceTop > cardHeight + margin ? 'top' : (spaceRight > cardWidth + margin ? 'right' : 'left');
+        } else if (placement === 'top' && spaceTop < cardHeight + margin) {
+          placement = spaceBottom > cardHeight + margin ? 'bottom' : 'right';
+        }
+
+        let top = 0;
+        let left = 0;
+        if (arrow) arrow.className = 'tour-pointer-arrow';
+
+        if (placement === 'right') {
+          left = rect.right + margin;
+          top = rect.top + (rect.height / 2) - 36;
+          if (arrow) arrow.classList.add('arrow-left');
+        } else if (placement === 'left') {
+          left = rect.left - cardWidth - margin;
+          top = rect.top + (rect.height / 2) - 36;
+          if (arrow) arrow.classList.add('arrow-right');
+        } else if (placement === 'bottom') {
+          left = Math.max(16, rect.left + (rect.width / 2) - (cardWidth / 2));
+          top = rect.bottom + margin;
+          if (arrow) arrow.classList.add('arrow-top');
+        } else { // top
+          left = Math.max(16, rect.left + (rect.width / 2) - (cardWidth / 2));
+          top = rect.top - cardHeight - margin;
+          if (arrow) arrow.classList.add('arrow-bottom');
+        }
+
+        // Clamp securely within screen bounds
+        top = Math.max(16, Math.min(window.innerHeight - cardHeight - 20, top));
+        left = Math.max(16, Math.min(window.innerWidth - cardWidth - 20, left));
+
+        card.style.top = top + 'px';
+        card.style.left = left + 'px';
+      }, 100);
+    },
+
+    toggleAutoRoll: function () {
+      if (isAutoRolling) {
+        this.pauseAutoRoll();
+      } else {
+        this.startAutoRoll();
+      }
+    },
+
+    startAutoRoll: function () {
+      isAutoRolling = true;
+      const icon = document.getElementById('tourRollIcon');
+      const label = document.getElementById('tourRollLabel');
+      if (icon) icon.className = 'fa-solid fa-pause';
+      if (label) label.textContent = 'Pause';
+      this.startAutoRollTimer();
+    },
+
+    pauseAutoRoll: function () {
+      isAutoRolling = false;
+      if (autoRollTimer) clearTimeout(autoRollTimer);
+      const icon = document.getElementById('tourRollIcon');
+      const label = document.getElementById('tourRollLabel');
+      const fill = document.getElementById('tourRollProgressFill');
+      if (icon) icon.className = 'fa-solid fa-play';
+      if (label) label.textContent = 'Auto-Roll';
+      if (fill) {
+        fill.style.transition = 'none';
+        fill.style.width = '0%';
+      }
+    },
+
+    startAutoRollTimer: function () {
+      if (autoRollTimer) clearTimeout(autoRollTimer);
+      const fill = document.getElementById('tourRollProgressFill');
+      if (fill) {
+        fill.style.transition = 'none';
+        fill.style.width = '0%';
+        setTimeout(() => {
+          fill.style.transition = `width ${AUTO_ROLL_DURATION}ms linear`;
+          fill.style.width = '100%';
+        }, 30);
+      }
+
+      autoRollTimer = setTimeout(() => {
+        if (!isAutoRolling) return;
+        if (currentTourIndex < activeTourSteps.length - 1) {
+          currentTourIndex++;
+          this.renderTourStep();
+        } else {
+          // Loop back or complete
+          this.pauseAutoRoll();
+          this.stopProjectTour();
+          this.showNotification('🎉 Guided Tour completed! You visited all key buttons.');
+        }
+      }, AUTO_ROLL_DURATION);
+    },
+
     nextTourStep: function () {
-      if (currentTourIndex < tourSteps.length - 1) {
+      if (autoRollTimer) clearTimeout(autoRollTimer);
+      if (currentTourIndex < activeTourSteps.length - 1) {
         currentTourIndex++;
         this.renderTourStep();
       } else {
         this.stopProjectTour();
-        alert('🎉 Tour completed! You have explored the core features of the LUCY™ Management Suite.');
+        this.showNotification('🎉 Guided Tour completed! All features explored.');
       }
     },
 
     prevTourStep: function () {
+      if (autoRollTimer) clearTimeout(autoRollTimer);
       if (currentTourIndex > 0) {
         currentTourIndex--;
         this.renderTourStep();
@@ -555,8 +946,97 @@
     },
 
     stopProjectTour: function () {
+      this.pauseAutoRoll();
       const overlay = document.getElementById('tourSpotlightOverlay');
+      const beacon = document.getElementById('tourSpotlightBeacon');
+      const card = document.getElementById('tourPopoverCard');
+
       if (overlay) overlay.classList.remove('active');
+      if (beacon) beacon.classList.remove('active');
+      if (card) card.classList.remove('active');
+      this.unbindTourKeyEvents();
+    },
+
+    bindTourKeyEvents: function () {
+      this._tourKeyHandler = (e) => {
+        if (e.key === 'Escape') {
+          this.stopProjectTour();
+        } else if (e.key === 'ArrowRight') {
+          this.nextTourStep();
+        } else if (e.key === 'ArrowLeft') {
+          this.prevTourStep();
+        }
+      };
+      window.addEventListener('keydown', this._tourKeyHandler);
+    },
+
+    unbindTourKeyEvents: function () {
+      if (this._tourKeyHandler) {
+        window.removeEventListener('keydown', this._tourKeyHandler);
+        this._tourKeyHandler = null;
+      }
+    },
+
+    // Branding Synchronization
+    tempLogoBase64: null,
+
+    syncBrandingDisplay: function () {
+      const org = (window.AuthSession ? window.AuthSession.getOrg() : null) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
+      const logo = (window.AuthSession ? window.AuthSession.getLogo() : null) || localStorage.getItem('active_org_logo') || null;
+
+      const titleEl = document.getElementById('assistantHeaderTitle');
+      const iconEl = document.getElementById('assistantBrandIcon');
+      const dispOrg = document.getElementById('qaBrandingOrgNameDisplay');
+      const inputOrg = document.getElementById('qaInputOrgName');
+      const previewEl = document.getElementById('qaBrandingLogoPreview');
+
+      if (titleEl) titleEl.textContent = org.toUpperCase() + ' • Assistant';
+      if (dispOrg) dispOrg.textContent = org.toUpperCase();
+      if (inputOrg && !inputOrg.value) inputOrg.value = org;
+
+      if (logo) {
+        if (iconEl) {
+          iconEl.innerHTML = `<img src="${logo}" alt="${org}" style="width:100%; height:100%; object-fit:contain; border-radius:inherit; display:block;">`;
+        }
+        if (previewEl) {
+          previewEl.innerHTML = `<img src="${logo}" alt="${org}" style="width:100%; height:100%; object-fit:contain; border-radius:inherit; display:block;">`;
+        }
+      }
+    },
+
+    handleLogoUpload: function (event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (file.size > 3 * 1024 * 1024) {
+        alert('File size exceeds 3MB. Please choose a smaller image.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.tempLogoBase64 = e.target.result;
+        const previewEl = document.getElementById('qaBrandingLogoPreview');
+        if (previewEl) {
+          previewEl.innerHTML = `<img src="${this.tempLogoBase64}" alt="Logo Preview" style="width:100%; height:100%; object-fit:contain; border-radius:inherit; display:block;">`;
+        }
+      };
+      reader.readAsDataURL(file);
+    },
+
+    saveBranding: function () {
+      const inputOrg = document.getElementById('qaInputOrgName');
+      const newName = inputOrg ? inputOrg.value.trim() : '';
+
+      if (window.AuthSession) {
+        if (newName) window.AuthSession.setOrgName(newName);
+        if (this.tempLogoBase64) window.AuthSession.setOrgLogo(this.tempLogoBase64);
+        window.AuthSession.applyGlobalBranding();
+      } else {
+        if (newName) localStorage.setItem('active_org', newName);
+        if (this.tempLogoBase64) localStorage.setItem('active_org_logo', this.tempLogoBase64);
+      }
+
+      this.syncBrandingDisplay();
+      this.showNotification('🎉 Organization branding updated globally across all portals!');
     }
   };
 
