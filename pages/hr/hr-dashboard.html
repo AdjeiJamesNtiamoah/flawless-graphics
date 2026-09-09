@@ -15,6 +15,10 @@
   <!-- Pop-up Toaster & School Messenger Styles -->
   <link rel="stylesheet" href="../../assets/css/toaster.css">
   <link rel="stylesheet" href="../../assets/css/school-messenger.css">
+  <!-- Short Skeletal Loading Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/skeleton.css">
+  <!-- Floating Quick Assistant Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
 
   <!-- Central Authentication Bridge -->
   <script src="../../assets/js/auth-session.js"></script>
@@ -480,11 +484,17 @@
       backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
       display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
     }
-    .custom-modal-overlay.active { display: flex; }
     .modal-card {
       background: var(--card); border: 1px solid var(--border); border-radius: 24px;
-      max-width: 780px; width: 100%; padding: 36px; box-shadow: 0 20px 30px -10px rgba(0,0,0,0.08);
-      max-height: 92vh; overflow-y: auto;
+      max-width: 780px; width: 100%; padding: 0; box-shadow: 0 20px 30px -10px rgba(0,0,0,0.08);
+      max-height: 92vh; display: flex; flex-direction: column; overflow: hidden;
+    }
+    .modal-header-stagnant {
+      position: sticky; top: 0; z-index: 30; background: var(--card); border-bottom: 1px solid var(--border);
+      padding: 24px 32px 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+    }
+    .modal-card form {
+      overflow-y: auto; flex: 1; padding: 24px 32px 32px;
     }
     .form-section-title {
       font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px;
@@ -622,6 +632,98 @@
   </style>
 </head>
 <body>
+
+<!-- Short Skeletal Loading Placeholder -->
+<div id="skeletonLoader" class="skeleton-dashboard-overlay">
+  <!-- Sidebar Skeleton -->
+  <aside class="skeleton-sidebar">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+      <div class="skeleton-shimmer-dark" style="width: 40px; height: 40px; border-radius: 10px;"></div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div class="skeleton-shimmer-dark" style="width: 110px; height: 16px; border-radius: 4px;"></div>
+        <div class="skeleton-shimmer-dark" style="width: 85px; height: 11px; border-radius: 4px;"></div>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06);">
+      <div class="skeleton-shimmer-dark" style="width: 36px; height: 36px; border-radius: 50%;"></div>
+      <div style="display: flex; flex-direction: column; gap: 5px;">
+        <div class="skeleton-shimmer-dark" style="width: 95px; height: 13px; border-radius: 4px;"></div>
+        <div class="skeleton-shimmer-dark" style="width: 120px; height: 10px; border-radius: 4px;"></div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
+      <div class="skeleton-shimmer-dark" style="height: 38px; border-radius: 10px;"></div>
+      <div class="skeleton-shimmer-dark" style="height: 38px; border-radius: 10px;"></div>
+      <div class="skeleton-shimmer-dark" style="height: 38px; border-radius: 10px;"></div>
+      <div class="skeleton-shimmer-dark" style="height: 38px; border-radius: 10px;"></div>
+      <div class="skeleton-shimmer-dark" style="height: 38px; border-radius: 10px;"></div>
+      <div class="skeleton-shimmer-dark" style="height: 38px; border-radius: 10px;"></div>
+    </div>
+  </aside>
+
+  <!-- Main Content Skeleton -->
+  <main class="skeleton-main">
+    <div class="skeleton-topbar">
+      <div>
+        <div class="skeleton-shimmer-light" style="width: 170px; height: 26px; border-radius: 6px; margin-bottom: 6px;"></div>
+        <div class="skeleton-shimmer-light" style="width: 250px; height: 13px; border-radius: 4px;"></div>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <div class="skeleton-shimmer-light" style="width: 180px; height: 36px; border-radius: 10px;"></div>
+        <div class="skeleton-shimmer-light" style="width: 110px; height: 36px; border-radius: 10px;"></div>
+      </div>
+    </div>
+
+    <!-- 4 KPI Cards -->
+    <div class="skeleton-kpis">
+      <div class="skeleton-kpi-card">
+        <div class="skeleton-shimmer-light" style="width: 44px; height: 44px; border-radius: 12px;"></div>
+        <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+          <div class="skeleton-shimmer-light" style="width: 70px; height: 11px; border-radius: 4px;"></div>
+          <div class="skeleton-shimmer-light" style="width: 45px; height: 22px; border-radius: 4px;"></div>
+        </div>
+      </div>
+      <div class="skeleton-kpi-card">
+        <div class="skeleton-shimmer-light" style="width: 44px; height: 44px; border-radius: 12px;"></div>
+        <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+          <div class="skeleton-shimmer-light" style="width: 80px; height: 11px; border-radius: 4px;"></div>
+          <div class="skeleton-shimmer-light" style="width: 50px; height: 22px; border-radius: 4px;"></div>
+        </div>
+      </div>
+      <div class="skeleton-kpi-card">
+        <div class="skeleton-shimmer-light" style="width: 44px; height: 44px; border-radius: 12px;"></div>
+        <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+          <div class="skeleton-shimmer-light" style="width: 75px; height: 11px; border-radius: 4px;"></div>
+          <div class="skeleton-shimmer-light" style="width: 85px; height: 22px; border-radius: 4px;"></div>
+        </div>
+      </div>
+      <div class="skeleton-kpi-card">
+        <div class="skeleton-shimmer-light" style="width: 44px; height: 44px; border-radius: 12px;"></div>
+        <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+          <div class="skeleton-shimmer-light" style="width: 90px; height: 11px; border-radius: 4px;"></div>
+          <div class="skeleton-shimmer-light" style="width: 60px; height: 22px; border-radius: 4px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Row -->
+    <div class="skeleton-content-row">
+      <div class="skeleton-card-light" style="min-height: 280px;">
+        <div class="skeleton-shimmer-light" style="width: 150px; height: 18px; border-radius: 5px;"></div>
+        <div class="skeleton-shimmer-light" style="width: 100%; height: 40px; border-radius: 8px;"></div>
+        <div class="skeleton-shimmer-light" style="width: 100%; height: 40px; border-radius: 8px;"></div>
+        <div class="skeleton-shimmer-light" style="width: 100%; height: 40px; border-radius: 8px;"></div>
+        <div class="skeleton-shimmer-light" style="width: 100%; height: 40px; border-radius: 8px;"></div>
+      </div>
+      <div class="skeleton-card-light" style="min-height: 280px;">
+        <div class="skeleton-shimmer-light" style="width: 120px; height: 18px; border-radius: 5px;"></div>
+        <div class="skeleton-shimmer-light" style="width: 100%; height: 60px; border-radius: 10px;"></div>
+        <div class="skeleton-shimmer-light" style="width: 100%; height: 60px; border-radius: 10px;"></div>
+        <div class="skeleton-shimmer-light" style="width: 100%; height: 60px; border-radius: 10px;"></div>
+      </div>
+    </div>
+  </main>
+</div>
 
 <!-- SIDEBAR NAVIGATION -->
 <aside class="sidebar" id="sidebar">
@@ -1101,7 +1203,7 @@
 <!-- FULL TEACHER ADD/EDIT MODAL (from teacher.html) -->
 <div class="custom-modal-overlay" id="teacherModal">
   <div class="modal-card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+    <div class="modal-header-stagnant">
       <div>
         <h3 style="font-size:20px;font-weight:800;margin:0 0 4px" id="modalHeading">Add New Teacher</h3>
         <p style="font-size:12px;color:var(--muted);margin:0">Fill in all required fields to enrol a new staff member.</p>
@@ -3015,5 +3117,9 @@ if (document.readyState === 'loading') {
   bootstrapApp();
 }
 </script>
+<!-- Short Skeletal Loading Script -->
+<script src="../../assets/js/skeleton-loader.js"></script>
+<!-- Floating Quick Assistant Script -->
+<script src="../../assets/js/quick-assistant.js"></script>
 </body>
 </html>

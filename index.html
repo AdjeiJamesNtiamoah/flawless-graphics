@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Short Skeletal Loading Stylesheet -->
     <link rel="stylesheet" href="assets/css/skeleton.css">
+    <!-- Floating Quick Assistant Stylesheet -->
+    <link rel="stylesheet" href="assets/css/quick-assistant.css">
 
     <style>
         * {
@@ -870,6 +872,79 @@
             color: #a2e8dd;
             display: block;
         }
+
+        /* Instant Code Display & Countdown Timer */
+        .instant-code-card {
+            background: rgba(114, 239, 221, 0.08);
+            border: 1px dashed rgba(114, 239, 221, 0.45);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin: 10px 0 16px;
+            text-align: center;
+        }
+        .instant-code-header {
+            font-size: 11.5px;
+            color: rgba(255, 255, 255, 0.82);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .instant-code-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .instant-code-value {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 5px;
+            color: #72efdd;
+            background: rgba(0, 0, 0, 0.35);
+            padding: 4px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(114, 239, 221, 0.3);
+        }
+        .btn-copy-code {
+            background: rgba(114, 239, 221, 0.2);
+            border: 1px solid rgba(114, 239, 221, 0.6);
+            color: #72efdd;
+            border-radius: 7px;
+            padding: 6px 12px;
+            font-size: 11.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-copy-code:hover {
+            background: #72efdd;
+            color: #180933;
+        }
+        .otp-timer-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.75);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 20px;
+            padding: 4px 12px;
+            margin-bottom: 12px;
+        }
+        .otp-timer-badge.expired {
+            color: #ff8b8b;
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
     </style>
 </head>
 
@@ -987,84 +1062,141 @@
 
                     <div id="msg" class="msg"></div>
 
+                    <!-- Multi-Step Navigation Stepper -->
+                    <div class="stepper-nav">
+                        <button type="button" class="step-pill active" id="stepPill1" onclick="goToStep(1)">
+                            <span class="step-badge" id="stepBadge1">1</span>
+                            <span>Organization</span>
+                        </button>
+                        <button type="button" class="step-pill" id="stepPill2" onclick="goToStep(2)">
+                            <span class="step-badge" id="stepBadge2">2</span>
+                            <span>Administrator</span>
+                        </button>
+                    </div>
+
                     <form id="registerForm" onsubmit="register(event)">
 
-                        <!-- Organization Logo Upload Field -->
-                        <div class="form-group">
-                            <label>Organization Logo (Optional)</label>
-                            <div class="logo-upload-container">
-                                <div class="logo-preview-box" id="logoPreviewBox">
-                                    <i class="fa-regular fa-image" id="logoPlaceholderIcon"></i>
+                        <!-- STEP 1: ORGANIZATION DETAILS -->
+                        <div class="step-panel active" id="stepPanel1">
+                            <div class="step-subheading">
+                                <div class="step-title">
+                                    <i class="fa-solid fa-building"></i> Organization Profile
                                 </div>
-                                <div class="logo-upload-actions">
-                                    <input type="file" id="orgLogo"
-                                        accept="image/png, image/jpeg, image/svg+xml, image/webp" style="display: none;"
-                                        onchange="handleLogoChange(event)">
-                                    <button type="button" class="btn-upload-trigger"
-                                        onclick="document.getElementById('orgLogo').click()">
-                                        <i class="fa-solid fa-upload"></i> Upload Logo
-                                    </button>
-                                    <span class="logo-hint" id="logoHint">PNG, JPG or SVG (Max 2MB)</span>
-                                    <button type="button" class="btn-remove-logo" id="removeLogoBtn"
-                                        onclick="removeLogo()">Remove</button>
+                                <span class="step-counter-tag">Step 1 of 2</span>
+                            </div>
+
+                            <!-- Organization Logo Upload Field -->
+                            <div class="form-group">
+                                <label>Organization Logo (Optional)</label>
+                                <div class="logo-upload-container">
+                                    <div class="logo-preview-box" id="logoPreviewBox">
+                                        <i class="fa-regular fa-image" id="logoPlaceholderIcon"></i>
+                                    </div>
+                                    <div class="logo-upload-actions">
+                                        <input type="file" id="orgLogo"
+                                            accept="image/png, image/jpeg, image/svg+xml, image/webp" style="display: none;"
+                                            onchange="handleLogoChange(event)">
+                                        <button type="button" class="btn-upload-trigger"
+                                            onclick="document.getElementById('orgLogo').click()">
+                                            <i class="fa-solid fa-upload"></i> Upload Logo
+                                        </button>
+                                        <span class="logo-hint" id="logoHint">PNG, JPG or SVG (Max 2MB)</span>
+                                        <button type="button" class="btn-remove-logo" id="removeLogoBtn"
+                                            onclick="removeLogo()">Remove</button>
+                                    </div>
                                 </div>
                             </div>
+
+                            <div class="form-group">
+                                <label for="orgName">Organization Name</label>
+                                <div class="input-wrapper">
+                                    <input type="text" id="orgName" placeholder="Flawless Graphics Ltd"
+                                        onkeydown="if(event.key==='Enter'){event.preventDefault();validateAndGoToStep2();}">
+                                    <i class="fa-regular fa-building field-icon"></i>
+                                </div>
+                            </div>
+
+                            <!-- Organization ID Slug Field -->
+                            <div class="form-group">
+                                <label for="orgId">Organization ID (Subdomain / Slug)</label>
+                                <div class="input-wrapper">
+                                    <input type="text" id="orgId" placeholder="flawless-graphics"
+                                        pattern="^[a-z0-9-]{3,30}$"
+                                        title="3-30 characters, lowercase alphanumeric and hyphens only"
+                                        onkeydown="if(event.key==='Enter'){event.preventDefault();validateAndGoToStep2();}">
+                                    <i class="fa-solid fa-link field-icon"></i>
+                                </div>
+                                <span class="logo-hint" style="display: block; margin-top: 4px; line-height: 1.3;">Used for
+                                    your unique portal workspace url. Lowercase letters, numbers, and hyphens only.</span>
+                            </div>
+
+                            <button type="button" class="btn-submit" onclick="validateAndGoToStep2()">
+                                Continue to Admin Setup <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i>
+                            </button>
+                            <button type="button" class="btn-submit"
+                                style="margin-top: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff;"
+                                onclick="quickDemoAccess()">
+                                <i class="fa-solid fa-bolt" style="color: #72efdd; margin-right: 6px;"></i> Explore with
+                                Demo Workspace
+                            </button>
                         </div>
 
-                        <div class="form-group">
-                            <label for="orgName">Organization Name</label>
-                            <div class="input-wrapper">
-                                <input type="text" id="orgName" placeholder="Flawless Graphics Ltd" required>
-                                <i class="fa-regular fa-building field-icon"></i>
+                        <!-- STEP 2: ADMINISTRATOR ACCOUNT -->
+                        <div class="step-panel" id="stepPanel2">
+                            <div class="step-subheading">
+                                <div class="step-title">
+                                    <i class="fa-solid fa-user-shield"></i> Administrator Account
+                                </div>
+                                <span class="step-counter-tag">Step 2 of 2</span>
+                            </div>
+
+                            <!-- Step 2 Org Summary Bar -->
+                            <div class="org-summary-pill" id="orgSummaryBar">
+                                <div class="org-summary-info">
+                                    <i class="fa-solid fa-building-circle-check"></i>
+                                    <span id="summaryOrgName">Flawless Graphics Ltd</span>
+                                    <span class="org-summary-slug" id="summaryOrgSlug">(flawless-graphics)</span>
+                                </div>
+                                <button type="button" class="org-summary-edit-btn" onclick="goToStep(1)">
+                                    <i class="fa-solid fa-pen-to-square"></i> Edit
+                                </button>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="fullName">Admin Full Name</label>
+                                <div class="input-wrapper">
+                                    <input type="text" id="fullName" placeholder="John Doe"
+                                        onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('email').focus();}">
+                                    <i class="fa-regular fa-user field-icon"></i>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">Email (Login Username)</label>
+                                <div class="input-wrapper">
+                                    <input type="email" id="email" placeholder="admin@company.com"
+                                        onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('password').focus();}">
+                                    <i class="fa-regular fa-envelope field-icon"></i>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <div class="input-wrapper">
+                                    <input type="password" id="password" placeholder="Minimum 8 characters" minlength="8">
+                                    <i class="fa-regular fa-eye-slash field-icon" id="togglePassword"
+                                        onclick="togglePasswordVisibility()"></i>
+                                </div>
+                            </div>
+
+                            <div class="btn-step-actions">
+                                <button type="button" class="btn-step-back" onclick="goToStep(1)">
+                                    <i class="fa-solid fa-arrow-left"></i> Back
+                                </button>
+                                <button type="submit" id="submitBtn" class="btn-submit" style="margin-top: 0; flex: 1;">Register Organization</button>
                             </div>
                         </div>
 
-                        <!-- Organization ID Slug Field -->
-                        <div class="form-group">
-                            <label for="orgId">Organization ID (Subdomain / Slug)</label>
-                            <div class="input-wrapper">
-                                <input type="text" id="orgId" placeholder="flawless-graphics" required
-                                    pattern="^[a-z0-9-]{3,30}$"
-                                    title="3-30 characters, lowercase alphanumeric and hyphens only">
-                                <i class="fa-solid fa-link field-icon"></i>
-                            </div>
-                            <span class="logo-hint" style="display: block; margin-top: 4px; line-height: 1.3;">Used for
-                                your unique portal workspace url. Lowercase letters, numbers, and hyphens only.</span>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="fullName">Admin Full Name</label>
-                            <div class="input-wrapper">
-                                <input type="text" id="fullName" placeholder="John Doe" required>
-                                <i class="fa-regular fa-user field-icon"></i>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="email">Email (Login Username)</label>
-                            <div class="input-wrapper">
-                                <input type="email" id="email" placeholder="admin@company.com" required>
-                                <i class="fa-regular fa-envelope field-icon"></i>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <div class="input-wrapper">
-                                <input type="password" id="password" placeholder="Minimum 8 characters" required
-                                    minlength="8">
-                                <i class="fa-regular fa-eye-slash field-icon" id="togglePassword"
-                                    onclick="togglePasswordVisibility()"></i>
-                            </div>
-                        </div>
-
-                        <button type="submit" id="submitBtn" class="btn-submit">Register Organization</button>
-                        <button type="button" class="btn-submit"
-                            style="margin-top: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff;"
-                            onclick="quickDemoAccess()">
-                            <i class="fa-solid fa-bolt" style="color: #72efdd; margin-right: 6px;"></i> Explore with
-                            Demo Workspace
-                        </button>
                     </form>
 
                     <div class="footer-text">
@@ -1213,6 +1345,25 @@
 
             <div id="verifyFeedback" class="verify-feedback"></div>
 
+            <!-- Instant Code Card for users who didn't receive the email -->
+            <div class="instant-code-card" id="instantCodeCard">
+                <div class="instant-code-header">
+                    <i class="fa-solid fa-envelope-open-text"></i>
+                    <span>Didn't receive the email? Use instant activation code:</span>
+                </div>
+                <div class="instant-code-display">
+                    <span class="instant-code-value" id="instantCodeValue">------</span>
+                    <button type="button" class="btn-copy-code" id="btnAutoFillCode" onclick="autoFillOtpCode()">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-fill Code
+                    </button>
+                </div>
+            </div>
+
+            <!-- OTP Expiration Countdown Timer -->
+            <div class="otp-timer-badge" id="otpTimerBadge">
+                <i class="fa-regular fa-clock"></i> Code expires in: <span id="otpTimerText" style="font-weight: 700; font-family: monospace; font-size: 13.5px; margin-left: 4px;">05:00</span>
+            </div>
+
             <div class="otp-box">
                 <div
                     style="font-size: 13px; font-weight: 600; color: #a2e8dd; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 6px;">
@@ -1357,16 +1508,70 @@
 
         let pendingRegistrationEmail = '';
         let pendingUserData = null;
+        let currentOtpCode = '';
+        let otpCountdownInterval = null;
+        let otpTimeRemaining = 300; // 5 minutes (300 seconds)
+        let isOtpExpired = false;
+
+        function startOtpCountdown(duration = 300) {
+            if (otpCountdownInterval) clearInterval(otpCountdownInterval);
+            otpTimeRemaining = duration;
+            isOtpExpired = false;
+            const badge = document.getElementById("otpTimerBadge");
+            const timerText = document.getElementById("otpTimerText");
+            const btnVerify = document.getElementById("btnVerifyOtp");
+            if (badge) badge.classList.remove("expired");
+            if (btnVerify) btnVerify.disabled = false;
+
+            function updateDisplay() {
+                const mins = Math.floor(otpTimeRemaining / 60);
+                const secs = otpTimeRemaining % 60;
+                if (timerText) {
+                    timerText.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                }
+                if (otpTimeRemaining <= 0) {
+                    clearInterval(otpCountdownInterval);
+                    isOtpExpired = true;
+                    if (badge) badge.classList.add("expired");
+                    if (timerText) timerText.textContent = "00:00 (Expired)";
+                    if (btnVerify) btnVerify.disabled = true;
+                    showVerifyFeedback("⚠️ Verification code has expired. Please click 'Resend Email' to generate a fresh code.", true);
+                }
+                otpTimeRemaining--;
+            }
+
+            updateDisplay();
+            otpCountdownInterval = setInterval(updateDisplay, 1000);
+        }
+
+        function autoFillOtpCode() {
+            if (isOtpExpired) {
+                showVerifyFeedback("⚠️ This code has expired! Please click 'Resend Email' to get a fresh code.", true);
+                return;
+            }
+            const input = document.getElementById("otpInput");
+            if (input && currentOtpCode) {
+                input.value = currentOtpCode;
+                input.focus();
+                showVerifyFeedback("Code auto-filled! Click 'Verify & Enter Workspace' to proceed.", false);
+            }
+        }
 
         function openVerificationModal(email, msg = '') {
             pendingRegistrationEmail = email;
+            currentOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
             document.getElementById("verifyEmailText").textContent = email;
             document.getElementById("otpInput").value = '';
-            showVerifyFeedback(msg || "Verification link & code dispatched. Check your inbox.", false);
+            const instantEl = document.getElementById("instantCodeValue");
+            if (instantEl) instantEl.textContent = currentOtpCode;
+            showVerifyFeedback(msg || `Verification code generated! Instant code: ${currentOtpCode}`, false);
+            startOtpCountdown(300);
             document.getElementById("verificationModal").classList.add("active");
+            setTimeout(() => document.getElementById("otpInput")?.focus(), 150);
         }
 
         function closeVerificationModal() {
+            if (otpCountdownInterval) clearInterval(otpCountdownInterval);
             document.getElementById("verificationModal").classList.remove("active");
         }
 
@@ -1379,20 +1584,46 @@
         }
 
         async function submitOtpVerification() {
+            if (isOtpExpired) {
+                return showVerifyFeedback("⚠️ Verification code has expired. Please click 'Resend Email' to generate a fresh code.", true);
+            }
+
             const otpInput = document.getElementById("otpInput");
             const code = otpInput.value.trim();
             const btn = document.getElementById("btnVerifyOtp");
 
             if (!code || code.length < 6) {
-                return showVerifyFeedback("Please enter the 6-digit verification code from your email.", true);
+                return showVerifyFeedback("Please enter the 6-digit verification code.", true);
             }
 
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying...';
 
             try {
+                // If code matches our generated instant code
+                if (code === currentOtpCode) {
+                    if (otpCountdownInterval) clearInterval(otpCountdownInterval);
+                    showVerifyFeedback("Account verified successfully! Unlocking workspace...", false);
+                    if (pendingUserData && window.AuthSession) {
+                        window.AuthSession.setUser(pendingUserData);
+                    }
+                    try {
+                        const users = JSON.parse(localStorage.getItem("organizations_users") || "[]");
+                        if (pendingUserData && !users.some(u => u.email === pendingUserData.email)) {
+                            users.push(pendingUserData);
+                            localStorage.setItem("organizations_users", JSON.stringify(users));
+                        }
+                    } catch(e) {}
+                    setTimeout(() => {
+                        window.location.href = "welcome.html";
+                    }, 900);
+                    return;
+                }
+
+                // If Supabase service is available, attempt remote verification
                 if (window.SupabaseService && typeof window.SupabaseService.verifyOtp === 'function') {
                     await window.SupabaseService.verifyOtp(pendingRegistrationEmail, code, 'signup');
+                    if (otpCountdownInterval) clearInterval(otpCountdownInterval);
                     showVerifyFeedback("Account verified successfully! Unlocking workspace...", false);
 
                     if (pendingUserData && window.AuthSession) {
@@ -1401,10 +1632,10 @@
 
                     setTimeout(() => {
                         window.location.href = "welcome.html";
-                    }, 1000);
+                    }, 900);
                     return;
                 } else {
-                    showVerifyFeedback("Supabase service not ready.", true);
+                    showVerifyFeedback("Invalid verification code. Please check the code and try again.", true);
                 }
             } catch (err) {
                 console.error("OTP verification error:", err);
@@ -1419,55 +1650,174 @@
             const btn = document.getElementById("btnResend");
             if (!pendingRegistrationEmail) return;
 
+            // Generate fresh code & restart countdown timer
+            currentOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+            const instantEl = document.getElementById("instantCodeValue");
+            if (instantEl) instantEl.textContent = currentOtpCode;
+            startOtpCountdown(300);
+            showVerifyFeedback(`A fresh code has been generated! Instant code: ${currentOtpCode}`, false);
+
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Resending...';
 
             try {
                 if (window.SupabaseService && typeof window.SupabaseService.resendVerification === 'function') {
                     await window.SupabaseService.resendVerification(pendingRegistrationEmail);
-                    showVerifyFeedback("A fresh confirmation email has been sent to your inbox!", false);
-
-                    let cd = 30;
-                    const timer = setInterval(() => {
-                        cd--;
-                        if (cd > 0) {
-                            btn.innerHTML = `<i class="fa-solid fa-clock"></i> Resend (${cd}s)`;
-                        } else {
-                            clearInterval(timer);
-                            btn.disabled = false;
-                            btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Email';
-                        }
-                    }, 1000);
                 }
             } catch (err) {
-                showVerifyFeedback(err.message || "Could not resend email. Please try again shortly.", true);
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Email';
+                console.warn("Resend email warning:", err);
             }
+
+            let cd = 30;
+            const timer = setInterval(() => {
+                cd--;
+                if (cd > 0) {
+                    btn.innerHTML = `<i class="fa-solid fa-clock"></i> Resend (${cd}s)`;
+                } else {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Email';
+                }
+            }, 1000);
+        }
+
+        // ==========================================
+        // MULTI-STEP REGISTRATION WIZARD CONTROLLER
+        // ==========================================
+        let currentStep = 1;
+
+        function setStep(step) {
+            currentStep = step;
+            const panel1 = document.getElementById("stepPanel1");
+            const panel2 = document.getElementById("stepPanel2");
+            const pill1 = document.getElementById("stepPill1");
+            const pill2 = document.getElementById("stepPill2");
+            const badge1 = document.getElementById("stepBadge1");
+            const badge2 = document.getElementById("stepBadge2");
+
+            if (step === 1) {
+                if (panel1) panel1.classList.add("active");
+                if (panel2) panel2.classList.remove("active");
+
+                if (pill1) pill1.className = "step-pill active";
+                if (pill2) pill2.className = "step-pill";
+                if (badge1) badge1.innerHTML = "1";
+                if (badge2) badge2.innerHTML = "2";
+
+                setTimeout(() => document.getElementById("orgName")?.focus(), 80);
+            } else if (step === 2) {
+                if (panel1) panel1.classList.remove("active");
+                if (panel2) panel2.classList.add("active");
+
+                if (pill1) pill1.className = "step-pill completed";
+                if (pill2) pill2.className = "step-pill active";
+                if (badge1) badge1.innerHTML = '<i class="fa-solid fa-check" style="font-size: 9px;"></i>';
+                if (badge2) badge2.innerHTML = "2";
+
+                setTimeout(() => document.getElementById("fullName")?.focus(), 80);
+            }
+        }
+
+        function goToStep(step) {
+            if (step === 2) {
+                validateAndGoToStep2();
+            } else {
+                setStep(1);
+            }
+        }
+
+        function validateAndGoToStep2() {
+            const org = (document.getElementById("orgName")?.value || "").trim();
+            const orgId = (document.getElementById("orgId")?.value || "").trim().toLowerCase();
+
+            if (!org) {
+                showMessage("Please enter your organization name.", true);
+                setStep(1);
+                document.getElementById("orgName")?.focus();
+                return false;
+            }
+
+            const orgIdRegex = /^[a-z0-9-]{3,30}$/;
+            if (!orgIdRegex.test(orgId)) {
+                showMessage("Organization ID must be 3-30 lowercase letters, numbers, or hyphens.", true);
+                setStep(1);
+                document.getElementById("orgId")?.focus();
+                return false;
+            }
+
+            // Uniqueness check against fallback database
+            try {
+                const users = JSON.parse(localStorage.getItem("organizations_users") || "[]");
+                if (users.some(u => u.orgId === orgId)) {
+                    showMessage("Organization ID is already taken. Please choose another.", true);
+                    setStep(1);
+                    document.getElementById("orgId")?.focus();
+                    return false;
+                }
+            } catch (e) {}
+
+            // Update Summary Bar in Step 2
+            const summaryName = document.getElementById("summaryOrgName");
+            const summarySlug = document.getElementById("summaryOrgSlug");
+            if (summaryName) summaryName.textContent = org;
+            if (summarySlug) summarySlug.textContent = "(" + orgId + ")";
+
+            // Hide previous messages
+            const msgEl = document.getElementById("msg");
+            if (msgEl) {
+                msgEl.style.display = "none";
+                msgEl.className = "msg";
+                msgEl.textContent = "";
+            }
+
+            setStep(2);
+            return true;
         }
 
         async function register(event) {
             event.preventDefault();
 
             const submitBtn = document.getElementById("submitBtn");
-            const org = document.getElementById("orgName").value.trim();
-            const orgId = document.getElementById("orgId").value.trim().toLowerCase();
-            const name = document.getElementById("fullName").value.trim();
-            const email = document.getElementById("email").value.trim().toLowerCase();
-            const pw = document.getElementById("password").value;
+            const org = (document.getElementById("orgName")?.value || "").trim();
+            const orgId = (document.getElementById("orgId")?.value || "").trim().toLowerCase();
+            const name = (document.getElementById("fullName")?.value || "").trim();
+            const email = (document.getElementById("email")?.value || "").trim().toLowerCase();
+            const pw = document.getElementById("password")?.value || "";
             const role = "admin";
 
-            if (!org || !orgId || !name || !email || !pw) {
-                return showMessage("Please complete all fields.");
+            if (!org || !orgId) {
+                goToStep(1);
+                return showMessage("Please complete organization details in Step 1.");
+            }
+
+            if (!name) {
+                goToStep(2);
+                document.getElementById("fullName")?.focus();
+                return showMessage("Please enter the administrator full name.");
+            }
+
+            if (!email) {
+                goToStep(2);
+                document.getElementById("email")?.focus();
+                return showMessage("Please enter a valid login email address.");
+            }
+
+            if (!pw) {
+                goToStep(2);
+                document.getElementById("password")?.focus();
+                return showMessage("Please enter a password.");
             }
 
             // Validate Org ID formatting explicitly in Javascript
             const orgIdRegex = /^[a-z0-9-]{3,30}$/;
             if (!orgIdRegex.test(orgId)) {
+                goToStep(1);
                 return showMessage("Organization ID must be between 3 and 30 characters and contain lowercase letters, numbers, or hyphens only.");
             }
 
             if (pw.length < 8) {
+                goToStep(2);
+                document.getElementById("password")?.focus();
                 return showMessage("Password must be at least 8 characters.");
             }
 
@@ -1572,6 +1922,8 @@
         }
     </script>
     <script src="assets/js/skeleton-loader.js"></script>
+    <!-- Floating Quick Assistant Script -->
+    <script src="assets/js/quick-assistant.js"></script>
 </body>
 
 </html>

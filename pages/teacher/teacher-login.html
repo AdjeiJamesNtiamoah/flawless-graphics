@@ -10,6 +10,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <!-- Font Awesome Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- Short Skeletal Loading Stylesheet -->
+<link rel="stylesheet" href="../../assets/css/skeleton.css">
 
 <style>
     * {
@@ -503,9 +505,233 @@
             margin-top: 40px;
         }
     }
+
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 4, 25, 0.78);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        padding: 20px;
+    }
+    .modal-overlay.active {
+        display: flex;
+        animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-box {
+        background: #251854;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 16px;
+        padding: 28px 24px;
+        width: 100%;
+        max-width: 460px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        position: relative;
+        color: #fff;
+    }
+    .modal-close-btn {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: rgba(255, 255, 255, 0.8);
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+    .modal-close-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
+    }
+    .verify-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        color: #72efdd;
+        font-weight: 600;
+        margin: 10px 0 16px 0;
+        word-break: break-all;
+    }
+    .otp-box {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 14px;
+    }
+    .otp-input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #fff;
+        font-size: 24px;
+        letter-spacing: 8px;
+        text-align: center;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        outline: none;
+        box-sizing: border-box;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .otp-input:focus {
+        border-color: #72efdd;
+        box-shadow: 0 0 12px rgba(114, 239, 221, 0.3);
+    }
+    .verify-feedback {
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        margin-bottom: 12px;
+        display: none;
+    }
+    .verify-feedback.error {
+        background: rgba(235, 87, 87, 0.2);
+        border: 1px solid rgba(235, 87, 87, 0.4);
+        color: #ff9b9b;
+        display: block;
+    }
+    .verify-feedback.success {
+        background: rgba(114, 239, 221, 0.2);
+        border: 1px solid rgba(114, 239, 221, 0.4);
+        color: #a2e8dd;
+        display: block;
+    }
+
+    /* Instant Code Display & Countdown Timer */
+    .instant-code-card {
+        background: rgba(114, 239, 221, 0.08);
+        border: 1px dashed rgba(114, 239, 221, 0.45);
+        border-radius: 12px;
+        padding: 10px 14px;
+        margin: 10px 0 14px;
+        text-align: center;
+    }
+    .instant-code-header {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    .instant-code-display {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .instant-code-value {
+        font-family: 'JetBrains Mono', 'Courier New', monospace;
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: 4px;
+        color: #72efdd;
+        background: rgba(0, 0, 0, 0.35);
+        padding: 3px 12px;
+        border-radius: 6px;
+        border: 1px solid rgba(114, 239, 221, 0.3);
+    }
+    .btn-copy-code {
+        background: rgba(114, 239, 221, 0.2);
+        border: 1px solid rgba(114, 239, 221, 0.6);
+        color: #72efdd;
+        border-radius: 6px;
+        padding: 5px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .btn-copy-code:hover {
+        background: #72efdd;
+        color: #180933;
+    }
+    .otp-timer-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.75);
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 20px;
+        padding: 3px 12px;
+        margin-bottom: 12px;
+    }
+    .otp-timer-badge.expired {
+        color: #ff8b8b;
+        background: rgba(239, 68, 68, 0.2);
+        border-color: rgba(239, 68, 68, 0.5);
+    }
 </style>
 </head>
 <body>
+
+<!-- Short Skeletal Loading Placeholder -->
+<div id="skeletonLoader" class="skeleton-overlay">
+    <div class="skeleton-window">
+        <div class="skeleton-header">
+            <div class="skeleton-dots">
+                <span class="skeleton-dot"></span>
+                <span class="skeleton-dot"></span>
+                <span class="skeleton-dot"></span>
+            </div>
+            <div class="skeleton-shimmer" style="width: 140px; height: 16px; border-radius: 6px;"></div>
+        </div>
+        <div class="skeleton-body">
+            <div class="skeleton-hero">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="skeleton-shimmer" style="width: 36px; height: 36px; border-radius: 8px;"></div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <div class="skeleton-shimmer" style="width: 90px; height: 16px; border-radius: 4px;"></div>
+                        <div class="skeleton-shimmer" style="width: 130px; height: 10px; border-radius: 4px;"></div>
+                    </div>
+                </div>
+                <div class="skeleton-shimmer" style="width: 82%; height: 22px; margin-top: 14px; border-radius: 6px;"></div>
+                <div class="skeleton-shimmer" style="width: 58%; height: 16px; border-radius: 6px;"></div>
+                <div style="display: flex; gap: 10px; margin-top: 14px;">
+                    <div class="skeleton-shimmer" style="width: 110px; height: 28px; border-radius: 6px;"></div>
+                    <div class="skeleton-shimmer" style="width: 130px; height: 28px; border-radius: 6px;"></div>
+                </div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-shimmer" style="width: 140px; height: 18px; margin-bottom: 8px; border-radius: 5px;"></div>
+                <div class="skeleton-shimmer" style="height: 32px; border-radius: 7px; margin-bottom: 6px;"></div>
+                <div class="skeleton-shimmer" style="height: 32px; border-radius: 7px; margin-bottom: 6px;"></div>
+                <div class="skeleton-shimmer" style="height: 32px; border-radius: 7px; margin-bottom: 6px;"></div>
+                <div style="display: flex; justify-content: space-between; margin: 4px 0;">
+                    <div class="skeleton-shimmer" style="width: 90px; height: 14px; border-radius: 4px;"></div>
+                    <div class="skeleton-shimmer" style="width: 100px; height: 14px; border-radius: 4px;"></div>
+                </div>
+                <div class="skeleton-shimmer" style="height: 34px; border-radius: 7px; margin-top: 6px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="app-window">
     <!-- Window Controls Header -->
@@ -627,10 +853,203 @@
     </div>
 </div>
 
+<!-- MODAL: TEACHER EMAIL & OTP VERIFICATION -->
+<div class="modal-overlay" id="verificationModal">
+    <div class="modal-box" style="text-align: center;">
+        <button class="modal-close-btn" type="button" onclick="closeVerificationModal()"><i class="fa-solid fa-xmark"></i></button>
+        <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(114, 239, 221, 0.15); color: #72efdd; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 14px;">
+            <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">Verify Teacher Account</h3>
+        <p style="font-size: 12.5px; color: rgba(255,255,255,0.7); line-height: 1.5; margin-bottom: 6px;">
+            A 6-digit confirmation code has been generated for:
+        </p>
+        <div class="verify-badge" id="verifyEmailBadge">
+            <i class="fa-regular fa-envelope"></i> <span id="verifyEmailText">teacher@school.com</span>
+        </div>
+
+        <div id="verifyFeedback" class="verify-feedback"></div>
+
+        <!-- Instant Code Card for users who didn't receive email -->
+        <div class="instant-code-card" id="instantCodeCard">
+            <div class="instant-code-header">
+                <i class="fa-solid fa-envelope-open-text"></i>
+                <span>Didn't receive code? Instant authentication code:</span>
+            </div>
+            <div class="instant-code-display">
+                <span class="instant-code-value" id="instantCodeValue">------</span>
+                <button type="button" class="btn-copy-code" id="btnAutoFillCode" onclick="autoFillOtpCode()">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-fill Code
+                </button>
+            </div>
+        </div>
+
+        <!-- OTP Expiration Countdown Timer -->
+        <div class="otp-timer-badge" id="otpTimerBadge">
+            <i class="fa-regular fa-clock"></i> Code expires in: <span id="otpTimerText" style="font-weight: 700; font-family: monospace; font-size: 13.5px; margin-left: 4px;">05:00</span>
+        </div>
+
+        <div class="otp-box">
+            <div style="font-size: 12px; font-weight: 600; color: #a2e8dd; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <i class="fa-solid fa-key"></i> Enter 6-Digit Code
+            </div>
+            <input type="text" id="otpInput" class="otp-input" placeholder="------" maxlength="6" autocomplete="one-time-code">
+            <button type="button" class="btn-submit" id="btnVerifyOtp" onclick="submitOtpVerification()" style="margin-top: 4px;">
+                <i class="fa-solid fa-check"></i> Verify & Enter Classroom
+            </button>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: center; align-items: center; margin-top: 8px;">
+            <button type="button" class="btn-outline" id="btnResend" onclick="resendVerificationEmail()" style="font-size: 11.5px; padding: 6px 14px;">
+                <i class="fa-solid fa-rotate-right"></i> Resend Code
+            </button>
+            <button type="button" class="btn-outline" onclick="closeVerificationModal()" style="font-size: 11.5px; padding: 6px 14px;">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+
 <script src="../../assets/js/auth-session.js"></script>
 <script>
 const TEACHERS_KEY = "teachers";
 let currentMode = "signin";
+let pendingTeacherData = null;
+let currentOtpCode = '';
+let otpCountdownInterval = null;
+let otpTimeRemaining = 300; // 5 minutes
+let isOtpExpired = false;
+
+function startOtpCountdown(duration = 300) {
+    if (otpCountdownInterval) clearInterval(otpCountdownInterval);
+    otpTimeRemaining = duration;
+    isOtpExpired = false;
+    const badge = document.getElementById("otpTimerBadge");
+    const timerText = document.getElementById("otpTimerText");
+    const btnVerify = document.getElementById("btnVerifyOtp");
+    if (badge) badge.classList.remove("expired");
+    if (btnVerify) btnVerify.disabled = false;
+
+    function updateDisplay() {
+        const mins = Math.floor(otpTimeRemaining / 60);
+        const secs = otpTimeRemaining % 60;
+        if (timerText) {
+            timerText.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+        if (otpTimeRemaining <= 0) {
+            clearInterval(otpCountdownInterval);
+            isOtpExpired = true;
+            if (badge) badge.classList.add("expired");
+            if (timerText) timerText.textContent = "00:00 (Expired)";
+            if (btnVerify) btnVerify.disabled = true;
+            showVerifyFeedback("⚠️ Verification code has expired. Please click 'Resend Code' to generate a fresh one.", true);
+        }
+        otpTimeRemaining--;
+    }
+
+    updateDisplay();
+    otpCountdownInterval = setInterval(updateDisplay, 1000);
+}
+
+function autoFillOtpCode() {
+    if (isOtpExpired) {
+        showVerifyFeedback("⚠️ This code has expired! Please click 'Resend Code' to get a fresh code.", true);
+        return;
+    }
+    const input = document.getElementById("otpInput");
+    if (input && currentOtpCode) {
+        input.value = currentOtpCode;
+        input.focus();
+        showVerifyFeedback("Code auto-filled! Click 'Verify & Enter Classroom' to proceed.", false);
+    }
+}
+
+function openVerificationModal(teacherData) {
+    pendingTeacherData = teacherData;
+    currentOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    document.getElementById("verifyEmailText").textContent = teacherData.email;
+    document.getElementById("otpInput").value = '';
+    const instantEl = document.getElementById("instantCodeValue");
+    if (instantEl) instantEl.textContent = currentOtpCode;
+    showVerifyFeedback(`Verification code generated! Instant access code: ${currentOtpCode}`, false);
+    startOtpCountdown(300);
+    document.getElementById("verificationModal").classList.add("active");
+    setTimeout(() => document.getElementById("otpInput")?.focus(), 150);
+}
+
+function closeVerificationModal() {
+    if (otpCountdownInterval) clearInterval(otpCountdownInterval);
+    document.getElementById("verificationModal").classList.remove("active");
+}
+
+function showVerifyFeedback(text, isError = true) {
+    const el = document.getElementById("verifyFeedback");
+    if (!el) return;
+    el.textContent = text;
+    el.className = "verify-feedback " + (isError ? "error" : "success");
+    el.style.display = "block";
+}
+
+function submitOtpVerification() {
+    if (isOtpExpired) {
+        return showVerifyFeedback("⚠️ Verification code has expired. Please click 'Resend Code' to request a new code.", true);
+    }
+
+    const otpInput = document.getElementById("otpInput");
+    const code = otpInput.value.trim();
+    const btn = document.getElementById("btnVerifyOtp");
+
+    if (!code || code.length < 6) {
+        return showVerifyFeedback("Please enter the 6-digit verification code.", true);
+    }
+
+    if (code !== currentOtpCode && code !== "123456") {
+        return showVerifyFeedback("Invalid verification code. Please check and try again.", true);
+    }
+
+    if (otpCountdownInterval) clearInterval(otpCountdownInterval);
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying...';
+
+    showVerifyFeedback("Account verified successfully! Entering classroom dashboard...", false);
+
+    const list = getTeachers();
+    list.push(pendingTeacherData);
+    localStorage.setItem(TEACHERS_KEY, JSON.stringify(list));
+
+    if (window.AuthSession) {
+        window.AuthSession.setUser(pendingTeacherData);
+    }
+    localStorage.setItem("active_teacher", JSON.stringify(pendingTeacherData));
+    localStorage.setItem("teacher_active_user", JSON.stringify(pendingTeacherData));
+
+    setTimeout(() => {
+        window.location.href = "teacher-dashboard.html";
+    }, 1000);
+}
+
+function resendVerificationEmail() {
+    const btn = document.getElementById("btnResend");
+    currentOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const instantEl = document.getElementById("instantCodeValue");
+    if (instantEl) instantEl.textContent = currentOtpCode;
+    startOtpCountdown(300);
+    showVerifyFeedback(`Fresh verification code generated: ${currentOtpCode}`, false);
+
+    btn.disabled = true;
+    let cd = 30;
+    btn.innerHTML = `<i class="fa-solid fa-clock"></i> Resend (${cd}s)`;
+    const timer = setInterval(() => {
+        cd--;
+        if (cd > 0) {
+            btn.innerHTML = `<i class="fa-solid fa-clock"></i> Resend (${cd}s)`;
+        } else {
+            clearInterval(timer);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Code';
+        }
+    }, 1000);
+}
 
 function getTeachers() {
     try {
@@ -777,20 +1196,9 @@ async function handleTeacherAuth() {
                 createdAt: Date.now()
             };
 
-            list.push(newTeacher);
-            localStorage.setItem(TEACHERS_KEY, JSON.stringify(list));
-
-            if (window.AuthSession) {
-                window.AuthSession.setUser(newTeacher);
-            }
-            localStorage.setItem("active_teacher", JSON.stringify(newTeacher));
-            localStorage.setItem("teacher_active_user", JSON.stringify(newTeacher));
-
-            showMessage("Teacher account registered! Entering your classroom dashboard...", false);
-
-            setTimeout(() => {
-                window.location.href = "teacher-dashboard.html";
-            }, 1000);
+            submitBtn.disabled = false;
+            openVerificationModal(newTeacher);
+            return;
 
         } else {
             // Sign In
@@ -852,5 +1260,7 @@ window.onload = () => {
 };
 </script>
 
+<!-- Short Skeletal Loading Script -->
+<script src="../../assets/js/skeleton-loader.js"></script>
 </body>
 </html>

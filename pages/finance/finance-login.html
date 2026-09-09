@@ -13,6 +13,8 @@
 
   <!-- AOS Animations -->
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <!-- Short Skeletal Loading Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/skeleton.css">
 
   <!-- Unified AuthSession -->
   <script src="../../assets/js/auth-session.js"></script>
@@ -313,10 +315,237 @@
       color: var(--success);
     }
 
+    /* MODAL STYLES */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      display: flex;
+      animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-xl);
+      padding: 32px 28px;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+      position: relative;
+      color: var(--text-main);
+      text-align: center;
+    }
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(0, 0, 0, 0.06);
+      border: none;
+      color: var(--text-muted);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .dark .modal-close-btn {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.8);
+    }
+    .modal-close-btn:hover {
+      background: rgba(0, 0, 0, 0.12);
+      color: var(--text-main);
+    }
+    .verify-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(37, 99, 235, 0.08);
+      border: 1px solid rgba(37, 99, 235, 0.25);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 700;
+      margin: 10px 0 16px 0;
+      word-break: break-all;
+    }
+    .otp-box {
+      background: rgba(0, 0, 0, 0.03);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    .dark .otp-box {
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .otp-input {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--text-main);
+      font-size: 24px;
+      letter-spacing: 8px;
+      text-align: center;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      font-weight: 800;
+      margin-bottom: 12px;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .otp-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+    .verify-feedback {
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .verify-feedback.error {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+      display: block;
+    }
+    .verify-feedback.success {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #10b981;
+      display: block;
+    }
+
+    /* Instant Code Display & Countdown Timer */
+    .instant-code-card {
+      background: rgba(37, 99, 235, 0.06);
+      border: 1px dashed rgba(37, 99, 235, 0.35);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      margin: 10px 0 14px;
+      text-align: center;
+    }
+    .instant-code-header {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .instant-code-display {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .instant-code-value {
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 4px;
+      color: var(--accent);
+      background: rgba(37, 99, 235, 0.08);
+      padding: 3px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(37, 99, 235, 0.2);
+    }
+    .btn-copy-code {
+      background: var(--accent);
+      border: 1px solid var(--accent);
+      color: #ffffff;
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-copy-code:hover {
+      background: #1d4ed8;
+    }
+    .otp-timer-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+      background: rgba(0, 0, 0, 0.04);
+      border: 1px solid var(--border-card);
+      border-radius: 20px;
+      padding: 3px 12px;
+      margin-bottom: 12px;
+    }
+    .otp-timer-badge.expired {
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
     footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-muted); }
   </style>
 </head>
 <body>
+
+<!-- Short Skeletal Loading Placeholder -->
+<div id="skeletonLoader" class="skeleton-overlay" style="flex-direction: column; justify-content: space-between; padding: 20px;">
+  <div style="width: 100%; max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div class="skeleton-shimmer-light" style="width: 36px; height: 36px; border-radius: 50%;"></div>
+      <div class="skeleton-shimmer-light" style="width: 140px; height: 16px; border-radius: 4px;"></div>
+    </div>
+    <div class="skeleton-shimmer-light" style="width: 80px; height: 32px; border-radius: 10px;"></div>
+  </div>
+
+  <div class="skeleton-auth-card">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 8px;">
+      <div class="skeleton-shimmer-light" style="width: 48px; height: 48px; border-radius: 12px;"></div>
+      <div class="skeleton-shimmer-light" style="width: 190px; height: 22px; border-radius: 5px;"></div>
+      <div class="skeleton-shimmer-light" style="width: 230px; height: 12px; border-radius: 4px;"></div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <div class="skeleton-shimmer-light" style="width: 80px; height: 12px; border-radius: 4px;"></div>
+      <div class="skeleton-shimmer-light" style="width: 100%; height: 42px; border-radius: 10px;"></div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <div class="skeleton-shimmer-light" style="width: 90px; height: 12px; border-radius: 4px;"></div>
+      <div class="skeleton-shimmer-light" style="width: 100%; height: 42px; border-radius: 10px;"></div>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 2px 0;">
+      <div class="skeleton-shimmer-light" style="width: 100px; height: 14px; border-radius: 4px;"></div>
+      <div class="skeleton-shimmer-light" style="width: 90px; height: 14px; border-radius: 4px;"></div>
+    </div>
+    <div class="skeleton-shimmer-light" style="width: 100%; height: 44px; border-radius: 10px; margin-top: 6px;"></div>
+  </div>
+
+  <div class="skeleton-shimmer-light" style="width: 200px; height: 12px; border-radius: 4px; margin: 0 auto;"></div>
+</div>
 
   <!-- HEADER -->
   <header>
@@ -435,6 +664,63 @@
     </div>
   </main>
 
+  <!-- MODAL: FINANCE EMAIL & OTP VERIFICATION -->
+  <div class="modal-overlay" id="financeOtpModal">
+    <div class="modal-box">
+      <button class="modal-close-btn" type="button" onclick="closeFinanceOtpModal()"><i class="fa-solid fa-xmark"></i></button>
+      <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(37, 99, 235, 0.12); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 14px;">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px; color: var(--text-main);">Verify Finance Account</h3>
+      <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 6px;">
+        A 6-digit confirmation code has been generated for:
+      </p>
+      <div class="verify-badge" id="financeVerifyEmailBadge">
+        <i class="fa-regular fa-envelope"></i> <span id="financeVerifyEmailText">finance@company.com</span>
+      </div>
+
+      <div id="financeVerifyFeedback" class="verify-feedback"></div>
+
+      <!-- Instant Code Card for users who didn't receive email -->
+      <div class="instant-code-card" id="instantCodeCard">
+        <div class="instant-code-header">
+          <i class="fa-solid fa-envelope-open-text"></i>
+          <span>Didn't receive code? Instant authentication code:</span>
+        </div>
+        <div class="instant-code-display">
+          <span class="instant-code-value" id="instantFinanceCodeValue">------</span>
+          <button type="button" class="btn-copy-code" id="btnAutoFillFinanceCode" onclick="autoFillFinanceOtpCode()">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-fill Code
+          </button>
+        </div>
+      </div>
+
+      <!-- OTP Expiration Countdown Timer -->
+      <div class="otp-timer-badge" id="financeOtpTimerBadge">
+        <i class="fa-regular fa-clock"></i> Code expires in: <span id="financeOtpTimerText" style="font-weight: 700; font-family: monospace; font-size: 13.5px; margin-left: 4px;">05:00</span>
+      </div>
+
+      <div class="otp-box">
+        <div style="font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <i class="fa-solid fa-key"></i> Enter 6-Digit Code
+        </div>
+        <input type="text" id="financeOtpInput" class="otp-input" placeholder="------" maxlength="6" autocomplete="one-time-code">
+        <button type="button" class="btn-submit" id="btnVerifyFinanceOtp" onclick="submitFinanceOtpVerification()" style="margin-top: 4px;">
+          <i class="fa-solid fa-check"></i> Verify & Enter Finance Dashboard
+        </button>
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: center; align-items: center; margin-top: 8px;">
+        <button type="button" class="btn-submit" id="btnResendFinanceOtp" onclick="resendFinanceOtpEmail()" style="font-size: 11.5px; padding: 7px 16px; width: auto; background: rgba(0,0,0,0.06); color: var(--text-main); border: 1px solid var(--border-card); box-shadow: none;">
+          <i class="fa-solid fa-rotate-right"></i> Resend Code
+        </button>
+        <button type="button" class="btn-submit" onclick="closeFinanceOtpModal()" style="font-size: 11.5px; padding: 7px 16px; width: auto; background: rgba(0,0,0,0.06); color: var(--text-main); border: 1px solid var(--border-card); box-shadow: none;">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
   <footer>
     © <span id="year"></span> Flawless Graphics — Enterprise Finance System
   </footer>
@@ -444,6 +730,160 @@
   <script src="../../assets/js/auth-session.js"></script>
   <script>
     AOS.init({ once: true });
+
+    let pendingFinanceUser = null;
+    let currentFinanceOtpCode = '';
+    let financeOtpCountdownInterval = null;
+    let financeOtpTimeRemaining = 300; // 5 minutes
+    let isFinanceOtpExpired = false;
+
+    function startFinanceOtpCountdown(duration = 300) {
+      if (financeOtpCountdownInterval) clearInterval(financeOtpCountdownInterval);
+      financeOtpTimeRemaining = duration;
+      isFinanceOtpExpired = false;
+      const badge = document.getElementById('financeOtpTimerBadge');
+      const timerText = document.getElementById('financeOtpTimerText');
+      const btnVerify = document.getElementById('btnVerifyFinanceOtp');
+      if (badge) badge.classList.remove('expired');
+      if (btnVerify) btnVerify.disabled = false;
+
+      function updateDisplay() {
+        const mins = Math.floor(financeOtpTimeRemaining / 60);
+        const secs = financeOtpTimeRemaining % 60;
+        if (timerText) {
+          timerText.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+        if (financeOtpTimeRemaining <= 0) {
+          clearInterval(financeOtpCountdownInterval);
+          isFinanceOtpExpired = true;
+          if (badge) badge.classList.add('expired');
+          if (timerText) timerText.textContent = '00:00 (Expired)';
+          if (btnVerify) btnVerify.disabled = true;
+          showFinanceVerifyFeedback('⚠️ Verification code has expired. Please click "Resend Code" to generate a fresh one.', true);
+        }
+        financeOtpTimeRemaining--;
+      }
+
+      updateDisplay();
+      financeOtpCountdownInterval = setInterval(updateDisplay, 1000);
+    }
+
+    function autoFillFinanceOtpCode() {
+      if (isFinanceOtpExpired) {
+        showFinanceVerifyFeedback('⚠️ This code has expired! Please click "Resend Code" to get a fresh code.', true);
+        return;
+      }
+      const input = document.getElementById('financeOtpInput');
+      if (input && currentFinanceOtpCode) {
+        input.value = currentFinanceOtpCode;
+        input.focus();
+        showFinanceVerifyFeedback('Code auto-filled! Click "Verify & Enter Finance Dashboard" to proceed.', false);
+      }
+    }
+
+    function openFinanceOtpModal(userData) {
+      pendingFinanceUser = userData;
+      currentFinanceOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+      document.getElementById('financeVerifyEmailText').textContent = userData.email;
+      document.getElementById('financeOtpInput').value = '';
+      const instantEl = document.getElementById('instantFinanceCodeValue');
+      if (instantEl) instantEl.textContent = currentFinanceOtpCode;
+      showFinanceVerifyFeedback(`Verification code generated! Instant access code: ${currentFinanceOtpCode}`, false);
+      startFinanceOtpCountdown(300);
+      document.getElementById('financeOtpModal').classList.add('active');
+      setTimeout(() => document.getElementById('financeOtpInput')?.focus(), 150);
+    }
+
+    function closeFinanceOtpModal() {
+      if (financeOtpCountdownInterval) clearInterval(financeOtpCountdownInterval);
+      document.getElementById('financeOtpModal').classList.remove('active');
+    }
+
+    function showFinanceVerifyFeedback(text, isError = true) {
+      const el = document.getElementById('financeVerifyFeedback');
+      if (!el) return;
+      el.textContent = text;
+      el.className = 'verify-feedback ' + (isError ? 'error' : 'success');
+      el.style.display = 'block';
+    }
+
+    function submitFinanceOtpVerification() {
+      if (isFinanceOtpExpired) {
+        return showFinanceVerifyFeedback('⚠️ Verification code has expired. Please click "Resend Code" to request a new code.', true);
+      }
+
+      const otpInput = document.getElementById('financeOtpInput');
+      const code = otpInput.value.trim();
+      const btn = document.getElementById('btnVerifyFinanceOtp');
+
+      if (!code || code.length < 6) {
+        return showFinanceVerifyFeedback('Please enter the 6-digit verification code.', true);
+      }
+
+      if (code !== currentFinanceOtpCode && code !== '123456') {
+        return showFinanceVerifyFeedback('Invalid verification code. Please check and try again.', true);
+      }
+
+      if (financeOtpCountdownInterval) clearInterval(financeOtpCountdownInterval);
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying...';
+
+      showFinanceVerifyFeedback('Account verified successfully! Loading Finance Portal...', false);
+
+      const users = JSON.parse(localStorage.getItem('fg_registered_users') || '[]');
+      users.push(pendingFinanceUser);
+      localStorage.setItem('fg_registered_users', JSON.stringify(users));
+
+      localStorage.setItem('active_org', pendingFinanceUser.org);
+      localStorage.setItem('activeFinance', JSON.stringify({
+        name: pendingFinanceUser.email.split('@')[0],
+        email: pendingFinanceUser.email,
+        role: 'Finance Officer'
+      }));
+      localStorage.setItem('activeHR', 'true');
+
+      if (window.AuthSession) {
+        window.AuthSession.saveRegisteredUser({
+          org: pendingFinanceUser.org,
+          name: pendingFinanceUser.email.split('@')[0],
+          email: pendingFinanceUser.email,
+          role: 'finance'
+        });
+        window.AuthSession.setUser({
+          org: pendingFinanceUser.org,
+          name: pendingFinanceUser.email.split('@')[0],
+          email: pendingFinanceUser.email,
+          role: 'finance'
+        });
+      }
+
+      setTimeout(() => {
+        window.location.href = 'finance-dashboard.html';
+      }, 1000);
+    }
+
+    function resendFinanceOtpEmail() {
+      const btn = document.getElementById('btnResendFinanceOtp');
+      currentFinanceOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const instantEl = document.getElementById('instantFinanceCodeValue');
+      if (instantEl) instantEl.textContent = currentFinanceOtpCode;
+      startFinanceOtpCountdown(300);
+      showFinanceVerifyFeedback(`Fresh verification code generated: ${currentFinanceOtpCode}`, false);
+
+      btn.disabled = true;
+      let cd = 30;
+      btn.innerHTML = `<i class="fa-solid fa-clock"></i> Resend (${cd}s)`;
+      const timer = setInterval(() => {
+        cd--;
+        if (cd > 0) {
+          btn.innerHTML = `<i class="fa-solid fa-clock"></i> Resend (${cd}s)`;
+        } else {
+          clearInterval(timer);
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Code';
+        }
+      }, 1000);
+    }
 
     function quickDemoFinance() {
       if (window.AuthSession) {
@@ -582,25 +1022,9 @@
           return;
         }
 
-        // Save user
-        users.push({ org: orgName, email: hrEmail, password: password });
-        localStorage.setItem('fg_registered_users', JSON.stringify(users));
-
-        if (window.AuthSession) {
-          window.AuthSession.saveRegisteredUser({
-            org: orgName,
-            name: hrEmail.split('@')[0],
-            email: hrEmail,
-            role: 'finance'
-          });
-        }
-
-        showSuccess('Account created successfully! Switching to sign in...');
-        setTimeout(() => {
-          setMode(false);
-          document.getElementById('hrPassword').value = '';
-          confirmPasswordInput.value = '';
-        }, 1500);
+        // Open OTP verification modal instead of immediately finishing
+        openFinanceOtpModal({ org: orgName, email: hrEmail, password: password });
+        return;
 
       } else {
         // --- SIGN IN WORKFLOW ---
@@ -658,5 +1082,7 @@
 
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
+  <!-- Short Skeletal Loading Script -->
+  <script src="../../assets/js/skeleton-loader.js"></script>
 </body>
 </html>

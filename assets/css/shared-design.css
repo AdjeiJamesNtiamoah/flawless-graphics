@@ -655,3 +655,33 @@ body {
   .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
   .main-wrapper { padding: 0 16px; margin: 20px auto; }
 }
+
+/* ==========================================================================
+   Universal Stagnant (Sticky) Modal Form Headers
+   ========================================================================== */
+.modal-sticky-container,
+.student-modal-card,
+.modal-card {
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.modal-header-stagnant,
+.modal-header-row,
+.modal-header-sticky {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 30 !important;
+  background: var(--bg-surface, #ffffff) !important;
+  border-bottom: 1px solid var(--border-card, rgba(0, 0, 0, 0.08)) !important;
+  flex-shrink: 0 !important;
+}
+
+.modal-scroll-body,
+.student-modal-card form,
+.modal-card form {
+  overflow-y: auto !important;
+  flex: 1 1 auto !important;
+}
+

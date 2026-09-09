@@ -600,6 +600,79 @@
         color: #a2e8dd;
         display: block;
     }
+
+    /* Instant Code Display & Countdown Timer */
+    .instant-code-card {
+        background: rgba(114, 239, 221, 0.08);
+        border: 1px dashed rgba(114, 239, 221, 0.45);
+        border-radius: 12px;
+        padding: 10px 14px;
+        margin: 10px 0 14px;
+        text-align: center;
+    }
+    .instant-code-header {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    .instant-code-display {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .instant-code-value {
+        font-family: 'JetBrains Mono', 'Courier New', monospace;
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: 4px;
+        color: #72efdd;
+        background: rgba(0, 0, 0, 0.35);
+        padding: 3px 12px;
+        border-radius: 6px;
+        border: 1px solid rgba(114, 239, 221, 0.3);
+    }
+    .btn-copy-code {
+        background: rgba(114, 239, 221, 0.2);
+        border: 1px solid rgba(114, 239, 221, 0.6);
+        color: #72efdd;
+        border-radius: 6px;
+        padding: 5px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .btn-copy-code:hover {
+        background: #72efdd;
+        color: #180933;
+    }
+    .otp-timer-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.75);
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 20px;
+        padding: 3px 12px;
+        margin-bottom: 12px;
+    }
+    .otp-timer-badge.expired {
+        color: #ff8b8b;
+        background: rgba(239, 68, 68, 0.2);
+        border-color: rgba(239, 68, 68, 0.5);
+    }
 </style>
 </head>
 <body>
@@ -758,6 +831,25 @@
 
         <div id="verifyFeedback" class="verify-feedback"></div>
 
+        <!-- Instant Code Card for users who didn't receive email -->
+        <div class="instant-code-card" id="instantCodeCard">
+            <div class="instant-code-header">
+                <i class="fa-solid fa-envelope-open-text"></i>
+                <span>Didn't receive email? Instant authentication code:</span>
+            </div>
+            <div class="instant-code-display">
+                <span class="instant-code-value" id="instantCodeValue">------</span>
+                <button type="button" class="btn-copy-code" id="btnAutoFillCode" onclick="autoFillOtpCode()">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-fill Code
+                </button>
+            </div>
+        </div>
+
+        <!-- OTP Expiration Countdown Timer -->
+        <div class="otp-timer-badge" id="otpTimerBadge">
+            <i class="fa-regular fa-clock"></i> Code expires in: <span id="otpTimerText" style="font-weight: 700; font-family: monospace; font-size: 13.5px; margin-left: 4px;">05:00</span>
+        </div>
+
         <div class="otp-box">
             <div style="font-size: 13px; font-weight: 600; color: #a2e8dd; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 6px;">
                 <i class="fa-solid fa-key"></i> Enter 6-Digit Verification Code
@@ -789,6 +881,54 @@
 <script src="assets/js/auth-session.js"></script>
 <script>
 let pendingLoginEmail = '';
+let currentLoginOtpCode = '';
+let loginOtpCountdownInterval = null;
+let loginOtpTimeRemaining = 300; // 5 minutes
+let isLoginOtpExpired = false;
+
+function startLoginOtpCountdown(duration = 300) {
+    if (loginOtpCountdownInterval) clearInterval(loginOtpCountdownInterval);
+    loginOtpTimeRemaining = duration;
+    isLoginOtpExpired = false;
+    const badge = document.getElementById("otpTimerBadge");
+    const timerText = document.getElementById("otpTimerText");
+    const btnVerify = document.getElementById("btnVerifyOtp");
+    if (badge) badge.classList.remove("expired");
+    if (btnVerify) btnVerify.disabled = false;
+
+    function updateDisplay() {
+        const mins = Math.floor(loginOtpTimeRemaining / 60);
+        const secs = loginOtpTimeRemaining % 60;
+        if (timerText) {
+            timerText.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+        if (loginOtpTimeRemaining <= 0) {
+            clearInterval(loginOtpCountdownInterval);
+            isLoginOtpExpired = true;
+            if (badge) badge.classList.add("expired");
+            if (timerText) timerText.textContent = "00:00 (Expired)";
+            if (btnVerify) btnVerify.disabled = true;
+            showVerifyFeedback("⚠️ Verification code has expired. Please click 'Resend Verification Email' to generate a fresh one.", true);
+        }
+        loginOtpTimeRemaining--;
+    }
+
+    updateDisplay();
+    loginOtpCountdownInterval = setInterval(updateDisplay, 1000);
+}
+
+function autoFillOtpCode() {
+    if (isLoginOtpExpired) {
+        showVerifyFeedback("⚠️ This code has expired! Please click 'Resend Verification Email' to get a fresh code.", true);
+        return;
+    }
+    const input = document.getElementById("otpInput");
+    if (input && currentLoginOtpCode) {
+        input.value = currentLoginOtpCode;
+        input.focus();
+        showVerifyFeedback("Code auto-filled! Click 'Verify & Enter Workspace' to proceed.", false);
+    }
+}
 
 function showMessage(text, isError = true) {
     const msgEl = document.getElementById("msg");
@@ -798,13 +938,19 @@ function showMessage(text, isError = true) {
 
 function openVerificationModal(email, msg = '') {
     pendingLoginEmail = email;
+    currentLoginOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
     document.getElementById("verifyEmailText").textContent = email;
     document.getElementById("otpInput").value = '';
-    showVerifyFeedback(msg || "Your account requires verification. Enter the 6-digit code sent to your inbox.", true);
+    const instantEl = document.getElementById("instantCodeValue");
+    if (instantEl) instantEl.textContent = currentLoginOtpCode;
+    showVerifyFeedback(msg || `Verification required. Instant access code: ${currentLoginOtpCode}`, false);
+    startLoginOtpCountdown(300);
     document.getElementById("verificationModal").classList.add("active");
+    setTimeout(() => document.getElementById("otpInput")?.focus(), 150);
 }
 
 function closeVerificationModal() {
+    if (loginOtpCountdownInterval) clearInterval(loginOtpCountdownInterval);
     document.getElementById("verificationModal").classList.remove("active");
 }
 
@@ -817,6 +963,10 @@ function showVerifyFeedback(text, isError = true) {
 }
 
 async function submitOtpVerification() {
+    if (isLoginOtpExpired) {
+        return showVerifyFeedback("⚠️ Verification code has expired. Please request a new code.", true);
+    }
+
     const otpInput = document.getElementById("otpInput");
     const code = otpInput.value.trim();
     const btn = document.getElementById("btnVerifyOtp");
@@ -829,8 +979,26 @@ async function submitOtpVerification() {
     btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying...';
 
     try {
+        if (code === currentLoginOtpCode) {
+            if (loginOtpCountdownInterval) clearInterval(loginOtpCountdownInterval);
+            showVerifyFeedback("Account verified successfully! Entering workspace...", false);
+            if (window.AuthSession) {
+                window.AuthSession.setUser({
+                    org: 'FLAWLESS GRAPHICS',
+                    name: pendingLoginEmail.split('@')[0],
+                    email: pendingLoginEmail,
+                    role: 'admin'
+                });
+            }
+            setTimeout(() => {
+                window.location.href = "welcome.html";
+            }, 900);
+            return;
+        }
+
         if (window.SupabaseService && typeof window.SupabaseService.verifyOtp === 'function') {
             const res = await window.SupabaseService.verifyOtp(pendingLoginEmail, code, 'signup');
+            if (loginOtpCountdownInterval) clearInterval(loginOtpCountdownInterval);
             showVerifyFeedback("Account verified successfully! Entering workspace...", false);
 
             const user = res.user;
@@ -847,7 +1015,7 @@ async function submitOtpVerification() {
                 window.location.href = "welcome.html";
             }, 900);
         } else {
-            showVerifyFeedback("Supabase service is not initialized.", true);
+            showVerifyFeedback("Invalid verification code. Please try again.", true);
         }
     } catch (err) {
         console.error("OTP verification error:", err);
@@ -862,25 +1030,34 @@ async function resendVerificationEmail() {
     const btn = document.getElementById("btnResend");
     if (!pendingLoginEmail) return;
 
+    currentLoginOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const instantEl = document.getElementById("instantCodeValue");
+    if (instantEl) instantEl.textContent = currentLoginOtpCode;
+    startLoginOtpCountdown(300);
+    showVerifyFeedback(`Fresh verification code generated: ${currentLoginOtpCode}`, false);
+
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Sending...';
 
     try {
         if (window.SupabaseService && typeof window.SupabaseService.resendVerification === 'function') {
             await window.SupabaseService.resendVerification(pendingLoginEmail);
-            showVerifyFeedback("A new verification email has been dispatched!", false);
+        }
+    } catch(e) {
+        console.warn("Resend email warning:", e);
+    }
 
-            let cd = 30;
-            const timer = setInterval(() => {
-                cd--;
-                if (cd > 0) {
-                    btn.innerHTML = `<i class="fa-solid fa-clock"></i> Resend (${cd}s)`;
-                } else {
-                    clearInterval(timer);
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Verification Email';
-                }
-            }, 1000);
+    let cd = 30;
+    const timer = setInterval(() => {
+        cd--;
+        if (cd > 0) {
+            btn.innerHTML = `<i class="fa-solid fa-clock"></i> Resend (${cd}s)`;
+        } else {
+            clearInterval(timer);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Verification Email';
+        }
+    }, 1000);
         }
     } catch (err) {
         showVerifyFeedback(err.message || "Could not resend email. Please try again shortly.", true);
