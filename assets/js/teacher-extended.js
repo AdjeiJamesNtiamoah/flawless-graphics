@@ -47,21 +47,37 @@
   };
   window.saveStudents = (arr)=> save(STUD_KEY, arr);
   window.addStudent = (student)=>{
+    const sName = (student.firstName || 'Student') + (student.lastName ? ' ' + student.lastName : '');
+    if (window.Toaster && typeof window.Toaster.success === 'function') {
+      window.Toaster.success('Student Enrolled', `${sName} has been enrolled successfully!`);
+    }
     const arr = getStudents();
     arr.push(Object.assign({ id: Date.now(), createdAt: Date.now() }, student));
     saveStudents(arr);
     return arr[arr.length-1];
   };
   window.updateStudent = (id, patch)=>{
+    if (window.Toaster && typeof window.Toaster.success === 'function') {
+      window.Toaster.success('Record Updated', 'Student profile details updated successfully!');
+    }
     const arr = getStudents().map(s => s.id === id ? Object.assign({}, s, patch) : s);
     saveStudents(arr);
   };
-  window.deleteStudent = (id)=>{ const arr = getStudents().filter(s=>s.id !== id); saveStudents(arr); };
+  window.deleteStudent = (id)=>{
+    const arr = getStudents().filter(s=>s.id !== id);
+    saveStudents(arr);
+    if (window.Toaster && typeof window.Toaster.info === 'function') {
+      window.Toaster.info('Student Removed', 'Student record removed from active roster.');
+    }
+  };
 
   // --- Classes API (extend existing) ---
   window.getClasses = ()=> read(CLASS_KEY);
   window.saveClasses = (arr)=> save(CLASS_KEY, arr);
   window.addClass = (c) => {
+    if (window.Toaster && typeof window.Toaster.success === 'function') {
+      window.Toaster.success('Classroom Added', `Class "${c.name || 'New Class'}" created successfully!`);
+    }
     const arr = getClasses();
     arr.push(Object.assign({ id: Date.now() }, c));
     saveClasses(arr);
@@ -71,12 +87,18 @@
   window.getSchedule = ()=> read(SCHED_KEY);
   window.saveSchedule = (a)=> save(SCHED_KEY, a);
   window.addScheduleSlot = (slot) => {
+    if (window.Toaster && typeof window.Toaster.success === 'function') {
+      window.Toaster.success('Schedule Updated', `Timetable slot for ${slot.className || 'class'} saved!`);
+    }
     // slot: { classId, teacherEmail, day (1-5), time ('08:00'), room}
     const arr = getSchedule();
     arr.push(Object.assign({ id: Date.now() }, slot));
     saveSchedule(arr);
   };
   window.deleteScheduleSlot = (id) => {
+    if (window.Toaster && typeof window.Toaster.info === 'function') {
+      window.Toaster.info('Schedule Removed', 'Timetable slot removed from schedule.');
+    }
     const a = getSchedule().filter(s=> s.id !== id);
     saveSchedule(a);
   };
@@ -85,6 +107,9 @@
   window.getStudentAttendance = ()=> read(STD_ATT_KEY);
   window.saveStudentAttendance = (a)=> save(STD_ATT_KEY, a);
   window.recordStudentAttendance = ({studentId, classId, status='present', note=''})=>{
+    if (window.Toaster && typeof window.Toaster.success === 'function') {
+      window.Toaster.success('Attendance Recorded', `Student attendance marked as ${status}.`);
+    }
     const arr = getStudentAttendance();
     arr.push({ id: Date.now(), studentId, classId, status, note, teacherEmail: TEACHER_SESSION.email, date: new Date().toISOString() });
     saveStudentAttendance(arr);

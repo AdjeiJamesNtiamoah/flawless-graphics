@@ -6,6 +6,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Google Fonts: Plus Jakarta Sans -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Teacher Registration & Onboarding — FLAWLESS GRAPHICS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <!-- Font Awesome Icons -->
@@ -14,6 +22,8 @@
 <link rel="stylesheet" href="../../assets/css/skeleton.css">
 <!-- Floating Quick Assistant Stylesheet -->
 <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
+<!-- Toaster Notifications Stylesheet -->
+<link rel="stylesheet" href="../../assets/css/toaster.css">
 
 <style>
     * {
@@ -707,6 +717,11 @@
         border-color: rgba(239, 68, 68, 0.5);
     }
 </style>
+  <!-- Floating 3-Dots Quick Dock Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/quick-dock.css">
+  <!-- Pop-up Toaster System -->
+  <link rel="stylesheet" href="../../assets/css/toaster.css">
+  <script src="../../assets/js/toaster.js"></script>
 </head>
 <body>
 
@@ -1088,21 +1103,54 @@ function submitOtpVerification() {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying...';
 
-    showVerifyFeedback("Account verified successfully! Entering classroom...", false);
+    showVerifyFeedback("Account verified! Submitting for Human Resources approval...", false);
 
+    pendingTeacherData.status = 'pending_approval';
+
+    // 1. Master organizations_users
+    try {
+        let orgUsers = JSON.parse(localStorage.getItem('organizations_users') || '[]');
+        const uIdx = orgUsers.findIndex(u => (u.email || '').toLowerCase() === pendingTeacherData.email.toLowerCase());
+        if (uIdx >= 0) orgUsers[uIdx] = Object.assign({}, orgUsers[uIdx], pendingTeacherData);
+        else orgUsers.push(pendingTeacherData);
+        localStorage.setItem('organizations_users', JSON.stringify(orgUsers));
+    } catch(e) {}
+
+    // 2. Local teachers list
     const list = getTeachers();
-    list.push(pendingTeacherData);
+    const tIdx = list.findIndex(t => (t.email || '').toLowerCase() === pendingTeacherData.email.toLowerCase());
+    if (tIdx >= 0) list[tIdx] = pendingTeacherData;
+    else list.push(pendingTeacherData);
     localStorage.setItem(TEACHERS_KEY, JSON.stringify(list));
 
-    if (window.AuthSession) {
-        window.AuthSession.setUser(pendingTeacherData);
-    } else {
-        localStorage.setItem("active_teacher", JSON.stringify(pendingTeacherData));
-        localStorage.setItem("teacher_active_user", JSON.stringify(pendingTeacherData));
-    }
+    // 3. Organization staff roster
+    const orgKey = `${pendingTeacherData.org || 'FLAWLESS GRAPHICS'}_teachers`;
+    try {
+        let orgStaff = JSON.parse(localStorage.getItem(orgKey) || '[]');
+        if (!orgStaff.some(s => (s.email || '').toLowerCase() === pendingTeacherData.email.toLowerCase())) {
+            orgStaff.push({
+                id: 't_' + Date.now(),
+                name: pendingTeacherData.name,
+                email: pendingTeacherData.email,
+                role: 'Teacher',
+                position: 'Educator / Teacher',
+                status: 'pending_approval',
+                photo: pendingTeacherData.photo || null,
+                createdAt: Date.now()
+            });
+            localStorage.setItem(orgKey, JSON.stringify(orgStaff));
+        }
+    } catch(e) {}
 
     setTimeout(() => {
-        window.location.href = "teacher-profile.html";
+        closeVerificationModal();
+        showMessage("Registration submitted successfully! Your account is awaiting approval by Human Resources. Redirecting to portal sign-in...", false);
+        if (window.Toaster && typeof window.Toaster.warning === 'function') {
+            window.Toaster.warning("Account Pending Approval", "Your Teacher registration has been submitted and is awaiting Human Resources authorization.");
+        }
+        setTimeout(() => {
+            window.location.href = "teacher-login.html";
+        }, 1200);
     }, 1000);
 }
 
@@ -1165,6 +1213,8 @@ async function registerTeacher() {
             pass: hashed,
             photo: currentPhotoBase64,
             role: "teacher",
+            status: "pending_approval",
+            org: (window.AuthSession ? window.AuthSession.getOrg() : '') || "FLAWLESS GRAPHICS",
             createdAt: Date.now()
         };
 
@@ -1179,9 +1229,13 @@ async function registerTeacher() {
 }
 </script>
 
+<!-- Toaster Engine Script -->
+<script src="../../assets/js/toaster.js"></script>
 <!-- Short Skeletal Loading Script -->
 <script src="../../assets/js/skeleton-loader.js"></script>
 <!-- Floating Quick Assistant Script -->
 <script src="../../assets/js/quick-assistant.js"></script>
+<!-- Floating 3-Dots Quick Dock Script -->
+<script src="../../assets/js/quick-dock.js"></script>
 </body>
 </html>

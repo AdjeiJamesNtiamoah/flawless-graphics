@@ -436,6 +436,11 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
   .sidebar { display: none; }
 }
 </style>
+  <!-- Floating 3-Dots Quick Dock Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/quick-dock.css">
+  <!-- Pop-up Toaster System -->
+  <link rel="stylesheet" href="../../assets/css/toaster.css">
+  <script src="../../assets/js/toaster.js"></script>
 </head>
 <body>
 
@@ -982,7 +987,22 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
 function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
 function read(k){ return safeParse(localStorage.getItem(k)) || [] }
 function save(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
-function toast(msg, t=2500){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'), t); }
+function toast(msg, t=2800) {
+  if (window.Toaster && typeof window.Toaster.show === 'function') {
+    const isWarn = /error|fail|invalid|required|select|provide/i.test(msg);
+    const isInfo = /info|remove|delete|status|clock/i.test(msg);
+    const type = isWarn ? 'warning' : (isInfo ? 'info' : 'success');
+    const title = type === 'success' ? 'Saved Successfully' : (type === 'warning' ? 'Required Action' : 'Teacher Portal');
+    window.Toaster.show({ type, title, message: msg, duration: t });
+  } else {
+    const el = document.getElementById('toast');
+    if (el) {
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), t);
+    }
+  }
+}
 function escapeHtml(str){ return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 /* Session Verification */
@@ -1799,5 +1819,7 @@ updateKPIs();
 <script src="../../assets/js/skeleton-loader.js"></script>
 <!-- Floating Quick Assistant Script -->
 <script src="../../assets/js/quick-assistant.js"></script>
+  <!-- Floating 3-Dots Quick Dock Script -->
+  <script src="../../assets/js/quick-dock.js"></script>
 </body>
 </html>

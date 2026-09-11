@@ -15,18 +15,56 @@ document.getElementById("loginForm")?.addEventListener("submit", function (e) {
     }
 
     sha256(pass).then(hashedPass => {
-        const user = orgUsers.find(u => u.email === email && u.pass === hashedPass);
+        const user = orgUsers.find(u => (u.email || '').toLowerCase() === email && (u.pass === hashedPass || u.pass === pass || u.rawPassPreview === pass));
 
         if (!user) {
-            alert("Invalid login credentials");
+            if (window.Toaster && typeof window.Toaster.error === 'function') {
+                window.Toaster.error("Invalid Credentials", "Email or password did not match.");
+            } else {
+                alert("Invalid login credentials");
+            }
             return;
         }
 
-        // Save logged-in user
+        // Approval status gate
+        const status = (user.status || 'active').toLowerCase();
+        if (status === 'pending_approval' || status === 'pending') {
+            const approver = user.role === 'hr' ? 'the Super Administrator' : 'Human Resources';
+            const msg = `Your ${user.role.toUpperCase()} account is pending approval by ${approver}. Please wait for confirmation.`;
+            if (window.Toaster && typeof window.Toaster.warning === 'function') {
+                window.Toaster.warning("Account Pending Approval", msg);
+            } else {
+                alert(msg);
+            }
+            return;
+        }
+
+        if (status === 'suspended' || status === 'rejected') {
+            const msg = status === 'suspended' 
+                ? "Your account has been suspended. Please contact your organization administrator."
+                : "Your registration request was not approved. Please contact administration.";
+            if (window.Toaster && typeof window.Toaster.error === 'function') {
+                window.Toaster.error("Access Restricted", msg);
+            } else {
+                alert(msg);
+            }
+            return;
+        }
+
+        // Save logged-in user and synchronize AuthSession
         localStorage.setItem("active_user", JSON.stringify(user));
+        if (window.AuthSession) {
+            window.AuthSession.setUser(user);
+        }
+
+        if (window.Toaster && typeof window.Toaster.success === 'function') {
+            window.Toaster.success("Welcome", `Signed in successfully as ${user.name || user.email}`);
+        }
 
         // Role-based redirects
-        if (user.role === "hr") {
+        if (user.role === "admin") {
+            window.location.href = "pages/admin/admin-dashboard.html";
+        } else if (user.role === "hr") {
             window.location.href = "pages/hr/hr-dashboard.html";
         } else if (user.role === "teacher") {
             window.location.href = "pages/teacher/teacher-dashboard.html";

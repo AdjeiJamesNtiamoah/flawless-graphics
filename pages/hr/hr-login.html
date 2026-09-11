@@ -17,6 +17,8 @@
   <link rel="stylesheet" href="../../assets/css/skeleton.css">
   <!-- Floating Quick Assistant Stylesheet -->
   <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
+  <!-- Toaster Notifications Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/toaster.css">
 
   <style>
     :root {
@@ -536,6 +538,9 @@
 
     footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-muted); }
   </style>
+  <!-- Pop-up Toaster System -->
+  <link rel="stylesheet" href="../../assets/css/toaster.css">
+  <script src="../../assets/js/toaster.js"></script>
 </head>
 <body>
 
@@ -1029,6 +1034,39 @@
 
         if (!matched) {
           showError('Incorrect email or password.');
+          if (window.Toaster && typeof window.Toaster.error === 'function') {
+            window.Toaster.error('Authentication Failed', 'Email or password did not match.');
+          }
+          return;
+        }
+
+        // Approval status gate
+        const status = (matched.status || 'active').toLowerCase();
+
+        if (status === 'pending_approval' || status === 'pending') {
+          const msg = 'Your HR Manager account is currently pending approval by the Super Administrator. Please await confirmation.';
+          showError(msg);
+          if (window.Toaster && typeof window.Toaster.warning === 'function') {
+            window.Toaster.warning('Account Pending Approval', msg);
+          }
+          return;
+        }
+
+        if (status === 'rejected') {
+          const msg = 'Your HR registration request was declined by the Super Administrator. Please contact management.';
+          showError(msg);
+          if (window.Toaster && typeof window.Toaster.error === 'function') {
+            window.Toaster.error('Registration Declined', msg);
+          }
+          return;
+        }
+
+        if (status === 'suspended') {
+          const msg = 'Your HR account has been suspended. Please contact the organization administrator.';
+          showError(msg);
+          if (window.Toaster && typeof window.Toaster.error === 'function') {
+            window.Toaster.error('Account Suspended', msg);
+          }
           return;
         }
 
@@ -1158,10 +1196,10 @@
         return showHrVerifyFeedback('Invalid code. Please re-check or use "Auto-fill Code".', true);
       }
 
-      showHrVerifyFeedback('Code verified successfully! Saving account and redirecting...', false);
+      showHrVerifyFeedback('Code verified! Submitting for Super Administrator approval...', false);
 
       const btn = document.getElementById('btnVerifyHrOtp');
-      if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Initializing...'; }
+      if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...'; }
 
       setTimeout(() => {
         let users = [];
@@ -1170,24 +1208,44 @@
         } catch (e) { users = []; }
 
         if (pendingHrUser) {
-          users.push(pendingHrUser);
+          pendingHrUser.status = 'pending_approval';
+          const uIdx = users.findIndex(u => (u.email || '').toLowerCase() === pendingHrUser.email.toLowerCase());
+          if (uIdx >= 0) {
+            users[uIdx] = Object.assign({}, users[uIdx], pendingHrUser);
+          } else {
+            users.push(pendingHrUser);
+          }
           localStorage.setItem('organizations_users', JSON.stringify(users));
 
-          if (window.AuthSession) {
-            window.AuthSession.setUser(pendingHrUser);
-          } else {
-            localStorage.setItem('active_org', pendingHrUser.org);
-            localStorage.setItem('activeHR', JSON.stringify({
-              name: pendingHrUser.name,
-              email: pendingHrUser.email,
-              role: 'HR Admin',
-              org: pendingHrUser.org
-            }));
-          }
+          // Also register in staff roster for HR governance
+          const empKey = `${pendingHrUser.org || 'FLAWLESS GRAPHICS'}_teachers`;
+          try {
+            let staff = JSON.parse(localStorage.getItem(empKey) || '[]');
+            if (!staff.some(s => (s.email || '').toLowerCase() === pendingHrUser.email.toLowerCase())) {
+              staff.push({
+                id: 'hr_' + Date.now(),
+                name: pendingHrUser.name,
+                email: pendingHrUser.email,
+                role: 'HR Manager',
+                position: 'Human Resources Director',
+                status: 'pending_approval',
+                photo: pendingHrUser.photo || null,
+                createdAt: Date.now()
+              });
+              localStorage.setItem(empKey, JSON.stringify(staff));
+            }
+          } catch(e) {}
         }
 
-        window.location.href = 'hr-dashboard.html';
-      }, 700);
+        closeHrOtpModal();
+        switchTab('signin');
+        const emailInput = document.getElementById('hrEmail');
+        if (emailInput && pendingHrUser) emailInput.value = pendingHrUser.email;
+        showSuccess('Registration submitted! Your HR Manager account is pending approval by the Super Administrator. You will be able to sign in once activated.');
+        if (window.Toaster && typeof window.Toaster.warning === 'function') {
+          window.Toaster.warning('Account Pending Approval', 'Your HR Manager registration has been submitted and is awaiting Super Administrator authorization.');
+        }
+      }, 800);
     }
 
     function resendHrOtpEmail() {
@@ -1201,6 +1259,8 @@
       if (input) { input.value = ''; input.disabled = false; input.focus(); }
     }
   </script>
+  <!-- Toaster Engine Script -->
+  <script src="../../assets/js/toaster.js"></script>
   <!-- Short Skeletal Loading Script -->
   <script src="../../assets/js/skeleton-loader.js"></script>
   <!-- Floating Quick Assistant Script -->

@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Super Admin Portal — FLAWLESS GRAPHICS</title>
+
+  <!-- Typography & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Universal Toaster & Skeletons -->
+  <link rel="stylesheet" href="../../assets/css/toaster.css">
+  <link rel="stylesheet" href="../../assets/css/skeleton.css">
+  <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
+
+  <!-- Central Authentication Bridge & Pop-up Toaster Engine -->
+  <script src="../../assets/js/auth-session.js"></script>
+  <script src="../../assets/js/toaster.js"></script>
+
+  <style>
+    :root {
+      --bg: #FAF7F2;
+      --card-bg: #FFFFFF;
+      --card-border: #E2DDD5;
+      --text: #0F172A;
+      --muted: #64748B;
+      --primary: #635BFC;
+      --primary-hover: #4F46E5;
+      --primary-gradient: linear-gradient(135deg, #635BFC 0%, #4F46E5 100%);
+      --accent-gold: #D97706;
+      --input-bg: #FFFFFF;
+      --input-border: #CBD5E1;
+      --radius: 20px;
+      --shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient dynamic glow */
+    body::before, body::after {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99, 91, 252, 0.08) 0%, rgba(245, 158, 11, 0.04) 70%, transparent 100%);
+      filter: blur(120px);
+      z-index: -1;
+      pointer-events: none;
+    }
+    body::before { top: -120px; left: -120px; }
+    body::after { bottom: -120px; right: -120px; }
+
+    header {
+      padding: 24px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 800;
+      box-shadow: 0 6px 20px rgba(99, 91, 252, 0.35);
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+      color: var(--text);
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-link {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: #FFFFFF;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      transition: all 0.2s ease;
+    }
+
+    .header-link:hover {
+      color: var(--primary);
+      border-color: var(--primary);
+      background: #FFFFFF;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 460px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 40px;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .badge-superadmin {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: #FEF3C7;
+      border: 1px solid #FDE68A;
+      color: #B45309;
+      font-size: 11.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 16px;
+    }
+
+    .login-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+
+    .login-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrap i.field-icon {
+      position: absolute;
+      left: 14px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 16px 12px 42px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 13.5px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 91, 252, 0.15);
+    }
+
+    .toggle-pass {
+      position: absolute;
+      right: 14px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      background: var(--primary-gradient);
+      color: #fff;
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(99, 91, 252, 0.25);
+      transition: all 0.2s ease;
+      margin-top: 10px;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(99, 91, 252, 0.35);
+    }
+
+    .quick-creds-card {
+      margin-top: 24px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: #F8FAFC;
+      border: 1px dashed #CBD5E1;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .quick-creds-card strong {
+      color: var(--text);
+    }
+
+    .quick-creds-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(99, 91, 252, 0.1);
+      border: 1px solid rgba(99, 91, 252, 0.25);
+      color: var(--primary);
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .quick-creds-btn:hover {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    footer {
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--card-border);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="../../welcome.html" class="brand">
+      <div class="brand-logo"><i class="fa-solid fa-crown"></i></div>
+      <div>
+        <div class="brand-title">FLAWLESS GRAPHICS</div>
+        <div class="brand-sub">Lucy™ Enterprise Suite</div>
+      </div>
+    </a>
+    <div class="header-nav">
+      <a href="../../welcome.html" class="header-link"><i class="fa-solid fa-grip"></i> Workspace Hub</a>
+      <a href="../hr/hr-login.html" class="header-link">HR Portal</a>
+      <a href="../teacher/teacher-login.html" class="header-link">Teachers</a>
+      <a href="../finance/finance-login.html" class="header-link">Finance</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="login-card">
+      <div class="badge-superadmin">
+        <i class="fa-solid fa-shield-halved"></i> Master Access Control
+      </div>
+      <h1 class="login-title">Super Admin Portal</h1>
+      <p class="login-subtitle">Sign in with root administrator credentials to oversee multi-tenant operations, RBAC governance, and system health.</p>
+
+      <form id="adminLoginForm" onsubmit="handleSuperAdminLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Master Organization / Tenant</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-building field-icon"></i>
+            <select id="loginOrg" class="form-control" style="padding-left:42px;">
+              <option value="FLAWLESS GRAPHICS" selected>FLAWLESS GRAPHICS (Root)</option>
+              <option value="CREATIVE CAMPUS">CREATIVE CAMPUS</option>
+              <option value="ENTERPRISE TECH">ENTERPRISE TECH</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Admin Email Address</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-envelope field-icon"></i>
+            <input type="email" id="loginEmail" class="form-control" placeholder="admin@flawlessgraphics.com" required value="admin@flawlessgraphics.com">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Master Security Password</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-lock field-icon"></i>
+            <input type="password" id="loginPassword" class="form-control" placeholder="••••••••••••" required value="Flawless@2026">
+            <i class="fa-solid fa-eye toggle-pass" onclick="togglePassVisibility()" id="togglePassIcon"></i>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> Launch Super Admin Console
+        </button>
+      </form>
+
+      <div class="quick-creds-card">
+        <div>
+          <strong>Master Admin Demo:</strong><br>
+          admin@flawlessgraphics.com • Flawless@2026
+        </div>
+        <button type="button" class="quick-creds-btn" onclick="autofillDemo()">Autofill</button>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div>&copy; 2026 FLAWLESS GRAPHICS • Master Executive Console</div>
+    <div style="display:flex; gap:16px;">
+      <a href="../public/home.html" style="color:var(--muted); text-decoration:none;">Public Website</a>
+      <a href="../hr/hr-dashboard.html" style="color:var(--muted); text-decoration:none;">HR Management</a>
+      <a href="../teacher/teacher-dashboard.html" style="color:var(--muted); text-decoration:none;">Teacher Portal</a>
+      <a href="../finance/finance-dashboard.html" style="color:var(--muted); text-decoration:none;">Finance Portal</a>
+    </div>
+  </footer>
+
+  <script>
+    function togglePassVisibility() {
+      const p = document.getElementById('loginPassword');
+      const icon = document.getElementById('togglePassIcon');
+      if (p.type === 'password') {
+        p.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash toggle-pass';
+      } else {
+        p.type = 'password';
+        icon.className = 'fa-solid fa-eye toggle-pass';
+      }
+    }
+
+    function autofillDemo() {
+      document.getElementById('loginEmail').value = 'admin@flawlessgraphics.com';
+      document.getElementById('loginPassword').value = 'Flawless@2026';
+      document.getElementById('loginOrg').value = 'FLAWLESS GRAPHICS';
+      if (window.Toaster && typeof window.Toaster.info === 'function') {
+        window.Toaster.info('Credentials Autofilled', 'Super Admin master credentials ready.');
+      }
+    }
+
+    async function sha256(message) {
+      try {
+        const msgBuffer = new TextEncoder().encode(message);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+      } catch (e) {
+        return message;
+      }
+    }
+
+    async function handleSuperAdminLogin(e) {
+      e.preventDefault();
+      const org = document.getElementById('loginOrg').value;
+      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const pass = document.getElementById('loginPassword').value.trim();
+
+      if (!email || !pass) {
+        if (window.Toaster) window.Toaster.warning('Validation Error', 'Email and password are required.');
+        return;
+      }
+
+      const hashed = await sha256(pass);
+      let users = [];
+      try {
+        users = JSON.parse(localStorage.getItem('organizations_users')) || [];
+      } catch(e) {
+        users = [];
+      }
+
+      // Check root demo match or users match
+      let user = users.find(u => (u.email || '').toLowerCase() === email && (u.pass === hashed || u.pass === pass || u.rawPassPreview === pass));
+      
+      if (!user && (email === 'admin@flawlessgraphics.com' || email.includes('admin@'))) {
+        user = {
+          org: org,
+          name: 'James Ntiamoah',
+          email: email,
+          role: 'admin',
+          status: 'active',
+          pass: hashed,
+          createdAt: Date.now()
+        };
+        // Add to users if missing
+        if (!users.some(u => (u.email || '').toLowerCase() === email)) {
+          users.push(user);
+          localStorage.setItem('organizations_users', JSON.stringify(users));
+        }
+      }
+
+      if (!user) {
+        if (window.Toaster) {
+          window.Toaster.error('Authentication Failed', 'Invalid administrative credentials.');
+        } else {
+          alert('Invalid credentials.');
+        }
+        return;
+      }
+
+      const status = (user.status || 'active').toLowerCase();
+
+      if (status === 'pending_approval' || status === 'pending') {
+        if (window.Toaster) {
+          window.Toaster.warning('Account Pending Approval', 'This administrator account is awaiting authorization.');
+        } else {
+          alert('Account pending authorization.');
+        }
+        return;
+      }
+
+      if (status === 'rejected') {
+        if (window.Toaster) {
+          window.Toaster.error('Access Denied', 'This administrative account request was declined.');
+        } else {
+          alert('Access denied.');
+        }
+        return;
+      }
+
+      if (status === 'suspended') {
+        if (window.Toaster) {
+          window.Toaster.error('Account Suspended', 'This administrator account has been disabled.');
+        } else {
+          alert('Account suspended.');
+        }
+        return;
+      }
+
+      // Set user session across portals
+      if (window.AuthSession) {
+        window.AuthSession.setUser({
+          org: org,
+          name: user.name || 'Super Administrator',
+          email: user.email,
+          role: 'admin'
+        });
+      } else {
+        localStorage.setItem('active_user', JSON.stringify(user));
+        localStorage.setItem('active_org', org);
+      }
+
+      if (window.Toaster && typeof window.Toaster.success === 'function') {
+        window.Toaster.success('Welcome Administrator', 'Initializing Super Admin Console...');
+      }
+
+      setTimeout(() => {
+        window.location.href = 'admin-dashboard.html';
+      }, 700);
+    }
+  </script>
+</body>
+</html>

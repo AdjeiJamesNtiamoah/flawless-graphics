@@ -86,6 +86,11 @@
       max-width: 100% !important;
     }
   </style>
+  <!-- Floating 3-Dots Quick Dock Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/quick-dock.css">
+  <!-- Pop-up Toaster System -->
+  <link rel="stylesheet" href="../../assets/css/toaster.css">
+  <script src="../../assets/js/toaster.js"></script>
 </head>
 <body>
 
@@ -561,11 +566,18 @@
       showToast('Attendance report exported');
     }
 
-    function showToast(msg) {
-      const el = document.getElementById('toast');
-      document.getElementById('toastMsg').textContent = msg;
-      el.classList.add('show');
-      setTimeout(() => el.classList.remove('show'), 2500);
+    function showToast(msg, type = 'success') {
+      if (window.Toaster && typeof window.Toaster.show === 'function') {
+        window.Toaster.show({ type: type, message: msg });
+      } else {
+        const el = document.getElementById('toast');
+        if (el) {
+          const m = document.getElementById('toastMsg');
+          if (m) m.textContent = msg;
+          el.classList.add('show');
+          setTimeout(() => el.classList.remove('show'), 2500);
+        }
+      }
     }
 
     function escapeHtml(str) {
@@ -598,5 +610,7 @@
   </script>
   <!-- Short Skeletal Loading Script -->
   <script src="../../assets/js/skeleton-loader.js"></script>
+  <!-- Floating 3-Dots Quick Dock Script -->
+  <script src="../../assets/js/quick-dock.js"></script>
 </body>
 </html>

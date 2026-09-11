@@ -14,6 +14,8 @@
 <link rel="stylesheet" href="../../assets/css/skeleton.css">
 <!-- Floating Quick Assistant Stylesheet -->
 <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
+<!-- Toaster Notifications Stylesheet -->
+<link rel="stylesheet" href="../../assets/css/toaster.css">
 
 <style>
     * {
@@ -690,6 +692,9 @@
         border-color: rgba(239, 68, 68, 0.5);
     }
 </style>
+  <!-- Pop-up Toaster System -->
+  <link rel="stylesheet" href="../../assets/css/toaster.css">
+  <script src="../../assets/js/toaster.js"></script>
 </head>
 <body>
 
@@ -1036,20 +1041,61 @@ function submitOtpVerification() {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying...';
 
-    showVerifyFeedback("Account verified successfully! Entering classroom dashboard...", false);
+    showVerifyFeedback("Account verified! Submitting for Human Resources approval...", false);
 
+    pendingTeacherData.status = 'pending_approval';
+
+    // 1. Persist to master organizations_users repository
+    try {
+        let orgUsers = JSON.parse(localStorage.getItem('organizations_users') || '[]');
+        const uIdx = orgUsers.findIndex(u => (u.email || '').toLowerCase() === pendingTeacherData.email.toLowerCase());
+        if (uIdx >= 0) {
+            orgUsers[uIdx] = Object.assign({}, orgUsers[uIdx], pendingTeacherData);
+        } else {
+            orgUsers.push(pendingTeacherData);
+        }
+        localStorage.setItem('organizations_users', JSON.stringify(orgUsers));
+    } catch(e) {
+        console.warn("Error saving to organizations_users:", e);
+    }
+
+    // 2. Persist to teachers list
     const list = getTeachers();
-    list.push(pendingTeacherData);
+    const tIdx = list.findIndex(t => (t.email || '').toLowerCase() === pendingTeacherData.email.toLowerCase());
+    if (tIdx >= 0) list[tIdx] = pendingTeacherData;
+    else list.push(pendingTeacherData);
     localStorage.setItem(TEACHERS_KEY, JSON.stringify(list));
 
-    if (window.AuthSession) {
-        window.AuthSession.setUser(pendingTeacherData);
+    // 3. Persist to organization teachers roster
+    const orgKey = `${pendingTeacherData.org || 'FLAWLESS GRAPHICS'}_teachers`;
+    try {
+        let orgStaff = JSON.parse(localStorage.getItem(orgKey) || '[]');
+        if (!orgStaff.some(s => (s.email || '').toLowerCase() === pendingTeacherData.email.toLowerCase())) {
+            orgStaff.push({
+                id: 't_' + Date.now(),
+                name: pendingTeacherData.name,
+                email: pendingTeacherData.email,
+                role: 'Teacher',
+                position: 'Educator / Teacher',
+                status: 'pending_approval',
+                photo: pendingTeacherData.photo || null,
+                createdAt: Date.now()
+            });
+            localStorage.setItem(orgKey, JSON.stringify(orgStaff));
+        }
+    } catch(e) {
+        console.warn("Error saving to org staff roster:", e);
     }
-    localStorage.setItem("active_teacher", JSON.stringify(pendingTeacherData));
-    localStorage.setItem("teacher_active_user", JSON.stringify(pendingTeacherData));
 
     setTimeout(() => {
-        window.location.href = "teacher-dashboard.html";
+        closeVerificationModal();
+        switchTeacherTab('signin');
+        const emailInput = document.getElementById('email');
+        if (emailInput) emailInput.value = pendingTeacherData.email;
+        showMessage("Registration submitted successfully! Your account is awaiting approval by Human Resources. You will receive access once approved.", false);
+        if (window.Toaster && typeof window.Toaster.warning === 'function') {
+            window.Toaster.warning("Account Pending Approval", "Your Teacher account has been registered and is awaiting Human Resources authorization.");
+        }
     }, 1000);
 }
 
@@ -1254,6 +1300,7 @@ async function handleTeacherAuth() {
                 email: email,
                 pass: hashed,
                 role: "teacher",
+                status: "pending_approval",
                 photo: currentTeacherPhotoBase64 || null,
                 org: (window.AuthSession ? window.AuthSession.getOrg() : '') || "FLAWLESS GRAPHICS",
                 createdAt: Date.now()
@@ -1270,6 +1317,15 @@ async function handleTeacherAuth() {
                 (t.pass === hashed || t.pass === pw)
             );
 
+            // Also check master organizations_users
+            let orgUsers = [];
+            try { orgUsers = JSON.parse(localStorage.getItem('organizations_users') || '[]'); } catch(e){}
+            const matchedOrgUser = orgUsers.find(u => (u.email || '').toLowerCase() === email && (u.pass === hashed || u.pass === pw || u.rawPassPreview === pw));
+
+            if (!teacher && matchedOrgUser) {
+                teacher = Object.assign({}, matchedOrgUser, { role: "teacher" });
+            }
+
             if (!teacher) {
                 // Allow general user or demo fallback
                 const activeUser = window.AuthSession ? window.AuthSession.getUser() : null;
@@ -1280,12 +1336,43 @@ async function handleTeacherAuth() {
                         name: email.split("@")[0],
                         email: email,
                         org: (window.AuthSession ? window.AuthSession.getOrg() : '') || "FLAWLESS GRAPHICS",
-                        role: "teacher"
+                        role: "teacher",
+                        status: "active"
                     };
                 } else {
                     submitBtn.disabled = false;
                     return showMessage("Incorrect email or password.");
                 }
+            }
+
+            // Approval status gate
+            const userStatus = ((matchedOrgUser && matchedOrgUser.status) || (teacher && teacher.status) || 'active').toLowerCase();
+
+            if (userStatus === 'pending_approval' || userStatus === 'pending') {
+                submitBtn.disabled = false;
+                const msg = "Your Teacher account is currently pending approval by Human Resources. Please await confirmation.";
+                if (window.Toaster && typeof window.Toaster.warning === 'function') {
+                    window.Toaster.warning("Account Pending Approval", msg);
+                }
+                return showMessage(msg, true);
+            }
+
+            if (userStatus === 'rejected') {
+                submitBtn.disabled = false;
+                const msg = "Your teacher registration request was declined by Human Resources. Please contact administration.";
+                if (window.Toaster && typeof window.Toaster.error === 'function') {
+                    window.Toaster.error("Registration Declined", msg);
+                }
+                return showMessage(msg, true);
+            }
+
+            if (userStatus === 'suspended') {
+                submitBtn.disabled = false;
+                const msg = "Your teacher account has been suspended. Please contact the administrator.";
+                if (window.Toaster && typeof window.Toaster.error === 'function') {
+                    window.Toaster.error("Account Suspended", msg);
+                }
+                return showMessage(msg, true);
             }
 
             if (window.AuthSession) {
@@ -1301,6 +1388,9 @@ async function handleTeacherAuth() {
             }
 
             showMessage("Authentication successful! Entering Teacher Portal...", false);
+            if (window.Toaster && typeof window.Toaster.success === 'function') {
+                window.Toaster.success("Welcome Back", `Signed in as ${teacher.name}`);
+            }
 
             setTimeout(() => {
                 window.location.href = "teacher-dashboard.html";
@@ -1323,6 +1413,8 @@ window.onload = () => {
 };
 </script>
 
+<!-- Toaster Engine Script -->
+<script src="../../assets/js/toaster.js"></script>
 <!-- Short Skeletal Loading Script -->
 <script src="../../assets/js/skeleton-loader.js"></script>
 <!-- Floating Quick Assistant Script -->

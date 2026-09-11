@@ -17,6 +17,8 @@
   <link rel="stylesheet" href="../../assets/css/skeleton.css">
   <!-- Floating Quick Assistant Stylesheet -->
   <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
+  <!-- Toaster Notifications Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/toaster.css">
 
   <!-- Unified AuthSession -->
   <script src="../../assets/js/auth-session.js"></script>
@@ -512,6 +514,9 @@
 
     footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-muted); }
   </style>
+  <!-- Pop-up Toaster System -->
+  <link rel="stylesheet" href="../../assets/css/toaster.css">
+  <script src="../../assets/js/toaster.js"></script>
 </head>
 <body>
 
@@ -830,38 +835,58 @@
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying...';
 
-      showFinanceVerifyFeedback('Account verified successfully! Loading Finance Portal...', false);
+      showFinanceVerifyFeedback('Account verified! Submitting for Human Resources approval...', false);
 
-      const users = JSON.parse(localStorage.getItem('fg_registered_users') || '[]');
-      users.push(pendingFinanceUser);
-      localStorage.setItem('fg_registered_users', JSON.stringify(users));
-
-      localStorage.setItem('active_org', pendingFinanceUser.org);
-      localStorage.setItem('activeFinance', JSON.stringify({
+      // Prepare user record
+      const financeRecord = {
+        org: pendingFinanceUser.org || 'FLAWLESS GRAPHICS',
         name: pendingFinanceUser.email.split('@')[0],
-        email: pendingFinanceUser.email,
-        role: 'Finance Officer'
-      }));
-      localStorage.setItem('activeHR', 'true');
+        email: pendingFinanceUser.email.toLowerCase(),
+        pass: pendingFinanceUser.password, // raw or hashed
+        rawPassPreview: pendingFinanceUser.password,
+        role: 'finance',
+        status: 'pending_approval',
+        createdAt: Date.now()
+      };
 
-      if (window.AuthSession) {
-        window.AuthSession.saveRegisteredUser({
-          org: pendingFinanceUser.org,
-          name: pendingFinanceUser.email.split('@')[0],
-          email: pendingFinanceUser.email,
-          role: 'finance'
-        });
-        window.AuthSession.setUser({
-          org: pendingFinanceUser.org,
-          name: pendingFinanceUser.email.split('@')[0],
-          email: pendingFinanceUser.email,
-          role: 'finance'
-        });
+      // Hash password if crypto/AuthSession available
+      if (window.AuthSession && typeof window.AuthSession.sha256 === 'function') {
+        window.AuthSession.sha256(pendingFinanceUser.password).then(h => {
+          financeRecord.pass = h;
+          saveRecord();
+        }).catch(() => saveRecord());
+      } else {
+        saveRecord();
       }
 
-      setTimeout(() => {
-        window.location.href = 'finance-dashboard.html';
-      }, 1000);
+      function saveRecord() {
+        // 1. Unified organizations_users
+        try {
+          let orgUsers = JSON.parse(localStorage.getItem('organizations_users') || '[]');
+          const idx = orgUsers.findIndex(u => (u.email || '').toLowerCase() === financeRecord.email);
+          if (idx >= 0) orgUsers[idx] = Object.assign({}, orgUsers[idx], financeRecord);
+          else orgUsers.push(financeRecord);
+          localStorage.setItem('organizations_users', JSON.stringify(orgUsers));
+        } catch(e) {
+          console.warn('Error saving to organizations_users:', e);
+        }
+
+        // 2. Legacy fallback
+        const users = JSON.parse(localStorage.getItem('fg_registered_users') || '[]');
+        users.push(pendingFinanceUser);
+        localStorage.setItem('fg_registered_users', JSON.stringify(users));
+
+        setTimeout(() => {
+          closeFinanceOtpModal();
+          setMode(false);
+          const emailInput = document.getElementById('hrEmail');
+          if (emailInput) emailInput.value = financeRecord.email;
+          showSuccess('Registration submitted! Your Finance account is awaiting approval by Human Resources. You will be able to sign in once activated.');
+          if (window.Toaster && typeof window.Toaster.warning === 'function') {
+            window.Toaster.warning('Account Pending Approval', 'Your Finance account has been registered and is awaiting Human Resources authorization.');
+          }
+        }, 900);
+      }
     }
 
     function resendFinanceOtpEmail() {
@@ -1030,33 +1055,102 @@
 
       } else {
         // --- SIGN IN WORKFLOW ---
-        const userMatch = users.find(u => u.email.toLowerCase() === hrEmail.toLowerCase() && u.password === password);
+        let orgUsers = [];
+        try {
+          orgUsers = JSON.parse(localStorage.getItem('organizations_users') || '[]');
+        } catch(e) { orgUsers = []; }
 
-        // Allow login if user matches registered account OR simple default validation
-        if (!userMatch && users.length > 0) {
+        const lowerEmail = hrEmail.toLowerCase();
+        let matchedUser = orgUsers.find(u => (u.email || '').toLowerCase() === lowerEmail);
+
+        // Fallback to legacy fg_registered_users
+        const legacyMatch = users.find(u => (u.email || '').toLowerCase() === lowerEmail);
+        if (!matchedUser && legacyMatch) {
+          matchedUser = {
+            org: legacyMatch.org || orgName,
+            name: legacyMatch.email.split('@')[0],
+            email: legacyMatch.email,
+            role: 'finance',
+            status: 'active',
+            pass: legacyMatch.password
+          };
+        }
+
+        // Demo user fallback
+        if (!matchedUser && (lowerEmail === 'bursar@flawlessgraphics.com' || lowerEmail.includes('finance@') || lowerEmail === 'admin@flawlessgraphics.com' || orgUsers.length === 0)) {
+          matchedUser = {
+            org: orgName || 'FLAWLESS GRAPHICS',
+            name: lowerEmail.split('@')[0],
+            email: lowerEmail,
+            role: 'finance',
+            status: 'active',
+            pass: password
+          };
+        }
+
+        if (!matchedUser) {
           showError('Invalid email or password.');
+          if (window.Toaster && typeof window.Toaster.error === 'function') {
+            window.Toaster.error('Authentication Failed', 'Email or password did not match.');
+          }
+          return;
+        }
+
+        // Approval status gate
+        const status = (matchedUser.status || 'active').toLowerCase();
+
+        if (status === 'pending_approval' || status === 'pending') {
+          const msg = 'Your Finance account is currently pending approval by Human Resources. Please await confirmation.';
+          showError(msg);
+          if (window.Toaster && typeof window.Toaster.warning === 'function') {
+            window.Toaster.warning('Account Pending Approval', msg);
+          }
+          return;
+        }
+
+        if (status === 'rejected') {
+          const msg = 'Your finance registration request was declined. Please contact administration.';
+          showError(msg);
+          if (window.Toaster && typeof window.Toaster.error === 'function') {
+            window.Toaster.error('Access Declined', msg);
+          }
+          return;
+        }
+
+        if (status === 'suspended') {
+          const msg = 'Your finance account has been suspended. Please contact the administrator.';
+          showError(msg);
+          if (window.Toaster && typeof window.Toaster.error === 'function') {
+            window.Toaster.error('Account Suspended', msg);
+          }
           return;
         }
 
         // Save session credentials
         localStorage.setItem('active_org', orgName);
         localStorage.setItem('activeFinance', JSON.stringify({
-          name: hrEmail.split('@')[0],
-          email: hrEmail,
-          role: 'Finance Admin'
+          name: matchedUser.name || lowerEmail.split('@')[0],
+          email: lowerEmail,
+          role: 'Finance Officer'
         }));
         localStorage.setItem('activeHR', 'true'); // Satisfies dashboard route guard
 
         if (window.AuthSession) {
-          window.AuthSession.login({
+          window.AuthSession.setUser({
             org: orgName,
-            name: hrEmail.split('@')[0],
-            email: hrEmail,
-            role: 'Finance Officer'
+            name: matchedUser.name || lowerEmail.split('@')[0],
+            email: lowerEmail,
+            role: 'finance'
           });
         }
 
-        window.location.href = 'finance-dashboard.html';
+        if (window.Toaster && typeof window.Toaster.success === 'function') {
+          window.Toaster.success('Welcome Back', `Entering Finance Portal as ${matchedUser.name || lowerEmail}`);
+        }
+
+        setTimeout(() => {
+          window.location.href = 'finance-dashboard.html';
+        }, 500);
       }
     });
 
@@ -1084,6 +1178,8 @@
 
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
+  <!-- Toaster Engine Script -->
+  <script src="../../assets/js/toaster.js"></script>
   <!-- Short Skeletal Loading Script -->
   <script src="../../assets/js/skeleton-loader.js"></script>
   <!-- Floating Quick Assistant Script -->

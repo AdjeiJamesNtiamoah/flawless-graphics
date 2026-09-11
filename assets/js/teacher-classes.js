@@ -120,7 +120,7 @@
     const className = document.getElementById('schedClassName').value.trim();
     const teacherName = document.getElementById('schedTeacher').value.trim();
     if(!day || !time || !className) return alert('Fill schedule fields');
-    const s = getSchedule(); s.push({ day, time, className, teacherName }); saveSchedule(s); renderTimetable(); alert('Scheduled');
+    const s = getSchedule(); s.push({ day, time, className, teacherName }); saveSchedule(s); renderTimetable(); if (window.Toaster) { window.Toaster.success('Timetable Saved', `Scheduled slot for ${className} saved successfully!`); } else { alert('Scheduled'); }
   });
 
   // file import/export
@@ -140,7 +140,7 @@
           if(data.classes) saveClasses(data.classes);
           if(data.schedule) saveSchedule(data.schedule);
           renderTable(); renderCards(); renderTimetable();
-          alert('Import done');
+          if (window.Toaster) { window.Toaster.success('Import Complete', 'Classes and schedule imported successfully!'); } else { alert('Import done'); }
         }catch(err){ alert('Invalid JSON'); }
       }; r.readAsText(f);
     }; ip.click();

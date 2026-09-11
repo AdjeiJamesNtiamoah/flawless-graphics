@@ -52,6 +52,7 @@
     .contact-hero h2 span {
       background: var(--accent-gradient);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     .contact-hero p {
@@ -126,7 +127,37 @@
     .faq-item.open .faq-answer {
       display: block;
     }
+
+    /* --- TOAST NOTIFICATION (Synchronized with HR Dashboard) --- */
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 14px 22px;
+      border-radius: 12px;
+      font-weight: 600;
+      opacity: 0;
+      font-size: 13px;
+      transform: translateY(20px);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 200;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
   </style>
+  <!-- Floating 3-Dots Quick Dock Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/quick-dock.css">
+  <!-- Pop-up Toaster System -->
+  <link rel="stylesheet" href="../../assets/css/toaster.css">
+  <script src="../../assets/js/toaster.js"></script>
 </head>
 <body>
 
@@ -399,10 +430,10 @@
 
   </main>
 
-  <!-- TOAST NOTIFICATION -->
-  <div id="contactToast" class="modern-toast success">
-    <i class="fa-solid fa-circle-check" style="font-size: 18px; color: #10b981;"></i>
-    <span id="toastMsg">Inquiry received successfully!</span>
+  <!-- TOAST NOTIFICATION FALLBACK (Matches HR Dashboard) -->
+  <div class="toast" id="toast">
+    <i class="fa-solid fa-circle-check" style="color: #10b981;"></i>
+    <span id="toastText">Action completed</span>
   </div>
 
   <!-- FOOTER -->
@@ -478,20 +509,73 @@
         sendBtn.disabled = false;
         sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Transmit Message';
         document.getElementById('inquiryForm').reset();
-        showToast('Thank you! Your message has been sent to our team.');
+        if (window.Toaster && typeof window.Toaster.success === 'function') {
+          window.Toaster.success('Message Transmitted', 'Thank you! Your message has been sent to our team.', 4000);
+        } else {
+          showToast('Thank you! Your message has been sent to our team.');
+        }
       }, 900);
     }
 
-    function showToast(msg) {
-      const toast = document.getElementById('contactToast');
-      document.getElementById('toastMsg').textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3500);
+    function showToast(msg, type = 'success', options = {}) {
+      if (window.Toaster && typeof window.Toaster.show === 'function') {
+        if (type === 'troubleshoot' || options.troubleshoot) {
+          window.Toaster.troubleshoot(Object.assign({
+            title: options.title || 'Support Notice',
+            message: msg,
+            troubleshoot: options.troubleshoot || 'Please review inputs and system connectivity.',
+            steps: options.steps || []
+          }, options));
+          return;
+        }
+        const titleMap = {
+          success: 'Message Transmitted',
+          info: 'Enterprise Support',
+          warning: 'Attention',
+          error: 'Transmission Error',
+          troubleshoot: 'Troubleshoot / Error'
+        };
+        window.Toaster.show(Object.assign({
+          type: type,
+          title: options.title || titleMap[type] || 'Contact Desk',
+          message: msg
+        }, options));
+      } else {
+        const t = document.getElementById('toast') || document.getElementById('contactToast');
+        if (t) {
+          const el = document.getElementById('toastText') || document.getElementById('toastMsg');
+          if (el) el.textContent = msg;
+          t.classList.add('show');
+          setTimeout(() => t.classList.remove('show'), 2800);
+        }
+      }
     }
+
+    function showErrorToast(title, msg, troubleshootHint, steps, error) {
+      if (window.Toaster && typeof window.Toaster.troubleshoot === 'function') {
+        window.Toaster.troubleshoot({
+          title: title || 'System Operation Error',
+          message: msg || '',
+          troubleshoot: troubleshootHint || 'An unexpected operation error occurred. Your inputs remain safe.',
+          steps: steps || [
+            'Check network connectivity.',
+            'Verify all required contact fields are filled.',
+            'Try submitting again or contact our hotline directly.'
+          ],
+          error: error || '',
+          copyable: true
+        });
+      } else {
+        showToast((title ? title + ': ' : '') + msg, 'error');
+      }
+    }
+    window.showErrorToast = showErrorToast;
   </script>
   <!-- Short Skeletal Loading Engine -->
   <script src="../../assets/js/skeleton-loader.js"></script>
   <!-- Floating Quick Assistant Script -->
   <script src="../../assets/js/quick-assistant.js"></script>
+  <!-- Floating 3-Dots Quick Dock Script -->
+  <script src="../../assets/js/quick-dock.js"></script>
 </body>
 </html>

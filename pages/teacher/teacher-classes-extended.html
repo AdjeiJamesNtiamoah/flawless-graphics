@@ -15,6 +15,11 @@
   <link rel="stylesheet" href="../../assets/css/shared-design.css">
   <!-- Short Skeletal Loading Stylesheet -->
   <link rel="stylesheet" href="../../assets/css/skeleton.css">
+  <!-- Floating 3-Dots Quick Dock Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/quick-dock.css">
+  <!-- Pop-up Toaster System -->
+  <link rel="stylesheet" href="../../assets/css/toaster.css">
+  <script src="../../assets/js/toaster.js"></script>
 </head>
 <body>
 
@@ -198,7 +203,7 @@
       currentExtStudentPhoto = null;
       const pInput = document.getElementById('s_photo');
       if (pInput) pInput.value = '';
-      refreshStudents();
+      refreshStudents(); if (window.Toaster) { window.Toaster.success('Student Saved', `${firstName} ${lastName} saved successfully!`); }
       document.getElementById('s_first').value = ''; 
       document.getElementById('s_last').value = ''; 
       document.getElementById('s_class').value = ''; 
@@ -230,9 +235,11 @@
     applyTheme(savedTheme === 'true');
     themeBtn.addEventListener('click', () => applyTheme(!htmlEl.classList.contains('dark')));
 
-    refreshStudents();
+    refreshStudents(); if (window.Toaster) { window.Toaster.success('Student Saved', `${firstName} ${lastName} saved successfully!`); }
   </script>
   <!-- Short Skeletal Loading Script -->
   <script src="../../assets/js/skeleton-loader.js"></script>
+  <!-- Floating 3-Dots Quick Dock Script -->
+  <script src="../../assets/js/quick-dock.js"></script>
 </body>
 </html>

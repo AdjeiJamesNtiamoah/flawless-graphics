@@ -20,6 +20,21 @@
 
   const rootPrefix = getRootPrefix();
 
+  // Auto-inject Toaster CSS & JS if not already loaded
+  function ensureToaster() {
+    if (!document.querySelector('link[href*="toaster.css"]')) {
+      const l = document.createElement('link');
+      l.rel = 'stylesheet';
+      l.href = rootPrefix + 'assets/css/toaster.css';
+      document.head.appendChild(l);
+    }
+    if (!window.Toaster) {
+      const s = document.createElement('script');
+      s.src = rootPrefix + 'assets/js/toaster.js';
+      document.head.appendChild(s);
+    }
+  }
+
   // Create markup dynamically
   function buildAssistantMarkup() {
     const container = document.createElement('div');
@@ -55,19 +70,23 @@
         <nav class="assistant-nav" id="assistantNav">
           <button type="button" class="assistant-nav-btn active" data-tab="tab-subscriptions">
             <i class="fa-solid fa-gem"></i>
-            <span>Subscriptions</span>
+            <span>Plans</span>
           </button>
           <button type="button" class="assistant-nav-btn" data-tab="tab-help">
             <i class="fa-solid fa-circle-question"></i>
-            <span>Help Desk</span>
+            <span>Help</span>
           </button>
           <button type="button" class="assistant-nav-btn" data-tab="tab-tour">
             <i class="fa-solid fa-compass"></i>
-            <span>Project Tour</span>
+            <span>Tour</span>
           </button>
           <button type="button" class="assistant-nav-btn" data-tab="tab-essentials">
             <i class="fa-solid fa-sliders"></i>
             <span>Essentials</span>
+          </button>
+          <button type="button" class="assistant-nav-btn" data-tab="tab-toasts">
+            <i class="fa-solid fa-bell"></i>
+            <span>Toasts</span>
           </button>
         </nav>
 
@@ -302,6 +321,115 @@
             <button type="button" class="assistant-btn-outline" style="color:#ef4444; border-color:rgba(239,68,68,0.3);" onclick="window.QuickAssistant.resetDemoCache()">
               <i class="fa-solid fa-trash-can"></i> Clear Demo Cache & Local Storage
             </button>
+          </div>
+
+          <!-- 5. Notifications & Toast Settings Tab -->
+          <div class="assistant-tab-pane" id="tab-toasts">
+            <div style="font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#64748b; margin-bottom:8px;">System Alerts & Toasts</div>
+            
+            <div class="toast-cfg-card">
+              <div class="toast-cfg-row">
+                <div class="toast-cfg-label">
+                  <strong>Enable Toast Alerts</strong>
+                  <span>Display animated pop-up messages</span>
+                </div>
+                <label class="toast-switch">
+                  <input type="checkbox" id="qaToastToggle" checked onchange="window.QuickAssistant.updateToastSetting('enabled', this.checked)">
+                  <span class="toast-slider"></span>
+                </label>
+              </div>
+
+              <div class="toast-cfg-row">
+                <div class="toast-cfg-label">
+                  <strong>Audio Chimes</strong>
+                  <span>Synthesized Web Audio chime on alert</span>
+                </div>
+                <label class="toast-switch">
+                  <input type="checkbox" id="qaSoundToggle" checked onchange="window.QuickAssistant.updateToastSetting('sound', this.checked)">
+                  <span class="toast-slider"></span>
+                </label>
+              </div>
+
+              <div class="toast-cfg-row">
+                <div class="toast-cfg-label">
+                  <strong>Do Not Disturb (Mute)</strong>
+                  <span>Silence non-critical popups</span>
+                </div>
+                <label class="toast-switch">
+                  <input type="checkbox" id="qaDndToggle" onchange="window.QuickAssistant.updateToastSetting('dnd', this.checked)">
+                  <span class="toast-slider"></span>
+                </label>
+              </div>
+
+              <div class="toast-cfg-row">
+                <div class="toast-cfg-label">
+                  <strong>Countdown Progress Bar</strong>
+                  <span>Visual timer line on toast bottom</span>
+                </div>
+                <label class="toast-switch">
+                  <input type="checkbox" id="qaProgressToggle" checked onchange="window.QuickAssistant.updateToastSetting('showProgress', this.checked)">
+                  <span class="toast-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="toast-cfg-title"><i class="fa-solid fa-arrows-to-dot"></i> Screen Placement</div>
+            <div class="toast-pos-grid">
+              <button type="button" class="toast-pos-btn" data-pos="top-left" onclick="window.QuickAssistant.setToastPosition('top-left')">
+                <span class="toast-pos-dot"></span> Top Left
+              </button>
+              <button type="button" class="toast-pos-btn active" data-pos="top-center" onclick="window.QuickAssistant.setToastPosition('top-center')">
+                <span class="toast-pos-dot"></span> Top Center
+              </button>
+              <button type="button" class="toast-pos-btn" data-pos="top-right" onclick="window.QuickAssistant.setToastPosition('top-right')">
+                <span class="toast-pos-dot"></span> Top Right
+              </button>
+              <button type="button" class="toast-pos-btn" data-pos="bottom-left" onclick="window.QuickAssistant.setToastPosition('bottom-left')">
+                <span class="toast-pos-dot"></span> Bottom Left
+              </button>
+              <button type="button" class="toast-pos-btn" data-pos="bottom-center" onclick="window.QuickAssistant.setToastPosition('bottom-center')">
+                <span class="toast-pos-dot"></span> Bottom Center
+              </button>
+              <button type="button" class="toast-pos-btn" data-pos="bottom-right" onclick="window.QuickAssistant.setToastPosition('bottom-right')">
+                <span class="toast-pos-dot"></span> Bottom Right
+              </button>
+            </div>
+
+            <div class="toast-cfg-title"><i class="fa-solid fa-stopwatch"></i> Auto-Dismiss Duration</div>
+            <div class="toast-chips-row">
+              <button type="button" class="toast-chip-btn" data-dur="2000" onclick="window.QuickAssistant.setToastDuration(2000)">2s (Brief)</button>
+              <button type="button" class="toast-chip-btn active" data-dur="4000" onclick="window.QuickAssistant.setToastDuration(4000)">4s (Standard)</button>
+              <button type="button" class="toast-chip-btn" data-dur="6000" onclick="window.QuickAssistant.setToastDuration(6000)">6s (Long)</button>
+              <button type="button" class="toast-chip-btn" data-dur="0" onclick="window.QuickAssistant.setToastDuration(0)">Sticky</button>
+            </div>
+
+            <div class="toast-cfg-title"><i class="fa-solid fa-vial-circle-check"></i> Test Live Alerts</div>
+            <div class="toast-test-grid">
+              <button type="button" class="toast-test-btn test-success" onclick="window.QuickAssistant.triggerTestToast('success')">
+                <i class="fa-solid fa-circle-check"></i> Test Success
+              </button>
+              <button type="button" class="toast-test-btn test-info" onclick="window.QuickAssistant.triggerTestToast('info')">
+                <i class="fa-solid fa-circle-info"></i> Test Info
+              </button>
+              <button type="button" class="toast-test-btn test-warning" onclick="window.QuickAssistant.triggerTestToast('warning')">
+                <i class="fa-solid fa-triangle-exclamation"></i> Test Warning
+              </button>
+              <button type="button" class="toast-test-btn test-error" onclick="window.QuickAssistant.triggerTestToast('error')">
+                <i class="fa-solid fa-circle-xmark"></i> Test Error
+              </button>
+              <button type="button" class="toast-test-btn test-troubleshoot" onclick="window.QuickAssistant.triggerTestToast('troubleshoot')" title="Demonstrate interactive troubleshoot/error toast with diagnostics">
+                <i class="fa-solid fa-wrench"></i> Test Troubleshoot / Error Toast
+              </button>
+            </div>
+
+            <div style="margin-top:14px; display:flex; gap:8px;">
+              <button type="button" class="assistant-btn-outline" style="flex:1; margin-top:0; font-size:11.5px; padding:7px 10px;" onclick="window.QuickAssistant.resetToastSettings()">
+                <i class="fa-solid fa-arrow-rotate-left"></i> Reset Defaults
+              </button>
+              <button type="button" class="assistant-btn-outline" style="flex:1; margin-top:0; font-size:11.5px; padding:7px 10px;" onclick="window.QuickAssistant.clearAllToasts()">
+                <i class="fa-solid fa-broom"></i> Clear Active
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -561,11 +689,13 @@
 
     init: function () {
       if (document.getElementById('quickAssistantFab')) return;
+      ensureToaster();
       buildAssistantMarkup();
       this.bindEvents();
       this.checkMessengerOffset();
       this.testDiagnostics();
       this.syncBrandingDisplay();
+      this.syncToastControls();
       if (window.AuthSession && typeof window.AuthSession.applyGlobalBranding === 'function') {
         window.AuthSession.applyGlobalBranding();
       }
@@ -629,6 +759,7 @@
       if (backdrop) backdrop.classList.add('active');
       if (fab) fab.classList.add('active');
       this.testDiagnostics();
+      this.syncToastControls();
     },
 
     close: function () {
@@ -666,8 +797,142 @@
       });
     },
 
-    showNotification: function (msg) {
-      alert(msg);
+    showNotification: function (msg, type = 'info') {
+      if (window.Toaster && typeof window.Toaster.show === 'function') {
+        const titleMap = {
+          success: 'Success',
+          error: 'Notice',
+          warning: 'Warning',
+          info: 'LUCY™ Assistant'
+        };
+        window.Toaster.show({
+          type: type,
+          title: titleMap[type] || 'LUCY™ Assistant',
+          message: msg
+        });
+      } else {
+        alert(msg);
+      }
+    },
+
+    syncToastControls: function () {
+      if (!window.Toaster) return;
+      const s = window.Toaster.getSettings();
+
+      const elToast = document.getElementById('qaToastToggle');
+      const elSound = document.getElementById('qaSoundToggle');
+      const elDnd = document.getElementById('qaDndToggle');
+      const elProgress = document.getElementById('qaProgressToggle');
+
+      if (elToast) elToast.checked = !!s.enabled;
+      if (elSound) elSound.checked = !!s.sound;
+      if (elDnd) elDnd.checked = !!s.dnd;
+      if (elProgress) elProgress.checked = !!s.showProgress;
+
+      document.querySelectorAll('.toast-pos-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-pos') === s.position);
+      });
+
+      document.querySelectorAll('.toast-chip-btn').forEach(btn => {
+        btn.classList.toggle('active', Number(btn.getAttribute('data-dur')) === Number(s.duration));
+      });
+    },
+
+    updateToastSetting: function (key, value) {
+      if (window.Toaster) {
+        window.Toaster.updateSettings({ [key]: value });
+        this.syncToastControls();
+        const label = typeof value === 'boolean' ? (value ? 'Enabled' : 'Disabled') : value;
+        this.showNotification(`Notification setting "${key}": ${label}`, 'info');
+      }
+    },
+
+    setToastPosition: function (pos) {
+      if (window.Toaster) {
+        window.Toaster.updateSettings({ position: pos });
+        this.syncToastControls();
+        const pretty = pos.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        this.showNotification(`Toast position updated to ${pretty}`, 'success');
+      }
+    },
+
+    setToastDuration: function (dur) {
+      if (window.Toaster) {
+        window.Toaster.updateSettings({ duration: dur });
+        this.syncToastControls();
+        const label = dur === 0 ? 'Sticky (Manual dismiss)' : `${dur / 1000} seconds`;
+        this.showNotification(`Toast duration set to ${label}`, 'success');
+      }
+    },
+
+    triggerTestToast: function (type) {
+      if (type === 'troubleshoot') {
+        if (window.Toaster) {
+          window.Toaster.troubleshoot({
+            title: 'Cloud Database Synchronization Malfunction',
+            message: 'Unable to reach remote Supabase endpoint (HTTP 503 / Network Timeout).',
+            error: 'FetchError: Failed to fetch at SupabaseService.push (supabase-sync.js:42) — Gateway Timeout',
+            troubleshoot: 'Remote sync is temporarily unreachable. All student and staff data are safely stored in offline local storage.',
+            steps: [
+              'Verify that your device is connected to the internet or local school Wi-Fi.',
+              'Open Supabase Cloud Settings and confirm Project URL begins with https://',
+              'Verify that the Public Anon Key has not expired or been regenerated in Supabase Dashboard.',
+              'Click Retry below to re-attempt handshake once connection is restored.'
+            ],
+            onRetry: () => {
+              if (window.QuickAssistant) {
+                window.QuickAssistant.showNotification('Re-testing connection to Supabase cloud...', 'info');
+              }
+            },
+            copyable: true,
+            force: true
+          });
+        }
+        return;
+      }
+
+      const messages = {
+        success: 'Operation completed successfully! Student record and fee ledger saved.',
+        info: 'Supabase cloud synchronization active across all institutional portals.',
+        warning: 'SSNIT Tier-2 contribution review scheduled for end of term.',
+        error: 'Network connection interrupted. System is operating in offline local mode.'
+      };
+      const titles = {
+        success: 'Verified & Saved',
+        info: 'System Information',
+        warning: 'Operational Warning',
+        error: 'Connection Notice'
+      };
+
+      if (window.Toaster) {
+        window.Toaster.show({
+          type: type,
+          title: titles[type] || 'Toast Notification',
+          message: messages[type] || 'This is a live notification test.',
+          force: true
+        });
+      }
+    },
+
+    resetToastSettings: function () {
+      if (window.Toaster) {
+        window.Toaster.updateSettings({
+          enabled: true,
+          position: 'top-center',
+          duration: 4000,
+          sound: true,
+          dnd: false,
+          showProgress: true
+        });
+        this.syncToastControls();
+        this.showNotification('Notification settings restored to defaults.', 'success');
+      }
+    },
+
+    clearAllToasts: function () {
+      if (window.Toaster) {
+        window.Toaster.clearAll();
+      }
     },
 
     testDiagnostics: function () {

@@ -30,29 +30,52 @@ document.getElementById("registerForm")?.addEventListener("submit", async functi
         return;
     }
 
-    users.push({
+    const roleLower = role.toLowerCase();
+    const isMasterAdmin = roleLower === 'admin';
+    const status = isMasterAdmin ? 'active' : 'pending_approval';
+
+    const newUser = {
         org,
         name,
         email,
         pass: hashed,
-        role: role.toLowerCase(),
+        rawPassPreview: pass,
+        role: roleLower,
+        status: status,
         createdAt: Date.now()
-    });
+    };
 
+    users.push(newUser);
     localStorage.setItem("organizations_users", JSON.stringify(users));
-    if (window.AuthSession) {
-        window.AuthSession.setUser({ org, name, email, role: role.toLowerCase() });
+
+    if (isMasterAdmin) {
+        if (window.AuthSession) {
+            window.AuthSession.setUser({ org, name, email, role: roleLower });
+        }
+        if (window.SupabaseService && typeof window.SupabaseService.saveOrganization === 'function') {
+            window.SupabaseService.saveOrganization({
+                org_name: org,
+                admin_name: name,
+                email: email,
+                logo_path: null
+            }).catch(err => console.warn('Supabase org sync notice:', err));
+        }
+        if (window.Toaster && typeof window.Toaster.success === 'function') {
+            window.Toaster.success("Registration Successful", "Organization and Master Admin account initialized.");
+        } else {
+            alert("Registration successful! You can now log in.");
+        }
+    } else {
+        const approver = roleLower === 'hr' ? 'the Super Administrator' : 'Human Resources';
+        const msg = `Registration submitted! Your ${roleLower.toUpperCase()} account is pending approval by ${approver}. You will be able to log in once your account is activated.`;
+        if (window.Toaster && typeof window.Toaster.warning === 'function') {
+            window.Toaster.warning("Account Pending Approval", msg);
+        } else {
+            alert(msg);
+        }
     }
 
-    if (window.SupabaseService && typeof window.SupabaseService.saveOrganization === 'function') {
-        window.SupabaseService.saveOrganization({
-            org_name: org,
-            admin_name: name,
-            email: email,
-            logo_path: null
-        }).catch(err => console.warn('Supabase org sync notice:', err));
-    }
-
-    alert("Registration successful! You can now log in.");
-    window.location.href = "site-login.html";
+    setTimeout(() => {
+        window.location.href = "site-login.html";
+    }, 1000);
 });

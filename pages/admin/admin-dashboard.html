@@ -1,0 +1,2367 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Super Admin Portal — FLAWLESS GRAPHICS</title>
+
+  <!-- External Libraries & Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Universal Toaster & Loading Styles -->
+  <link rel="stylesheet" href="../../assets/css/toaster.css">
+  <link rel="stylesheet" href="../../assets/css/skeleton.css">
+  <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
+
+  <!-- Central Authentication Bridge & Pop-up Toaster Engine -->
+  <script src="../../assets/js/auth-session.js"></script>
+  <script src="../../assets/js/toaster.js"></script>
+
+  <!-- Supabase Cloud Integration -->
+  <script src="../../assets/js/supabase-config.js"></script>
+  <script src="../../assets/js/supabase-client.js"></script>
+
+  <style>
+    :root {
+      --primary: #635bfc;
+      --primary-hover: #4f46e5;
+      --primary-light: rgba(99, 91, 252, 0.1);
+      --primary-gradient: linear-gradient(135deg, #635bfc 0%, #4f46e5 100%);
+      --accent-gold: #d97706;
+      --accent-gold-bg: #fef3c7;
+      --accent-green: #059669;
+      --accent-green-bg: #d1fae5;
+      --accent-red: #dc2626;
+      --accent-red-bg: #fee2e2;
+      --accent-cyan: #0284c7;
+      --bg: #FAF7F2;
+      --card: #ffffff;
+      --card-inner: #f8fafc;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2ddd5;
+      --border-active: rgba(99, 91, 252, 0.4);
+      --sidebar-bg: #0b1120;
+      --radius: 16px;
+      --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+      --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+      --shadow-hover: 0 16px 32px -4px rgba(99, 91, 252, 0.15);
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      background-color: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* --- SIDEBAR --- */
+    .sidebar {
+      width: 270px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      gap: 14px;
+      transition: var(--transition);
+      z-index: 20;
+      flex-shrink: 0;
+      color: #ffffff;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .sidebar::-webkit-scrollbar { display: none; }
+    .sidebar.collapsed { width: 80px; padding: 20px 10px; }
+    .sidebar.collapsed .hide-collapsed { display: none !important; }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 8px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(99, 91, 252, 0.35);
+      flex-shrink: 0;
+    }
+    .org-name {
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+      color: #ffffff;
+    }
+    .badge-admin-crown {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #fbbf24;
+      background: rgba(245, 158, 11, 0.18);
+      padding: 2px 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      margin-top: 2px;
+    }
+
+    .sidebar-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      margin-top: 4px;
+    }
+    .profile-thumb {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 2px solid var(--primary);
+    }
+
+    .nav-category {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #94a3b8;
+      margin: 14px 8px 4px;
+    }
+
+    .nav-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      border-radius: 12px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: var(--transition);
+    }
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      transform: translateX(3px);
+    }
+    .nav-btn.active {
+      background: var(--primary-gradient);
+      color: #ffffff;
+      font-weight: 700;
+      box-shadow: 0 6px 20px rgba(99, 91, 252, 0.35);
+    }
+    .nav-btn i.nav-icon {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    /* --- MAIN CONTENT AREA --- */
+    .main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    /* Topbar */
+    .topbar {
+      height: 72px;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 10;
+      flex-shrink: 0;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .top-search-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .top-search-wrap i {
+      position: absolute;
+      left: 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .top-search-input {
+      padding: 9px 16px 9px 38px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text);
+      font-size: 13px;
+      width: 260px;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+    .top-search-input:focus {
+      width: 320px;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 91, 252, 0.15);
+    }
+
+    .tenant-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    }
+    .tenant-select {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+    .tenant-select option {
+      background: #ffffff;
+      color: var(--text);
+    }
+
+    .btn-top {
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition);
+      text-decoration: none;
+    }
+    .btn-top.ghost {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      color: var(--text);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+    .btn-top.ghost:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      color: var(--primary);
+    }
+    .btn-top.primary {
+      background: var(--primary-gradient);
+      border: none;
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(99, 91, 252, 0.3);
+    }
+    .btn-top.primary:hover {
+      box-shadow: 0 6px 20px rgba(99, 91, 252, 0.45);
+      transform: translateY(-1px);
+    }
+
+    /* Main Scrollable Content Container */
+    .content-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px;
+      background: var(--bg);
+    }
+
+    /* Panels & Sections */
+    .admin-section {
+      display: none;
+      animation: fadeIn 0.25s ease forwards;
+    }
+    .admin-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    .kpi-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: var(--transition);
+    }
+    .kpi-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-active);
+      box-shadow: var(--shadow-hover);
+    }
+    .kpi-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .kpi-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.1;
+    }
+    .kpi-sub {
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Analytics Chart Grid */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 1024px) {
+      .chart-grid { grid-template-columns: 1fr; }
+    }
+
+    .chart-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .chart-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .chart-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Operations Launchpad Cards */
+    .launchpad-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    .portal-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .portal-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+    }
+    .portal-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--primary-gradient);
+    }
+    .portal-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 14px;
+    }
+
+    /* Tables */
+    .data-table-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow-x: auto;
+      box-shadow: var(--shadow-sm);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    th {
+      background: #f8fafc;
+      padding: 14px 20px;
+      font-size: 11.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 16px 20px;
+      font-size: 13px;
+      border-bottom: 1px solid #f1f5f9;
+      color: var(--text);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td {
+      background: #f8fafc;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+    .badge-primary { background: var(--primary-light); color: var(--primary); }
+    .badge-success { background: var(--accent-green-bg); color: var(--accent-green); }
+    .badge-warning { background: var(--accent-gold-bg); color: var(--accent-gold); }
+    .badge-danger { background: var(--accent-red-bg); color: var(--accent-red); }
+    .badge-cyan { background: #e0f2fe; color: var(--accent-cyan); }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    .modal-backdrop.active {
+      display: flex !important;
+      animation: fadeIn 0.2s ease forwards;
+    }
+    .modal-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 580px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+      color: var(--text);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13.5px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 91, 252, 0.15);
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    /* Embedded Portal Frame */
+    .embedded-container {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 140px);
+      box-shadow: var(--shadow-sm);
+    }
+    .embedded-bar {
+      padding: 12px 20px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .embedded-frame {
+      flex: 1;
+      width: 100%;
+      border: none;
+      background: #FAF7F2;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <a href="javascript:void(0)" onclick="switchSection('overview')" class="brand">
+      <div class="brand-logo"><i class="fa-solid fa-crown"></i></div>
+      <div class="hide-collapsed">
+        <div class="org-name" id="sideOrgName">FLAWLESS GRAPHICS</div>
+        <div class="badge-admin-crown"><i class="fa-solid fa-shield-halved"></i> Super Admin</div>
+      </div>
+    </a>
+
+    <div class="sidebar-profile hide-collapsed">
+      <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Super Admin" class="profile-thumb" id="sideAdminPhoto">
+      <div style="overflow:hidden;">
+        <div style="font-weight:800; font-size:13px; color:#fff; white-space:nowrap; text-overflow:ellipsis;" id="sideAdminName">James Ntiamoah</div>
+        <div style="font-size:11px; color:var(--muted); white-space:nowrap; text-overflow:ellipsis;" id="sideAdminEmail">admin@flawlessgraphics.com</div>
+      </div>
+    </div>
+
+    <div class="nav-category hide-collapsed">CORE GOVERNANCE</div>
+    <button type="button" class="nav-btn active" data-sec="overview" onclick="switchSection('overview')">
+      <i class="fa-solid fa-gauge-high nav-icon"></i>
+      <span class="hide-collapsed">Executive Overview</span>
+    </button>
+    <button type="button" class="nav-btn" data-sec="tenants" onclick="switchSection('tenants')">
+      <i class="fa-solid fa-building-user nav-icon"></i>
+      <span class="hide-collapsed">Tenants &amp; Orgs</span>
+    </button>
+    <button type="button" class="nav-btn" data-sec="users" onclick="switchSection('users')">
+      <i class="fa-solid fa-users-gear nav-icon"></i>
+      <span class="hide-collapsed">Global Users (RBAC)</span>
+    </button>
+    <button type="button" class="nav-btn" data-sec="portals" onclick="switchSection('portals')">
+      <i class="fa-solid fa-layer-group nav-icon"></i>
+      <span class="hide-collapsed">Portal Hub &amp; Jump</span>
+    </button>
+    <button type="button" class="nav-btn" data-sec="broadcasts" onclick="switchSection('broadcasts')">
+      <i class="fa-solid fa-bullhorn nav-icon"></i>
+      <span class="hide-collapsed">Broadcast Console</span>
+    </button>
+
+    <div class="nav-category hide-collapsed">OPERATIONS &amp; HEALTH</div>
+    <button type="button" class="nav-btn" data-sec="health" onclick="switchSection('health')">
+      <i class="fa-solid fa-heart-pulse nav-icon"></i>
+      <span class="hide-collapsed">System Health &amp; Sync</span>
+    </button>
+    <button type="button" class="nav-btn" data-sec="audit" onclick="switchSection('audit')">
+      <i class="fa-solid fa-clock-rotate-left nav-icon"></i>
+      <span class="hide-collapsed">Audit Trail &amp; Logs</span>
+    </button>
+    <button type="button" class="nav-btn" data-sec="backup" onclick="switchSection('backup')">
+      <i class="fa-solid fa-database nav-icon"></i>
+      <span class="hide-collapsed">Backup &amp; Disaster Rec.</span>
+    </button>
+    <button type="button" class="nav-btn" data-sec="settings" onclick="switchSection('settings')">
+      <i class="fa-solid fa-sliders nav-icon"></i>
+      <span class="hide-collapsed">Master Settings</span>
+    </button>
+
+    <div style="margin-top:auto; padding-top:16px; border-top:1px solid var(--border);">
+      <button type="button" class="nav-btn" onclick="logoutAdmin()" style="color:var(--accent-red);">
+        <i class="fa-solid fa-arrow-right-from-bracket nav-icon"></i>
+        <span class="hide-collapsed">Sign Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="main-area">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="top-search-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" class="top-search-input" id="globalAdminSearch" placeholder="Search across all modules, users & orgs..." oninput="handleGlobalSearch(this.value)">
+        </div>
+
+        <div class="tenant-badge">
+          <i class="fa-solid fa-building" style="color:var(--primary);"></i>
+          <select id="activeTenantSelect" class="tenant-select" onchange="handleTenantSwitch(this.value)">
+            <option value="FLAWLESS GRAPHICS" selected>FLAWLESS GRAPHICS</option>
+            <option value="CREATIVE CAMPUS">CREATIVE CAMPUS</option>
+            <option value="ENTERPRISE TECH">ENTERPRISE TECH</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <button type="button" class="btn-top ghost" onclick="openBackupExportModal()" title="Export Database Snapshot">
+          <i class="fa-solid fa-download"></i> Backup Snapshot
+        </button>
+        <button type="button" class="btn-top primary" onclick="openUserModal()">
+          <i class="fa-solid fa-user-plus"></i> New User
+        </button>
+        <a href="../../welcome.html" class="btn-top ghost" title="Return to Workspace Hub">
+          <i class="fa-solid fa-grip"></i> Hub
+        </a>
+      </div>
+    </header>
+
+    <!-- CONTENT SCROLL -->
+    <main class="content-scroll">
+
+      <!-- =========================================================
+           1. EXECUTIVE OVERVIEW SECTION
+           ========================================================= -->
+      <section class="admin-section active" id="sec_overview">
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h2 style="margin:0; font-size:24px; font-weight:800; color:var(--text);">Executive Command Center</h2>
+            <div style="font-size:13px; color:var(--muted); margin-top:4px;">Cross-tenant institutional metrics, user governance &amp; system health telemetry.</div>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn-top ghost" onclick="refreshAllStats()"><i class="fa-solid fa-arrows-rotate"></i> Refresh Telemetry</button>
+          </div>
+        </div>
+
+        <!-- Pending Registrations Alert Banner -->
+        <div id="pendingRegistrationsBanner" style="display:none; margin-bottom:24px; background:linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.08) 100%); border:1px solid rgba(245, 158, 11, 0.35); border-radius:var(--radius); padding:16px 20px; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <div style="width:42px; height:42px; border-radius:12px; background:var(--accent-gold-bg); color:var(--accent-gold); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">
+              <i class="fa-solid fa-user-clock"></i>
+            </div>
+            <div>
+              <div style="font-weight:800; font-size:14px; color:var(--text);" id="pendingBannerTitle">Pending User Registration Requests</div>
+              <div style="font-size:12.5px; color:var(--muted);" id="pendingBannerSub">There are accounts awaiting administrative review and authorization.</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn-top primary" style="background:var(--accent-gold); border-color:var(--accent-gold); font-size:12px; padding:7px 14px;" onclick="filterPendingUsers()"><i class="fa-solid fa-list-check"></i> Review Approvals</button>
+          </div>
+        </div>
+
+        <!-- Metric KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background:var(--primary-light); color:var(--primary);"><i class="fa-solid fa-building"></i></div>
+            <div>
+              <div class="kpi-title">Active Tenants</div>
+              <div class="kpi-value" id="kpi_tenants">3</div>
+              <div class="kpi-sub">Multi-tenant environments</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background:rgba(6, 182, 212, 0.14); color:var(--accent-cyan);"><i class="fa-solid fa-users"></i></div>
+            <div>
+              <div class="kpi-title">Global Users</div>
+              <div class="kpi-value" id="kpi_users">0</div>
+              <div class="kpi-sub">Active login credentials</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background:var(--accent-green-bg); color:var(--accent-green);"><i class="fa-solid fa-user-graduate"></i></div>
+            <div>
+              <div class="kpi-title">Enrolled Students</div>
+              <div class="kpi-value" id="kpi_students">0</div>
+              <div class="kpi-sub">Across all classrooms</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background:var(--accent-gold-bg); color:var(--accent-gold);"><i class="fa-solid fa-chalkboard-user"></i></div>
+            <div>
+              <div class="kpi-title">Staff &amp; Faculty</div>
+              <div class="kpi-value" id="kpi_staff">0</div>
+              <div class="kpi-sub">Educators &amp; Officers</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background:rgba(168, 85, 247, 0.14); color:#c084fc;"><i class="fa-solid fa-money-bill-wave"></i></div>
+            <div>
+              <div class="kpi-title">Est. Monthly Payroll</div>
+              <div class="kpi-value" id="kpi_payroll">GHS 0</div>
+              <div class="kpi-sub">Total compensation run-rate</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="chart-grid">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-title"><i class="fa-solid fa-chart-line" style="color:var(--primary);"></i> Student Growth &amp; Enrollment Velocity</div>
+              <span class="badge badge-primary">Real-Time Data</span>
+            </div>
+            <div style="height: 250px;">
+              <canvas id="enrollmentTrendChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-title"><i class="fa-solid fa-chart-pie" style="color:var(--accent-cyan);"></i> RBAC Role Distribution</div>
+              <span class="badge badge-cyan">Access Control</span>
+            </div>
+            <div style="height: 250px;">
+              <canvas id="roleDistributionChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Operations Launchpad -->
+        <h3 style="font-size:18px; font-weight:800; color:var(--text); margin-bottom:16px;">Cross-Portal Quick Launchpad</h3>
+        <div class="launchpad-grid">
+          <div class="portal-card">
+            <div>
+              <div class="portal-icon-box" style="background:var(--primary-light); color:var(--primary);"><i class="fa-solid fa-briefcase"></i></div>
+              <h4 style="margin:0 0 6px; font-size:16px; color:var(--text);">HR Management Portal</h4>
+              <p style="margin:0; font-size:12.5px; color:var(--muted); line-height:1.5;">Manage staff rosters, employee appraisals, payroll compensation, and student onboarding admissions.</p>
+            </div>
+            <div style="margin-top:18px; display:flex; gap:8px;">
+              <a href="../hr/hr-dashboard.html" class="btn-top primary" style="font-size:12px; padding:7px 12px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Portal</a>
+              <button class="btn-top ghost" style="font-size:12px; padding:7px 12px;" onclick="previewPortalInFrame('../hr/hr-dashboard.html', 'HR Operations Hub')"><i class="fa-solid fa-eye"></i> Inspect</button>
+            </div>
+          </div>
+
+          <div class="portal-card">
+            <div>
+              <div class="portal-icon-box" style="background:rgba(6, 182, 212, 0.14); color:var(--accent-cyan);"><i class="fa-solid fa-chalkboard-user"></i></div>
+              <h4 style="margin:0 0 6px; font-size:16px; color:var(--text);">Teachers Classroom Portal</h4>
+              <p style="margin:0; font-size:12.5px; color:var(--muted); line-height:1.5;">Access classroom lesson modules, student gradebooks, daily attendance tracking, and student profiles.</p>
+            </div>
+            <div style="margin-top:18px; display:flex; gap:8px;">
+              <a href="../teacher/teacher-dashboard.html" class="btn-top primary" style="font-size:12px; padding:7px 12px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Portal</a>
+              <button class="btn-top ghost" style="font-size:12px; padding:7px 12px;" onclick="previewPortalInFrame('../teacher/teacher-dashboard.html', 'Teacher Classroom Portal')"><i class="fa-solid fa-eye"></i> Inspect</button>
+            </div>
+          </div>
+
+          <div class="portal-card">
+            <div>
+              <div class="portal-icon-box" style="background:var(--accent-gold-bg); color:var(--accent-gold);"><i class="fa-solid fa-scale-balanced"></i></div>
+              <h4 style="margin:0 0 6px; font-size:16px; color:var(--text);">Finance &amp; Bursary Portal</h4>
+              <p style="margin:0; font-size:12.5px; color:var(--muted); line-height:1.5;">Manage tuition invoices, fee receipts, payment gateways, budget ledger, and institutional statements.</p>
+            </div>
+            <div style="margin-top:18px; display:flex; gap:8px;">
+              <a href="../finance/finance-dashboard.html" class="btn-top primary" style="font-size:12px; padding:7px 12px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Portal</a>
+              <button class="btn-top ghost" style="font-size:12px; padding:7px 12px;" onclick="previewPortalInFrame('../finance/finance-dashboard.html', 'Finance & Bursary Portal')"><i class="fa-solid fa-eye"></i> Inspect</button>
+            </div>
+          </div>
+
+          <div class="portal-card">
+            <div>
+              <div class="portal-icon-box" style="background:var(--accent-green-bg); color:var(--accent-green);"><i class="fa-solid fa-globe"></i></div>
+              <h4 style="margin:0 0 6px; font-size:16px; color:var(--text);">Public Web Experience</h4>
+              <p style="margin:0; font-size:12.5px; color:var(--muted); line-height:1.5;">Institutional landing page, public course offerings, admissions inquiries, and showcase portfolio.</p>
+            </div>
+            <div style="margin-top:18px; display:flex; gap:8px;">
+              <a href="../public/home.html" class="btn-top primary" style="font-size:12px; padding:7px 12px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Site</a>
+              <button class="btn-top ghost" style="font-size:12px; padding:7px 12px;" onclick="previewPortalInFrame('../public/home.html', 'Public Home Page')"><i class="fa-solid fa-eye"></i> Inspect</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           2. TENANTS & MULTI-ORGANIZATION SECTION
+           ========================================================= -->
+      <section class="admin-section" id="sec_tenants">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h2 style="margin:0; font-size:22px; font-weight:800; color:var(--text);">Tenants &amp; Institutional Registry</h2>
+            <div style="font-size:13px; color:var(--muted); margin-top:4px;">Multi-organization partitioning, custom branding, and institutional module access.</div>
+          </div>
+          <button class="btn-top primary" onclick="openNewTenantModal()"><i class="fa-solid fa-plus"></i> Add Organization</button>
+        </div>
+
+        <div class="launchpad-grid" id="tenantsGrid">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+      <!-- =========================================================
+           3. GLOBAL USERS & RBAC GOVERNANCE SECTION
+           ========================================================= -->
+      <section class="admin-section" id="sec_users">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <h2 style="margin:0; font-size:22px; font-weight:800; color:var(--text);">Global User Governance (RBAC)</h2>
+            <span id="pendingApprovalCounterBadge" class="badge" style="display:none; background:rgba(245, 158, 11, 0.15); color:#d97706; border:1px solid rgba(245, 158, 11, 0.4); font-size:12px; cursor:pointer;" onclick="filterPendingUsers()"><i class="fa-solid fa-clock"></i> <span id="pendingApprovalCountText">0</span> Pending Review</span>
+            <div style="width:100%; font-size:13px; color:var(--muted); margin-top:2px;">Master user accounts registry, role-based access control &amp; multi-tier registration approvals.</div>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn-top ghost" onclick="syncAllStaffLogins()"><i class="fa-solid fa-arrows-rotate"></i> Auto-Provision All Staff</button>
+            <button class="btn-top primary" onclick="openUserModal()"><i class="fa-solid fa-user-plus"></i> Create Account</button>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:12px; margin-bottom:18px; flex-wrap:wrap;">
+          <input type="text" id="filterUserSearch" class="form-input" placeholder="Filter by name or email..." style="max-width:280px;" oninput="renderMasterUsersTable()">
+          <select id="filterUserOrg" class="form-select" style="max-width:220px;" onchange="renderMasterUsersTable()">
+            <option value="">All Organizations</option>
+          </select>
+          <select id="filterUserRole" class="form-select" style="max-width:180px;" onchange="renderMasterUsersTable()">
+            <option value="">All Roles</option>
+            <option value="admin">Super Admin</option>
+            <option value="hr">HR Manager</option>
+            <option value="teacher">Teacher / Academic</option>
+            <option value="finance">Finance / Bursar</option>
+          </select>
+          <select id="filterUserStatus" class="form-select" style="max-width:180px;" onchange="renderMasterUsersTable()">
+            <option value="">All Statuses</option>
+            <option value="pending_approval">Pending Approval</option>
+            <option value="active">Active Only</option>
+            <option value="suspended">Suspended Only</option>
+            <option value="rejected">Rejected Only</option>
+          </select>
+        </div>
+
+        <div class="data-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>User Account</th>
+                <th>Organization</th>
+                <th>Assigned Role</th>
+                <th>Status</th>
+                <th>Linked Staff</th>
+                <th>Created</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="masterUsersTableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           4. PORTAL HUB & JUMP SECTION
+           ========================================================= -->
+      <section class="admin-section" id="sec_portals">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h2 style="margin:0; font-size:22px; font-weight:800; color:var(--text);">Live Interactive Portal Inspector</h2>
+            <div style="font-size:13px; color:var(--muted); margin-top:4px;">Test, inspect, and interact with all sub-portals directly within the Super Admin Console.</div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn-top ghost" onclick="previewPortalInFrame('../hr/hr-dashboard.html', 'HR Management Portal')">HR Hub</button>
+            <button class="btn-top ghost" onclick="previewPortalInFrame('../teacher/teacher-dashboard.html', 'Teacher Classroom Portal')">Teachers</button>
+            <button class="btn-top ghost" onclick="previewPortalInFrame('../finance/finance-dashboard.html', 'Finance Portal')">Finance</button>
+            <button class="btn-top ghost" onclick="previewPortalInFrame('../public/home.html', 'Public Website')">Public Site</button>
+          </div>
+        </div>
+
+        <div class="embedded-container">
+          <div class="embedded-bar">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <i class="fa-solid fa-window-maximize" style="color:var(--primary);"></i>
+              <span id="inspectorTitle" style="font-weight:700; color:var(--text); font-size:14px;">HR Management Portal</span>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-top ghost" style="padding:4px 10px; font-size:12px;" onclick="reloadInspector()"><i class="fa-solid fa-rotate"></i> Reload Frame</button>
+              <a href="#" id="inspectorExternalLink" target="_blank" class="btn-top ghost" style="padding:4px 10px; font-size:12px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open in New Window</a>
+            </div>
+          </div>
+          <iframe id="inspectorFrame" class="embedded-frame" src="../hr/hr-dashboard.html"></iframe>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           5. SYSTEM HEALTH & TELEMETRY SECTION
+           ========================================================= -->
+      <section class="admin-section" id="sec_health">
+        <h2 style="margin:0 0 4px; font-size:22px; font-weight:800; color:var(--text);">System Health &amp; Telemetry</h2>
+        <div style="font-size:13px; color:var(--muted); margin-bottom:24px;">Real-time infrastructure monitors, local storage capacity &amp; Supabase cloud synchronization.</div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background:var(--accent-green-bg); color:var(--accent-green);"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+            <div>
+              <div class="kpi-title">Supabase Cloud Sync</div>
+              <div class="kpi-value" id="health_cloud">Connected</div>
+              <div class="kpi-sub">AdjeiJamesNtiamoah Cloud</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background:var(--primary-light); color:var(--primary);"><i class="fa-solid fa-hard-drive"></i></div>
+            <div>
+              <div class="kpi-title">LocalStorage Quota</div>
+              <div class="kpi-value" id="health_storage">Ready</div>
+              <div class="kpi-sub" id="health_storage_sub">Estimating usage...</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background:var(--accent-gold-bg); color:var(--accent-gold);"><i class="fa-solid fa-shield-halved"></i></div>
+            <div>
+              <div class="kpi-title">Security Session</div>
+              <div class="kpi-value">Active</div>
+              <div class="kpi-sub">Auto-Lock: 15 minutes</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background:rgba(6, 182, 212, 0.14); color:var(--accent-cyan);"><i class="fa-solid fa-bell"></i></div>
+            <div>
+              <div class="kpi-title">Toaster Notifications</div>
+              <div class="kpi-value">Lucy™ Engine</div>
+              <div class="kpi-sub">Audio chime &amp; card alerts</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card" style="margin-top:24px;">
+          <h3 style="margin:0 0 16px; font-size:16px; font-weight:800; color:var(--text);"><i class="fa-solid fa-list-check" style="color:var(--primary); margin-right:8px;"></i> Subsystem Status &amp; Readiness Matrix</h3>
+          <div class="data-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Subsystem / Service</th>
+                  <th>Type</th>
+                  <th>Target Namespace</th>
+                  <th>Status</th>
+                  <th>Last Ping / Check</th>
+                </tr>
+              </thead>
+              <tbody id="healthServicesTable">
+                <tr>
+                  <td><strong>AuthSession Bridge</strong></td>
+                  <td>Core Session Broker</td>
+                  <td>active_org_user, active_user</td>
+                  <td><span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Operational</span></td>
+                  <td>Instantaneous</td>
+                </tr>
+                <tr>
+                  <td><strong>Lucy™ Toaster Engine</strong></td>
+                  <td>Universal Alerts &amp; Chime</td>
+                  <td>window.Toaster (toaster.js)</td>
+                  <td><span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Active</span></td>
+                  <td>Ready</td>
+                </tr>
+                <tr>
+                  <td><strong>Students &amp; Trainees Store</strong></td>
+                  <td>Academic Records</td>
+                  <td>${ORG}_students, ${ORG}_classes</td>
+                  <td><span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Synchronized</span></td>
+                  <td>Live LocalStorage</td>
+                </tr>
+                <tr>
+                  <td><strong>Staff &amp; Payroll Store</strong></td>
+                  <td>Personnel &amp; Ledgers</td>
+                  <td>${ORG}_teachers, ${ORG}_payroll</td>
+                  <td><span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Synchronized</span></td>
+                  <td>Live LocalStorage</td>
+                </tr>
+                <tr>
+                  <td><strong>Supabase REST Gateway</strong></td>
+                  <td>Cloud Persistence</td>
+                  <td>https://*.supabase.co</td>
+                  <td><span class="badge badge-cyan"><i class="fa-solid fa-cloud"></i> Ready for Sync</span></td>
+                  <td>Configured</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           6. AUDIT TRAIL & LOGS SECTION
+           ========================================================= -->
+      <section class="admin-section" id="sec_audit">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h2 style="margin:0; font-size:22px; font-weight:800; color:var(--text);">System Audit Trail &amp; Activity Log</h2>
+            <div style="font-size:13px; color:var(--muted); margin-top:4px;">Chronological ledger of logins, account creation, role changes, and data modifications.</div>
+          </div>
+          <button class="btn-top ghost" onclick="clearAuditLogs()"><i class="fa-solid fa-trash-can"></i> Clear Logs</button>
+        </div>
+
+        <div class="data-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Operator</th>
+                <th>Action</th>
+                <th>Target Resource</th>
+                <th>Severity</th>
+              </tr>
+            </thead>
+            <tbody id="auditTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           7. BACKUP & DISASTER RECOVERY SECTION
+           ========================================================= -->
+      <section class="admin-section" id="sec_backup">
+        <h2 style="margin:0 0 4px; font-size:22px; font-weight:800; color:var(--text);">Backup &amp; Disaster Recovery</h2>
+        <div style="font-size:13px; color:var(--muted); margin-bottom:24px;">Full database snapshot exports, JSON restoration &amp; disaster protection.</div>
+
+        <div class="grid-2" style="margin-bottom:24px;">
+          <div class="chart-card">
+            <h3 style="margin:0 0 10px; font-size:16px; font-weight:800; color:var(--text);"><i class="fa-solid fa-download" style="color:var(--accent-green); margin-right:8px;"></i> Export Full Database Snapshot</h3>
+            <p style="font-size:13px; color:var(--muted); line-height:1.5; margin-bottom:18px;">Download a complete, encrypted JSON archive containing all organizations, user accounts, students, classes, attendance records, staff rosters, and system settings.</p>
+            <button class="btn-top primary" onclick="exportFullDatabaseSnapshot()"><i class="fa-solid fa-file-arrow-down"></i> Download JSON Snapshot</button>
+          </div>
+
+          <div class="chart-card">
+            <h3 style="margin:0 0 10px; font-size:16px; font-weight:800; color:var(--text);"><i class="fa-solid fa-upload" style="color:var(--accent-gold); margin-right:8px;"></i> Restore Database Snapshot</h3>
+            <p style="font-size:13px; color:var(--muted); line-height:1.5; margin-bottom:18px;">Upload a previously exported JSON backup file to restore system state. This will merge or overwrite local records safely.</p>
+            <input type="file" id="restoreFileInput" accept=".json" style="display:none;" onchange="handleRestoreFile(event)">
+            <button class="btn-top ghost" onclick="document.getElementById('restoreFileInput').click()"><i class="fa-solid fa-file-import"></i> Upload JSON Backup</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           8. MASTER SYSTEM SETTINGS SECTION
+           ========================================================= -->
+      <section class="admin-section" id="sec_settings">
+        <h2 style="margin:0 0 4px; font-size:22px; font-weight:800; color:var(--text);">Master System Settings</h2>
+        <div style="font-size:13px; color:var(--muted); margin-bottom:24px;">Global tenant configurations, timeout thresholds, and visual themes.</div>
+
+        <div class="chart-card" style="max-width:700px;">
+          <div class="form-group">
+            <label class="form-label">Auto-Lock Idle Timeout (Minutes)</label>
+            <input type="number" id="setting_timeout" class="form-input" min="1" max="180" value="15" style="max-width:180px;">
+            <div style="font-size:11.5px; color:var(--muted); margin-top:4px;">Session automatically locks if no user action is detected.</div>
+          </div>
+
+          <div class="form-group" style="margin-top:20px;">
+            <label class="form-label">Universal Notification Sound</label>
+            <select id="setting_sound" class="form-select" style="max-width:240px;">
+              <option value="enabled" selected>Enabled (Lucy™ Alert Chime)</option>
+              <option value="disabled">Mute Audio Chimes</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-top:20px;">
+            <label class="form-label">Self-Registration for Staff</label>
+            <select id="setting_reg" class="form-select" style="max-width:240px;">
+              <option value="allowed" selected>Enabled (Open Registration)</option>
+              <option value="invite_only">Invite Only (Admin approval required)</option>
+            </select>
+          </div>
+
+          <button class="btn-top primary" style="margin-top:24px;" onclick="saveAdminSettings()"><i class="fa-solid fa-check"></i> Save Global Configurations</button>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           9. SYSTEM & ORGANIZATIONAL BROADCAST CONSOLE
+           ========================================================= -->
+      <section class="admin-section" id="sec_broadcasts">
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h2 style="margin:0; font-size:24px; font-weight:800; color:var(--text); display:flex; align-items:center; gap:10px;">
+              <i class="fa-solid fa-bullhorn" style="color:var(--accent-gold);"></i> System &amp; Organizational Broadcast Console
+            </h2>
+            <div style="font-size:13px; color:var(--muted); margin-top:4px;">
+              Super Admin official directives published here carry a verified gold badge across Teacher, HR, and Staff portals.
+            </div>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn-top ghost" onclick="renderAdminBroadcasts()"><i class="fa-solid fa-rotate"></i> Refresh Directives</button>
+          </div>
+        </div>
+
+        <!-- Super Admin Broadcast Composer -->
+        <div class="chart-card" style="margin-bottom:24px;">
+          <h3 style="margin:0 0 16px; font-size:16px; font-weight:800; color:var(--text); display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-pen-nib" style="color:var(--primary);"></i> Issue Institutional Super Admin Directive
+          </h3>
+          <form id="adminBroadcastForm" onsubmit="handleAdminPublishBroadcast(event)">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:14px;">
+              <div>
+                <label class="form-label">Broadcast Headline *</label>
+                <input type="text" id="adm_bcTitle" class="form-input" placeholder="e.g. End of Term System Maintenance &amp; Grade Moderation" required>
+              </div>
+              <div>
+                <label class="form-label">Category *</label>
+                <select id="adm_bcCategory" class="form-select" required>
+                  <option value="Urgent">Urgent Institutional Alert</option>
+                  <option value="Academic">Academic Directive</option>
+                  <option value="Policy">Policy &amp; Compliance Mandate</option>
+                  <option value="General">General System Notice</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label">Priority Level *</label>
+                <select id="adm_bcPriority" class="form-select" required>
+                  <option value="High">High Priority (Urgent Popover Banner)</option>
+                  <option value="Normal">Normal Standard</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label">Target Tenant</label>
+                <select id="adm_bcTenant" class="form-select">
+                  <option value="all">Broadcast to All Tenants &amp; Portals</option>
+                  <option value="active" selected>Active Tenant Only</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="margin-bottom:16px;">
+              <label class="form-label">Directive Message Body *</label>
+              <textarea id="adm_bcBody" class="form-input" rows="3" placeholder="Specify all governance directives, compliance deadlines, and instructions..." required style="resize:vertical; font-family:inherit;"></textarea>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; cursor:pointer;">
+                <input type="checkbox" id="adm_bcPinned" style="width:16px; height:16px; accent-color:var(--accent-gold);" checked>
+                <span><i class="fa-solid fa-thumbtack" style="color:var(--accent-gold);"></i> Pin with Verified Super Admin Gold Ribbon</span>
+              </label>
+              <button type="submit" class="btn-top primary" style="padding:10px 22px; font-size:13.5px; font-weight:700;">
+                <i class="fa-solid fa-paper-plane"></i> Publish Super Admin Broadcast
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Active Broadcasts Table -->
+        <div class="table-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+            <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--text);">Published Directives Ledger</h3>
+            <span class="badge" id="adm_bcCount" style="background:var(--accent-gold-bg); color:var(--accent-gold); font-weight:800;">0 Directives</span>
+          </div>
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Directive Headline</th>
+                  <th>Issuer Role</th>
+                  <th>Category</th>
+                  <th>Priority</th>
+                  <th>Published Date</th>
+                  <th>Pinned</th>
+                  <th style="text-align:right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="adm_broadcastsTableBody">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- =========================================================
+       MODAL: USER ACCOUNT (ADD / EDIT)
+       ========================================================= -->
+  <div class="modal-backdrop" id="userModal" onclick="if(event.target===this)closeUserModal()">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-user-shield" style="color:var(--primary);"></i>
+          <span id="userModalHeading">Create System User Account</span>
+        </div>
+        <button type="button" onclick="closeUserModal()" style="background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form id="userModalForm" onsubmit="handleSaveUser(event)">
+        <input type="hidden" id="um_originalEmail" value="">
+
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input type="text" id="um_name" class="form-input" placeholder="e.g. Kwame Boateng" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Email Address (Login ID) *</label>
+            <input type="email" id="um_email" class="form-input" placeholder="kwame@flawless.org" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Assigned Organization *</label>
+            <select id="um_org" class="form-select" required>
+              <option value="FLAWLESS GRAPHICS">FLAWLESS GRAPHICS</option>
+              <option value="CREATIVE CAMPUS">CREATIVE CAMPUS</option>
+              <option value="ENTERPRISE TECH">ENTERPRISE TECH</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">System Role *</label>
+            <select id="um_role" class="form-select" required>
+              <option value="teacher">Teacher / Academic Staff</option>
+              <option value="hr">HR Manager</option>
+              <option value="finance">Finance / Bursar</option>
+              <option value="admin">Super Administrator</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Access Status *</label>
+            <select id="um_status" class="form-select" required>
+              <option value="active">Active (Permitted)</option>
+              <option value="pending_approval">Pending Approval</option>
+              <option value="suspended">Suspended (Blocked)</option>
+              <option value="rejected">Rejected (Denied)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password <span id="um_passReq">*</span></label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="um_pass" class="form-input" placeholder="••••••••••••">
+            <button type="button" class="btn-top ghost" style="padding:0 14px; font-size:12px;" onclick="generatePasswordForModal()">Generate</button>
+          </div>
+          <div style="font-size:11px; color:var(--muted); margin-top:4px;" id="um_passHint">Auto-generated default password. Staff can change upon login.</div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:24px; padding-top:16px; border-top:1px solid var(--border);">
+          <button type="button" class="btn-top ghost" onclick="closeUserModal()">Cancel</button>
+          <button type="submit" class="btn-top primary" id="um_submitBtn"><i class="fa-solid fa-check"></i> Save User Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL: NEW TENANT / ORGANIZATION
+       ========================================================= -->
+  <div class="modal-backdrop" id="tenantModal" onclick="if(event.target===this)closeTenantModal()">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-building-circle-check" style="color:var(--primary);"></i>
+          <span>Add New Institutional Tenant</span>
+        </div>
+        <button type="button" onclick="closeTenantModal()" style="background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form id="tenantModalForm" onsubmit="handleSaveTenant(event)">
+        <div class="form-group">
+          <label class="form-label">Organization Legal Name *</label>
+          <input type="text" id="tm_name" class="form-input" placeholder="e.g. ACCRA DESIGN ACADEMY" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Tenant Code / ID *</label>
+            <input type="text" id="tm_code" class="form-input" placeholder="ADA-CAMPUS" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Primary Brand Color</label>
+            <input type="color" id="tm_color" class="form-input" value="#635bfc" style="height:44px; padding:4px;">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Organization Tagline / Motto</label>
+          <input type="text" id="tm_tagline" class="form-input" placeholder="e.g. Empowering Creative Leaders">
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:24px; padding-top:16px; border-top:1px solid var(--border);">
+          <button type="button" class="btn-top ghost" onclick="closeTenantModal()">Cancel</button>
+          <button type="submit" class="btn-top primary"><i class="fa-solid fa-check"></i> Register Tenant</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // 1. Session & Access Guard
+    const user = window.AuthSession ? window.AuthSession.requireAuth('admin-login.html', true) : null;
+    let ACTIVE_ORG = (user && user.org) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
+
+    // Chart instances
+    let enrollmentChart = null;
+    let roleChart = null;
+
+    // Boot UI
+    document.addEventListener('DOMContentLoaded', () => {
+      initAdminUI();
+      refreshAllStats();
+      logAuditAction('Portal Initialized', 'Super Admin Console loaded successfully.', 'INFO');
+    });
+
+    function initAdminUI() {
+      // Set admin details
+      if (user) {
+        document.getElementById('sideAdminName').textContent = user.name || 'Super Administrator';
+        document.getElementById('sideAdminEmail').textContent = user.email || 'admin@flawlessgraphics.com';
+        document.getElementById('sideOrgName').textContent = ACTIVE_ORG;
+      }
+
+      // Populate Tenant Selector
+      const sel = document.getElementById('activeTenantSelect');
+      if (sel) {
+        const tenants = getTenantsList();
+        sel.innerHTML = tenants.map(t => `<option value="${t.name}" ${t.name === ACTIVE_ORG ? 'selected' : ''}>${t.name}</option>`).join('');
+      }
+
+      // Populate Org filter in Users tab
+      const uOrg = document.getElementById('filterUserOrg');
+      if (uOrg) {
+        const tenants = getTenantsList();
+        uOrg.innerHTML = '<option value="">All Organizations</option>' + tenants.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+      }
+
+      renderTenantsGrid();
+      renderMasterUsersTable();
+      renderAuditLogs();
+      checkStorageCapacity();
+    }
+
+    function switchSection(secId) {
+      document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+      const targetSec = document.getElementById('sec_' + secId);
+      const targetBtn = document.querySelector(`.nav-btn[data-sec="${secId}"]`);
+      if (targetSec) targetSec.classList.add('active');
+      if (targetBtn) targetBtn.classList.add('active');
+
+      if (secId === 'overview') {
+        setTimeout(initCharts, 50);
+      }
+      if (secId === 'users') {
+        renderMasterUsersTable();
+      }
+      if (secId === 'tenants') {
+        renderTenantsGrid();
+      }
+      if (secId === 'audit') {
+        renderAuditLogs();
+      }
+      if (secId === 'health') {
+        checkStorageCapacity();
+      }
+      if (secId === 'broadcasts') {
+        renderAdminBroadcasts();
+      }
+    }
+
+    function handleTenantSwitch(newOrg) {
+      if (!newOrg) return;
+      ACTIVE_ORG = newOrg;
+      localStorage.setItem('active_org', newOrg);
+      if (window.AuthSession) {
+        const curr = window.AuthSession.getUser() || {};
+        curr.org = newOrg;
+        window.AuthSession.setUser(curr);
+      }
+      document.getElementById('sideOrgName').textContent = newOrg;
+      refreshAllStats();
+      renderMasterUsersTable();
+      logAuditAction('Tenant Switch', `Switched active administrative scope to ${newOrg}`, 'INFO');
+      if (window.Toaster) {
+        window.Toaster.success('Active Tenant Changed', `Switched to ${newOrg}. Sub-portal records updated.`);
+      }
+    }
+
+    function getTenantsList() {
+      let tenants = JSON.parse(localStorage.getItem('system_tenants') || 'null');
+      if (!Array.isArray(tenants) || tenants.length === 0) {
+        tenants = [
+          { name: 'FLAWLESS GRAPHICS', code: 'FG-ROOT', tagline: 'Creative Design & Systems Architecture', color: '#635bfc', status: 'Active' },
+          { name: 'CREATIVE CAMPUS', code: 'CC-CAMPUS', tagline: 'School of Media Arts & Design', color: '#06b6d4', status: 'Active' },
+          { name: 'ENTERPRISE TECH', code: 'ET-TECH', tagline: 'Software Engineering & Cloud Institute', color: '#10b981', status: 'Active' }
+        ];
+        localStorage.setItem('system_tenants', JSON.stringify(tenants));
+      }
+      return tenants;
+    }
+
+    function renderTenantsGrid() {
+      const tenants = getTenantsList();
+      const grid = document.getElementById('tenantsGrid');
+      if (!grid) return;
+
+      grid.innerHTML = tenants.map(t => {
+        // Count students and staff in this tenant
+        const studs = JSON.parse(localStorage.getItem(`${t.name}_students`) || '[]');
+        const staff = JSON.parse(localStorage.getItem(`${t.name}_teachers`) || '[]');
+        const isCurrent = t.name === ACTIVE_ORG;
+
+        return `
+          <div class="portal-card" style="border-top: 4px solid ${t.color};">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                <div class="portal-icon-box" style="background:rgba(99,91,252,0.15); color:${t.color};"><i class="fa-solid fa-building"></i></div>
+                ${isCurrent ? '<span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Current Scope</span>' : '<span class="badge badge-primary">Tenant</span>'}
+              </div>
+              <h3 style="margin:0 0 6px; font-size:16px; color:var(--text);">${escapeHtml(t.name)}</h3>
+              <div style="font-size:11.5px; font-weight:700; color:${t.color}; margin-bottom:8px;">${escapeHtml(t.code)}</div>
+              <p style="margin:0; font-size:12px; color:var(--muted); line-height:1.5;">${escapeHtml(t.tagline || 'Institutional Branch')}</p>
+
+              <div style="display:flex; gap:16px; margin-top:16px; padding-top:12px; border-top:1px solid var(--border);">
+                <div>
+                  <div style="font-size:10.5px; color:var(--muted); text-transform:uppercase; font-weight:700;">Students</div>
+                  <div style="font-size:16px; font-weight:800; color:var(--text);">${studs.length}</div>
+                </div>
+                <div>
+                  <div style="font-size:10.5px; color:var(--muted); text-transform:uppercase; font-weight:700;">Staff</div>
+                  <div style="font-size:16px; font-weight:800; color:var(--text);">${staff.length}</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:20px; display:flex; gap:8px;">
+              <button class="btn-top primary" style="font-size:12px; padding:7px 12px; flex:1; justify-content:center;" onclick="handleTenantSwitch('${t.name}')">
+                <i class="fa-solid fa-repeat"></i> Set Scope
+              </button>
+              <button class="btn-top ghost" style="font-size:12px; padding:7px 10px;" title="Delete Tenant" onclick="deleteTenant('${t.name}')">
+                <i class="fa-solid fa-trash" style="color:var(--accent-red);"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function refreshAllStats() {
+      // 1. Tenants count
+      const tenants = getTenantsList();
+      const kpiTenants = document.getElementById('kpi_tenants');
+      if (kpiTenants) kpiTenants.textContent = tenants.length;
+
+      // 2. Global Users count
+      const users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
+      const kpiUsers = document.getElementById('kpi_users');
+      if (kpiUsers) kpiUsers.textContent = users.length;
+
+      // Pending Approval Count & Banner
+      const pendingUsers = users.filter(u => {
+        const s = (u.status || 'active').toLowerCase();
+        return s === 'pending_approval' || s === 'pending';
+      });
+      const pendingCount = pendingUsers.length;
+
+      const pBanner = document.getElementById('pendingRegistrationsBanner');
+      const pBadge = document.getElementById('pendingApprovalCounterBadge');
+      const pText = document.getElementById('pendingApprovalCountText');
+      const pSub = document.getElementById('pendingBannerSub');
+
+      if (pendingCount > 0) {
+        if (pBanner) pBanner.style.display = 'flex';
+        if (pBadge) pBadge.style.display = 'inline-flex';
+        if (pText) pText.textContent = pendingCount;
+        if (pSub) pSub.textContent = `${pendingCount} registration request(s) awaiting administrative review and approval.`;
+      } else {
+        if (pBanner) pBanner.style.display = 'none';
+        if (pBadge) pBadge.style.display = 'none';
+      }
+
+      // 3. Students across all tenants
+      let totalStudents = 0;
+      let totalStaff = 0;
+      let totalSalary = 0;
+
+      tenants.forEach(t => {
+        const studs = JSON.parse(localStorage.getItem(`${t.name}_students`) || '[]');
+        totalStudents += studs.length;
+
+        const staff = JSON.parse(localStorage.getItem(`${t.name}_teachers`) || '[]');
+        totalStaff += staff.length;
+        staff.forEach(s => {
+          totalSalary += Number(s.salary) || 0;
+        });
+      });
+
+      const kpiStuds = document.getElementById('kpi_students');
+      if (kpiStuds) kpiStuds.textContent = totalStudents;
+
+      const kpiStaff = document.getElementById('kpi_staff');
+      if (kpiStaff) kpiStaff.textContent = totalStaff;
+
+      const kpiPay = document.getElementById('kpi_payroll');
+      if (kpiPay) kpiPay.textContent = 'GHS ' + totalSalary.toLocaleString();
+
+      initCharts();
+    }
+
+    function initCharts() {
+      // 1. Enrollment Chart
+      const ctx1 = document.getElementById('enrollmentTrendChart');
+      if (ctx1) {
+        if (enrollmentChart) enrollmentChart.destroy();
+        enrollmentChart = new Chart(ctx1, {
+          type: 'line',
+          data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+            datasets: [{
+              label: 'Enrolled Trainees & Students',
+              data: [12, 19, 25, 32, 45, 58, 70, 85, 102],
+              borderColor: '#635bfc',
+              backgroundColor: 'rgba(99, 91, 252, 0.15)',
+              fill: true,
+              tension: 0.35,
+              borderWidth: 3
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { color: 'rgba(0,0,0,0.06)' }, ticks: { color: '#64748b' } },
+              y: { grid: { color: 'rgba(0,0,0,0.06)' }, ticks: { color: '#64748b' } }
+            }
+          }
+        });
+      }
+
+      // 2. Role Distribution Chart
+      const ctx2 = document.getElementById('roleDistributionChart');
+      if (ctx2) {
+        const users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
+        let adminC = 0, hrC = 0, teachC = 0, finC = 0;
+        users.forEach(u => {
+          const r = (u.role || '').toLowerCase();
+          if (r === 'admin') adminC++;
+          else if (r === 'hr') hrC++;
+          else if (r === 'finance') finC++;
+          else teachC++;
+        });
+
+        if (roleChart) roleChart.destroy();
+        roleChart = new Chart(ctx2, {
+          type: 'doughnut',
+          data: {
+            labels: ['Super Admin', 'HR Manager', 'Teachers', 'Finance'],
+            datasets: [{
+              data: [adminC || 1, hrC || 2, teachC || 4, finC || 1],
+              backgroundColor: ['#635bfc', '#10b981', '#06b6d4', '#f59e0b'],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { color: '#475569', font: { size: 11, family: "'Plus Jakarta Sans', sans-serif" } }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // --- USER MANAGEMENT (RBAC) ---
+    function renderMasterUsersTable() {
+      const users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
+      const tbody = document.getElementById('masterUsersTableBody');
+      if (!tbody) return;
+
+      const q = (document.getElementById('filterUserSearch')?.value || '').trim().toLowerCase();
+      const orgF = (document.getElementById('filterUserOrg')?.value || '').trim();
+      const roleF = (document.getElementById('filterUserRole')?.value || '').toLowerCase();
+      const statF = (document.getElementById('filterUserStatus')?.value || '').toLowerCase();
+
+      const filtered = users.filter(u => {
+        const mQ = !q || (u.name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q);
+        const mOrg = !orgF || u.org === orgF;
+        const mRole = !roleF || (u.role || '').toLowerCase() === roleF;
+        const uStat = (u.status || 'active').toLowerCase();
+        const isPending = uStat === 'pending_approval' || uStat === 'pending';
+        const isSusp = uStat === 'suspended';
+        const isRej = uStat === 'rejected';
+
+        let mStat = true;
+        if (statF === 'active') mStat = uStat === 'active' && !isSusp && !isPending && !isRej;
+        else if (statF === 'pending_approval') mStat = isPending;
+        else if (statF === 'suspended') mStat = isSusp;
+        else if (statF === 'rejected') mStat = isRej;
+
+        return mQ && mOrg && mRole && mStat;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:32px; color:var(--muted);">No matching user accounts found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(u => {
+        const role = (u.role || 'teacher').toLowerCase();
+        const roleBadge = role === 'admin' ? '<span class="badge badge-primary"><i class="fa-solid fa-crown"></i> Super Admin</span>' :
+          (role === 'hr' ? '<span class="badge badge-success"><i class="fa-solid fa-briefcase"></i> HR Manager</span>' :
+          (role === 'finance' ? '<span class="badge badge-warning"><i class="fa-solid fa-coins"></i> Finance Officer</span>' :
+          '<span class="badge badge-cyan"><i class="fa-solid fa-chalkboard-user"></i> Teacher</span>'));
+
+        const uStat = (u.status || 'active').toLowerCase();
+        const isPending = uStat === 'pending_approval' || uStat === 'pending';
+        const isSusp = uStat === 'suspended';
+        const isRej = uStat === 'rejected';
+
+        let statusBadge = '<span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Active</span>';
+        if (isPending) {
+          statusBadge = '<span class="badge" style="background:rgba(245, 158, 11, 0.15); color:#d97706; border:1px solid rgba(245, 158, 11, 0.4);"><i class="fa-solid fa-clock"></i> Pending Approval</span>';
+        } else if (isSusp) {
+          statusBadge = '<span class="badge badge-danger"><i class="fa-solid fa-ban"></i> Suspended</span>';
+        } else if (isRej) {
+          statusBadge = '<span class="badge" style="background:rgba(239, 68, 68, 0.15); color:#ef4444; border:1px solid rgba(239, 68, 68, 0.35);"><i class="fa-solid fa-xmark"></i> Rejected</span>';
+        }
+
+        const initial = (u.name || u.email || 'U').charAt(0).toUpperCase();
+
+        return `
+          <tr>
+            <td>
+              <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:36px; height:36px; border-radius:10px; background:var(--primary-gradient); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:#fff; flex-shrink:0;">
+                  ${initial}
+                </div>
+                <div>
+                  <div style="font-weight:700; color:var(--text);">${escapeHtml(u.name || 'User')}</div>
+                  <div style="font-size:11.5px; color:var(--muted);">${escapeHtml(u.email)}</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge" style="background:#f1f5f9; color:var(--text); border:1px solid var(--border);">${escapeHtml(u.org || 'FLAWLESS GRAPHICS')}</span></td>
+            <td>${roleBadge}</td>
+            <td>${statusBadge}</td>
+            <td><span style="font-size:12px; color:var(--muted);">${u.linkedStaffId ? '<i class="fa-solid fa-link" style="color:var(--primary);"></i> Linked' : 'Standalone'}</span></td>
+            <td><span style="font-size:12px; color:var(--muted);">${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'Active'}</span></td>
+            <td style="text-align:right;">
+              <div style="display:inline-flex; gap:6px; align-items:center;">
+                ${isPending ? `
+                  <button class="btn-top primary" style="background:#10b981; border-color:#10b981; padding:4px 10px; font-size:12px; font-weight:700;" title="Approve Registration" onclick="approveUserAccount('${escapeHtml(u.email)}')"><i class="fa-solid fa-check"></i> Approve</button>
+                  <button class="btn-top ghost" style="color:var(--accent-red); padding:4px 8px; font-size:12px;" title="Reject Registration" onclick="rejectUserAccount('${escapeHtml(u.email)}')"><i class="fa-solid fa-xmark"></i> Reject</button>
+                ` : (isRej ? `
+                  <button class="btn-top ghost" style="color:var(--accent-green); padding:4px 8px; font-size:12px;" title="Approve Account" onclick="approveUserAccount('${escapeHtml(u.email)}')"><i class="fa-solid fa-check"></i> Restore</button>
+                ` : `
+                  <button class="btn-top ghost" style="padding:4px 8px; font-size:12px; color:${isSusp ? 'var(--accent-green)' : 'var(--accent-gold)'};" title="${isSusp ? 'Restore Access' : 'Suspend Access'}" onclick="toggleUserStatus('${escapeHtml(u.email)}')"><i class="fa-solid ${isSusp ? 'fa-unlock' : 'fa-ban'}"></i></button>
+                `)}
+                <button class="btn-top ghost" style="padding:4px 8px; font-size:12px;" title="Edit User" onclick="openUserModal('${escapeHtml(u.email)}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button class="btn-top ghost" style="padding:4px 8px; font-size:12px; color:var(--accent-red);" title="Delete Account" onclick="deleteMasterUser('${escapeHtml(u.email)}')"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function approveUserAccount(email) {
+      let users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
+      const target = users.find(u => (u.email || '').toLowerCase() === email.toLowerCase());
+      if (!target) return;
+      target.status = 'active';
+      target.approvedAt = Date.now();
+      localStorage.setItem('organizations_users', JSON.stringify(users));
+
+      // Also update org teachers roster if teacher or hr
+      const orgKey = `${target.org || 'FLAWLESS GRAPHICS'}_teachers`;
+      try {
+        let staff = JSON.parse(localStorage.getItem(orgKey) || '[]');
+        const sIdx = staff.findIndex(s => (s.email || '').toLowerCase() === email.toLowerCase());
+        if (sIdx >= 0) {
+          staff[sIdx].status = 'Active';
+          localStorage.setItem(orgKey, JSON.stringify(staff));
+        }
+      } catch(e) {}
+
+      logAuditAction('User Approved', `Approved ${(target.role || 'user').toUpperCase()} registration for ${target.name} (${email})`, 'SUCCESS');
+      if (window.Toaster) {
+        window.Toaster.success('Account Approved', `Granted active access for ${target.name} [${(target.role || '').toUpperCase()}].`);
+      }
+      renderMasterUsersTable();
+      refreshAllStats();
+    }
+
+    function rejectUserAccount(email) {
+      if (!confirm(`Are you sure you want to decline registration for (${email})?`)) return;
+      let users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
+      const target = users.find(u => (u.email || '').toLowerCase() === email.toLowerCase());
+      if (!target) return;
+      target.status = 'rejected';
+      target.rejectedAt = Date.now();
+      localStorage.setItem('organizations_users', JSON.stringify(users));
+
+      // Also update org teachers roster if teacher or hr
+      const orgKey = `${target.org || 'FLAWLESS GRAPHICS'}_teachers`;
+      try {
+        let staff = JSON.parse(localStorage.getItem(orgKey) || '[]');
+        const sIdx = staff.findIndex(s => (s.email || '').toLowerCase() === email.toLowerCase());
+        if (sIdx >= 0) {
+          staff[sIdx].status = 'Rejected';
+          localStorage.setItem(orgKey, JSON.stringify(staff));
+        }
+      } catch(e) {}
+
+      logAuditAction('User Rejected', `Declined registration for ${target.name} (${email})`, 'WARNING');
+      if (window.Toaster) {
+        window.Toaster.info('Registration Declined', `Registration request for ${target.name} has been declined.`);
+      }
+      renderMasterUsersTable();
+      refreshAllStats();
+    }
+
+    function filterPendingUsers() {
+      switchSection('users');
+      const statSelect = document.getElementById('filterUserStatus');
+      if (statSelect) {
+        statSelect.value = 'pending_approval';
+        renderMasterUsersTable();
+      }
+    }
+
+    function openUserModal(userEmail = null) {
+      const modal = document.getElementById('userModal');
+      const form = document.getElementById('userModalForm');
+      if (form) form.reset();
+
+      // Populate Org options
+      const orgSelect = document.getElementById('um_org');
+      if (orgSelect) {
+        const tenants = getTenantsList();
+        orgSelect.innerHTML = tenants.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+      }
+
+      if (userEmail) {
+        const users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
+        const target = users.find(u => (u.email || '').toLowerCase() === userEmail.toLowerCase());
+        if (target) {
+          document.getElementById('userModalHeading').textContent = 'Edit System User Account';
+          document.getElementById('um_originalEmail').value = target.email;
+          document.getElementById('um_name').value = target.name || '';
+          document.getElementById('um_email').value = target.email || '';
+          document.getElementById('um_org').value = target.org || ACTIVE_ORG;
+          document.getElementById('um_role').value = (target.role || 'teacher').toLowerCase();
+          document.getElementById('um_status').value = target.status || 'active';
+          document.getElementById('um_pass').value = '';
+          document.getElementById('um_passReq').style.display = 'none';
+          document.getElementById('um_passHint').textContent = 'Leave blank to preserve existing password.';
+        }
+      } else {
+        document.getElementById('userModalHeading').textContent = 'Create System User Account';
+        document.getElementById('um_originalEmail').value = '';
+        document.getElementById('um_org').value = ACTIVE_ORG;
+        document.getElementById('um_role').value = 'teacher';
+        document.getElementById('um_status').value = 'active';
+        document.getElementById('um_pass').value = 'Flawless@' + Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('um_passReq').style.display = 'inline';
+        document.getElementById('um_passHint').textContent = 'Auto-generated initial password.';
+      }
+
+      modal.classList.add('active');
+    }
+
+    function closeUserModal() {
+      document.getElementById('userModal')?.classList.remove('active');
+    }
+
+    function generatePasswordForModal() {
+      const pass = 'Flawless@' + Math.floor(1000 + Math.random() * 9000);
+      document.getElementById('um_pass').value = pass;
+    }
+
+    async function handleSaveUser(e) {
+      e.preventDefault();
+      const origEmail = document.getElementById('um_originalEmail').value.trim().toLowerCase();
+      const name = document.getElementById('um_name').value.trim();
+      const email = document.getElementById('um_email').value.trim().toLowerCase();
+      const org = document.getElementById('um_org').value;
+      const role = document.getElementById('um_role').value;
+      const status = document.getElementById('um_status').value;
+      const pass = document.getElementById('um_pass').value.trim();
+
+      let users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
+
+      if (origEmail !== email && users.some(u => (u.email || '').toLowerCase() === email)) {
+        if (window.Toaster) window.Toaster.error('Email Conflict', `An account with ${email} already exists.`);
+        return;
+      }
+
+      if (origEmail) {
+        const idx = users.findIndex(u => (u.email || '').toLowerCase() === origEmail);
+        if (idx !== -1) {
+          users[idx].name = name;
+          users[idx].email = email;
+          users[idx].org = org;
+          users[idx].role = role;
+          users[idx].status = status;
+          if (pass) users[idx].pass = pass;
+        }
+        logAuditAction('User Updated', `Updated account for ${name} (${email}) [${role}]`, 'INFO');
+      } else {
+        users.unshift({
+          id: 'u_' + Date.now(),
+          org,
+          name,
+          email,
+          role,
+          status,
+          pass: pass || 'Flawless@2026',
+          createdAt: Date.now()
+        });
+        logAuditAction('User Created', `Provisioned new account for ${name} (${email}) [${role}]`, 'SUCCESS');
+      }
+
+      localStorage.setItem('organizations_users', JSON.stringify(users));
+      closeUserModal();
+      renderMasterUsersTable();
+      refreshAllStats();
+      if (window.Toaster) window.Toaster.success('User Account Saved', `Account for ${name} saved successfully.`);
+    }
+
+    function toggleUserStatus(email) {
+      let users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
+      const target = users.find(u => (u.email || '').toLowerCase() === email.toLowerCase());
+      if (!target) return;
+      target.status = target.status === 'suspended' ? 'active' : 'suspended';
+      localStorage.setItem('organizations_users', JSON.stringify(users));
+      renderMasterUsersTable();
+      logAuditAction('Access Status Changed', `Set access status of ${email} to ${target.status}`, 'WARNING');
+      if (window.Toaster) window.Toaster.info('Status Changed', `${target.name}'s account is now ${target.status.toUpperCase()}.`);
+    }
+
+    function deleteMasterUser(email) {
+      if (!confirm(`Are you sure you want to permanently delete user account (${email})?`)) return;
+      let users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
+      users = users.filter(u => (u.email || '').toLowerCase() !== email.toLowerCase());
+      localStorage.setItem('organizations_users', JSON.stringify(users));
+      renderMasterUsersTable();
+      refreshAllStats();
+      logAuditAction('User Deleted', `Purged user account for ${email}`, 'WARNING');
+      if (window.Toaster) window.Toaster.info('User Deleted', `Account ${email} has been removed.`);
+    }
+
+    function syncAllStaffLogins() {
+      const tenants = getTenantsList();
+      let users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
+      let count = 0;
+
+      tenants.forEach(t => {
+        const staff = JSON.parse(localStorage.getItem(`${t.name}_teachers`) || '[]');
+        staff.forEach(s => {
+          if (!s.email) return;
+          const sEmail = s.email.trim().toLowerCase();
+          if (!users.some(u => (u.email || '').toLowerCase() === sEmail)) {
+            const pos = (s.position || s.role || '').toLowerCase();
+            let r = 'teacher';
+            if (pos.includes('director') || pos.includes('head') || pos.includes('admin')) r = 'admin';
+            else if (pos.includes('hr')) r = 'hr';
+            else if (pos.includes('finance') || pos.includes('account')) r = 'finance';
+
+            users.push({
+              id: 'u_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+              org: t.name,
+              name: s.name || s.fullName || sEmail.split('@')[0],
+              email: sEmail,
+              role: r,
+              status: 'active',
+              pass: 'Flawless@2026',
+              linkedStaffId: s.id,
+              createdAt: Date.now()
+            });
+            count++;
+          }
+        });
+      });
+
+      if (count > 0) {
+        localStorage.setItem('organizations_users', JSON.stringify(users));
+        renderMasterUsersTable();
+        refreshAllStats();
+        logAuditAction('Batch Staff Provisioning', `Auto-provisioned ${count} staff member accounts`, 'SUCCESS');
+        if (window.Toaster) window.Toaster.success('Staff Logins Provisioned', `${count} staff members now have portal access.`);
+      } else {
+        if (window.Toaster) window.Toaster.info('Already Synchronized', 'All registered staff members already have user accounts.');
+      }
+    }
+
+    // --- TENANTS MANAGEMENT ---
+    function openNewTenantModal() {
+      document.getElementById('tenantModalForm')?.reset();
+      document.getElementById('tenantModal')?.classList.add('active');
+    }
+    function closeTenantModal() {
+      document.getElementById('tenantModal')?.classList.remove('active');
+    }
+    function handleSaveTenant(e) {
+      e.preventDefault();
+      const name = document.getElementById('tm_name').value.trim().toUpperCase();
+      const code = document.getElementById('tm_code').value.trim().toUpperCase();
+      const color = document.getElementById('tm_color').value;
+      const tagline = document.getElementById('tm_tagline').value.trim();
+
+      let tenants = getTenantsList();
+      if (tenants.some(t => t.name === name)) {
+        if (window.Toaster) window.Toaster.warning('Tenant Exists', `Organization ${name} is already registered.`);
+        return;
+      }
+
+      tenants.push({ name, code, color, tagline, status: 'Active' });
+      localStorage.setItem('system_tenants', JSON.stringify(tenants));
+      closeTenantModal();
+      renderTenantsGrid();
+      initAdminUI();
+      logAuditAction('Tenant Created', `Registered new organization tenant: ${name} (${code})`, 'SUCCESS');
+      if (window.Toaster) window.Toaster.success('Tenant Registered', `${name} created and initialized.`);
+    }
+
+    function deleteTenant(tenantName) {
+      if (tenantName === 'FLAWLESS GRAPHICS') {
+        if (window.Toaster) window.Toaster.warning('Action Blocked', 'Root organization cannot be deleted.');
+        return;
+      }
+      if (!confirm(`Are you sure you want to delete organization tenant ${tenantName}?`)) return;
+      let tenants = getTenantsList();
+      tenants = tenants.filter(t => t.name !== tenantName);
+      localStorage.setItem('system_tenants', JSON.stringify(tenants));
+      renderTenantsGrid();
+      initAdminUI();
+      logAuditAction('Tenant Deleted', `Removed organization tenant ${tenantName}`, 'WARNING');
+      if (window.Toaster) window.Toaster.info('Tenant Removed', `${tenantName} deleted.`);
+    }
+
+    // --- PORTAL INSPECTOR ---
+    function previewPortalInFrame(url, title) {
+      switchSection('portals');
+      const frame = document.getElementById('inspectorFrame');
+      const titleEl = document.getElementById('inspectorTitle');
+      const extLink = document.getElementById('inspectorExternalLink');
+      if (frame) frame.src = url;
+      if (titleEl) titleEl.textContent = title;
+      if (extLink) extLink.href = url;
+    }
+
+    function reloadInspector() {
+      const frame = document.getElementById('inspectorFrame');
+      if (frame) frame.src = frame.src;
+    }
+
+    // --- AUDIT LOGS ---
+    function getAuditLogs() {
+      return JSON.parse(localStorage.getItem('system_audit_logs') || '[]');
+    }
+
+    function logAuditAction(action, details, severity = 'INFO') {
+      let logs = getAuditLogs();
+      logs.unshift({
+        id: 'aud_' + Date.now(),
+        timestamp: new Date().toLocaleTimeString(),
+        operator: user ? user.name : 'Super Admin',
+        action,
+        details,
+        severity
+      });
+      if (logs.length > 100) logs = logs.slice(0, 100);
+      localStorage.setItem('system_audit_logs', JSON.stringify(logs));
+      renderAuditLogs();
+    }
+
+    function renderAuditLogs() {
+      const logs = getAuditLogs();
+      const tbody = document.getElementById('auditTableBody');
+      if (!tbody) return;
+
+      if (logs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:32px; color:var(--muted);">No audit logs recorded yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = logs.map(l => {
+        const badge = l.severity === 'SUCCESS' ? '<span class="badge badge-success">SUCCESS</span>' :
+          (l.severity === 'WARNING' ? '<span class="badge badge-warning">WARNING</span>' :
+          '<span class="badge badge-primary">INFO</span>');
+
+        return `
+          <tr>
+            <td><strong style="color:var(--text); font-family:monospace;">${l.timestamp}</strong></td>
+            <td>${escapeHtml(l.operator)}</td>
+            <td><strong>${escapeHtml(l.action)}</strong></td>
+            <td><span style="font-size:12px; color:var(--muted);">${escapeHtml(l.details)}</span></td>
+            <td>${badge}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function clearAuditLogs() {
+      if (!confirm('Clear all recorded system audit logs?')) return;
+      localStorage.removeItem('system_audit_logs');
+      renderAuditLogs();
+      if (window.Toaster) window.Toaster.info('Logs Cleared', 'Audit trail history emptied.');
+    }
+
+    // --- STORAGE & HEALTH CHECK ---
+    function checkStorageCapacity() {
+      try {
+        let total = 0;
+        for (let x in localStorage) {
+          if (localStorage.hasOwnProperty(x)) {
+            total += ((localStorage[x].length + x.length) * 2);
+          }
+        }
+        const kb = (total / 1024).toFixed(2);
+        const sub = document.getElementById('health_storage_sub');
+        if (sub) sub.textContent = `${kb} KB of ~5,000 KB utilized`;
+      } catch(e) {}
+    }
+
+    // --- BACKUP & SNAPSHOT ENGINE ---
+    function exportFullDatabaseSnapshot() {
+      const dump = {
+        exportedAt: new Date().toISOString(),
+        author: user ? user.name : 'Super Admin',
+        activeOrg: ACTIVE_ORG,
+        data: {}
+      };
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k) {
+          try {
+            dump.data[k] = JSON.parse(localStorage.getItem(k));
+          } catch(e) {
+            dump.data[k] = localStorage.getItem(k);
+          }
+        }
+      }
+
+      const blob = new Blob([JSON.stringify(dump, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `flawless_backup_snapshot_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      logAuditAction('Database Export', 'Exported full JSON snapshot of institutional database', 'SUCCESS');
+      if (window.Toaster) window.Toaster.success('Snapshot Exported', 'Full database snapshot downloaded successfully.');
+    }
+
+    function handleRestoreFile(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (!parsed.data || typeof parsed.data !== 'object') {
+            throw new Error('Invalid snapshot structure');
+          }
+
+          if (!confirm(`Warning: Restoring will merge/overwrite local records from backup created on ${parsed.exportedAt || 'earlier date'}. Proceed?`)) {
+            return;
+          }
+
+          for (const key in parsed.data) {
+            const val = parsed.data[key];
+            if (typeof val === 'object') {
+              localStorage.setItem(key, JSON.stringify(val));
+            } else {
+              localStorage.setItem(key, String(val));
+            }
+          }
+
+          logAuditAction('Database Restored', `Restored snapshot from ${file.name}`, 'WARNING');
+          if (window.Toaster) {
+            window.Toaster.success('Database Restored', 'Snapshot applied successfully! Reloading...');
+          }
+          setTimeout(() => location.reload(), 1200);
+        } catch(err) {
+          if (window.Toaster) window.Toaster.error('Restore Error', 'Invalid or corrupt JSON snapshot file.');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    function openBackupExportModal() {
+      switchSection('backup');
+    }
+
+    function saveAdminSettings() {
+      const timeout = document.getElementById('setting_timeout')?.value || 15;
+      const sound = document.getElementById('setting_sound')?.value || 'enabled';
+      const reg = document.getElementById('setting_reg')?.value || 'allowed';
+
+      localStorage.setItem('admin_master_settings', JSON.stringify({ timeout, sound, reg }));
+      logAuditAction('Settings Saved', `Master configurations updated (Timeout: ${timeout}m, Sound: ${sound})`, 'INFO');
+      if (window.Toaster) window.Toaster.success('Settings Saved', 'Global system configurations updated.');
+    }
+
+    /* -------------------------------------------------------------
+       SUPER ADMIN BROADCAST CONSOLE LOGIC
+    ------------------------------------------------------------- */
+    function renderAdminBroadcasts() {
+      const annKey = `${ACTIVE_ORG}_announcements`;
+      const ann = safeParse(localStorage.getItem(annKey)) || [];
+      const tbody = document.getElementById('adm_broadcastsTableBody');
+      const countBadge = document.getElementById('adm_bcCount');
+      if (!tbody) return;
+
+      if (countBadge) countBadge.textContent = `${ann.length} Directives`;
+
+      if (ann.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:28px; color:var(--muted);">No published directives found for this organization.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      ann.forEach((a, i) => {
+        const isSuperAdmin = a.role === 'admin' || (a.author && a.author.includes('Super Admin'));
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight:700; color:var(--muted);">${i + 1}</td>
+          <td style="font-weight:800; color:var(--text);">
+            <div>${escapeHtml(a.title || 'Directive')}</div>
+            <div style="font-size:11.5px; color:var(--muted); max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(a.body || a.text || '')}</div>
+          </td>
+          <td>
+            ${isSuperAdmin 
+              ? '<span class="badge" style="background:#fef3c7; color:#b45309; border:1px solid rgba(245, 158, 11, 0.4); font-weight:800;"><i class="fa-solid fa-certificate"></i> [Super Admin Broadcast]</span>' 
+              : '<span class="badge badge-purple"><i class="fa-solid fa-user-shield"></i> ' + escapeHtml(a.author || 'HR') + '</span>'
+            }
+          </td>
+          <td>
+            <span class="badge badge-blue">${escapeHtml(a.category || 'General')}</span>
+          </td>
+          <td>
+            ${a.priority === 'High' 
+              ? '<span class="badge badge-red"><i class="fa-solid fa-triangle-exclamation"></i> High</span>' 
+              : '<span class="badge" style="background:rgba(0,0,0,0.05); color:var(--muted);">Normal</span>'
+            }
+          </td>
+          <td style="font-size:12px; color:var(--muted);">${escapeHtml(a.date || 'Today')}</td>
+          <td>
+            ${a.pinned 
+              ? '<span style="color:var(--accent-gold); font-weight:800;"><i class="fa-solid fa-thumbtack"></i> Pinned</span>' 
+              : '<span style="color:var(--muted);">No</span>'
+            }
+          </td>
+          <td style="text-align:right;">
+            <button type="button" class="btn-top ghost btn-sm" onclick="toggleAdminPinBroadcast('${escapeHtml(a.id)}') style="padding:4px 8px; font-size:11px;" title="Pin/Unpin">
+              <i class="fa-solid fa-thumbtack"></i>
+            </button>
+            <button type="button" class="btn-top ghost btn-sm" onclick="deleteAdminBroadcast('${escapeHtml(a.id)}') style="padding:4px 8px; font-size:11px; color:var(--accent-red);" title="Delete">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function handleAdminPublishBroadcast(e) {
+      if (e) e.preventDefault();
+      const title = document.getElementById('adm_bcTitle')?.value.trim();
+      const category = document.getElementById('adm_bcCategory')?.value || 'Urgent';
+      const priority = document.getElementById('adm_bcPriority')?.value || 'High';
+      const tenantMode = document.getElementById('adm_bcTenant')?.value || 'active';
+      const body = document.getElementById('adm_bcBody')?.value.trim();
+      const pinned = document.getElementById('adm_bcPinned')?.checked || true;
+
+      if (!title || !body) return;
+
+      const newBc = {
+        id: 'bc_' + Date.now(),
+        title: title,
+        body: body,
+        text: body,
+        author: 'Super Administrator',
+        role: 'admin',
+        category: category,
+        priority: priority,
+        pinned: pinned,
+        timestamp: Date.now(),
+        date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+      };
+
+      const tenantsToUpdate = (tenantMode === 'all') 
+        ? ['FLAWLESS GRAPHICS', 'CREATIVE CAMPUS', 'ENTERPRISE TECH', ACTIVE_ORG] 
+        : [ACTIVE_ORG];
+
+      [...new Set(tenantsToUpdate)].forEach(org => {
+        const key = `${org}_announcements`;
+        const list = safeParse(localStorage.getItem(key)) || [];
+        list.unshift(Object.assign({}, newBc, { id: 'bc_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5) }));
+        localStorage.setItem(key, JSON.stringify(list));
+      });
+
+      document.getElementById('adminBroadcastForm')?.reset();
+      renderAdminBroadcasts();
+      if (window.Toaster && typeof window.Toaster.success === 'function') {
+        window.Toaster.success('Official Super Admin Broadcast Published Across All Portals');
+      } else {
+        alert('Super Admin Broadcast successfully published to staff portals!');
+      }
+    }
+
+    function toggleAdminPinBroadcast(id) {
+      const annKey = `${ACTIVE_ORG}_announcements`;
+      const ann = safeParse(localStorage.getItem(annKey)) || [];
+      const target = ann.find(a => String(a.id) === String(id));
+      if (target) {
+        target.pinned = !target.pinned;
+        localStorage.setItem(annKey, JSON.stringify(ann));
+        renderAdminBroadcasts();
+      }
+    }
+
+    function deleteAdminBroadcast(id) {
+      const annKey = `${ACTIVE_ORG}_announcements`;
+      let ann = safeParse(localStorage.getItem(annKey)) || [];
+      ann = ann.filter(a => String(a.id) !== String(id));
+      localStorage.setItem(annKey, JSON.stringify(ann));
+      renderAdminBroadcasts();
+    }
+
+    window.renderAdminBroadcasts = renderAdminBroadcasts;
+    window.handleAdminPublishBroadcast = handleAdminPublishBroadcast;
+    window.toggleAdminPinBroadcast = toggleAdminPinBroadcast;
+    window.deleteAdminBroadcast = deleteAdminBroadcast;
+
+        function handleGlobalSearch(query) {
+      if (!query || query.length < 2) return;
+      // If user typed 'user' or search looks like an email, jump to users
+      if (query.includes('@') || query.toLowerCase().includes('user')) {
+        switchSection('users');
+        const uInput = document.getElementById('filterUserSearch');
+        if (uInput) {
+          uInput.value = query;
+          renderMasterUsersTable();
+        }
+      }
+    }
+
+    function logoutAdmin() {
+      if (!confirm('Sign out from Super Admin Console?')) return;
+      if (window.AuthSession) {
+        localStorage.removeItem('active_org_user');
+        localStorage.removeItem('active_user');
+      }
+      window.location.href = 'admin-login.html';
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+  </script>
+</body>
+</html>

@@ -486,6 +486,11 @@
         }
     }
 </style>
+  <!-- Floating 3-Dots Quick Dock Stylesheet -->
+  <link rel="stylesheet" href="assets/css/quick-dock.css">
+  <!-- Pop-up Toaster System -->
+  <link rel="stylesheet" href="assets/css/toaster.css">
+  <script src="assets/js/toaster.js"></script>
 </head>
 <body>
 
@@ -583,6 +588,20 @@
                 </div>
 
                 <div class="portal-actions">
+                    <!-- Super Admin Master Console -->
+                    <a href="pages/admin/admin-dashboard.html" class="btn-portal" id="portalAdminLink" style="background: linear-gradient(135deg, rgba(99, 91, 252, 0.35) 0%, rgba(6, 182, 212, 0.25) 100%); border: 1px solid rgba(99, 91, 252, 0.5); box-shadow: 0 4px 15px rgba(99, 91, 252, 0.25);">
+                        <div class="portal-info">
+                            <div class="portal-icon" style="background: linear-gradient(135deg, #635bfc 0%, #06b6d4 100%); color: #fff;">
+                                <i class="fa-solid fa-crown"></i>
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:2px;">
+                                <span style="font-weight: 800; color:#fff;">Super Admin Portal</span>
+                                <span style="font-size: 11px; color: rgba(255,255,255,0.7);">Master Governance &amp; Multi-Tenant Console</span>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right arrow-icon" style="color: #635bfc;"></i>
+                    </a>
+
                     <!-- Continue to Website -->
                     <a href="pages/public/home.html" class="btn-portal btn-primary">
                         <div class="portal-info">
@@ -691,5 +710,7 @@ function logout() {
 <script src="assets/js/skeleton-loader.js"></script>
 <!-- Floating Quick Assistant Script -->
 <script src="assets/js/quick-assistant.js"></script>
+  <!-- Floating 3-Dots Quick Dock Script -->
+  <script src="assets/js/quick-dock.js"></script>
 </body>
 </html>

@@ -676,6 +676,9 @@
         border-color: rgba(239, 68, 68, 0.5);
     }
 </style>
+  <!-- Pop-up Toaster System -->
+  <link rel="stylesheet" href="assets/css/toaster.css">
+  <script src="assets/js/toaster.js"></script>
 </head>
 <body>
 
@@ -1197,7 +1200,7 @@ async function login() {
         } catch(e) { users = []; }
 
         const hashedPw = await AuthSession.sha256(pw);
-        const user = users.find(u => u.email === email && u.pass === hashedPw);
+        const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && (u.pass === hashedPw || u.pass === pw));
 
         if (!user) {
             submitBtn.disabled = false;
@@ -1205,10 +1208,30 @@ async function login() {
             return showMessage("Incorrect email address or password.");
         }
 
+        // Multi-tier registration approval status gate
+        if (user.status === 'pending_approval') {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Log In';
+            return showMessage("Your account has been verified and is awaiting administrator approval. You will gain access once approved.", true);
+        }
+        if (user.status === 'rejected') {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Log In';
+            return showMessage("Your account registration was declined by the administrator. Please contact your organization manager.", true);
+        }
+        if (user.status === 'suspended') {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Log In';
+            return showMessage("Your account has been temporarily suspended. Please contact organization administration.", true);
+        }
+
         AuthSession.setUser(user);
         showMessage("Authentication successful! Redirecting...", false);
         setTimeout(() => {
-            window.location.href = "welcome.html";
+            if (user.role === 'teacher') window.location.href = "pages/teacher/teacher-dashboard.html";
+            else if (user.role === 'hr') window.location.href = "pages/hr/hr-dashboard.html";
+            else if (user.role === 'finance') window.location.href = "pages/finance/finance-dashboard.html";
+            else window.location.href = "welcome.html";
         }, 800);
 
     } catch (err) {

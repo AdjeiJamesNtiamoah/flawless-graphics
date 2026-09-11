@@ -436,6 +436,11 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
   .sidebar { display: none; }
 }
 </style>
+  <!-- Floating 3-Dots Quick Dock Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/quick-dock.css">
+  <!-- Pop-up Toaster System -->
+  <link rel="stylesheet" href="../../assets/css/toaster.css">
+  <script src="../../assets/js/toaster.js"></script>
 </head>
 <body>
 
@@ -555,16 +560,26 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
       <button class="tab" data-section="students"><i class="fa-solid fa-user-graduate"></i> Students</button>
       <button class="tab" data-section="attendance"><i class="fa-solid fa-clipboard-user"></i> Attendance</button>
       <button class="tab" data-section="assignments"><i class="fa-solid fa-book-open"></i> Assignments</button>
+      <button class="tab" data-section="assessments"><i class="fa-solid fa-stamp"></i> Assessments</button>
       <button class="tab" data-section="messages"><i class="fa-solid fa-paper-plane"></i> Messages</button>
       <button class="tab" data-section="lessons"><i class="fa-solid fa-note-sticky"></i> Lesson Notes</button>
-      <button class="tab" data-section="timetable"><i class="fa-solid fa-calendar-days"></i> Timetable</button>
+      <button class="tab" data-section="timetable"><i class="fa-solid fa-calendar-days"></i> Timetable &amp; Calendar</button>
+      <button class="tab" data-section="broadcasts"><i class="fa-solid fa-bullhorn"></i> Directives &amp; Broadcasts</button>
       <button class="tab" data-section="settings"><i class="fa-solid fa-gear"></i> Settings</button>
     </nav>
 
-    <div style="margin-top:auto; display:flex; gap:12px; align-items:center;">
-      <div class="notification-bell" id="notifBell" title="Notifications">
+    <div style="margin-top:auto; display:flex; gap:12px; align-items:center; position:relative;">
+      <div class="notification-bell" id="notifBell" title="Notifications" onclick="toggleNotificationPopover(event)">
         <i class="fa-regular fa-bell"></i>
         <span class="count" id="notifCount" style="display:none">0</span>
+        <!-- Floating Notification Popover -->
+        <div id="notifPopover" style="display:none; position:absolute; bottom:42px; left:0; width:310px; background:var(--card-bg, #0f172a); border:1px solid var(--card-border); border-radius:12px; padding:14px; box-shadow:0 12px 32px rgba(0,0,0,0.45); z-index:1000; text-align:left;" onclick="event.stopPropagation()">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid var(--card-border); padding-bottom:6px;">
+            <strong style="font-size:13px;"><i class="fa-solid fa-bell" style="color:var(--accent1);"></i> Notifications</strong>
+            <span class="tiny" id="notifPopoverCount">0 unread</span>
+          </div>
+          <div id="notifPopoverList" style="max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
       </div>
       <button class="btn ghost" id="logoutBtn" style="flex:1"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
     </div>
@@ -609,6 +624,46 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
 
     <!-- OVERVIEW SECTION -->
     <section id="overviewSection" class="card view-panel">
+      <!-- Published Broadcast / Directive Alert Banner for Teachers -->
+      <div id="teacherBroadcastBanner" style="display:none; margin-bottom:18px; background:linear-gradient(135deg, rgba(245,158,11,0.14) 0%, rgba(99,91,252,0.1) 100%); border:1px solid rgba(245,158,11,0.35); border-radius:12px; padding:14px 18px; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+        <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:280px;">
+          <div style="width:38px; height:38px; border-radius:10px; background:rgba(245,158,11,0.2); color:#f59e0b; display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0;">
+            <i class="fa-solid fa-bullhorn"></i>
+          </div>
+          <div>
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:2px; flex-wrap:wrap;">
+              <span id="teacherBcBannerAuthor"></span>
+              <strong style="font-size:14px; color:var(--text-main);" id="teacherBcBannerTitle">Official Institutional Directive</strong>
+            </div>
+            <div class="tiny" id="teacherBcBannerBody" style="color:var(--text-muted); line-height:1.4;">New directive published by institutional leadership.</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn ghost btn-sm" onclick="acknowledgeActiveBroadcast()" style="padding:6px 12px; font-size:12px;">
+            <i class="fa-solid fa-check"></i> Acknowledge
+          </button>
+          <button type="button" class="btn prim btn-sm" onclick="goToTeacherBroadcasts()" style="padding:6px 12px; font-size:12px;">
+            <i class="fa-solid fa-arrow-right"></i> Review Directives
+          </button>
+        </div>
+      </div>
+
+      <!-- Published Academic Calendar Banner for Teachers -->
+      <div id="teacherCalOverviewBanner" style="display:none; margin-bottom:18px; background:linear-gradient(135deg, rgba(99,91,252,0.12) 0%, rgba(16,185,129,0.08) 100%); border:1px solid rgba(99,91,252,0.25); border-radius:12px; padding:14px 18px; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:36px; height:36px; border-radius:10px; background:rgba(99,91,252,0.2); color:var(--accent1, #5ce1e6); display:flex; align-items:center; justify-content:center; font-size:16px;">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+          <div>
+            <div style="font-weight:700; font-size:14px;" id="teacherCalBannerTitle">Academic Calendar Published for Staff Review</div>
+            <div class="tiny" id="teacherCalBannerSubtitle" style="color:var(--text-muted);">Institutional term dates &amp; assessment milestones are live. Faculty review window is open.</div>
+          </div>
+        </div>
+        <button type="button" class="btn prim" onclick="goToTeacherTimetable()" style="padding:6px 14px; font-size:12px;">
+          <i class="fa-solid fa-eye"></i> Review Calendar
+        </button>
+      </div>
+
       <div style="display:flex; justify-content:space-between; align-items:center">
         <h3 style="margin:0">Recent Activity Feed</h3>
         <div class="tiny" id="lastUpdated">—</div>
@@ -696,6 +751,46 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
       <div id="assignmentList"></div>
     </section>
 
+    <!-- ASSESSMENTS SECTION -->
+    <section id="assessmentsSection" class="card view-panel" style="display:none">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+        <div>
+          <h3 style="margin:0; display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-stamp" style="color:var(--accent1, #5ce1e6);"></i> Student Assessments &amp; Grading Desk
+          </h3>
+          <div class="tiny" style="color:var(--text-muted); margin-top:2px;">
+            Continuous Assessment (30%) &amp; Final Exam (70%) marks submitted for institutional HR approval &amp; certification
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button type="button" class="btn prim" onclick="openNewAssessmentModal()" style="padding:6px 14px; font-size:12px;">
+            <i class="fa-solid fa-plus"></i> Record Assessment
+          </button>
+          <button type="button" class="btn ghost" onclick="renderTeacherAssessments()" style="padding:6px 10px; font-size:12px;">
+            <i class="fa-solid fa-rotate"></i> Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Assessment Roster Table -->
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Student Profile</th>
+              <th>Class &amp; Subject</th>
+              <th>CA (30%)</th>
+              <th>Exam (70%)</th>
+              <th>Total &amp; Grade</th>
+              <th>Certification Status</th>
+              <th style="text-align:right">HR Audit</th>
+            </tr>
+          </thead>
+          <tbody id="teacherAssessmentsTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- MESSAGES SECTION -->
     <section id="messagesSection" class="card view-panel" style="display:none">
       <h3>Internal Messaging</h3>
@@ -726,9 +821,40 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
       <div id="notesList" style="margin-top:20px"></div>
     </section>
 
-    <!-- TIMETABLE SECTION -->
+    <!-- TIMETABLE & ACADEMIC CALENDAR SECTION -->
     <section id="timetableSection" class="card view-panel" style="display:none">
-      <h3>Schedule / Timetable</h3>
+      <!-- Institutional Academic Calendar for Staff Review Module -->
+      <div style="margin-bottom:24px; padding-bottom:20px; border-bottom:1px solid var(--card-border);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+          <div>
+            <h3 style="margin:0; display:flex; align-items:center; gap:8px;">
+              <i class="fa-solid fa-calendar-days" style="color:var(--accent1, #5ce1e6);"></i>
+              Institutional Academic Calendar (Staff Review)
+            </h3>
+            <div class="tiny" style="color:var(--text-muted); margin-top:2px;">
+              Term schedule, CA deadlines, and examination milestones published by HR Administration for faculty review
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button type="button" class="btn ghost" onclick="renderTeacherCalendarReview()" style="padding:5px 10px; font-size:12px;">
+              <i class="fa-solid fa-rotate"></i> Refresh
+            </button>
+            <button type="button" class="btn prim" id="ackCalendarBtn" onclick="acknowledgeAcademicCalendar()" style="padding:5px 12px; font-size:12px;">
+              <i class="fa-solid fa-check-double"></i> Acknowledge Calendar
+            </button>
+          </div>
+        </div>
+
+        <div id="teacherCalendarContainer">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Weekly Classroom Schedule -->
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="margin:0"><i class="fa-solid fa-clock"></i> Weekly Classroom Timetable</h3>
+        <span class="tiny" style="color:var(--text-muted);">Personal class teaching schedule</span>
+      </div>
       <div style="display:grid; grid-template-columns: 1fr 1fr 120px 120px auto; gap:10px; margin-top:12px; align-items:center;">
         <select id="ttClassSelect"></select>
         <select id="ttDay">
@@ -739,6 +865,36 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
         <button class="btn prim" id="saveTTBtn"><i class="fa-solid fa-plus"></i> Add Slot</button>
       </div>
       <div id="timetableList" style="margin-top:20px"></div>
+    </section>
+
+    <!-- BROADCASTS & DIRECTIVES SECTION -->
+    <section id="broadcastsSection" class="card view-panel" style="display:none">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+        <div>
+          <h3 style="margin:0; font-size:18px; display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-bullhorn" style="color:var(--accent1);"></i> Institutional Directives &amp; Staff Broadcasts
+          </h3>
+          <div class="tiny" style="color:var(--text-muted); margin-top:2px;">
+            Verified executive communiqués from Super Administrator and HR Directorate.
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <select id="teacherBcCategoryFilter" class="select" onchange="filterTeacherBroadcasts()" style="padding:6px 10px; font-size:12px; background:var(--card-bg); color:var(--text-main); border:1px solid var(--card-border); border-radius:8px;">
+            <option value="">All Directives</option>
+            <option value="Urgent">Urgent Notices</option>
+            <option value="Academic">Academic</option>
+            <option value="Policy">Policy</option>
+            <option value="General">General</option>
+          </select>
+          <button type="button" class="btn ghost btn-sm" onclick="acknowledgeAllBroadcasts()">
+            <i class="fa-solid fa-check-double"></i> Acknowledge All
+          </button>
+        </div>
+      </div>
+
+      <div id="teacherBroadcastsList" style="display:flex; flex-direction:column; gap:12px; margin-top:14px;">
+        <!-- Dynamically rendered -->
+      </div>
     </section>
 
     <!-- SETTINGS SECTION -->
@@ -960,7 +1116,7 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
         <div class="modal-icon-circle" id="vs_avatar"><i class="fa-solid fa-user"></i></div>
         <div>
           <h3 id="vs_fullName" style="margin:0; font-size:18px; font-weight:800;">Student Profile</h3>
-          <div class="tiny" id="vs_classRoll" style="color:var(--text-muted);">Class & Roll</div>
+          <div class="tiny" id="vs_classRoll" style="color:var(--text-muted);">Class &amp; Roll</div>
         </div>
       </div>
       <button class="modal-close-x" onclick="closeViewStudentModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -970,6 +1126,68 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
       <button type="button" class="btn ghost" onclick="closeViewStudentModal()">Close</button>
       <button type="button" class="btn prim" id="vs_editBtn"><i class="fa-solid fa-pen"></i> Edit Record</button>
     </div>
+  </div>
+</div>
+
+<!-- Modal: Record / Edit Faculty Assessment -->
+<div class="modal-overlay" id="recordAssessmentModal">
+  <div class="modal student-modal-card" style="max-width: 580px !important;">
+    <div class="modal-header-row">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="modal-icon-circle" style="background:rgba(92, 225, 230, 0.15); color:var(--accent1, #5ce1e6);"><i class="fa-solid fa-stamp"></i></div>
+        <div>
+          <h3 id="ra_modalTitle" style="margin:0; font-size:18px; font-weight:800;">Record Student Assessment</h3>
+          <div class="tiny" style="color:var(--text-muted);">Enter continuous assessment &amp; exam marks for HR certification</div>
+        </div>
+      </div>
+      <button class="modal-close-x" onclick="closeRecordAssessmentModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <form id="recordAssessmentForm" onsubmit="handleSaveTeacherAssessment(event)" style="padding:18px 24px; display:flex; flex-direction:column; gap:14px; overflow-y:auto; max-height:calc(90vh - 140px);">
+      <input type="hidden" id="ra_editId" value="">
+
+      <div>
+        <label class="field-label" style="font-weight:700; font-size:12px; margin-bottom:4px; display:block;">Academic Classroom *</label>
+        <select id="ra_classSelect" onchange="populateStudentsForAssessment()" required></select>
+      </div>
+
+      <div>
+        <label class="field-label" style="font-weight:700; font-size:12px; margin-bottom:4px; display:block;">Student *</label>
+        <select id="ra_studentSelect" required></select>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <div>
+          <label class="field-label" style="font-weight:700; font-size:12px; margin-bottom:4px; display:block;">CA Score (Max 30) *</label>
+          <input type="number" id="ra_caScore" min="0" max="30" placeholder="e.g. 25" oninput="recalcAssessmentScores()" required>
+        </div>
+        <div>
+          <label class="field-label" style="font-weight:700; font-size:12px; margin-bottom:4px; display:block;">Exam Score (Max 70) *</label>
+          <input type="number" id="ra_examScore" min="0" max="70" placeholder="e.g. 62" oninput="recalcAssessmentScores()" required>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:10px; padding:12px;">
+        <div>
+          <div class="tiny" style="color:var(--text-muted);">Calculated Total</div>
+          <div style="font-size:20px; font-weight:800; color:var(--accent1, #5ce1e6);" id="ra_totalScore">0%</div>
+        </div>
+        <div>
+          <div class="tiny" style="color:var(--text-muted);">Letter Grade</div>
+          <div style="font-size:20px; font-weight:800; color:#10b981;" id="ra_gradeBadge">F</div>
+        </div>
+      </div>
+
+      <div>
+        <label class="field-label" style="font-weight:700; font-size:12px; margin-bottom:4px; display:block;">Faculty Remarks &amp; Competency Feedback</label>
+        <textarea id="ra_teacherRemarks" rows="3" placeholder="Detail student performance, project delivery, and recommended growth areas..."></textarea>
+      </div>
+
+      <div class="modal-footer-row" style="padding:14px 0 0; margin-top:8px;">
+        <button type="button" class="btn ghost" onclick="closeRecordAssessmentModal()">Cancel</button>
+        <button type="submit" class="btn prim"><i class="fa-solid fa-paper-plane"></i> Submit for HR Certification</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -983,7 +1201,22 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
 function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
 function read(k){ return safeParse(localStorage.getItem(k)) || [] }
 function save(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
-function toast(msg, t=2500){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'), t); }
+function toast(msg, t=2800) {
+  if (window.Toaster && typeof window.Toaster.show === 'function') {
+    const isWarn = /error|fail|invalid|required|select|provide/i.test(msg);
+    const isInfo = /info|remove|delete|status|clock/i.test(msg);
+    const type = isWarn ? 'warning' : (isInfo ? 'info' : 'success');
+    const title = type === 'success' ? 'Saved Successfully' : (type === 'warning' ? 'Required Action' : 'Teacher Portal');
+    window.Toaster.show({ type, title, message: msg, duration: t });
+  } else {
+    const el = document.getElementById('toast');
+    if (el) {
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), t);
+    }
+  }
+}
 function escapeHtml(str){ return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 /* Session Verification */
@@ -1009,6 +1242,8 @@ const NOTE_KEY = `${ORG}_lesson_notes`;
 const TT_KEY = `${ORG}_timetable`;
 const SETTINGS_KEY = `${ORG}_settings`;
 const ACT_KEY = `${ORG}_activity`;
+const CALENDAR_KEY = `${ORG}_academic_calendar`;
+const ASSESS_KEY = `${ORG}_student_assessments`;
 
 /* Ensure Default Stores */
 if(!localStorage.getItem(CLASSES_KEY)) save(CLASSES_KEY, []);
@@ -1040,6 +1275,20 @@ document.querySelectorAll('.tab').forEach(btn=>{
     if(target) {
       target.style.display = 'block';
       document.getElementById('pageTitle').textContent = btn.textContent.trim();
+    }
+    if (sec === 'timetable') {
+      renderTeacherCalendarReview();
+      renderTimetable();
+    }
+    if (sec === 'assessments') {
+      renderTeacherAssessments();
+    }
+    if (sec === 'overview') {
+      updateCalendarOverviewBanner();
+      renderTeacherBroadcastBanner();
+    }
+    if (sec === 'broadcasts') {
+      renderTeacherBroadcasts();
     }
   });
 });
@@ -1774,6 +2023,660 @@ document.getElementById('logoutBtn').addEventListener('click', ()=>{
   window.location.href = 'teacher-login.html';
 });
 
+/* -------------------------------------------------------------
+   ACADEMIC CALENDAR & STAFF REVIEW LOGIC
+------------------------------------------------------------- */
+function getAcademicCalendarForStaff() {
+  let list = safeParse(localStorage.getItem(CALENDAR_KEY));
+  if (!list || !Array.isArray(list) || !list.length) {
+    list = safeParse(localStorage.getItem('FLAWLESS GRAPHICS_academic_calendar'));
+  }
+  return (list && Array.isArray(list)) ? list : [];
+}
+
+function renderTeacherCalendarReview() {
+  const container = document.getElementById('teacherCalendarContainer');
+  if (!container) return;
+
+  const calendar = getAcademicCalendarForStaff();
+  const publishedTerms = calendar.filter(t => t.status === 'Published for Staff Review' || t.status === 'Certified');
+  const termsToDisplay = publishedTerms.length ? publishedTerms : calendar;
+
+  if (!termsToDisplay.length) {
+    container.innerHTML = `
+      <div style="padding:18px; text-align:center; background:rgba(255,255,255,0.02); border:1px dashed var(--card-border); border-radius:12px;">
+        <i class="fa-solid fa-calendar-xmark" style="font-size:24px; color:var(--text-muted); margin-bottom:8px; display:block;"></i>
+        <div style="font-weight:700; font-size:13px;">No Academic Terms Published Yet</div>
+        <div class="tiny" style="color:var(--text-muted); margin-top:2px;">
+          HR Administration is finalizing term schedules. Once published for staff review, timelines and deadlines will appear here.
+        </div>
+      </div>
+    `;
+    updateCalendarOverviewBanner(null);
+    return;
+  }
+
+  const ackKey = `${ORG}_calendar_ack_${teacher.email || 'teacher'}`;
+  const isAck = localStorage.getItem(ackKey) === 'true';
+
+  const ackBtn = document.getElementById('ackCalendarBtn');
+  if (ackBtn) {
+    if (isAck) {
+      ackBtn.classList.remove('prim');
+      ackBtn.classList.add('ghost');
+      ackBtn.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#10b981;"></i> Acknowledged';
+    } else {
+      ackBtn.classList.add('prim');
+      ackBtn.classList.remove('ghost');
+      ackBtn.innerHTML = '<i class="fa-solid fa-check-double"></i> Acknowledge Calendar';
+    }
+  }
+
+  container.innerHTML = termsToDisplay.map(t => {
+    const isLive = t.status === 'Published for Staff Review';
+    return `
+      <div style="background:var(--card-bg); border:1px solid ${isLive ? 'rgba(92, 225, 230, 0.3)' : 'var(--card-border)'}; border-radius:12px; padding:16px; margin-bottom:12px; box-shadow:0 4px 14px rgba(0,0,0,0.12);">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-weight:800; font-size:15px; color:var(--text-main);">${escapeHtml(t.termTitle || 'Academic Term')}</span>
+              <span class="badge" style="background:${isLive ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.08)'}; color:${isLive ? '#10b981' : 'var(--text-muted)'}; font-size:10.5px;">
+                ${isLive ? '<i class="fa-solid fa-circle" style="font-size:6px; margin-right:4px;"></i> Live Staff Review' : escapeHtml(t.status || 'Draft')}
+              </span>
+            </div>
+            <div class="tiny" style="color:var(--text-muted); margin-top:3px;">
+              Academic Session: <strong>${escapeHtml(t.academicYear || '2026/2027')}</strong> &bull; Review Window: <strong>${t.reviewWindowEnd ? new Date(t.reviewWindowEnd).toLocaleDateString() : 'Active'}</strong>
+            </div>
+          </div>
+          ${isAck ? `
+            <span class="badge" style="background:rgba(16,185,129,0.15); color:#10b981; font-size:11px; padding:4px 10px;">
+              <i class="fa-solid fa-check"></i> Confirmed by Faculty
+            </span>
+          ` : `
+            <span class="badge" style="background:rgba(245,158,11,0.15); color:#f59e0b; font-size:11px; padding:4px 10px;">
+              <i class="fa-solid fa-clock"></i> Review Pending
+            </span>
+          `}
+        </div>
+
+        <!-- Timeline Grid -->
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:12px; background:rgba(255,255,255,0.02); border:1px solid var(--card-border); border-radius:10px; padding:12px;">
+          <div>
+            <div class="tiny" style="color:var(--text-muted);"><i class="fa-solid fa-calendar-day" style="color:var(--accent1);"></i> Term Duration</div>
+            <div style="font-size:12.5px; font-weight:700; margin-top:2px;">
+              ${t.startDate ? new Date(t.startDate).toLocaleDateString() : 'TBD'} &rarr; ${t.endDate ? new Date(t.endDate).toLocaleDateString() : 'TBD'}
+            </div>
+          </div>
+          <div>
+            <div class="tiny" style="color:var(--text-muted);"><i class="fa-solid fa-file-circle-check" style="color:#f59e0b;"></i> CA Marks Deadline</div>
+            <div style="font-size:12.5px; font-weight:700; color:#f59e0b; margin-top:2px;">
+              ${t.caDeadline ? new Date(t.caDeadline).toLocaleDateString() : 'End of Wk 7'}
+            </div>
+          </div>
+          <div>
+            <div class="tiny" style="color:var(--text-muted);"><i class="fa-solid fa-pen-nib" style="color:#ef4444;"></i> Exams Period</div>
+            <div style="font-size:12.5px; font-weight:700; margin-top:2px;">
+              ${t.examStart ? new Date(t.examStart).toLocaleDateString() : 'TBD'} &rarr; ${t.endDate ? new Date(t.endDate).toLocaleDateString() : 'TBD'}
+            </div>
+          </div>
+        </div>
+
+        ${t.notes ? `
+          <div style="font-size:12px; color:var(--text-muted); background:rgba(0,0,0,0.1); border-left:3px solid var(--accent1); padding:8px 12px; border-radius:4px; line-height:1.4;">
+            <strong style="color:var(--text-main); font-size:11px; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:2px;">
+              <i class="fa-solid fa-bullhorn"></i> Faculty Directives from HR:
+            </strong>
+            ${escapeHtml(t.notes)}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+
+  updateCalendarOverviewBanner(termsToDisplay[0]);
+  updateNotificationBell();
+}
+
+function acknowledgeAcademicCalendar() {
+  const ackKey = `${ORG}_calendar_ack_${teacher.email || 'teacher'}`;
+  localStorage.setItem(ackKey, 'true');
+  pushActivity(`Acknowledged Academic Calendar for Staff Review`);
+  toast('Academic calendar successfully acknowledged. Receipt logged for HR.');
+  renderTeacherCalendarReview();
+}
+
+function updateCalendarOverviewBanner(activeTerm) {
+  const banner = document.getElementById('teacherCalOverviewBanner');
+  if (!banner) return;
+
+  if (!activeTerm) {
+    const calendar = getAcademicCalendarForStaff();
+    activeTerm = calendar.find(t => t.status === 'Published for Staff Review') || calendar[0];
+  }
+
+  if (activeTerm && (activeTerm.status === 'Published for Staff Review' || activeTerm.status === 'Certified')) {
+    banner.style.display = 'flex';
+    const titleEl = document.getElementById('teacherCalBannerTitle');
+    const subEl = document.getElementById('teacherCalBannerSubtitle');
+    if (titleEl) titleEl.textContent = `Academic Calendar Published: ${activeTerm.termTitle || 'New Term'}`;
+    if (subEl) subEl.textContent = `Session ${activeTerm.academicYear || '2026/2027'} &bull; CA Deadline: ${activeTerm.caDeadline ? new Date(activeTerm.caDeadline).toLocaleDateString() : 'Scheduled'} &bull; Faculty review open.`;
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+function goToTeacherTimetable() {
+  const tab = document.querySelector('[data-section="timetable"]');
+  if (tab) tab.click();
+}
+
+/* -------------------------------------------------------------
+   STUDENT ASSESSMENTS & GRADING DESK
+------------------------------------------------------------- */
+function getStudentAssessmentsForTeacher() {
+  let list = safeParse(localStorage.getItem(ASSESS_KEY));
+  if (!list || !Array.isArray(list) || !list.length) {
+    list = safeParse(localStorage.getItem('FLAWLESS GRAPHICS_student_assessments'));
+  }
+  return (list && Array.isArray(list)) ? list : [];
+}
+
+function renderTeacherAssessments() {
+  const tbody = document.getElementById('teacherAssessmentsTableBody');
+  if (!tbody) return;
+
+  const assessments = getStudentAssessmentsForTeacher();
+  if (!assessments.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" style="text-align:center; padding:28px; color:var(--text-muted);">
+          <i class="fa-solid fa-stamp" style="font-size:24px; opacity:0.5; margin-bottom:8px; display:block;"></i>
+          No assessments recorded yet. Click <strong>Record Assessment</strong> to submit continuous assessment &amp; exam marks.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = assessments.map(a => {
+    const isApproved = a.status === 'Approved & Certified';
+    const ca = a.caScore !== undefined ? a.caScore : 0;
+    const exam = a.examScore !== undefined ? a.examScore : 0;
+    const total = a.totalScore !== undefined ? a.totalScore : (ca + exam);
+    const grade = a.grade || 'A';
+
+    return `
+      <tr>
+        <td>
+          <div style="font-weight:700; color:var(--text-main); font-size:13.5px;">${escapeHtml(a.studentName || 'Student')}</div>
+          <div class="tiny" style="color:var(--text-muted); font-size:11px;">Roll: ${escapeHtml(a.studentRoll || 'STU-000')}</div>
+        </td>
+        <td>
+          <div style="font-weight:600; font-size:13px;">${escapeHtml(a.className || 'Class')}</div>
+          <div class="tiny" style="color:var(--text-muted); font-size:11px;">${escapeHtml(a.subject || 'Academic Core')}</div>
+        </td>
+        <td>
+          <span style="background:rgba(255,255,255,0.05); padding:3px 8px; border-radius:6px; font-weight:700; font-size:12.5px;">
+            ${ca} / 30
+          </span>
+        </td>
+        <td>
+          <span style="background:rgba(255,255,255,0.05); padding:3px 8px; border-radius:6px; font-weight:700; font-size:12.5px;">
+            ${exam} / 70
+          </span>
+        </td>
+        <td>
+          <div style="font-weight:800; font-size:14px; color:var(--accent1, #5ce1e6);">${total}%</div>
+          <span class="badge" style="background:rgba(16,185,129,0.15); color:#10b981; font-size:10px; padding:1px 6px;">Grade ${grade}</span>
+        </td>
+        <td>
+          ${isApproved ? `
+            <span class="badge" style="background:rgba(16, 185, 129, 0.2); color:#10b981; font-size:11px; padding:4px 10px;">
+              <i class="fa-solid fa-stamp"></i> Approved &amp; Certified
+            </span>
+          ` : `
+            <span class="badge" style="background:rgba(245, 158, 11, 0.2); color:#f59e0b; font-size:11px; padding:4px 10px;">
+              <i class="fa-solid fa-clock"></i> Awaiting HR Certification
+            </span>
+          `}
+        </td>
+        <td style="text-align:right;">
+          ${isApproved ? `
+            <div class="tiny" style="color:#10b981; font-weight:700;">
+              <i class="fa-solid fa-circle-check"></i> Certified by HR
+            </div>
+            <div class="tiny" style="color:var(--text-muted); font-size:10px;">${a.certifiedAt ? new Date(a.certifiedAt).toLocaleDateString() : 'Official'}</div>
+          ` : `
+            <span class="tiny" style="color:var(--text-muted); font-style:italic;">Pending HR QA</span>
+          `}
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function openNewAssessmentModal() {
+  const modal = document.getElementById('recordAssessmentModal');
+  if (!modal) return;
+
+  const classSelect = document.getElementById('ra_classSelect');
+  const classes = getClasses();
+  if (classSelect) {
+    classSelect.innerHTML = '<option value="">-- Select Classroom --</option>' +
+      classes.map(c => `<option value="${c.id}">${escapeHtml(c.name)} (${escapeHtml(c.subject || 'Core')})</option>`).join('');
+  }
+
+  document.getElementById('ra_editId').value = '';
+  document.getElementById('ra_caScore').value = '';
+  document.getElementById('ra_examScore').value = '';
+  document.getElementById('ra_totalScore').textContent = '0%';
+  document.getElementById('ra_gradeBadge').textContent = 'F';
+  document.getElementById('ra_teacherRemarks').value = '';
+
+  populateStudentsForAssessment();
+  modal.classList.add('active');
+}
+
+function closeRecordAssessmentModal() {
+  const modal = document.getElementById('recordAssessmentModal');
+  if (modal) modal.classList.remove('active');
+}
+
+function populateStudentsForAssessment() {
+  const classId = document.getElementById('ra_classSelect')?.value;
+  const studentSelect = document.getElementById('ra_studentSelect');
+  if (!studentSelect) return;
+
+  if (!classId) {
+    // Populate all students from all classes or defaults
+    const classes = getClasses();
+    let allStudents = [];
+    classes.forEach(c => {
+      (c.students || []).forEach(s => {
+        allStudents.push({ ...s, classId: c.id, className: c.name, subject: c.subject });
+      });
+    });
+
+    if (!allStudents.length) {
+      allStudents = [
+        { id: 's_demo1', firstName: 'Samuel', lastName: 'Kofi Mensah', roll: 'STU-2026-001' },
+        { id: 's_demo2', firstName: 'Amina', lastName: 'Bello', roll: 'STU-2026-002' },
+        { id: 's_demo3', firstName: 'Kwesi', lastName: 'Appiah', roll: 'STU-2026-003' }
+      ];
+    }
+
+    studentSelect.innerHTML = '<option value="">-- Select Student --</option>' +
+      allStudents.map(s => {
+        const name = (s.firstName ? `${s.firstName} ${s.lastName || ''}` : s.name).trim();
+        return `<option value="${s.id}" data-name="${escapeHtml(name)}" data-roll="${escapeHtml(s.roll || 'STU-000')}">${escapeHtml(name)} (${escapeHtml(s.roll || 'STU-000')})</option>`;
+      }).join('');
+    return;
+  }
+
+  const c = getClasses().find(x => x.id === classId);
+  const students = (c && c.students) ? c.students : [];
+  if (!students.length) {
+    studentSelect.innerHTML = '<option value="">No students enrolled in selected class</option>';
+  } else {
+    studentSelect.innerHTML = '<option value="">-- Select Student --</option>' +
+      students.map(s => {
+        const name = (s.firstName ? `${s.firstName} ${s.lastName || ''}` : s.name).trim();
+        return `<option value="${s.id}" data-name="${escapeHtml(name)}" data-roll="${escapeHtml(s.roll || 'STU-000')}">${escapeHtml(name)} (${escapeHtml(s.roll || 'STU-000')})</option>`;
+      }).join('');
+  }
+}
+
+function recalcAssessmentScores() {
+  const ca = Math.min(30, Math.max(0, parseFloat(document.getElementById('ra_caScore')?.value) || 0));
+  const exam = Math.min(70, Math.max(0, parseFloat(document.getElementById('ra_examScore')?.value) || 0));
+  const total = Math.round(ca + exam);
+
+  let grade = 'F';
+  if (total >= 80) grade = 'A';
+  else if (total >= 70) grade = 'B';
+  else if (total >= 60) grade = 'C';
+  else if (total >= 50) grade = 'D';
+
+  const totalEl = document.getElementById('ra_totalScore');
+  const gradeEl = document.getElementById('ra_gradeBadge');
+  if (totalEl) totalEl.textContent = `${total}%`;
+  if (gradeEl) {
+    gradeEl.textContent = grade;
+    gradeEl.style.color = (grade === 'A' || grade === 'B') ? '#10b981' : (grade === 'C' ? 'var(--accent1)' : '#f59e0b');
+  }
+}
+
+function handleSaveTeacherAssessment(e) {
+  if (e) e.preventDefault();
+
+  const classSelect = document.getElementById('ra_classSelect');
+  const studentSelect = document.getElementById('ra_studentSelect');
+  const studentOpt = studentSelect?.selectedOptions[0];
+
+  const studentId = studentSelect?.value;
+  const studentName = studentOpt?.dataset.name || studentOpt?.textContent || 'Student';
+  const studentRoll = studentOpt?.dataset.roll || 'STU-2026-000';
+
+  const classId = classSelect?.value;
+  const classObj = getClasses().find(c => c.id === classId);
+  const className = classObj?.name || 'Assigned Classroom';
+  const subject = classObj?.subject || 'Academic Course';
+
+  const caScore = Math.min(30, Math.max(0, parseFloat(document.getElementById('ra_caScore')?.value) || 0));
+  const examScore = Math.min(70, Math.max(0, parseFloat(document.getElementById('ra_examScore')?.value) || 0));
+  const totalScore = Math.round(caScore + examScore);
+
+  let grade = 'F';
+  if (totalScore >= 80) grade = 'A';
+  else if (totalScore >= 70) grade = 'B';
+  else if (totalScore >= 60) grade = 'C';
+  else if (totalScore >= 50) grade = 'D';
+
+  const remarks = document.getElementById('ra_teacherRemarks')?.value.trim();
+
+  let assessments = getStudentAssessmentsForTeacher();
+  const newRecord = {
+    id: 'as_' + Date.now(),
+    studentId: studentId || ('stu_' + Date.now()),
+    studentName,
+    studentRoll,
+    className,
+    subject,
+    teacherName: (teacher && (teacher.name || teacher.fullName)) || 'Faculty Instructor',
+    caScore,
+    examScore,
+    totalScore,
+    grade,
+    status: 'Awaiting HR Certification',
+    teacherRemarks: remarks || 'Faculty continuous evaluation & end-of-term score submitted.',
+    submittedAt: Date.now()
+  };
+
+  assessments.unshift(newRecord);
+  save(ASSESS_KEY, assessments);
+  // Also keep active org synced
+  localStorage.setItem(`${ORG}_student_assessments`, JSON.stringify(assessments));
+
+  renderTeacherAssessments();
+  closeRecordAssessmentModal();
+  pushActivity(`Recorded assessment for ${studentName} (${totalScore}%) — Sent for HR Certification`);
+  toast(`Assessment submitted to HR QA Desk for certification`);
+}
+
+/* -------------------------------------------------------------
+   NOTIFICATIONS POPOVER & BELL
+------------------------------------------------------------- */
+function toggleNotificationPopover(e) {
+  if (e) e.stopPropagation();
+  const pop = document.getElementById('notifPopover');
+  if (!pop) return;
+  const isOpen = pop.style.display === 'block';
+  pop.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) updateNotificationBell();
+}
+
+document.addEventListener('click', (e) => {
+  const pop = document.getElementById('notifPopover');
+  if (pop && !pop.contains(e.target)) {
+    pop.style.display = 'none';
+  }
+});
+
+function updateNotificationBell() {
+  const bellCount = document.getElementById('notifCount');
+  const popoverCount = document.getElementById('notifPopoverCount');
+  const popoverList = document.getElementById('notifPopoverList');
+
+  const notifications = [];
+
+  // Check published broadcasts from HR & Super Admin
+  const broadcastKey = `${ORG}_announcements`;
+  const broadcasts = safeParse(localStorage.getItem(broadcastKey)) || [];
+  const ackBcKey = `${ORG}_broadcast_ack_${teacher.email || 'teacher'}`;
+  const acknowledgedIds = safeParse(localStorage.getItem(ackBcKey)) || [];
+
+  const unreadBroadcasts = broadcasts.filter(b => !acknowledgedIds.includes(String(b.id)));
+  if (unreadBroadcasts.length > 0) {
+    const latest = unreadBroadcasts[0];
+    const isSuperAdmin = latest.role === 'admin' || (latest.author && latest.author.includes('Super Admin'));
+    notifications.push({
+      type: 'broadcast',
+      icon: 'fa-solid fa-bullhorn',
+      color: isSuperAdmin ? '#f59e0b' : 'var(--accent1)',
+      title: isSuperAdmin ? '[Super Admin Directive]' : (latest.title || 'Official Broadcast'),
+      desc: latest.title || (latest.body || latest.text || '').slice(0, 50),
+      action: "goToTeacherBroadcasts()"
+    });
+  }
+
+  // Check published calendar
+  const calendar = getAcademicCalendarForStaff();
+  const liveTerm = calendar.find(t => t.status === 'Published for Staff Review');
+  if (liveTerm) {
+    const ackKey = `${ORG}_calendar_ack_${teacher.email || 'teacher'}`;
+    const isAck = localStorage.getItem(ackKey) === 'true';
+    if (!isAck) {
+      notifications.push({
+        type: 'calendar',
+        icon: 'fa-solid fa-calendar-days',
+        color: 'var(--accent1)',
+        title: 'Academic Calendar Review',
+        desc: `${liveTerm.termTitle || 'New Term'} published for faculty review.`,
+        action: 'goToTeacherTimetable()'
+      });
+    }
+  }
+
+  // Check pending certified assessments
+  const assessments = getStudentAssessmentsForTeacher();
+  const certified = assessments.filter(a => a.status === 'Approved & Certified');
+  if (certified.length) {
+    notifications.push({
+      type: 'assessment',
+      icon: 'fa-solid fa-stamp',
+      color: '#10b981',
+      title: 'Assessment Certified',
+      desc: `${certified.length} student assessment(s) officially endorsed by HR.`,
+      action: "document.querySelector('[data-section=\"assessments\"]').click()"
+    });
+  }
+
+  const unreadCount = notifications.length;
+  if (bellCount) {
+    bellCount.textContent = unreadCount;
+    bellCount.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+  }
+  if (popoverCount) {
+    popoverCount.textContent = `${unreadCount} active`;
+  }
+  if (popoverList) {
+    if (!notifications.length) {
+      popoverList.innerHTML = '<div class="tiny" style="color:var(--text-muted); text-align:center; padding:8px;">No unread notifications</div>';
+    } else {
+      popoverList.innerHTML = notifications.map(n => `
+        <div onclick="${n.action}; document.getElementById('notifPopover').style.display='none';" style="cursor:pointer; padding:8px 10px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:8px; display:flex; gap:10px; align-items:flex-start;">
+          <i class="${n.icon}" style="color:${n.color}; font-size:14px; margin-top:2px;"></i>
+          <div>
+            <div style="font-weight:700; font-size:12px; color:var(--text-main);">${escapeHtml(n.title)}</div>
+            <div class="tiny" style="color:var(--text-muted); font-size:11px;">${escapeHtml(n.desc)}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+}
+
+/* -------------------------
+  CROSS-PORTAL DIRECTIVES & BROADCASTS
+------------------------- */
+let activeBroadcastId = null;
+
+function renderTeacherBroadcastBanner() {
+  const banner = document.getElementById('teacherBroadcastBanner');
+  if (!banner) return;
+  const broadcastKey = `${ORG}_announcements`;
+  const broadcasts = safeParse(localStorage.getItem(broadcastKey)) || [];
+  const ackBcKey = `${ORG}_broadcast_ack_${teacher.email || 'teacher'}`;
+  const acknowledgedIds = safeParse(localStorage.getItem(ackBcKey)) || [];
+
+  const unread = broadcasts.filter(b => !acknowledgedIds.includes(String(b.id)));
+  if (!unread.length) {
+    banner.style.display = 'none';
+    return;
+  }
+
+  const latest = unread[0];
+  activeBroadcastId = latest.id;
+  const isSuperAdmin = latest.role === 'admin' || (latest.author && latest.author.includes('Super Admin'));
+  
+  banner.style.display = 'flex';
+  
+  const titleEl = document.getElementById('teacherBcBannerTitle');
+  if (titleEl) titleEl.textContent = latest.title || 'Official Institutional Directive';
+  
+  const authorEl = document.getElementById('teacherBcBannerAuthor');
+  if (authorEl) {
+    authorEl.innerHTML = isSuperAdmin
+      ? '<span class="badge" style="background:#fef3c7; color:#b45309; border:1px solid rgba(245,158,11,0.3); font-weight:800; font-size:11px; padding:2px 8px;"><i class="fa-solid fa-certificate"></i> [Super Admin Broadcast]</span>'
+      : '<span class="badge" style="background:rgba(99,91,252,0.15); color:var(--accent1); font-size:11px; padding:2px 8px;"><i class="fa-solid fa-user-shield"></i> ' + escapeHtml(latest.author || 'HR Directorate') + '</span>';
+  }
+
+  const bodyEl = document.getElementById('teacherBcBannerBody');
+  if (bodyEl) {
+    const raw = latest.body || latest.text || '';
+    bodyEl.textContent = raw.length > 130 ? raw.slice(0, 130) + '...' : raw;
+  }
+}
+
+function acknowledgeActiveBroadcast() {
+  if (!activeBroadcastId) return;
+  const ackBcKey = `${ORG}_broadcast_ack_${teacher.email || 'teacher'}`;
+  const acknowledgedIds = safeParse(localStorage.getItem(ackBcKey)) || [];
+  if (!acknowledgedIds.includes(String(activeBroadcastId))) {
+    acknowledgedIds.push(String(activeBroadcastId));
+    localStorage.setItem(ackBcKey, JSON.stringify(acknowledgedIds));
+  }
+  renderTeacherBroadcastBanner();
+  updateNotificationBell();
+  toast('Directive receipt acknowledged');
+}
+
+function acknowledgeAllBroadcasts() {
+  const broadcastKey = `${ORG}_announcements`;
+  const broadcasts = safeParse(localStorage.getItem(broadcastKey)) || [];
+  const ackBcKey = `${ORG}_broadcast_ack_${teacher.email || 'teacher'}`;
+  const allIds = broadcasts.map(b => String(b.id));
+  localStorage.setItem(ackBcKey, JSON.stringify(allIds));
+  renderTeacherBroadcastBanner();
+  renderTeacherBroadcasts();
+  updateNotificationBell();
+  toast('All institutional directives acknowledged');
+}
+
+function goToTeacherBroadcasts() {
+  const btn = document.querySelector('.tab[data-section="broadcasts"]');
+  if (btn) btn.click();
+}
+
+function renderTeacherBroadcasts() {
+  const container = document.getElementById('teacherBroadcastsList');
+  if (!container) return;
+
+  const broadcastKey = `${ORG}_announcements`;
+  const broadcasts = safeParse(localStorage.getItem(broadcastKey)) || [];
+  const ackBcKey = `${ORG}_broadcast_ack_${teacher.email || 'teacher'}`;
+  const acknowledgedIds = safeParse(localStorage.getItem(ackBcKey)) || [];
+
+  const catFilter = document.getElementById('teacherBcCategoryFilter')?.value || '';
+
+  let filtered = broadcasts;
+  if (catFilter) {
+    filtered = filtered.filter(b => b.category && b.category.toLowerCase() === catFilter.toLowerCase());
+  }
+
+  // Sort pinned first
+  filtered.sort((x, y) => {
+    if (x.pinned && !y.pinned) return -1;
+    if (!x.pinned && y.pinned) return 1;
+    return (y.timestamp || 0) - (x.timestamp || 0);
+  });
+
+  if (!filtered.length) {
+    container.innerHTML = '<div class="tiny" style="text-align:center; padding:32px; color:var(--text-muted);"><i class="fa-solid fa-bullhorn" style="font-size:24px; opacity:0.3; margin-bottom:8px;"></i><div>No directives or announcements found.</div></div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(b => {
+    const isSuperAdmin = b.role === 'admin' || (b.author && b.author.includes('Super Admin'));
+    const isAck = acknowledgedIds.includes(String(b.id));
+    const cat = b.category || 'General';
+    const isHigh = b.priority === 'High';
+
+    return `
+      <div style="background:var(--card-bg); border:1px solid ${b.pinned ? 'rgba(245,158,11,0.4)' : 'var(--card-border)'}; border-radius:12px; padding:16px 18px; ${b.pinned ? 'border-left:4px solid #f59e0b;' : ''}">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            ${isSuperAdmin 
+              ? '<span class="badge" style="background:#fef3c7; color:#b45309; border:1px solid rgba(245,158,11,0.3); font-weight:800;"><i class="fa-solid fa-certificate"></i> [Super Admin Broadcast]</span>' 
+              : '<span class="badge" style="background:rgba(99,91,252,0.15); color:var(--accent1);"><i class="fa-solid fa-user-shield"></i> ' + escapeHtml(b.author || 'HR Directorate') + '</span>'
+            }
+            <span class="badge badge-blue">${escapeHtml(cat)}</span>
+            ${isHigh ? '<span class="badge badge-red"><i class="fa-solid fa-bell"></i> High Priority</span>' : ''}
+            ${b.pinned ? '<span class="badge badge-orange"><i class="fa-solid fa-thumbtack"></i> Pinned</span>' : ''}
+          </div>
+          <div class="tiny" style="color:var(--text-muted);">
+            <i class="fa-solid fa-clock"></i> ${escapeHtml(b.date || 'Today')}
+          </div>
+        </div>
+
+        <div style="font-size:15px; font-weight:800; color:var(--text-main); margin-bottom:6px;">
+          ${escapeHtml(b.title || 'Directive')}
+        </div>
+        <div style="font-size:13px; color:var(--text-main); line-height:1.6; margin-bottom:12px; white-space:pre-wrap;">
+          ${escapeHtml(b.body || b.text || '')}
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--card-border); padding-top:8px;">
+          <div class="tiny" style="color:var(--text-muted);">
+            Audience: <strong>${b.audience === 'support' ? 'Support Personnel' : (b.audience === 'teachers' ? 'Teaching Faculty' : 'All Institutional Personnel')}</strong>
+          </div>
+          <div>
+            ${isAck 
+              ? '<span class="tiny" style="color:#10b981; font-weight:700;"><i class="fa-solid fa-circle-check"></i> Receipt Acknowledged</span>'
+              : `<button type="button" class="btn ghost btn-sm" onclick="acknowledgeSingleBroadcast('${b.id}')" style="padding:4px 10px; font-size:11.5px;"><i class="fa-solid fa-check"></i> Acknowledge Receipt</button>`
+            }
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function acknowledgeSingleBroadcast(id) {
+  const ackBcKey = `${ORG}_broadcast_ack_${teacher.email || 'teacher'}`;
+  const acknowledgedIds = safeParse(localStorage.getItem(ackBcKey)) || [];
+  if (!acknowledgedIds.includes(String(id))) {
+    acknowledgedIds.push(String(id));
+    localStorage.setItem(ackBcKey, JSON.stringify(acknowledgedIds));
+  }
+  renderTeacherBroadcastBanner();
+  renderTeacherBroadcasts();
+  updateNotificationBell();
+  toast('Directive receipt acknowledged');
+}
+
+function filterTeacherBroadcasts() {
+  renderTeacherBroadcasts();
+}
+
+window.renderTeacherBroadcastBanner = renderTeacherBroadcastBanner;
+window.acknowledgeActiveBroadcast = acknowledgeActiveBroadcast;
+window.acknowledgeAllBroadcasts = acknowledgeAllBroadcasts;
+window.goToTeacherBroadcasts = goToTeacherBroadcasts;
+window.renderTeacherBroadcasts = renderTeacherBroadcasts;
+window.acknowledgeSingleBroadcast = acknowledgeSingleBroadcast;
+window.filterTeacherBroadcasts = filterTeacherBroadcasts;
+
 /* -------------------------
   KPI UPDATES & INITIALIZATION
 ------------------------- */
@@ -1795,11 +2698,17 @@ renderAssignments();
 renderMessages();
 renderNotes();
 renderTimetable();
+renderTeacherCalendarReview();
+renderTeacherAssessments();
+renderTeacherBroadcastBanner();
 updateKPIs();
+updateNotificationBell();
 </script>
 <!-- Short Skeletal Loading Script -->
 <script src="../../assets/js/skeleton-loader.js"></script>
 <!-- Floating Quick Assistant Script -->
 <script src="../../assets/js/quick-assistant.js"></script>
+  <!-- Floating 3-Dots Quick Dock Script -->
+  <script src="../../assets/js/quick-dock.js"></script>
 </body>
 </html>

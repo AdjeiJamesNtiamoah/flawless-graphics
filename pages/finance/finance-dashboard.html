@@ -640,6 +640,11 @@
       }
     }
   </style>
+  <!-- Floating 3-Dots Quick Dock Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/quick-dock.css">
+  <!-- Pop-up Toaster System -->
+  <link rel="stylesheet" href="../../assets/css/toaster.css">
+  <script src="../../assets/js/toaster.js"></script>
 </head>
 <body>
 
@@ -2009,7 +2014,7 @@
       localStorage.setItem('fg_payroll', JSON.stringify(payrollData));
       addAuditLog('Batch salary disbursement authorized for all active staff');
       renderAll();
-      alert('All pending staff salaries have been approved for bank wire transfer.');
+      if (window.Toaster) { window.Toaster.success('Salaries Approved', 'All pending staff salaries authorized for bank wire transfer!'); } else { alert('All pending staff salaries have been approved for bank wire transfer.'); }
     }
 
     // DISBURSEMENT ACTIONS
@@ -2147,7 +2152,7 @@
       const apiKey = document.getElementById('api-key').value;
 
       addAuditLog('System settings & configuration updated');
-      alert('Settings saved successfully.');
+      if (window.Toaster) { window.Toaster.success('Settings Saved', 'Finance portal preferences saved successfully!'); } else { alert('Settings saved successfully.'); }
     }
 
     function exportData() {
@@ -2238,7 +2243,7 @@
       window.SupabaseConfig.saveCredentials(url, key, true);
       updateCloudSyncStatus();
       closeCloudModal();
-      alert('Supabase cloud configuration saved!');
+      if (window.Toaster) { window.Toaster.success('Cloud Connected', 'Supabase credentials saved successfully!'); } else { alert('Supabase cloud configuration saved!'); }
     }
 
     function handleResetCloud() {
@@ -2343,5 +2348,7 @@
   <script src="../../assets/js/skeleton-loader.js"></script>
   <!-- Floating Quick Assistant Script -->
   <script src="../../assets/js/quick-assistant.js"></script>
+  <!-- Floating 3-Dots Quick Dock Script -->
+  <script src="../../assets/js/quick-dock.js"></script>
 </body>
 </html>

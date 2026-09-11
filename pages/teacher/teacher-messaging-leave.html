@@ -15,6 +15,11 @@
   <link rel="stylesheet" href="../../assets/css/shared-design.css">
   <!-- Short Skeletal Loading Stylesheet -->
   <link rel="stylesheet" href="../../assets/css/skeleton.css">
+  <!-- Floating 3-Dots Quick Dock Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/quick-dock.css">
+  <!-- Pop-up Toaster System -->
+  <link rel="stylesheet" href="../../assets/css/toaster.css">
+  <script src="../../assets/js/toaster.js"></script>
 </head>
 <body>
 
@@ -223,7 +228,7 @@
       if (window.sendMessage) {
         sendMessage({ fromEmail: teacher.email, toEmail: hrEmail, subject: subj, body, createdAt: Date.now() });
       }
-      alert('Message transmitted to HR Desk successfully!');
+      if (window.Toaster) { window.Toaster.success('Message Transmitted', 'Message transmitted to HR Desk successfully!'); } else { alert('Message transmitted to HR Desk successfully!'); }
       document.getElementById('msgSubject').value = '';
       document.getElementById('msgBody').value = '';
       renderMessages();
@@ -238,7 +243,7 @@
       if (window.requestLeave) {
         requestLeave({ teacherEmail: teacher.email, fromDate, toDate, reason, status: 'Pending', createdAt: Date.now() });
       }
-      alert('Leave application submitted to HR approval queue!');
+      if (window.Toaster) { window.Toaster.success('Leave Submitted', 'Leave application submitted to HR approval queue!'); } else { alert('Leave application submitted to HR approval queue!'); }
       document.getElementById('leaveReason').value = '';
       renderLeaves();
     });
@@ -269,5 +274,7 @@
   </script>
   <!-- Short Skeletal Loading Script -->
   <script src="../../assets/js/skeleton-loader.js"></script>
+  <!-- Floating 3-Dots Quick Dock Script -->
+  <script src="../../assets/js/quick-dock.js"></script>
 </body>
 </html>
