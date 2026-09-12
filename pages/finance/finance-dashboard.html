@@ -732,6 +732,12 @@
         <i class="fa-solid fa-cloud" id="cloudSyncIcon"></i> <span id="cloudSyncLabel">Connect Supabase</span>
       </button>
 
+      <!-- Notifications Arrived Trigger -->
+      <button class="btn-action" id="financeTopbarNotifBtn" onclick="if(window.QuickDock){window.QuickDock.openNotifications();}" title="Notifications Arrived" style="border: 1px solid rgba(251, 191, 36, 0.4); color: #fbbf24; background: rgba(251, 191, 36, 0.08); border-radius: 9999px; padding: 6px 14px; font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; gap: 7px; cursor: pointer;">
+        <i class="fa-solid fa-bell"></i> <span>Notifications</span>
+        <span id="financeTopbarNotifBadge" style="background:#fbbf24; color:#0f172a; padding:1px 6px; font-size:11px; font-weight:800; border-radius:10px;">0</span>
+      </button>
+
       <!-- Currency Switcher -->
       <div style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; padding: 2px 8px;">
         <span style="font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.6); margin-right: 4px;">CURR:</span>

@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="../../assets/css/toaster.css">
   <link rel="stylesheet" href="../../assets/css/skeleton.css">
   <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
+  <link rel="stylesheet" href="../../assets/css/quick-dock.css">
 
   <!-- Central Authentication Bridge & Pop-up Toaster Engine -->
   <script src="../../assets/js/auth-session.js"></script>
@@ -712,6 +713,11 @@
       </div>
 
       <div class="topbar-right">
+        <button type="button" class="btn-top ghost" id="adminTopbarNotifBtn" onclick="if(window.QuickDock){window.QuickDock.openNotifications();}" title="Notifications Arrived" style="display:inline-flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-bell" style="color:var(--accent-gold);"></i>
+          <span class="hide-collapsed" style="font-weight:700;">Notifications</span>
+          <span class="badge badge-warning" id="adminTopbarNotifBadge" style="padding:2px 7px; font-size:11px; border-radius:10px;">0</span>
+        </button>
         <button type="button" class="btn-top ghost" onclick="openBackupExportModal()" title="Export Database Snapshot">
           <i class="fa-solid fa-download"></i> Backup Snapshot
         </button>
@@ -1786,6 +1792,9 @@
       }
       renderMasterUsersTable();
       refreshAllStats();
+      if (window.QuickDock && typeof window.QuickDock.refreshNotifications === 'function') {
+        window.QuickDock.refreshNotifications();
+      }
     }
 
     function rejectUserAccount(email) {
@@ -1814,6 +1823,9 @@
       }
       renderMasterUsersTable();
       refreshAllStats();
+      if (window.QuickDock && typeof window.QuickDock.refreshNotifications === 'function') {
+        window.QuickDock.refreshNotifications();
+      }
     }
 
     function filterPendingUsers() {
@@ -2362,6 +2374,14 @@
     function escapeHtml(str) {
       return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
+
+    window.switchSection = switchSection;
+    window.approveUserAccount = approveUserAccount;
+    window.rejectUserAccount = rejectUserAccount;
+    window.refreshAllStats = refreshAllStats;
+    window.renderMasterUsersTable = renderMasterUsersTable;
   </script>
+  <!-- Floating 3-Dots Quick Dock & Notifications Script -->
+  <script src="../../assets/js/quick-dock.js"></script>
 </body>
 </html>

@@ -261,6 +261,38 @@
         },
 
         /**
+         * Cryptographic Smart ID generator for registered users, staff and students
+         */
+        generateSmartId: function(user, role = 'user') {
+            const effectiveRole = (role || (user && user.role) || 'USER').toUpperCase().slice(0, 3);
+            const year = new Date().getFullYear();
+            const randomNum = Math.floor(100000 + Math.random() * 900000);
+            const hexSuffix = Math.random().toString(16).substring(2, 6).toUpperCase();
+            const smartIdNum = `FG-${effectiveRole}-${year}-${randomNum}`;
+            const rfidHex1 = Math.random().toString(16).substring(2, 4).toUpperCase();
+            const rfidHex2 = Math.random().toString(16).substring(2, 4).toUpperCase();
+            const rfidHex3 = Math.random().toString(16).substring(2, 4).toUpperCase();
+            const rfidUid = `E0:04:01:${rfidHex1}:${rfidHex2}:${rfidHex3}`;
+            const issueDate = new Date().toISOString().split('T')[0];
+            const expYear = year + 3;
+            const expiryDate = `${expYear}-08-31`;
+            const securityHash = `SEC-${hexSuffix}-${Date.now().toString(36).toUpperCase()}`;
+            const qrData = `https://verify.flawlessgraphics.com/id/${smartIdNum}?u=${encodeURIComponent((user && (user.name || user.email)) || '')}&sec=${securityHash}`;
+
+            return {
+                smartIdNumber: smartIdNum,
+                rfidUid: rfidUid,
+                barcode: `*${smartIdNum}*`,
+                qrData: qrData,
+                issueDate: issueDate,
+                expiryDate: expiryDate,
+                securityHash: securityHash,
+                status: 'Active',
+                issuedBy: 'Directorate of Certification & HR Registry'
+            };
+        },
+
+        /**
          * Initialize demo session if no session is active
          */
         initDemoSession: function() {
@@ -268,10 +300,14 @@
         },
 
         /**
-         * Ensure user exists in registered list
+         * Ensure user exists in registered list and possesses a Smart ID
          */
         saveRegisteredUser: function(user) {
             try {
+                if (!user.smartId) {
+                    user.smartId = this.generateSmartId(user, user.role);
+                    user.smartIdNumber = user.smartId.smartIdNumber;
+                }
                 let users = safeParse(localStorage.getItem(USERS_KEY), []);
                 const idx = users.findIndex(u => u.email === user.email);
                 if (idx >= 0) {

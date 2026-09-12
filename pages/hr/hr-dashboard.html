@@ -1639,6 +1639,9 @@
       </div>
     </div>
 
+    <!-- Faculty Pending Approval Banner -->
+    <div id="classPendingApprovalBanner" style="display:none; margin-bottom:16px;"></div>
+
     <!-- Metric Summary Grid -->
     <div class="class-grid" id="classMetricsSummary"></div>
 
@@ -1855,6 +1858,9 @@
         <button class="btn ghost" onclick="loadHRStudents()"><i class="fa-solid fa-rotate"></i> Refresh List</button>
       </div>
     </div>
+    <!-- Faculty Pending Student Registrations Banner -->
+    <div id="studentPendingApprovalBanner" style="display:none; margin-bottom:16px;"></div>
+
     <div style="overflow-x:auto">
       <table>
         <thead>
@@ -5003,8 +5009,39 @@ function renderClassesSection() {
   const gradeFilter = document.getElementById('filterClassGrade')?.value || '';
   const teacherFilter = document.getElementById('filterClassTeacher')?.value || '';
 
+  const pendingClasses = classes.filter(c => c.approvalStatus === 'pending' || c.status === 'Pending HR Approval');
+  const bannerEl = document.getElementById('classPendingApprovalBanner');
+  if (bannerEl) {
+    if (pendingClasses.length > 0) {
+      bannerEl.style.display = 'flex';
+      bannerEl.style.alignItems = 'center';
+      bannerEl.style.justifyContent = 'space-between';
+      bannerEl.style.flexWrap = 'wrap';
+      bannerEl.style.gap = '12px';
+      bannerEl.innerHTML = `
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:38px; height:38px; border-radius:10px; background:rgba(245,158,11,0.25); color:#f59e0b; display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0;">
+            <i class="fa-solid fa-chalkboard-user"></i>
+          </div>
+          <div>
+            <div style="font-weight:800; font-size:13.5px; color:var(--text);">Faculty Classroom Registration Requests (${pendingClasses.length} Pending Approval)</div>
+            <div class="small" style="color:var(--muted);">Teachers have submitted new classes awaiting your administrative sign-off before official curriculum enrollment.</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-sm" style="background:#10b981; border-color:#059669; color:#fff; font-weight:800; padding:6px 14px; font-size:12px;" onclick="approveAllPendingClasses()">
+            <i class="fa-solid fa-check-double"></i> Approve All Classes
+          </button>
+        </div>
+      `;
+    } else {
+      bannerEl.style.display = 'none';
+      bannerEl.innerHTML = '';
+    }
+  }
+
   const totalClasses = classes.length;
-  const totalStudents = classes.reduce((sum, c) => sum + Number(c.enrolled || 0), 0);
+  const totalStudents = classes.reduce((sum, c) => sum + Number(c.enrolled || (c.students || []).length || 0), 0);
   const assignedCount = classes.filter(c => c.teacherName && c.teacherName.trim() !== '').length;
   const unassignedCount = totalClasses - assignedCount;
 
@@ -5017,7 +5054,7 @@ function renderClassesSection() {
           <i class="fa-solid fa-chalkboard" style="color:var(--primary);"></i>
         </div>
         <div style="font-size:26px;font-weight:800;">${totalClasses}</div>
-        <div class="small" style="color:var(--muted);">Active curriculum modules</div>
+        <div class="small" style="color:var(--muted);">${pendingClasses.length > 0 ? `<span style="color:#f59e0b;font-weight:700;">${pendingClasses.length} Pending Approval</span>` : 'Active curriculum modules'}</div>
       </div>
       <div class="class-card">
         <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -5069,7 +5106,7 @@ function renderClassesSection() {
   }
 
   const filtered = classes.filter(c => {
-    const matchSearch = !search || c.name.toLowerCase().includes(search) || c.code.toLowerCase().includes(search) || (c.subject && c.subject.toLowerCase().includes(search)) || (c.teacherName && c.teacherName.toLowerCase().includes(search));
+    const matchSearch = !search || c.name.toLowerCase().includes(search) || (c.code && c.code.toLowerCase().includes(search)) || (c.subject && c.subject.toLowerCase().includes(search)) || (c.teacherName && c.teacherName.toLowerCase().includes(search));
     const matchGrade = !gradeFilter || c.grade === gradeFilter;
     const matchTeacher = !teacherFilter || c.teacherName === teacherFilter;
     return matchSearch && matchGrade && matchTeacher;
@@ -5085,26 +5122,32 @@ function renderClassesSection() {
   }
 
   filtered.forEach(c => {
+    const isPending = c.approvalStatus === 'pending' || c.status === 'Pending HR Approval';
     const isAssigned = Boolean(c.teacherName && c.teacherName.trim() !== '');
-    const enrolled = Number(c.enrolled || 0);
+    const enrolled = Number(c.enrolled || (c.students || []).length || 0);
     const capacity = Number(c.capacity || 30);
     const pct = Math.min(100, Math.round((enrolled / capacity) * 100));
 
+    const statusBadgeHtml = isPending ?
+      `<span class="badge-pill badge-orange" style="background:rgba(245,158,11,0.2); color:#f59e0b; font-weight:700;"><i class="fa-solid fa-clock"></i> Pending HR Approval</span>` :
+      `<span class="badge-pill ${isAssigned ? 'badge-green' : 'badge-orange'}"><i class="fa-solid ${isAssigned ? 'fa-circle-check' : 'fa-clock'}"></i> ${isAssigned ? 'Assigned' : 'Unassigned'}</span>`;
+
     const tr = document.createElement('tr');
+    if (isPending) tr.style.background = 'rgba(245,158,11,0.04)';
     tr.innerHTML = `
       <td>
         <div style="font-weight:700;font-size:13.5px;">${escapeHtml(c.name)}</div>
-        <div class="small" style="color:var(--muted);"><span class="badge-pill badge-purple" style="font-size:10px;padding:2px 6px;">${escapeHtml(c.code)}</span></div>
+        <div class="small" style="color:var(--muted);"><span class="badge-pill badge-purple" style="font-size:10px;padding:2px 6px;">${escapeHtml(c.code || c.id || 'CLS')}</span></div>
       </td>
       <td><strong>${escapeHtml(c.subject || 'General')}</strong></td>
       <td><span class="badge-pill" style="background:rgba(99,91,252,0.1);color:var(--primary);">${escapeHtml(c.grade || 'Grade 10')}</span></td>
       <td>
-        ${isAssigned ? `
+        ${isAssigned || c.submittedBy ? `
           <div class="teacher-badge-wrap">
-            <div class="teacher-avatar-sm">${escapeHtml((c.teacherName || 'T').substring(0,2).toUpperCase())}</div>
+            <div class="teacher-avatar-sm">${escapeHtml((c.teacherName || c.submittedBy || 'T').substring(0,2).toUpperCase())}</div>
             <div>
-              <div style="font-weight:700;font-size:13px;">${escapeHtml(c.teacherName)}</div>
-              <div class="small" style="color:var(--muted);">${escapeHtml(c.teacherEmail || '')}</div>
+              <div style="font-weight:700;font-size:13px;">${escapeHtml(c.teacherName || c.submittedBy)}</div>
+              <div class="small" style="color:var(--muted);">${escapeHtml(c.teacherEmail || c.submittedByEmail || (isPending ? 'Faculty Submission' : ''))}</div>
             </div>
           </div>
         ` : `
@@ -5127,19 +5170,25 @@ function renderClassesSection() {
         </div>
       </td>
       <td>
-        <span class="badge-pill ${isAssigned ? 'badge-green' : 'badge-orange'}">
-          <i class="fa-solid ${isAssigned ? 'fa-circle-check' : 'fa-clock'}"></i>
-          ${isAssigned ? 'Assigned' : 'Unassigned'}
-        </span>
+        ${statusBadgeHtml}
       </td>
       <td style="text-align:right;">
         <div style="display:inline-flex;gap:6px;">
-          <button class="btn ghost" style="padding:6px 10px;font-size:11px;" title="Reassign / Change Teacher" onclick="openAssignModal('${c.id}')">
-            <i class="fa-solid fa-pencil"></i>
-          </button>
-          <button class="btn ghost" style="padding:6px 10px;font-size:11px;color:var(--accent-red);" title="Remove Class" onclick="deleteClassroom('${c.id}')">
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
+          ${isPending ? `
+            <button class="btn btn-sm" style="background:#10b981; border-color:#059669; color:#fff; font-weight:800; padding:5px 12px; font-size:11px;" title="Approve & Officially Register Class" onclick="approveClassRegistration('${c.id}')">
+              <i class="fa-solid fa-check"></i> Approve
+            </button>
+            <button class="btn ghost btn-sm" style="padding:5px 9px; font-size:11px; color:var(--accent-red);" title="Decline Class Registration" onclick="rejectClassRegistration('${c.id}')">
+              <i class="fa-solid fa-xmark"></i> Reject
+            </button>
+          ` : `
+            <button class="btn ghost" style="padding:6px 10px;font-size:11px;" title="Reassign / Change Teacher" onclick="openAssignModal('${c.id}')">
+              <i class="fa-solid fa-pencil"></i>
+            </button>
+            <button class="btn ghost" style="padding:6px 10px;font-size:11px;color:var(--accent-red);" title="Remove Class" onclick="deleteClassroom('${c.id}')">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          `}
         </div>
       </td>
     `;
@@ -5294,6 +5343,99 @@ function deleteClassroom(classId) {
     if (window.Toaster) {
       window.Toaster.info('Class Removed', 'Classroom has been decommissioned.', 3000);
     }
+  }
+}
+
+function approveClassRegistration(classId) {
+  let classes = getClassesList();
+  const c = classes.find(x => x.id === classId);
+  if (!c) return;
+
+  c.status = 'Active';
+  c.approvalStatus = 'approved';
+  c.approvedBy = 'HR Directorate';
+  c.approvedAt = Date.now();
+  saveClassesList(classes);
+
+  let approvals = read(`${ACTIVE_ORG}_academic_registration_approvals`) || [];
+  const req = approvals.find(r => r.type === 'class' && r.targetId === classId);
+  if (req) {
+    req.status = 'approved';
+    req.approvedBy = 'HR Directorate';
+    req.approvedAt = Date.now();
+    save(`${ACTIVE_ORG}_academic_registration_approvals`, approvals);
+  }
+
+  if (window.Toaster && typeof window.Toaster.success === 'function') {
+    window.Toaster.success('Class Registration Approved', `Classroom '${c.name}' has been certified and enrolled into active curriculum.`);
+  } else {
+    showToast(`Class '${c.name}' approved and registered.`);
+  }
+
+  renderClassesSection();
+}
+
+function rejectClassRegistration(classId) {
+  if (!confirm('Are you sure you want to decline this classroom registration request?')) return;
+  let classes = getClassesList();
+  const c = classes.find(x => x.id === classId);
+  if (!c) return;
+
+  c.status = 'Rejected';
+  c.approvalStatus = 'rejected';
+  c.rejectedBy = 'HR Directorate';
+  c.rejectedAt = Date.now();
+  saveClassesList(classes);
+
+  let approvals = read(`${ACTIVE_ORG}_academic_registration_approvals`) || [];
+  const req = approvals.find(r => r.type === 'class' && r.targetId === classId);
+  if (req) {
+    req.status = 'rejected';
+    req.rejectedBy = 'HR Directorate';
+    req.rejectedAt = Date.now();
+    save(`${ACTIVE_ORG}_academic_registration_approvals`, approvals);
+  }
+
+  if (window.Toaster && typeof window.Toaster.warning === 'function') {
+    window.Toaster.warning('Class Registration Declined', `Classroom '${c.name}' was not approved.`);
+  } else {
+    showToast(`Class '${c.name}' rejected.`);
+  }
+
+  renderClassesSection();
+}
+
+function approveAllPendingClasses() {
+  let classes = getClassesList();
+  let count = 0;
+  classes.forEach(c => {
+    if (c.approvalStatus === 'pending' || c.status === 'Pending HR Approval') {
+      c.status = 'Active';
+      c.approvalStatus = 'approved';
+      c.approvedBy = 'HR Directorate';
+      c.approvedAt = Date.now();
+      count++;
+    }
+  });
+
+  if (count > 0) {
+    saveClassesList(classes);
+    let approvals = read(`${ACTIVE_ORG}_academic_registration_approvals`) || [];
+    approvals.forEach(r => {
+      if (r.type === 'class' && r.status === 'pending') {
+        r.status = 'approved';
+        r.approvedBy = 'HR Directorate';
+        r.approvedAt = Date.now();
+      }
+    });
+    save(`${ACTIVE_ORG}_academic_registration_approvals`, approvals);
+
+    if (window.Toaster && typeof window.Toaster.success === 'function') {
+      window.Toaster.success('Classes Approved', `All ${count} pending classroom modules have been certified and activated.`);
+    } else {
+      showToast(`Approved ${count} classes.`);
+    }
+    renderClassesSection();
   }
 }
 
@@ -5760,6 +5902,37 @@ function getEnrolledStudentsList() {
 
 function loadHRStudents() {
   const studs = getEnrolledStudentsList();
+  const pendingStudents = studs.filter(s => s.approvalStatus === 'pending' || s.status === 'Pending HR Approval');
+  const bannerEl = document.getElementById('studentPendingApprovalBanner');
+  if (bannerEl) {
+    if (pendingStudents.length > 0) {
+      bannerEl.style.display = 'flex';
+      bannerEl.style.alignItems = 'center';
+      bannerEl.style.justifyContent = 'space-between';
+      bannerEl.style.flexWrap = 'wrap';
+      bannerEl.style.gap = '12px';
+      bannerEl.innerHTML = `
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:38px; height:38px; border-radius:10px; background:rgba(245,158,11,0.25); color:#f59e0b; display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0;">
+            <i class="fa-solid fa-user-clock"></i>
+          </div>
+          <div>
+            <div style="font-weight:800; font-size:13.5px; color:var(--text);">Faculty Student Registration Requests (${pendingStudents.length} Pending Approval)</div>
+            <div class="small" style="color:var(--muted);">Teachers have submitted student registrations awaiting HR validation and official enrollment.</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-sm" style="background:#10b981; border-color:#059669; color:#fff; font-weight:800; padding:6px 14px; font-size:12px;" onclick="approveAllPendingStudents()">
+            <i class="fa-solid fa-check-double"></i> Approve All Students
+          </button>
+        </div>
+      `;
+    } else {
+      bannerEl.style.display = 'none';
+      bannerEl.innerHTML = '';
+    }
+  }
+
   const tbody = document.getElementById('studentTableBody');
   if (tbody) {
     if (studs.length === 0) {
@@ -5769,15 +5942,16 @@ function loadHRStudents() {
         const code = escapeHtml(s.roll || s.enrollment_code || s.id || 'STU-2026-001');
         const name = escapeHtml(s.student_name || [s.firstName, s.middleName, s.lastName].filter(Boolean).join(' ') || 'Unnamed Student');
         const className = escapeHtml(s.class_name || s.className || 'General Studies');
+        const isPending = s.approvalStatus === 'pending' || s.status === 'Pending HR Approval';
         const status = s.status || 'Active';
-        const statusClass = status === 'Active' ? 'badge-green' : (status === 'Probation' ? 'badge-amber' : (status === 'Scholarship' ? 'badge-blue' : 'badge-purple'));
-        const statusLabel = status === 'Active' ? 'Active Student' : status;
+        const statusClass = isPending ? 'badge-orange' : (status === 'Active' ? 'badge-green' : (status === 'Probation' ? 'badge-amber' : (status === 'Scholarship' ? 'badge-blue' : 'badge-purple')));
+        const statusLabel = isPending ? 'Pending HR Approval' : (status === 'Active' ? 'Active Student' : status);
         const photo = s.photo || DEFAULT_STUDENT_AVATAR;
         const guardianPhone = escapeHtml(s.phone || s.guardian_phone || s.guardianPhone || 'No Phone');
         const guardianName = escapeHtml(s.guardianName || s.guardian_name || 'Guardian');
 
         return `
-          <tr>
+          <tr ${isPending ? 'style="background:rgba(245,158,11,0.04);"' : ''}>
             <td><strong style="color:var(--primary); font-family:monospace; font-size:13px;">${code}</strong></td>
             <td>
               <div style="display:flex; align-items:center; gap:12px;">
@@ -5792,15 +5966,24 @@ function loadHRStudents() {
             <td>
               <div style="font-size:12.5px; font-weight:600; color:var(--text);"><i class="fa-solid fa-calendar-day" style="color:var(--muted); margin-right:4px;"></i>${escapeHtml(s.term || '2026 - Term 1')}</div>
             </td>
-            <td><span class="badge-pill ${statusClass}"><i class="fa-solid fa-circle" style="font-size:6.5px"></i> ${escapeHtml(statusLabel)}</span></td>
+            <td><span class="badge-pill ${statusClass}"><i class="fa-solid ${isPending ? 'fa-clock' : 'fa-circle'}" style="font-size:6.5px"></i> ${escapeHtml(statusLabel)}</span></td>
             <td style="text-align:right">
               <div style="display:inline-flex; gap:6px;">
-                <button class="btn ghost" style="padding:5px 9px; font-size:12px; color:var(--primary);" title="Edit Student Profile" onclick="editHRStudent('${code}')">
-                  <i class="fa-solid fa-pen-to-square"></i>
-                </button>
-                <button class="btn ghost" style="padding:5px 9px; font-size:12px; color:var(--accent-red);" title="Delete Student Record" onclick="deleteHRStudent('${code}')">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
+                ${isPending ? `
+                  <button class="btn btn-sm" style="background:#10b981; border-color:#059669; color:#fff; font-weight:800; padding:5px 12px; font-size:11px;" title="Approve & Officially Register Student" onclick="approveStudentRegistration('${code}', '${s.classId || ''}')">
+                    <i class="fa-solid fa-check"></i> Approve
+                  </button>
+                  <button class="btn ghost btn-sm" style="padding:5px 9px; font-size:11px; color:var(--accent-red);" title="Decline Student Registration" onclick="rejectStudentRegistration('${code}', '${s.classId || ''}')">
+                    <i class="fa-solid fa-xmark"></i> Reject
+                  </button>
+                ` : `
+                  <button class="btn ghost" style="padding:5px 9px; font-size:12px; color:var(--primary);" title="Edit Student Profile" onclick="editHRStudent('${code}')">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </button>
+                  <button class="btn ghost" style="padding:5px 9px; font-size:12px; color:var(--accent-red);" title="Delete Student Record" onclick="deleteHRStudent('${code}')">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                `}
               </div>
             </td>
           </tr>
@@ -6098,6 +6281,168 @@ function deleteHRStudent(code) {
     window.Toaster.info('Student Record Removed', `Student (${code}) has been unenrolled.`);
   } else {
     showToast(`Student record ${code} removed.`);
+  }
+}
+
+function approveStudentRegistration(studentCodeOrId, classId) {
+  let classes = typeof getClassesList === 'function' ? getClassesList() : (read(CLASSES_STORAGE_KEY) || []);
+  let approvedStudent = null;
+
+  if (Array.isArray(classes)) {
+    classes.forEach(c => {
+      if (Array.isArray(c.students)) {
+        c.students.forEach(s => {
+          if ((s.roll || s.enrollment_code || s.id) === studentCodeOrId || s.id === studentCodeOrId) {
+            s.status = 'Active';
+            s.approvalStatus = 'approved';
+            s.approvedBy = 'HR Directorate';
+            s.approvedAt = Date.now();
+            approvedStudent = s;
+          }
+        });
+      }
+    });
+    save(CLASSES_STORAGE_KEY, classes);
+  }
+
+  let studs = read(STUD_KEY);
+  if (Array.isArray(studs)) {
+    studs.forEach(s => {
+      if ((s.roll || s.enrollment_code || s.id) === studentCodeOrId || s.id === studentCodeOrId) {
+        s.status = 'Active';
+        s.approvalStatus = 'approved';
+        s.approvedBy = 'HR Directorate';
+        s.approvedAt = Date.now();
+        if (!approvedStudent) approvedStudent = s;
+      }
+    });
+    save(STUD_KEY, studs);
+  }
+
+  let approvals = read(`${ACTIVE_ORG}_academic_registration_approvals`) || [];
+  const req = approvals.find(r => r.type === 'student' && (r.targetId === studentCodeOrId || r.roll === studentCodeOrId));
+  if (req) {
+    req.status = 'approved';
+    req.approvedBy = 'HR Directorate';
+    req.approvedAt = Date.now();
+    save(`${ACTIVE_ORG}_academic_registration_approvals`, approvals);
+  }
+
+  const sName = approvedStudent ? [approvedStudent.firstName, approvedStudent.lastName].filter(Boolean).join(' ') || approvedStudent.student_name || studentCodeOrId : studentCodeOrId;
+
+  if (window.Toaster && typeof window.Toaster.success === 'function') {
+    window.Toaster.success('Student Registration Approved', `Student '${sName}' has been officially registered and enrolled.`);
+  } else {
+    showToast(`Student '${sName}' approved.`);
+  }
+
+  loadHRStudents();
+  renderClassesSection();
+}
+
+function rejectStudentRegistration(studentCodeOrId, classId) {
+  if (!confirm(`Are you sure you want to decline registration for student (${studentCodeOrId})?`)) return;
+
+  let classes = typeof getClassesList === 'function' ? getClassesList() : (read(CLASSES_STORAGE_KEY) || []);
+  if (Array.isArray(classes)) {
+    classes.forEach(c => {
+      if (Array.isArray(c.students)) {
+        c.students.forEach(s => {
+          if ((s.roll || s.enrollment_code || s.id) === studentCodeOrId || s.id === studentCodeOrId) {
+            s.status = 'Rejected';
+            s.approvalStatus = 'rejected';
+            s.rejectedBy = 'HR Directorate';
+            s.rejectedAt = Date.now();
+          }
+        });
+      }
+    });
+    save(CLASSES_STORAGE_KEY, classes);
+  }
+
+  let studs = read(STUD_KEY);
+  if (Array.isArray(studs)) {
+    studs.forEach(s => {
+      if ((s.roll || s.enrollment_code || s.id) === studentCodeOrId || s.id === studentCodeOrId) {
+        s.status = 'Rejected';
+        s.approvalStatus = 'rejected';
+        s.rejectedBy = 'HR Directorate';
+        s.rejectedAt = Date.now();
+      }
+    });
+    save(STUD_KEY, studs);
+  }
+
+  let approvals = read(`${ACTIVE_ORG}_academic_registration_approvals`) || [];
+  const req = approvals.find(r => r.type === 'student' && (r.targetId === studentCodeOrId || r.roll === studentCodeOrId));
+  if (req) {
+    req.status = 'rejected';
+    req.rejectedBy = 'HR Directorate';
+    req.rejectedAt = Date.now();
+    save(`${ACTIVE_ORG}_academic_registration_approvals`, approvals);
+  }
+
+  if (window.Toaster && typeof window.Toaster.warning === 'function') {
+    window.Toaster.warning('Student Registration Declined', `Student (${studentCodeOrId}) registration was rejected.`);
+  } else {
+    showToast(`Student registration rejected.`);
+  }
+
+  loadHRStudents();
+  renderClassesSection();
+}
+
+function approveAllPendingStudents() {
+  let count = 0;
+  let classes = typeof getClassesList === 'function' ? getClassesList() : (read(CLASSES_STORAGE_KEY) || []);
+  if (Array.isArray(classes)) {
+    classes.forEach(c => {
+      if (Array.isArray(c.students)) {
+        c.students.forEach(s => {
+          if (s.approvalStatus === 'pending' || s.status === 'Pending HR Approval') {
+            s.status = 'Active';
+            s.approvalStatus = 'approved';
+            s.approvedBy = 'HR Directorate';
+            s.approvedAt = Date.now();
+            count++;
+          }
+        });
+      }
+    });
+    save(CLASSES_STORAGE_KEY, classes);
+  }
+
+  let studs = read(STUD_KEY);
+  if (Array.isArray(studs)) {
+    studs.forEach(s => {
+      if (s.approvalStatus === 'pending' || s.status === 'Pending HR Approval') {
+        s.status = 'Active';
+        s.approvalStatus = 'approved';
+        s.approvedBy = 'HR Directorate';
+        s.approvedAt = Date.now();
+      }
+    });
+    save(STUD_KEY, studs);
+  }
+
+  if (count > 0) {
+    let approvals = read(`${ACTIVE_ORG}_academic_registration_approvals`) || [];
+    approvals.forEach(r => {
+      if (r.type === 'student' && r.status === 'pending') {
+        r.status = 'approved';
+        r.approvedBy = 'HR Directorate';
+        r.approvedAt = Date.now();
+      }
+    });
+    save(`${ACTIVE_ORG}_academic_registration_approvals`, approvals);
+
+    if (window.Toaster && typeof window.Toaster.success === 'function') {
+      window.Toaster.success('Students Approved', `All ${count} student registrations have been certified and enrolled.`);
+    } else {
+      showToast(`Approved ${count} students.`);
+    }
+    loadHRStudents();
+    renderClassesSection();
   }
 }
 
@@ -9828,6 +10173,14 @@ function bootstrapApp() {
     window.warnLockedScore = warnLockedScore;
     window.approveStudentAssessment = approveStudentAssessment;
     window.submitAssessmentApproval = submitAssessmentApproval;
+
+    // Academic Registration Approvals Attachments
+    window.approveClassRegistration = approveClassRegistration;
+    window.rejectClassRegistration = rejectClassRegistration;
+    window.approveAllPendingClasses = approveAllPendingClasses;
+    window.approveStudentRegistration = approveStudentRegistration;
+    window.rejectStudentRegistration = rejectStudentRegistration;
+    window.approveAllPendingStudents = approveAllPendingStudents;
 
     // Cross-Portal Broadcasts Attachments
     window.renderAnnouncements = renderAnnouncements;

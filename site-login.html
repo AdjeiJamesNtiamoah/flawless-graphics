@@ -1231,6 +1231,7 @@ async function login() {
             if (user.role === 'teacher') window.location.href = "pages/teacher/teacher-dashboard.html";
             else if (user.role === 'hr') window.location.href = "pages/hr/hr-dashboard.html";
             else if (user.role === 'finance') window.location.href = "pages/finance/finance-dashboard.html";
+            else if (user.role === 'student') window.location.href = 'pages/student/student-dashboard.html';
             else window.location.href = "welcome.html";
         }, 800);
 

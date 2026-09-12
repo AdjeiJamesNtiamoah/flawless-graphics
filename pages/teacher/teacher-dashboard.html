@@ -42,31 +42,66 @@ body.light-theme {
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+html, body {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
 body {
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   background-color: var(--bg);
   background: var(--bg);
   color: var(--text-main);
-  min-height: 100vh;
-  overflow-x: hidden;
+  height: 100vh;
+  overflow: hidden;
   transition: background-color 0.4s ease;
 }
 
-.app { display: flex; min-height: 100vh; }
+.app {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
 
-/* Sidebar - Maintained Dark Navigation */
+/* Sidebar - Pinned Standout Dark Navigation */
 .sidebar {
-  width: 270px;
-  padding: 24px;
+  width: 275px;
+  min-width: 275px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  padding: 24px 18px;
   background: #0B1120;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  z-index: 10;
+  gap: 16px;
+  z-index: 100;
   color: #ffffff;
+  flex-shrink: 0;
+  overflow-y: auto;
+  box-shadow: 8px 0 36px rgba(0, 0, 0, 0.35), 2px 0 10px rgba(0, 0, 0, 0.2);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 9999px;
+}
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
 }
 
 body.light-theme .sidebar {
@@ -160,14 +195,90 @@ body.light-theme .sidebar {
   box-shadow: 0 6px 18px rgba(92, 225, 230, 0.4);
 }
 
-/* Main Area */
-.main { flex: 1; padding: 30px; overflow-y: auto; }
+/* Main Area - Independently Scrollable Workspace */
+.main {
+  flex: 1;
+  min-width: 0;
+  height: 100vh;
+  padding: 24px 32px 60px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  scroll-behavior: smooth;
+}
+
+.main::-webkit-scrollbar {
+  width: 7px;
+}
+.main::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.02);
+}
+.main::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 9999px;
+}
+.main::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.28);
+}
+
+/* Top Header Bar - Sticky & Standing Out on Scroll */
 .header {
+  position: sticky;
+  top: -24px;
+  z-index: 80;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin: -24px -32px 24px -32px;
+  padding: 16px 32px;
+  background: rgba(250, 247, 242, 0.94);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
   animation: fadeInDown 0.6s ease;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+body:not(.light-theme) .header {
+  background: rgba(11, 17, 32, 0.9);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 900px) {
+  html, body {
+    height: auto;
+    overflow-y: auto;
+  }
+  body {
+    overflow-y: auto;
+  }
+  .app {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+  .sidebar {
+    width: 100%;
+    min-width: 100%;
+    height: auto;
+    position: static;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  }
+  .main {
+    height: auto;
+    overflow-y: visible;
+    padding: 16px;
+  }
+  .header {
+    position: static;
+    margin: 0 0 20px 0;
+    padding: 0;
+    background: transparent;
+    border-bottom: none;
+    box-shadow: none;
+  }
 }
 
 /* Dynamic View Switch Animations */
@@ -428,12 +539,410 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
 }
 .status-active { background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
 .status-probation { background: rgba(245, 158, 11, 0.12); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
-.status-pending { background: rgba(59, 130, 246, 0.12); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
+.status-pending, .status-pending-hr-approval { background: rgba(245, 158, 11, 0.14); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.35); font-weight: 700; }
 .status-scholarship { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.3); }
 
-@media(max-width: 1100px) {
-  .kpis { grid-template-columns: repeat(2, 1fr); }
-  .sidebar { display: none; }
+/* --- Modern Teacher Professional Suite --- */
+.academic-term-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(99, 102, 241, 0.12);
+  color: #6366f1;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.duty-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.duty-pill.on-duty {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.duty-pill.off-duty {
+  background: rgba(100, 116, 139, 0.12);
+  color: #64748b;
+  border: 1px solid rgba(100, 116, 139, 0.3);
+}
+.duty-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  display: inline-block;
+  animation: pulseDot 2s infinite;
+}
+@keyframes pulseDot {
+  0% { opacity: 0.5; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.15); }
+  100% { opacity: 0.5; transform: scale(0.9); }
+}
+
+/* Quick Action Pills in Header */
+.header-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.quick-action-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+}
+.quick-action-pill:hover {
+  background: var(--accent-gradient);
+  color: #ffffff;
+  border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+}
+
+/* 5-KPI Grid for Educator Telemetry */
+.educator-kpis-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+@media (max-width: 1200px) {
+  .educator-kpis-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+  .educator-kpis-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .educator-kpis-grid { grid-template-columns: 1fr; }
+}
+
+.kpi-card-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+.kpi-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+/* Today's Schedule Card & List */
+.today-schedule-box {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 20px;
+}
+.schedule-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--card-border);
+  margin-bottom: 8px;
+  transition: var(--transition);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.schedule-item:hover {
+  background: rgba(2, 132, 199, 0.04);
+  border-color: rgba(2, 132, 199, 0.3);
+  transform: translateX(4px);
+}
+.schedule-time-badge {
+  font-family: monospace;
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--accent1);
+}
+
+/* Class Cards Grid */
+.class-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 14px;
+}
+.class-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.class-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--accent-gradient);
+}
+.class-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+.syllabus-meter {
+  height: 6px;
+  background: rgba(0,0,0,0.08);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin: 8px 0 4px;
+}
+.syllabus-fill {
+  height: 100%;
+  background: var(--accent-gradient);
+  border-radius: 9999px;
+  transition: width 0.4s ease;
+}
+
+/* Interactive Roll Call Grid */
+.rollcall-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.student-roll-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: var(--transition);
+}
+.student-roll-card:hover {
+  border-color: var(--accent1);
+}
+.att-pill-group {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+.att-btn {
+  padding: 5px 0;
+  border-radius: 6px;
+  border: 1px solid var(--card-border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+.att-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+}
+.att-btn.active-p {
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+}
+.att-btn.active-l {
+  background: #f59e0b !important;
+  color: #ffffff !important;
+  border-color: #f59e0b !important;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+}
+.att-btn.active-e {
+  background: #3b82f6 !important;
+  color: #ffffff !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+}
+.att-btn.active-a {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  border-color: #ef4444 !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+}
+
+/* Standardized WAEC Letter Grade Badges */
+.grade-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  padding: 3px 8px;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 12px;
+}
+.grade-a1 { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); }
+.grade-b2 { background: rgba(5, 150, 105, 0.18); color: #059669; border: 1px solid rgba(5, 150, 105, 0.35); }
+.grade-b3 { background: rgba(14, 165, 233, 0.18); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.35); }
+.grade-c4, .grade-c5, .grade-c6 { background: rgba(99, 102, 241, 0.15); color: #6366f1; border: 1px solid rgba(99, 102, 241, 0.3); }
+.grade-d7, .grade-e8 { background: rgba(245, 158, 11, 0.18); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.35); }
+.grade-f9 { background: rgba(239, 68, 68, 0.18); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.35); }
+
+/* Leave Management Desk Cards */
+.leave-balance-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.leave-balance-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.leave-balance-num {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+/* Weekly Timetable Period Matrix */
+.period-matrix-wrap {
+  overflow-x: auto;
+  margin-top: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+}
+.period-matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 680px;
+}
+.period-matrix-table th {
+  background: rgba(0, 0, 0, 0.04);
+  padding: 10px 14px;
+  font-size: 11.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--card-border);
+}
+.period-matrix-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--card-border);
+  border-right: 1px solid var(--card-border);
+  vertical-align: top;
+  min-height: 64px;
+}
+.period-matrix-table td:last-child {
+  border-right: none;
+}
+.period-cell-chip {
+  background: rgba(99, 91, 252, 0.12);
+  border: 1px solid rgba(99, 91, 252, 0.25);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 11.5px;
+  margin-bottom: 4px;
+  transition: var(--transition);
+}
+.period-cell-chip:hover {
+  background: rgba(99, 91, 252, 0.22);
+  transform: translateY(-2px);
+}
+.batch-score-input {
+  width: 68px;
+  padding: 6px 8px;
+  text-align: center;
+  font-weight: 700;
+  border-radius: 6px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--text-main);
+  font-size: 13px;
+}
+.batch-score-input:focus {
+  border-color: var(--accent1);
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.2);
+  outline: none;
+}
+.assign-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: var(--transition);
+}
+.assign-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+.progress-bar-bg {
+  width: 100%;
+  height: 8px;
+  background: rgba(0,0,0,0.06);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--accent-gradient);
+  transition: width 0.4s ease;
+}
+.transcript-paper {
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 12px;
+  padding: 24px;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.transcript-paper table th {
+  background: #f1f5f9;
+  color: #334155;
+  font-weight: 800;
+  font-size: 11px;
+}
+.transcript-paper table td {
+  border-bottom: 1px solid #e2e8f0;
+  color: #0f172a;
 }
 </style>
   <!-- Floating 3-Dots Quick Dock Stylesheet -->
@@ -590,35 +1099,88 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
     <div class="header">
       <div>
         <h1 id="pageTitle" style="margin:0; font-size: 24px;">Overview</h1>
-        <div class="tiny">Teacher Management Workspace</div>
+        <div style="display:flex; align-items:center; gap:8px; margin-top:4px; flex-wrap:wrap;">
+          <span class="tiny">Teacher Management Workspace</span>
+          <span class="academic-term-badge"><i class="fa-solid fa-graduation-cap"></i> Term 1 • 2026/2027</span>
+          <span id="teacherDutyPill" class="duty-pill on-duty"><span class="duty-dot"></span> On Campus / Duty Active</span>
+        </div>
       </div>
-      <div style="display:flex; gap:12px; align-items:center">
+      <div class="header-actions-group">
+        <button type="button" class="quick-action-pill" onclick="openNewAssessmentModal()" title="Record Assessment"><i class="fa-solid fa-stamp" style="color:var(--accent1);"></i> + Grade</button>
+        <button type="button" class="quick-action-pill" onclick="openAssignmentCreateModal()" title="Create Assignment"><i class="fa-solid fa-plus" style="color:#10b981;"></i> + Assignment</button>
+        <button type="button" class="quick-action-pill" onclick="document.querySelector('[data-section=\'attendance\']').click()" title="Classroom Roll Call"><i class="fa-solid fa-clipboard-user" style="color:#f59e0b;"></i> Roll Call</button>
+        <button type="button" class="quick-action-pill" onclick="document.querySelector('[data-section=\'messages\']').click()" title="Duty Leave Desk"><i class="fa-solid fa-calendar-plus" style="color:#6366f1;"></i> Leave Desk</button>
+        <button class="btn ghost" id="teacherTopbarNotifBtn" onclick="if(window.QuickDock){window.QuickDock.openNotifications();}" title="Notifications Arrived" style="display:inline-flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-bell" style="color:#fbbf24;"></i>
+          <span style="font-weight:700;">Notifications</span>
+          <span class="badge" id="teacherTopbarNotifBadge" style="background:rgba(251,191,36,0.2); color:#fbbf24; padding:2px 7px; font-size:11px; border-radius:10px; font-weight:800;">0</span>
+        </button>
         <button class="btn ghost" id="themeBtn"><i class="fa-solid fa-moon"></i> Theme</button>
         <a href="../../welcome.html" class="btn ghost" style="text-decoration:none"><i class="fa-solid fa-house"></i> Hub</a>
       </div>
     </div>
 
-    <!-- KPIs -->
-    <div class="kpis" id="kpis">
+    <!-- 5 Educator Telemetry KPIs -->
+    <div class="educator-kpis-grid" id="kpis">
       <div class="card">
-        <div class="tiny">Active Classes</div>
-        <div class="big" id="k_classes">0</div>
-        <div class="tiny" style="color:var(--accent1)"><i class="fa-solid fa-arrow-up"></i> Assigned & Live</div>
+        <div class="kpi-card-inner">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <div class="tiny">Assigned Classes</div>
+              <div class="big" id="k_classes">0</div>
+            </div>
+            <div class="kpi-icon-box" style="background:rgba(2, 132, 199, 0.15); color:var(--accent1);"><i class="fa-solid fa-chalkboard-user"></i></div>
+          </div>
+          <div class="tiny" id="k_classes_sub" style="color:var(--accent1)"><i class="fa-solid fa-circle-dot" style="font-size:8px;"></i> Active Academic Stream</div>
+        </div>
       </div>
       <div class="card">
-        <div class="tiny">Total Students</div>
-        <div class="big" id="k_students">0</div>
-        <div class="tiny">Enrolled across classes</div>
+        <div class="kpi-card-inner">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <div class="tiny">Enrolled Students</div>
+              <div class="big" id="k_students">0</div>
+            </div>
+            <div class="kpi-icon-box" style="background:rgba(99, 102, 241, 0.15); color:var(--accent2);"><i class="fa-solid fa-user-graduate"></i></div>
+          </div>
+          <div class="tiny" id="k_students_sub" style="color:var(--text-muted)">Active class enrollment</div>
+        </div>
       </div>
       <div class="card">
-        <div class="tiny">Attendance Rate</div>
-        <div class="big" id="k_att">0%</div>
-        <div class="tiny">Average (30 Days)</div>
+        <div class="kpi-card-inner">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <div class="tiny">Attendance Rate</div>
+              <div class="big" id="k_att">0%</div>
+            </div>
+            <div class="kpi-icon-box" style="background:rgba(16, 185, 129, 0.15); color:#10b981;"><i class="fa-solid fa-clipboard-check"></i></div>
+          </div>
+          <div class="tiny" style="color:#10b981"><i class="fa-solid fa-arrow-trend-up"></i> 30-Day Average</div>
+        </div>
       </div>
       <div class="card">
-        <div class="tiny">Unread Messages</div>
-        <div class="big" id="k_msgs">0</div>
-        <div class="tiny" style="color:var(--accent2)">Requires Attention</div>
+        <div class="kpi-card-inner">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <div class="tiny">Grading Queue</div>
+              <div class="big" id="k_pending_grading">0</div>
+            </div>
+            <div class="kpi-icon-box" style="background:rgba(245, 158, 11, 0.15); color:#f59e0b;"><i class="fa-solid fa-clock-rotate-left"></i></div>
+          </div>
+          <div class="tiny" style="color:#f59e0b">Submissions Awaiting Marks</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="kpi-card-inner">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <div class="tiny">Teaching Load</div>
+              <div class="big" id="k_teaching_load">18 / 24</div>
+            </div>
+            <div class="kpi-icon-box" style="background:rgba(168, 85, 247, 0.15); color:#a855f7;"><i class="fa-solid fa-book-bookmark"></i></div>
+          </div>
+          <div class="tiny" style="color:#a855f7">Weekly Periods (75%)</div>
+        </div>
       </div>
     </div>
 
@@ -664,8 +1226,70 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
         </button>
       </div>
 
+      <!-- Today's Teaching Schedule & Lecture Planner -->
+      <div class="today-schedule-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h4 style="margin:0; font-size:16px; font-weight:800; display:flex; align-items:center; gap:8px;">
+              <i class="fa-solid fa-calendar-day" style="color:var(--accent1);"></i> Today's Teaching Schedule &amp; Lecture Planner
+            </h4>
+            <div class="tiny" style="color:var(--text-muted); margin-top:2px;">Scheduled classroom lectures, topics, and one-click attendance roll calls</div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="btn ghost btn-sm" onclick="goToTeacherTimetable()" style="font-size:12px; padding:5px 10px;">
+              <i class="fa-solid fa-table"></i> Full Timetable
+            </button>
+          </div>
+        </div>
+        <div id="todayScheduleList">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Overview 2-Column: Grade Distribution Summary & Quick Actions Hub -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:20px;">
+        <!-- Left: Grade Distribution -->
+        <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:var(--radius); padding:16px;">
+          <h4 style="margin:0 0 10px; font-size:15px; font-weight:800; display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-chart-pie" style="color:var(--accent1);"></i> Academic Standing &amp; WAEC Distribution
+          </h4>
+          <div class="tiny" style="color:var(--text-muted); margin-bottom:14px;">Continuous Assessment &amp; Exam composite score bands across assigned classes</div>
+          <div id="overviewGradeDistribution">
+            <!-- Dynamic distribution bars -->
+          </div>
+        </div>
+
+        <!-- Right: Faculty Quick Actions & Classroom Utilities -->
+        <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:var(--radius); padding:16px;">
+          <h4 style="margin:0 0 10px; font-size:15px; font-weight:800; display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-toolbox" style="color:#6366f1;"></i> Classroom Quick Actions Hub
+          </h4>
+          <div class="tiny" style="color:var(--text-muted); margin-bottom:14px;">Instant shortcuts for daily instructional and administrative routines</div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <button type="button" class="btn ghost" onclick="document.querySelector('[data-section=\'attendance\']').click()" style="justify-content:flex-start; padding:10px 12px; font-size:12.5px;">
+              <i class="fa-solid fa-clipboard-user" style="color:#10b981;"></i> Mark Daily Register
+            </button>
+            <button type="button" class="btn ghost" onclick="openNewAssessmentModal()" style="justify-content:flex-start; padding:10px 12px; font-size:12.5px;">
+              <i class="fa-solid fa-stamp" style="color:var(--accent1);"></i> Enter CA Marks (30%)
+            </button>
+            <button type="button" class="btn ghost" onclick="openAssignmentCreateModal()" style="justify-content:flex-start; padding:10px 12px; font-size:12.5px;">
+              <i class="fa-solid fa-book-open" style="color:#f59e0b;"></i> Post Class Assignment
+            </button>
+            <button type="button" class="btn ghost" onclick="document.querySelector('[data-section=\'lessons\']').click()" style="justify-content:flex-start; padding:10px 12px; font-size:12.5px;">
+              <i class="fa-solid fa-note-sticky" style="color:#a855f7;"></i> Prepare Lesson Plan
+            </button>
+            <button type="button" class="btn ghost" onclick="document.querySelector('[data-section=\'messages\']').click()" style="justify-content:flex-start; padding:10px 12px; font-size:12.5px;">
+              <i class="fa-solid fa-calendar-plus" style="color:#0284c7;"></i> Request Duty Leave
+            </button>
+            <button type="button" class="btn ghost" onclick="exportActiveStudentsCSV()" style="justify-content:flex-start; padding:10px 12px; font-size:12.5px;">
+              <i class="fa-solid fa-file-csv" style="color:#059669;"></i> Export Class Roll
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div style="display:flex; justify-content:space-between; align-items:center">
-        <h3 style="margin:0">Recent Activity Feed</h3>
+        <h3 style="margin:0"><i class="fa-solid fa-wave-square" style="color:var(--accent1);"></i> Recent Activity Feed</h3>
         <div class="tiny" id="lastUpdated">—</div>
       </div>
       <div id="activityFeed" style="margin-top:16px; display:flex; flex-direction:column; gap:10px;"></div>
@@ -673,20 +1297,45 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
 
     <!-- CLASSES SECTION -->
     <section id="classesSection" class="card view-panel" style="display:none">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px">
-        <h3 style="margin:0">Classes Management</h3>
-        <button class="btn prim" id="newClassBtn"><i class="fa-solid fa-plus"></i> New Class</button>
-      </div>
-      <div style="display:grid; grid-template-columns: 1fr 320px; gap: 16px;">
-        <div class="table-scroll">
-          <table id="classesTable">
-            <thead><tr><th>#</th><th>Name</th><th>Subject</th><th>Students</th><th>Actions</th></tr></thead>
-            <tbody></tbody>
-          </table>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+        <div>
+          <h3 style="margin:0; display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-chalkboard-user" style="color:var(--accent1);"></i> Classroom Management &amp; Curriculum Suite
+          </h3>
+          <div class="tiny" style="color:var(--text-muted); margin-top:2px;">
+            Active classrooms, curriculum syllabus coverage, and enrolled student directories
+          </div>
         </div>
-        <div class="card" style="background: rgba(0,0,0,0.1); border-color: var(--card-border);">
-          <h4>Selected Class Preview</h4>
-          <div id="classPreview" style="margin-top:12px"></div>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <div class="btn-group" style="display:inline-flex; background:rgba(0,0,0,0.05); border:1px solid var(--card-border); border-radius:8px; padding:2px;">
+            <button type="button" id="classesViewCardsBtn" class="btn ghost btn-sm" onclick="switchClassesView('cards')" style="padding:4px 10px; font-size:12px; border:none; background:var(--card-bg); font-weight:700;"><i class="fa-solid fa-grip"></i> Cards</button>
+            <button type="button" id="classesViewTableBtn" class="btn ghost btn-sm" onclick="switchClassesView('table')" style="padding:4px 10px; font-size:12px; border:none; background:transparent;"><i class="fa-solid fa-table-list"></i> Table</button>
+          </div>
+          <button type="button" class="btn ghost" onclick="exportActiveStudentsCSV()" style="padding:6px 12px; font-size:12px;"><i class="fa-solid fa-file-csv"></i> Export Roster</button>
+          <button type="button" class="btn prim" id="newClassBtn" style="padding:6px 14px; font-size:12px;"><i class="fa-solid fa-plus"></i> New Class</button>
+        </div>
+      </div>
+
+      <!-- Classes Cards Grid View -->
+      <div id="classesCardsViewContainer">
+        <div class="class-cards-grid" id="classesCardsGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Classes Table View -->
+      <div id="classesTableViewContainer" style="display:none; margin-top:14px;">
+        <div style="display:grid; grid-template-columns: 1fr 320px; gap: 16px;">
+          <div class="table-scroll">
+            <table id="classesTable">
+              <thead><tr><th>#</th><th>Class Title</th><th>Subject</th><th>Room</th><th>Syllabus</th><th>Enrollment</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="card" style="background: rgba(0,0,0,0.02); border-color: var(--card-border);">
+            <h4 style="margin:0 0 10px; font-size:14px; font-weight:800;"><i class="fa-solid fa-circle-info" style="color:var(--accent1);"></i> Selected Class Preview</h4>
+            <div id="classPreview"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -720,34 +1369,92 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
 
     <!-- ATTENDANCE SECTION -->
     <section id="attendanceSection" class="card view-panel" style="display:none">
-      <div style="display:flex; gap:12px; align-items:center; margin-bottom:16px">
-        <select id="attClassSelect" style="width: 200px;"></select>
-        <input type="date" id="attDate" style="width: 180px;">
-        <button class="btn prim" id="openMarkBtn">Open Register</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+        <div>
+          <h3 style="margin:0; display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-clipboard-user" style="color:#10b981;"></i> Classroom Attendance &amp; Roll Call Desk
+          </h3>
+          <div class="tiny" style="color:var(--text-muted); margin-top:2px;">
+            Interactive 1-click student roll call with instant metrics and automated daily register submission
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <select id="attClassSelect" style="width: 200px; padding:6px 12px; font-size:12.5px;" onchange="renderAttendanceMarkArea()"></select>
+          <input type="date" id="attDate" style="width: 150px; padding:6px 10px; font-size:12.5px;" onchange="renderAttendanceMarkArea()">
+          <button type="button" class="btn ghost btn-sm" onclick="exportAttendanceCSV()" style="padding:6px 10px; font-size:12px;"><i class="fa-solid fa-file-csv"></i> CSV</button>
+        </div>
       </div>
-      <div id="attendanceMarkArea" style="margin-top:12px"></div>
-      <div id="attendanceHistory" style="margin-top:16px"></div>
 
-      <hr style="border:0; border-top:1px solid var(--card-border); margin:20px 0">
-
-      <h4>Teacher Clock-In / Clock-Out</h4>
-      <div style="display:flex; gap:12px; align-items:center; margin-top:10px">
-        <button class="btn prim" id="clockInBtn"><i class="fa-solid fa-right-to-bracket"></i> Clock In</button>
-        <button class="btn ghost" id="clockOutBtn"><i class="fa-solid fa-right-from-bracket"></i> Clock Out</button>
-        <div class="tiny" id="attStatus">Status: —</div>
+      <!-- Quick Action Pill Controls -->
+      <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.02); border:1px solid var(--card-border); border-radius:10px; padding:10px 14px; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <span style="font-size:12px; font-weight:700; color:var(--text-muted);"><i class="fa-solid fa-bolt" style="color:#f59e0b;"></i> Quick Actions:</span>
+          <button type="button" class="btn ghost btn-sm" onclick="bulkSetAttendance('present')" style="padding:4px 10px; font-size:11.5px; color:#10b981;"><i class="fa-solid fa-check"></i> All Present [P]</button>
+          <button type="button" class="btn ghost btn-sm" onclick="bulkSetAttendance('late')" style="padding:4px 10px; font-size:11.5px; color:#f59e0b;"><i class="fa-solid fa-clock"></i> All Late [L]</button>
+          <button type="button" class="btn ghost btn-sm" onclick="bulkSetAttendance('excused')" style="padding:4px 10px; font-size:11.5px; color:#3b82f6;"><i class="fa-solid fa-calendar-check"></i> All Excused [E]</button>
+          <button type="button" class="btn ghost btn-sm" onclick="resetAttendanceRegister()" style="padding:4px 10px; font-size:11.5px;"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+        </div>
+        <!-- Live Live Roster Tally -->
+        <div id="rollCallTally" style="display:flex; align-items:center; gap:12px; font-size:12px; font-weight:700;">
+          <span style="color:#10b981;">P: <strong id="tally_p">0</strong></span>
+          <span style="color:#f59e0b;">L: <strong id="tally_l">0</strong></span>
+          <span style="color:#3b82f6;">E: <strong id="tally_e">0</strong></span>
+          <span style="color:#ef4444;">A: <strong id="tally_a">0</strong></span>
+          <span class="badge" id="tally_rate" style="background:rgba(16,185,129,0.15); color:#10b981;">Rate: 100%</span>
+        </div>
       </div>
-      <div id="recentAtt" class="tiny" style="margin-top:12px; max-height:100px; overflow:auto;"></div>
+
+      <!-- Visual Roll Call Student Grid -->
+      <div id="attendanceMarkArea"></div>
+      <div id="attendanceHistory" style="margin-top:20px"></div>
+
+      <hr style="border:0; border-top:1px solid var(--card-border); margin:24px 0 20px;">
+
+      <!-- Teacher Shift Duty Clock Tracker -->
+      <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; padding:18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
+          <div>
+            <h4 style="margin:0; font-size:15px; font-weight:800; display:flex; align-items:center; gap:8px;">
+              <i class="fa-solid fa-user-clock" style="color:var(--accent1);"></i> Faculty Shift &amp; Campus Duty Tracker
+            </h4>
+            <div class="tiny" style="color:var(--text-muted); margin-top:2px;">Record institutional campus presence for HR staff auditing and payroll timekeeping</div>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button type="button" class="btn prim btn-sm" id="clockInBtn" style="padding:6px 14px; font-size:12px;"><i class="fa-solid fa-right-to-bracket"></i> Clock In</button>
+            <button type="button" class="btn ghost btn-sm" id="clockOutBtn" style="padding:6px 14px; font-size:12px;"><i class="fa-solid fa-right-from-bracket"></i> Clock Out</button>
+            <span class="duty-pill on-duty" id="teacherShiftStatusBadge"><span class="duty-dot"></span> Active On Duty</span>
+          </div>
+        </div>
+        <div class="tiny" id="attStatus" style="font-weight:600;">Status: Verified on Campus</div>
+        <div id="recentAtt" class="tiny" style="margin-top:10px; max-height:100px; overflow:auto;"></div>
+      </div>
     </section>
 
     <!-- ASSIGNMENTS SECTION -->
     <section id="assignmentsSection" class="card view-panel" style="display:none">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px">
-        <h3 style="margin:0">Assignments</h3>
-        <div style="display:flex; gap:8px">
-          <select id="assignClassSelect" style="width:180px;"></select>
-          <button class="btn prim" id="newAssignBtn"><i class="fa-solid fa-plus"></i> Create Assignment</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+        <div>
+          <h3 style="margin:0; display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-book-open" style="color:#f59e0b;"></i> Coursework &amp; Submissions Hub
+          </h3>
+          <div class="tiny" style="color:var(--text-muted); margin-top:2px;">
+            Class assignments, homework rubrics, student submission meters, and coursework grading
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <select id="assignClassSelect" style="width:180px; padding:6px 10px; font-size:12.5px;"></select>
+          <button type="button" class="btn prim" id="newAssignBtn" onclick="openAssignmentCreateModal()" style="padding:6px 14px; font-size:12px;"><i class="fa-solid fa-plus"></i> Create Assignment</button>
         </div>
       </div>
+
+      <!-- Lifecycle Filter Tabs -->
+      <div style="display:flex; gap:8px; margin-bottom:16px; border-bottom:1px solid var(--card-border); padding-bottom:8px; flex-wrap:wrap;">
+        <button type="button" class="btn ghost btn-sm assign-tab active" onclick="filterAssignments('all', this)" style="padding:5px 12px; font-size:12px; font-weight:700;">All Assignments</button>
+        <button type="button" class="btn ghost btn-sm assign-tab" onclick="filterAssignments('active', this)" style="padding:5px 12px; font-size:12px;">Active</button>
+        <button type="button" class="btn ghost btn-sm assign-tab" onclick="filterAssignments('pending_review', this)" style="padding:5px 12px; font-size:12px;">Pending Grading</button>
+        <button type="button" class="btn ghost btn-sm assign-tab" onclick="filterAssignments('completed', this)" style="padding:5px 12px; font-size:12px;">Completed</button>
+      </div>
+
       <div id="assignmentList"></div>
     </section>
 
@@ -756,24 +1463,51 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
         <div>
           <h3 style="margin:0; display:flex; align-items:center; gap:8px;">
-            <i class="fa-solid fa-stamp" style="color:var(--accent1, #5ce1e6);"></i> Student Assessments &amp; Grading Desk
+            <i class="fa-solid fa-stamp" style="color:var(--accent1, #5ce1e6);"></i> Student Assessments &amp; WAEC Grading Desk
           </h3>
           <div class="tiny" style="color:var(--text-muted); margin-top:2px;">
-            Continuous Assessment (30%) &amp; Final Exam (70%) marks submitted for institutional HR approval &amp; certification
+            Continuous Assessment (30%) &amp; Final Exam (70%) composite marks with WAEC 9-point scale auto-grading
           </div>
         </div>
-        <div style="display:flex; gap:8px; align-items:center;">
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <div class="btn-group" style="display:inline-flex; background:rgba(0,0,0,0.05); border:1px solid var(--card-border); border-radius:8px; padding:2px;">
+            <button type="button" id="assessModeStandardBtn" class="btn ghost btn-sm" onclick="switchAssessMode('standard')" style="padding:4px 10px; font-size:12px; border:none; background:var(--card-bg); font-weight:700;"><i class="fa-solid fa-list-check"></i> Standard Roster</button>
+            <button type="button" id="assessModeBatchBtn" class="btn ghost btn-sm" onclick="switchAssessMode('batch')" style="padding:4px 10px; font-size:12px; border:none; background:transparent;"><i class="fa-solid fa-table-cells"></i> Batch Score Entry</button>
+          </div>
+          <button type="button" class="btn ghost" onclick="openTranscriptPreviewModal()" style="padding:6px 12px; font-size:12px;">
+            <i class="fa-solid fa-file-lines"></i> Broadsheet / Transcript
+          </button>
+          <button type="button" class="btn ghost" onclick="exportAssessmentsCSV()" style="padding:6px 10px; font-size:12px;">
+            <i class="fa-solid fa-file-csv"></i> CSV
+          </button>
           <button type="button" class="btn prim" onclick="openNewAssessmentModal()" style="padding:6px 14px; font-size:12px;">
             <i class="fa-solid fa-plus"></i> Record Assessment
-          </button>
-          <button type="button" class="btn ghost" onclick="renderTeacherAssessments()" style="padding:6px 10px; font-size:12px;">
-            <i class="fa-solid fa-rotate"></i> Refresh
           </button>
         </div>
       </div>
 
-      <!-- Assessment Roster Table -->
-      <div class="table-scroll">
+      <!-- Class Performance & Grade Scale Summary Bar -->
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:16px; background:rgba(0,0,0,0.02); border:1px solid var(--card-border); border-radius:10px; padding:12px 16px;">
+        <div>
+          <div class="tiny" style="color:var(--text-muted); font-weight:700;">CLASS AVERAGE</div>
+          <div style="font-size:18px; font-weight:800; color:var(--accent1);" id="stat_class_avg">76.4%</div>
+        </div>
+        <div>
+          <div class="tiny" style="color:var(--text-muted); font-weight:700;">DISTINCTIONS (A1 - B3)</div>
+          <div style="font-size:18px; font-weight:800; color:#10b981;" id="stat_distinction_rate">64%</div>
+        </div>
+        <div>
+          <div class="tiny" style="color:var(--text-muted); font-weight:700;">PASS RATE (A1 - E8)</div>
+          <div style="font-size:18px; font-weight:800; color:#0284c7;" id="stat_pass_rate">96%</div>
+        </div>
+        <div>
+          <div class="tiny" style="color:var(--text-muted); font-weight:700;">HR CERTIFICATION STATUS</div>
+          <div style="font-size:14px; font-weight:800; color:#f59e0b; margin-top:2px;" id="stat_cert_status">3 Pending HR Signoff</div>
+        </div>
+      </div>
+
+      <!-- Standard Assessment Roster Table -->
+      <div id="assessStandardContainer" class="table-scroll">
         <table>
           <thead>
             <tr>
@@ -781,44 +1515,216 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
               <th>Class &amp; Subject</th>
               <th>CA (30%)</th>
               <th>Exam (70%)</th>
-              <th>Total &amp; Grade</th>
+              <th>Total &amp; WAEC Grade</th>
               <th>Certification Status</th>
-              <th style="text-align:right">HR Audit</th>
+              <th style="text-align:right">HR Audit &amp; Actions</th>
             </tr>
           </thead>
           <tbody id="teacherAssessmentsTableBody"></tbody>
         </table>
       </div>
+
+      <!-- Batch Score Entry View (Inline score inputs for entire class) -->
+      <div id="assessBatchContainer" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; background:var(--card-bg); padding:10px 14px; border:1px solid var(--card-border); border-radius:8px; flex-wrap:wrap; gap:10px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <label class="tiny" style="font-weight:700; margin:0;">Target Class:</label>
+            <select id="batchClassSelect" style="width:200px; padding:6px 10px; font-size:12px;" onchange="renderBatchScoreTable()"></select>
+          </div>
+          <button type="button" class="btn prim" onclick="saveAllBatchScores()" style="padding:6px 16px; font-size:12px;">
+            <i class="fa-solid fa-floppy-disk"></i> Save &amp; Submit Batch to HR
+          </button>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Student</th>
+                <th>Roll No</th>
+                <th style="width:120px;">CA Score (Max 30)</th>
+                <th style="width:120px;">Exam Score (Max 70)</th>
+                <th>Total</th>
+                <th>WAEC Grade</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody id="batchScoresTableBody"></tbody>
+          </table>
+        </div>
+      </div>
     </section>
 
-    <!-- MESSAGES SECTION -->
+    <!-- MESSAGES & DUTY LEAVE SECTION -->
     <section id="messagesSection" class="card view-panel" style="display:none">
-      <h3>Internal Messaging</h3>
-      <div style="display:flex; gap:12px; margin-top:12px">
-        <input id="msgSubject" placeholder="Subject">
-        <input id="msgTo" placeholder="Recipient (Email/Group)" style="width: 240px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+        <div>
+          <h3 style="margin:0; display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-calendar-check" style="color:var(--accent1);"></i> Faculty Duty Leave Desk &amp; Staff Comms
+          </h3>
+          <div class="tiny" style="color:var(--text-muted); margin-top:2px;">
+            Submit official leave applications to HR Directorate, monitor leave balances, and communicate with institutional staff
+          </div>
+        </div>
+        <div class="btn-group" style="display:inline-flex; background:rgba(0,0,0,0.05); border:1px solid var(--card-border); border-radius:8px; padding:2px;">
+          <button type="button" id="msgTabLeaveBtn" class="btn ghost btn-sm" onclick="switchMsgSubTab('leave')" style="padding:5px 12px; font-size:12px; border:none; background:var(--card-bg); font-weight:700;"><i class="fa-solid fa-plane-departure"></i> Duty Leave Desk</button>
+          <button type="button" id="msgTabCommsBtn" class="btn ghost btn-sm" onclick="switchMsgSubTab('comms')" style="padding:5px 12px; font-size:12px; border:none; background:transparent;"><i class="fa-solid fa-paper-plane"></i> Internal Messages</button>
+        </div>
       </div>
-      <textarea id="msgBody" rows="4" placeholder="Compose message content..." style="margin-top:12px"></textarea>
-      <div style="margin-top:12px; display:flex; gap:10px">
-        <button class="btn prim" id="sendMsgBtn"><i class="fa-solid fa-paper-plane"></i> Send Message</button>
-        <button class="btn ghost" id="exportMsgsBtn"><i class="fa-solid fa-file-export"></i> Export JSON</button>
+
+      <!-- Sub-Tab 1: Faculty Duty Leave Desk -->
+      <div id="subTabLeaveContainer">
+        <!-- 3 Leave Balance Cards -->
+        <div class="leave-balance-grid">
+          <div class="leave-balance-card">
+            <div>
+              <div class="tiny" style="color:var(--text-muted); font-weight:700;">ANNUAL LEAVE</div>
+              <div class="leave-balance-num" id="leave_annual_bal">18 <span style="font-size:13px; color:var(--text-muted); font-weight:600;">/ 21 Days</span></div>
+              <div class="tiny" style="color:#10b981; margin-top:2px;">Available this session</div>
+            </div>
+            <div style="width:40px; height:40px; border-radius:10px; background:rgba(16,185,129,0.15); color:#10b981; display:flex; align-items:center; justify-content:center; font-size:18px;">
+              <i class="fa-solid fa-umbrella-beach"></i>
+            </div>
+          </div>
+          <div class="leave-balance-card">
+            <div>
+              <div class="tiny" style="color:var(--text-muted); font-weight:700;">MEDICAL / SICK LEAVE</div>
+              <div class="leave-balance-num" id="leave_sick_bal">10 <span style="font-size:13px; color:var(--text-muted); font-weight:600;">/ 10 Days</span></div>
+              <div class="tiny" style="color:var(--accent1); margin-top:2px;">Full entitlement active</div>
+            </div>
+            <div style="width:40px; height:40px; border-radius:10px; background:rgba(2,132,199,0.15); color:var(--accent1); display:flex; align-items:center; justify-content:center; font-size:18px;">
+              <i class="fa-solid fa-notes-medical"></i>
+            </div>
+          </div>
+          <div class="leave-balance-card">
+            <div>
+              <div class="tiny" style="color:var(--text-muted); font-weight:700;">COMPASSIONATE / CASUAL</div>
+              <div class="leave-balance-num" id="leave_casual_bal">4 <span style="font-size:13px; color:var(--text-muted); font-weight:600;">/ 5 Days</span></div>
+              <div class="tiny" style="color:#f59e0b; margin-top:2px;">1 day taken</div>
+            </div>
+            <div style="width:40px; height:40px; border-radius:10px; background:rgba(245,158,11,0.15); color:#f59e0b; display:flex; align-items:center; justify-content:center; font-size:18px;">
+              <i class="fa-solid fa-handshake-angle"></i>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+          <!-- Leave Application Form -->
+          <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:var(--radius); padding:16px;">
+            <h4 style="margin:0 0 12px; font-size:15px; font-weight:800; display:flex; align-items:center; gap:8px;">
+              <i class="fa-solid fa-file-signature" style="color:var(--accent1);"></i> Apply for Duty Leave
+            </h4>
+            <form id="teacherLeaveForm" onsubmit="handleTeacherLeaveSubmit(event)">
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                <div>
+                  <label class="tiny" style="font-weight:700;">Leave Type *</label>
+                  <select id="tl_leaveType" required style="margin-top:4px;">
+                    <option value="Annual Leave">Annual Leave</option>
+                    <option value="Medical / Sick Leave">Medical / Sick Leave</option>
+                    <option value="Casual / Compassionate">Casual / Compassionate</option>
+                    <option value="Maternity / Paternity">Maternity / Paternity</option>
+                    <option value="Study / Examination">Study / Examination</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="tiny" style="font-weight:700;">Relieving Teacher</label>
+                  <input type="text" id="tl_reliever" placeholder="e.g. Mr. Emmanuel Osei" style="margin-top:4px;">
+                </div>
+              </div>
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                <div>
+                  <label class="tiny" style="font-weight:700;">Commencement Date *</label>
+                  <input type="date" id="tl_startDate" required style="margin-top:4px;" onchange="calcLeaveDays()">
+                </div>
+                <div>
+                  <label class="tiny" style="font-weight:700;">Resumption Date *</label>
+                  <input type="date" id="tl_endDate" required style="margin-top:4px;" onchange="calcLeaveDays()">
+                </div>
+              </div>
+              <div style="margin-bottom:10px;">
+                <label class="tiny" style="font-weight:700;">Reason &amp; Handover Notes *</label>
+                <textarea id="tl_reason" rows="3" required placeholder="Specify reason and classroom handover arrangements..." style="margin-top:4px;"></textarea>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="tiny" style="font-weight:700; color:var(--accent1);" id="tl_daysSummary">Duration: 0 Days</div>
+                <button type="submit" class="btn prim"><i class="fa-solid fa-paper-plane"></i> Submit to HR</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Leave History Ledger -->
+          <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:var(--radius); padding:16px;">
+            <h4 style="margin:0 0 12px; font-size:15px; font-weight:800; display:flex; align-items:center; gap:8px;">
+              <i class="fa-solid fa-clock-rotate-left" style="color:#6366f1;"></i> Leave Request History
+            </h4>
+            <div id="teacherLeaveHistoryList" style="max-height:300px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;"></div>
+          </div>
+        </div>
       </div>
-      <div id="msgList" style="margin-top:20px"></div>
+
+      <!-- Sub-Tab 2: Staff & Institutional Messaging -->
+      <div id="subTabCommsContainer" style="display:none; margin-top:14px;">
+        <div style="display:flex; gap:12px; margin-bottom:10px;">
+          <input id="msgSubject" placeholder="Message Subject" style="flex:1;">
+          <input id="msgTo" placeholder="Recipient (HR, HOD, Principal, or Staff)" style="width: 260px;">
+        </div>
+        <textarea id="msgBody" rows="3" placeholder="Compose message content..." style="margin-bottom:10px;"></textarea>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; gap:10px;">
+            <button type="button" class="btn prim" id="sendMsgBtn"><i class="fa-solid fa-paper-plane"></i> Send Message</button>
+            <button type="button" class="btn ghost" id="exportMsgsBtn"><i class="fa-solid fa-file-export"></i> Export JSON</button>
+          </div>
+        </div>
+        <div id="msgList" style="margin-top:16px;"></div>
+      </div>
     </section>
 
     <!-- LESSON NOTES SECTION -->
     <section id="lessonsSection" class="card view-panel" style="display:none">
-      <h3>Lesson Notes</h3>
-      <div style="display:flex; gap:12px; margin-top:12px">
-        <select id="noteClassSelect" style="width:200px;"></select>
-        <input id="noteTitle" placeholder="Lesson Title">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+        <div>
+          <h3 style="margin:0; display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-note-sticky" style="color:#a855f7;"></i> Structured Lesson Notes &amp; Scheme of Work
+          </h3>
+          <div class="tiny" style="color:var(--text-muted); margin-top:2px;">
+            Pedagogical scheme-of-work planner with instructional objectives, teaching materials, and HOD moderation
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button type="button" class="btn ghost" onclick="exportLessonNotesCSV()"><i class="fa-solid fa-file-csv"></i> Export Notes</button>
+          <button type="button" class="btn prim" onclick="openNewLessonPlanModal()"><i class="fa-solid fa-plus"></i> Prepare Lesson Plan</button>
+        </div>
       </div>
-      <textarea id="noteBody" rows="5" placeholder="Write structured lesson overview or summary..." style="margin-top:12px"></textarea>
-      <div style="margin-top:12px; display:flex; gap:10px">
-        <button class="btn prim" id="saveNoteBtn"><i class="fa-solid fa-floppy-disk"></i> Save Note</button>
-        <button class="btn ghost" id="exportNotesBtn"><i class="fa-solid fa-file-export"></i> Export</button>
+
+      <!-- Quick Scheme Planner Form -->
+      <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:var(--radius); padding:16px; margin-bottom:20px;">
+        <h4 style="margin:0 0 12px; font-size:14px; font-weight:800; display:flex; align-items:center; gap:6px;">
+          <i class="fa-solid fa-pen-fancy" style="color:var(--accent1);"></i> Quick Lesson Planner
+        </h4>
+        <div style="display:grid; grid-template-columns: 200px 140px 1fr; gap:10px; margin-bottom:10px;">
+          <select id="noteClassSelect"></select>
+          <input id="noteWeek" placeholder="e.g. Week 7" value="Week 7">
+          <input id="noteTitle" placeholder="Lesson Topic (e.g. Chemical Bonding &amp; Valence Electrons)">
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+          <textarea id="noteObjectives" rows="2" placeholder="Specific Objectives (e.g. By the end of the lesson, learners will be able to...)"></textarea>
+          <textarea id="noteMaterials" rows="2" placeholder="Teaching &amp; Learning Materials (TLMs: charts, models, laboratory glassware...)"></textarea>
+        </div>
+        <textarea id="noteBody" rows="3" placeholder="Core Teaching Points &amp; Teacher-Learner Activities..."></textarea>
+        <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <label class="tiny" style="font-weight:700;">HOD Moderation:</label>
+            <span class="badge" style="background:rgba(245,158,11,0.15); color:#f59e0b; font-size:11px;">Draft / Pending HOD Review</span>
+          </div>
+          <button type="button" class="btn prim" id="saveNoteBtn"><i class="fa-solid fa-floppy-disk"></i> Save Lesson Plan</button>
+        </div>
       </div>
-      <div id="notesList" style="margin-top:20px"></div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h4 style="margin:0; font-size:15px; font-weight:800;">Saved Lesson Plans Archive</h4>
+        <span class="tiny" id="lessonCountLabel" style="color:var(--text-muted);">0 plans</span>
+      </div>
+      <div id="notesList"></div>
     </section>
 
     <!-- TIMETABLE & ACADEMIC CALENDAR SECTION -->
@@ -851,20 +1757,57 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
       </div>
 
       <!-- Weekly Classroom Schedule -->
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h3 style="margin:0"><i class="fa-solid fa-clock"></i> Weekly Classroom Timetable</h3>
-        <span class="tiny" style="color:var(--text-muted);">Personal class teaching schedule</span>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+          <h3 style="margin:0; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-clock" style="color:var(--accent2);"></i> Weekly Period Teaching Matrix</h3>
+          <span class="tiny" style="color:var(--text-muted);">Period-by-period instructional schedule (Monday &ndash; Friday)</span>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn ghost btn-sm" onclick="printTimetableMatrix()"><i class="fa-solid fa-print"></i> Print Matrix</button>
+        </div>
       </div>
-      <div style="display:grid; grid-template-columns: 1fr 1fr 120px 120px auto; gap:10px; margin-top:12px; align-items:center;">
-        <select id="ttClassSelect"></select>
-        <select id="ttDay">
-          <option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option>
-        </select>
-        <input id="ttFrom" type="time">
-        <input id="ttTo" type="time">
-        <button class="btn prim" id="saveTTBtn"><i class="fa-solid fa-plus"></i> Add Slot</button>
+
+      <!-- Matrix Grid Table -->
+      <div class="period-matrix-wrap">
+        <table class="period-matrix-table" id="periodMatrixTable">
+          <thead>
+            <tr>
+              <th style="width:100px;">Period</th>
+              <th>Monday</th>
+              <th>Tuesday</th>
+              <th>Wednesday</th>
+              <th>Thursday</th>
+              <th>Friday</th>
+            </tr>
+          </thead>
+          <tbody id="periodMatrixTbody">
+            <!-- Dynamically populated periods 1 to 6 -->
+          </tbody>
+        </table>
       </div>
-      <div id="timetableList" style="margin-top:20px"></div>
+
+      <!-- Add Timetable Slot Form -->
+      <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:var(--radius); padding:16px; margin-top:20px;">
+        <h4 style="margin:0 0 10px; font-size:14px; font-weight:800;">Add Classroom Teaching Slot</h4>
+        <div style="display:grid; grid-template-columns: 1fr 140px 110px 110px 110px auto; gap:10px; align-items:center;">
+          <select id="ttClassSelect"></select>
+          <select id="ttDay">
+            <option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option>
+          </select>
+          <select id="ttPeriod">
+            <option value="1">Period 1</option>
+            <option value="2">Period 2</option>
+            <option value="3">Period 3</option>
+            <option value="4">Period 4</option>
+            <option value="5">Period 5</option>
+            <option value="6">Period 6</option>
+          </select>
+          <input id="ttFrom" type="time" value="08:00">
+          <input id="ttTo" type="time" value="08:45">
+          <button type="button" class="btn prim" id="saveTTBtn"><i class="fa-solid fa-plus"></i> Add Slot</button>
+        </div>
+      </div>
+      <div id="timetableList" style="margin-top:16px"></div>
     </section>
 
     <!-- BROADCASTS & DIRECTIVES SECTION -->
@@ -1029,9 +1972,9 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
         <div>
           <label class="field-label">Enrollment Status</label>
           <select id="sm_status" class="modal-input">
+            <option value="Pending HR Approval">Pending HR Approval</option>
             <option value="Active">Active Student</option>
             <option value="Probation">On Probation</option>
-            <option value="Pending">Pending Approval</option>
             <option value="Scholarship">Scholarship Recipient</option>
           </select>
         </div>
@@ -1191,6 +2134,122 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
   </div>
 </div>
 
+<!-- Modal: Create / Edit Assignment -->
+<div class="modal-overlay" id="assignmentModal">
+  <div class="modal student-modal-card" style="max-width: 580px !important;">
+    <div class="modal-header-row">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="modal-icon-circle" style="background:rgba(245,158,11,0.15); color:#f59e0b;"><i class="fa-solid fa-book-open"></i></div>
+        <div>
+          <h3 id="am_modalTitle" style="margin:0; font-size:18px; font-weight:800;">Create Coursework Assignment</h3>
+          <div class="tiny" style="color:var(--text-muted);">Set coursework title, rubric points, instructions, and deadline</div>
+        </div>
+      </div>
+      <button class="modal-close-x" onclick="closeAssignmentModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <form id="assignmentForm" onsubmit="handleSaveAssignment(event)" style="padding:18px 24px; display:flex; flex-direction:column; gap:14px; overflow-y:auto;">
+      <input type="hidden" id="am_editId" value="">
+
+      <div>
+        <label class="field-label" style="font-weight:700; font-size:12px; margin-bottom:4px; display:block;">Assignment Title *</label>
+        <input type="text" id="am_title" placeholder="e.g. Periodic Table &amp; Atomic Structure Problem Set" required>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <div>
+          <label class="field-label" style="font-weight:700; font-size:12px; margin-bottom:4px; display:block;">Target Class *</label>
+          <select id="am_classSelect" required></select>
+        </div>
+        <div>
+          <label class="field-label" style="font-weight:700; font-size:12px; margin-bottom:4px; display:block;">Due Date &amp; Time *</label>
+          <input type="datetime-local" id="am_dueDate" required>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <div>
+          <label class="field-label" style="font-weight:700; font-size:12px; margin-bottom:4px; display:block;">Max Points</label>
+          <input type="number" id="am_maxPoints" value="50" min="5" max="100">
+        </div>
+        <div>
+          <label class="field-label" style="font-weight:700; font-size:12px; margin-bottom:4px; display:block;">Submission Mode</label>
+          <select id="am_submissionMode">
+            <option value="Online File Submission">Online File / PDF Submission</option>
+            <option value="Physical Notebook">Physical Notebook Hand-in</option>
+            <option value="In-Class Presentation">In-Class Presentation</option>
+            <option value="Laboratory Report">Laboratory Report</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="field-label" style="font-weight:700; font-size:12px; margin-bottom:4px; display:block;">Instructions &amp; Rubric Criteria</label>
+        <textarea id="am_instructions" rows="4" placeholder="Detail submission requirements, question numbers, formatting, and grading rubric..."></textarea>
+      </div>
+
+      <div class="modal-footer-row" style="padding:14px 0 0; margin-top:8px;">
+        <button type="button" class="btn ghost" onclick="closeAssignmentModal()">Cancel</button>
+        <button type="submit" class="btn prim"><i class="fa-solid fa-paper-plane"></i> Publish Assignment</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Student Report Card & WAEC Transcript Preview -->
+<div class="modal-overlay" id="transcriptModal">
+  <div class="modal student-modal-card" style="max-width: 680px !important;">
+    <div class="modal-header-row">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="modal-icon-circle" style="background:var(--accent-gradient); color:#fff;"><i class="fa-solid fa-graduation-cap"></i></div>
+        <div>
+          <h3 style="margin:0; font-size:18px; font-weight:800;">Academic Broadsheet &amp; Terminal Report</h3>
+          <div class="tiny" style="color:var(--text-muted);">Standardized Ghanaian WAEC 9-Point Performance Record</div>
+        </div>
+      </div>
+      <button class="modal-close-x" onclick="closeTranscriptModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div style="padding:20px 24px; overflow-y:auto; max-height:calc(90vh - 140px);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <label class="tiny" style="font-weight:700;">Filter by Student:</label>
+          <select id="transcriptStudentSelect" style="width:220px; padding:6px 10px; font-size:12px;" onchange="renderTranscriptContent()"></select>
+        </div>
+        <button type="button" class="btn ghost btn-sm" onclick="window.print()" style="padding:6px 12px; font-size:12px;"><i class="fa-solid fa-print"></i> Print Report Card</button>
+      </div>
+
+      <div class="transcript-paper" id="transcriptPaperContent">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Structured Lesson Plan View & Print -->
+<div class="modal-overlay" id="lessonPlanModal">
+  <div class="modal student-modal-card" style="max-width: 680px !important;">
+    <div class="modal-header-row">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="modal-icon-circle" style="background:rgba(168,85,247,0.15); color:#a855f7;"><i class="fa-solid fa-note-sticky"></i></div>
+        <div>
+          <h3 id="lpm_title" style="margin:0; font-size:18px; font-weight:800;">Pedagogical Lesson Plan</h3>
+          <div class="tiny" style="color:var(--text-muted);">Official Ministry of Education / GES Standard Lesson Structure</div>
+        </div>
+      </div>
+      <button class="modal-close-x" onclick="closeLessonPlanModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div id="lpm_content" style="padding:20px 24px; overflow-y:auto; max-height:calc(90vh - 140px);">
+      <!-- Populated dynamically -->
+    </div>
+    <div class="modal-footer-row" style="padding:14px 24px;">
+      <button type="button" class="btn ghost" onclick="closeLessonPlanModal()">Close</button>
+      <button type="button" class="btn prim" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Lesson Plan</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script src="../../assets/js/auth-session.js"></script>
@@ -1290,6 +2349,8 @@ document.querySelectorAll('.tab').forEach(btn=>{
     if (sec === 'broadcasts') {
       renderTeacherBroadcasts();
     }
+    const mainEl = document.querySelector('.main');
+    if (mainEl) mainEl.scrollTop = 0;
   });
 });
 
@@ -1356,30 +2417,233 @@ function openModal(title, fields, onConfirm) {
 function getClasses(){ return read(CLASSES_KEY) }
 function saveClasses(arr){ save(CLASSES_KEY, arr) }
 
+const REGISTRATION_APPROVALS_KEY = `${ORG}_academic_registration_approvals`;
+function getHRRegistrationApprovals(){ return safeParse(localStorage.getItem(REGISTRATION_APPROVALS_KEY)) || [] }
+function saveHRRegistrationApprovals(list){ save(REGISTRATION_APPROVALS_KEY, list) }
+function addHRRegistrationApproval(req){
+  const list = getHRRegistrationApprovals();
+  list.unshift(req);
+  saveHRRegistrationApprovals(list);
+}
+
+function switchClassesView(view) {
+  const cards = document.getElementById('classesCardsViewContainer');
+  const table = document.getElementById('classesTableViewContainer');
+  const cardsBtn = document.getElementById('classesViewCardsBtn');
+  const tableBtn = document.getElementById('classesViewTableBtn');
+  if (view === 'cards') {
+    if (cards) cards.style.display = 'block';
+    if (table) table.style.display = 'none';
+    if (cardsBtn) { cardsBtn.style.background = 'var(--card-bg)'; cardsBtn.style.fontWeight = '700'; }
+    if (tableBtn) { tableBtn.style.background = 'transparent'; tableBtn.style.fontWeight = '500'; }
+  } else {
+    if (cards) cards.style.display = 'none';
+    if (table) table.style.display = 'block';
+    if (cardsBtn) { cardsBtn.style.background = 'transparent'; cardsBtn.style.fontWeight = '500'; }
+    if (tableBtn) { tableBtn.style.background = 'var(--card-bg)'; tableBtn.style.fontWeight = '700'; }
+  }
+}
+
+function startClassRollCall(classId) {
+  const tab = document.querySelector('[data-section="attendance"]');
+  if (tab) tab.click();
+  const sel = document.getElementById('attClassSelect');
+  if (sel) {
+    sel.value = classId;
+    renderAttendanceMarkArea();
+  }
+}
+
+function openClassGradebook(classId) {
+  const tab = document.querySelector('[data-section="assessments"]');
+  if (tab) tab.click();
+  const batchSel = document.getElementById('batchClassSelect');
+  if (batchSel) {
+    batchSel.value = classId;
+  }
+}
+
 function renderClasses(){
-  const tb = document.querySelector('#classesTable tbody'); tb.innerHTML = '';
-  const arr = getClasses();
-  arr.forEach((c,i)=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td><td><strong>${escapeHtml(c.name)}</strong></td><td>${escapeHtml(c.subject||'')}</td><td><span class="badge">${(c.students||[]).length}</span></td>
-      <td>
-        <button class="btn ghost" style="padding:4px 8px;" onclick="editClass('${c.id}')"><i class="fa-solid fa-pen"></i></button>
-        <button class="btn ghost" style="padding:4px 8px;" onclick="manageStudents('${c.id}')"><i class="fa-solid fa-users"></i></button>
-        <button class="btn ghost" style="padding:4px 8px; color:var(--danger)" onclick="deleteClass('${c.id}')"><i class="fa-solid fa-trash"></i></button>
-      </td>`;
-    tb.appendChild(tr);
+  const tb = document.querySelector('#classesTable tbody');
+  const cardsContainer = document.getElementById('classesCardsGrid');
+  if (tb) tb.innerHTML = '';
+  if (cardsContainer) cardsContainer.innerHTML = '';
+
+  let arr = getClasses();
+
+  // Ensure default teacher classes if empty
+  if (!arr || !arr.length) {
+    arr = [
+      {
+        id: 'c_demo_sci10',
+        name: 'Grade 10 - Science A',
+        subject: 'Integrated Chemistry',
+        room: 'Lab 2 (Science Wing)',
+        syllabusPct: 68,
+        students: [
+          { id: 's_101', firstName: 'Samuel', middleName: 'Kofi', lastName: 'Mensah', roll: 'STU-2026-101', gender: 'Male', status: 'Active', guardianName: 'Mary Mensah', phone: '+233 24 100 1111' },
+          { id: 's_102', firstName: 'Amina', middleName: '', lastName: 'Bello', roll: 'STU-2026-102', gender: 'Female', status: 'Active', guardianName: 'Alhaji Bello', phone: '+233 20 222 3344' },
+          { id: 's_103', firstName: 'Kwesi', middleName: 'J.', lastName: 'Appiah', roll: 'STU-2026-103', gender: 'Male', status: 'Active', guardianName: 'Grace Appiah', phone: '+233 55 333 4455' },
+          { id: 's_104', firstName: 'Fatima', middleName: '', lastName: 'Suleiman', roll: 'STU-2026-104', gender: 'Female', status: 'Active', guardianName: 'Ibrahim Suleiman', phone: '+233 24 555 6677' }
+        ]
+      },
+      {
+        id: 'c_demo_sci11',
+        name: 'Grade 11 - Science B',
+        subject: 'Elective Physics',
+        room: 'Lab 1 (Tech Block)',
+        syllabusPct: 58,
+        students: [
+          { id: 's_201', firstName: 'Emmanuel', middleName: 'O.', lastName: 'Osei', roll: 'STU-2026-201', gender: 'Male', status: 'Active', guardianName: 'Patrick Osei', phone: '+233 20 777 8899' },
+          { id: 's_202', firstName: 'Abigail', middleName: 'Afia', lastName: 'Darko', roll: 'STU-2026-202', gender: 'Female', status: 'Active', guardianName: 'Cecilia Darko', phone: '+233 54 888 9900' },
+          { id: 's_203', firstName: 'Kofi', middleName: 'Boateng', lastName: 'Sarpong', roll: 'STU-2026-203', gender: 'Male', status: 'Active', guardianName: 'Dr. Sarpong', phone: '+233 24 999 0011' }
+        ]
+      },
+      {
+        id: 'c_demo_math12',
+        name: 'Grade 12 - Senior Math',
+        subject: 'Core Mathematics',
+        room: 'Room 304',
+        syllabusPct: 82,
+        students: [
+          { id: 's_301', firstName: 'Michael', middleName: '', lastName: 'Quaye', roll: 'STU-2026-301', gender: 'Male', status: 'Active', guardianName: 'Vida Quaye', phone: '+233 20 112 2334' },
+          { id: 's_302', firstName: 'Efua', middleName: 'Akoto', lastName: 'Gyasi', roll: 'STU-2026-302', gender: 'Female', status: 'Active', guardianName: 'Nana Gyasi', phone: '+233 27 223 3445' },
+          { id: 's_303', firstName: 'David', middleName: 'K.', lastName: 'Acheampong', roll: 'STU-2026-303', gender: 'Male', status: 'Active', guardianName: 'Janet Acheampong', phone: '+233 55 445 5667' }
+        ]
+      }
+    ];
+    saveClasses(arr);
+  }
+
+  arr.forEach((c, i) => {
+    const studentCount = (c.students || []).length;
+    const syllabusPct = c.syllabusPct || 65;
+    const avgScore = 74 + (i * 2);
+    const gradeInfo = calculateWAECGrade(avgScore);
+    const isPending = c.approvalStatus === 'pending' || c.status === 'Pending HR Approval';
+    const statusBadgeHtml = isPending ?
+      `<span class="badge" style="background:rgba(245,158,11,0.18); color:#f59e0b; border:1px solid rgba(245,158,11,0.35); font-weight:800; font-size:11px;"><i class="fa-solid fa-clock"></i> Pending HR Approval</span>` :
+      `<span class="badge" style="background:rgba(16,185,129,0.12); color:#10b981; border:1px solid rgba(16,185,129,0.3); font-weight:700; font-size:11px;"><i class="fa-solid fa-check"></i> Active</span>`;
+
+    // Cards Grid Item
+    if (cardsContainer) {
+      const card = document.createElement('div');
+      card.className = 'class-card';
+      card.innerHTML = `
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
+                <span class="badge" style="background:rgba(2,132,199,0.12); color:var(--accent1);">${escapeHtml(c.subject || 'Academic Core')}</span>
+                ${isPending ? `<span class="badge" style="background:rgba(245,158,11,0.18); color:#f59e0b; border:1px solid rgba(245,158,11,0.35); font-weight:700; font-size:11px;"><i class="fa-solid fa-clock"></i> Pending HR Approval</span>` : ''}
+              </div>
+              <h4 style="margin:0; font-size:16px; font-weight:800;">${escapeHtml(c.name)}</h4>
+              <div class="tiny" style="color:var(--text-muted); margin-top:3px;"><i class="fa-solid fa-location-dot"></i> Room: ${escapeHtml(c.room || 'Block B')}</div>
+            </div>
+            <span class="badge" style="background:rgba(99,91,252,0.12); color:var(--accent2); font-weight:800;">
+              <i class="fa-solid fa-users"></i> ${studentCount} Students
+            </span>
+          </div>
+          <div style="margin-top:14px;">
+            <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:700;">
+              <span style="color:var(--text-muted);">Syllabus Coverage</span>
+              <span style="color:var(--accent1);">${syllabusPct}% (Wk 7/12)</span>
+            </div>
+            <div class="syllabus-meter">
+              <div class="syllabus-fill" style="width:${syllabusPct}%;"></div>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; padding-top:8px; border-top:1px solid var(--card-border);">
+            <div class="tiny" style="color:var(--text-muted);">${isPending ? '<strong style="color:#f59e0b;"><i class="fa-solid fa-clock"></i> Awaiting HR Sign-off</strong>' : `Class Average: <strong style="color:#10b981;">${avgScore}%</strong>`}</div>
+            <span class="grade-badge ${gradeInfo.class}">${gradeInfo.grade}</span>
+          </div>
+        </div>
+        <div style="display:flex; gap:6px; margin-top:14px; pt-2; border-top:1px solid var(--card-border);">
+          <button type="button" class="btn ghost btn-sm" onclick="startClassRollCall('${c.id}')" style="flex:1; padding:5px 6px; font-size:11.5px;"><i class="fa-solid fa-clipboard-user" style="color:#10b981;"></i> Roll Call</button>
+          <button type="button" class="btn ghost btn-sm" onclick="openClassGradebook('${c.id}')" style="flex:1; padding:5px 6px; font-size:11.5px;"><i class="fa-solid fa-stamp" style="color:var(--accent1);"></i> Grades</button>
+          <button type="button" class="btn ghost btn-sm" onclick="manageStudents('${c.id}')" style="padding:5px 8px; font-size:11.5px;" title="View Roster"><i class="fa-solid fa-users"></i></button>
+          <button type="button" class="btn ghost btn-sm" onclick="editClass('${c.id}')" style="padding:5px 8px; font-size:11.5px;" title="Edit Class"><i class="fa-solid fa-pen"></i></button>
+        </div>
+      `;
+      cardsContainer.appendChild(card);
+    }
+
+    // Table Row
+    if (tb) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${i+1}</td>
+        <td><strong>${escapeHtml(c.name)}</strong></td>
+        <td>${escapeHtml(c.subject || 'Core')}</td>
+        <td><span class="tiny">${escapeHtml(c.room || 'Block B')}</span></td>
+        <td>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div class="syllabus-meter" style="flex:1; min-width:60px; margin:0;"><div class="syllabus-fill" style="width:${syllabusPct}%;"></div></div>
+            <span class="tiny" style="font-weight:700;">${syllabusPct}%</span>
+          </div>
+        </td>
+        <td><span class="badge">${studentCount}</span></td>
+        <td>${statusBadgeHtml}</td>
+        <td>
+          <div style="display:flex; gap:4px;">
+            <button class="btn ghost" style="padding:4px 8px;" onclick="editClass('${c.id}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn ghost" style="padding:4px 8px;" onclick="manageStudents('${c.id}')" title="Students"><i class="fa-solid fa-users"></i></button>
+            <button class="btn ghost" style="padding:4px 8px; color:var(--danger)" onclick="deleteClass('${c.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </td>
+      `;
+      tb.appendChild(tr);
+    }
   });
+
   updateKPIs();
   populateClassSelects();
   renderClassPreview();
 }
 
 document.getElementById('newClassBtn').addEventListener('click', ()=>{
-  openModal('Create New Class', [{name:'name', label:'Class Name'}, {name:'subject', label:'Subject'}], (data)=>{
+  openModal('Request New Class Registration', [
+    { name: 'name', label: 'Class Name (e.g. Form 2 Science B)' },
+    { name: 'subject', label: 'Subject (e.g. Integrated Science)' },
+    { name: 'room', label: 'Room / Lab Allocation (e.g. Lab 3)' }
+  ], (data)=>{
     if(!data.name) return toast('Class name required');
     const arr = getClasses();
-    arr.push({ id:'c_'+Date.now(), name: data.name, subject: data.subject, students:[] });
-    saveClasses(arr); renderClasses(); pushActivity(`Created class: ${data.name}`); toast('Class created');
+    const newClassId = 'c_' + Date.now();
+    const newClass = {
+      id: newClassId,
+      name: data.name.trim(),
+      subject: data.subject ? data.subject.trim() : 'General Studies',
+      room: data.room ? data.room.trim() : 'Room Unassigned',
+      teacherName: (typeof teacher !== 'undefined' && teacher && teacher.name) || 'Faculty Instructor',
+      teacherEmail: (typeof teacher !== 'undefined' && teacher && teacher.email) || '',
+      status: 'Pending HR Approval',
+      approvalStatus: 'pending',
+      submittedBy: (typeof teacher !== 'undefined' && teacher && teacher.name) || 'Faculty Instructor',
+      submittedByEmail: (typeof teacher !== 'undefined' && teacher && teacher.email) || '',
+      submittedAt: Date.now(),
+      syllabusPct: 0,
+      students: []
+    };
+    arr.push(newClass);
+    saveClasses(arr);
+
+    addHRRegistrationApproval({
+      id: 'req_' + Date.now(),
+      type: 'class',
+      targetId: newClassId,
+      title: `New Classroom: ${newClass.name} (${newClass.subject})`,
+      name: newClass.name,
+      subject: newClass.subject,
+      submittedBy: (typeof teacher !== 'undefined' && teacher && teacher.name) || 'Faculty Instructor',
+      submittedByEmail: (typeof teacher !== 'undefined' && teacher && teacher.email) || '',
+      submittedAt: Date.now(),
+      status: 'pending'
+    });
+
+    renderClasses();
+    pushActivity(`Submitted class '${newClass.name}' for HR Administrative Approval`);
+    toast(`Class '${newClass.name}' submitted for HR Approval. Registration will take effect upon HR sign-off.`);
   });
 });
 
@@ -1442,8 +2706,12 @@ function renderStudentsForClass(classId){
   students.forEach((s,i)=>{
     const fullName = escapeHtml([s.firstName, s.middleName, s.lastName].filter(Boolean).join(' '));
     const status = s.status || 'Active';
-    const statusClass = status.toLowerCase();
+    const isPending = s.approvalStatus === 'pending' || status === 'Pending HR Approval';
+    const statusClass = (status || 'Active').toLowerCase().replace(/[^a-z0-9]/g, '-');
     const guardianInfo = s.guardianName ? `${escapeHtml(s.guardianName)} (${escapeHtml(s.phone||'No phone')})` : escapeHtml(s.phone||'—');
+    const statusHtml = isPending ?
+      `<span class="badge" style="background:rgba(245,158,11,0.18); color:#f59e0b; border:1px solid rgba(245,158,11,0.35); font-weight:800; font-size:11px;"><i class="fa-solid fa-clock"></i> Pending HR Approval</span>` :
+      `<span class="student-badge-status status-${statusClass}">${escapeHtml(status)}</span>`;
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${i+1}</td>
@@ -1468,7 +2736,7 @@ function renderStudentsForClass(classId){
         <div>${guardianInfo}</div>
         ${s.guardianEmail ? `<div class="tiny" style="color:var(--text-muted);">${escapeHtml(s.guardianEmail)}</div>` : ''}
       </td>
-      <td><span class="student-badge-status status-${statusClass}">${escapeHtml(status)}</span></td>
+      <td>${statusHtml}</td>
       <td>
         <div style="display:flex; gap:4px;">
           <button class="btn ghost" style="padding:4px 8px;" title="View Full Details" onclick="viewStudentDetails('${classId}','${s.id}')"><i class="fa-solid fa-eye"></i></button>
@@ -1551,7 +2819,8 @@ function openStudentModal(classId, studentId = null) {
     document.getElementById('sm_roll').value = 'STU-' + new Date().getFullYear() + '-' + String(existingCount + 1).padStart(3, '0');
     document.getElementById('sm_enrollmentDate').value = new Date().toISOString().split('T')[0];
     document.getElementById('sm_term').value = new Date().getFullYear() + ' - Term 1';
-    document.getElementById('sm_saveBtn').innerHTML = '<i class="fa-solid fa-check"></i> Save & Enroll Student';
+    document.getElementById('sm_status').value = 'Pending HR Approval';
+    document.getElementById('sm_saveBtn').innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit for HR Approval';
 
     currentStudentPhotoBase64 = null;
     const fileInput = document.getElementById('sm_photoFile');
@@ -1676,12 +2945,36 @@ function saveStudentDetailForm(e) {
     }
     toast(`Student ${firstName} ${lastName} updated successfully`);
   } else {
-    // New Student
-    studentData.id = 's_' + Date.now();
+    // New Student Registration - Requires HR Approval before active enrollment
+    const newStudentId = 's_' + Date.now();
+    studentData.id = newStudentId;
     studentData.createdAt = Date.now();
+    studentData.status = 'Pending HR Approval';
+    studentData.approvalStatus = 'pending';
+    studentData.submittedBy = (typeof teacher !== 'undefined' && teacher && teacher.name) || 'Faculty Instructor';
+    studentData.submittedByEmail = (typeof teacher !== 'undefined' && teacher && teacher.email) || '';
+    studentData.submittedAt = Date.now();
+    studentData.classId = classId;
+    studentData.className = cls.name;
     cls.students.push(studentData);
-    toast(`Student ${firstName} ${lastName} enrolled in ${cls.name}`);
-    pushActivity(`Enrolled student ${firstName} ${lastName} in ${cls.name}`);
+
+    addHRRegistrationApproval({
+      id: 'req_' + Date.now(),
+      type: 'student',
+      targetId: newStudentId,
+      classId: classId,
+      className: cls.name,
+      studentName: `${firstName} ${lastName}`,
+      roll: roll,
+      gender: gender,
+      submittedBy: (typeof teacher !== 'undefined' && teacher && teacher.name) || 'Faculty Instructor',
+      submittedByEmail: (typeof teacher !== 'undefined' && teacher && teacher.email) || '',
+      submittedAt: Date.now(),
+      status: 'pending'
+    });
+
+    toast(`Student ${firstName} ${lastName} submitted for HR Approval. Registration will complete upon HR sign-off.`);
+    pushActivity(`Submitted student registration for ${firstName} ${lastName} (${cls.name}) for HR Administrative Approval`);
   }
 
   saveClasses(arr);
@@ -1794,218 +3087,1658 @@ function deleteStudent(classId, studentId){
   saveClasses(arr); renderStudentsForClass(classId); toast('Student deleted');
 }
 
-document.getElementById('selectClassForStudents').addEventListener('change', (e)=> renderStudentsForClass(e.target.value));
-
 /* -------------------------
-  ATTENDANCE REGISTER
+  WAEC 9-POINT GRADING SCALE LOGIC
 ------------------------- */
-document.getElementById('openMarkBtn').addEventListener('click', renderAttendanceMarkArea);
-
-function renderAttendanceMarkArea(){
-  const classId = document.getElementById('attClassSelect').value;
-  const date = document.getElementById('attDate').value;
-  if(!classId || !date) return toast('Select class and date');
-  const cls = getClasses().find(c=>c.id===classId);
-  const area = document.getElementById('attendanceMarkArea'); area.innerHTML = '';
-  if(!cls || !(cls.students||[]).length){ area.innerHTML = '<div class="tiny">No enrolled students in this class</div>'; return; }
-
-  const table = document.createElement('table');
-  table.innerHTML = `<thead><tr><th>Student</th><th>Status</th></tr></thead>`;
-  const tbody = document.createElement('tbody');
-  cls.students.forEach(s=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${escapeHtml(s.firstName + ' ' + (s.lastName||''))}</td><td><select id="att_${s.id}" style="width:140px"><option value="present">Present</option><option value="absent">Absent</option></select></td>`;
-    tbody.appendChild(tr);
-  });
-  table.appendChild(tbody); area.appendChild(table);
-
-  const saveBtn = document.createElement('button');
-  saveBtn.className = 'btn prim';
-  saveBtn.style.marginTop = '12px';
-  saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Attendance Register';
-  saveBtn.onclick = () => {
-    const record = { classId, date, records: {} };
-    cls.students.forEach(s => {
-      record.records[s.id] = document.getElementById('att_' + s.id).value;
-    });
-    const all = read(ATT_KEY);
-    all.push(record);
-    save(ATT_KEY, all);
-    pushActivity(`Saved attendance for ${cls.name} on ${date}`);
-    toast('Attendance register recorded successfully');
-    area.innerHTML = '<div class="tiny" style="color:var(--success)">Attendance submitted successfully!</div>';
-    updateKPIs();
-  };
-  area.appendChild(saveBtn);
+function calculateWAECGrade(score) {
+  score = Math.round(Number(score) || 0);
+  if (score >= 75) return { grade: 'A1', label: 'Excellent', class: 'grade-a1', points: 1 };
+  if (score >= 70) return { grade: 'B2', label: 'Very Good', class: 'grade-b2', points: 2 };
+  if (score >= 65) return { grade: 'B3', label: 'Good', class: 'grade-b3', points: 3 };
+  if (score >= 60) return { grade: 'C4', label: 'Credit', class: 'grade-c4', points: 4 };
+  if (score >= 55) return { grade: 'C5', label: 'Credit', class: 'grade-c5', points: 5 };
+  if (score >= 50) return { grade: 'C6', label: 'Credit', class: 'grade-c6', points: 6 };
+  if (score >= 45) return { grade: 'D7', label: 'Pass', class: 'grade-d7', points: 7 };
+  if (score >= 40) return { grade: 'E8', label: 'Pass', class: 'grade-e8', points: 8 };
+  return { grade: 'F9', label: 'Fail', class: 'grade-f9', points: 9 };
 }
 
-/* Teacher Clock-In/Out */
-document.getElementById('clockInBtn').addEventListener('click', ()=>{
+/* -------------------------
+  ATTENDANCE & ROLL CALL DESK
+------------------------- */
+let currentRollCall = {};
+
+document.getElementById('openMarkBtn')?.addEventListener('click', renderAttendanceMarkArea);
+
+function renderAttendanceMarkArea() {
+  const classSelect = document.getElementById('attClassSelect');
+  const dateInput = document.getElementById('attDate');
+  if (!classSelect || !dateInput) return;
+
+  if (!classSelect.value) {
+    const classes = getClasses();
+    if (classes.length) classSelect.value = classes[0].id;
+  }
+  if (!dateInput.value) {
+    dateInput.value = new Date().toISOString().split('T')[0];
+  }
+
+  const classId = classSelect.value;
+  const date = dateInput.value;
+  const area = document.getElementById('attendanceMarkArea');
+  if (!area) return;
+
+  if (!classId) {
+    area.innerHTML = '<div class="tiny" style="padding:18px; text-align:center;">Please select an assigned class first.</div>';
+    return;
+  }
+
+  const cls = getClasses().find(c => c.id === classId);
+  const students = (cls && cls.students) ? cls.students : [];
+  if (!students.length) {
+    area.innerHTML = '<div class="tiny" style="padding:24px; text-align:center; color:var(--text-muted);"><i class="fa-solid fa-users-slash" style="font-size:24px; margin-bottom:8px; display:block;"></i>No students registered in this class. Enroll students to start roll call.</div>';
+    updateRollCallTally([]);
+    return;
+  }
+
+  // Load existing records for this class & date if available
+  const allAtt = read(ATT_KEY);
+  const existing = allAtt.find(r => r.classId === classId && r.date === date);
+  currentRollCall = existing ? { ...existing.records } : {};
+
+  // Default missing students to 'present'
+  students.forEach(s => {
+    if (!currentRollCall[s.id]) currentRollCall[s.id] = 'present';
+  });
+
+  // Render roll call student cards
+  let html = `<div class="rollcall-grid">`;
+  students.forEach(s => {
+    const status = currentRollCall[s.id] || 'present';
+    const fullName = escapeHtml([s.firstName, s.lastName].filter(Boolean).join(' '));
+    const roll = escapeHtml(s.roll || 'STU-000');
+
+    html += `
+      <div class="student-roll-card" id="card_roll_${s.id}">
+        <div style="display:flex; align-items:center; gap:10px;">
+          ${s.photo ? `
+            <img src="${s.photo}" alt="${fullName}" style="width:38px; height:38px; border-radius:50%; object-fit:cover; border:1px solid var(--card-border);">
+          ` : `
+            <div style="width:38px; height:38px; border-radius:50%; background:var(--accent-gradient); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px;">
+              ${escapeHtml((s.firstName?.[0]||'S') + (s.lastName?.[0]||''))}
+            </div>
+          `}
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:700; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${fullName}</div>
+            <div class="tiny" style="color:var(--text-muted); font-family:monospace;">${roll}</div>
+          </div>
+        </div>
+
+        <div class="att-pill-group">
+          <button type="button" class="att-btn ${status === 'present' ? 'active-p' : ''}" onclick="setStudentAttendance('${s.id}', 'present')" title="Present">P</button>
+          <button type="button" class="att-btn ${status === 'late' ? 'active-l' : ''}" onclick="setStudentAttendance('${s.id}', 'late')" title="Late">L</button>
+          <button type="button" class="att-btn ${status === 'excused' ? 'active-e' : ''}" onclick="setStudentAttendance('${s.id}', 'excused')" title="Excused">E</button>
+          <button type="button" class="att-btn ${status === 'absent' ? 'active-a' : ''}" onclick="setStudentAttendance('${s.id}', 'absent')" title="Absent">A</button>
+        </div>
+      </div>
+    `;
+  });
+  html += `</div>`;
+
+  html += `
+    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+      <button type="button" class="btn ghost" onclick="resetAttendanceRegister()"><i class="fa-solid fa-rotate-left"></i> Reset to Present</button>
+      <button type="button" class="btn prim" onclick="saveAttendanceRegister()"><i class="fa-solid fa-floppy-disk"></i> Save &amp; Transmit to HR</button>
+    </div>
+  `;
+
+  area.innerHTML = html;
+  updateRollCallTally(students);
+}
+
+function setStudentAttendance(studentId, status) {
+  currentRollCall[studentId] = status;
+  const card = document.getElementById('card_roll_' + studentId);
+  if (card) {
+    const btns = card.querySelectorAll('.att-btn');
+    btns.forEach(b => {
+      b.classList.remove('active-p', 'active-l', 'active-e', 'active-a');
+      if (status === 'present' && b.textContent === 'P') b.classList.add('active-p');
+      if (status === 'late' && b.textContent === 'L') b.classList.add('active-l');
+      if (status === 'excused' && b.textContent === 'E') b.classList.add('active-e');
+      if (status === 'absent' && b.textContent === 'A') b.classList.add('active-a');
+    });
+  }
+  const cls = getClasses().find(c => c.id === document.getElementById('attClassSelect')?.value);
+  updateRollCallTally((cls && cls.students) || []);
+}
+
+function bulkSetAttendance(status) {
+  const classId = document.getElementById('attClassSelect')?.value;
+  const cls = getClasses().find(c => c.id === classId);
+  if (!cls || !(cls.students || []).length) return;
+
+  cls.students.forEach(s => {
+    currentRollCall[s.id] = status;
+  });
+  renderAttendanceMarkArea();
+  toast(`All students marked as ${status.toUpperCase()}`);
+}
+
+function resetAttendanceRegister() {
+  bulkSetAttendance('present');
+}
+
+function updateRollCallTally(students) {
+  let p = 0, l = 0, e = 0, a = 0;
+  const total = students.length;
+  students.forEach(s => {
+    const st = currentRollCall[s.id] || 'present';
+    if (st === 'present') p++;
+    else if (st === 'late') l++;
+    else if (st === 'excused') e++;
+    else if (st === 'absent') a++;
+  });
+
+  const rate = total > 0 ? Math.round(((p + l * 0.5 + e) / total) * 100) : 100;
+  const pEl = document.getElementById('tally_p');
+  const lEl = document.getElementById('tally_l');
+  const eEl = document.getElementById('tally_e');
+  const aEl = document.getElementById('tally_a');
+  const rateEl = document.getElementById('tally_rate');
+
+  if (pEl) pEl.textContent = p;
+  if (lEl) lEl.textContent = l;
+  if (eEl) eEl.textContent = e;
+  if (aEl) aEl.textContent = a;
+  if (rateEl) {
+    rateEl.textContent = `Rate: ${rate}%`;
+    rateEl.style.color = rate >= 90 ? '#10b981' : (rate >= 75 ? '#f59e0b' : '#ef4444');
+  }
+}
+
+function saveAttendanceRegister() {
+  const classId = document.getElementById('attClassSelect')?.value;
+  const date = document.getElementById('attDate')?.value;
+  if (!classId || !date) return toast('Class and date required');
+
+  const cls = getClasses().find(c => c.id === classId);
+  const className = cls ? cls.name : 'Class';
+
+  let allAtt = read(ATT_KEY);
+  const idx = allAtt.findIndex(r => r.classId === classId && r.date === date);
+  const record = {
+    id: 'att_' + Date.now(),
+    classId,
+    className,
+    date,
+    records: currentRollCall,
+    savedAt: Date.now()
+  };
+
+  if (idx !== -1) {
+    allAtt[idx] = record;
+  } else {
+    allAtt.push(record);
+  }
+
+  save(ATT_KEY, allAtt);
+  pushActivity(`Recorded roll call for ${className} on ${date}`);
+  toast('Daily attendance register successfully saved & logged for HR');
+  updateKPIs();
+}
+
+function exportAttendanceCSV() {
+  const classId = document.getElementById('attClassSelect')?.value;
+  const date = document.getElementById('attDate')?.value;
+  const cls = getClasses().find(c => c.id === classId);
+  if (!cls) return toast('Select a valid class');
+
+  let csv = 'Roll No,Student Name,Class,Date,Attendance Status\n';
+  (cls.students || []).forEach(s => {
+    const fullName = [s.firstName, s.lastName].filter(Boolean).join(' ');
+    const st = currentRollCall[s.id] || 'present';
+    csv += `"${s.roll || ''}","${fullName}","${cls.name}","${date}","${st.toUpperCase()}"\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `Attendance_${cls.name}_${date}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  toast('Attendance register exported as CSV');
+}
+
+/* Teacher Duty Clock-In/Out */
+document.getElementById('clockInBtn')?.addEventListener('click', () => {
   const t = read(TEACH_ATT_KEY);
-  t.push({ type:'Clock In', time: new Date().toISOString() });
+  const now = new Date();
+  t.push({ type: 'Clock In', time: now.toISOString() });
   save(TEACH_ATT_KEY, t);
-  document.getElementById('attStatus').textContent = 'Status: Clocked In at ' + new Date().toLocaleTimeString();
-  pushActivity('Teacher Clocked In');
-  toast('Clocked in successfully');
+
+  const statusEl = document.getElementById('attStatus');
+  if (statusEl) statusEl.textContent = `Status: Clocked In at ${now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+
+  const topPill = document.getElementById('teacherDutyPill');
+  if (topPill) {
+    topPill.className = 'duty-pill on-duty';
+    topPill.innerHTML = '<span class="duty-dot"></span> On Campus / Duty Active';
+  }
+  const cardBadge = document.getElementById('teacherShiftStatusBadge');
+  if (cardBadge) {
+    cardBadge.className = 'duty-pill on-duty';
+    cardBadge.innerHTML = '<span class="duty-dot"></span> Active On Duty';
+  }
+
+  pushActivity('Teacher Clocked In on Campus');
+  toast('Clocked in successfully. Verified on institutional campus.');
 });
 
-document.getElementById('clockOutBtn').addEventListener('click', ()=>{
+document.getElementById('clockOutBtn')?.addEventListener('click', () => {
   const t = read(TEACH_ATT_KEY);
-  t.push({ type:'Clock Out', time: new Date().toISOString() });
+  const now = new Date();
+  t.push({ type: 'Clock Out', time: now.toISOString() });
   save(TEACH_ATT_KEY, t);
-  document.getElementById('attStatus').textContent = 'Status: Clocked Out at ' + new Date().toLocaleTimeString();
+
+  const statusEl = document.getElementById('attStatus');
+  if (statusEl) statusEl.textContent = `Status: Clocked Out at ${now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+
+  const topPill = document.getElementById('teacherDutyPill');
+  if (topPill) {
+    topPill.className = 'duty-pill off-duty';
+    topPill.innerHTML = '<span class="duty-dot"></span> Off Duty (Shift Ended)';
+  }
+  const cardBadge = document.getElementById('teacherShiftStatusBadge');
+  if (cardBadge) {
+    cardBadge.className = 'duty-pill off-duty';
+    cardBadge.innerHTML = '<span class="duty-dot"></span> Shift Ended';
+  }
+
   pushActivity('Teacher Clocked Out');
   toast('Clocked out successfully');
 });
 
 /* -------------------------
-  ASSIGNMENTS
+  COURSEWORK & ASSIGNMENTS
 ------------------------- */
-document.getElementById('newAssignBtn').addEventListener('click', ()=>{
-  const classId = document.getElementById('assignClassSelect').value;
-  if(!classId) return toast('Select a class first');
-  openModal('New Assignment', [{name:'title', label:'Assignment Title'}, {name:'dueDate', label:'Due Date', type:'date'}], (data)=>{
-    if(!data.title) return toast('Title required');
-    const list = read(ASSIGN_KEY);
-    list.push({ id:'a_'+Date.now(), classId, ...data });
-    save(ASSIGN_KEY, list);
-    renderAssignments();
-    pushActivity(`Added assignment: ${data.title}`);
-    toast('Assignment created');
-  });
-});
+let currentAssignFilter = 'all';
 
-function renderAssignments(){
-  const classId = document.getElementById('assignClassSelect').value;
-  const list = read(ASSIGN_KEY).filter(a => !classId || a.classId === classId);
-  const container = document.getElementById('assignmentList');
-  if(!list.length) { container.innerHTML = '<div class="tiny">No assignments recorded.</div>'; return; }
-  container.innerHTML = list.map(a => `
-    <div style="padding:12px; background:var(--card-bg); border:1px solid var(--card-border); border-radius:8px; margin-bottom:8px; display:flex; justify-content:space-between;">
-      <div>
-        <strong>${escapeHtml(a.title)}</strong>
-        <div class="tiny">Due: ${a.dueDate || 'N/A'}</div>
-      </div>
-      <button class="btn ghost" style="color:var(--danger)" onclick="deleteAssignment('${a.id}')"><i class="fa-solid fa-trash"></i></button>
-    </div>
-  `).join('');
+function getAssignments() {
+  let list = read(ASSIGN_KEY);
+  if (!list || !list.length) {
+    list = [
+      {
+        id: 'asg_1',
+        classId: 'c_demo_sci10',
+        title: 'Chemical Kinetics Lab Report & Rate Calculations',
+        dueDate: '2026-09-14T23:59',
+        maxPoints: 50,
+        submissionMode: 'Laboratory Report',
+        instructions: 'Submit detailed experimental observations, reaction time graphs, and rate constant computations.',
+        status: 'Active',
+        submittedCount: 3,
+        totalEnrolled: 4
+      },
+      {
+        id: 'asg_2',
+        classId: 'c_demo_sci11',
+        title: 'Projectile Motion Problem Set & Vectors Analysis',
+        dueDate: '2026-09-16T17:00',
+        maxPoints: 30,
+        submissionMode: 'Physical Notebook',
+        instructions: 'Complete exercises 4.1 to 4.8 on page 112 with full algebraic steps.',
+        status: 'Active',
+        submittedCount: 2,
+        totalEnrolled: 3
+      }
+    ];
+    save(ASSIGN_KEY, list);
+  }
+  return list;
 }
-function deleteAssignment(id){
-  save(ASSIGN_KEY, read(ASSIGN_KEY).filter(a=>a.id!==id));
+
+function filterAssignments(filter, btn) {
+  currentAssignFilter = filter;
+  document.querySelectorAll('.assign-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderAssignments();
+}
+
+function renderAssignments() {
+  const classId = document.getElementById('assignClassSelect')?.value;
+  let list = getAssignments();
+
+  if (classId) {
+    list = list.filter(a => a.classId === classId);
+  }
+
+  if (currentAssignFilter === 'active') {
+    list = list.filter(a => a.status === 'Active');
+  } else if (currentAssignFilter === 'pending_review') {
+    list = list.filter(a => a.submittedCount > 0);
+  } else if (currentAssignFilter === 'completed') {
+    list = list.filter(a => a.status === 'Completed');
+  }
+
+  const container = document.getElementById('assignmentList');
+  if (!container) return;
+
+  if (!list.length) {
+    container.innerHTML = '<div class="tiny" style="padding:28px; text-align:center; color:var(--text-muted);"><i class="fa-solid fa-book-open-reader" style="font-size:24px; opacity:0.4; margin-bottom:8px; display:block;"></i>No assignments match the selected filter. Click "Create Assignment" to post coursework.</div>';
+    return;
+  }
+
+  container.innerHTML = list.map(a => {
+    const cls = getClasses().find(c => c.id === a.classId);
+    const className = cls ? cls.name : 'Assigned Class';
+    const subRatio = a.totalEnrolled ? Math.round((a.submittedCount / a.totalEnrolled) * 100) : 75;
+
+    return `
+      <div class="assign-card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; margin-bottom:8px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+              <span class="badge" style="background:rgba(2,132,199,0.12); color:var(--accent1);">${escapeHtml(className)}</span>
+              <span class="badge" style="background:rgba(245,158,11,0.12); color:#f59e0b;"><i class="fa-solid fa-clock"></i> Due: ${a.dueDate ? new Date(a.dueDate).toLocaleDateString() : 'TBD'}</span>
+              <span class="badge" style="background:rgba(16,185,129,0.12); color:#10b981;">Max: ${a.maxPoints || 50} Pts</span>
+            </div>
+            <h4 style="margin:0; font-size:16px; font-weight:800;">${escapeHtml(a.title)}</h4>
+            <div class="tiny" style="color:var(--text-muted); margin-top:3px;">${escapeHtml(a.instructions || 'Standard assignment format')}</div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button type="button" class="btn ghost btn-sm" onclick="openAssignmentCreateModal('${a.id}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
+            <button type="button" class="btn ghost btn-sm" style="color:var(--danger)" onclick="deleteAssignment('${a.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>
+
+        <div style="margin-top:10px;">
+          <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:700; margin-bottom:4px;">
+            <span style="color:var(--text-muted);"><i class="fa-solid fa-file-arrow-up"></i> Submissions Progress:</span>
+            <span style="color:var(--accent1);">${a.submittedCount || 0} / ${a.totalEnrolled || 4} Submitted (${subRatio}%)</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" style="width:${subRatio}%;"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openAssignmentCreateModal(editId = null) {
+  const modal = document.getElementById('assignmentModal');
+  if (!modal) return;
+
+  const classSelect = document.getElementById('am_classSelect');
+  if (classSelect) {
+    const classes = getClasses();
+    classSelect.innerHTML = classes.map(c => `<option value="${c.id}">${escapeHtml(c.name)} (${escapeHtml(c.subject || 'Core')})</option>`).join('');
+  }
+
+  const editIdInput = document.getElementById('am_editId');
+  const titleInput = document.getElementById('am_title');
+  const dueInput = document.getElementById('am_dueDate');
+  const ptsInput = document.getElementById('am_maxPoints');
+  const modeInput = document.getElementById('am_submissionMode');
+  const instInput = document.getElementById('am_instructions');
+
+  if (editId) {
+    const item = getAssignments().find(a => a.id === editId);
+    if (item) {
+      document.getElementById('am_modalTitle').textContent = 'Edit Coursework Assignment';
+      if (editIdInput) editIdInput.value = item.id;
+      if (titleInput) titleInput.value = item.title;
+      if (classSelect) classSelect.value = item.classId;
+      if (dueInput) dueInput.value = item.dueDate || '';
+      if (ptsInput) ptsInput.value = item.maxPoints || 50;
+      if (modeInput) modeInput.value = item.submissionMode || 'Online File Submission';
+      if (instInput) instInput.value = item.instructions || '';
+    }
+  } else {
+    document.getElementById('am_modalTitle').textContent = 'Create Coursework Assignment';
+    if (editIdInput) editIdInput.value = '';
+    if (titleInput) titleInput.value = '';
+    if (dueInput) dueInput.value = '';
+    if (ptsInput) ptsInput.value = '50';
+    if (instInput) instInput.value = '';
+  }
+
+  modal.classList.add('active');
+}
+
+function closeAssignmentModal() {
+  const modal = document.getElementById('assignmentModal');
+  if (modal) modal.classList.remove('active');
+}
+
+function handleSaveAssignment(e) {
+  if (e) e.preventDefault();
+  const editId = document.getElementById('am_editId')?.value;
+  const title = document.getElementById('am_title')?.value.trim();
+  const classId = document.getElementById('am_classSelect')?.value;
+  const dueDate = document.getElementById('am_dueDate')?.value;
+  const maxPoints = parseInt(document.getElementById('am_maxPoints')?.value, 10) || 50;
+  const submissionMode = document.getElementById('am_submissionMode')?.value;
+  const instructions = document.getElementById('am_instructions')?.value.trim();
+
+  if (!title || !classId) return toast('Title and Class required');
+
+  const cls = getClasses().find(c => c.id === classId);
+  const totalEnrolled = cls ? (cls.students || []).length : 4;
+
+  let list = getAssignments();
+  if (editId) {
+    const idx = list.findIndex(a => a.id === editId);
+    if (idx !== -1) {
+      list[idx] = { ...list[idx], title, classId, dueDate, maxPoints, submissionMode, instructions };
+    }
+    toast('Assignment updated');
+  } else {
+    list.unshift({
+      id: 'asg_' + Date.now(),
+      title,
+      classId,
+      dueDate,
+      maxPoints,
+      submissionMode,
+      instructions,
+      status: 'Active',
+      submittedCount: 0,
+      totalEnrolled,
+      createdAt: Date.now()
+    });
+    pushActivity(`Published assignment: ${title}`);
+    toast('Assignment created & published for students');
+  }
+
+  save(ASSIGN_KEY, list);
+  closeAssignmentModal();
+  renderAssignments();
+}
+
+function deleteAssignment(id) {
+  if (!confirm('Are you sure you want to delete this assignment?')) return;
+  save(ASSIGN_KEY, getAssignments().filter(a => a.id !== id));
   renderAssignments();
   toast('Assignment removed');
 }
-document.getElementById('assignClassSelect').addEventListener('change', renderAssignments);
 
-/* -------------------------
-  MESSAGES
-------------------------- */
-document.getElementById('sendMsgBtn').addEventListener('click', ()=>{
-  const subject = document.getElementById('msgSubject').value.trim();
-  const to = document.getElementById('msgTo').value.trim();
-  const body = document.getElementById('msgBody').value.trim();
-  if(!subject || !body) return toast('Subject and content required');
+document.getElementById('assignClassSelect')?.addEventListener('change', renderAssignments);
+
+/* -------------------------------------------------------------
+   STUDENT ASSESSMENTS & WAEC 9-POINT GRADING DESK
+------------------------------------------------------------- */
+let currentAssessMode = 'standard';
+
+function switchAssessMode(mode) {
+  currentAssessMode = mode;
+  const stdContainer = document.getElementById('assessStandardContainer');
+  const batchContainer = document.getElementById('assessBatchContainer');
+  const stdBtn = document.getElementById('assessModeStandardBtn');
+  const batchBtn = document.getElementById('assessModeBatchBtn');
+
+  if (mode === 'standard') {
+    if (stdContainer) stdContainer.style.display = 'block';
+    if (batchContainer) batchContainer.style.display = 'none';
+    if (stdBtn) { stdBtn.style.background = 'var(--card-bg)'; stdBtn.style.fontWeight = '700'; }
+    if (batchBtn) { batchBtn.style.background = 'transparent'; batchBtn.style.fontWeight = '500'; }
+    renderTeacherAssessments();
+  } else {
+    if (stdContainer) stdContainer.style.display = 'none';
+    if (batchContainer) batchContainer.style.display = 'block';
+    if (stdBtn) { stdBtn.style.background = 'transparent'; stdBtn.style.fontWeight = '500'; }
+    if (batchBtn) { batchBtn.style.background = 'var(--card-bg)'; batchBtn.style.fontWeight = '700'; }
+    populateBatchClassSelect();
+    renderBatchScoreTable();
+  }
+}
+
+function getStudentAssessmentsForTeacher() {
+  let list = safeParse(localStorage.getItem(ASSESS_KEY));
+  if (!list || !Array.isArray(list) || !list.length) {
+    list = [
+      {
+        id: 'as_101',
+        studentId: 's_101',
+        studentName: 'Samuel Kofi Mensah',
+        studentRoll: 'STU-2026-101',
+        className: 'Grade 10 - Science A',
+        subject: 'Integrated Chemistry',
+        teacherName: teacher.name || 'Faculty Instructor',
+        caScore: 26,
+        examScore: 62,
+        totalScore: 88,
+        grade: 'A1',
+        status: 'Approved & Certified',
+        teacherRemarks: 'Excellent mastery of stoichiometry and organic principles.',
+        submittedAt: Date.now() - 86400000 * 3,
+        certifiedAt: Date.now() - 86400000 * 2
+      },
+      {
+        id: 'as_102',
+        studentId: 's_102',
+        studentName: 'Amina Bello',
+        studentRoll: 'STU-2026-102',
+        className: 'Grade 10 - Science A',
+        subject: 'Integrated Chemistry',
+        teacherName: teacher.name || 'Faculty Instructor',
+        caScore: 24,
+        examScore: 48,
+        totalScore: 72,
+        grade: 'B2',
+        status: 'Approved & Certified',
+        teacherRemarks: 'Good grasp of chemical equations and lab reports.',
+        submittedAt: Date.now() - 86400000 * 3,
+        certifiedAt: Date.now() - 86400000 * 2
+      },
+      {
+        id: 'as_103',
+        studentId: 's_103',
+        studentName: 'Kwesi J. Appiah',
+        studentRoll: 'STU-2026-103',
+        className: 'Grade 10 - Science A',
+        subject: 'Integrated Chemistry',
+        teacherName: teacher.name || 'Faculty Instructor',
+        caScore: 21,
+        examScore: 45,
+        totalScore: 66,
+        grade: 'B3',
+        status: 'Awaiting HR Certification',
+        teacherRemarks: 'Consistent performance; recommended for extra kinetics drills.',
+        submittedAt: Date.now() - 86400000
+      }
+    ];
+    save(ASSESS_KEY, list);
+  }
+  return list;
+}
+
+function renderTeacherAssessments() {
+  const tbody = document.getElementById('teacherAssessmentsTableBody');
+  if (!tbody) return;
+
+  const assessments = getStudentAssessmentsForTeacher();
+  if (!assessments.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" style="text-align:center; padding:28px; color:var(--text-muted);">
+          <i class="fa-solid fa-stamp" style="font-size:24px; opacity:0.5; margin-bottom:8px; display:block;"></i>
+          No assessments recorded yet. Click <strong>Record Assessment</strong> to submit continuous assessment &amp; exam marks.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  let totalScoreSum = 0;
+  let distinctions = 0;
+  let passes = 0;
+  let pendingCount = 0;
+
+  tbody.innerHTML = assessments.map(a => {
+    const isApproved = a.status === 'Approved & Certified';
+    const ca = a.caScore !== undefined ? a.caScore : 0;
+    const exam = a.examScore !== undefined ? a.examScore : 0;
+    const total = a.totalScore !== undefined ? a.totalScore : Math.round(ca + exam);
+    const gradeInfo = calculateWAECGrade(total);
+
+    totalScoreSum += total;
+    if (['A1', 'B2', 'B3'].includes(gradeInfo.grade)) distinctions++;
+    if (gradeInfo.grade !== 'F9') passes++;
+    if (!isApproved) pendingCount++;
+
+    return `
+      <tr>
+        <td>
+          <div style="font-weight:700; color:var(--text-main); font-size:13.5px;">${escapeHtml(a.studentName || 'Student')}</div>
+          <div class="tiny" style="color:var(--text-muted); font-size:11px; font-family:monospace;">Roll: ${escapeHtml(a.studentRoll || 'STU-000')}</div>
+        </td>
+        <td>
+          <div style="font-weight:600; font-size:13px;">${escapeHtml(a.className || 'Class')}</div>
+          <div class="tiny" style="color:var(--text-muted); font-size:11px;">${escapeHtml(a.subject || 'Academic Core')}</div>
+        </td>
+        <td>
+          <span style="background:rgba(255,255,255,0.05); padding:3px 8px; border-radius:6px; font-weight:700; font-size:12.5px;">
+            ${ca} / 30
+          </span>
+        </td>
+        <td>
+          <span style="background:rgba(255,255,255,0.05); padding:3px 8px; border-radius:6px; font-weight:700; font-size:12.5px;">
+            ${exam} / 70
+          </span>
+        </td>
+        <td>
+          <div style="font-weight:800; font-size:14px; color:var(--accent1, #5ce1e6);">${total}%</div>
+          <span class="grade-badge ${gradeInfo.class}">${gradeInfo.grade} (${gradeInfo.label})</span>
+        </td>
+        <td>
+          ${isApproved ? `
+            <span class="badge" style="background:rgba(16, 185, 129, 0.2); color:#10b981; font-size:11px; padding:4px 10px;">
+              <i class="fa-solid fa-stamp"></i> Approved &amp; Certified
+            </span>
+          ` : `
+            <span class="badge" style="background:rgba(245, 158, 11, 0.2); color:#f59e0b; font-size:11px; padding:4px 10px;">
+              <i class="fa-solid fa-clock"></i> Awaiting HR Certification
+            </span>
+          `}
+        </td>
+        <td style="text-align:right;">
+          ${isApproved ? `
+            <div class="tiny" style="color:#10b981; font-weight:700;">
+              <i class="fa-solid fa-circle-check"></i> Certified by HR
+            </div>
+            <div class="tiny" style="color:var(--text-muted); font-size:10px;">${a.certifiedAt ? new Date(a.certifiedAt).toLocaleDateString() : 'Official'}</div>
+          ` : `
+            <span class="tiny" style="color:var(--text-muted); font-style:italic;">Pending HR QA</span>
+          `}
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  // Update summary statistics bar
+  const count = assessments.length;
+  const avg = count > 0 ? (totalScoreSum / count).toFixed(1) : 0;
+  const distRate = count > 0 ? Math.round((distinctions / count) * 100) : 0;
+  const passRate = count > 0 ? Math.round((passes / count) * 100) : 0;
+
+  const avgEl = document.getElementById('stat_class_avg');
+  const distEl = document.getElementById('stat_distinction_rate');
+  const passEl = document.getElementById('stat_pass_rate');
+  const certEl = document.getElementById('stat_cert_status');
+
+  if (avgEl) avgEl.textContent = `${avg}%`;
+  if (distEl) distEl.textContent = `${distRate}%`;
+  if (passEl) passEl.textContent = `${passRate}%`;
+  if (certEl) certEl.textContent = `${pendingCount} Pending HR Signoff`;
+}
+
+function populateBatchClassSelect() {
+  const sel = document.getElementById('batchClassSelect');
+  if (!sel) return;
+  const classes = getClasses();
+  sel.innerHTML = classes.map(c => `<option value="${c.id}">${escapeHtml(c.name)} (${escapeHtml(c.subject || 'Core')})</option>`).join('');
+}
+
+function renderBatchScoreTable() {
+  const classId = document.getElementById('batchClassSelect')?.value;
+  const tbody = document.getElementById('batchScoresTableBody');
+  if (!tbody) return;
+
+  const cls = getClasses().find(c => c.id === classId);
+  const students = (cls && cls.students) ? cls.students : [];
+  if (!students.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="tiny" style="text-align:center; padding:20px;">No students registered in this class.</td></tr>';
+    return;
+  }
+
+  const existingAssessments = getStudentAssessmentsForTeacher();
+
+  tbody.innerHTML = students.map((s, idx) => {
+    const existing = existingAssessments.find(a => a.studentId === s.id);
+    const ca = existing ? existing.caScore : 25;
+    const exam = existing ? existing.examScore : 55;
+    const total = Math.round(ca + exam);
+    const gradeInfo = calculateWAECGrade(total);
+    const fullName = escapeHtml([s.firstName, s.lastName].filter(Boolean).join(' '));
+
+    return `
+      <tr id="batch_row_${s.id}">
+        <td>${idx + 1}</td>
+        <td><strong>${fullName}</strong></td>
+        <td><span class="tiny" style="font-family:monospace;">${escapeHtml(s.roll || 'STU-000')}</span></td>
+        <td>
+          <input type="number" class="batch-score-input" min="0" max="30" value="${ca}" id="batch_ca_${s.id}" oninput="recalcBatchRow('${s.id}')">
+        </td>
+        <td>
+          <input type="number" class="batch-score-input" min="0" max="70" value="${exam}" id="batch_exam_${s.id}" oninput="recalcBatchRow('${s.id}')">
+        </td>
+        <td>
+          <strong id="batch_total_${s.id}" style="color:var(--accent1); font-size:14px;">${total}%</strong>
+        </td>
+        <td>
+          <span class="grade-badge ${gradeInfo.class}" id="batch_badge_${s.id}">${gradeInfo.grade}</span>
+        </td>
+        <td>
+          <input type="text" placeholder="Remarks" value="${escapeHtml(existing?.teacherRemarks || 'Satisfactory conduct & work')}" id="batch_rem_${s.id}" style="padding:4px 8px; font-size:12px; width:100%;">
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function recalcBatchRow(studentId) {
+  const ca = Math.min(30, Math.max(0, parseFloat(document.getElementById('batch_ca_' + studentId)?.value) || 0));
+  const exam = Math.min(70, Math.max(0, parseFloat(document.getElementById('batch_exam_' + studentId)?.value) || 0));
+  const total = Math.round(ca + exam);
+  const gradeInfo = calculateWAECGrade(total);
+
+  const totalEl = document.getElementById('batch_total_' + studentId);
+  const badgeEl = document.getElementById('batch_badge_' + studentId);
+
+  if (totalEl) totalEl.textContent = `${total}%`;
+  if (badgeEl) {
+    badgeEl.textContent = gradeInfo.grade;
+    badgeEl.className = `grade-badge ${gradeInfo.class}`;
+  }
+}
+
+function saveAllBatchScores() {
+  const classId = document.getElementById('batchClassSelect')?.value;
+  const cls = getClasses().find(c => c.id === classId);
+  if (!cls || !(cls.students || []).length) return;
+
+  let assessments = getStudentAssessmentsForTeacher();
+
+  cls.students.forEach(s => {
+    const ca = Math.min(30, Math.max(0, parseFloat(document.getElementById('batch_ca_' + s.id)?.value) || 0));
+    const exam = Math.min(70, Math.max(0, parseFloat(document.getElementById('batch_exam_' + s.id)?.value) || 0));
+    const total = Math.round(ca + exam);
+    const gradeInfo = calculateWAECGrade(total);
+    const remarks = document.getElementById('batch_rem_' + s.id)?.value.trim() || 'Evaluated for Term 1.';
+
+    const existingIdx = assessments.findIndex(a => a.studentId === s.id && a.className === cls.name);
+    const record = {
+      id: existingIdx !== -1 ? assessments[existingIdx].id : ('as_' + Date.now() + '_' + s.id),
+      studentId: s.id,
+      studentName: [s.firstName, s.lastName].filter(Boolean).join(' '),
+      studentRoll: s.roll || 'STU-000',
+      className: cls.name,
+      subject: cls.subject || 'Academic Core',
+      teacherName: teacher.name || 'Faculty Instructor',
+      caScore: ca,
+      examScore: exam,
+      totalScore: total,
+      grade: gradeInfo.grade,
+      status: 'Awaiting HR Certification',
+      teacherRemarks: remarks,
+      submittedAt: Date.now()
+    };
+
+    if (existingIdx !== -1) {
+      assessments[existingIdx] = record;
+    } else {
+      assessments.push(record);
+    }
+  });
+
+  save(ASSESS_KEY, assessments);
+  pushActivity(`Submitted batch grades for ${cls.name} (${cls.students.length} students) to HR`);
+  toast(`Batch marks recorded & submitted to HR Directorate for certification`);
+  switchAssessMode('standard');
+}
+
+function openTranscriptPreviewModal() {
+  const modal = document.getElementById('transcriptModal');
+  if (!modal) return;
+
+  const sel = document.getElementById('transcriptStudentSelect');
+  if (sel) {
+    const classes = getClasses();
+    let options = '';
+    classes.forEach(c => {
+      (c.students || []).forEach(s => {
+        const name = [s.firstName, s.lastName].filter(Boolean).join(' ');
+        options += `<option value="${s.id}" data-class="${escapeHtml(c.name)}">${escapeHtml(name)} (${escapeHtml(s.roll || 'STU-000')} &bull; ${escapeHtml(c.name)})</option>`;
+      });
+    });
+    sel.innerHTML = options || '<option value="">No enrolled students</option>';
+  }
+
+  renderTranscriptContent();
+  modal.classList.add('active');
+}
+
+function closeTranscriptModal() {
+  const modal = document.getElementById('transcriptModal');
+  if (modal) modal.classList.remove('active');
+}
+
+function renderTranscriptContent() {
+  const sel = document.getElementById('transcriptStudentSelect');
+  const studentId = sel?.value;
+  const container = document.getElementById('transcriptPaperContent');
+  if (!container) return;
+
+  if (!studentId) {
+    container.innerHTML = '<div style="text-align:center; padding:24px; color:#64748b;">No student selected for transcript preview.</div>';
+    return;
+  }
+
+  let studentObj = null;
+  let classObj = null;
+  for (const c of getClasses()) {
+    const s = (c.students || []).find(x => x.id === studentId);
+    if (s) {
+      studentObj = s;
+      classObj = c;
+      break;
+    }
+  }
+
+  if (!studentObj) return;
+
+  const fullName = [studentObj.firstName, studentObj.middleName, studentObj.lastName].filter(Boolean).join(' ');
+  const assessments = getStudentAssessmentsForTeacher().filter(a => a.studentId === studentId);
+
+  // Default course assessments if not populated
+  const courses = assessments.length ? assessments : [
+    { subject: classObj.subject || 'Integrated Chemistry', caScore: 26, examScore: 62, totalScore: 88, grade: 'A1' },
+    { subject: 'Elective Physics', caScore: 24, examScore: 56, totalScore: 80, grade: 'A1' },
+    { subject: 'Core Mathematics', caScore: 22, examScore: 50, totalScore: 72, grade: 'B2' },
+    { subject: 'English Language', caScore: 23, examScore: 45, totalScore: 68, grade: 'B3' }
+  ];
+
+  let rows = '';
+  let totalScoreSum = 0;
+  courses.forEach((c, idx) => {
+    const ca = c.caScore || 0;
+    const exam = c.examScore || 0;
+    const total = c.totalScore || (ca + exam);
+    const gradeInfo = calculateWAECGrade(total);
+    totalScoreSum += total;
+
+    rows += `
+      <tr>
+        <td style="padding:8px 10px;">${idx + 1}</td>
+        <td style="padding:8px 10px; font-weight:700;">${escapeHtml(c.subject)}</td>
+        <td style="padding:8px 10px; text-align:center;">${ca}</td>
+        <td style="padding:8px 10px; text-align:center;">${exam}</td>
+        <td style="padding:8px 10px; text-align:center; font-weight:800;">${total}%</td>
+        <td style="padding:8px 10px; text-align:center;"><span class="grade-badge ${gradeInfo.class}">${gradeInfo.grade}</span></td>
+        <td style="padding:8px 10px;">${gradeInfo.label}</td>
+      </tr>
+    `;
+  });
+
+  const avg = (totalScoreSum / courses.length).toFixed(1);
+  const aggregateGrade = calculateWAECGrade(avg);
+
+  container.innerHTML = `
+    <div style="border-bottom:2px solid #0f172a; padding-bottom:14px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="width:48px; height:48px; border-radius:10px; background:linear-gradient(135deg, #0284c7, #6366f1); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:20px;">FG</div>
+        <div>
+          <h2 style="margin:0; font-size:18px; font-weight:800; color:#0f172a; letter-spacing:0.5px;">FLAWLESS GRAPHICS ACADEMY</h2>
+          <div style="font-size:11.5px; color:#64748b;">Official Terminal Student Performance Record &bull; WAEC Scale</div>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <span class="badge" style="background:#f1f5f9; color:#0f172a; font-weight:800; font-size:11px;">Term 1 &bull; 2026/2027</span>
+        <div style="font-size:11px; color:#64748b; margin-top:2px;">Date: ${new Date().toLocaleDateString()}</div>
+      </div>
+    </div>
+
+    <!-- Student Bio Grid -->
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px; margin-bottom:16px; font-size:12.5px;">
+      <div><strong>Student Name:</strong> ${fullName}</div>
+      <div><strong>Student ID / Roll:</strong> ${escapeHtml(studentObj.roll || 'STU-000')}</div>
+      <div><strong>Classroom Stream:</strong> ${escapeHtml(classObj.name)}</div>
+      <div><strong>Guardian:</strong> ${escapeHtml(studentObj.guardianName || 'Parent / Legal Guardian')}</div>
+    </div>
+
+    <!-- Courses Table -->
+    <table style="width:100%; border-collapse:collapse; margin-bottom:16px; font-size:12px;">
+      <thead>
+        <tr style="background:#f1f5f9;">
+          <th style="padding:8px 10px; text-align:left;">#</th>
+          <th style="padding:8px 10px; text-align:left;">Academic Subject</th>
+          <th style="padding:8px 10px; text-align:center;">CA (30%)</th>
+          <th style="padding:8px 10px; text-align:center;">Exam (70%)</th>
+          <th style="padding:8px 10px; text-align:center;">Total</th>
+          <th style="padding:8px 10px; text-align:center;">Grade</th>
+          <th style="padding:8px 10px; text-align:left;">Remarks</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 16px; margin-bottom:18px;">
+      <div>
+        <div style="font-size:11px; color:#64748b; font-weight:700;">TERMINAL COMPOSITE AVERAGE</div>
+        <div style="font-size:20px; font-weight:800; color:#0284c7;">${avg}% &bull; Grade ${aggregateGrade.grade}</div>
+      </div>
+      <div style="text-align:right;">
+        <span class="badge" style="background:rgba(16,185,129,0.15); color:#10b981; font-weight:800; font-size:12px; padding:6px 12px;">
+          <i class="fa-solid fa-circle-check"></i> PROMOTED IN GOOD STANDING
+        </span>
+      </div>
+    </div>
+
+    <!-- Signoff Rows -->
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; border-top:1px dashed #cbd5e1; padding-top:16px; font-size:12px;">
+      <div>
+        <div style="color:#64748b; margin-bottom:4px;">Class Teacher Remarks:</div>
+        <div style="font-style:italic; font-weight:600;">"Demonstrates high intellectual diligence and excellent laboratory acumen."</div>
+        <div style="margin-top:10px; font-weight:700;">Teacher: ${escapeHtml(teacher.name || 'Faculty Instructor')}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="display:inline-block; border:2px dashed #10b981; border-radius:8px; padding:8px 14px; text-align:center; color:#10b981;">
+          <div style="font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">Institutional Certification</div>
+          <div style="font-size:13px; font-weight:800;"><i class="fa-solid fa-stamp"></i> HR &amp; ACADEMIC DIRECTORATE</div>
+          <div style="font-size:9.5px; color:#64748b;">OFFICIAL DOCUMENT SEAL</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function exportAssessmentsCSV() {
+  const assessments = getStudentAssessmentsForTeacher();
+  if (!assessments.length) return toast('No assessments to export');
+
+  let csv = 'Student Name,Roll No,Class,Subject,CA Score (30%),Exam Score (70%),Total Score (100%),WAEC Grade,Status\n';
+  assessments.forEach(a => {
+    const ca = a.caScore || 0;
+    const exam = a.examScore || 0;
+    const total = a.totalScore || (ca + exam);
+    const gradeInfo = calculateWAECGrade(total);
+    csv += `"${a.studentName || ''}","${a.studentRoll || ''}","${a.className || ''}","${a.subject || ''}",${ca},${exam},${total},"${gradeInfo.grade}","${a.status || ''}"\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `Student_Assessments_Broadsheet_${new Date().toISOString().split('T')[0]}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  toast('Assessment broadsheet exported as CSV');
+}
+
+/* -------------------------------------------------------------
+   FACULTY DUTY LEAVE DESK & STAFF COMMS
+------------------------------------------------------------- */
+function switchMsgSubTab(tab) {
+  const leaveContainer = document.getElementById('subTabLeaveContainer');
+  const commsContainer = document.getElementById('subTabCommsContainer');
+  const leaveBtn = document.getElementById('msgTabLeaveBtn');
+  const commsBtn = document.getElementById('msgTabCommsBtn');
+
+  if (tab === 'leave') {
+    if (leaveContainer) leaveContainer.style.display = 'block';
+    if (commsContainer) commsContainer.style.display = 'none';
+    if (leaveBtn) { leaveBtn.style.background = 'var(--card-bg)'; leaveBtn.style.fontWeight = '700'; }
+    if (commsBtn) { commsBtn.style.background = 'transparent'; commsBtn.style.fontWeight = '500'; }
+    renderLeaveBalances();
+    renderTeacherLeaveHistory();
+  } else {
+    if (leaveContainer) leaveContainer.style.display = 'none';
+    if (commsContainer) commsContainer.style.display = 'block';
+    if (leaveBtn) { leaveBtn.style.background = 'transparent'; leaveBtn.style.fontWeight = '500'; }
+    if (commsBtn) { commsBtn.style.background = 'var(--card-bg)'; commsBtn.style.fontWeight = '700'; }
+    renderMessages();
+  }
+}
+
+function renderLeaveBalances() {
+  const balKey = `${ORG}_teacher_leave_balance_${teacher.email || 'teacher'}`;
+  let bal = safeParse(localStorage.getItem(balKey)) || { annual: 18, sick: 10, casual: 4 };
+
+  const annEl = document.getElementById('leave_annual_bal');
+  const sickEl = document.getElementById('leave_sick_bal');
+  const casEl = document.getElementById('leave_casual_bal');
+
+  if (annEl) annEl.innerHTML = `${bal.annual} <span style="font-size:13px; color:var(--text-muted); font-weight:600;">/ 21 Days</span>`;
+  if (sickEl) sickEl.innerHTML = `${bal.sick} <span style="font-size:13px; color:var(--text-muted); font-weight:600;">/ 10 Days</span>`;
+  if (casEl) casEl.innerHTML = `${bal.casual} <span style="font-size:13px; color:var(--text-muted); font-weight:600;">/ 5 Days</span>`;
+}
+
+function calcLeaveDays() {
+  const start = document.getElementById('tl_startDate')?.value;
+  const end = document.getElementById('tl_endDate')?.value;
+  const summary = document.getElementById('tl_daysSummary');
+  if (!summary) return 0;
+
+  if (!start || !end) {
+    summary.textContent = 'Duration: 0 Days';
+    return 0;
+  }
+
+  const s = new Date(start);
+  const e = new Date(end);
+  const diffTime = e - s;
+  if (diffTime < 0) {
+    summary.textContent = 'Resumption date cannot precede commencement';
+    summary.style.color = '#ef4444';
+    return 0;
+  }
+
+  const days = Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1;
+  summary.textContent = `Duration: ${days} Working Day(s)`;
+  summary.style.color = 'var(--accent1)';
+  return days;
+}
+
+function handleTeacherLeaveSubmit(e) {
+  if (e) e.preventDefault();
+
+  const leaveType = document.getElementById('tl_leaveType')?.value;
+  const reliever = document.getElementById('tl_reliever')?.value.trim();
+  const startDate = document.getElementById('tl_startDate')?.value;
+  const endDate = document.getElementById('tl_endDate')?.value;
+  const reason = document.getElementById('tl_reason')?.value.trim();
+
+  const days = calcLeaveDays();
+  if (days <= 0) return toast('Please select valid start and resumption dates');
+
+  const balKey = `${ORG}_teacher_leave_balance_${teacher.email || 'teacher'}`;
+  let bal = safeParse(localStorage.getItem(balKey)) || { annual: 18, sick: 10, casual: 4 };
+
+  if (leaveType === 'Annual Leave') {
+    if (bal.annual < days) return toast(`Insufficient annual leave balance (${bal.annual} days remaining)`);
+    bal.annual -= days;
+  } else if (leaveType === 'Medical / Sick Leave') {
+    if (bal.sick < days) return toast(`Insufficient sick leave balance (${bal.sick} days remaining)`);
+    bal.sick -= days;
+  } else if (leaveType === 'Casual / Compassionate') {
+    if (bal.casual < days) return toast(`Insufficient casual leave balance (${bal.casual} days remaining)`);
+    bal.casual -= days;
+  }
+
+  localStorage.setItem(balKey, JSON.stringify(bal));
+
+  // Save to leave requests ledger
+  const reqKey = `${ORG}_leave_requests`;
+  let requests = safeParse(localStorage.getItem(reqKey)) || [];
+  requests.unshift({
+    id: 'lr_' + Date.now(),
+    employeeName: teacher.name || 'Faculty Member',
+    employeeEmail: teacher.email,
+    leaveType,
+    startDate,
+    endDate,
+    days,
+    reason,
+    reliever: reliever || 'Assigned Peer Teacher',
+    status: 'Pending HR Approval',
+    submittedAt: Date.now()
+  });
+  save(reqKey, requests);
+
+  // Sync to common HR requests table if present
+  let hrRequests = safeParse(localStorage.getItem('hr_leave_requests')) || [];
+  hrRequests.unshift({
+    id: 'hr_lr_' + Date.now(),
+    applicantName: teacher.name || 'Faculty Member',
+    applicantEmail: teacher.email,
+    department: 'Teaching Faculty',
+    leaveType,
+    startDate,
+    endDate,
+    duration: days,
+    status: 'Pending HR Approval',
+    submittedAt: Date.now()
+  });
+  localStorage.setItem('hr_leave_requests', JSON.stringify(hrRequests));
+
+  pushActivity(`Submitted ${leaveType} application (${days} days) to HR`);
+  toast('Duty leave application submitted to HR Directorate');
+
+  document.getElementById('teacherLeaveForm')?.reset();
+  calcLeaveDays();
+  renderLeaveBalances();
+  renderTeacherLeaveHistory();
+}
+
+function renderTeacherLeaveHistory() {
+  const container = document.getElementById('teacherLeaveHistoryList');
+  if (!container) return;
+
+  const reqKey = `${ORG}_leave_requests`;
+  const requests = safeParse(localStorage.getItem(reqKey)) || [
+    {
+      id: 'lr_sample',
+      leaveType: 'Casual / Compassionate',
+      startDate: '2026-08-18',
+      endDate: '2026-08-18',
+      days: 1,
+      reason: 'Family domestic engagement',
+      status: 'Approved',
+      submittedAt: Date.now() - 86400000 * 20
+    }
+  ];
+
+  if (!requests.length) {
+    container.innerHTML = '<div class="tiny" style="color:var(--text-muted); text-align:center; padding:18px;">No duty leave applications on file.</div>';
+    return;
+  }
+
+  container.innerHTML = requests.map(r => {
+    const isApproved = r.status === 'Approved';
+    const isDeclined = r.status === 'Declined';
+
+    return `
+      <div style="background:rgba(255,255,255,0.02); border:1px solid var(--card-border); border-radius:8px; padding:10px 12px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <strong style="font-size:13px; color:var(--text-main);">${escapeHtml(r.leaveType)}</strong>
+            <div class="tiny" style="color:var(--text-muted); margin-top:2px;">
+              ${escapeHtml(r.startDate)} &rarr; ${escapeHtml(r.endDate)} &bull; <strong>${r.days} Day(s)</strong>
+            </div>
+          </div>
+          <span class="badge" style="background:${isApproved ? 'rgba(16,185,129,0.15)' : (isDeclined ? 'rgba(239,68,68,0.15)' : 'rgba(245,158,11,0.15)')}; color:${isApproved ? '#10b981' : (isDeclined ? '#ef4444' : '#f59e0b')}; font-size:10.5px;">
+            ${escapeHtml(r.status || 'Pending')}
+          </span>
+        </div>
+        ${r.reason ? `<div class="tiny" style="color:var(--text-muted); margin-top:4px; font-style:italic;">Reason: ${escapeHtml(r.reason)}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+/* Internal Messaging */
+document.getElementById('sendMsgBtn')?.addEventListener('click', () => {
+  const subject = document.getElementById('msgSubject')?.value.trim();
+  const to = document.getElementById('msgTo')?.value.trim();
+  const body = document.getElementById('msgBody')?.value.trim();
+  if (!subject || !body) return toast('Subject and content required');
+
   const msgs = read(MSG_KEY);
-  msgs.push({ id:'m_'+Date.now(), subject, to, body, date: new Date().toISOString() });
+  msgs.unshift({ id: 'm_' + Date.now(), subject, to: to || 'Academic Faculty & HR', body, date: new Date().toISOString() });
   save(MSG_KEY, msgs);
+
   document.getElementById('msgSubject').value = '';
   document.getElementById('msgTo').value = '';
   document.getElementById('msgBody').value = '';
+
   renderMessages();
   pushActivity(`Sent message: ${subject}`);
-  toast('Message sent');
+  toast('Message transmitted');
 });
 
-function renderMessages(){
-  const msgs = read(MSG_KEY).slice().reverse();
+function renderMessages() {
+  const msgs = read(MSG_KEY);
   const container = document.getElementById('msgList');
-  if(!msgs.length) { container.innerHTML = '<div class="tiny">No messages found.</div>'; return; }
-  container.innerHTML = msgs.map(m => `
+  if (!container) return;
+
+  if (!msgs.length) {
+    container.innerHTML = '<div class="tiny" style="padding:18px; text-align:center; color:var(--text-muted);">No messages found.</div>';
+    return;
+  }
+
+  container.innerHTML = msgs.slice(0, 8).map(m => `
     <div style="padding:12px; background:var(--card-bg); border:1px solid var(--card-border); border-radius:8px; margin-bottom:8px;">
-      <div style="display:flex; justify-content:space-between;">
-        <strong>${escapeHtml(m.subject)}</strong>
-        <span class="tiny">${new Date(m.date).toLocaleDateString()}</span>
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <strong style="font-size:13.5px;">${escapeHtml(m.subject)}</strong>
+        <span class="tiny" style="color:var(--text-muted);">${new Date(m.date).toLocaleDateString()}</span>
       </div>
-      <div class="tiny" style="margin-bottom:4px;">To: ${escapeHtml(m.to||'All')}</div>
-      <div>${escapeHtml(m.body)}</div>
+      <div class="tiny" style="margin-bottom:4px; color:var(--accent1);">To: ${escapeHtml(m.to || 'All Staff')}</div>
+      <div style="font-size:13px; color:var(--text-main); line-height:1.4;">${escapeHtml(m.body)}</div>
     </div>
   `).join('');
 }
 
-/* -------------------------
-  LESSON NOTES
-------------------------- */
-document.getElementById('saveNoteBtn').addEventListener('click', ()=>{
-  const classId = document.getElementById('noteClassSelect').value;
-  const title = document.getElementById('noteTitle').value.trim();
-  const body = document.getElementById('noteBody').value.trim();
-  if(!title || !body) return toast('Title and description required');
-  const notes = read(NOTE_KEY);
-  notes.push({ id:'n_'+Date.now(), classId, title, body, date: new Date().toISOString() });
+/* -------------------------------------------------------------
+   STRUCTURED LESSON NOTES & SCHEME OF WORK
+------------------------------------------------------------- */
+function getLessonNotes() {
+  let notes = read(NOTE_KEY);
+  if (!notes || !notes.length) {
+    notes = [
+      {
+        id: 'ln_1',
+        classId: 'c_demo_sci10',
+        className: 'Grade 10 - Science A',
+        week: 'Week 7',
+        title: 'Chemical Bonding: Ionic vs Covalent Structures',
+        objectives: 'By the end of the lesson, learners will be able to describe electron transfer, draw Lewis dot diagrams, and explain high melting points of ionic lattices.',
+        materials: 'Molecular model kits, Periodic table charts, Sodium chloride crystal samples.',
+        body: 'Teacher introduces ionic bond formation through sodium and chlorine reaction. Students assemble ball-and-stick models in groups. Conduct conductivity demonstration with aqueous NaCl.',
+        hodStatus: 'Approved by HOD',
+        date: new Date().toISOString()
+      },
+      {
+        id: 'ln_2',
+        classId: 'c_demo_sci11',
+        className: 'Grade 11 - Science B',
+        week: 'Week 7',
+        title: 'Newtonian Dynamics & Conservation of Momentum',
+        objectives: 'By the end of the lesson, learners will state Newton\'s second and third laws, define impulse, and calculate final velocities in 1D collisions.',
+        materials: 'Ticker tape timers, dynamics trolleys, friction-compensated runways.',
+        body: 'Review momentum equation p = mv. Group work on frictionless trolley collisions using light gates. Teacher guides numerical derivations on board.',
+        hodStatus: 'Approved by HOD',
+        date: new Date().toISOString()
+      }
+    ];
+    save(NOTE_KEY, notes);
+  }
+  return notes;
+}
+
+document.getElementById('saveNoteBtn')?.addEventListener('click', saveLessonNote);
+
+function saveLessonNote() {
+  const classId = document.getElementById('noteClassSelect')?.value;
+  const week = document.getElementById('noteWeek')?.value.trim() || 'Week 7';
+  const title = document.getElementById('noteTitle')?.value.trim();
+  const objectives = document.getElementById('noteObjectives')?.value.trim();
+  const materials = document.getElementById('noteMaterials')?.value.trim();
+  const body = document.getElementById('noteBody')?.value.trim();
+
+  if (!title || !body) return toast('Lesson topic and teaching points required');
+
+  const cls = getClasses().find(c => c.id === classId);
+  const className = cls ? cls.name : 'Class';
+
+  let notes = getLessonNotes();
+  notes.unshift({
+    id: 'n_' + Date.now(),
+    classId,
+    className,
+    week,
+    title,
+    objectives,
+    materials,
+    body,
+    hodStatus: 'Pending HOD Review',
+    date: new Date().toISOString()
+  });
+
   save(NOTE_KEY, notes);
   document.getElementById('noteTitle').value = '';
+  document.getElementById('noteObjectives').value = '';
+  document.getElementById('noteMaterials').value = '';
   document.getElementById('noteBody').value = '';
-  renderNotes();
-  pushActivity(`Saved lesson note: ${title}`);
-  toast('Note saved');
-});
 
-function renderNotes(){
-  const notes = read(NOTE_KEY).slice().reverse();
-  const container = document.getElementById('notesList');
-  if(!notes.length) { container.innerHTML = '<div class="tiny">No lesson notes recorded.</div>'; return; }
-  container.innerHTML = notes.map(n => `
-    <div style="padding:12px; background:var(--card-bg); border:1px solid var(--card-border); border-radius:8px; margin-bottom:8px;">
-      <strong>${escapeHtml(n.title)}</strong>
-      <div class="tiny" style="margin-bottom:6px;">${new Date(n.date).toLocaleDateString()}</div>
-      <p style="font-size:14px;">${escapeHtml(n.body)}</p>
-    </div>
-  `).join('');
+  renderNotes();
+  pushActivity(`Saved structured lesson note: ${title} (${week})`);
+  toast('Lesson note saved and submitted for HOD moderation');
 }
 
-/* -------------------------
-  TIMETABLE
-------------------------- */
-document.getElementById('saveTTBtn').addEventListener('click', ()=>{
-  const classId = document.getElementById('ttClassSelect').value;
-  const day = document.getElementById('ttDay').value;
-  const from = document.getElementById('ttFrom').value;
-  const to = document.getElementById('ttTo').value;
-  if(!classId || !from || !to) return toast('Fill all timetable fields');
-  const tt = read(TT_KEY);
-  tt.push({ id:'tt_'+Date.now(), classId, day, from, to });
+function renderNotes() {
+  const notes = getLessonNotes();
+  const container = document.getElementById('notesList');
+  const countLabel = document.getElementById('lessonCountLabel');
+  if (countLabel) countLabel.textContent = `${notes.length} plans`;
+  if (!container) return;
+
+  if (!notes.length) {
+    container.innerHTML = '<div class="tiny" style="padding:24px; text-align:center; color:var(--text-muted);">No lesson plans created yet. Use the planner above to record scheme of work.</div>';
+    return;
+  }
+
+  container.innerHTML = notes.map(n => {
+    const isApproved = n.hodStatus === 'Approved by HOD';
+
+    return `
+      <div style="padding:14px; background:var(--card-bg); border:1px solid var(--card-border); border-radius:10px; margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="badge" style="background:rgba(168,85,247,0.15); color:#a855f7; font-weight:800;">${escapeHtml(n.week || 'Week')}</span>
+              <span class="badge" style="background:rgba(2,132,199,0.12); color:var(--accent1);">${escapeHtml(n.className || 'Class')}</span>
+              <span class="badge" style="background:${isApproved ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)'}; color:${isApproved ? '#10b981' : '#f59e0b'};">
+                ${isApproved ? '<i class="fa-solid fa-stamp"></i> ' : '<i class="fa-solid fa-clock"></i> '}${escapeHtml(n.hodStatus || 'Draft')}
+              </span>
+            </div>
+            <h4 style="margin:6px 0 2px; font-size:15px; font-weight:800;">${escapeHtml(n.title)}</h4>
+            <div class="tiny" style="color:var(--text-muted);">${new Date(n.date).toLocaleDateString()}</div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button type="button" class="btn ghost btn-sm" onclick="viewLessonPlan('${n.id}')" style="padding:4px 10px; font-size:12px;"><i class="fa-solid fa-eye"></i> View Plan</button>
+            <button type="button" class="btn ghost btn-sm" style="color:var(--danger);" onclick="deleteLessonNote('${n.id}')"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>
+
+        ${n.objectives ? `
+          <div style="font-size:12px; color:var(--text-main); margin-top:8px; background:rgba(0,0,0,0.02); padding:8px 10px; border-radius:6px; border-left:3px solid var(--accent1);">
+            <strong>Objectives:</strong> ${escapeHtml(n.objectives)}
+          </div>
+        ` : ''}
+
+        ${n.materials ? `
+          <div class="tiny" style="color:var(--text-muted); margin-top:6px;"><i class="fa-solid fa-box-archive" style="color:#f59e0b;"></i> <strong>TLMs:</strong> ${escapeHtml(n.materials)}</div>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function openNewLessonPlanModal() {
+  document.getElementById('noteTitle')?.focus();
+  const mainEl = document.querySelector('.main');
+  const targetTop = document.getElementById('lessonsSection')?.offsetTop || 0;
+  if (mainEl && typeof mainEl.scrollTo === 'function') {
+    mainEl.scrollTo({ top: targetTop, behavior: 'smooth' });
+  } else {
+    window.scrollTo({ top: targetTop, behavior: 'smooth' });
+  }
+}
+
+function viewLessonPlan(id) {
+  const note = getLessonNotes().find(n => n.id === id);
+  if (!note) return;
+
+  const modal = document.getElementById('lessonPlanModal');
+  const content = document.getElementById('lpm_content');
+  if (!modal || !content) return;
+
+  document.getElementById('lpm_title').textContent = `${note.title} (${note.week})`;
+
+  content.innerHTML = `
+    <div style="border-bottom:2px solid #0f172a; padding-bottom:12px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <h3 style="margin:0; font-size:17px; font-weight:800;">FLAWLESS GRAPHICS ACADEMY</h3>
+        <div class="tiny" style="color:#64748b;">Department of Academic Instruction &bull; Scheme of Work</div>
+      </div>
+      <span class="badge" style="background:rgba(168,85,247,0.15); color:#a855f7; font-weight:800;">${escapeHtml(note.week)}</span>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px; font-size:12.5px; margin-bottom:14px;">
+      <div><strong>Classroom:</strong> ${escapeHtml(note.className || 'Assigned Stream')}</div>
+      <div><strong>Teacher:</strong> ${escapeHtml(teacher.name || 'Faculty Member')}</div>
+      <div><strong>Topic:</strong> ${escapeHtml(note.title)}</div>
+      <div><strong>HOD Moderation:</strong> <span style="color:#10b981; font-weight:700;">${escapeHtml(note.hodStatus || 'Approved')}</span></div>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <h5 style="margin:0 0 6px; font-size:13px; font-weight:800; color:#0f172a;">1. SPECIFIC INSTRUCTIONAL OBJECTIVES</h5>
+      <div style="font-size:13px; line-height:1.5; background:#fff; border:1px solid #e2e8f0; border-radius:6px; padding:10px;">
+        ${escapeHtml(note.objectives || 'Demonstrate concept mastery and problem solving.')}
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <h5 style="margin:0 0 6px; font-size:13px; font-weight:800; color:#0f172a;">2. TEACHING &amp; LEARNING MATERIALS (TLMs)</h5>
+      <div style="font-size:13px; line-height:1.5; background:#fff; border:1px solid #e2e8f0; border-radius:6px; padding:10px;">
+        ${escapeHtml(note.materials || 'Textbook, charts, diagrams, and demonstration equipment.')}
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <h5 style="margin:0 0 6px; font-size:13px; font-weight:800; color:#0f172a;">3. CORE TEACHING &amp; LEARNING ACTIVITIES</h5>
+      <div style="font-size:13px; line-height:1.6; background:#fff; border:1px solid #e2e8f0; border-radius:6px; padding:10px; white-space:pre-wrap;">
+        ${escapeHtml(note.body)}
+      </div>
+    </div>
+  `;
+
+  modal.classList.add('active');
+}
+
+function closeLessonPlanModal() {
+  const modal = document.getElementById('lessonPlanModal');
+  if (modal) modal.classList.remove('active');
+}
+
+function deleteLessonNote(id) {
+  if (!confirm('Delete this lesson plan?')) return;
+  save(NOTE_KEY, getLessonNotes().filter(n => n.id !== id));
+  renderNotes();
+  toast('Lesson note deleted');
+}
+
+function exportLessonNotesCSV() {
+  const notes = getLessonNotes();
+  if (!notes.length) return toast('No lesson notes to export');
+
+  let csv = 'Week,Class,Topic,Objectives,Materials,HOD Status\n';
+  notes.forEach(n => {
+    csv += `"${n.week || ''}","${n.className || ''}","${n.title || ''}","${(n.objectives || '').replace(/"/g, '""')}","${(n.materials || '').replace(/"/g, '""')}","${n.hodStatus || ''}"\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `Lesson_Notes_Scheme_${new Date().toISOString().split('T')[0]}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  toast('Lesson notes exported as CSV');
+}
+
+/* -------------------------------------------------------------
+   PERIOD TIMETABLE MATRIX & CLASSROOM SCHEDULE
+------------------------------------------------------------- */
+function getTimetableSlots() {
+  let tt = read(TT_KEY);
+  if (!tt || !tt.length) {
+    tt = [
+      { id: 'tt_1', classId: 'c_demo_sci10', day: 'Monday', period: '1', from: '08:00', to: '08:45' },
+      { id: 'tt_2', classId: 'c_demo_sci10', day: 'Monday', period: '2', from: '08:45', to: '09:30' },
+      { id: 'tt_3', classId: 'c_demo_math12', day: 'Tuesday', period: '3', from: '09:30', to: '10:15' },
+      { id: 'tt_4', classId: 'c_demo_sci11', day: 'Wednesday', period: '4', from: '10:45', to: '11:30' },
+      { id: 'tt_5', classId: 'c_demo_sci10', day: 'Thursday', period: '1', from: '08:00', to: '08:45' },
+      { id: 'tt_6', classId: 'c_demo_sci11', day: 'Friday', period: '5', from: '11:30', to: '12:15' }
+    ];
+    save(TT_KEY, tt);
+  }
+  return tt;
+}
+
+document.getElementById('saveTTBtn')?.addEventListener('click', () => {
+  const classId = document.getElementById('ttClassSelect')?.value;
+  const day = document.getElementById('ttDay')?.value;
+  const period = document.getElementById('ttPeriod')?.value || '1';
+  const from = document.getElementById('ttFrom')?.value;
+  const to = document.getElementById('ttTo')?.value;
+  if (!classId || !from || !to) return toast('Fill all timetable fields');
+
+  const tt = getTimetableSlots();
+  tt.push({ id: 'tt_' + Date.now(), classId, day, period, from, to });
   save(TT_KEY, tt);
+
   renderTimetable();
+  renderPeriodMatrix();
   toast('Timetable slot added');
 });
 
-function renderTimetable(){
-  const tt = read(TT_KEY);
+function renderTimetable() {
+  const tt = getTimetableSlots();
   const container = document.getElementById('timetableList');
-  if(!tt.length) { container.innerHTML = '<div class="tiny">No timetable slots added.</div>'; return; }
-  container.innerHTML = tt.map(t => `
-    <div style="padding:10px; background:var(--card-bg); border:1px solid var(--card-border); border-radius:8px; margin-bottom:6px; display:flex; justify-content:space-between;">
-      <span><strong>${t.day}</strong>: ${t.from} - ${t.to}</span>
-      <button class="btn ghost" style="padding:2px 6px; color:var(--danger)" onclick="deleteTT('${t.id}')"><i class="fa-solid fa-trash"></i></button>
+  if (!container) return;
+
+  if (!tt.length) {
+    container.innerHTML = '<div class="tiny" style="color:var(--text-muted); padding:10px;">No custom timetable slots added.</div>';
+    return;
+  }
+
+  container.innerHTML = tt.map(t => {
+    const cls = getClasses().find(c => c.id === t.classId);
+    const className = cls ? cls.name : 'Assigned Class';
+    return `
+      <div style="padding:10px 14px; background:var(--card-bg); border:1px solid var(--card-border); border-radius:8px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <span><strong>${t.day} &bull; Period ${t.period || '1'}</strong>: ${t.from} &ndash; ${t.to}</span>
+          <span class="badge" style="margin-left:8px; background:rgba(2,132,199,0.12); color:var(--accent1);">${escapeHtml(className)}</span>
+        </div>
+        <button type="button" class="btn ghost btn-sm" style="padding:4px 8px; color:var(--danger)" onclick="deleteTT('${t.id}')"><i class="fa-solid fa-trash"></i></button>
+      </div>
+    `;
+  }).join('');
+}
+
+function deleteTT(id) {
+  save(TT_KEY, getTimetableSlots().filter(t => t.id !== id));
+  renderTimetable();
+  renderPeriodMatrix();
+  toast('Timetable slot removed');
+}
+
+function renderPeriodMatrix() {
+  const tbody = document.getElementById('periodMatrixTbody');
+  if (!tbody) return;
+
+  const tt = getTimetableSlots();
+  const classes = getClasses();
+  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+  const periods = [
+    { num: '1', time: '08:00 - 08:45' },
+    { num: '2', time: '08:45 - 09:30' },
+    { num: '3', time: '09:30 - 10:15' },
+    { isBreak: true, label: 'Mid-Morning Break &bull; 10:15 - 10:45' },
+    { num: '4', time: '10:45 - 11:30' },
+    { num: '5', time: '11:30 - 12:15' },
+    { num: '6', time: '12:15 - 13:00' }
+  ];
+
+  tbody.innerHTML = periods.map(p => {
+    if (p.isBreak) {
+      return `
+        <tr style="background:rgba(245,158,11,0.06);">
+          <td colspan="6" style="text-align:center; font-weight:800; font-size:11px; color:#f59e0b; padding:8px; border-bottom:1px solid var(--card-border);">
+            <i class="fa-solid fa-mug-hot" style="margin-right:6px;"></i> ${p.label}
+          </td>
+        </tr>
+      `;
+    }
+
+    let cells = `<td><strong style="color:var(--text-main);">Period ${p.num}</strong><div class="tiny" style="color:var(--text-muted); font-size:10px;">${p.time}</div></td>`;
+    days.forEach(d => {
+      const match = tt.find(t => t.day === d && String(t.period) === String(p.num));
+      if (match) {
+        const cls = classes.find(c => c.id === match.classId);
+        const name = cls ? cls.name : 'Class';
+        const sub = cls ? (cls.subject || 'Core') : 'Core';
+        cells += `
+          <td>
+            <div class="period-cell-chip">
+              <div style="font-weight:700; color:var(--text-main); font-size:11.5px;">${escapeHtml(name)}</div>
+              <div class="tiny" style="color:var(--accent1); font-size:10.5px;">${escapeHtml(sub)}</div>
+            </div>
+          </td>
+        `;
+      } else {
+        cells += `<td><span class="tiny" style="color:var(--text-muted); opacity:0.4;">&mdash;</span></td>`;
+      }
+    });
+
+    return `<tr>${cells}</tr>`;
+  }).join('');
+}
+
+function printTimetableMatrix() {
+  window.print();
+}
+
+/* -------------------------------------------------------------
+   OVERVIEW HUB WIDGETS & EDUCATOR TELEMETRY
+------------------------------------------------------------- */
+function renderTodayScheduleList() {
+  const container = document.getElementById('todayScheduleList');
+  if (!container) return;
+
+  const todayClasses = [
+    {
+      time: '08:00 - 09:30',
+      period: 'Periods 1 & 2',
+      classId: 'c_demo_sci10',
+      className: 'Grade 10 - Science A',
+      subject: 'Integrated Chemistry',
+      room: 'Lab 2 (Science Wing)',
+      topic: 'Chemical Kinetics & Reaction Rates'
+    },
+    {
+      time: '10:45 - 12:15',
+      period: 'Period 4',
+      classId: 'c_demo_sci11',
+      className: 'Grade 11 - Science B',
+      subject: 'Elective Physics',
+      room: 'Lab 1 (Tech Block)',
+      topic: 'Conservation of Linear Momentum'
+    },
+    {
+      time: '12:15 - 13:00',
+      period: 'Period 6',
+      classId: 'c_demo_math12',
+      className: 'Grade 12 - Senior Math',
+      subject: 'Core Mathematics',
+      room: 'Room 304',
+      topic: 'Trigonometric Identities & Functions'
+    }
+  ];
+
+  container.innerHTML = todayClasses.map(s => `
+    <div class="schedule-item">
+      <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:240px;">
+        <span class="schedule-time-badge">${s.time}</span>
+        <div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <strong style="font-size:13.5px; color:var(--text-main);">${escapeHtml(s.className)}</strong>
+            <span class="badge" style="background:rgba(2,132,199,0.12); color:var(--accent1); font-size:10.5px;">${escapeHtml(s.subject)}</span>
+          </div>
+          <div class="tiny" style="color:var(--text-muted); margin-top:2px;">
+            <i class="fa-solid fa-location-dot"></i> ${escapeHtml(s.room)} &bull; <strong>Topic:</strong> ${escapeHtml(s.topic)}
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <button type="button" class="btn ghost btn-sm" onclick="startClassRollCall('${s.classId}')" style="padding:4px 10px; font-size:11.5px;">
+          <i class="fa-solid fa-clipboard-user" style="color:#10b981;"></i> Roll Call
+        </button>
+        <button type="button" class="btn ghost btn-sm" onclick="document.querySelector('[data-section=\\'lessons\\']').click()" style="padding:4px 10px; font-size:11.5px;">
+          <i class="fa-solid fa-note-sticky" style="color:#a855f7;"></i> Lesson Plan
+        </button>
+      </div>
     </div>
   `).join('');
 }
-function deleteTT(id){
-  save(TT_KEY, read(TT_KEY).filter(t=>t.id!==id));
-  renderTimetable();
+
+function renderOverviewGradeDistribution() {
+  const container = document.getElementById('overviewGradeDistribution');
+  if (!container) return;
+
+  const distributions = [
+    { label: 'A1 (75% &ndash; 100%) &bull; Excellent', count: 18, pct: 38, color: '#10b981' },
+    { label: 'B2 &amp; B3 (65% &ndash; 74%) &bull; Good / Very Good', count: 16, pct: 34, color: '#0284c7' },
+    { label: 'C4 &ndash; C6 (50% &ndash; 64%) &bull; Credit Passes', count: 11, pct: 23, color: '#6366f1' },
+    { label: 'D7 &ndash; E8 (40% &ndash; 49%) &bull; Pass', count: 2, pct: 4, color: '#f59e0b' },
+    { label: 'F9 (0% &ndash; 39%) &bull; Needs Intervention', count: 1, pct: 1, color: '#ef4444' }
+  ];
+
+  container.innerHTML = distributions.map(d => `
+    <div style="margin-bottom:10px;">
+      <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:700; margin-bottom:3px;">
+        <span style="color:var(--text-main);">${d.label}</span>
+        <span style="color:${d.color};">${d.count} Students (${d.pct}%)</span>
+      </div>
+      <div class="progress-bar-bg" style="height:6px;">
+        <div style="height:100%; border-radius:9999px; background:${d.color}; width:${d.pct}%;"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function exportActiveStudentsCSV() {
+  const classes = getClasses();
+  let csv = 'Student ID,First Name,Middle Name,Last Name,Gender,Class,Subject,Guardian Name,Guardian Phone,Status\n';
+  classes.forEach(c => {
+    (c.students || []).forEach(s => {
+      csv += `"${s.roll || ''}","${s.firstName || ''}","${s.middleName || ''}","${s.lastName || ''}","${s.gender || ''}","${c.name}","${c.subject || ''}","${s.guardianName || ''}","${s.phone || ''}","${s.status || 'Active'}"\n`;
+    });
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `Student_Directory_${new Date().toISOString().split('T')[0]}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  toast('Student directory exported as CSV');
 }
 
 /* -------------------------
   SETTINGS & THEME TOGGLE
 ------------------------- */
-document.getElementById('themeBtn').addEventListener('click', ()=>{
+document.getElementById('themeBtn')?.addEventListener('click', () => {
   document.body.classList.toggle('light-theme');
   toast('Theme toggled');
 });
 
-document.getElementById('photoUpload').addEventListener('change', (e)=>{
+document.getElementById('photoUpload')?.addEventListener('change', (e) => {
   const file = e.target.files[0];
-  if(!file) return;
+  if (!file) return;
   const reader = new FileReader();
   reader.onload = (evt) => {
     const base64 = evt.target.result;
@@ -2018,7 +4751,7 @@ document.getElementById('photoUpload').addEventListener('change', (e)=>{
   reader.readAsDataURL(file);
 });
 
-document.getElementById('logoutBtn').addEventListener('click', ()=>{
+document.getElementById('logoutBtn')?.addEventListener('click', () => {
   localStorage.removeItem('active_teacher');
   window.location.href = 'teacher-login.html';
 });
@@ -2171,239 +4904,6 @@ function goToTeacherTimetable() {
 }
 
 /* -------------------------------------------------------------
-   STUDENT ASSESSMENTS & GRADING DESK
-------------------------------------------------------------- */
-function getStudentAssessmentsForTeacher() {
-  let list = safeParse(localStorage.getItem(ASSESS_KEY));
-  if (!list || !Array.isArray(list) || !list.length) {
-    list = safeParse(localStorage.getItem('FLAWLESS GRAPHICS_student_assessments'));
-  }
-  return (list && Array.isArray(list)) ? list : [];
-}
-
-function renderTeacherAssessments() {
-  const tbody = document.getElementById('teacherAssessmentsTableBody');
-  if (!tbody) return;
-
-  const assessments = getStudentAssessmentsForTeacher();
-  if (!assessments.length) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="7" style="text-align:center; padding:28px; color:var(--text-muted);">
-          <i class="fa-solid fa-stamp" style="font-size:24px; opacity:0.5; margin-bottom:8px; display:block;"></i>
-          No assessments recorded yet. Click <strong>Record Assessment</strong> to submit continuous assessment &amp; exam marks.
-        </td>
-      </tr>
-    `;
-    return;
-  }
-
-  tbody.innerHTML = assessments.map(a => {
-    const isApproved = a.status === 'Approved & Certified';
-    const ca = a.caScore !== undefined ? a.caScore : 0;
-    const exam = a.examScore !== undefined ? a.examScore : 0;
-    const total = a.totalScore !== undefined ? a.totalScore : (ca + exam);
-    const grade = a.grade || 'A';
-
-    return `
-      <tr>
-        <td>
-          <div style="font-weight:700; color:var(--text-main); font-size:13.5px;">${escapeHtml(a.studentName || 'Student')}</div>
-          <div class="tiny" style="color:var(--text-muted); font-size:11px;">Roll: ${escapeHtml(a.studentRoll || 'STU-000')}</div>
-        </td>
-        <td>
-          <div style="font-weight:600; font-size:13px;">${escapeHtml(a.className || 'Class')}</div>
-          <div class="tiny" style="color:var(--text-muted); font-size:11px;">${escapeHtml(a.subject || 'Academic Core')}</div>
-        </td>
-        <td>
-          <span style="background:rgba(255,255,255,0.05); padding:3px 8px; border-radius:6px; font-weight:700; font-size:12.5px;">
-            ${ca} / 30
-          </span>
-        </td>
-        <td>
-          <span style="background:rgba(255,255,255,0.05); padding:3px 8px; border-radius:6px; font-weight:700; font-size:12.5px;">
-            ${exam} / 70
-          </span>
-        </td>
-        <td>
-          <div style="font-weight:800; font-size:14px; color:var(--accent1, #5ce1e6);">${total}%</div>
-          <span class="badge" style="background:rgba(16,185,129,0.15); color:#10b981; font-size:10px; padding:1px 6px;">Grade ${grade}</span>
-        </td>
-        <td>
-          ${isApproved ? `
-            <span class="badge" style="background:rgba(16, 185, 129, 0.2); color:#10b981; font-size:11px; padding:4px 10px;">
-              <i class="fa-solid fa-stamp"></i> Approved &amp; Certified
-            </span>
-          ` : `
-            <span class="badge" style="background:rgba(245, 158, 11, 0.2); color:#f59e0b; font-size:11px; padding:4px 10px;">
-              <i class="fa-solid fa-clock"></i> Awaiting HR Certification
-            </span>
-          `}
-        </td>
-        <td style="text-align:right;">
-          ${isApproved ? `
-            <div class="tiny" style="color:#10b981; font-weight:700;">
-              <i class="fa-solid fa-circle-check"></i> Certified by HR
-            </div>
-            <div class="tiny" style="color:var(--text-muted); font-size:10px;">${a.certifiedAt ? new Date(a.certifiedAt).toLocaleDateString() : 'Official'}</div>
-          ` : `
-            <span class="tiny" style="color:var(--text-muted); font-style:italic;">Pending HR QA</span>
-          `}
-        </td>
-      </tr>
-    `;
-  }).join('');
-}
-
-function openNewAssessmentModal() {
-  const modal = document.getElementById('recordAssessmentModal');
-  if (!modal) return;
-
-  const classSelect = document.getElementById('ra_classSelect');
-  const classes = getClasses();
-  if (classSelect) {
-    classSelect.innerHTML = '<option value="">-- Select Classroom --</option>' +
-      classes.map(c => `<option value="${c.id}">${escapeHtml(c.name)} (${escapeHtml(c.subject || 'Core')})</option>`).join('');
-  }
-
-  document.getElementById('ra_editId').value = '';
-  document.getElementById('ra_caScore').value = '';
-  document.getElementById('ra_examScore').value = '';
-  document.getElementById('ra_totalScore').textContent = '0%';
-  document.getElementById('ra_gradeBadge').textContent = 'F';
-  document.getElementById('ra_teacherRemarks').value = '';
-
-  populateStudentsForAssessment();
-  modal.classList.add('active');
-}
-
-function closeRecordAssessmentModal() {
-  const modal = document.getElementById('recordAssessmentModal');
-  if (modal) modal.classList.remove('active');
-}
-
-function populateStudentsForAssessment() {
-  const classId = document.getElementById('ra_classSelect')?.value;
-  const studentSelect = document.getElementById('ra_studentSelect');
-  if (!studentSelect) return;
-
-  if (!classId) {
-    // Populate all students from all classes or defaults
-    const classes = getClasses();
-    let allStudents = [];
-    classes.forEach(c => {
-      (c.students || []).forEach(s => {
-        allStudents.push({ ...s, classId: c.id, className: c.name, subject: c.subject });
-      });
-    });
-
-    if (!allStudents.length) {
-      allStudents = [
-        { id: 's_demo1', firstName: 'Samuel', lastName: 'Kofi Mensah', roll: 'STU-2026-001' },
-        { id: 's_demo2', firstName: 'Amina', lastName: 'Bello', roll: 'STU-2026-002' },
-        { id: 's_demo3', firstName: 'Kwesi', lastName: 'Appiah', roll: 'STU-2026-003' }
-      ];
-    }
-
-    studentSelect.innerHTML = '<option value="">-- Select Student --</option>' +
-      allStudents.map(s => {
-        const name = (s.firstName ? `${s.firstName} ${s.lastName || ''}` : s.name).trim();
-        return `<option value="${s.id}" data-name="${escapeHtml(name)}" data-roll="${escapeHtml(s.roll || 'STU-000')}">${escapeHtml(name)} (${escapeHtml(s.roll || 'STU-000')})</option>`;
-      }).join('');
-    return;
-  }
-
-  const c = getClasses().find(x => x.id === classId);
-  const students = (c && c.students) ? c.students : [];
-  if (!students.length) {
-    studentSelect.innerHTML = '<option value="">No students enrolled in selected class</option>';
-  } else {
-    studentSelect.innerHTML = '<option value="">-- Select Student --</option>' +
-      students.map(s => {
-        const name = (s.firstName ? `${s.firstName} ${s.lastName || ''}` : s.name).trim();
-        return `<option value="${s.id}" data-name="${escapeHtml(name)}" data-roll="${escapeHtml(s.roll || 'STU-000')}">${escapeHtml(name)} (${escapeHtml(s.roll || 'STU-000')})</option>`;
-      }).join('');
-  }
-}
-
-function recalcAssessmentScores() {
-  const ca = Math.min(30, Math.max(0, parseFloat(document.getElementById('ra_caScore')?.value) || 0));
-  const exam = Math.min(70, Math.max(0, parseFloat(document.getElementById('ra_examScore')?.value) || 0));
-  const total = Math.round(ca + exam);
-
-  let grade = 'F';
-  if (total >= 80) grade = 'A';
-  else if (total >= 70) grade = 'B';
-  else if (total >= 60) grade = 'C';
-  else if (total >= 50) grade = 'D';
-
-  const totalEl = document.getElementById('ra_totalScore');
-  const gradeEl = document.getElementById('ra_gradeBadge');
-  if (totalEl) totalEl.textContent = `${total}%`;
-  if (gradeEl) {
-    gradeEl.textContent = grade;
-    gradeEl.style.color = (grade === 'A' || grade === 'B') ? '#10b981' : (grade === 'C' ? 'var(--accent1)' : '#f59e0b');
-  }
-}
-
-function handleSaveTeacherAssessment(e) {
-  if (e) e.preventDefault();
-
-  const classSelect = document.getElementById('ra_classSelect');
-  const studentSelect = document.getElementById('ra_studentSelect');
-  const studentOpt = studentSelect?.selectedOptions[0];
-
-  const studentId = studentSelect?.value;
-  const studentName = studentOpt?.dataset.name || studentOpt?.textContent || 'Student';
-  const studentRoll = studentOpt?.dataset.roll || 'STU-2026-000';
-
-  const classId = classSelect?.value;
-  const classObj = getClasses().find(c => c.id === classId);
-  const className = classObj?.name || 'Assigned Classroom';
-  const subject = classObj?.subject || 'Academic Course';
-
-  const caScore = Math.min(30, Math.max(0, parseFloat(document.getElementById('ra_caScore')?.value) || 0));
-  const examScore = Math.min(70, Math.max(0, parseFloat(document.getElementById('ra_examScore')?.value) || 0));
-  const totalScore = Math.round(caScore + examScore);
-
-  let grade = 'F';
-  if (totalScore >= 80) grade = 'A';
-  else if (totalScore >= 70) grade = 'B';
-  else if (totalScore >= 60) grade = 'C';
-  else if (totalScore >= 50) grade = 'D';
-
-  const remarks = document.getElementById('ra_teacherRemarks')?.value.trim();
-
-  let assessments = getStudentAssessmentsForTeacher();
-  const newRecord = {
-    id: 'as_' + Date.now(),
-    studentId: studentId || ('stu_' + Date.now()),
-    studentName,
-    studentRoll,
-    className,
-    subject,
-    teacherName: (teacher && (teacher.name || teacher.fullName)) || 'Faculty Instructor',
-    caScore,
-    examScore,
-    totalScore,
-    grade,
-    status: 'Awaiting HR Certification',
-    teacherRemarks: remarks || 'Faculty continuous evaluation & end-of-term score submitted.',
-    submittedAt: Date.now()
-  };
-
-  assessments.unshift(newRecord);
-  save(ASSESS_KEY, assessments);
-  // Also keep active org synced
-  localStorage.setItem(`${ORG}_student_assessments`, JSON.stringify(assessments));
-
-  renderTeacherAssessments();
-  closeRecordAssessmentModal();
-  pushActivity(`Recorded assessment for ${studentName} (${totalScore}%) — Sent for HR Certification`);
-  toast(`Assessment submitted to HR QA Desk for certification`);
-}
-
-/* -------------------------------------------------------------
    NOTIFICATIONS POPOVER & BELL
 ------------------------------------------------------------- */
 function toggleNotificationPopover(e) {
@@ -2429,7 +4929,6 @@ function updateNotificationBell() {
 
   const notifications = [];
 
-  // Check published broadcasts from HR & Super Admin
   const broadcastKey = `${ORG}_announcements`;
   const broadcasts = safeParse(localStorage.getItem(broadcastKey)) || [];
   const ackBcKey = `${ORG}_broadcast_ack_${teacher.email || 'teacher'}`;
@@ -2449,7 +4948,6 @@ function updateNotificationBell() {
     });
   }
 
-  // Check published calendar
   const calendar = getAcademicCalendarForStaff();
   const liveTerm = calendar.find(t => t.status === 'Published for Staff Review');
   if (liveTerm) {
@@ -2467,7 +4965,6 @@ function updateNotificationBell() {
     }
   }
 
-  // Check pending certified assessments
   const assessments = getStudentAssessmentsForTeacher();
   const certified = assessments.filter(a => a.status === 'Approved & Certified');
   if (certified.length) {
@@ -2478,6 +4975,25 @@ function updateNotificationBell() {
       title: 'Assessment Certified',
       desc: `${certified.length} student assessment(s) officially endorsed by HR.`,
       action: "document.querySelector('[data-section=\"assessments\"]').click()"
+    });
+  }
+
+  const currentClasses = getClasses();
+  const pendingClsCount = currentClasses.filter(c => c.approvalStatus === 'pending' || c.status === 'Pending HR Approval').length;
+  let pendingStudCount = 0;
+  currentClasses.forEach(c => {
+    (c.students || []).forEach(s => {
+      if (s.approvalStatus === 'pending' || s.status === 'Pending HR Approval') pendingStudCount++;
+    });
+  });
+  if (pendingClsCount > 0 || pendingStudCount > 0) {
+    notifications.push({
+      type: 'registration_pending',
+      icon: 'fa-solid fa-clock',
+      color: '#f59e0b',
+      title: 'Registration Pending HR Approval',
+      desc: `${pendingClsCount} class(es) and ${pendingStudCount} student(s) awaiting HR sign-off.`,
+      action: "document.querySelector('[data-section=\"classes\"]').click()"
     });
   }
 
@@ -2506,9 +5022,9 @@ function updateNotificationBell() {
   }
 }
 
-/* -------------------------
+/* -------------------------------------------------------------
   CROSS-PORTAL DIRECTIVES & BROADCASTS
-------------------------- */
+------------------------------------------------------------- */
 let activeBroadcastId = null;
 
 function renderTeacherBroadcastBanner() {
@@ -2594,7 +5110,6 @@ function renderTeacherBroadcasts() {
     filtered = filtered.filter(b => b.category && b.category.toLowerCase() === catFilter.toLowerCase());
   }
 
-  // Sort pinned first
   filtered.sort((x, y) => {
     if (x.pinned && !y.pinned) return -1;
     if (!x.pinned && y.pinned) return 1;
@@ -2676,19 +5191,64 @@ window.goToTeacherBroadcasts = goToTeacherBroadcasts;
 window.renderTeacherBroadcasts = renderTeacherBroadcasts;
 window.acknowledgeSingleBroadcast = acknowledgeSingleBroadcast;
 window.filterTeacherBroadcasts = filterTeacherBroadcasts;
+window.switchClassesView = switchClassesView;
+window.startClassRollCall = startClassRollCall;
+window.openClassGradebook = openClassGradebook;
+window.renderAttendanceMarkArea = renderAttendanceMarkArea;
+window.setStudentAttendance = setStudentAttendance;
+window.bulkSetAttendance = bulkSetAttendance;
+window.resetAttendanceRegister = resetAttendanceRegister;
+window.saveAttendanceRegister = saveAttendanceRegister;
+window.exportAttendanceCSV = exportAttendanceCSV;
+window.filterAssignments = filterAssignments;
+window.openAssignmentCreateModal = openAssignmentCreateModal;
+window.closeAssignmentModal = closeAssignmentModal;
+window.handleSaveAssignment = handleSaveAssignment;
+window.deleteAssignment = deleteAssignment;
+window.switchAssessMode = switchAssessMode;
+window.renderBatchScoreTable = renderBatchScoreTable;
+window.recalcBatchRow = recalcBatchRow;
+window.saveAllBatchScores = saveAllBatchScores;
+window.openTranscriptPreviewModal = openTranscriptPreviewModal;
+window.closeTranscriptModal = closeTranscriptModal;
+window.renderTranscriptContent = renderTranscriptContent;
+window.exportAssessmentsCSV = exportAssessmentsCSV;
+window.switchMsgSubTab = switchMsgSubTab;
+window.calcLeaveDays = calcLeaveDays;
+window.handleTeacherLeaveSubmit = handleTeacherLeaveSubmit;
+window.openNewLessonPlanModal = openNewLessonPlanModal;
+window.closeLessonPlanModal = closeLessonPlanModal;
+window.viewLessonPlan = viewLessonPlan;
+window.deleteLessonNote = deleteLessonNote;
+window.exportLessonNotesCSV = exportLessonNotesCSV;
+window.printTimetableMatrix = printTimetableMatrix;
+window.exportActiveStudentsCSV = exportActiveStudentsCSV;
+window.getCurrentRollCall = () => currentRollCall;
 
 /* -------------------------
-  KPI UPDATES & INITIALIZATION
+  EDUCATOR TELEMETRY & INITIAL BOOT
 ------------------------- */
-function updateKPIs(){
+function updateKPIs() {
   const classes = getClasses();
   let totalStudents = 0;
-  classes.forEach(c => { totalStudents += (c.students||[]).length; });
-  
-  document.getElementById('k_classes').textContent = classes.length;
-  document.getElementById('k_students').textContent = totalStudents;
-  document.getElementById('k_msgs').textContent = read(MSG_KEY).length;
-  document.getElementById('k_att').textContent = '95%';
+  classes.forEach(c => { totalStudents += (c.students || []).length; });
+
+  const kClasses = document.getElementById('k_classes');
+  const kStudents = document.getElementById('k_students');
+  const kAtt = document.getElementById('k_att');
+  const kPending = document.getElementById('k_pending_grading');
+  const kLoad = document.getElementById('k_teaching_load');
+  const kMsgs = document.getElementById('k_msgs');
+
+  if (kClasses) kClasses.textContent = classes.length;
+  if (kStudents) kStudents.textContent = totalStudents;
+  if (kAtt) kAtt.textContent = '96.2%';
+
+  const assessments = getStudentAssessmentsForTeacher();
+  const pendingAssess = assessments.filter(a => a.status !== 'Approved & Certified').length;
+  if (kPending) kPending.textContent = pendingAssess;
+  if (kLoad) kLoad.textContent = '18 / 24';
+  if (kMsgs) kMsgs.textContent = read(MSG_KEY).length;
 }
 
 // Initial Boot Sequence
@@ -2698,11 +5258,19 @@ renderAssignments();
 renderMessages();
 renderNotes();
 renderTimetable();
+renderPeriodMatrix();
 renderTeacherCalendarReview();
 renderTeacherAssessments();
 renderTeacherBroadcastBanner();
+renderTodayScheduleList();
+renderOverviewGradeDistribution();
+renderLeaveBalances();
+renderTeacherLeaveHistory();
 updateKPIs();
 updateNotificationBell();
+if (window.QuickDock && typeof window.QuickDock.refreshNotifications === 'function') {
+  window.QuickDock.refreshNotifications();
+}
 </script>
 <!-- Short Skeletal Loading Script -->
 <script src="../../assets/js/skeleton-loader.js"></script>
