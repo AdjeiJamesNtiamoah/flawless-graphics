@@ -2,18 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Organization Sign In — FLAWLESS GRAPHICS</title>
+<title>Direct Institutional Access Console — FLAWLESS GRAPHICS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Google Fonts: Plus Jakarta Sans -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <!-- Font Awesome Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<!-- Short Skeletal Loading Stylesheet -->
-<link rel="stylesheet" href="assets/css/skeleton.css">
-<!-- Floating Quick Assistant Stylesheet -->
-<link rel="stylesheet" href="assets/css/quick-assistant.css">
+<!-- Universal Toaster -->
+<link rel="stylesheet" href="assets/css/toaster.css">
+<script src="assets/js/toaster.js"></script>
+<script src="assets/js/auth-session.js"></script>
+
+<!-- Supabase Cloud Integration -->
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/supabase-client.js"></script>
+<script src="assets/js/realtime-auth.js"></script>
 
 <style>
     * {
@@ -23,349 +28,372 @@
     }
 
     body {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        background-color: #FAF7F2;
-        background: #FAF7F2;
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background-color: #060B18;
+        color: #F8FAFC;
         min-height: 100vh;
         display: flex;
-        justify-content: center;
+        flex-direction: column;
         align-items: center;
-        padding: 10px 16px;
-        color: #0F172A;
+        justify-content: center;
+        padding: 32px 16px;
+        position: relative;
         overflow-x: hidden;
     }
 
-    /* Window Frame UI Container */
-    .app-window {
+    /* Subtle blueprint grid overlay */
+    .grid-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background-image: 
+            linear-gradient(to right, rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+        background-size: 32px 32px;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    /* Ambient atmospheric glow */
+    body::before {
+        content: '';
+        position: fixed;
+        top: -10%; left: 15%;
+        width: 650px; height: 650px;
+        background: radial-gradient(circle, rgba(37, 99, 235, 0.12) 0%, transparent 70%);
+        filter: blur(90px);
+        pointer-events: none;
+        z-index: 0;
+    }
+    body::after {
+        content: '';
+        position: fixed;
+        bottom: -10%; right: 15%;
+        width: 650px; height: 650px;
+        background: radial-gradient(circle, rgba(147, 51, 234, 0.11) 0%, transparent 70%);
+        filter: blur(90px);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .main-wrapper {
         width: 100%;
-        max-width: 1020px;
-        max-height: calc(100vh - 20px);
-        background: rgba(55, 25, 110, 0.94);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-radius: 18px;
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.15);
-        overflow: hidden;
+        max-width: 1080px;
+        z-index: 1;
+        position: relative;
         display: flex;
         flex-direction: column;
-        animation: windowEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        align-items: center;
     }
 
-    @keyframes windowEntrance {
-        from {
-            opacity: 0;
-            transform: translateY(20px) scale(0.98);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
+    /* Top Gateway Header */
+    .gateway-header {
+        text-align: center;
+        margin-bottom: 28px;
     }
 
-    /* Mock Mac Top Bar */
-    .window-header {
-        background: rgba(255, 255, 255, 0.05);
-        padding: 8px 18px;
+    .gateway-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        border-radius: 9999px;
+        background: rgba(56, 189, 248, 0.08);
+        border: 1px solid rgba(56, 189, 248, 0.28);
+        color: #38bdf8;
+        font-size: 11.5px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 14px;
+    }
+
+    .gateway-badge .badge-dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: #38bdf8;
+        box-shadow: 0 0 8px #38bdf8;
+    }
+
+    .gateway-title {
+        font-size: 32px;
+        font-weight: 800;
+        letter-spacing: -0.6px;
+        color: #ffffff;
+        margin-bottom: 8px;
+    }
+
+    .gateway-subtitle {
+        font-size: 14px;
+        color: #94a3b8;
+        max-width: 680px;
+        margin: 0 auto;
+        line-height: 1.5;
+    }
+
+    /* Master Console Card */
+    .console-card {
+        width: 100%;
+        background: rgba(13, 22, 42, 0.82);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        box-shadow: 0 25px 65px -10px rgba(0, 0, 0, 0.7), 0 0 40px rgba(56, 189, 248, 0.06);
+        overflow: hidden;
+        animation: cardFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes cardFadeIn {
+        from { opacity: 0; transform: translateY(18px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Console Top Navigation Bar */
+    .console-topbar {
+        padding: 14px 28px;
+        background: rgba(15, 23, 42, 0.65);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        flex-shrink: 0;
+        flex-wrap: wrap;
+        gap: 14px;
     }
 
-    .window-dots {
-        display: flex;
-        gap: 8px;
-    }
-
-    .dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-    }
-    .dot-1 { background: #9c8ce8; }
-    .dot-2 { background: #72efdd; }
-    .dot-3 { background: #92b0ff; }
-
-    .window-quick-nav {
+    .console-tabs {
         display: flex;
         align-items: center;
         gap: 8px;
+        flex-wrap: wrap;
     }
-    .window-nav-link {
-        color: rgba(255, 255, 255, 0.75);
-        font-size: 11px;
-        font-weight: 600;
-        text-decoration: none;
-        padding: 5px 12px;
+
+    .tab-btn {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 12px;
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 8px 16px;
+        color: #94a3b8;
+        font-size: 12.5px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .tab-btn.active {
+        background: rgba(2, 132, 199, 0.22);
+        border-color: #38bdf8;
+        color: #ffffff;
+        box-shadow: 0 0 16px rgba(56, 189, 248, 0.2);
+    }
+
+    .security-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #34d399;
+    }
+
+    .security-badge .sec-dot {
+        width: 7px; height: 7px;
+        border-radius: 50%;
+        background: #10b981;
+        box-shadow: 0 0 8px #10b981;
+    }
+
+    /* Split 2-Column Body */
+    .console-body {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: 440px;
+    }
+
+    @media (max-width: 860px) {
+        .console-body {
+            grid-template-columns: 1fr;
+        }
+        .left-panel {
+            border-right: none !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    }
+
+    /* Left Panel: Role Overview */
+    .left-panel {
+        padding: 44px 40px;
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .role-badge {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        padding: 5px 12px;
+        border-radius: 8px;
+        background: rgba(147, 51, 234, 0.15);
+        border: 1px solid rgba(147, 51, 234, 0.35);
+        color: #c084fc;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        margin-bottom: 16px;
     }
-    .window-nav-link:hover {
+
+    .role-title {
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: -0.4px;
         color: #ffffff;
-        background: rgba(255, 255, 255, 0.16);
-        transform: translateY(-2px) scale(1.02);
-        box-shadow: 0 4px 14px rgba(114, 239, 221, 0.3);
-        border-color: rgba(114, 239, 221, 0.4);
+        margin-bottom: 10px;
+        line-height: 1.25;
     }
 
-    /* Main Split Body Layout */
-    .main-container {
-        display: flex;
-        flex-direction: row;
-        min-height: 440px;
-        position: relative;
-        overflow-y: auto;
-        scrollbar-width: thin;
-        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    .role-desc {
+        font-size: 13.5px;
+        color: #94a3b8;
+        line-height: 1.6;
+        margin-bottom: 24px;
     }
 
-    .main-container::-webkit-scrollbar {
-        width: 5px;
-    }
-    .main-container::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 4px;
-    }
-
-    /* Left Hero Banner Section */
-    .hero-section {
-        flex: 1;
-        padding: 24px 32px;
+    .feature-list {
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        position: relative;
-        overflow: hidden;
+        gap: 12px;
+        margin-bottom: 32px;
     }
 
-    /* Abstract Animated 3D Ribbons */
-    .ribbon-container {
-        position: absolute;
-        top: -20px;
-        left: -20px;
-        width: 220px;
-        height: 220px;
-        pointer-events: none;
-        opacity: 0.85;
-    }
-
-    .ribbon {
-        position: absolute;
-        border-radius: 50%;
-        border: 20px solid transparent;
-    }
-
-    .ribbon-1 {
-        width: 170px;
-        height: 170px;
-        border-top-color: #5ce1e6;
-        border-right-color: #5ce1e6;
-        transform: rotate(-25deg);
-        filter: drop-shadow(0 8px 12px rgba(0,0,0,0.25));
-        animation: floatShape1 6s ease-in-out infinite alternate;
-    }
-
-    .ribbon-2 {
-        width: 140px;
-        height: 140px;
-        top: 20px;
-        left: 15px;
-        border-bottom-color: #8c52ff;
-        border-left-color: #8c52ff;
-        transform: rotate(15deg);
-        filter: drop-shadow(0 8px 12px rgba(0,0,0,0.25));
-        animation: floatShape2 8s ease-in-out infinite alternate;
-    }
-
-    @keyframes floatShape1 {
-        0% { transform: rotate(-25deg) translateY(0px); }
-        100% { transform: rotate(-15deg) translateY(10px); }
-    }
-
-    @keyframes floatShape2 {
-        0% { transform: rotate(15deg) translateY(0px); }
-        100% { transform: rotate(25deg) translateY(-8px); }
-    }
-
-    .brand-logo {
+    .feature-item {
         display: flex;
         align-items: center;
-        gap: 10px;
-        z-index: 2;
-        margin-top: 10px;
-    }
-
-    .logo-icon {
-        font-size: 26px;
-        color: #ffffff;
-        transition: transform 0.3s ease;
-    }
-
-    .brand-logo:hover .logo-icon {
-        transform: scale(1.1) rotate(-5deg);
-    }
-
-    .brand-title {
-        font-size: 20px;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-    }
-
-    .brand-subtitle {
-        font-size: 10px;
-        color: rgba(255, 255, 255, 0.6);
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    .hero-text {
-        z-index: 2;
-        margin-top: 18px;
-        max-width: 340px;
-    }
-
-    .hero-text h1 {
-        font-size: 18px;
+        gap: 12px;
+        font-size: 13.5px;
+        color: #e2e8f0;
         font-weight: 500;
-        line-height: 1.35;
-        color: #ffffff;
     }
 
-    .hero-text span {
-        font-weight: 700;
+    .feature-item i {
+        color: #10b981;
+        font-size: 14px;
+        flex-shrink: 0;
     }
 
-    .hero-buttons {
-        display: flex;
-        gap: 10px;
+    .btn-fullscreen {
+        display: inline-flex;
         align-items: center;
-        margin-top: 16px;
-        z-index: 2;
-    }
-
-    .btn-outline {
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        gap: 8px;
+        padding: 10px 18px;
+        border-radius: 10px;
         background: rgba(255, 255, 255, 0.05);
-        color: #fff;
-        padding: 7px 14px;
-        border-radius: 8px;
-        font-size: 11.5px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #38bdf8;
+        font-size: 12.5px;
         font-weight: 600;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
         text-decoration: none;
+        transition: all 0.2s ease;
+        align-self: flex-start;
     }
 
-    .btn-outline:hover {
-        background: rgba(255, 255, 255, 0.18);
-        border-color: #72efdd;
-        transform: translateY(-2px) scale(1.02);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), 0 0 10px rgba(114, 239, 221, 0.25);
-    }
-
-    .link-subtle {
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 11px;
-        text-decoration: none;
-        font-weight: 500;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        transition: all 0.25s ease;
-    }
-
-    .link-subtle:hover {
-        color: #72efdd;
-        transform: translateY(-2px);
-        text-decoration: none;
-    }
-
-    /* Right Form Card Section */
-    .form-section {
-        flex: 1;
-        padding: 14px 28px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .card {
-        width: 100%;
-        max-width: 410px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 14px;
-        padding: 18px 22px;
-        backdrop-filter: blur(20px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-
-    .card h2 {
-        font-size: 18px;
-        font-weight: 700;
-        margin-bottom: 12px;
+    .btn-fullscreen:hover {
+        background: rgba(56, 189, 248, 0.12);
+        border-color: #38bdf8;
         color: #ffffff;
+    }
+
+    /* Right Panel: Authentication Form */
+    .right-panel {
+        padding: 44px 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .auth-header {
+        margin-bottom: 24px;
+    }
+
+    .auth-header h3 {
+        font-size: 22px;
+        font-weight: 800;
+        color: #ffffff;
+        letter-spacing: -0.3px;
+        margin-bottom: 6px;
+    }
+
+    .auth-header p {
+        font-size: 13px;
+        color: #94a3b8;
     }
 
     .form-group {
-        margin-bottom: 10px;
+        margin-bottom: 18px;
     }
 
-    label {
+    .form-label {
         display: block;
         font-size: 11px;
-        font-weight: 600;
-        color: rgba(255, 255, 255, 0.85);
-        margin-bottom: 3px;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 8px;
     }
 
-    .input-wrapper {
+    .input-wrap {
         position: relative;
         display: flex;
         align-items: center;
     }
 
-    input {
-        width: 100%;
-        padding: 8px 36px 8px 11px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 7px;
-        color: #ffffff;
-        font-size: 12px;
-        font-family: inherit;
-        outline: none;
-        transition: all 0.25s ease;
-    }
-
-    input::placeholder {
-        color: rgba(255, 255, 255, 0.35);
-    }
-
-    input:focus {
-        border-color: #a2e8dd;
-        background: rgba(255, 255, 255, 0.12);
-        box-shadow: 0 0 0 2px rgba(162, 232, 221, 0.2);
-    }
-
-    .field-icon {
+    .input-wrap i.field-icon {
         position: absolute;
-        right: 12px;
-        color: rgba(255, 255, 255, 0.5);
-        font-size: 13px;
-        cursor: pointer;
-        transition: color 0.2s ease;
+        left: 15px;
+        color: #64748b;
+        font-size: 14px;
     }
 
-    .field-icon:hover {
+    .form-control {
+        width: 100%;
+        padding: 13px 16px 13px 42px;
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 10px;
+        color: #ffffff;
+        font-size: 14px;
+        outline: none;
+        font-family: inherit;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+        background: rgba(15, 23, 42, 0.9);
+    }
+
+    .toggle-pass {
+        position: absolute;
+        right: 14px;
+        color: #64748b;
+        cursor: pointer;
+        font-size: 14px;
+        transition: color 0.2s;
+    }
+
+    .toggle-pass:hover {
         color: #ffffff;
     }
 
@@ -373,880 +401,662 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 12px;
-        font-size: 11px;
+        margin-bottom: 22px;
+        font-size: 12.5px;
     }
 
-    .remember-me {
+    .remember-wrap {
         display: flex;
         align-items: center;
-        gap: 6px;
-        color: rgba(255, 255, 255, 0.8);
+        gap: 8px;
+        color: #94a3b8;
         cursor: pointer;
     }
 
-    .remember-me input[type="checkbox"] {
-        width: 13px;
-        height: 13px;
-        accent-color: #72efdd;
-        cursor: pointer;
+    .remember-wrap input[type="checkbox"] {
+        accent-color: #38bdf8;
+        width: 15px;
+        height: 15px;
+        border-radius: 4px;
+    }
+
+    .forgot-link {
+        color: #38bdf8;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s;
+    }
+
+    .forgot-link:hover {
+        text-decoration: underline;
     }
 
     .btn-submit {
         width: 100%;
-        padding: 8px 14px;
-        background: #a2e8dd;
+        padding: 14px 20px;
+        border-radius: 12px;
         border: none;
-        border-radius: 7px;
-        color: #1a0836;
-        font-size: 12.5px;
+        background: linear-gradient(135deg, #0284c7 0%, #9333ea 100%);
+        color: #ffffff;
+        font-size: 14.5px;
         font-weight: 700;
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 6px 20px rgba(147, 51, 234, 0.35);
         transition: all 0.25s ease;
-        position: relative;
-        overflow: hidden;
     }
 
     .btn-submit:hover {
-        background: #8ce2d5;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 14px rgba(140, 226, 213, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(147, 51, 234, 0.45);
+        filter: brightness(1.06);
     }
 
-    .btn-submit:active {
-        transform: translateY(0);
-    }
-
-    .btn-submit:disabled {
-        background: rgba(255, 255, 255, 0.2);
-        color: rgba(255, 255, 255, 0.4);
-        cursor: not-allowed;
-        transform: none;
-        box-shadow: none;
-    }
-
-    .footer-text {
+    .auth-footer-text {
         text-align: center;
-        margin-top: 10px;
-        font-size: 11px;
-        color: rgba(255, 255, 255, 0.7);
+        margin-top: 18px;
+        font-size: 12px;
+        color: #94a3b8;
     }
 
-    .footer-text a {
-        color: #ffffff;
-        font-weight: 600;
+    .auth-footer-text a {
+        color: #38bdf8;
+        font-weight: 700;
         text-decoration: none;
+        margin-left: 4px;
     }
 
-    .footer-text a:hover {
+    .auth-footer-text a:hover {
         text-decoration: underline;
     }
 
-    /* Animated Notifications */
-    .msg {
-        padding: 10px 14px;
-        border-radius: 8px;
-        margin-bottom: 16px;
-        display: none;
-        font-size: 12px;
-        font-weight: 500;
-        animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-6px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .msg.error {
-        background: rgba(235, 87, 87, 0.2);
-        border: 1px solid #eb5757;
-        color: #ff9999;
-        display: block;
-    }
-
-    .msg.success {
-        background: rgba(39, 174, 96, 0.2);
-        border: 1px solid #27ae60;
-        color: #7bed9f;
-        display: block;
-    }
-
-    /* Responsive Design Adjustments */
-    @media (max-width: 850px) {
-        .main-container {
-            flex-direction: column;
-        }
-        .hero-section {
-            padding: 30px;
-        }
-        .ribbon-container {
-            transform: scale(0.7);
-            top: -60px;
-            left: -60px;
-        }
-        .brand-logo {
-            margin-top: 40px;
-        }
-    }
-
-    /* Verification Modal Styles */
+    /* Modal Overlay for OTP Verification */
     .modal-overlay {
         position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(18, 9, 41, 0.85);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(10px);
         display: none;
         align-items: center;
         justify-content: center;
         z-index: 1000;
         padding: 20px;
     }
+
     .modal-overlay.active {
         display: flex;
     }
+
     .modal-box {
-        background: linear-gradient(135deg, #44218c 0%, #291258 100%);
+        background: #0d162a;
         border: 1px solid rgba(255, 255, 255, 0.15);
         border-radius: 20px;
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-        max-width: 480px;
+        padding: 32px;
+        max-width: 440px;
         width: 100%;
-        padding: 30px;
-        color: #ffffff;
-        position: relative;
         text-align: center;
-        animation: modalPop 0.25s ease-out;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+        position: relative;
     }
-    @keyframes modalPop {
-        from { transform: scale(0.92); opacity: 0; }
-        to { transform: scale(1); opacity: 1; }
-    }
-    .modal-close-btn {
+
+    .modal-close {
         position: absolute;
-        top: 18px;
-        right: 18px;
-        background: rgba(255, 255, 255, 0.1);
+        top: 16px; right: 16px;
+        background: rgba(255, 255, 255, 0.08);
         border: none;
-        color: #fff;
-        width: 32px;
-        height: 32px;
+        color: #94a3b8;
+        width: 32px; height: 32px;
         border-radius: 50%;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 14px;
-        transition: background 0.2s;
     }
-    .modal-close-btn:hover {
-        background: rgba(235, 87, 87, 0.4);
+
+    .modal-close:hover {
+        color: #ffffff;
     }
-    .verify-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(114, 239, 221, 0.12);
-        color: #72efdd;
-        border: 1px solid rgba(114, 239, 221, 0.3);
-        padding: 8px 14px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 14px;
-        margin: 12px 0 20px 0;
-        word-break: break-all;
-    }
-    .otp-box {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 18px;
-        margin-bottom: 18px;
-    }
-    .otp-input {
+
+    .otp-field {
         width: 100%;
-        background: rgba(255, 255, 255, 0.08);
+        background: rgba(15, 23, 42, 0.8);
         border: 1px solid rgba(255, 255, 255, 0.2);
         color: #fff;
         font-size: 24px;
-        letter-spacing: 8px;
+        letter-spacing: 6px;
         text-align: center;
         padding: 12px;
-        border-radius: 8px;
+        border-radius: 10px;
         font-weight: 700;
-        margin-bottom: 12px;
+        margin: 16px 0;
         outline: none;
-        transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .otp-input:focus {
-        border-color: #72efdd;
-        box-shadow: 0 0 12px rgba(114, 239, 221, 0.3);
-    }
-    .verify-feedback {
-        padding: 10px 14px;
-        border-radius: 8px;
-        font-size: 13px;
-        margin-bottom: 14px;
-        display: none;
-    }
-    .verify-feedback.error {
-        background: rgba(235, 87, 87, 0.2);
-        border: 1px solid rgba(235, 87, 87, 0.4);
-        color: #ff9b9b;
-        display: block;
-    }
-    .verify-feedback.success {
-        background: rgba(114, 239, 221, 0.2);
-        border: 1px solid rgba(114, 239, 221, 0.4);
-        color: #a2e8dd;
-        display: block;
-    }
-
-    /* Instant Code Display & Countdown Timer */
-    .instant-code-card {
-        background: rgba(114, 239, 221, 0.08);
-        border: 1px dashed rgba(114, 239, 221, 0.45);
-        border-radius: 12px;
-        padding: 10px 14px;
-        margin: 10px 0 14px;
-        text-align: center;
-    }
-    .instant-code-header {
-        font-size: 11px;
-        color: rgba(255, 255, 255, 0.8);
-        margin-bottom: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-    }
-    .instant-code-display {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-    .instant-code-value {
-        font-family: 'JetBrains Mono', 'Courier New', monospace;
-        font-size: 20px;
-        font-weight: 800;
-        letter-spacing: 4px;
-        color: #72efdd;
-        background: rgba(0, 0, 0, 0.35);
-        padding: 3px 12px;
-        border-radius: 6px;
-        border: 1px solid rgba(114, 239, 221, 0.3);
-    }
-    .btn-copy-code {
-        background: rgba(114, 239, 221, 0.2);
-        border: 1px solid rgba(114, 239, 221, 0.6);
-        color: #72efdd;
-        border-radius: 6px;
-        padding: 5px 10px;
-        font-size: 11px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-    }
-    .btn-copy-code:hover {
-        background: #72efdd;
-        color: #180933;
-    }
-    .otp-timer-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.75);
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        border-radius: 20px;
-        padding: 3px 12px;
-        margin-bottom: 12px;
-    }
-    .otp-timer-badge.expired {
-        color: #ff8b8b;
-        background: rgba(239, 68, 68, 0.2);
-        border-color: rgba(239, 68, 68, 0.5);
     }
 </style>
-  <!-- Pop-up Toaster System -->
-  <link rel="stylesheet" href="assets/css/toaster.css">
-  <script src="assets/js/toaster.js"></script>
 </head>
 <body>
 
-<!-- Short Skeletal Loading Placeholder -->
-<div id="skeletonLoader" class="skeleton-overlay">
-    <div class="skeleton-window">
-        <div class="skeleton-header">
-            <div class="skeleton-dots">
-                <span class="skeleton-dot"></span>
-                <span class="skeleton-dot"></span>
-                <span class="skeleton-dot"></span>
+<div class="grid-overlay"></div>
+
+<div class="main-wrapper">
+    <!-- Top Platform Nav -->
+    <header style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 28px; flex-wrap: wrap; gap: 12px;">
+        <a href="index.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff;">
+            <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #0284c7, #9333ea); display: flex; align-items: center; justify-content: center; font-size: 17px; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);">
+                <i class="fa-solid fa-graduation-cap"></i>
             </div>
-            <div class="skeleton-shimmer" style="width: 140px; height: 16px; border-radius: 6px;"></div>
+            <div>
+                <div style="font-weight: 800; font-size: 15px; letter-spacing: -0.2px;">FLAWLESS GRAPHICS</div>
+                <div style="font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700;">Enterprise ERP</div>
+            </div>
+        </a>
+        <nav style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <a href="index.html" class="tab-btn" style="text-decoration: none;"><i class="fa-solid fa-house"></i> Overview</a>
+            <a href="welcome.html" class="tab-btn" style="text-decoration: none;"><i class="fa-solid fa-grid-horizontal"></i> Unified Hub</a>
+            <a href="register.html" class="tab-btn" style="text-decoration: none; background: rgba(56, 189, 248, 0.12); border-color: rgba(56, 189, 248, 0.3); color: #38bdf8;"><i class="fa-solid fa-building-circle-check"></i> Register Org</a>
+        </nav>
+    </header>
+
+    <!-- Top Gateway Header -->
+    <div class="gateway-header">
+        <div class="gateway-badge">
+            <span class="badge-dot"></span>
+            Executive &amp; Administrative Command Gateways
         </div>
-        <div class="skeleton-body">
-            <div class="skeleton-hero">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <div class="skeleton-shimmer" style="width: 36px; height: 36px; border-radius: 8px;"></div>
-                    <div style="display: flex; flex-direction: column; gap: 6px;">
-                        <div class="skeleton-shimmer" style="width: 90px; height: 16px; border-radius: 4px;"></div>
-                        <div class="skeleton-shimmer" style="width: 130px; height: 10px; border-radius: 4px;"></div>
+        <h1 class="gateway-title">Direct Institutional Access Console</h1>
+        <p class="gateway-subtitle">
+            Single sign-on authentication for Bursars &amp; Accountants, Human Resource Directors, Super Administrators, Educators, and Students.
+        </p>
+    </div>
+
+    <!-- Master Console Card -->
+    <div class="console-card">
+        <!-- Top Console Header Bar -->
+        <div class="console-topbar">
+            <div style="font-size: 11.5px; font-weight: 800; color: #34d399; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-shield-halved" id="topbarIcon"></i> <span id="topbarTitle">SUPER ADMINISTRATOR CONSOLE</span>
+            </div>
+            <div class="security-badge">
+                <span class="sec-dot"></span> SHA-256 Encrypted Gateway
+            </div>
+        </div>
+
+        <!-- Split 2-Column Body -->
+        <div class="console-body">
+            <!-- Left Overview Column -->
+            <div class="left-panel">
+                <div>
+                    <div class="role-badge" id="roleBadge">SUPER ADMINISTRATOR CONSOLE</div>
+                    <h2 class="role-title" id="roleTitle">Super Admin Command Center</h2>
+                    <p class="role-desc" id="roleDesc">
+                        Master organizational governance, multi-tenant workspace routing, institutional logo branding, and cryptographic audit log inspection.
+                    </p>
+                    <div class="feature-list" id="featureList">
+                        <div class="feature-item"><i class="fa-solid fa-check"></i> <span>Full system administrative rights &amp; role assignment</span></div>
+                        <div class="feature-item"><i class="fa-solid fa-check"></i> <span>Organization branding &amp; logo customization</span></div>
+                        <div class="feature-item"><i class="fa-solid fa-check"></i> <span>Centralized security policy &amp; audit inspection</span></div>
                     </div>
                 </div>
-                <div class="skeleton-shimmer" style="width: 82%; height: 22px; margin-top: 14px; border-radius: 6px;"></div>
-                <div class="skeleton-shimmer" style="width: 58%; height: 16px; border-radius: 6px;"></div>
-                <div style="display: flex; gap: 10px; margin-top: 14px;">
-                    <div class="skeleton-shimmer" style="width: 110px; height: 28px; border-radius: 6px;"></div>
-                    <div class="skeleton-shimmer" style="width: 130px; height: 28px; border-radius: 6px;"></div>
+                <a href="pages/admin/admin-login.html" class="btn-fullscreen" id="btnFullscreen">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> <span id="fullscreenText">Open Fullscreen Super Admin Login Page</span>
+                </a>
+            </div>
+
+            <!-- Right Authentication Form Column -->
+            <div class="right-panel">
+                <!-- Role Selector Tabs -->
+                <div class="console-tabs" style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px;">
+                    <button type="button" class="tab-btn active" id="tabAdmin" onclick="switchConsoleRole('admin')">
+                        <i class="fa-solid fa-shield-halved"></i> Super Admin
+                    </button>
+                    <button type="button" class="tab-btn" id="tabFinance" onclick="switchConsoleRole('finance')">
+                        <i class="fa-solid fa-file-invoice-dollar"></i> Bursary &amp; Treasury
+                    </button>
+                    <button type="button" class="tab-btn" id="tabHR" onclick="switchConsoleRole('hr')">
+                        <i class="fa-solid fa-users-gear"></i> HR &amp; Faculty
+                    </button>
+                    <button type="button" class="tab-btn" id="tabTeacher" onclick="switchConsoleRole('teacher')">
+                        <i class="fa-solid fa-chalkboard-user"></i> Educator
+                    </button>
+                    <button type="button" class="tab-btn" id="tabStudent" onclick="switchConsoleRole('student')">
+                        <i class="fa-solid fa-graduation-cap"></i> Student
+                    </button>
                 </div>
-            </div>
-            <div class="skeleton-card">
-                <div class="skeleton-shimmer" style="width: 140px; height: 18px; margin-bottom: 8px; border-radius: 5px;"></div>
-                <div class="skeleton-shimmer" style="height: 32px; border-radius: 7px; margin-bottom: 6px;"></div>
-                <div class="skeleton-shimmer" style="height: 32px; border-radius: 7px; margin-bottom: 6px;"></div>
-                <div class="skeleton-shimmer" style="height: 32px; border-radius: 7px; margin-bottom: 6px;"></div>
-                <div style="display: flex; justify-content: space-between; margin: 4px 0;">
-                    <div class="skeleton-shimmer" style="width: 90px; height: 14px; border-radius: 4px;"></div>
-                    <div class="skeleton-shimmer" style="width: 100px; height: 14px; border-radius: 4px;"></div>
+
+                <div class="auth-header">
+                    <h3 id="authDeskTitle">Sign In to Super Admin Desk</h3>
+                    <p id="authDeskSubtitle">Enter your institutional administrative credentials to launch your console.</p>
                 </div>
-                <div class="skeleton-shimmer" style="height: 34px; border-radius: 7px; margin-top: 6px;"></div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="app-window">
-    <!-- Window Controls Header -->
-    <div class="window-header">
-        <div style="display: flex; align-items: center; gap: 16px;">
-            <div class="window-dots">
-                <div class="dot dot-1"></div>
-                <div class="dot dot-2"></div>
-                <div class="dot dot-3"></div>
-            </div>
-            <nav class="window-quick-nav">
-                <a href="welcome.html" class="window-nav-link"><i class="fa-solid fa-grid-horizontal"></i> Hub</a>
-                <a href="pages/public/home.html" class="window-nav-link"><i class="fa-solid fa-house"></i> Main Site</a>
-                <a href="index.html" class="window-nav-link"><i class="fa-solid fa-building"></i> Register Org</a>
-                <a href="pages/hr/hr-dashboard.html" class="window-nav-link"><i class="fa-solid fa-users-gear"></i> HR Portal</a>
-            </nav>
-        </div>
-        <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.5); letter-spacing: 0.5px;">
-            LUCY™ ENTERPRISE
-        </div>
-    </div>
-
-    <div class="main-container">
-        <!-- Left Hero Banner -->
-        <div class="hero-section">
-            <div class="ribbon-container">
-                <div class="ribbon ribbon-1"></div>
-                <div class="ribbon ribbon-2"></div>
-            </div>
-
-            <div class="brand-logo">
-                <div class="org-logo-preview" id="orgLogoBox" style="width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
-                    <i class="fa-solid fa-elephant logo-icon" style="font-size:18px;"></i>
-                </div>
-                <div>
-                    <div class="brand-title" id="orgTitle">FLAWLESS GRAPHICS</div>
-                    <div class="brand-subtitle">Innovation Starts Here</div>
-                </div>
-            </div>
-
-            <div class="hero-text">
-                <h1>Log in to access your <span>LUCY™</span> enterprise dashboard</h1>
-            </div>
-
-            <div class="hero-buttons">
-                <a href="index.html" class="btn-outline">Register Organization</a>
-                <button class="btn-outline" type="button" onclick="window.SupabaseConfig && window.SupabaseConfig.openConfigModal()" style="border-color: rgba(114, 239, 221, 0.4); color: #72efdd;" title="Configure Supabase Cloud URL & API Key">
-                    <i class="fa-solid fa-cloud" style="margin-right: 6px;"></i> Connect Supabase
-                </button>
-            </div>
-        </div>
-
-        <!-- Right Form Section -->
-        <div class="form-section">
-            <div class="card">
-                <h2>Log In to FLAWLESS GRAPHICS</h2>
-
-                <div id="msg" class="msg"></div>
-
-                <form id="loginForm" onsubmit="event.preventDefault(); login();">
-                    <div class="form-group">
-                        <label for="email">Your Email</label>
-                        <div class="input-wrapper">
-                            <input type="email" id="email" placeholder="admin@company.com" required autocomplete="username">
-                            <i class="fa-regular fa-envelope field-icon"></i>
+                <form id="consoleLoginForm" onsubmit="event.preventDefault(); handleConsoleAuth();">
+                    <div class="form-group" id="siteOrgGroup">
+                        <label class="form-label" id="labelSiteOrg">Institution Workspace (Subdomain Slug)</label>
+                        <div class="input-wrap">
+                            <i class="fa-solid fa-school field-icon"></i>
+                            <select id="siteOrgSelect" class="form-control" style="cursor: pointer; padding-left: 42px;">
+                                <option value="">-- Loading Approved Institutions... --</option>
+                            </select>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="password">Your Password</label>
-                        <div class="input-wrapper">
-                            <input type="password" id="password" placeholder="Enter password" required autocomplete="current-password">
-                            <i class="fa-regular fa-eye-slash field-icon" id="togglePassword" onclick="togglePasswordVisibility()"></i>
+                        <label class="form-label" id="labelEmail">Institutional Email</label>
+                        <div class="input-wrap">
+                            <i class="fa-solid fa-envelope field-icon" id="fieldIcon"></i>
+                            <input type="text" id="loginEmail" class="form-control" placeholder="admin@institution.edu" required autocomplete="username">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" id="labelPassword">Master Password</label>
+                        <div class="input-wrap">
+                            <i class="fa-solid fa-lock field-icon"></i>
+                            <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+                            <i class="fa-solid fa-eye toggle-pass" id="togglePasswordIcon" onclick="togglePasswordVisibility()"></i>
                         </div>
                     </div>
 
                     <div class="form-extras">
-                        <label class="remember-me">
-                            <input type="checkbox" id="remember" checked>
-                            <span>Remember</span>
+                        <label class="remember-wrap">
+                            <input type="checkbox" id="rememberCreds" checked>
+                            <span>Remember credentials</span>
                         </label>
-                        <a href="welcome.html" class="link-subtle" onclick="quickDemoLogin(event)">Demo Login</a>
+                        <a href="#" class="forgot-link" onclick="handleForgotPassword()">Forgot Password?</a>
                     </div>
 
-                    <button type="submit" id="submitBtn" class="btn-submit">Log In</button>
-                    <button type="button" class="btn-submit" style="margin-top: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff;" onclick="quickDemoLogin(event)">
-                        <i class="fa-solid fa-bolt" style="color: #72efdd; margin-right: 6px;"></i> One-Click Demo Access
+                    <button type="submit" class="btn-submit" id="btnSubmitConsole">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                        <span id="submitBtnText">Sign In to Super Admin Console</span>
                     </button>
                 </form>
 
-                <div class="footer-text">
-                    Don't have an account? <a href="index.html">Sign Up</a>
+                <div class="auth-footer-text">
+                    New Educational Institution? <a href="register.html">Register School Workspace</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- MODAL: EMAIL & OTP VERIFICATION -->
+<!-- Modal: OTP Verification -->
 <div class="modal-overlay" id="verificationModal">
-    <div class="modal-box" style="max-width: 480px; text-align: center;">
-        <button class="modal-close-btn" onclick="closeVerificationModal()"><i class="fa-solid fa-xmark"></i></button>
-        <div style="width: 58px; height: 58px; border-radius: 50%; background: rgba(114, 239, 221, 0.15); color: #72efdd; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 16px;">
+    <div class="modal-box">
+        <button type="button" class="modal-close" onclick="closeVerificationModal()"><i class="fa-solid fa-xmark"></i></button>
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(56,189,248,0.15); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 12px;">
             <i class="fa-solid fa-shield-halved"></i>
         </div>
-        <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 6px;">Email Verification Required</h3>
-        <p style="font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.5; margin-bottom: 6px;">
-            Your account must be confirmed before accessing the workspace.
-        </p>
-        <div class="verify-badge" id="verifyEmailBadge">
-            <i class="fa-regular fa-envelope"></i> <span id="verifyEmailText">user@company.com</span>
-        </div>
-
-        <div id="verifyFeedback" class="verify-feedback"></div>
-
-        <!-- Instant Code Card for users who didn't receive email -->
-        <div class="instant-code-card" id="instantCodeCard">
-            <div class="instant-code-header">
-                <i class="fa-solid fa-envelope-open-text"></i>
-                <span>Didn't receive email? Instant authentication code:</span>
-            </div>
-            <div class="instant-code-display">
-                <span class="instant-code-value" id="instantCodeValue">------</span>
-                <button type="button" class="btn-copy-code" id="btnAutoFillCode" onclick="autoFillOtpCode()">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-fill Code
-                </button>
-            </div>
-        </div>
-
-        <!-- OTP Expiration Countdown Timer -->
-        <div class="otp-timer-badge" id="otpTimerBadge">
-            <i class="fa-regular fa-clock"></i> Code expires in: <span id="otpTimerText" style="font-weight: 700; font-family: monospace; font-size: 13.5px; margin-left: 4px;">05:00</span>
-        </div>
-
-        <div class="otp-box">
-            <div style="font-size: 13px; font-weight: 600; color: #a2e8dd; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                <i class="fa-solid fa-key"></i> Enter 6-Digit Verification Code
-            </div>
-            <input type="text" id="otpInput" class="otp-input" placeholder="------" maxlength="6" autocomplete="one-time-code">
-            <button type="button" class="btn-submit" id="btnVerifyOtp" onclick="submitOtpVerification()" style="margin-top: 4px;">
-                <i class="fa-solid fa-check"></i> Verify & Enter Workspace
-            </button>
-        </div>
-
-        <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 18px; line-height: 1.5;">
-            Or click the link sent to your email inbox. Need another link?
-        </div>
-
-        <div style="display: flex; gap: 10px; justify-content: center; align-items: center;">
-            <button type="button" class="btn-outline" id="btnResend" onclick="resendVerificationEmail()" style="font-size: 12px; padding: 8px 16px;">
-                <i class="fa-solid fa-rotate-right"></i> Resend Verification Email
-            </button>
-            <button type="button" class="btn-outline" onclick="closeVerificationModal()" style="font-size: 12px; padding: 8px 16px;">
-                Close
-            </button>
-        </div>
+        <h3 style="font-size: 19px; font-weight: 800; color: #fff; margin-bottom: 4px;">Security Code Verification</h3>
+        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 12px;">A 6-digit cryptographic verification code was generated for your session:</p>
+        <div style="display: inline-block; padding: 4px 12px; background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); border-radius: 6px; color: #38bdf8; font-size: 12.5px; font-weight: 700; margin-bottom: 12px;" id="verifyEmailText">user@company.com</div>
+        <div id="verifyFeedback" style="font-size: 12px; color: #10b981; margin-bottom: 8px;"></div>
+        <input type="text" id="otpInput" class="otp-field" placeholder="------" maxlength="6">
+        <button type="button" class="btn-submit" onclick="submitOtpVerification()" style="margin-top: 6px;">
+            <i class="fa-solid fa-check"></i> Verify &amp; Launch Console
+        </button>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="assets/js/supabase-config.js"></script>
-<script src="assets/js/supabase-client.js"></script>
-<script src="assets/js/auth-session.js"></script>
 <script>
-let pendingLoginEmail = '';
-let currentLoginOtpCode = '';
-let loginOtpCountdownInterval = null;
-let loginOtpTimeRemaining = 300; // 5 minutes
-let isLoginOtpExpired = false;
+const ROLE_CONFIGS = {
+    admin: {
+        icon: 'fa-solid fa-shield-halved',
+        badge: 'SUPER ADMINISTRATOR CONSOLE',
+        badgeColor: 'rgba(147, 51, 234, 0.15)',
+        badgeBorder: 'rgba(147, 51, 234, 0.35)',
+        badgeText: '#c084fc',
+        title: 'Super Admin Command Center',
+        desc: 'Master organizational governance, multi-tenant workspace routing, institutional logo branding, and cryptographic audit log inspection.',
+        features: [
+            'Full system administrative rights & role assignment',
+            'Organization branding & logo customization',
+            'Centralized security policy & audit inspection'
+        ],
+        fullscreenUrl: 'pages/admin/admin-login.html',
+        fullscreenText: 'Open Fullscreen Super Admin Login Page',
+        deskTitle: 'Sign In to Super Admin Desk',
+        deskSubtitle: 'Enter your institutional administrative credentials to launch your console.',
+        labelEmail: 'INSTITUTIONAL EMAIL',
+        emailPlaceholder: 'admin@institution.edu',
+        defaultEmail: 'admin@flawlessgraphics.com',
+        labelPass: 'MASTER PASSWORD',
+        submitText: 'Sign In to Super Admin Console',
+        targetDashboard: 'pages/admin/admin-dashboard.html'
+    },
+    finance: {
+        icon: 'fa-solid fa-file-invoice-dollar',
+        badge: 'BURSARY & TREASURY CONSOLE',
+        badgeColor: 'rgba(16, 185, 129, 0.15)',
+        badgeBorder: 'rgba(16, 185, 129, 0.35)',
+        badgeText: '#34d399',
+        title: 'Fiscal & Treasury Command Center',
+        desc: 'Tuition invoicing, expenditure auditing, real-time balance sheets, and cryptographic bursary receipts.',
+        features: [
+            'Automated student tuition invoicing & clearance verification',
+            'Multi-currency bursary ledgers & expense auditing',
+            'Cryptographic receipt generation & verification'
+        ],
+        fullscreenUrl: 'pages/finance/finance-login.html',
+        fullscreenText: 'Open Fullscreen Bursary Login Page',
+        deskTitle: 'Sign In to Bursary & Treasury',
+        deskSubtitle: 'Enter your institutional finance credentials to access treasury ledgers.',
+        labelEmail: 'FINANCE EMAIL ADDRESS',
+        emailPlaceholder: 'finance@institution.edu',
+        defaultEmail: 'bursar@flawlessgraphics.com',
+        labelPass: 'TREASURY PASSWORD',
+        submitText: 'Sign In to Finance Console',
+        targetDashboard: 'pages/finance/finance-dashboard.html'
+    },
+    hr: {
+        icon: 'fa-solid fa-users-gear',
+        badge: 'HR & FACULTY PAYROLL CONSOLE',
+        badgeColor: 'rgba(234, 88, 12, 0.15)',
+        badgeBorder: 'rgba(234, 88, 12, 0.35)',
+        badgeText: '#fb923c',
+        title: 'Human Resources & Faculty Payroll',
+        desc: 'Staff directory management, biographical onboarding, leave tracking, and automated biometric payroll processing.',
+        features: [
+            'Comprehensive academic & non-academic staff directories',
+            'Automated payroll computation with digital payslip delivery',
+            'Leave approval workflows & biometric attendance monitoring'
+        ],
+        fullscreenUrl: 'pages/hr/hr-login.html',
+        fullscreenText: 'Open Fullscreen HR Login Page',
+        deskTitle: 'Sign In to HR & Payroll Desk',
+        deskSubtitle: 'Enter your institutional HR credentials to launch payroll & staff records.',
+        labelEmail: 'HR EMAIL ADDRESS',
+        emailPlaceholder: 'hr@institution.edu',
+        defaultEmail: 'hr@flawlessgraphics.com',
+        labelPass: 'SECURITY PASSWORD',
+        submitText: 'Sign In to HR Console',
+        targetDashboard: 'pages/hr/hr-dashboard.html'
+    },
+    teacher: {
+        icon: 'fa-solid fa-chalkboard-user',
+        badge: 'EDUCATOR WORKSTATION CONSOLE',
+        badgeColor: 'rgba(6, 182, 212, 0.15)',
+        badgeBorder: 'rgba(6, 182, 212, 0.35)',
+        badgeText: '#38bdf8',
+        title: 'Faculty Academic Command Desk',
+        desc: 'Course curriculum planning, terminal gradebook scoring, attendance tracking, and student progress reports.',
+        features: [
+            'Instant gradebook recording & automated weighted GPA scaling',
+            'Classroom biometric attendance sync & roll-call monitoring',
+            'Subject syllabus distribution & term report card compiler'
+        ],
+        fullscreenUrl: 'pages/teacher/teacher-login.html',
+        fullscreenText: 'Open Fullscreen Teacher Login Page',
+        deskTitle: 'Sign In to Educator Desk',
+        deskSubtitle: 'Enter your teacher staff ID or institutional email to access classes.',
+        labelEmail: 'STAFF ID OR WORK EMAIL',
+        emailPlaceholder: 'teacher@institution.edu',
+        defaultEmail: 'teacher@flawlessgraphics.com',
+        labelPass: 'ACCOUNT PASSWORD',
+        submitText: 'Sign In to Teacher Workstation',
+        targetDashboard: 'pages/teacher/teacher-dashboard.html'
+    },
+    student: {
+        icon: 'fa-solid fa-graduation-cap',
+        badge: 'STUDENT ACADEMIC PORTAL',
+        badgeColor: 'rgba(99, 102, 241, 0.15)',
+        badgeBorder: 'rgba(99, 102, 241, 0.35)',
+        badgeText: '#818cf8',
+        title: 'Student Learning & Portfolio Hub',
+        desc: 'Terminal grade broadsheets, fee balance statements, examination timetables, and academic performance tracking.',
+        features: [
+            'Real-time terminal report card & 9-point GPA tracking',
+            'Examination schedules & live lecture timetables',
+            'Bursary clearance verification & payment receipts'
+        ],
+        fullscreenUrl: 'pages/student/student-login.html',
+        fullscreenText: 'Open Fullscreen Student Portal',
+        deskTitle: 'Sign In to Student Portal',
+        deskSubtitle: 'Enter your Student Roll Number or registered email to view grades.',
+        labelEmail: 'STUDENT ROLL NUMBER / EMAIL',
+        emailPlaceholder: 'student@institution.edu',
+        defaultEmail: 'student@flawlessgraphics.com',
+        labelPass: 'STUDENT PIN / PASSWORD',
+        submitText: 'Access Student Portal',
+        targetDashboard: 'pages/student/student-dashboard.html'
+    }
+};
 
-function startLoginOtpCountdown(duration = 300) {
-    if (loginOtpCountdownInterval) clearInterval(loginOtpCountdownInterval);
-    loginOtpTimeRemaining = duration;
-    isLoginOtpExpired = false;
-    const badge = document.getElementById("otpTimerBadge");
-    const timerText = document.getElementById("otpTimerText");
-    const btnVerify = document.getElementById("btnVerifyOtp");
-    if (badge) badge.classList.remove("expired");
-    if (btnVerify) btnVerify.disabled = false;
+let currentRole = 'admin';
+let generatedOtp = '';
+let targetRedirectUrl = '';
 
-    function updateDisplay() {
-        const mins = Math.floor(loginOtpTimeRemaining / 60);
-        const secs = loginOtpTimeRemaining % 60;
-        if (timerText) {
-            timerText.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+function switchConsoleRole(roleKey) {
+    if (!ROLE_CONFIGS[roleKey]) return;
+    currentRole = roleKey;
+
+    // Update active tab buttons
+    ['admin', 'finance', 'hr', 'teacher', 'student'].forEach(r => {
+        const tab = document.getElementById('tab' + r.charAt(0).toUpperCase() + r.slice(1));
+        if (tab) {
+            if (r === roleKey) tab.classList.add('active');
+            else tab.classList.remove('active');
         }
-        if (loginOtpTimeRemaining <= 0) {
-            clearInterval(loginOtpCountdownInterval);
-            isLoginOtpExpired = true;
-            if (badge) badge.classList.add("expired");
-            if (timerText) timerText.textContent = "00:00 (Expired)";
-            if (btnVerify) btnVerify.disabled = true;
-            showVerifyFeedback("⚠️ Verification code has expired. Please click 'Resend Verification Email' to generate a fresh one.", true);
-        }
-        loginOtpTimeRemaining--;
-    }
+    });
 
-    updateDisplay();
-    loginOtpCountdownInterval = setInterval(updateDisplay, 1000);
-}
+    const cfg = ROLE_CONFIGS[roleKey];
 
-function autoFillOtpCode() {
-    if (isLoginOtpExpired) {
-        showVerifyFeedback("⚠️ This code has expired! Please click 'Resend Verification Email' to get a fresh code.", true);
-        return;
-    }
-    const input = document.getElementById("otpInput");
-    if (input && currentLoginOtpCode) {
-        input.value = currentLoginOtpCode;
-        input.focus();
-        showVerifyFeedback("Code auto-filled! Click 'Verify & Enter Workspace' to proceed.", false);
-    }
-}
+    // Sync console topbar format to match reference
+    const topbarTitle = document.getElementById('topbarTitle');
+    if (topbarTitle) topbarTitle.textContent = cfg.badge;
+    const topbarIcon = document.getElementById('topbarIcon');
+    if (topbarIcon && cfg.icon) topbarIcon.className = cfg.icon;
 
-function showMessage(text, isError = true) {
-    const msgEl = document.getElementById("msg");
-    msgEl.textContent = text;
-    msgEl.className = "msg " + (isError ? "error" : "success");
-}
+    const roleBadge = document.getElementById('roleBadge');
+    roleBadge.textContent = cfg.badge;
+    roleBadge.style.background = cfg.badgeColor;
+    roleBadge.style.borderColor = cfg.badgeBorder;
+    roleBadge.style.color = cfg.badgeText;
 
-function openVerificationModal(email, msg = '') {
-    pendingLoginEmail = email;
-    currentLoginOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
-    document.getElementById("verifyEmailText").textContent = email;
-    document.getElementById("otpInput").value = '';
-    const instantEl = document.getElementById("instantCodeValue");
-    if (instantEl) instantEl.textContent = currentLoginOtpCode;
-    showVerifyFeedback(msg || `Verification required. Instant access code: ${currentLoginOtpCode}`, false);
-    startLoginOtpCountdown(300);
-    document.getElementById("verificationModal").classList.add("active");
-    setTimeout(() => document.getElementById("otpInput")?.focus(), 150);
-}
+    document.getElementById('roleTitle').textContent = cfg.title;
+    document.getElementById('roleDesc').textContent = cfg.desc;
 
-function closeVerificationModal() {
-    if (loginOtpCountdownInterval) clearInterval(loginOtpCountdownInterval);
-    document.getElementById("verificationModal").classList.remove("active");
-}
+    // Features
+    const featureList = document.getElementById('featureList');
+    featureList.innerHTML = cfg.features.map(f => 
+        `<div class="feature-item"><i class="fa-solid fa-check"></i> <span>${f}</span></div>`
+    ).join('');
 
-function showVerifyFeedback(text, isError = true) {
-    const el = document.getElementById("verifyFeedback");
-    if (!el) return;
-    el.textContent = text;
-    el.className = "verify-feedback " + (isError ? "error" : "success");
-    el.style.display = "block";
-}
+    // Fullscreen link
+    const btnFullscreen = document.getElementById('btnFullscreen');
+    btnFullscreen.href = cfg.fullscreenUrl;
+    document.getElementById('fullscreenText').textContent = cfg.fullscreenText;
 
-async function submitOtpVerification() {
-    if (isLoginOtpExpired) {
-        return showVerifyFeedback("⚠️ Verification code has expired. Please request a new code.", true);
-    }
-
-    const otpInput = document.getElementById("otpInput");
-    const code = otpInput.value.trim();
-    const btn = document.getElementById("btnVerifyOtp");
-
-    if (!code || code.length < 6) {
-        return showVerifyFeedback("Please enter the 6-digit verification code.", true);
-    }
-
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying...';
-
-    try {
-        if (code === currentLoginOtpCode) {
-            if (loginOtpCountdownInterval) clearInterval(loginOtpCountdownInterval);
-            showVerifyFeedback("Account verified successfully! Entering workspace...", false);
-            if (window.AuthSession) {
-                window.AuthSession.setUser({
-                    org: 'FLAWLESS GRAPHICS',
-                    name: pendingLoginEmail.split('@')[0],
-                    email: pendingLoginEmail,
-                    role: 'admin'
-                });
-            }
-            setTimeout(() => {
-                window.location.href = "welcome.html";
-            }, 900);
-            return;
-        }
-
-        if (window.SupabaseService && typeof window.SupabaseService.verifyOtp === 'function') {
-            const res = await window.SupabaseService.verifyOtp(pendingLoginEmail, code, 'signup');
-            if (loginOtpCountdownInterval) clearInterval(loginOtpCountdownInterval);
-            showVerifyFeedback("Account verified successfully! Entering workspace...", false);
-
-            const user = res.user;
-            if (window.AuthSession && user) {
-                window.AuthSession.setUser({
-                    org: user.user_metadata?.org_name || 'FLAWLESS GRAPHICS',
-                    name: user.user_metadata?.admin_name || user.email.split('@')[0],
-                    email: user.email,
-                    role: 'admin'
-                });
-            }
-
-            setTimeout(() => {
-                window.location.href = "welcome.html";
-            }, 900);
-        } else {
-            showVerifyFeedback("Invalid verification code. Please try again.", true);
-        }
-    } catch (err) {
-        console.error("OTP verification error:", err);
-        showVerifyFeedback(err.message || "Invalid or expired verification code.", true);
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> Verify & Enter Workspace';
-    }
-}
-
-async function resendVerificationEmail() {
-    const btn = document.getElementById("btnResend");
-    if (!pendingLoginEmail) return;
-
-    currentLoginOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const instantEl = document.getElementById("instantCodeValue");
-    if (instantEl) instantEl.textContent = currentLoginOtpCode;
-    startLoginOtpCountdown(300);
-    showVerifyFeedback(`Fresh verification code generated: ${currentLoginOtpCode}`, false);
-
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Sending...';
-
-    try {
-        if (window.SupabaseService && typeof window.SupabaseService.resendVerification === 'function') {
-            await window.SupabaseService.resendVerification(pendingLoginEmail);
-        }
-    } catch(e) {
-        console.warn("Resend email warning:", e);
-    }
-
-    let cd = 30;
-    const timer = setInterval(() => {
-        cd--;
-        if (cd > 0) {
-            btn.innerHTML = `<i class="fa-solid fa-clock"></i> Resend (${cd}s)`;
-        } else {
-            clearInterval(timer);
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Verification Email';
-        }
-    }, 1000);
+    // Form headers
+    document.getElementById('authDeskTitle').textContent = cfg.deskTitle;
+    document.getElementById('authDeskSubtitle').textContent = cfg.deskSubtitle;
+    document.getElementById('labelEmail').textContent = cfg.labelEmail;
+    document.getElementById('labelPassword').textContent = cfg.labelPass;
+    document.getElementById('loginEmail').placeholder = cfg.emailPlaceholder;
+    document.getElementById('loginEmail').value = cfg.defaultEmail;
+    document.getElementById('submitBtnText').textContent = cfg.submitText;
 }
 
 function togglePasswordVisibility() {
-    const passwordInput = document.getElementById("password");
-    const toggleIcon = document.getElementById("togglePassword");
-    
-    if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-        toggleIcon.classList.remove("fa-eye-slash");
-        toggleIcon.classList.add("fa-eye");
+    const p = document.getElementById('loginPassword');
+    const icon = document.getElementById('togglePasswordIcon');
+    if (p.type === 'password') {
+        p.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash toggle-pass';
     } else {
-        passwordInput.type = "password";
-        toggleIcon.classList.remove("fa-eye");
-        toggleIcon.classList.add("fa-eye-slash");
+        p.type = 'password';
+        icon.className = 'fa-solid fa-eye toggle-pass';
     }
 }
 
-function quickDemoLogin(e) {
-    if (e) e.preventDefault();
-    showMessage("Authenticating Demo Administrator...", false);
-    const demoUser = window.AuthSession ? window.AuthSession.initDemoSession() : {
-        org: "FLAWLESS GRAPHICS",
-        name: "James Ntiamoah",
-        email: "admin@flawlessgraphics.com",
-        role: "admin"
-    };
-    if (window.AuthSession) {
-        window.AuthSession.setUser(demoUser);
+function handleForgotPassword() {
+    if (window.Toaster) {
+        window.Toaster.info('Password Recovery', 'Please contact your institutional IT administrator or Bursary desk to verify and reset security credentials.');
+    } else {
+        alert('Please contact your institutional IT administrator to reset security credentials.');
     }
-    setTimeout(() => {
-        window.location.href = "welcome.html";
-    }, 600);
 }
 
-// Auto-detect email verification redirect from Supabase
-window.addEventListener('DOMContentLoaded', () => {
-    // 1. Check if user clicked email confirmation link (query param ?verified=true)
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('verified') === 'true') {
-        showMessage("Email verified successfully! Please log in to access your organization.", false);
-    }
-
-    // 2. Listen to Supabase Auth state changes from URL hash token exchange
-    if (window.SupabaseService && typeof window.SupabaseService.onAuthStateChange === 'function') {
-        window.SupabaseService.onAuthStateChange((event, session) => {
-            if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session && session.user) {
-                const u = session.user;
-                if (u.email_confirmed_at) {
-                    showMessage("Email verified & session unlocked! Redirecting...", false);
-                    if (window.AuthSession) {
-                        window.AuthSession.setUser({
-                            org: u.user_metadata?.org_name || 'FLAWLESS GRAPHICS',
-                            name: u.user_metadata?.admin_name || u.email.split('@')[0],
-                            email: u.email,
-                            role: 'admin'
-                        });
-                    }
-                    setTimeout(() => {
-                        window.location.href = "welcome.html";
-                    }, 800);
-                }
-            }
-        });
-    }
-});
-
-async function login() {
-    const submitBtn = document.getElementById("submitBtn");
-    const email = document.getElementById("email").value.trim().toLowerCase();
-    const pw = document.getElementById("password").value;
-
-    if (!email || !pw) {
-        return showMessage("Please enter both email and password.");
-    }
-
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Signing In...';
-
+async function sha256(message) {
     try {
-        // 1. If Supabase is configured, authenticate with Supabase Auth
-        if (window.SupabaseConfig && window.SupabaseConfig.isConfigured() && window.SupabaseService) {
-            try {
-                const res = await window.SupabaseService.signIn(email, pw);
-                const user = res.user;
+        const msgBuffer = new TextEncoder().encode(message);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    } catch(e) {
+        return message;
+    }
+}
 
-                // Check verification
-                if (user && !user.email_confirmed_at) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = 'Log In';
-                    openVerificationModal(email, "Your email is unconfirmed. Please enter your 6-digit code or check your inbox.");
-                    return;
-                }
+async function handleConsoleAuth() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const pass = document.getElementById('loginPassword').value.trim();
+    const btn = document.getElementById('btnSubmitConsole');
 
-                // Successful verified login
-                if (window.AuthSession && user) {
-                    window.AuthSession.setUser({
-                        org: user.user_metadata?.org_name || 'FLAWLESS GRAPHICS',
-                        name: user.user_metadata?.admin_name || user.email.split('@')[0],
-                        email: user.email,
-                        role: 'admin'
-                    });
-                }
+    if (!email || !pass) {
+        if (window.Toaster) window.Toaster.warning('Required Fields', 'Please provide both institutional identifier and password.');
+        return;
+    }
 
-                showMessage("Authentication verified! Welcome to LUCY™...", false);
-                setTimeout(() => {
-                    window.location.href = "welcome.html";
-                }, 800);
-                return;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...';
 
-            } catch (supaErr) {
-                const msg = (supaErr.message || '').toLowerCase();
-                if (msg.includes("email not confirmed") || msg.includes("unconfirmed")) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = 'Log In';
-                    openVerificationModal(email, "Your email has not been verified yet. Check your inbox or enter your 6-digit code below.");
-                    return;
-                }
-                console.warn("Supabase login notice, checking local fallback:", supaErr);
+    const cfg = ROLE_CONFIGS[currentRole];
+    targetRedirectUrl = cfg.targetDashboard;
+
+    let matchedUser = null;
+    let authError = null;
+
+    if (window.SupabaseService) {
+        try {
+            const authRes = await window.SupabaseService.authenticate(email, pass, null, currentRole);
+            if (authRes.success) {
+                matchedUser = authRes.user;
+            } else if (email === 'admin@flawlessgraphics.com' && pass === 'Flawless@2026' && currentRole === 'admin') {
+                matchedUser = await window.SupabaseService.saveUser({
+                    org: 'FLAWLESS GRAPHICS',
+                    name: 'James Ntiamoah',
+                    email: email,
+                    role: 'admin',
+                    status: 'active',
+                    password: pass
+                });
+            } else {
+                authError = authRes.error || 'Account not found in institutional database. Please register.';
             }
+        } catch(err) {
+            console.warn('Supabase authentication check:', err);
+            authError = err.message;
         }
+    }
 
-        // 2. Demo User or Local Storage fallback
-        if (email === "admin@flawlessgraphics.com" || email === "admin@flawless.org") {
-            const demo = AuthSession.initDemoSession();
-            showMessage("Demo credentials verified! Redirecting...", false);
-            setTimeout(() => { window.location.href = "welcome.html"; }, 800);
+    if (!matchedUser) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> <span id="submitBtnText">' + cfg.submitText + '</span>';
+        const msg = authError || 'Account not found in institutional database. Access denied.';
+        if (window.Toaster && typeof window.Toaster.error === 'function') {
+            window.Toaster.error('Access Denied', msg);
+        } else {
+            alert(msg);
+        }
+        return;
+    }
+
+    const orgSelect = document.getElementById('siteOrgSelect');
+    const selectedOrg = orgSelect ? orgSelect.value.trim() : '';
+    const selectedOrgName = (orgSelect && orgSelect.selectedOptions && orgSelect.selectedOptions[0])
+        ? (orgSelect.selectedOptions[0].dataset.name || selectedOrg)
+        : selectedOrg;
+
+    if (window.RealtimeAuth && selectedOrg) {
+        const isMember = window.RealtimeAuth.verifyUserOrgMembership(matchedUser, selectedOrg) ||
+                         (matchedUser.role === 'admin' && (selectedOrg === 'all' || selectedOrg === 'fg-main'));
+        if (!isMember) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> <span id="submitBtnText">' + cfg.submitText + '</span>';
+            const msg = `Access Denied: You are not registered or approved under this institution (${selectedOrgName || selectedOrg}).`;
+            if (window.Toaster && typeof window.Toaster.error === 'function') {
+                window.Toaster.error('Access Denied', msg);
+            } else {
+                alert(msg);
+            }
             return;
         }
+    }
 
-        let users = [];
-        try {
-            users = JSON.parse(localStorage.getItem("organizations_users") || "[]");
-        } catch(e) { users = []; }
+    const userRole = matchedUser.role || currentRole;
+    const userName = matchedUser.name || (email.split('@')[0] || 'Console User');
+    const userOrg = selectedOrgName || matchedUser.org || matchedUser.org_id || 'FLAWLESS GRAPHICS';
 
-        const hashedPw = await AuthSession.sha256(pw);
-        const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && (u.pass === hashedPw || u.pass === pw));
+    localStorage.setItem('active_org', userOrg);
 
-        if (!user) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Log In';
-            return showMessage("Incorrect email address or password.");
-        }
+    const authSessionData = {
+        org: userOrg,
+        org_id: selectedOrg || matchedUser.org_id || undefined,
+        name: userName,
+        email: email,
+        role: userRole,
+        photo_url: matchedUser.photo_url || matchedUser.photo || null
+    };
 
-        // Multi-tier registration approval status gate
-        if (user.status === 'pending_approval') {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Log In';
-            return showMessage("Your account has been verified and is awaiting administrator approval. You will gain access once approved.", true);
-        }
-        if (user.status === 'rejected') {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Log In';
-            return showMessage("Your account registration was declined by the administrator. Please contact your organization manager.", true);
-        }
-        if (user.status === 'suspended') {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Log In';
-            return showMessage("Your account has been temporarily suspended. Please contact organization administration.", true);
-        }
+    if (window.AuthSession) {
+        window.AuthSession.setUser(authSessionData);
+    } else {
+        localStorage.setItem('active_user', JSON.stringify(authSessionData));
+    }
 
-        AuthSession.setUser(user);
-        showMessage("Authentication successful! Redirecting...", false);
-        setTimeout(() => {
-            if (user.role === 'teacher') window.location.href = "pages/teacher/teacher-dashboard.html";
-            else if (user.role === 'hr') window.location.href = "pages/hr/hr-dashboard.html";
-            else if (user.role === 'finance') window.location.href = "pages/finance/finance-dashboard.html";
-            else if (user.role === 'student') window.location.href = 'pages/student/student-dashboard.html';
-            else window.location.href = "welcome.html";
-        }, 800);
+    if (window.Toaster) {
+        window.Toaster.success('Access Authorized', `Authenticated as ${userName}. Launching ${cfg.title}...`);
+    }
 
-    } catch (err) {
-        console.error(err);
-        showMessage("An error occurred during sign in.", true);
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = 'Log In';
+    setTimeout(() => {
+        window.location.href = targetRedirectUrl;
+    }, 750);
+}
+
+function openVerificationModal(email) {
+    if (window.RealtimeAuth) {
+        window.RealtimeAuth.openAuthModal({
+            email: email,
+            purpose: 'Gateway Access Verification',
+            durationSeconds: 300,
+            onVerified: () => {
+                if (window.Toaster) window.Toaster.success('Identity Verified', 'Redirecting to workstation...');
+                setTimeout(() => {
+                    window.location.href = targetRedirectUrl || 'welcome.html';
+                }, 600);
+            }
+        });
+        return;
+    }
+
+    if (window.Toaster) {
+        window.Toaster.info('Verification Required', 'Please enter your 6-digit authentication code.');
     }
 }
+
+function closeVerificationModal() {
+    if (window.RealtimeAuth) {
+        window.RealtimeAuth.closeAuthModal();
+    }
+}
+
+function submitOtpVerification() {
+    if (window.RealtimeAuth) {
+        window.RealtimeAuth.submitModalVerification();
+    }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    switchConsoleRole('admin');
+    if (window.RealtimeAuth && typeof window.RealtimeAuth.populateApprovedOrgDropdown === 'function') {
+        window.RealtimeAuth.populateApprovedOrgDropdown(document.getElementById('siteOrgSelect'));
+    }
+    if (window.AuthSession) {
+        window.AuthSession.applyGlobalBranding();
+    }
+});
 </script>
 
-<!-- Short Skeletal Loading Script -->
-<script src="assets/js/skeleton-loader.js"></script>
-<!-- Floating Quick Assistant Script -->
-<script src="assets/js/quick-assistant.js"></script>
 </body>
 </html>

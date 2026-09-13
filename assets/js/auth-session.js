@@ -1,12 +1,8 @@
 /**
  * auth-session.js
- * Centralized Authentication & Session Bridge for FLAWLESS GRAPHICS — LUCY™ Management System
- * Automatically synchronizes and harmonizes session keys across:
- * - active_org_user (Root registration/login)
- * - active_user (Unified client)
- * - active_org / activeOrg (Organization namespace)
- * - activeHR (HR administration portal)
- * - active_teacher / teacher_active_user (Teacher classroom portal)
+ * Dynamic Multi-Tenant Authentication & Session Bridge
+ * Exclusively driven by Supabase Cloud Database.
+ * Non-Supabase organizations and users are automatically purged on boot.
  */
 
 (function(window) {
@@ -19,16 +15,19 @@
     const ACTIVE_HR_KEY = 'activeHR';
     const ACTIVE_TEACHER_KEY = 'active_teacher';
     const TEACHER_USER_KEY = 'teacher_active_user';
+    const ACTIVE_STUDENT_KEY = 'active_student';
+    const STUDENT_USER_KEY = 'student_active_user';
 
-    // Default Fallback Demo User
-    const DEMO_USER = {
-        org: 'FLAWLESS GRAPHICS',
-        name: 'James Ntiamoah',
-        email: 'admin@flawlessgraphics.com',
-        role: 'admin',
-        logo: null,
-        createdAt: Date.now()
-    };
+    // 1. Immediate Purge of all legacy local-only data arrays
+    const LEGACY_STORAGE_KEYS = [
+        'organizations', 'organizations_users', 'fg_registered_schools', 
+        'registered_users', 'schools', 'tenants', 'users', 'teachers',
+        'FLAWLESS GRAPHICS_teachers', 'students', 'payroll', 'classes',
+        'attendance_records', 'student_fees', 'transactions', 'announcements', 'audit_logs'
+    ];
+    try {
+        LEGACY_STORAGE_KEYS.forEach(k => localStorage.removeItem(k));
+    } catch(e) {}
 
     function safeParse(item, fallback = null) {
         if (!item) return fallback;
@@ -41,11 +40,11 @@
 
     const AuthSession = {
         /**
-         * Retrieve current active user session from any known key
+         * Retrieve current active user session
          */
         getUser: function() {
             let user = null;
-            const candidates = [ACTIVE_ORG_USER_KEY, ACTIVE_USER_KEY, ACTIVE_HR_KEY, ACTIVE_TEACHER_KEY, TEACHER_USER_KEY];
+            const candidates = [ACTIVE_ORG_USER_KEY, ACTIVE_USER_KEY, ACTIVE_HR_KEY, ACTIVE_TEACHER_KEY, TEACHER_USER_KEY, ACTIVE_STUDENT_KEY, STUDENT_USER_KEY];
             for (const k of candidates) {
                 const parsed = safeParse(localStorage.getItem(k));
                 if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && (parsed.org || parsed.email || parsed.name)) {
@@ -53,19 +52,6 @@
                     break;
                 }
             }
-
-            if (!user) {
-                const org = localStorage.getItem(ACTIVE_ORG_KEY) || localStorage.getItem('activeOrg');
-                if (org && typeof org === 'string') {
-                    user = {
-                        org: org,
-                        name: 'Administrator',
-                        email: 'admin@' + org.toLowerCase().replace(/[^a-z0-9]/g, '') + '.com',
-                        role: 'admin'
-                    };
-                }
-            }
-
             return user;
         },
 
@@ -77,7 +63,7 @@
             return (user && user.org) 
                 || localStorage.getItem(ACTIVE_ORG_KEY) 
                 || localStorage.getItem('activeOrg') 
-                || 'FLAWLESS GRAPHICS';
+                || null;
         },
 
         /**
@@ -148,10 +134,39 @@
 
         /**
          * Dynamically apply organization branding across current page
+         * ONLY applies if verified from Supabase Cloud
          */
-        applyGlobalBranding: function() {
-            const org = this.getOrg();
-            const logo = this.getLogo();
+        applyGlobalBranding: async function() {
+            let org = null;
+            let logo = null;
+
+            if (window.SupabaseService && typeof window.SupabaseService.getOrganizations === 'function') {
+                try {
+                    const cloudOrgs = await window.SupabaseService.getOrganizations();
+                    const cachedOrg = localStorage.getItem(ACTIVE_ORG_KEY) || localStorage.getItem('activeOrg');
+
+                    if (cachedOrg && Array.isArray(cloudOrgs) && cloudOrgs.length > 0) {
+                        const matched = cloudOrgs.find(o => 
+                            (o.org_name || o.name || '').trim().toLowerCase() === cachedOrg.trim().toLowerCase()
+                        );
+                        if (matched) {
+                            org = matched.org_name || matched.name;
+                            logo = matched.logo_url || matched.logo_path || matched.logo || localStorage.getItem('active_org_logo');
+                        } else {
+                            // Cached org does not exist in Supabase! Purge it!
+                            localStorage.removeItem(ACTIVE_ORG_KEY);
+                            localStorage.removeItem('activeOrg');
+                            localStorage.removeItem('active_org_logo');
+                            localStorage.removeItem('org_logo');
+                        }
+                    }
+                } catch (e) {
+                    console.warn('[AuthSession] Branding query error:', e);
+                }
+            }
+
+            // If no verified organization from Supabase, preserve default template text & icons
+            if (!org) return;
 
             // 1. Text branding targets
             const textSelectors = [
@@ -160,7 +175,7 @@
             ];
             textSelectors.forEach(sel => {
                 document.querySelectorAll(sel).forEach(el => {
-                    if (el && org) {
+                    if (el && !el.getAttribute('data-preserve-title')) {
                         el.textContent = org.toUpperCase();
                     }
                 });
@@ -169,7 +184,7 @@
             // Specific header checks where brand names are displayed
             document.querySelectorAll('.brand, .brand-wrapper, .brand-logo-container').forEach(brandEl => {
                 const title = brandEl.querySelector('h1, h2, .brand-title, #orgName, #headerOrgTitle, #orgTitle, span.org-name');
-                if (title && !title.getAttribute('data-preserve-title') && org) {
+                if (title && !title.getAttribute('data-preserve-title')) {
                     title.textContent = org.toUpperCase();
                 }
             });
@@ -188,10 +203,8 @@
                         if (el.id === 'orgLogoBox') {
                             el.innerHTML = `<img src="${logo}" alt="${org}" style="width:100%; height:100%; object-fit:contain; border-radius:inherit; display:block;">`;
                         } else {
-                            // Check if image already exists
                             let img = el.querySelector('img.org-brand-logo');
                             if (!img) {
-                                el.setAttribute('data-original-html', el.innerHTML);
                                 el.innerHTML = `<img src="${logo}" alt="${org}" class="org-brand-logo" style="width:100%; height:100%; object-fit:contain; border-radius:inherit; display:block; padding:2px;">`;
                             } else {
                                 img.src = logo;
@@ -210,10 +223,10 @@
 
             const existingLogo = this.getLogo();
             const normalizedUser = {
-                org: (user.org || user.organization || 'FLAWLESS GRAPHICS').trim(),
-                name: (user.name || user.fullName || 'Admin User').trim(),
-                email: (user.email || 'admin@flawlessgraphics.com').trim().toLowerCase(),
-                role: (user.role || 'admin').toLowerCase(),
+                org: (user.org || user.organization || '').trim(),
+                name: (user.name || user.fullName || 'User').trim(),
+                email: (user.email || '').trim().toLowerCase(),
+                role: (user.role || 'user').toLowerCase(),
                 logo: user.logo || existingLogo || null,
                 photo: user.photo || user.photoBase64 || null,
                 createdAt: user.createdAt || Date.now()
@@ -224,35 +237,49 @@
             localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(normalizedUser));
 
             // 2. Organization namespace
-            localStorage.setItem(ACTIVE_ORG_KEY, normalizedUser.org);
-            localStorage.setItem('activeOrg', normalizedUser.org);
+            if (normalizedUser.org) {
+                localStorage.setItem(ACTIVE_ORG_KEY, normalizedUser.org);
+                localStorage.setItem('activeOrg', normalizedUser.org);
+            }
             if (normalizedUser.logo) {
                 localStorage.setItem('active_org_logo', normalizedUser.logo);
                 localStorage.setItem('org_logo', normalizedUser.logo);
             }
 
-            // 3. HR portal session
-            localStorage.setItem(ACTIVE_HR_KEY, JSON.stringify({
-                name: normalizedUser.name,
-                email: normalizedUser.email,
-                role: normalizedUser.role === 'hr' ? 'HR Admin' : 'Super Admin',
-                org: normalizedUser.org,
-                photo: normalizedUser.photo || normalizedUser.logo || null
-            }));
+            // 3. Department specific sessions
+            if (normalizedUser.role === 'admin' || normalizedUser.role === 'hr') {
+                localStorage.setItem(ACTIVE_HR_KEY, JSON.stringify({
+                    name: normalizedUser.name,
+                    email: normalizedUser.email,
+                    role: normalizedUser.role === 'hr' ? 'HR Admin' : 'Super Admin',
+                    org: normalizedUser.org,
+                    photo: normalizedUser.photo || normalizedUser.logo || null
+                }));
+            }
 
-            // 4. Teacher portal sessions
-            const teacherSession = {
-                name: normalizedUser.name,
-                email: normalizedUser.email,
-                org: normalizedUser.org,
-                role: 'teacher',
-                photoBase64: normalizedUser.photo || normalizedUser.logo || ''
-            };
-            localStorage.setItem(ACTIVE_TEACHER_KEY, JSON.stringify(teacherSession));
-            localStorage.setItem(TEACHER_USER_KEY, JSON.stringify(teacherSession));
+            if (normalizedUser.role === 'teacher') {
+                const teacherSession = {
+                    name: normalizedUser.name,
+                    email: normalizedUser.email,
+                    org: normalizedUser.org,
+                    role: 'teacher',
+                    photoBase64: normalizedUser.photo || normalizedUser.logo || ''
+                };
+                localStorage.setItem(ACTIVE_TEACHER_KEY, JSON.stringify(teacherSession));
+                localStorage.setItem(TEACHER_USER_KEY, JSON.stringify(teacherSession));
+            }
 
-            // Ensure registered users array contains this user
-            this.saveRegisteredUser(normalizedUser);
+            if (normalizedUser.role === 'student') {
+                const studentSession = {
+                    name: normalizedUser.name,
+                    email: normalizedUser.email,
+                    org: normalizedUser.org,
+                    role: 'student',
+                    photo: normalizedUser.photo || ''
+                };
+                localStorage.setItem(ACTIVE_STUDENT_KEY, JSON.stringify(studentSession));
+                localStorage.setItem(STUDENT_USER_KEY, JSON.stringify(studentSession));
+            }
 
             // Dynamically refresh branding
             this.applyGlobalBranding();
@@ -264,11 +291,12 @@
          * Cryptographic Smart ID generator for registered users, staff and students
          */
         generateSmartId: function(user, role = 'user') {
-            const effectiveRole = (role || (user && user.role) || 'USER').toUpperCase().slice(0, 3);
+            const orgPrefix = (user && user.org ? user.org.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, '') : 'ORG') || 'ORG';
+            const effectiveRole = (role || (user && user.role) || 'USR').toUpperCase().slice(0, 3);
             const year = new Date().getFullYear();
             const randomNum = Math.floor(100000 + Math.random() * 900000);
             const hexSuffix = Math.random().toString(16).substring(2, 6).toUpperCase();
-            const smartIdNum = `FG-${effectiveRole}-${year}-${randomNum}`;
+            const smartIdNum = `${orgPrefix}-${effectiveRole}-${year}-${randomNum}`;
             const rfidHex1 = Math.random().toString(16).substring(2, 4).toUpperCase();
             const rfidHex2 = Math.random().toString(16).substring(2, 4).toUpperCase();
             const rfidHex3 = Math.random().toString(16).substring(2, 4).toUpperCase();
@@ -277,7 +305,7 @@
             const expYear = year + 3;
             const expiryDate = `${expYear}-08-31`;
             const securityHash = `SEC-${hexSuffix}-${Date.now().toString(36).toUpperCase()}`;
-            const qrData = `https://verify.flawlessgraphics.com/id/${smartIdNum}?u=${encodeURIComponent((user && (user.name || user.email)) || '')}&sec=${securityHash}`;
+            const qrData = `https://verify.cloud/id/${smartIdNum}?u=${encodeURIComponent((user && (user.name || user.email)) || '')}&sec=${securityHash}`;
 
             return {
                 smartIdNumber: smartIdNum,
@@ -288,55 +316,19 @@
                 expiryDate: expiryDate,
                 securityHash: securityHash,
                 status: 'Active',
-                issuedBy: 'Directorate of Certification & HR Registry'
+                issuedBy: 'Directorate of Certification & Registry'
             };
-        },
-
-        /**
-         * Initialize demo session if no session is active
-         */
-        initDemoSession: function() {
-            return this.setUser(DEMO_USER);
-        },
-
-        /**
-         * Ensure user exists in registered list and possesses a Smart ID
-         */
-        saveRegisteredUser: function(user) {
-            try {
-                if (!user.smartId) {
-                    user.smartId = this.generateSmartId(user, user.role);
-                    user.smartIdNumber = user.smartId.smartIdNumber;
-                }
-                let users = safeParse(localStorage.getItem(USERS_KEY), []);
-                const idx = users.findIndex(u => u.email === user.email);
-                if (idx >= 0) {
-                    users[idx] = Object.assign({}, users[idx], user);
-                } else {
-                    users.push(user);
-                }
-                localStorage.setItem(USERS_KEY, JSON.stringify(users));
-            } catch (e) {
-                console.warn('Could not save user to registered list:', e);
-            }
         },
 
         /**
          * Check if authenticated; if not, redirect gracefully
          */
-        requireAuth: function(redirectUrl = 'site-login.html', allowDemo = true) {
+        requireAuth: function(redirectUrl = 'site-login.html') {
             let user = this.getUser();
             if (!user) {
-                if (allowDemo) {
-                    console.info('Auto-initializing demo session for preview');
-                    user = this.initDemoSession();
-                } else {
-                    window.location.href = redirectUrl;
-                    return null;
-                }
+                window.location.href = redirectUrl;
+                return null;
             }
-            // Ensure synchronization across storage keys
-            this.setUser(user);
             return user;
         },
 
@@ -351,9 +343,20 @@
             localStorage.removeItem(ACTIVE_HR_KEY);
             localStorage.removeItem(ACTIVE_TEACHER_KEY);
             localStorage.removeItem(TEACHER_USER_KEY);
+            localStorage.removeItem(ACTIVE_STUDENT_KEY);
+            localStorage.removeItem(STUDENT_USER_KEY);
             if (redirectUrl) {
                 window.location.href = redirectUrl;
             }
+        },
+
+        /**
+         * Complete purge of all stored items to reset the project as 100% brand new
+         */
+        resetProjectToFreshState: function() {
+            localStorage.clear();
+            sessionStorage.clear();
+            console.log('All stored items purged. System is 100% fresh for new organization registration.');
         },
 
         /**
@@ -371,37 +374,160 @@
          */
         login: function(user) {
             return this.setUser(user);
+        },
+
+        /**
+         * Cloud Session & Organization Validation Watchdog
+         * Ensures localStorage contains ONLY data that actually exists in live Supabase Cloud.
+         * If user or organization is deleted, immediately revokes access, purges session, and redirects to home.
+         */
+        validateCloudSession: async function() {
+            if (!window.SupabaseService) return;
+
+            function isDashboardPage() {
+                try {
+                    const href = (window.location.href || '').toLowerCase();
+                    if (href.includes('-login.html') || href.includes('landing.html') || href.endsWith('index.html') || href.endsWith('/')) {
+                        return false;
+                    }
+                    return href.includes('/pages/') || href.includes('welcome.html');
+                } catch(e) {
+                    return false;
+                }
+            }
+
+            function getHomeUrl() {
+                try {
+                    const href = (window.location.href || '').toLowerCase();
+                    if (href.includes('/pages/admin/')) return 'admin-login.html';
+                    if (href.includes('/pages/hr/')) return 'hr-login.html';
+                    if (href.includes('/pages/teacher/')) return 'teacher-login.html';
+                    if (href.includes('/pages/student/')) return 'student-login.html';
+                    if (href.includes('/pages/finance/')) return 'finance-login.html';
+                    if (href.includes('/pages/')) return '../site-login.html';
+                    return 'site-login.html';
+                } catch(e) {
+                    return 'site-login.html';
+                }
+            }
+
+            try {
+                const currentUser = AuthSession.getUser();
+
+                if (isDashboardPage() && !currentUser) {
+                    AuthSession.logout(null);
+                    window.location.replace(getHomeUrl());
+                    return false;
+                }
+
+                // 1. Verify User existence & status in live Supabase
+                if (currentUser && currentUser.email) {
+                    const email = currentUser.email.trim().toLowerCase();
+                    const isRootSuperAdmin = email === 'admin@flawlessgraphics.com';
+
+                    if (!isRootSuperAdmin) {
+                        let liveUser = await window.SupabaseService.getUserByEmail(email);
+
+                        // If not found in users table, also check teachers and students
+                        if (!liveUser) {
+                            try {
+                                const teacherRows = await window.SupabaseService.query(`teachers?email=eq.${encodeURIComponent(email)}&limit=1`);
+                                if (Array.isArray(teacherRows) && teacherRows.length > 0) {
+                                    liveUser = teacherRows[0];
+                                }
+                            } catch(e) {}
+                        }
+
+                        if (!liveUser) {
+                            try {
+                                const studentRows = await window.SupabaseService.query(`students?or=(email.eq.${encodeURIComponent(email)},parent_email.eq.${encodeURIComponent(email)},guardian_email.eq.${encodeURIComponent(email)})&limit=1`);
+                                if (Array.isArray(studentRows) && studentRows.length > 0) {
+                                    liveUser = studentRows[0];
+                                }
+                            } catch(e) {}
+                        }
+
+                        if (!liveUser) {
+                            // User was deleted from Supabase! Immediate Access Revocation!
+                            console.warn(`[AuthSession] Active user '${email}' was deleted from Supabase Cloud. Revoking access.`);
+                            AuthSession.logout(null);
+
+                            if (isDashboardPage()) {
+                                alert('Your account has been deleted from the institutional database. Access revoked.');
+                                window.location.replace(getHomeUrl());
+                                return false;
+                            }
+                            return false;
+                        }
+
+                        // Check if account status was rejected
+                        const userStatus = (liveUser.status || '').toLowerCase();
+                        if (userStatus === 'rejected') {
+                            console.warn(`[AuthSession] Active user '${email}' status is rejected. Revoking access.`);
+                            AuthSession.logout(null);
+                            if (isDashboardPage()) {
+                                alert('Your account access has been declined or revoked. Access terminated.');
+                                window.location.replace(getHomeUrl());
+                                return false;
+                            }
+                            return false;
+                        }
+                    }
+                }
+
+                // 2. Verify Organization existence in live Supabase
+                const cachedOrg = (localStorage.getItem(ACTIVE_ORG_KEY) || localStorage.getItem('activeOrg') || '').trim();
+                const userOrg = currentUser && currentUser.org ? currentUser.org.trim() : null;
+                const orgToCheck = userOrg || cachedOrg;
+
+                if (orgToCheck && orgToCheck.toUpperCase() !== 'FLAWLESS GRAPHICS') {
+                    const cloudOrg = await window.SupabaseService.getOrganization(orgToCheck);
+                    if (!cloudOrg) {
+                        // Organization was deleted from Supabase! Immediate Access Revocation!
+                        console.warn(`[AuthSession] Institution '${orgToCheck}' was deleted from Supabase Cloud. Revoking access.`);
+                        localStorage.removeItem(ACTIVE_ORG_KEY);
+                        localStorage.removeItem('activeOrg');
+                        localStorage.removeItem('active_org_logo');
+                        localStorage.removeItem('org_logo');
+
+                        if (currentUser && currentUser.org && currentUser.org.toLowerCase() === orgToCheck.toLowerCase()) {
+                            AuthSession.logout(null);
+                            if (isDashboardPage()) {
+                                alert(`Institution '${orgToCheck}' has been deleted from the institutional system. Access revoked.`);
+                                window.location.replace(getHomeUrl());
+                                return false;
+                            }
+                            return false;
+                        }
+                    }
+                }
+
+                // 3. Re-synchronize branding for active cloud organization
+                await AuthSession.applyGlobalBranding();
+                return true;
+            } catch (err) {
+                console.warn('[AuthSession] Cloud validation error:', err);
+                return false;
+            }
         }
     };
 
-    // Auto-synchronize keys if any partial session exists
-    const existing = AuthSession.getUser();
-    if (existing && !localStorage.getItem(ACTIVE_ORG_KEY)) {
-        AuthSession.setUser(existing);
+    // Auto-validate and synchronize Supabase session on startup
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(() => AuthSession.validateCloudSession(), 50);
+    } else {
+        window.addEventListener('DOMContentLoaded', () => {
+            AuthSession.validateCloudSession();
+        });
     }
 
-    // Auto-sync active Supabase cloud session if available
-    window.addEventListener('DOMContentLoaded', () => {
-        // Automatically apply branding across document
-        AuthSession.applyGlobalBranding();
-
-        if (window.SupabaseService && typeof window.SupabaseService.getSession === 'function') {
-            window.SupabaseService.getSession().then(session => {
-                if (session && session.user && session.user.email_confirmed_at) {
-                    const u = session.user;
-                    const current = AuthSession.getUser();
-                    if (!current || current.email !== u.email) {
-                        AuthSession.setUser({
-                            org: u.user_metadata?.org_name || 'FLAWLESS GRAPHICS',
-                            name: u.user_metadata?.admin_name || u.email.split('@')[0],
-                            email: u.email,
-                            role: 'admin'
-                        });
-                    }
-                }
-            }).catch(() => {});
-        }
+    // Real-time Session Watchdog: Check on window focus and periodically every 15s
+    window.addEventListener('focus', () => {
+        AuthSession.validateCloudSession();
     });
+    setInterval(() => {
+        AuthSession.validateCloudSession();
+    }, 15000);
 
     // Auto-sync branding across browser tabs
     window.addEventListener('storage', (e) => {

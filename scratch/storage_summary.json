@@ -1,0 +1,756 @@
+{
+  "pages/admin/admin-dashboard.html": [
+    {
+      "line": 1407,
+      "code": "let ACTIVE_ORG = (user && user.org) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';"
+    },
+    {
+      "line": 1480,
+      "code": "localStorage.setItem('active_org', newOrg);"
+    },
+    {
+      "line": 1496,
+      "code": "let tenants = JSON.parse(localStorage.getItem('system_tenants') || 'null');"
+    },
+    {
+      "line": 1503,
+      "code": "localStorage.setItem('system_tenants', JSON.stringify(tenants));"
+    },
+    {
+      "line": 1515,
+      "code": "const studs = JSON.parse(localStorage.getItem(`${t.name}_students`) || '[]');"
+    },
+    {
+      "line": 1516,
+      "code": "const staff = JSON.parse(localStorage.getItem(`${t.name}_teachers`) || '[]');"
+    },
+    {
+      "line": 1562,
+      "code": "const users = JSON.parse(localStorage.getItem('organizations_users') || '[]');"
+    },
+    {
+      "line": 1594,
+      "code": "const studs = JSON.parse(localStorage.getItem(`${t.name}_students`) || '[]');"
+    },
+    {
+      "line": 1597,
+      "code": "const staff = JSON.parse(localStorage.getItem(`${t.name}_teachers`) || '[]');"
+    },
+    {
+      "line": 1650,
+      "code": "const users = JSON.parse(localStorage.getItem('organizations_users') || '[]');"
+    },
+    {
+      "line": 1687,
+      "code": "const users = JSON.parse(localStorage.getItem('organizations_users') || '[]');"
+    },
+    {
+      "line": 1780,
+      "code": "let users = JSON.parse(localStorage.getItem('organizations_users') || '[]');"
+    },
+    {
+      "line": 1785,
+      "code": "localStorage.setItem('organizations_users', JSON.stringify(users));"
+    },
+    {
+      "line": 1790,
+      "code": "let staff = JSON.parse(localStorage.getItem(orgKey) || '[]');"
+    },
+    {
+      "line": 1794,
+      "code": "localStorage.setItem(orgKey, JSON.stringify(staff));"
+    },
+    {
+      "line": 1819,
+      "code": "let users = JSON.parse(localStorage.getItem('organizations_users') || '[]');"
+    },
+    {
+      "line": 1824,
+      "code": "localStorage.setItem('organizations_users', JSON.stringify(users));"
+    },
+    {
+      "line": 1829,
+      "code": "let staff = JSON.parse(localStorage.getItem(orgKey) || '[]');"
+    },
+    {
+      "line": 1833,
+      "code": "localStorage.setItem(orgKey, JSON.stringify(staff));"
+    },
+    {
+      "line": 1877,
+      "code": "const users = JSON.parse(localStorage.getItem('organizations_users') || '[]');"
+    },
+    {
+      "line": 1924,
+      "code": "let users = JSON.parse(localStorage.getItem('organizations_users') || '[]');"
+    },
+    {
+      "line": 1956,
+      "code": "localStorage.setItem('organizations_users', JSON.stringify(users));"
+    },
+    {
+      "line": 1973,
+      "code": "let users = JSON.parse(localStorage.getItem('organizations_users') || '[]');"
+    },
+    {
+      "line": 1977,
+      "code": "localStorage.setItem('organizations_users', JSON.stringify(users));"
+    },
+    {
+      "line": 1985,
+      "code": "let users = JSON.parse(localStorage.getItem('organizations_users') || '[]');"
+    },
+    {
+      "line": 1987,
+      "code": "localStorage.setItem('organizations_users', JSON.stringify(users));"
+    },
+    {
+      "line": 1996,
+      "code": "let users = JSON.parse(localStorage.getItem('organizations_users') || '[]');"
+    },
+    {
+      "line": 2000,
+      "code": "const staff = JSON.parse(localStorage.getItem(`${t.name}_teachers`) || '[]');"
+    },
+    {
+      "line": 2028,
+      "code": "localStorage.setItem('organizations_users', JSON.stringify(users));"
+    },
+    {
+      "line": 2060,
+      "code": "localStorage.setItem('system_tenants', JSON.stringify(tenants));"
+    },
+    {
+      "line": 2083,
+      "code": "localStorage.setItem('system_tenants', JSON.stringify(tenants));"
+    },
+    {
+      "line": 2108,
+      "code": "return JSON.parse(localStorage.getItem('system_audit_logs') || '[]');"
+    },
+    {
+      "line": 2122,
+      "code": "localStorage.setItem('system_audit_logs', JSON.stringify(logs));"
+    },
+    {
+      "line": 2155,
+      "code": "localStorage.removeItem('system_audit_logs');"
+    },
+    {
+      "line": 2165,
+      "code": "if (localStorage.hasOwnProperty(x)) {"
+    },
+    {
+      "line": 2184,
+      "code": "for (let i = 0; i < localStorage.length; i++) {"
+    },
+    {
+      "line": 2185,
+      "code": "const k = localStorage.key(i);"
+    },
+    {
+      "line": 2188,
+      "code": "dump.data[k] = JSON.parse(localStorage.getItem(k));"
+    },
+    {
+      "line": 2190,
+      "code": "dump.data[k] = localStorage.getItem(k);"
+    },
+    {
+      "line": 2235,
+      "code": "localStorage.setItem(key, JSON.stringify(val));"
+    },
+    {
+      "line": 2237,
+      "code": "localStorage.setItem(key, String(val));"
+    },
+    {
+      "line": 2266,
+      "code": "localStorage.setItem('admin_master_settings', JSON.stringify({ timeout, sound, reg }));"
+    },
+    {
+      "line": 2279,
+      "code": "const ann = safeParse(localStorage.getItem(annKey)) || [];"
+    },
+    {
+      "line": 2367,
+      "code": "const list = safeParse(localStorage.getItem(key)) || [];"
+    },
+    {
+      "line": 2369,
+      "code": "localStorage.setItem(key, JSON.stringify(list));"
+    },
+    {
+      "line": 2393,
+      "code": "const ann = safeParse(localStorage.getItem(annKey)) || [];"
+    },
+    {
+      "line": 2397,
+      "code": "localStorage.setItem(annKey, JSON.stringify(ann));"
+    },
+    {
+      "line": 2404,
+      "code": "let ann = safeParse(localStorage.getItem(annKey)) || [];"
+    },
+    {
+      "line": 2406,
+      "code": "localStorage.setItem(annKey, JSON.stringify(ann));"
+    },
+    {
+      "line": 2431,
+      "code": "localStorage.removeItem('active_org_user');"
+    },
+    {
+      "line": 2432,
+      "code": "localStorage.removeItem('active_user');"
+    }
+  ],
+  "pages/hr/hr-dashboard.html": [
+    {
+      "line": 4515,
+      "code": "function read(k) { return safeParse(localStorage.getItem(k)) || []; }"
+    },
+    {
+      "line": 4516,
+      "code": "function save(k, v) { localStorage.setItem(k, JSON.stringify(v)); }"
+    },
+    {
+      "line": 4580,
+      "code": "const ACTIVE_ORG = (user && user.org) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';"
+    },
+    {
+      "line": 4660,
+      "code": "localStorage.setItem('active_org', orgSwitcher.value);"
+    },
+    {
+      "line": 4668,
+      "code": "let isCollapsed = localStorage.getItem('hr_sidebar_collapsed') === 'true';"
+    },
+    {
+      "line": 4676,
+      "code": "localStorage.setItem('hr_sidebar_collapsed', isCollapsed);"
+    },
+    {
+      "line": 4698,
+      "code": "localStorage.removeItem('activeHR');"
+    },
+    {
+      "line": 6497,
+      "code": "if (!hasPending && !hasDaniel && !localStorage.getItem('hr_pending_resolved')) {"
+    },
+    {
+      "line": 6788,
+      "code": "localStorage.setItem('hr_pending_resolved', 'true');"
+    },
+    {
+      "line": 6826,
+      "code": "localStorage.setItem('hr_pending_resolved', 'true');"
+    },
+    {
+      "line": 6905,
+      "code": "localStorage.removeItem('hr_pending_resolved');"
+    },
+    {
+      "line": 8309,
+      "code": "const cfg = safeParse(localStorage.getItem(SETTING_KEY)) || {};"
+    },
+    {
+      "line": 8355,
+      "code": "const savedIdle = localStorage.getItem('fg_idle_minutes') || cfg.idleMinutes || '15';"
+    },
+    {
+      "line": 8364,
+      "code": "const savedColor = localStorage.getItem('fg_primary_color') || '#635bfc';"
+    },
+    {
+      "line": 8392,
+      "code": "localStorage.setItem(SETTING_KEY, JSON.stringify(cfg));"
+    },
+    {
+      "line": 8393,
+      "code": "localStorage.setItem('fg_idle_minutes', cfg.idleMinutes);"
+    },
+    {
+      "line": 8434,
+      "code": "localStorage.setItem('fg_primary_color', color);"
+    },
+    {
+      "line": 8456,
+      "code": "localStorage.setItem('fg_theme_mode', mode);"
+    },
+    {
+      "line": 8461,
+      "code": "localStorage.setItem('fg_density', density);"
+    },
+    {
+      "line": 8484,
+      "code": "settings: safeParse(localStorage.getItem(SETTING_KEY)) || {}"
+    },
+    {
+      "line": 8517,
+      "code": "if (data.settings) localStorage.setItem(SETTING_KEY, JSON.stringify(data.settings));"
+    },
+    {
+      "line": 8530,
+      "code": "localStorage.removeItem(EMP_KEY);"
+    },
+    {
+      "line": 8531,
+      "code": "localStorage.removeItem(ATT_KEY);"
+    },
+    {
+      "line": 8532,
+      "code": "localStorage.removeItem(ANNOUNCE_KEY);"
+    },
+    {
+      "line": 8533,
+      "code": "localStorage.removeItem(CALENDAR_KEY);"
+    },
+    {
+      "line": 8534,
+      "code": "localStorage.removeItem(ASSESS_KEY);"
+    }
+  ],
+  "pages/finance/finance-dashboard.html": [
+    {
+      "line": 2047,
+      "code": "const activeOrg = localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || 'Flawless Graphics Academy';"
+    },
+    {
+      "line": 2053,
+      "code": "if (!localStorage.getItem('fg_payroll')) {"
+    },
+    {
+      "line": 2054,
+      "code": "localStorage.setItem('fg_payroll', JSON.stringify(defaultFacultyStaff));"
+    },
+    {
+      "line": 2056,
+      "code": "if (!localStorage.getItem('fg_student_fees')) {"
+    },
+    {
+      "line": 2057,
+      "code": "localStorage.setItem('fg_student_fees', JSON.stringify(defaultStudentAccounts));"
+    },
+    {
+      "line": 2059,
+      "code": "if (!localStorage.getItem('fg_scholarships')) {"
+    },
+    {
+      "line": 2060,
+      "code": "localStorage.setItem('fg_scholarships', JSON.stringify(defaultScholarships));"
+    },
+    {
+      "line": 2062,
+      "code": "if (!localStorage.getItem('fg_audit')) {"
+    },
+    {
+      "line": 2063,
+      "code": "localStorage.setItem('fg_audit', JSON.stringify(auditLogs));"
+    },
+    {
+      "line": 2105,
+      "code": "const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];"
+    },
+    {
+      "line": 2123,
+      "code": "const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];"
+    },
+    {
+      "line": 2184,
+      "code": "const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];"
+    },
+    {
+      "line": 2245,
+      "code": "const payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];"
+    },
+    {
+      "line": 2246,
+      "code": "const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];"
+    },
+    {
+      "line": 2247,
+      "code": "const schData = JSON.parse(localStorage.getItem('fg_scholarships')) || [];"
+    },
+    {
+      "line": 2248,
+      "code": "const auditData = JSON.parse(localStorage.getItem('fg_audit')) || [];"
+    },
+    {
+      "line": 2368,
+      "code": "const logs = JSON.parse(localStorage.getItem('fg_audit')) || [];"
+    },
+    {
+      "line": 2370,
+      "code": "localStorage.setItem('fg_audit', JSON.stringify(logs));"
+    },
+    {
+      "line": 2393,
+      "code": "const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];"
+    },
+    {
+      "line": 2408,
+      "code": "localStorage.setItem('fg_student_fees', JSON.stringify(feeData));"
+    },
+    {
+      "line": 2431,
+      "code": "const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];"
+    },
+    {
+      "line": 2454,
+      "code": "const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];"
+    },
+    {
+      "line": 2502,
+      "code": "const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];"
+    },
+    {
+      "line": 2506,
+      "code": "localStorage.setItem('fg_student_fees', JSON.stringify(feeData));"
+    },
+    {
+      "line": 2551,
+      "code": "const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];"
+    },
+    {
+      "line": 2580,
+      "code": "const payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];"
+    },
+    {
+      "line": 2603,
+      "code": "const payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];"
+    },
+    {
+      "line": 2629,
+      "code": "let payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];"
+    },
+    {
+      "line": 2638,
+      "code": "localStorage.setItem('fg_payroll', JSON.stringify(payrollData));"
+    },
+    {
+      "line": 2650,
+      "code": "const payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];"
+    },
+    {
+      "line": 2652,
+      "code": "localStorage.setItem('fg_payroll', JSON.stringify(payrollData));"
+    },
+    {
+      "line": 2661,
+      "code": "let payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];"
+    },
+    {
+      "line": 2663,
+      "code": "localStorage.setItem('fg_payroll', JSON.stringify(payrollData));"
+    },
+    {
+      "line": 2725,
+      "code": "const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];"
+    },
+    {
+      "line": 2729,
+      "code": "const schData = JSON.parse(localStorage.getItem('fg_scholarships')) || [];"
+    },
+    {
+      "line": 2743,
+      "code": "localStorage.setItem('fg_scholarships', JSON.stringify(schData));"
+    },
+    {
+      "line": 2788,
+      "code": "const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];"
+    },
+    {
+      "line": 2959,
+      "code": "payroll: JSON.parse(localStorage.getItem('fg_payroll')),"
+    },
+    {
+      "line": 2960,
+      "code": "studentFees: JSON.parse(localStorage.getItem('fg_student_fees')),"
+    },
+    {
+      "line": 2961,
+      "code": "scholarships: JSON.parse(localStorage.getItem('fg_scholarships')),"
+    },
+    {
+      "line": 2962,
+      "code": "audit: JSON.parse(localStorage.getItem('fg_audit'))"
+    },
+    {
+      "line": 2976,
+      "code": "localStorage.clear();"
+    }
+  ],
+  "pages/teacher/teacher-dashboard.html": [
+    {
+      "line": 978,
+      "code": "const raw = localStorage.getItem('teacher_portal_settings');"
+    },
+    {
+      "line": 982,
+      "code": "const activeTeacher = JSON.parse(localStorage.getItem('active_teacher') || localStorage.getItem('teacher_active_user') || '{}');"
+    },
+    {
+      "line": 1036,
+      "code": "localStorage.setItem('teacher_portal_settings', JSON.stringify(settings));"
+    },
+    {
+      "line": 1039,
+      "code": "let activeTeacher = JSON.parse(localStorage.getItem('active_teacher') || localStorage.getItem('teacher_active_user') || '{}');"
+    },
+    {
+      "line": 1043,
+      "code": "localStorage.setItem('active_teacher', JSON.stringify(activeTeacher));"
+    },
+    {
+      "line": 1044,
+      "code": "localStorage.setItem('teacher_active_user', JSON.stringify(activeTeacher));"
+    },
+    {
+      "line": 2582,
+      "code": "function read(k){ return safeParse(localStorage.getItem(k)) || [] }"
+    },
+    {
+      "line": 2583,
+      "code": "function save(k,v){ localStorage.setItem(k, JSON.stringify(v)) }"
+    },
+    {
+      "line": 2605,
+      "code": "for(const k of sessionCandidates){ const v = safeParse(localStorage.getItem(k)); if(v && (v.email || v.name)){ teacher = v; break; } }"
+    },
+    {
+      "line": 2607,
+      "code": "const activeOrg = localStorage.getItem('active_org');"
+    },
+    {
+      "line": 2614,
+      "code": "localStorage.setItem('active_teacher', JSON.stringify(teacher));"
+    },
+    {
+      "line": 2615,
+      "code": "localStorage.setItem('teacher_active_user', JSON.stringify(teacher));"
+    },
+    {
+      "line": 2617,
+      "code": "const ORG = teacher.org || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';"
+    },
+    {
+      "line": 2618,
+      "code": "if (!localStorage.getItem('active_org')) localStorage.setItem('active_org', ORG);"
+    },
+    {
+      "line": 2634,
+      "code": "if(!localStorage.getItem(CLASSES_KEY)) save(CLASSES_KEY, []);"
+    },
+    {
+      "line": 2635,
+      "code": "if(!localStorage.getItem(ASSIGN_KEY)) save(ASSIGN_KEY, []);"
+    },
+    {
+      "line": 2636,
+      "code": "if(!localStorage.getItem(ATT_KEY)) save(ATT_KEY, []);"
+    },
+    {
+      "line": 2637,
+      "code": "if(!localStorage.getItem(TEACH_ATT_KEY)) save(TEACH_ATT_KEY, []);"
+    },
+    {
+      "line": 2638,
+      "code": "if(!localStorage.getItem(MSG_KEY)) save(MSG_KEY, []);"
+    },
+    {
+      "line": 2639,
+      "code": "if(!localStorage.getItem(NOTE_KEY)) save(NOTE_KEY, []);"
+    },
+    {
+      "line": 2640,
+      "code": "if(!localStorage.getItem(TT_KEY)) save(TT_KEY, []);"
+    },
+    {
+      "line": 2641,
+      "code": "if(!localStorage.getItem(SETTINGS_KEY)) save(SETTINGS_KEY, { idle_minutes:10 });"
+    },
+    {
+      "line": 2642,
+      "code": "if(!localStorage.getItem(ACT_KEY)) save(ACT_KEY, []);"
+    },
+    {
+      "line": 2756,
+      "code": "function getHRRegistrationApprovals(){ return safeParse(localStorage.getItem(REGISTRATION_APPROVALS_KEY)) || [] }"
+    },
+    {
+      "line": 3935,
+      "code": "let list = safeParse(localStorage.getItem(ASSESS_KEY));"
+    },
+    {
+      "line": 4417,
+      "code": "let bal = safeParse(localStorage.getItem(balKey)) || { annual: 18, sick: 10, casual: 4 };"
+    },
+    {
+      "line": 4467,
+      "code": "let bal = safeParse(localStorage.getItem(balKey)) || { annual: 18, sick: 10, casual: 4 };"
+    },
+    {
+      "line": 4480,
+      "code": "localStorage.setItem(balKey, JSON.stringify(bal));"
+    },
+    {
+      "line": 4484,
+      "code": "let requests = safeParse(localStorage.getItem(reqKey)) || [];"
+    },
+    {
+      "line": 4501,
+      "code": "let hrRequests = safeParse(localStorage.getItem('hr_leave_requests')) || [];"
+    },
+    {
+      "line": 4514,
+      "code": "localStorage.setItem('hr_leave_requests', JSON.stringify(hrRequests));"
+    },
+    {
+      "line": 4530,
+      "code": "const requests = safeParse(localStorage.getItem(reqKey)) || ["
+    },
+    {
+      "line": 5081,
+      "code": "localStorage.setItem('active_teacher', JSON.stringify(teacher));"
+    },
+    {
+      "line": 5090,
+      "code": "localStorage.removeItem('active_teacher');"
+    },
+    {
+      "line": 5098,
+      "code": "let list = safeParse(localStorage.getItem(CALENDAR_KEY));"
+    },
+    {
+      "line": 5100,
+      "code": "list = safeParse(localStorage.getItem('FLAWLESS GRAPHICS_academic_calendar'));"
+    },
+    {
+      "line": 5128,
+      "code": "const isAck = localStorage.getItem(ackKey) === 'true';"
+    },
+    {
+      "line": 5210,
+      "code": "localStorage.setItem(ackKey, 'true');"
+    },
+    {
+      "line": 5268,
+      "code": "const broadcasts = safeParse(localStorage.getItem(broadcastKey)) || [];"
+    },
+    {
+      "line": 5270,
+      "code": "const acknowledgedIds = safeParse(localStorage.getItem(ackBcKey)) || [];"
+    },
+    {
+      "line": 5290,
+      "code": "const isAck = localStorage.getItem(ackKey) === 'true';"
+    },
+    {
+      "line": 5369,
+      "code": "const broadcasts = safeParse(localStorage.getItem(broadcastKey)) || [];"
+    },
+    {
+      "line": 5371,
+      "code": "const acknowledgedIds = safeParse(localStorage.getItem(ackBcKey)) || [];"
+    },
+    {
+      "line": 5405,
+      "code": "const acknowledgedIds = safeParse(localStorage.getItem(ackBcKey)) || [];"
+    },
+    {
+      "line": 5408,
+      "code": "localStorage.setItem(ackBcKey, JSON.stringify(acknowledgedIds));"
+    },
+    {
+      "line": 5417,
+      "code": "const broadcasts = safeParse(localStorage.getItem(broadcastKey)) || [];"
+    },
+    {
+      "line": 5420,
+      "code": "localStorage.setItem(ackBcKey, JSON.stringify(allIds));"
+    },
+    {
+      "line": 5437,
+      "code": "const broadcasts = safeParse(localStorage.getItem(broadcastKey)) || [];"
+    },
+    {
+      "line": 5439,
+      "code": "const acknowledgedIds = safeParse(localStorage.getItem(ackBcKey)) || [];"
+    },
+    {
+      "line": 5507,
+      "code": "const acknowledgedIds = safeParse(localStorage.getItem(ackBcKey)) || [];"
+    },
+    {
+      "line": 5510,
+      "code": "localStorage.setItem(ackBcKey, JSON.stringify(acknowledgedIds));"
+    }
+  ],
+  "pages/student/student-dashboard.html": [
+    {
+      "line": 2762,
+      "code": "const raw = localStorage.getItem('active_student');"
+    },
+    {
+      "line": 2788,
+      "code": "localStorage.setItem('active_student', JSON.stringify(activeStudent));"
+    },
+    {
+      "line": 2795,
+      "code": "localStorage.setItem('active_student', JSON.stringify(activeStudent));"
+    },
+    {
+      "line": 2847,
+      "code": "list = JSON.parse(localStorage.getItem(STUD_KEY) || '[]');"
+    },
+    {
+      "line": 2865,
+      "code": "localStorage.setItem('active_student', JSON.stringify(found));"
+    },
+    {
+      "line": 3081,
+      "code": "broadcasts = JSON.parse(localStorage.getItem(BROADCAST_KEY) || '[]');"
+    },
+    {
+      "line": 3144,
+      "code": "excuses = JSON.parse(localStorage.getItem('student_absence_excuses') || '[]');"
+    },
+    {
+      "line": 3213,
+      "code": "excuses = JSON.parse(localStorage.getItem('student_absence_excuses') || '[]');"
+    },
+    {
+      "line": 3223,
+      "code": "localStorage.setItem('student_absence_excuses', JSON.stringify(excuses));"
+    },
+    {
+      "line": 3269,
+      "code": "localStorage.removeItem('active_student');"
+    },
+    {
+      "line": 4027,
+      "code": "const raw = localStorage.getItem('student_portal_settings');"
+    },
+    {
+      "line": 4031,
+      "code": "const activeStudent = JSON.parse(localStorage.getItem('active_student') || localStorage.getItem('student_active_user') || '{}');"
+    },
+    {
+      "line": 4079,
+      "code": "localStorage.setItem('student_portal_settings', JSON.stringify(settings));"
+    },
+    {
+      "line": 4082,
+      "code": "let activeStudent = JSON.parse(localStorage.getItem('active_student') || localStorage.getItem('student_active_user') || '{}');"
+    },
+    {
+      "line": 4086,
+      "code": "localStorage.setItem('active_student', JSON.stringify(activeStudent));"
+    },
+    {
+      "line": 4087,
+      "code": "localStorage.setItem('student_active_user', JSON.stringify(activeStudent));"
+    }
+  ]
+}

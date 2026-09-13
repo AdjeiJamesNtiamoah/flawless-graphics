@@ -1,6 +1,6 @@
 -- ============================================================================
--- Migration: Create public.organizations Table
--- Project: FLAWLESS GRAPHICS — LUCY™ Management System
+-- Migration: Create Organizations Table
+-- Project: FLAWLESS GRAPHICS Enterprise Management System
 -- Date: 2026-09-05
 -- ============================================================================
 

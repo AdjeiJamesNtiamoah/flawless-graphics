@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FLAWLESS GRAPHICS — Finance Portal Auth</title>
+  <title>Bursary &amp; Treasury Command Console — FLAWLESS GRAPHICS</title>
 
   <!-- Typography & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,1178 +11,1234 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- AOS Animations -->
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <!-- Short Skeletal Loading Stylesheet -->
-  <link rel="stylesheet" href="../../assets/css/skeleton.css">
-  <!-- Floating Quick Assistant Stylesheet -->
-  <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
-  <!-- Toaster Notifications Stylesheet -->
+  <!-- Universal Toaster & Skeletons -->
   <link rel="stylesheet" href="../../assets/css/toaster.css">
+  <link rel="stylesheet" href="../../assets/css/skeleton.css">
+  <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
 
-  <!-- Unified AuthSession -->
+  <!-- Central Authentication Bridge & Pop-up Toaster Engine -->
   <script src="../../assets/js/auth-session.js"></script>
+  <script src="../../assets/js/toaster.js"></script>
+
+  <!-- Supabase Cloud Integration -->
+  <script src="../../assets/js/supabase-config.js"></script>
+  <script src="../../assets/js/supabase-client.js"></script>
+  <script src="../../assets/js/realtime-auth.js"></script>
 
   <style>
-    :root {
-      --bg-outer: #FAF7F2;
-      --card-bg: rgba(255, 255, 255, 0.94);
-      --card-border: rgba(226, 221, 213, 0.9);
-      --text-main: #0F172A;
-      --text-muted: #64748B;
-      --accent: #2563EB;
-      --accent-gradient: linear-gradient(135deg, #2563EB 0%, #06B6D4 100%);
-      --input-bg: #FFFFFF;
-      --input-border: rgba(203, 213, 225, 0.9);
-      --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
-      --radius-xl: 24px;
-      --radius-md: 12px;
-      --success: #10B981;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
-
-    .dark {
-      --bg-outer: #FAF7F2;
-      --card-bg: rgba(17, 24, 39, 0.7);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --text-main: #F8FAFC;
-      --text-muted: #94A3B8;
-      --accent: #38BDF8;
-      --accent-gradient: linear-gradient(135deg, #0284C7 0%, #6366F1 100%);
-      --input-bg: rgba(15, 23, 42, 0.6);
-      --input-border: rgba(255, 255, 255, 0.12);
-      --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease; }
 
     body {
-      background-color: var(--bg-outer);
-      color: var(--text-main);
+      background-color: #060B18;
+      color: #F8FAFC;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      overflow-x: hidden;
-      position: relative;
-    }
-
-    /* Background Ambient Glows */
-    body::before, body::after {
-      content: '';
-      position: absolute;
-      width: 450px;
-      height: 450px;
-      border-radius: 50%;
-      background: var(--accent-gradient);
-      filter: blur(140px);
-      opacity: 0.15;
-      z-index: -1;
-      pointer-events: none;
-    }
-    body::before { top: -100px; left: -100px; }
-    body::after { bottom: -100px; right: -100px; }
-
-    /* HEADER */
-    header {
-      padding: 20px 40px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
-    .brand:hover .logo-circle { transform: scale(1.05) rotate(-3deg); }
-    .logo-circle {
-      width: 42px;
-      height: 42px;
-      border-radius: var(--radius-md);
-      background: var(--accent-gradient);
-      display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      color: #fff;
-      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-      transition: transform 0.25s ease;
+      padding: 32px 16px;
+      position: relative;
+      overflow-x: hidden;
     }
-    .brand-title { font-size: 15px; font-weight: 800; letter-spacing: 0.5px; }
 
-    .header-actions {
+    /* Subtle blueprint grid overlay */
+    .grid-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        linear-gradient(to right, rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Ambient atmospheric glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -10%; left: 15%;
+      width: 650px; height: 650px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -10%; right: 15%;
+      width: 650px; height: 650px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.11) 0%, transparent 70%);
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .main-wrapper {
+      width: 100%;
+      max-width: 1080px;
+      z-index: 1;
+      position: relative;
       display: flex;
+      flex-direction: column;
       align-items: center;
+    }
+
+    /* Top Platform Navigation */
+    header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
       gap: 12px;
     }
 
-    /* BUTTON STYLES */
-    .btn-back {
-      background: rgba(0, 0, 0, 0.05);
-      border: 1px solid var(--input-border);
-      color: var(--text-main);
-      padding: 8px 16px;
-      border-radius: 30px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .dark .btn-back { background: rgba(255, 255, 255, 0.05); }
-    .btn-back:hover {
-      background: rgba(37, 99, 235, 0.15);
-      border-color: var(--accent);
-      color: var(--accent);
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-    }
-
-    .theme-toggle-btn {
-      background: rgba(0, 0, 0, 0.05);
-      border: 1px solid var(--input-border);
-      color: var(--text-main);
-      padding: 8px 16px;
-      border-radius: 30px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
+    .brand {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
     }
-    .dark .theme-toggle-btn { background: rgba(255, 255, 255, 0.05); }
 
-    /* CONTAINER */
-    main {
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #10b981 0%, #0284c7 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
-      flex: 1;
+      color: #fff;
+      font-size: 18px;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
     }
 
-    .login-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-lg);
-      width: 100%;
-      max-width: 460px;
-      padding: 40px;
-      position: relative;
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: #ffffff;
+      line-height: 1.2;
     }
 
-    /* TAB TOGGLER */
-    .auth-tabs {
-      display: flex;
-      background: rgba(0, 0, 0, 0.05);
-      border: 1px solid var(--input-border);
-      padding: 4px;
-      border-radius: 30px;
-      margin-bottom: 24px;
-    }
-    .dark .auth-tabs { background: rgba(255, 255, 255, 0.04); }
-    .tab-btn {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
+    .brand-sub {
+      font-size: 10px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
       font-weight: 700;
-      font-size: 13px;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.25s ease;
-    }
-    .tab-btn.active {
-      background: var(--card-bg);
-      color: var(--accent);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
-    .login-header { text-align: center; margin-bottom: 24px; }
-    .login-header h2 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
-    .login-header p { font-size: 13px; color: var(--text-muted); }
-
-    /* FORM STYLES */
-    .form-group { margin-bottom: 18px; }
-    .form-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-
-    .input-wrapper {
-      position: relative;
+    .header-nav {
       display: flex;
       align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
-    .input-wrapper i.icon {
-      position: absolute;
-      left: 14px;
-      color: var(--text-muted);
-      font-size: 14px;
-    }
-    .form-input {
-      width: 100%;
-      padding: 12px 14px 12px 40px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--input-border);
-      background: var(--input-bg);
-      color: var(--text-main);
-      font-size: 14px;
-      outline: none;
+
+    .header-link {
+      color: #94a3b8;
+      font-size: 12.5px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 7px 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       transition: all 0.2s ease;
-    }
-    .form-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .toggle-password {
-      position: absolute;
-      right: 14px;
-      cursor: pointer;
-      color: var(--text-muted);
+    .header-link:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Top Gateway Header */
+    .gateway-header {
+      text-align: center;
+      margin-bottom: 26px;
+    }
+
+    .gateway-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .gateway-badge .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 8px #34d399;
+    }
+
+    .gateway-title {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.6px;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .gateway-subtitle {
       font-size: 14px;
+      color: #94a3b8;
+      max-width: 680px;
+      margin: 0 auto;
+      line-height: 1.5;
     }
 
-    .form-options {
+    /* Master Console Card */
+    .console-card {
+      width: 100%;
+      background: rgba(13, 22, 42, 0.82);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      box-shadow: 0 25px 65px -10px rgba(0, 0, 0, 0.7), 0 0 40px rgba(16, 185, 129, 0.06);
+      overflow: hidden;
+      animation: cardFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes cardFadeIn {
+      from { opacity: 0; transform: translateY(18px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Console Top Navigation Bar */
+    .console-topbar {
+      padding: 14px 28px;
+      background: rgba(15, 23, 42, 0.65);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
-      font-size: 12px;
+      flex-wrap: wrap;
+      gap: 14px;
     }
-    .remember-me { display: flex; align-items: center; gap: 6px; color: var(--text-muted); cursor: pointer; }
-    .forgot-link { color: var(--accent); text-decoration: none; font-weight: 600; }
-    .forgot-link:hover { text-decoration: underline; }
+
+    .console-tabs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 8px 16px;
+      color: #94a3b8;
+      font-size: 12.5px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .tab-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .tab-btn.active {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: #10b981;
+      color: #ffffff;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.2);
+    }
+
+    .security-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #34d399;
+    }
+
+    .security-badge .sec-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    /* Split 2-Column Body */
+    .console-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 480px;
+    }
+
+    @media (max-width: 860px) {
+      .console-body {
+        grid-template-columns: 1fr;
+      }
+      .left-panel {
+        border-right: none !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+    }
+
+    /* Left Overview Panel */
+    .left-panel {
+      padding: 44px 40px;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 8px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .role-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      color: #ffffff;
+      margin-bottom: 10px;
+      line-height: 1.25;
+    }
+
+    .role-desc {
+      font-size: 13.5px;
+      color: #94a3b8;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13.5px;
+      color: #e2e8f0;
+      font-weight: 500;
+    }
+
+    .feature-item i {
+      color: #10b981;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .btn-action-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #38bdf8;
+      font-size: 12.5px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      align-self: flex-start;
+    }
+
+    .btn-action-link:hover {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: #38bdf8;
+      color: #ffffff;
+    }
+
+    /* Right Authentication Panel */
+    .right-panel {
+      padding: 44px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Sub Tabs: Sign In / Create Account */
+    .mode-tabs {
+      display: flex;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 20px;
+      gap: 4px;
+    }
+
+    .mode-tab {
+      flex: 1;
+      padding: 9px 14px;
+      border-radius: 8px;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .mode-tab.active {
+      background: rgba(16, 185, 129, 0.2);
+      color: #ffffff;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    .auth-header {
+      margin-bottom: 20px;
+    }
+
+    .auth-header h3 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+      margin-bottom: 4px;
+    }
+
+    .auth-header p {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    .alert-box {
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      margin-bottom: 16px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .alert-box.alert-error {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+
+    .alert-box.alert-success {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #6ee7b7;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 7px;
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrap i.field-icon {
+      position: absolute;
+      left: 15px;
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 16px 12px 42px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      color: #ffffff;
+      font-size: 14px;
+      outline: none;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .toggle-pass {
+      position: absolute;
+      right: 14px;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    .toggle-pass:hover {
+      color: #ffffff;
+    }
+
+    .form-extras {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-size: 12.5px;
+    }
+
+    .remember-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #94a3b8;
+      cursor: pointer;
+    }
+
+    .remember-wrap input[type="checkbox"] {
+      accent-color: #10b981;
+      width: 15px;
+      height: 15px;
+      border-radius: 4px;
+    }
+
+    .forgot-link {
+      color: #38bdf8;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
 
     .btn-submit {
       width: 100%;
-      padding: 14px;
-      border-radius: var(--radius-md);
+      padding: 14px 20px;
+      border-radius: 12px;
       border: none;
-      background: var(--accent-gradient);
-      color: #fff;
+      background: linear-gradient(135deg, #059669 0%, #0284c7 100%);
+      color: #ffffff;
+      font-size: 14.5px;
       font-weight: 700;
-      font-size: 14px;
       cursor: pointer;
-      box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
-      transition: all 0.25s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 14px 24px -5px rgba(37, 99, 235, 0.5); }
-
-    .card-footer-link {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 13px;
-    }
-    .card-footer-link a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: color 0.2s ease;
-    }
-    .card-footer-link a:hover {
-      color: var(--accent);
-    }
-
-    /* FEEDBACK MESSAGES */
-    .alert-box {
-      padding: 10px 14px;
-      border-radius: var(--radius-md);
-      font-size: 12px;
-      margin-bottom: 18px;
-      display: none;
-      align-items: center;
-      gap: 8px;
-    }
-    .alert-error {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: #EF4444;
-    }
-    .alert-success {
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: var(--success);
-    }
-
-    /* MODAL STYLES */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-      padding: 20px;
-    }
-    .modal-overlay.active {
-      display: flex;
-      animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    @keyframes modalFadeIn {
-      from { opacity: 0; transform: scale(0.96); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    .modal-box {
-      background: var(--bg-card);
-      border: 1px solid var(--border-card);
-      border-radius: var(--radius-xl);
-      padding: 32px 28px;
-      width: 100%;
-      max-width: 460px;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
-      position: relative;
-      color: var(--text-main);
-      text-align: center;
-    }
-    .modal-close-btn {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: rgba(0, 0, 0, 0.06);
-      border: none;
-      color: var(--text-muted);
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-    .dark .modal-close-btn {
-      background: rgba(255, 255, 255, 0.1);
-      color: rgba(255, 255, 255, 0.8);
-    }
-    .modal-close-btn:hover {
-      background: rgba(0, 0, 0, 0.12);
-      color: var(--text-main);
-    }
-    .verify-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(37, 99, 235, 0.08);
-      border: 1px solid rgba(37, 99, 235, 0.25);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 13px;
-      color: var(--accent);
-      font-weight: 700;
-      margin: 10px 0 16px 0;
-      word-break: break-all;
-    }
-    .otp-box {
-      background: rgba(0, 0, 0, 0.03);
-      border: 1px solid var(--border-card);
-      border-radius: var(--radius-lg);
-      padding: 18px;
-      margin-bottom: 16px;
-    }
-    .dark .otp-box {
-      background: rgba(255, 255, 255, 0.04);
-    }
-    .otp-input {
-      width: 100%;
-      background: var(--input-bg);
-      border: 1px solid var(--input-border);
-      color: var(--text-main);
-      font-size: 24px;
-      letter-spacing: 8px;
-      text-align: center;
-      padding: 12px;
-      border-radius: var(--radius-md);
-      font-weight: 800;
-      margin-bottom: 12px;
-      outline: none;
-      box-sizing: border-box;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .otp-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-    }
-    .verify-feedback {
-      padding: 10px 14px;
-      border-radius: var(--radius-md);
-      font-size: 12px;
-      margin-bottom: 12px;
-      display: none;
-    }
-    .verify-feedback.error {
-      background: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: #ef4444;
-      display: block;
-    }
-    .verify-feedback.success {
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: #10b981;
-      display: block;
-    }
-
-    /* Instant Code Display & Countdown Timer */
-    .instant-code-card {
-      background: rgba(37, 99, 235, 0.06);
-      border: 1px dashed rgba(37, 99, 235, 0.35);
-      border-radius: var(--radius-md);
-      padding: 10px 14px;
-      margin: 10px 0 14px;
-      text-align: center;
-    }
-    .instant-code-header {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .instant-code-display {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      flex-wrap: wrap;
-    }
-    .instant-code-value {
-      font-family: 'JetBrains Mono', 'Courier New', monospace;
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: 4px;
-      color: var(--accent);
-      background: rgba(37, 99, 235, 0.08);
-      padding: 3px 12px;
-      border-radius: 6px;
-      border: 1px solid rgba(37, 99, 235, 0.2);
-    }
-    .btn-copy-code {
-      background: var(--accent);
-      border: 1px solid var(--accent);
-      color: #ffffff;
-      border-radius: 6px;
-      padding: 5px 10px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .btn-copy-code:hover {
-      background: #1d4ed8;
-    }
-    .otp-timer-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      font-size: 12px;
-      color: var(--text-muted);
-      background: rgba(0, 0, 0, 0.04);
-      border: 1px solid var(--border-card);
-      border-radius: 20px;
-      padding: 3px 12px;
-      margin-bottom: 12px;
-    }
-    .otp-timer-badge.expired {
-      color: #ef4444;
-      background: rgba(239, 68, 68, 0.1);
-      border-color: rgba(239, 68, 68, 0.3);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+      transition: all 0.25s ease;
     }
 
-    footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-muted); }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.45);
+      filter: brightness(1.06);
+    }
+
+    .auth-footer-text {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .auth-footer-text a {
+      color: #38bdf8;
+      font-weight: 700;
+      text-decoration: none;
+      margin-left: 4px;
+    }
+
+    .auth-footer-text a:hover {
+      text-decoration: underline;
+    }
+
+    /* Modal Overlay for OTP Verification */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #0d162a;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+      position: relative;
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 16px; right: 16px;
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: #94a3b8;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close-btn:hover {
+      color: #ffffff;
+    }
+
+    .verify-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #34d399;
+      font-weight: 700;
+      margin: 10px 0 14px 0;
+    }
+
+    .otp-field {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 24px;
+      letter-spacing: 6px;
+      text-align: center;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      margin: 14px 0;
+      outline: none;
+    }
+
+    footer {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 12px;
+      color: #64748b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    footer a {
+      color: #94a3b8;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    footer a:hover {
+      color: #38bdf8;
+    }
   </style>
-  <!-- Pop-up Toaster System -->
-  <link rel="stylesheet" href="../../assets/css/toaster.css">
-  <script src="../../assets/js/toaster.js"></script>
 </head>
 <body>
 
-<!-- Short Skeletal Loading Placeholder -->
-<div id="skeletonLoader" class="skeleton-overlay" style="flex-direction: column; justify-content: space-between; padding: 20px;">
-  <div style="width: 100%; max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
-    <div style="display: flex; align-items: center; gap: 10px;">
-      <div class="skeleton-shimmer-light" style="width: 36px; height: 36px; border-radius: 50%;"></div>
-      <div class="skeleton-shimmer-light" style="width: 140px; height: 16px; border-radius: 4px;"></div>
-    </div>
-    <div class="skeleton-shimmer-light" style="width: 80px; height: 32px; border-radius: 10px;"></div>
-  </div>
+<div class="grid-overlay"></div>
 
-  <div class="skeleton-auth-card">
-    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 8px;">
-      <div class="skeleton-shimmer-light" style="width: 48px; height: 48px; border-radius: 12px;"></div>
-      <div class="skeleton-shimmer-light" style="width: 190px; height: 22px; border-radius: 5px;"></div>
-      <div class="skeleton-shimmer-light" style="width: 230px; height: 12px; border-radius: 4px;"></div>
-    </div>
-    <div style="display: flex; flex-direction: column; gap: 6px;">
-      <div class="skeleton-shimmer-light" style="width: 80px; height: 12px; border-radius: 4px;"></div>
-      <div class="skeleton-shimmer-light" style="width: 100%; height: 42px; border-radius: 10px;"></div>
-    </div>
-    <div style="display: flex; flex-direction: column; gap: 6px;">
-      <div class="skeleton-shimmer-light" style="width: 90px; height: 12px; border-radius: 4px;"></div>
-      <div class="skeleton-shimmer-light" style="width: 100%; height: 42px; border-radius: 10px;"></div>
-    </div>
-    <div style="display: flex; justify-content: space-between; align-items: center; margin: 2px 0;">
-      <div class="skeleton-shimmer-light" style="width: 100px; height: 14px; border-radius: 4px;"></div>
-      <div class="skeleton-shimmer-light" style="width: 90px; height: 14px; border-radius: 4px;"></div>
-    </div>
-    <div class="skeleton-shimmer-light" style="width: 100%; height: 44px; border-radius: 10px; margin-top: 6px;"></div>
-  </div>
-
-  <div class="skeleton-shimmer-light" style="width: 200px; height: 12px; border-radius: 4px; margin: 0 auto;"></div>
-</div>
-
-  <!-- HEADER -->
+<div class="main-wrapper">
+  <!-- Header Nav -->
   <header>
-    <div class="header-left">
-      <a href="../../welcome.html" class="brand">
-        <div class="logo-circle">FG</div>
+    <a href="../../index.html" class="brand">
+      <div class="brand-logo">
+        <i class="fa-solid fa-graduation-cap"></i>
+      </div>
+      <div>
         <div class="brand-title">FLAWLESS GRAPHICS</div>
-      </a>
-
-      <!-- Left-Aligned Navigation to Hub -->
-      <a href="../../welcome.html" class="btn-back">
-        <i class="fa-solid fa-arrow-left"></i>
-        <span>Back to Hub</span>
-      </a>
-    </div>
-
-    <div class="header-actions">
-      <!-- THEME TOGGLE BUTTON -->
-      <button class="theme-toggle-btn" id="themeBtn">
-        <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
-      </button>
-    </div>
+        <div class="brand-sub">Enterprise Institutional Cloud</div>
+      </div>
+    </a>
   </header>
 
-  <!-- MAIN CARD -->
-  <main>
-    <div class="login-card" data-aos="zoom-in" data-aos-duration="600">
-      
-      <!-- AUTH MODE SWITCHER -->
-      <div class="auth-tabs">
-        <button class="tab-btn active" id="tabSignIn">Sign In</button>
-        <button class="tab-btn" id="tabSignUp">Create Account</button>
+  <!-- Top Gateway Banner -->
+  <div class="gateway-header">
+    <div class="gateway-badge">
+      <span class="badge-dot"></span>
+      Fiscal &amp; Treasury Command Gateways
+    </div>
+    <h1 class="gateway-title">Direct Institutional Access Console</h1>
+    <p class="gateway-subtitle">
+      Single sign-on authentication for Bursars &amp; Accountants, Financial Controllers, and Treasury Directors.
+    </p>
+  </div>
+
+  <!-- Master Console Card -->
+  <div class="console-card">
+    <div class="console-topbar">
+      <div style="font-size: 11.5px; font-weight: 800; color: #34d399; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;">
+        <i class="fa-solid fa-file-invoice-dollar"></i> BURSARY &amp; TREASURY CONSOLE
       </div>
-
-      <div class="login-header">
-        <h2 id="formTitle">Finance Portal Login</h2>
-        <p id="formSub">Access your organization's administrative tools</p>
-      </div>
-
-      <!-- ALERTS -->
-      <div class="alert-box alert-error" id="errorBox">
-        <i class="fa-solid fa-circle-exclamation"></i>
-        <span id="errorMessage">Please complete all fields.</span>
-      </div>
-
-      <div class="alert-box alert-success" id="successBox">
-        <i class="fa-solid fa-circle-check"></i>
-        <span id="successMessage">Account created! You can now sign in.</span>
-      </div>
-
-      <!-- FORM -->
-      <form id="authForm">
-        <div class="form-group">
-          <label class="form-label" for="orgName">Organization Code / Name</label>
-          <div class="input-wrapper">
-            <i class="fa-solid fa-building icon"></i>
-            <input type="text" id="orgName" class="form-input" placeholder="e.g. FLAWLESS GRAPHICS" required />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="hrEmail">Finance Email</label>
-          <div class="input-wrapper">
-            <i class="fa-solid fa-envelope icon"></i>
-            <input type="email" id="hrEmail" class="form-input" placeholder="admin@flawlessgraphics.com" required />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="hrPassword">Password</label>
-          <div class="input-wrapper">
-            <i class="fa-solid fa-lock icon"></i>
-            <input type="password" id="hrPassword" class="form-input" placeholder="••••••••" required />
-            <i class="fa-solid fa-eye toggle-password" id="togglePassword"></i>
-          </div>
-        </div>
-
-        <!-- SIGN UP ONLY FIELD: CONFIRM PASSWORD -->
-        <div class="form-group" id="confirmPassGroup" style="display: none;">
-          <label class="form-label" for="confirmPassword">Confirm Password</label>
-          <div class="input-wrapper">
-            <i class="fa-solid fa-shield-halved icon"></i>
-            <input type="password" id="confirmPassword" class="form-input" placeholder="••••••••" />
-          </div>
-        </div>
-
-        <div class="form-options" id="signInOptions">
-          <label class="remember-me">
-            <input type="checkbox" id="rememberMe"> Remember active session
-          </label>
-          <a href="#" class="forgot-link" onclick="alert('Please contact System IT Support to reset credentials.')">Forgot password?</a>
-        </div>
-
-        <button type="submit" class="btn-submit" id="submitBtn">
-          <span>Sign In to Finance Dashboard</span>
-          <i class="fa-solid fa-arrow-right"></i>
-        </button>
-
-        <!-- Quick Demo Credentials Box -->
-        <div style="margin-top: 16px; padding: 12px; background: rgba(37,99,235,0.06); border: 1px dashed var(--accent); border-radius: 12px; text-align: center;">
-          <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">FAST EVALUATION DEMO</div>
-          <button type="button" onclick="fillFinanceDemo()" style="background: var(--accent-gradient); color: #fff; border: none; padding: 7px 18px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.25); display: inline-flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-fill Demo Account
-          </button>
-        </div>
-        <button type="button" class="btn-submit" style="margin-top: 10px; background: rgba(37,99,235,0.1); border: 1px solid rgba(37,99,235,0.3); color: var(--text-main);" onclick="quickDemoFinance()">
-          <i class="fa-solid fa-bolt" style="color: var(--accent);"></i>
-          <span>One-Click Demo Finance Access</span>
-        </button>
-      </form>
-
-      <!-- CARD FOOTER RETURN LINK -->
-      <div class="card-footer-link">
-        <a href="../../welcome.html"><i class="fa-solid fa-house"></i> Return to Hub</a>
+      <div class="security-badge">
+        <span class="sec-dot"></span> SHA-256 Encrypted Gateway
       </div>
     </div>
-  </main>
 
-  <!-- MODAL: FINANCE EMAIL & OTP VERIFICATION -->
-  <div class="modal-overlay" id="financeOtpModal">
-    <div class="modal-box">
-      <button class="modal-close-btn" type="button" onclick="closeFinanceOtpModal()"><i class="fa-solid fa-xmark"></i></button>
-      <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(37, 99, 235, 0.12); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 14px;">
-        <i class="fa-solid fa-shield-halved"></i>
-      </div>
-      <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px; color: var(--text-main);">Verify Finance Account</h3>
-      <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 6px;">
-        A 6-digit confirmation code has been generated for:
-      </p>
-      <div class="verify-badge" id="financeVerifyEmailBadge">
-        <i class="fa-regular fa-envelope"></i> <span id="financeVerifyEmailText">finance@company.com</span>
-      </div>
-
-      <div id="financeVerifyFeedback" class="verify-feedback"></div>
-
-      <!-- Instant Code Card for users who didn't receive email -->
-      <div class="instant-code-card" id="instantCodeCard">
-        <div class="instant-code-header">
-          <i class="fa-solid fa-envelope-open-text"></i>
-          <span>Didn't receive code? Instant authentication code:</span>
+    <div class="console-body">
+      <!-- Left Overview Panel -->
+      <div class="left-panel">
+        <div>
+          <div class="role-badge">BURSARY &amp; TREASURY CONSOLE</div>
+          <h2 class="role-title">Fiscal &amp; Treasury Command Center</h2>
+          <p class="role-desc">
+            Master tuition fee schedules, student clearance ledgers, multi-currency cash flow tracking, and cryptographic financial audit trails.
+          </p>
+          <div class="feature-list">
+            <div class="feature-item"><i class="fa-solid fa-check"></i> <span>Automated student tuition invoicing &amp; clearance tracking</span></div>
+            <div class="feature-item"><i class="fa-solid fa-check"></i> <span>Multi-currency bursary ledgers &amp; expense auditing</span></div>
+            <div class="feature-item"><i class="fa-solid fa-check"></i> <span>Cryptographic receipt generation &amp; verification</span></div>
+          </div>
         </div>
-        <div class="instant-code-display">
-          <span class="instant-code-value" id="instantFinanceCodeValue">------</span>
-          <button type="button" class="btn-copy-code" id="btnAutoFillFinanceCode" onclick="autoFillFinanceOtpCode()">
-            <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-fill Code
+        <a href="../../welcome.html" class="btn-action-link">
+          <i class="fa-solid fa-arrow-left"></i> Return to Workstation Hub
+        </a>
+      </div>
+
+      <!-- Right Form Panel -->
+      <div class="right-panel">
+        <!-- Dual Mode Switcher Tabs -->
+        <div class="mode-tabs">
+          <button type="button" class="mode-tab active" id="tabSignIn">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In
+          </button>
+          <button type="button" class="mode-tab" id="tabSignUp">
+            <i class="fa-solid fa-user-plus"></i> Register Finance Account
           </button>
         </div>
-      </div>
 
-      <!-- OTP Expiration Countdown Timer -->
-      <div class="otp-timer-badge" id="financeOtpTimerBadge">
-        <i class="fa-regular fa-clock"></i> Code expires in: <span id="financeOtpTimerText" style="font-weight: 700; font-family: monospace; font-size: 13.5px; margin-left: 4px;">05:00</span>
-      </div>
-
-      <div class="otp-box">
-        <div style="font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
-          <i class="fa-solid fa-key"></i> Enter 6-Digit Code
+        <div class="auth-header">
+          <h3 id="formTitle">Finance Portal Login</h3>
+          <p id="formSub">Access your organization's administrative fiscal tools</p>
         </div>
-        <input type="text" id="financeOtpInput" class="otp-input" placeholder="------" maxlength="6" autocomplete="one-time-code">
-        <button type="button" class="btn-submit" id="btnVerifyFinanceOtp" onclick="submitFinanceOtpVerification()" style="margin-top: 4px;">
-          <i class="fa-solid fa-check"></i> Verify & Enter Finance Dashboard
-        </button>
-      </div>
 
-      <div style="display: flex; gap: 10px; justify-content: center; align-items: center; margin-top: 8px;">
-        <button type="button" class="btn-submit" id="btnResendFinanceOtp" onclick="resendFinanceOtpEmail()" style="font-size: 11.5px; padding: 7px 16px; width: auto; background: rgba(0,0,0,0.06); color: var(--text-main); border: 1px solid var(--border-card); box-shadow: none;">
-          <i class="fa-solid fa-rotate-right"></i> Resend Code
-        </button>
-        <button type="button" class="btn-submit" onclick="closeFinanceOtpModal()" style="font-size: 11.5px; padding: 7px 16px; width: auto; background: rgba(0,0,0,0.06); color: var(--text-main); border: 1px solid var(--border-card); box-shadow: none;">
-          Cancel
-        </button>
+        <!-- Alert messages -->
+        <div class="alert-box alert-error" id="errorBox">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span id="errorMessage">Please complete all fields.</span>
+        </div>
+        <div class="alert-box alert-success" id="successBox">
+          <i class="fa-solid fa-circle-check"></i>
+          <span id="successMessage">Account verified! You can now sign in.</span>
+        </div>
+
+        <form id="authForm">
+          <div class="form-group">
+            <label class="form-label" for="orgName">Institution Workspace (Subdomain Slug)</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-school field-icon"></i>
+              <select id="orgName" class="form-control" style="background: rgba(15, 23, 42, 0.7); color: #fff; padding-left: 40px;" required>
+                <option value="">-- Loading Approved Institutions... --</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" id="financePhotoGroup" style="display: none;">
+            <label class="form-label">Finance Officer Profile Photo (Optional)</label>
+            <div style="display: flex; align-items: center; gap: 14px; padding: 10px 14px; background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(255, 255, 255, 0.2); border-radius: 12px;">
+              <div id="financePhotoPreview" style="width: 48px; height: 48px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                <i class="fa-solid fa-user-tie" style="font-size: 18px; color: #10b981;"></i>
+              </div>
+              <div style="flex: 1;">
+                <button type="button" class="btn-outline" style="padding: 6px 12px; font-size: 11px; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; cursor: pointer;" onclick="document.getElementById('financePhotoFile').click()">
+                  <i class="fa-solid fa-camera"></i> Choose Photo
+                </button>
+                <button type="button" id="removeFinancePhotoBtn" style="padding: 6px 10px; font-size: 11px; border-radius: 8px; display: none; color: #dc2626; border: 1px solid #fca5a5; background: transparent; cursor: pointer; margin-left: 6px;" onclick="removeFinancePhoto()">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+                <input type="file" id="financePhotoFile" accept="image/*" style="display: none;" onchange="handleFinancePhotoUpload(event)">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="hrEmail">Finance Email</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-envelope field-icon"></i>
+              <input type="email" id="hrEmail" class="form-control" placeholder="finance@institution.edu" required autocomplete="username" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="hrPassword">Password</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-lock field-icon"></i>
+              <input type="password" id="hrPassword" class="form-control" placeholder="••••••••" required autocomplete="current-password" />
+              <i class="fa-solid fa-eye toggle-pass" id="togglePassword"></i>
+            </div>
+            <div id="financePassMeter"></div>
+          </div>
+
+          <!-- Confirm Password for Sign Up mode -->
+          <div class="form-group" id="confirmPassGroup" style="display: none;">
+            <label class="form-label" for="confirmPassword">Confirm Password</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-shield-halved field-icon"></i>
+              <input type="password" id="confirmPassword" class="form-control" placeholder="••••••••" autocomplete="new-password" />
+            </div>
+          </div>
+
+          <div class="form-extras" id="signInOptions">
+            <label class="remember-wrap">
+              <input type="checkbox" id="rememberMe" checked>
+              <span>Remember active session</span>
+            </label>
+            <a href="#" class="forgot-link" onclick="if(window.Toaster) window.Toaster.info('Support', 'Please contact institutional IT support to reset credentials.')">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <span>Sign In to Finance Dashboard</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+
+        <div class="auth-footer-text">
+          New Educational Institution? <a href="../../register.html">Register School Workspace</a>
+        </div>
       </div>
     </div>
   </div>
 
   <footer>
-    © <span id="year"></span> Flawless Graphics — Enterprise Finance System
+    <div>&copy; 2026 <strong>FLAWLESS GRAPHICS</strong> &bull; Enterprise Institutional Management Platform. All rights reserved.</div>
+    <div style="display: flex; gap: 16px; margin-top: 4px;">
+      <a href="../../welcome.html">Workstation Hub</a>
+      <a href="../public/home.html">Public Site</a>
+      <a href="../../register.html">Register Organization</a>
+    </div>
   </footer>
+</div>
 
-  <!-- SCRIPT LOGIC -->
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script src="../../assets/js/auth-session.js"></script>
-  <script>
-    AOS.init({ once: true });
+<!-- Modal: Finance OTP Verification -->
+<div class="modal-overlay" id="financeOtpModal">
+  <div class="modal-box">
+    <button class="modal-close-btn" type="button" onclick="closeFinanceOtpModal()"><i class="fa-solid fa-xmark"></i></button>
+    <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); color: #34d399; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 12px;">
+      <i class="fa-solid fa-shield-halved"></i>
+    </div>
+    <h3 style="font-size: 19px; font-weight: 800; color: #fff; margin-bottom: 4px;">Verify Finance Account</h3>
+    <p style="font-size: 12.5px; color: #94a3b8; line-height: 1.5; margin-bottom: 6px;">
+      A 6-digit confirmation code has been generated for:
+    </p>
+    <div class="verify-badge" id="financeVerifyEmailBadge">
+      <i class="fa-regular fa-envelope"></i> <span id="financeVerifyEmailText">finance@company.com</span>
+    </div>
 
-    let pendingFinanceUser = null;
-    let currentFinanceOtpCode = '';
-    let financeOtpCountdownInterval = null;
-    let financeOtpTimeRemaining = 300; // 5 minutes
-    let isFinanceOtpExpired = false;
+    <div id="financeVerifyFeedback" style="font-size: 12px; margin-bottom: 10px; display: none;"></div>
 
-    function startFinanceOtpCountdown(duration = 300) {
-      if (financeOtpCountdownInterval) clearInterval(financeOtpCountdownInterval);
-      financeOtpTimeRemaining = duration;
-      isFinanceOtpExpired = false;
-      const badge = document.getElementById('financeOtpTimerBadge');
-      const timerText = document.getElementById('financeOtpTimerText');
-      const btnVerify = document.getElementById('btnVerifyFinanceOtp');
-      if (badge) badge.classList.remove('expired');
-      if (btnVerify) btnVerify.disabled = false;
+    <input type="text" id="financeOtpInput" class="otp-field" placeholder="------" maxlength="6" autocomplete="one-time-code">
 
-      function updateDisplay() {
-        const mins = Math.floor(financeOtpTimeRemaining / 60);
-        const secs = financeOtpTimeRemaining % 60;
-        if (timerText) {
-          timerText.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-        }
-        if (financeOtpTimeRemaining <= 0) {
-          clearInterval(financeOtpCountdownInterval);
-          isFinanceOtpExpired = true;
-          if (badge) badge.classList.add('expired');
-          if (timerText) timerText.textContent = '00:00 (Expired)';
-          if (btnVerify) btnVerify.disabled = true;
-          showFinanceVerifyFeedback('⚠️ Verification code has expired. Please click "Resend Code" to generate a fresh one.', true);
-        }
-        financeOtpTimeRemaining--;
+    <button type="button" class="btn-submit" id="btnVerifyFinanceOtp" onclick="submitFinanceOtpVerification()">
+      <i class="fa-solid fa-check"></i> Verify &amp; Enter Finance Dashboard
+    </button>
+
+    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 12px;">
+      <button type="button" class="tab-btn" id="btnResendFinanceOtp" onclick="resendFinanceOtpEmail()" style="font-size: 11.5px; padding: 6px 14px;">
+        <i class="fa-solid fa-rotate-right"></i> Resend Code
+      </button>
+      <button type="button" class="tab-btn" onclick="closeFinanceOtpModal()" style="font-size: 11.5px; padding: 6px 14px;">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let pendingFinanceUser = null;
+  let currentFinanceOtpCode = '';
+  let isSignUpMode = false;
+
+  const tabSignIn = document.getElementById('tabSignIn');
+  const tabSignUp = document.getElementById('tabSignUp');
+  const confirmPassGroup = document.getElementById('confirmPassGroup');
+  const signInOptions = document.getElementById('signInOptions');
+  const formTitle = document.getElementById('formTitle');
+  const formSub = document.getElementById('formSub');
+  const submitBtn = document.getElementById('submitBtn');
+  const confirmPasswordInput = document.getElementById('confirmPassword');
+  const hrPassword = document.getElementById('hrPassword');
+  const togglePassword = document.getElementById('togglePassword');
+  const errorBox = document.getElementById('errorBox');
+  const errorMessage = document.getElementById('errorMessage');
+  const successBox = document.getElementById('successBox');
+  const successMessage = document.getElementById('successMessage');
+
+  // Toggle Password
+  togglePassword.addEventListener('click', () => {
+    if (hrPassword.type === 'password') {
+      hrPassword.type = 'text';
+      togglePassword.classList.remove('fa-eye');
+      togglePassword.classList.add('fa-eye-slash');
+    } else {
+      hrPassword.type = 'password';
+      togglePassword.classList.remove('fa-eye-slash');
+      togglePassword.classList.add('fa-eye');
+    }
+  });
+
+  // Switch between Sign In and Sign Up
+  tabSignIn.addEventListener('click', () => setMode(false));
+  tabSignUp.addEventListener('click', () => setMode(true));
+
+  let currentFinancePhotoBase64 = null;
+
+  function handleFinancePhotoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      showError('Please select a valid image file (PNG, JPG, WebP).');
+      return;
+    }
+    if (file.size > 3 * 1024 * 1024) {
+      showError('Photo exceeds 3MB limit.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      currentFinancePhotoBase64 = e.target.result;
+      const preview = document.getElementById('financePhotoPreview');
+      if (preview) preview.innerHTML = `<img src="${currentFinancePhotoBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+      const removeBtn = document.getElementById('removeFinancePhotoBtn');
+      if (removeBtn) removeBtn.style.display = 'inline-block';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function removeFinancePhoto() {
+    currentFinancePhotoBase64 = null;
+    const preview = document.getElementById('financePhotoPreview');
+    if (preview) preview.innerHTML = '<i class="fa-solid fa-user-tie" style="font-size: 18px; color: #10b981;"></i>';
+    const removeBtn = document.getElementById('removeFinancePhotoBtn');
+    if (removeBtn) removeBtn.style.display = 'none';
+    const fileInput = document.getElementById('financePhotoFile');
+    if (fileInput) fileInput.value = '';
+  }
+
+  function setMode(signUp) {
+    isSignUpMode = signUp;
+    const meter = document.getElementById('financePassMeter');
+    if (meter) meter.style.display = signUp ? 'block' : 'none';
+    const photoGroup = document.getElementById('financePhotoGroup');
+    if (photoGroup) photoGroup.style.display = signUp ? 'block' : 'none';
+
+    if (signUp) {
+      tabSignUp.classList.add('active');
+      tabSignIn.classList.remove('active');
+      confirmPassGroup.style.display = 'block';
+      confirmPasswordInput.setAttribute('required', 'true');
+      signInOptions.style.display = 'none';
+      formTitle.textContent = 'Register Finance Account';
+      formSub.textContent = 'Create administrator credentials for your organization';
+      submitBtn.innerHTML = `<span>Create Finance Account</span> <i class="fa-solid fa-user-plus"></i>`;
+      if (window.StrongPassword) {
+        window.StrongPassword.attach('hrPassword', 'financePassMeter');
       }
+    } else {
+      tabSignIn.classList.add('active');
+      tabSignUp.classList.remove('active');
+      confirmPassGroup.style.display = 'none';
+      confirmPasswordInput.removeAttribute('required');
+      signInOptions.style.display = 'flex';
+      formTitle.textContent = 'Finance Portal Login';
+      formSub.textContent = 'Access your organization\'s administrative fiscal tools';
+      submitBtn.innerHTML = `<span>Sign In to Finance Dashboard</span> <i class="fa-solid fa-arrow-right"></i>`;
+    }
+  }
 
-      updateDisplay();
-      financeOtpCountdownInterval = setInterval(updateDisplay, 1000);
+  function hideMessages() {
+    errorBox.style.display = 'none';
+    successBox.style.display = 'none';
+  }
+
+  function showError(msg) {
+    errorMessage.textContent = msg;
+    errorBox.style.display = 'flex';
+    if (window.Toaster) window.Toaster.error('Authentication Error', msg);
+  }
+
+  function showSuccess(msg) {
+    successMessage.textContent = msg;
+    successBox.style.display = 'flex';
+    if (window.Toaster) window.Toaster.success('Success', msg);
+  }
+
+  // OTP Modal Functions
+  function openFinanceOtpModal(userData) {
+    pendingFinanceUser = userData;
+    currentFinanceOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    document.getElementById('financeVerifyEmailText').textContent = userData.email;
+    document.getElementById('financeOtpInput').value = '';
+    const feedback = document.getElementById('financeVerifyFeedback');
+    feedback.textContent = `Verification code: ${currentFinanceOtpCode}`;
+    feedback.style.color = '#34d399';
+    feedback.style.display = 'block';
+    document.getElementById('financeOtpModal').classList.add('active');
+  }
+
+  function closeFinanceOtpModal() {
+    document.getElementById('financeOtpModal').classList.remove('active');
+  }
+
+  function resendFinanceOtpEmail() {
+    currentFinanceOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const feedback = document.getElementById('financeVerifyFeedback');
+    feedback.textContent = `Fresh verification code: ${currentFinanceOtpCode}`;
+    feedback.style.color = '#34d399';
+    feedback.style.display = 'block';
+    if (window.Toaster) window.Toaster.info('New Code Generated', `Code: ${currentFinanceOtpCode}`);
+  }
+
+  function submitFinanceOtpVerification() {
+    const code = document.getElementById('financeOtpInput').value.trim();
+    if (!code || code.length < 6) {
+      if (window.Toaster) window.Toaster.warning('Invalid Code', 'Please enter a 6-digit code.');
+      return;
     }
 
-    function autoFillFinanceOtpCode() {
-      if (isFinanceOtpExpired) {
-        showFinanceVerifyFeedback('⚠️ This code has expired! Please click "Resend Code" to get a fresh code.', true);
+    const orgSelect = document.getElementById('orgName');
+    const selectedOrgName = (orgSelect && orgSelect.selectedOptions && orgSelect.selectedOptions[0])
+      ? (orgSelect.selectedOptions[0].dataset.name || orgSelect.value)
+      : (pendingFinanceUser.org || 'FLAWLESS GRAPHICS');
+
+    const financeRecord = {
+      org: selectedOrgName,
+      org_id: orgSelect ? orgSelect.value : undefined,
+      name: pendingFinanceUser.email.split('@')[0],
+      email: pendingFinanceUser.email.toLowerCase(),
+      password: pendingFinanceUser.password,
+      role: 'finance',
+      photo_url: currentFinancePhotoBase64 || null,
+      status: 'pending_approval'
+    };
+
+    if (window.SupabaseService) {
+      window.SupabaseService.saveUser(financeRecord).catch(console.warn);
+    }
+
+    closeFinanceOtpModal();
+    setMode(false);
+    showSuccess('Registration submitted! Your Finance account is pending approval by Human Resources.');
+
+    if (window.Toaster) {
+      window.Toaster.warning('Pending Approval', 'Your Finance account registration must be approved by the HR Directorate before you can log in.');
+    }
+  }
+
+  // Auth Form Submit
+  const authForm = document.getElementById('authForm');
+  authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideMessages();
+
+    const orgSelect = document.getElementById('orgName');
+    const orgName = orgSelect ? orgSelect.value.trim() : '';
+    const selectedOrgName = (orgSelect && orgSelect.selectedOptions && orgSelect.selectedOptions[0])
+      ? (orgSelect.selectedOptions[0].dataset.name || orgName)
+      : orgName;
+
+    const hrEmail = document.getElementById('hrEmail').value.trim();
+    const password = document.getElementById('hrPassword').value.trim();
+
+    if (!orgName || !hrEmail || !password) {
+      showError('Please select your approved institution workspace and fill in all fields.');
+      return;
+    }
+
+    if (isSignUpMode) {
+      if (window.StrongPassword) {
+        const pwCheck = window.StrongPassword.validate(password);
+        if (!pwCheck.valid) {
+          showError(pwCheck.error);
+          return;
+        }
+      }
+
+      const confirmPassword = confirmPasswordInput.value.trim();
+      if (password !== confirmPassword) {
+        showError('Passwords do not match. Please re-enter.');
         return;
       }
-      const input = document.getElementById('financeOtpInput');
-      if (input && currentFinanceOtpCode) {
-        input.value = currentFinanceOtpCode;
-        input.focus();
-        showFinanceVerifyFeedback('Code auto-filled! Click "Verify & Enter Finance Dashboard" to proceed.', false);
-      }
-    }
 
-    function openFinanceOtpModal(userData) {
-      pendingFinanceUser = userData;
-      currentFinanceOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
-      document.getElementById('financeVerifyEmailText').textContent = userData.email;
-      document.getElementById('financeOtpInput').value = '';
-      const instantEl = document.getElementById('instantFinanceCodeValue');
-      if (instantEl) instantEl.textContent = currentFinanceOtpCode;
-      showFinanceVerifyFeedback(`Verification code generated! Instant access code: ${currentFinanceOtpCode}`, false);
-      startFinanceOtpCountdown(300);
-      document.getElementById('financeOtpModal').classList.add('active');
-      setTimeout(() => document.getElementById('financeOtpInput')?.focus(), 150);
-    }
-
-    function closeFinanceOtpModal() {
-      if (financeOtpCountdownInterval) clearInterval(financeOtpCountdownInterval);
-      document.getElementById('financeOtpModal').classList.remove('active');
-    }
-
-    function showFinanceVerifyFeedback(text, isError = true) {
-      const el = document.getElementById('financeVerifyFeedback');
-      if (!el) return;
-      el.textContent = text;
-      el.className = 'verify-feedback ' + (isError ? 'error' : 'success');
-      el.style.display = 'block';
-    }
-
-    function submitFinanceOtpVerification() {
-      if (isFinanceOtpExpired) {
-        return showFinanceVerifyFeedback('⚠️ Verification code has expired. Please click "Resend Code" to request a new code.', true);
-      }
-
-      const otpInput = document.getElementById('financeOtpInput');
-      const code = otpInput.value.trim();
-      const btn = document.getElementById('btnVerifyFinanceOtp');
-
-      if (!code || code.length < 6) {
-        return showFinanceVerifyFeedback('Please enter the 6-digit verification code.', true);
-      }
-
-      if (code !== currentFinanceOtpCode && code !== '123456') {
-        return showFinanceVerifyFeedback('Invalid verification code. Please check and try again.', true);
-      }
-
-      if (financeOtpCountdownInterval) clearInterval(financeOtpCountdownInterval);
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying...';
-
-      showFinanceVerifyFeedback('Account verified! Submitting for Human Resources approval...', false);
-
-      // Prepare user record
       const financeRecord = {
-        org: pendingFinanceUser.org || 'FLAWLESS GRAPHICS',
-        name: pendingFinanceUser.email.split('@')[0],
-        email: pendingFinanceUser.email.toLowerCase(),
-        pass: pendingFinanceUser.password, // raw or hashed
-        rawPassPreview: pendingFinanceUser.password,
+        org: selectedOrgName,
+        org_id: orgName,
+        name: hrEmail.split('@')[0],
+        email: hrEmail.toLowerCase(),
+        password: password,
         role: 'finance',
-        status: 'pending_approval',
-        createdAt: Date.now()
+        photo_url: currentFinancePhotoBase64 || null,
+        status: 'pending_approval'
       };
 
-      // Hash password if crypto/AuthSession available
-      if (window.AuthSession && typeof window.AuthSession.sha256 === 'function') {
-        window.AuthSession.sha256(pendingFinanceUser.password).then(h => {
-          financeRecord.pass = h;
-          saveRecord();
-        }).catch(() => saveRecord());
-      } else {
-        saveRecord();
-      }
-
-      function saveRecord() {
-        // 1. Unified organizations_users
-        try {
-          let orgUsers = JSON.parse(localStorage.getItem('organizations_users') || '[]');
-          const idx = orgUsers.findIndex(u => (u.email || '').toLowerCase() === financeRecord.email);
-          if (idx >= 0) orgUsers[idx] = Object.assign({}, orgUsers[idx], financeRecord);
-          else orgUsers.push(financeRecord);
-          localStorage.setItem('organizations_users', JSON.stringify(orgUsers));
-        } catch(e) {
-          console.warn('Error saving to organizations_users:', e);
-        }
-
-        // 2. Legacy fallback
-        const users = JSON.parse(localStorage.getItem('fg_registered_users') || '[]');
-        users.push(pendingFinanceUser);
-        localStorage.setItem('fg_registered_users', JSON.stringify(users));
-
-        setTimeout(() => {
-          closeFinanceOtpModal();
-          setMode(false);
-          const emailInput = document.getElementById('hrEmail');
-          if (emailInput) emailInput.value = financeRecord.email;
-          showSuccess('Registration submitted! Your Finance account is awaiting approval by Human Resources. You will be able to sign in once activated.');
-          if (window.Toaster && typeof window.Toaster.warning === 'function') {
-            window.Toaster.warning('Account Pending Approval', 'Your Finance account has been registered and is awaiting Human Resources authorization.');
+      if (window.RealtimeAuth) {
+        window.RealtimeAuth.openAuthModal({
+          email: hrEmail,
+          purpose: 'Finance Account Registration',
+          durationSeconds: 300,
+          onVerified: async () => {
+            if (window.SupabaseService) {
+              await window.SupabaseService.saveUser(financeRecord).catch(console.warn);
+            }
+            setMode(false);
+            showSuccess('Registration submitted! Your Finance account is pending approval by Human Resources.');
+            if (window.Toaster) {
+              window.Toaster.warning('Pending Approval', 'Your Finance account registration must be approved by the HR Directorate before you can log in.');
+            }
           }
-        }, 900);
-      }
-    }
-
-    function resendFinanceOtpEmail() {
-      const btn = document.getElementById('btnResendFinanceOtp');
-      currentFinanceOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
-      const instantEl = document.getElementById('instantFinanceCodeValue');
-      if (instantEl) instantEl.textContent = currentFinanceOtpCode;
-      startFinanceOtpCountdown(300);
-      showFinanceVerifyFeedback(`Fresh verification code generated: ${currentFinanceOtpCode}`, false);
-
-      btn.disabled = true;
-      let cd = 30;
-      btn.innerHTML = `<i class="fa-solid fa-clock"></i> Resend (${cd}s)`;
-      const timer = setInterval(() => {
-        cd--;
-        if (cd > 0) {
-          btn.innerHTML = `<i class="fa-solid fa-clock"></i> Resend (${cd}s)`;
-        } else {
-          clearInterval(timer);
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Code';
-        }
-      }, 1000);
-    }
-
-    function quickDemoFinance() {
-      if (window.AuthSession) {
-        window.AuthSession.initDemoSession();
-        window.AuthSession.setUser({
-          org: (window.AuthSession.getOrg() || 'FLAWLESS GRAPHICS'),
-          name: 'James Ntiamoah (Finance Admin)',
-          email: 'bursar@flawlessgraphics.com',
-          role: 'finance'
         });
+        return;
       }
-      localStorage.setItem('active_org', 'FLAWLESS GRAPHICS');
-      localStorage.setItem('activeFinance', JSON.stringify({
-        name: 'James Ntiamoah (Finance Admin)',
-        email: 'bursar@flawlessgraphics.com',
-        role: 'Finance Officer'
-      }));
-      localStorage.setItem('activeHR', 'true');
-      window.location.href = 'finance-dashboard.html';
+
+      openFinanceOtpModal({ org: selectedOrgName, email: hrEmail, password: password });
+      return;
     }
 
-    // ---------- THEME SWITCHER ----------
-    const el = document.documentElement;
-    const themeBtn = document.getElementById('themeBtn');
+    // Sign In Mode
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...';
 
-    function applyTheme(isDark) {
-      if (isDark) {
-        el.classList.add('dark');
-        themeBtn.innerHTML = `<i class="fa-solid fa-sun"></i> <span>Light</span>`;
-      } else {
-        el.classList.remove('dark');
-        themeBtn.innerHTML = `<i class="fa-solid fa-moon"></i> <span>Dark</span>`;
-      }
-      localStorage.setItem('fg_theme_dark', isDark);
-    }
+    const lowerEmail = hrEmail.toLowerCase();
+    let matchedUser = null;
 
-    const savedTheme = localStorage.getItem('fg_theme_dark');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    applyTheme(savedTheme === null ? prefersDark : savedTheme === 'true');
-
-    themeBtn.addEventListener('click', () => applyTheme(!el.classList.contains('dark')));
-
-    // ---------- SHOW/HIDE PASSWORD ----------
-    const togglePassword = document.getElementById('togglePassword');
-    const hrPassword = document.getElementById('hrPassword');
-
-    togglePassword.addEventListener('click', () => {
-      const type = hrPassword.type === 'password' ? 'text' : 'password';
-      hrPassword.type = type;
-      togglePassword.classList.toggle('fa-eye');
-      togglePassword.classList.toggle('fa-eye-slash');
-    });
-
-    // ---------- TAB SWITCHING LOGIC ----------
-    let isSignUpMode = false;
-    const tabSignIn = document.getElementById('tabSignIn');
-    const tabSignUp = document.getElementById('tabSignUp');
-    const confirmPassGroup = document.getElementById('confirmPassGroup');
-    const signInOptions = document.getElementById('signInOptions');
-    const formTitle = document.getElementById('formTitle');
-    const formSub = document.getElementById('formSub');
-    const submitBtn = document.getElementById('submitBtn');
-    const confirmPasswordInput = document.getElementById('confirmPassword');
-
-    tabSignIn.addEventListener('click', () => setMode(false));
-    tabSignUp.addEventListener('click', () => setMode(true));
-
-    function setMode(signUp) {
-      isSignUpMode = signUp;
-      hideMessages();
-
-      if (signUp) {
-        tabSignUp.classList.add('active');
-        tabSignIn.classList.remove('active');
-        confirmPassGroup.style.display = 'block';
-        confirmPasswordInput.setAttribute('required', 'true');
-        signInOptions.style.display = 'none';
-        formTitle.textContent = 'Register Finance Account';
-        formSub.textContent = 'Create administrator credentials for your organization';
-        submitBtn.innerHTML = `<span>Create Finance Account</span> <i class="fa-solid fa-user-plus"></i>`;
-      } else {
-        tabSignIn.classList.add('active');
-        tabSignUp.classList.remove('active');
-        confirmPassGroup.style.display = 'none';
-        confirmPasswordInput.removeAttribute('required');
-        signInOptions.style.display = 'flex';
-        formTitle.textContent = 'Finance Portal Login';
-        formSub.textContent = 'Access your organization\'s administrative tools';
+    if (window.SupabaseService) {
+      try {
+        const authRes = await window.SupabaseService.authenticate(lowerEmail, password, null, 'finance');
+        if (authRes.success) {
+          matchedUser = authRes.user;
+        } else {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `<span>Sign In to Finance Dashboard</span> <i class="fa-solid fa-arrow-right"></i>`;
+          showError(authRes.error || 'Account not found in institutional database. Please register.');
+          return;
+        }
+      } catch(err) {
+        console.warn('Supabase auth attempt:', err);
+        submitBtn.disabled = false;
         submitBtn.innerHTML = `<span>Sign In to Finance Dashboard</span> <i class="fa-solid fa-arrow-right"></i>`;
-      }
-    }
-
-    // ---------- AUTH LOGIC ----------
-    const authForm = document.getElementById('authForm');
-    const errorBox = document.getElementById('errorBox');
-    const errorMessage = document.getElementById('errorMessage');
-    const successBox = document.getElementById('successBox');
-    const successMessage = document.getElementById('successMessage');
-
-    // Pre-fill active org if available
-    const existingOrg = localStorage.getItem('active_org') || localStorage.getItem('activeOrg');
-    if (existingOrg) document.getElementById('orgName').value = existingOrg;
-
-    authForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      hideMessages();
-
-      const orgName = document.getElementById('orgName').value.trim();
-      const hrEmail = document.getElementById('hrEmail').value.trim();
-      const password = document.getElementById('hrPassword').value.trim();
-
-      if (!orgName || !hrEmail || !password) {
-        showError('Please fill in all required fields.');
+        showError(err.message || 'Connection error. Please try again.');
         return;
       }
+    }
 
-      if (password.length < 4) {
-        showError('Password must be at least 4 characters long.');
+    if (!matchedUser) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<span>Sign In to Finance Dashboard</span> <i class="fa-solid fa-arrow-right"></i>`;
+      showError('Account not found in institutional database. Please register.');
+      return;
+    }
+
+    // Verify Institution Workspace Membership
+    if (window.RealtimeAuth && orgName) {
+      const isMember = window.RealtimeAuth.verifyUserOrgMembership(matchedUser, orgName) ||
+                       window.RealtimeAuth.verifyUserOrgMembership(matchedUser, selectedOrgName);
+      if (!isMember) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<span>Sign In to Finance Dashboard</span> <i class="fa-solid fa-arrow-right"></i>`;
+        showError(`Access Denied: You are not registered or approved under "${selectedOrgName}".`);
         return;
       }
-
-      // Read registered users from storage
-      const users = JSON.parse(localStorage.getItem('fg_registered_users') || '[]');
-
-      if (isSignUpMode) {
-        // --- SIGN UP WORKFLOW ---
-        const confirmPassword = confirmPasswordInput.value.trim();
-        if (password !== confirmPassword) {
-          showError('Passwords do not match.');
-          return;
-        }
-
-        const userExists = users.some(u => u.email.toLowerCase() === hrEmail.toLowerCase());
-        if (userExists) {
-          showError('An account with this email already exists. Please sign in.');
-          return;
-        }
-
-        // Open OTP verification modal instead of immediately finishing
-        openFinanceOtpModal({ org: orgName, email: hrEmail, password: password });
-        return;
-
-      } else {
-        // --- SIGN IN WORKFLOW ---
-        let orgUsers = [];
-        try {
-          orgUsers = JSON.parse(localStorage.getItem('organizations_users') || '[]');
-        } catch(e) { orgUsers = []; }
-
-        const lowerEmail = hrEmail.toLowerCase();
-        let matchedUser = orgUsers.find(u => (u.email || '').toLowerCase() === lowerEmail);
-
-        // Fallback to legacy fg_registered_users
-        const legacyMatch = users.find(u => (u.email || '').toLowerCase() === lowerEmail);
-        if (!matchedUser && legacyMatch) {
-          matchedUser = {
-            org: legacyMatch.org || orgName,
-            name: legacyMatch.email.split('@')[0],
-            email: legacyMatch.email,
-            role: 'finance',
-            status: 'active',
-            pass: legacyMatch.password
-          };
-        }
-
-        // Demo user fallback
-        if (!matchedUser && (lowerEmail === 'bursar@flawlessgraphics.com' || lowerEmail.includes('finance@') || lowerEmail === 'admin@flawlessgraphics.com' || orgUsers.length === 0)) {
-          matchedUser = {
-            org: orgName || 'FLAWLESS GRAPHICS',
-            name: lowerEmail.split('@')[0],
-            email: lowerEmail,
-            role: 'finance',
-            status: 'active',
-            pass: password
-          };
-        }
-
-        if (!matchedUser) {
-          showError('Invalid email or password.');
-          if (window.Toaster && typeof window.Toaster.error === 'function') {
-            window.Toaster.error('Authentication Failed', 'Email or password did not match.');
-          }
-          return;
-        }
-
-        // Approval status gate
-        const status = (matchedUser.status || 'active').toLowerCase();
-
-        if (status === 'pending_approval' || status === 'pending') {
-          const msg = 'Your Finance account is currently pending approval by Human Resources. Please await confirmation.';
-          showError(msg);
-          if (window.Toaster && typeof window.Toaster.warning === 'function') {
-            window.Toaster.warning('Account Pending Approval', msg);
-          }
-          return;
-        }
-
-        if (status === 'rejected') {
-          const msg = 'Your finance registration request was declined. Please contact administration.';
-          showError(msg);
-          if (window.Toaster && typeof window.Toaster.error === 'function') {
-            window.Toaster.error('Access Declined', msg);
-          }
-          return;
-        }
-
-        if (status === 'suspended') {
-          const msg = 'Your finance account has been suspended. Please contact the administrator.';
-          showError(msg);
-          if (window.Toaster && typeof window.Toaster.error === 'function') {
-            window.Toaster.error('Account Suspended', msg);
-          }
-          return;
-        }
-
-        // Save session credentials
-        localStorage.setItem('active_org', orgName);
-        localStorage.setItem('activeFinance', JSON.stringify({
-          name: matchedUser.name || lowerEmail.split('@')[0],
-          email: lowerEmail,
-          role: 'Finance Officer'
-        }));
-        localStorage.setItem('activeHR', 'true'); // Satisfies dashboard route guard
-
-        if (window.AuthSession) {
-          window.AuthSession.setUser({
-            org: orgName,
-            name: matchedUser.name || lowerEmail.split('@')[0],
-            email: lowerEmail,
-            role: 'finance'
-          });
-        }
-
-        if (window.Toaster && typeof window.Toaster.success === 'function') {
-          window.Toaster.success('Welcome Back', `Entering Finance Portal as ${matchedUser.name || lowerEmail}`);
-        }
-
-        setTimeout(() => {
-          window.location.href = 'finance-dashboard.html';
-        }, 500);
-      }
-    });
-
-    function fillFinanceDemo() {
-      document.getElementById('orgName').value = 'Flawless Graphics HQ';
-      document.getElementById('hrEmail').value = 'bursar@flawlessgraphics.com';
-      document.getElementById('hrPassword').value = 'finance2026';
-      hideMessages();
     }
 
-    function showError(msg) {
-      errorMessage.textContent = msg;
-      errorBox.style.display = 'flex';
+    if (window.AuthSession) {
+      window.AuthSession.setUser(matchedUser);
+    } else {
+      localStorage.setItem('active_user', JSON.stringify(matchedUser));
+      localStorage.setItem('active_org', orgName);
     }
 
-    function showSuccess(msg) {
-      successMessage.textContent = msg;
-      successBox.style.display = 'flex';
+    if (window.Toaster) {
+      window.Toaster.success('Welcome to Finance Desk', 'Initializing treasury ledgers...');
     }
 
-    function hideMessages() {
-      errorBox.style.display = 'none';
-      successBox.style.display = 'none';
-    }
+    setTimeout(() => {
+      window.location.href = 'finance-dashboard.html';
+    }, 700);
+  });
 
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
-  <!-- Toaster Engine Script -->
-  <script src="../../assets/js/toaster.js"></script>
-  <!-- Short Skeletal Loading Script -->
-  <script src="../../assets/js/skeleton-loader.js"></script>
-  <!-- Floating Quick Assistant Script -->
-  <script src="../../assets/js/quick-assistant.js"></script>
+  window.addEventListener('DOMContentLoaded', () => {
+    if (window.RealtimeAuth) {
+      window.RealtimeAuth.populateApprovedOrgDropdown(document.getElementById('orgName'));
+    }
+    if (window.AuthSession) {
+      window.AuthSession.applyGlobalBranding();
+    }
+  });
+</script>
+
 </body>
 </html>

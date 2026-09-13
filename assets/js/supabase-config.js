@@ -1,6 +1,6 @@
 /**
  * supabase-config.js
- * Supabase Project Configuration for FLAWLESS GRAPHICS — LUCY™ Management System
+ * Supabase Project Configuration for FLAWLESS GRAPHICS Enterprise School Management System
  * Account / Project: AdjeiJamesNtiamoah
  */
 
@@ -15,10 +15,8 @@
   // Default / Template Credentials for AdjeiJamesNtiamoah
   // Users can also enter or override these directly from the Cloud Sync UI modal
   const DEFAULT_CONFIG = {
-    // Replace with your actual project URL from: https://supabase.com/dashboard/project/_/settings/api
-    projectUrl: '', 
-    // Replace with your anon public key from: https://supabase.com/dashboard/project/_/settings/api
-    anonKey: '',
+    projectUrl: 'https://wmvsujwgvlosfjdlhadu.supabase.co', 
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndtdnN1andndmxvc2ZqZGxoYWR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgyOTMxODUsImV4cCI6MjEwMzg2OTE4NX0.7fcpfZtvTgYNxZpc4dW3K3xhZgTS7f0hrXGtzfItTzg',
     projectOwner: 'AdjeiJamesNtiamoah',
     autoSync: true
   };

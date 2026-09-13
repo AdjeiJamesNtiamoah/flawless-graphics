@@ -22,29 +22,119 @@
         box-sizing: border-box;
         margin: 0;
         padding: 0;
-    }
-
-    body {
+    }    body {
         font-family: 'Plus Jakarta Sans', sans-serif;
-        background-color: #FAF7F2;
-        background: #FAF7F2;
+        background-color: #060B18;
+        background: #060B18;
         min-height: 100vh;
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
-        padding: 20px;
-        color: #0F172A;
+        padding: 32px 16px;
+        color: #F8FAFC;
         overflow-x: hidden;
+        position: relative;
+    }
+
+    /* Subtle blueprint grid overlay */
+    .grid-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background-image: 
+            linear-gradient(to right, rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+        background-size: 32px 32px;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    body::before {
+        content: '';
+        position: fixed;
+        top: -10%; left: 15%;
+        width: 650px; height: 650px;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
+        filter: blur(90px);
+        pointer-events: none;
+        z-index: 0;
+    }
+    body::after {
+        content: '';
+        position: fixed;
+        bottom: -10%; right: 15%;
+        width: 650px; height: 650px;
+        background: radial-gradient(circle, rgba(6, 182, 212, 0.11) 0%, transparent 70%);
+        filter: blur(90px);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .main-wrapper {
+        width: 100%;
+        max-width: 1060px;
+        z-index: 1;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Top Gateway Header */
+    .gateway-header {
+        text-align: center;
+        margin-bottom: 26px;
+    }
+
+    .gateway-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        border-radius: 9999px;
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        color: #818cf8;
+        font-size: 11.5px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+    }
+
+    .gateway-badge .badge-dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: #818cf8;
+        box-shadow: 0 0 8px #818cf8;
+    }
+
+    .gateway-title {
+        font-size: 32px;
+        font-weight: 800;
+        letter-spacing: -0.6px;
+        color: #ffffff;
+        margin-bottom: 8px;
+    }
+
+    .gateway-subtitle {
+        font-size: 14px;
+        color: #94a3b8;
+        max-width: 680px;
+        margin: 0 auto;
+        line-height: 1.5;
     }
 
     /* Window Frame Container */
     .app-window {
         width: 100%;
         max-width: 1060px;
-        background: #ffffff;
-        border: 1px solid rgba(0, 0, 0, 0.08);
-        border-radius: 20px;
-        box-shadow: 0 25px 60px rgba(15, 23, 42, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04);
+        background: rgba(13, 22, 42, 0.82);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        box-shadow: 0 25px 65px -10px rgba(0, 0, 0, 0.7), 0 0 40px rgba(99, 102, 241, 0.06);
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -64,12 +154,12 @@
 
     /* Mock Mac Header Bar */
     .window-header {
-        background: #f8fafc;
-        padding: 12px 22px;
+        background: rgba(15, 23, 42, 0.65);
+        padding: 14px 28px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .window-dots {
@@ -94,14 +184,14 @@
     }
 
     .window-nav-link {
-        color: #475569;
+        color: #94a3b8;
         font-size: 11px;
         font-weight: 600;
         text-decoration: none;
-        padding: 5px 12px;
-        border-radius: 12px;
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
+        padding: 6px 14px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         display: inline-flex;
         align-items: center;
         gap: 6px;
@@ -109,11 +199,26 @@
     }
 
     .window-nav-link:hover {
-        color: #0284c7;
-        background: #f0f9ff;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
-        border-color: #0284c7;
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .security-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #34d399;
+    }
+    .security-badge .sec-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #10b981;
+        box-shadow: 0 0 8px #10b981;
+        display: inline-block;
     }
 
     /* Main Container */
@@ -133,14 +238,14 @@
     /* Left Hero Section */
     .hero-section {
         flex: 1.1;
-        padding: 34px 38px;
+        padding: 38px 40px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         position: relative;
         overflow: hidden;
-        background: linear-gradient(145deg, #f8fafc 0%, #eff6ff 100%);
-        border-right: 1px solid #e2e8f0;
+        background: transparent;
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .ribbon-container {
@@ -162,7 +267,7 @@
     .ribbon-1 {
         width: 180px;
         height: 180px;
-        background: rgba(2, 132, 199, 0.15);
+        background: rgba(2, 132, 199, 0.18);
         top: 20px;
         left: 20px;
     }
@@ -186,13 +291,13 @@
         font-size: 20px;
         font-weight: 800;
         letter-spacing: 0.5px;
-        color: #0f172a;
+        color: #ffffff;
         line-height: 1.2;
     }
 
     .brand-subtitle {
         font-size: 11px;
-        color: #0284c7;
+        color: #818cf8;
         text-transform: uppercase;
         letter-spacing: 1.5px;
         font-weight: 700;
@@ -206,13 +311,13 @@
 
     .hero-text h1 {
         font-size: 27px;
-        font-weight: 700;
+        font-weight: 800;
         line-height: 1.35;
-        color: #0f172a;
+        color: #ffffff;
     }
 
     .hero-text span {
-        background: linear-gradient(90deg, #0284c7, #6366f1);
+        background: linear-gradient(90deg, #38bdf8, #818cf8);
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -227,21 +332,21 @@
     }
 
     .feature-pill {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 12px;
         padding: 10px 14px;
         display: flex;
         align-items: center;
         gap: 10px;
-        color: #1e293b;
+        color: #e2e8f0;
         font-size: 12px;
         font-weight: 600;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
 
     .feature-pill i {
-        color: #0284c7;
+        color: #818cf8;
         font-size: 14px;
     }
 
@@ -254,9 +359,9 @@
     }
 
     .btn-outline {
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-        color: #0f172a;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #38bdf8;
         padding: 8px 16px;
         border-radius: 10px;
         font-size: 12px;
@@ -270,9 +375,9 @@
     }
 
     .btn-outline:hover {
-        background: #f0f9ff;
-        border-color: #0284c7;
-        color: #0284c7;
+        background: rgba(56, 189, 248, 0.12);
+        border-color: #38bdf8;
+        color: #ffffff;
     }
 
     /* Right Form Section */
@@ -282,26 +387,25 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        background: #FAF7F2;
+        background: transparent;
     }
 
     .card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 18px;
-        padding: 24px 28px;
-        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+        background: transparent;
+        border: none;
+        padding: 10px 0;
+        box-shadow: none;
     }
 
     /* Auth Mode Tabs */
     .auth-tabs {
         display: flex;
-        background: #f1f5f9;
+        background: rgba(15, 23, 42, 0.8);
         border-radius: 12px;
         padding: 4px;
         gap: 6px;
         margin-bottom: 20px;
-        border: 1px solid #e2e8f0;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .tab-btn {
@@ -309,7 +413,7 @@
         padding: 8px 14px;
         border: none;
         background: transparent;
-        color: #64748b;
+        color: #94a3b8;
         font-size: 12.5px;
         font-weight: 700;
         border-radius: 9px;
@@ -322,22 +426,22 @@
     }
 
     .tab-btn.active {
-        background: #ffffff;
-        color: #0f172a;
-        border: 1px solid #0284c7;
-        box-shadow: 0 2px 8px rgba(2, 132, 199, 0.14);
+        background: rgba(99, 102, 241, 0.2);
+        color: #ffffff;
+        border: 1px solid rgba(99, 102, 241, 0.4);
+        box-shadow: 0 2px 10px rgba(99, 102, 241, 0.25);
     }
 
     .card h2 {
-        font-size: 21px;
+        font-size: 22px;
         font-weight: 800;
-        color: #0f172a;
+        color: #ffffff;
         margin-bottom: 4px;
     }
 
     .card-subtitle {
         font-size: 12px;
-        color: #64748b;
+        color: #94a3b8;
         margin-bottom: 18px;
     }
 
@@ -349,15 +453,15 @@
         display: none;
     }
     .msg.error {
-        background: #fef2f2;
-        border: 1px solid #fecaca;
-        color: #b91c1c;
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        color: #fca5a5;
         display: block;
     }
     .msg.success {
-        background: #f0fdf4;
-        border: 1px solid #bbf7d0;
-        color: #15803d;
+        background: rgba(16, 185, 129, 0.15);
+        border: 1px solid rgba(16, 185, 129, 0.4);
+        color: #6ee7b7;
         display: block;
     }
 
@@ -368,12 +472,12 @@
 
     .form-group label {
         display: block;
-        font-size: 11.5px;
+        font-size: 11px;
         font-weight: 700;
-        color: #475569;
+        color: #94a3b8;
         margin-bottom: 6px;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.8px;
     }
 
     .input-wrapper {
@@ -382,11 +486,11 @@
 
     .input-wrapper input, .input-wrapper select {
         width: 100%;
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 10px;
         padding: 10px 14px 10px 38px;
-        color: #0f172a;
+        color: #ffffff;
         font-size: 13px;
         font-family: inherit;
         outline: none;
@@ -394,9 +498,9 @@
     }
 
     .input-wrapper input:focus, .input-wrapper select:focus {
-        border-color: #0284c7;
-        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
-        background: #ffffff;
+        border-color: #818cf8;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        background: rgba(15, 23, 42, 0.9);
     }
 
     .input-wrapper .field-icon {
@@ -404,7 +508,7 @@
         left: 13px;
         top: 50%;
         transform: translateY(-50%);
-        color: #94a3b8;
+        color: #64748b;
         font-size: 13px;
     }
 
@@ -413,9 +517,13 @@
         right: 13px;
         top: 50%;
         transform: translateY(-50%);
-        color: #94a3b8;
+        color: #64748b;
         font-size: 13px;
         cursor: pointer;
+    }
+
+    .input-wrapper .toggle-pw:hover {
+        color: #ffffff;
     }
 
     .form-row {
@@ -427,7 +535,7 @@
     /* Submit Button */
     .btn-submit {
         width: 100%;
-        background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+        background: linear-gradient(135deg, #0284c7 0%, #6366f1 100%);
         color: #ffffff;
         border: none;
         padding: 12px 18px;
@@ -439,110 +547,23 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        box-shadow: 0 6px 18px rgba(2, 132, 199, 0.28);
+        box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35);
         transition: all 0.25s ease;
         margin-top: 8px;
     }
 
     .btn-submit:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 24px rgba(2, 132, 199, 0.4);
+        box-shadow: 0 10px 24px rgba(99, 102, 241, 0.45);
         filter: brightness(1.05);
-    }
-
-    /* Enrolled Demo Switcher Box */
-    .demo-picker-card {
-        margin-top: 18px;
-        padding: 14px 16px;
-        background: #f8fafc;
-        border: 1px dashed #cbd5e1;
-        border-radius: 12px;
-    }
-
-    .demo-picker-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 10px;
-    }
-
-    .demo-picker-title {
-        font-size: 11.5px;
-        font-weight: 700;
-        color: #0284c7;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .demo-students-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-    }
-
-    .demo-student-chip {
-        padding: 7px 10px;
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-        transition: all 0.2s ease;
-    }
-
-    .demo-student-chip:hover {
-        background: #f0f9ff;
-        border-color: #0284c7;
-        transform: translateY(-1px);
-        box-shadow: 0 3px 8px rgba(2, 132, 199, 0.12);
-    }
-
-    .chip-avatar {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        background: #0284c7;
-        color: #ffffff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 800;
-        font-size: 10px;
-        flex-shrink: 0;
-    }
-
-    .chip-info {
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-
-    .chip-name {
-        font-size: 11.5px;
-        font-weight: 700;
-        color: #0f172a;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .chip-roll {
-        font-size: 9.5px;
-        color: #64748b;
-        font-family: 'JetBrains Mono', monospace;
     }
 
     /* Modal Overlay */
     .modal-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(15, 23, 42, 0.55);
-        backdrop-filter: blur(8px);
+        background: rgba(0, 0, 0, 0.78);
+        backdrop-filter: blur(10px);
         display: none;
         align-items: center;
         justify-content: center;
@@ -554,16 +575,16 @@
     }
 
     .modal-box {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
+        background: #0d162a;
+        border: 1px solid rgba(255, 255, 255, 0.15);
         border-radius: 20px;
         width: 100%;
         max-width: 440px;
         padding: 26px 28px;
-        box-shadow: 0 24px 50px rgba(15, 23, 42, 0.18);
+        box-shadow: 0 24px 50px rgba(0, 0, 0, 0.8);
         position: relative;
         text-align: center;
-        color: #0f172a;
+        color: #ffffff;
     }
 
     .modal-close-btn {
@@ -578,7 +599,7 @@
         transition: color 0.2s ease;
     }
     .modal-close-btn:hover {
-        color: #0f172a;
+        color: #ffffff;
     }
 </style>
 </head>
@@ -610,24 +631,33 @@
     </div>
 </div>
 
-<div class="app-window">
-    <!-- Window Header -->
-    <div class="window-header">
-        <div style="display: flex; align-items: center; gap: 18px;">
-            <div class="window-dots">
-                <div class="dot dot-1"></div>
-                <div class="dot dot-2"></div>
-                <div class="dot dot-3"></div>
-            </div>
-            <nav class="window-quick-nav">
-                <a href="../../welcome.html" class="window-nav-link"><i class="fa-solid fa-grid-horizontal"></i> Hub</a>
-                <a href="../public/home.html" class="window-nav-link"><i class="fa-solid fa-house"></i> Main Site</a>
-                <a href="../teacher/teacher-login.html" class="window-nav-link"><i class="fa-solid fa-chalkboard-user"></i> Teachers</a>
-                <a href="../hr/hr-dashboard.html" class="window-nav-link"><i class="fa-solid fa-users-gear"></i> HR Desk</a>
-            </nav>
+<div class="grid-overlay"></div>
+
+<div class="main-wrapper">
+    <!-- Top Gateway Header -->
+    <div class="gateway-header">
+        <div class="gateway-badge">
+            <span class="badge-dot"></span>
+            Student Academic Gateways
         </div>
-        <div style="font-size: 11px; font-weight: 800; color: #72efdd; letter-spacing: 1px;">
-            STUDENT PORTAL • LUCY™
+        <h1 class="gateway-title">Direct Institutional Access Console</h1>
+        <p class="gateway-subtitle">
+            Single sign-on authentication for Student Portfolios, Terminal Broad Sheets, and Curriculum Workstations.
+        </p>
+    </div>
+
+    <div class="app-window">
+    <!-- Window Header / Console Topbar -->
+    <div class="window-header">
+        <div style="font-size: 11.5px; font-weight: 800; color: #34d399; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-graduation-cap"></i> STUDENT ACADEMIC CONSOLE
+        </div>
+        <div class="security-badge">
+            <span class="sec-dot"></span> SHA-256 Encrypted Gateway
+        </div>
+        <div style="display: none;">
+            <div class="window-dots"><div class="dot dot-1"></div><div class="dot dot-2"></div><div class="dot dot-3"></div></div>
+            <nav class="window-quick-nav"><a href="../../welcome.html" class="window-nav-link">Hub</a><a href="../public/home.html" class="window-nav-link">Main Site</a></nav>
         </div>
     </div>
 
@@ -689,8 +719,36 @@
                 <div id="msg" class="msg"></div>
 
                 <form id="studentAuthForm" onsubmit="event.preventDefault(); handleStudentAuth();">
+                    <div class="form-group" id="studentOrgGroup">
+                        <label for="studentOrgSelect">Institution Workspace (Subdomain Slug)</label>
+                        <div class="input-wrapper">
+                            <select id="studentOrgSelect" style="width: 100%; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; padding: 11px 14px 11px 40px; color: #ffffff; font-size: 13.5px; outline: none;" required>
+                                <option value="">-- Loading Approved Institutions... --</option>
+                            </select>
+                            <i class="fa-solid fa-school field-icon"></i>
+                        </div>
+                    </div>
+
                     <!-- Self Registration Extra Fields -->
                     <div id="signupFields" style="display: none;">
+                        <div class="form-group" id="studentPhotoGroup">
+                            <label>Student Profile Photo (Optional)</label>
+                            <div style="display: flex; align-items: center; gap: 14px; padding: 10px 14px; background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(255, 255, 255, 0.2); border-radius: 12px; margin-bottom: 12px;">
+                                <div id="studentPhotoPreview" style="width: 48px; height: 48px; border-radius: 50%; background: rgba(56, 189, 248, 0.15); border: 2px solid #38bdf8; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                                    <i class="fa-solid fa-user-graduate" style="font-size: 18px; color: #38bdf8;"></i>
+                                </div>
+                                <div style="flex: 1;">
+                                    <button type="button" class="btn-outline" style="padding: 6px 12px; font-size: 11px; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; cursor: pointer;" onclick="document.getElementById('studentPhotoFile').click()">
+                                        <i class="fa-solid fa-camera"></i> Choose Photo
+                                    </button>
+                                    <button type="button" id="removeStudentPhotoBtn" style="padding: 6px 10px; font-size: 11px; border-radius: 8px; display: none; color: #dc2626; border: 1px solid #fca5a5; background: transparent; cursor: pointer; margin-left: 6px;" onclick="removeStudentPhoto()">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                    <input type="file" id="studentPhotoFile" accept="image/*" style="display: none;" onchange="handleStudentPhotoUpload(event)">
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="firstName">First Name</label>
@@ -756,77 +814,34 @@
                             <i class="fa-solid fa-lock field-icon"></i>
                             <i class="fa-regular fa-eye-slash toggle-pw" id="togglePw" onclick="togglePasswordVisibility()"></i>
                         </div>
+                        <div id="studentPassMeter"></div>
                     </div>
 
                     <button type="submit" id="submitBtn" class="btn-submit">
                         <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace
                     </button>
                 </form>
-
-                <!-- One-Click Enrolled Student Quick-Demo Picker -->
-                <div class="demo-picker-card" id="demoPickerCard">
-                    <div class="demo-picker-header">
-                        <div class="demo-picker-title">
-                            <i class="fa-solid fa-bolt"></i> Instant Demo Student Access
-                        </div>
-                        <span style="font-size: 10px; color: rgba(255,255,255,0.5);">One-Click Sign In</span>
-                    </div>
-
-                    <div class="demo-students-grid">
-                        <div class="demo-student-chip" role="button" tabindex="0" title="One-Click Sign In as Samuel Mensah" onclick="quickDemoStudent('s_101')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); quickDemoStudent('s_101');}">
-                            <div class="chip-avatar">SM</div>
-                            <div class="chip-info">
-                                <span class="chip-name">Samuel Mensah</span>
-                                <span class="chip-roll">STU-2026-001 • Gr 11</span>
-                            </div>
-                        </div>
-
-                        <div class="demo-student-chip" role="button" tabindex="0" title="One-Click Sign In as Yaa Asantewaa" onclick="quickDemoStudent('s_102')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); quickDemoStudent('s_102');}">
-                            <div class="chip-avatar" style="background: #f472b6;">YA</div>
-                            <div class="chip-info">
-                                <span class="chip-name">Yaa Asantewaa</span>
-                                <span class="chip-roll">STU-2026-002 • Gr 10</span>
-                            </div>
-                        </div>
-
-                        <div class="demo-student-chip" role="button" tabindex="0" title="One-Click Sign In as Kwabena Darko" onclick="quickDemoStudent('s_103')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); quickDemoStudent('s_103');}">
-                            <div class="chip-avatar" style="background: #fbbf24;">KD</div>
-                            <div class="chip-info">
-                                <span class="chip-name">Kwabena Darko</span>
-                                <span class="chip-roll">STU-2026-003 • Gr 12</span>
-                            </div>
-                        </div>
-
-                        <div class="demo-student-chip" role="button" tabindex="0" title="One-Click Sign In as Akua Donkor" onclick="quickDemoStudent('s_104')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); quickDemoStudent('s_104');}">
-                            <div class="chip-avatar" style="background: #a78bfa;">AD</div>
-                            <div class="chip-info">
-                                <span class="chip-name">Akua Donkor</span>
-                                <span class="chip-roll">STU-2026-004 • Scholar</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>
 </div>
+</div> <!-- /.main-wrapper -->
 
 <!-- Modal: OTP & Verification -->
 <div class="modal-overlay" id="verificationModal">
     <div class="modal-box">
         <button class="modal-close-btn" onclick="closeVerificationModal()"><i class="fa-solid fa-xmark"></i></button>
-        <div style="width: 52px; height: 52px; border-radius: 50%; background: #f0f9ff; color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 14px; border: 1px solid #bae6fd;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(56, 189, 248, 0.12); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 14px; border: 1px solid rgba(56, 189, 248, 0.3);">
             <i class="fa-solid fa-shield-halved"></i>
         </div>
-        <h3 style="font-size: 19px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">Student Identity Verification</h3>
-        <p style="font-size: 12.5px; color: #64748b; line-height: 1.5; margin-bottom: 14px;">
+        <h3 style="font-size: 19px; font-weight: 800; color: #ffffff; margin-bottom: 6px;">Student Identity Verification</h3>
+        <p style="font-size: 12.5px; color: #94a3b8; line-height: 1.5; margin-bottom: 14px;">
             Please confirm your 6-digit one-time authentication code.
         </p>
-        <div style="font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 800; letter-spacing: 6px; color: #0284c7; background: #f8fafc; padding: 8px 16px; border-radius: 10px; border: 1px solid rgba(2, 132, 199, 0.35); display: inline-block; margin-bottom: 14px;" id="demoOtpDisplay">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 800; letter-spacing: 6px; color: #38bdf8; background: rgba(15, 23, 42, 0.8); padding: 8px 16px; border-radius: 10px; border: 1px solid rgba(56, 189, 248, 0.35); display: inline-block; margin-bottom: 14px;" id="demoOtpDisplay">
             724819
         </div>
-        <input type="text" id="otpInput" style="width: 100%; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 18px; letter-spacing: 4px; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: #0f172a; margin-bottom: 12px; outline: none;" placeholder="------" maxlength="6">
+        <input type="text" id="otpInput" style="width: 100%; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 18px; letter-spacing: 4px; padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(15, 23, 42, 0.8); color: #ffffff; margin-bottom: 12px; outline: none;" placeholder="------" maxlength="6">
         <button type="button" class="btn-submit" onclick="submitOtpCode()" style="margin-top: 0;">
             <i class="fa-solid fa-check"></i> Verify & Enter Workspace
         </button>
@@ -838,6 +853,7 @@
 <script src="../../assets/js/supabase-config.js"></script>
 <script src="../../assets/js/supabase-client.js"></script>
 <script src="../../assets/js/auth-session.js"></script>
+<script src="../../assets/js/realtime-auth.js"></script>
 <script src="../../assets/js/toaster.js"></script>
 <script>
 const ORG = 'FLAWLESS GRAPHICS';
@@ -1058,7 +1074,48 @@ function switchTab(mode) {
     document.getElementById('formSubtitle').textContent = (mode === 'signin' ? 'Enter your Student Roll Number or registered email' : 'Register your student profile for institutional enrollment');
     document.getElementById('labelIdentifier').textContent = (mode === 'signin' ? 'Student Roll Number / Email' : 'Institutional Email (Optional)');
     document.getElementById('submitBtn').innerHTML = (mode === 'signin' ? '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace' : '<i class="fa-solid fa-user-plus"></i> Submit Student Enrollment');
+
+    const meter = document.getElementById('studentPassMeter');
+    if (meter) meter.style.display = (mode === 'signup' ? 'block' : 'none');
+    if (mode === 'signup' && window.StrongPassword) {
+        window.StrongPassword.attach('password', 'studentPassMeter');
+    }
+
     document.getElementById('msg').style.display = 'none';
+}
+
+let currentStudentPhotoBase64 = null;
+
+function handleStudentPhotoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+        showMessage('Please select a valid image file (PNG, JPG, WebP).');
+        return;
+    }
+    if (file.size > 3 * 1024 * 1024) {
+        showMessage('Photo exceeds 3MB limit.');
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        currentStudentPhotoBase64 = e.target.result;
+        const preview = document.getElementById('studentPhotoPreview');
+        if (preview) preview.innerHTML = `<img src="${currentStudentPhotoBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+        const removeBtn = document.getElementById('removeStudentPhotoBtn');
+        if (removeBtn) removeBtn.style.display = 'inline-block';
+    };
+    reader.readAsDataURL(file);
+}
+
+function removeStudentPhoto() {
+    currentStudentPhotoBase64 = null;
+    const preview = document.getElementById('studentPhotoPreview');
+    if (preview) preview.innerHTML = '<i class="fa-solid fa-user-graduate" style="font-size: 18px; color: #38bdf8;"></i>';
+    const removeBtn = document.getElementById('removeStudentPhotoBtn');
+    if (removeBtn) removeBtn.style.display = 'none';
+    const fileInput = document.getElementById('studentPhotoFile');
+    if (fileInput) fileInput.value = '';
 }
 
 function togglePasswordVisibility() {
@@ -1088,17 +1145,51 @@ async function handleStudentAuth() {
     const students = getStoredStudents();
 
     if (currentMode === 'signin') {
-        // Match by roll number OR email
-        const found = students.find(s => 
-            (s.roll && s.roll.toLowerCase() === ident) || 
-            (s.enrollment_code && s.enrollment_code.toLowerCase() === ident) || 
-            (s.email && s.email.toLowerCase() === ident)
-        );
+        const orgSelect = document.getElementById('studentOrgSelect');
+        const selectedOrgSlug = orgSelect ? orgSelect.value.trim() : '';
+        const selectedOrgName = (orgSelect && orgSelect.selectedOptions && orgSelect.selectedOptions[0]) 
+            ? (orgSelect.selectedOptions[0].dataset.name || selectedOrgSlug) 
+            : selectedOrgSlug;
+
+        let found = null;
+        if (window.SupabaseService) {
+            try {
+                const authRes = await window.SupabaseService.authenticate(ident, pw, null, 'student');
+                if (authRes.success) {
+                    found = authRes.user;
+                } else if (!authRes.status || (authRes.status !== 'pending_approval' && authRes.status !== 'pending')) {
+                    const cloudStudents = await window.SupabaseService.getStudents();
+                    found = cloudStudents.find(s => 
+                        (s.roll && s.roll.toLowerCase() === ident) || 
+                        (s.enrollment_code && s.enrollment_code.toLowerCase() === ident) || 
+                        (s.email && s.email.toLowerCase() === ident) ||
+                        (s.guardianEmail && s.guardianEmail.toLowerCase() === ident)
+                    );
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace';
+                    return showMessage(authRes.error || 'Student admission is awaiting approval by Human Resources.', true);
+                }
+            } catch(e) {
+                console.warn('Student Supabase auth check:', e);
+            }
+        }
 
         if (!found) {
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace';
-            return showMessage('No student account found matching that Roll Number or Email.');
+            return showMessage('No student account found in institutional database. Please register.');
+        }
+
+        // Verify Institution Workspace Membership
+        if (window.RealtimeAuth && selectedOrgSlug) {
+            const isMember = window.RealtimeAuth.verifyUserOrgMembership(found, selectedOrgSlug) ||
+                             window.RealtimeAuth.verifyUserOrgMembership(found, selectedOrgName);
+            if (!isMember) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace';
+                return showMessage(`Access Denied: You are not registered or approved under "${selectedOrgName}".`, true);
+            }
         }
 
         // Check if student requires HR approval
@@ -1119,6 +1210,18 @@ async function handleStudentAuth() {
 
     } else {
         // Self registration flow
+        const orgSelect = document.getElementById('studentOrgSelect');
+        const selectedOrgSlug = orgSelect ? orgSelect.value.trim() : '';
+        const selectedOrgName = (orgSelect && orgSelect.selectedOptions && orgSelect.selectedOptions[0]) 
+            ? (orgSelect.selectedOptions[0].dataset.name || selectedOrgSlug) 
+            : 'FLAWLESS GRAPHICS';
+
+        if (!selectedOrgSlug) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Submit Student Enrollment';
+            return showMessage('Please select an approved educational institution workspace.');
+        }
+
         const fName = (document.getElementById('firstName').value || '').trim();
         const lName = (document.getElementById('lastName').value || '').trim();
         const classId = document.getElementById('regClass').value;
@@ -1131,8 +1234,18 @@ async function handleStudentAuth() {
             return showMessage('Please provide both your First and Last name.');
         }
 
+        if (window.StrongPassword) {
+            const pwCheck = window.StrongPassword.validate(pw);
+            if (!pwCheck.valid) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Submit Student Enrollment';
+                return showMessage(pwCheck.error, true);
+            }
+        }
+
         const newRoll = 'STU-2026-' + Math.floor(100 + Math.random() * 900);
         const smartId = createStudentSmartId(newRoll, `${fName} ${lName}`);
+        const studentEmail = ident.includes('@') ? ident : `${fName.toLowerCase()}.${lName.toLowerCase()}@student.flawless.edu`;
         const newStudent = {
             id: 's_' + Date.now(),
             roll: newRoll,
@@ -1148,7 +1261,9 @@ async function handleStudentAuth() {
             middleName: '',
             lastName: lName,
             name: `${fName} ${lName}`,
-            email: ident.includes('@') ? ident : `${fName.toLowerCase()}.${lName.toLowerCase()}@student.flawless.edu`,
+            email: studentEmail,
+            org: selectedOrgName,
+            org_id: selectedOrgSlug,
             classId: classId,
             className: document.getElementById('regClass').selectedOptions[0].text,
             grade: 'Grade 10',
@@ -1164,121 +1279,77 @@ async function handleStudentAuth() {
             attendanceStreak: 0,
             gpa: 3.5,
             submittedAt: Date.now(),
-            photo: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
+            photo: currentStudentPhotoBase64 || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
         };
 
-        // Also register into central AuthSession directory with Smart ID
-        try {
-            if (window.AuthSession && typeof window.AuthSession.saveRegisteredUser === 'function') {
-                window.AuthSession.saveRegisteredUser({
-                    org: ORG,
-                    id: newStudent.id,
+        const completeEnrollment = () => {
+            // Direct Cloud Supabase Enrollment
+            if (window.SupabaseService) {
+                window.SupabaseService.createStudent({
+                    name: newStudent.name,
+                    full_name: newStudent.name,
+                    roll: newStudent.roll,
+                    email: newStudent.email,
+                    org_id: selectedOrgName,
+                    class_id: newStudent.classId,
+                    class_name: newStudent.className,
+                    status: 'pending_approval',
+                    photo: newStudent.photo
+                }).catch(console.warn);
+
+                window.SupabaseService.saveUser({
                     name: newStudent.name,
                     email: newStudent.email,
+                    password: pw,
+                    org: selectedOrgName,
+                    org_id: selectedOrgSlug,
                     role: 'student',
-                    roll: newStudent.roll,
-                    smartId: smartId,
-                    smartIdNumber: smartId.smartIdNumber
-                });
+                    photo_url: newStudent.photo,
+                    status: 'pending_approval'
+                }).catch(console.warn);
             }
-        } catch(e) {}
 
-        students.push(newStudent);
-        localStorage.setItem(STUD_KEY, JSON.stringify(students));
+            // Also register into central AuthSession directory with Smart ID
+            try {
+                if (window.AuthSession && typeof window.AuthSession.saveRegisteredUser === 'function') {
+                    window.AuthSession.saveRegisteredUser({
+                        org: selectedOrgName,
+                        id: newStudent.id,
+                        name: newStudent.name,
+                        email: newStudent.email,
+                        role: 'student',
+                        roll: newStudent.roll,
+                        smartId: smartId,
+                        smartIdNumber: smartId.smartIdNumber
+                    });
+                }
+            } catch(e) {}
 
-        // Also record to HR pending approvals queue
-        try {
-            const queueKey = `${ORG}_academic_registration_approvals`;
-            const queue = JSON.parse(localStorage.getItem(queueKey) || '[]');
-            queue.push({
-                id: 'req_stu_' + Date.now(),
-                type: 'student',
-                targetId: newStudent.id,
-                studentName: newStudent.name,
-                roll: newStudent.roll,
-                classId: newStudent.classId,
-                className: newStudent.className,
-                submittedBy: 'Student Self-Service Portal',
-                submittedAt: Date.now(),
-                status: 'pending'
+            students.push(newStudent);
+            localStorage.setItem(STUD_KEY, JSON.stringify(students));
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Submit Student Enrollment';
+            showMessage('Registration submitted successfully! Your account is Pending HR Approval before official activation.', false);
+            setTimeout(() => { switchTab('signin'); }, 2000);
+        };
+
+        if (window.RealtimeAuth) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Submit Student Enrollment';
+            window.RealtimeAuth.openAuthModal({
+                email: studentEmail,
+                purpose: 'Student Enrollment Verification',
+                durationSeconds: 300,
+                onVerified: async () => {
+                    completeEnrollment();
+                }
             });
-            localStorage.setItem(queueKey, JSON.stringify(queue));
-        } catch(e) {}
-
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Submit Student Enrollment';
-        showMessage('Registration submitted successfully! Your account is Pending HR Approval before official activation.', false);
-        setTimeout(() => { switchTab('signin'); }, 2000);
-    }
-}
-
-function quickDemoStudent(studentId) {
-    // 1. First search direct institutional default catalog
-    let student = DEFAULT_STUDENTS.find(s => 
-        s.id === studentId || 
-        (s.roll && s.roll.toLowerCase() === String(studentId).toLowerCase())
-    );
-
-    // 2. Search stored institutional roster if not found in defaults
-    if (!student) {
-        const stored = getStoredStudents();
-        student = stored.find(s => 
-            s.id === studentId || 
-            String(s.id) === String(studentId) || 
-            (s.roll && s.roll.toLowerCase() === String(studentId).toLowerCase()) ||
-            (s.enrollment_code && s.enrollment_code.toLowerCase() === String(studentId).toLowerCase())
-        );
-    }
-
-    // 3. Fallback to default student 0 (Samuel Mensah)
-    if (!student) {
-        student = DEFAULT_STUDENTS[0];
-    }
-
-    if (!student) {
-        showMessage('Unable to locate demo student profile. Please sign in with roll number.', true);
-        return;
-    }
-
-    // Ensure demo account is Active and Approved for immediate workspace access
-    student = Object.assign({}, student, {
-        status: 'Active',
-        approvalStatus: 'approved'
-    });
-
-    // Populate inputs visually so user sees credential feedback
-    const identInput = document.getElementById('identifier');
-    const pwInput = document.getElementById('password');
-    if (identInput) {
-        identInput.value = student.roll || student.email || '';
-    }
-    if (pwInput) {
-        pwInput.value = 'student123';
-    }
-
-    // Visual button feedback
-    const submitBtn = document.getElementById('submitBtn');
-    if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Launching ${student.name.split(' ')[0]}'s Workspace...`;
-    }
-
-    showMessage(`One-Click Verified: Signing in as ${student.name}...`, false);
-
-    // Ensure profile is synced into stored list
-    try {
-        let list = getStoredStudents();
-        const idx = list.findIndex(s => s.id === student.id || (s.roll && s.roll === student.roll));
-        if (idx >= 0) {
-            list[idx] = Object.assign({}, list[idx], student);
-        } else {
-            list.unshift(student);
+            return;
         }
-        localStorage.setItem(STUD_KEY, JSON.stringify(list));
-    } catch(e) {}
 
-    // Execute authentication & redirect
-    authenticateStudentSession(student);
+        completeEnrollment();
+    }
 }
 
 function authenticateStudentSession(student) {
@@ -1339,9 +1410,12 @@ function authenticateStudentSession(student) {
     window.addEventListener('beforeunload', () => {});
 }
 
-// Dismiss skeleton loader immediately
+// Dismiss skeleton loader immediately and populate approved institutions
 window.addEventListener('DOMContentLoaded', () => {
     getStoredStudents();
+    if (window.RealtimeAuth && typeof window.RealtimeAuth.populateApprovedOrgDropdown === 'function') {
+        window.RealtimeAuth.populateApprovedOrgDropdown(document.getElementById('studentOrgSelect'));
+    }
     const sk = document.getElementById('skeletonLoader');
     if (sk) {
         sk.classList.add('fade-out');

@@ -24,6 +24,7 @@
   <!-- Central Authentication Bridge & Pop-up Toaster Engine -->
   <script src="../../assets/js/auth-session.js"></script>
   <script src="../../assets/js/toaster.js"></script>
+  <script src="../../assets/js/realtime-bus.js"></script>
 
   <!-- Supabase Cloud Integration -->
   <script src="../../assets/js/supabase-config.js"></script>
@@ -4511,8 +4512,82 @@
    CORE STORAGE & UTILITY ENGINE
 ------------------------------------------------------------- */
 function safeParse(s) { try { return JSON.parse(s); } catch (e) { return null; } }
-function read(k) { return safeParse(localStorage.getItem(k)) || []; }
-function save(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
+const hrStore = {};
+function read(k) { return hrStore[k] || []; }
+function save(k, v) { 
+  hrStore[k] = v;
+}
+
+async function loadHRCloudData() {
+  if (!window.SupabaseService) return;
+  try {
+    // 0. Verify logged in HR user exists in Supabase
+    const activeHrUser = (window.AuthSession ? window.AuthSession.getUser() : null) || JSON.parse(localStorage.getItem('activeHR') || localStorage.getItem('active_user') || 'null');
+    if (activeHrUser && activeHrUser.email) {
+      const hrEmail = activeHrUser.email.trim().toLowerCase();
+      if (hrEmail !== 'admin@flawlessgraphics.com') {
+        const liveUser = await window.SupabaseService.getUserByEmail(hrEmail);
+        if (!liveUser) {
+          alert('Your HR administrator account has been deleted from the institutional database. Access revoked.');
+          if (window.AuthSession) {
+            window.AuthSession.logout('hr-login.html');
+          } else {
+            localStorage.clear();
+            window.location.replace('hr-login.html');
+          }
+          return;
+        }
+      }
+    }
+
+    // 1. Validate organization from Supabase
+    const orgs = await window.SupabaseService.getOrganizations();
+    if (Array.isArray(orgs) && orgs.length > 0) {
+      const match = orgs.find(o => (o.org_name || o.name || '').toLowerCase() === (ACTIVE_ORG || '').toLowerCase());
+      if (!match) {
+        ACTIVE_ORG = orgs[0].org_name || orgs[0].name || 'FLAWLESS GRAPHICS';
+        localStorage.setItem('active_org', ACTIVE_ORG);
+        localStorage.setItem('activeOrg', ACTIVE_ORG);
+        const sideOrgEl = document.getElementById('sideOrg');
+        if (sideOrgEl) sideOrgEl.textContent = ACTIVE_ORG.toUpperCase();
+      }
+
+      // Re-populate org switcher with live Supabase organizations only
+      const orgSwitcher = document.getElementById('orgSwitcher');
+      if (orgSwitcher) {
+        orgSwitcher.innerHTML = '';
+        orgs.forEach(o => {
+          const name = o.org_name || o.name;
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = name;
+          if (name === ACTIVE_ORG) opt.selected = true;
+          orgSwitcher.appendChild(opt);
+        });
+      }
+    }
+
+    const teachers = await window.SupabaseService.getTeachers(ACTIVE_ORG);
+    hrStore[EMP_KEY] = teachers;
+
+    const att = await window.SupabaseService.getAttendance(ACTIVE_ORG);
+    hrStore[ATT_KEY] = att;
+
+    const ann = await window.SupabaseService.getAnnouncements(ACTIVE_ORG);
+    hrStore[ANNOUNCE_KEY] = ann;
+
+    const students = await window.SupabaseService.getStudents(ACTIVE_ORG);
+    hrStore[STUD_KEY] = students;
+
+    const payroll = await window.SupabaseService.getPayroll(ACTIVE_ORG);
+    hrStore['fg_payroll'] = payroll;
+
+    const users = await window.SupabaseService.getUsers(ACTIVE_ORG);
+    hrStore[USERS_STORAGE_KEY] = users;
+  } catch (err) {
+    console.warn('[HR Supabase] Load error:', err);
+  }
+}
 function escapeHtml(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
 // Global chart instances (declared early to prevent TDZ ReferenceErrors)
@@ -4593,39 +4668,9 @@ const ASSESS_KEY = `${ACTIVE_ORG}_student_assessments`;
    DEFAULT SEED DATA
 ------------------------------------------------------------- */
 function initDefaultData() {
-  let emps = read(EMP_KEY);
-  if (!emps || emps.length === 0) {
-    emps = [
-      { id: 'e1', name: 'James Ntiamoah', fullName: 'James Ntiamoah', role: 'Creative Director', position: 'Creative Director', dept: 'Executive & Design', department: 'Executive & Design', email: 'james@flawless.org', salary: 8500, photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80' },
-      { id: 'e2', name: 'Ama Serwaa', fullName: 'Ama Serwaa', role: 'HR Manager', position: 'HR Manager', dept: 'Operations', department: 'Operations', email: 'ama@flawless.org', salary: 6200, photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80' },
-      { id: 'e3', name: 'Kwame Boateng', fullName: 'Kwame Boateng', role: 'Lead Instructor', position: 'Lead Instructor', dept: 'Academic Staff', department: 'Academic Staff', email: 'kwame@flawless.org', salary: 5400, photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80' },
-      { id: 'e4', name: 'Abena Mansa', fullName: 'Abena Mansa', role: 'Chief Accountant', position: 'Chief Accountant', dept: 'Finance', department: 'Finance', email: 'abena@flawless.org', salary: 7100, photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80' },
-      { id: 'e5', name: 'Kofi Owusu', fullName: 'Kofi Owusu', role: 'Senior Designer', position: 'Senior Designer', dept: 'Digital Media', department: 'Digital Media', email: 'kofi@flawless.org', salary: 5000, photo: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=120&q=80' },
-      { id: 'e6', name: 'Esi Badu', fullName: 'Esi Badu', role: 'Science Educator', position: 'Science Educator', dept: 'Academic Staff', department: 'Academic Staff', email: 'esi@flawless.org', salary: 4800, photo: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=120&q=80' }
-    ];
-    save(EMP_KEY, emps);
-  } else {
-    // Normalize properties for backwards compatibility
-    emps.forEach((e, idx) => {
-      if (!e.id) e.id = 'e' + (idx + 1);
-      if (!e.name && e.fullName) e.name = e.fullName;
-      if (!e.fullName && e.name) e.fullName = e.name;
-      if (!e.role && e.position) e.role = e.position;
-      if (!e.dept && e.department) e.dept = e.department;
-      if (!e.photo) e.photo = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80';
-    });
-    save(EMP_KEY, emps);
-  }
-
-  // Initial Announcements
-  let ann = read(ANNOUNCE_KEY);
-  if (!ann || ann.length === 0) {
-    ann = [
-      { id: 'a1', title: 'Q3 Enterprise Performance Reviews', text: 'All department managers must finalize Q3 appraisals before the upcoming payroll deadline.', date: 'Today, 09:30 AM', author: 'HR Director' },
-      { id: 'a2', title: 'Campus IT Infrastructure Upgrade', text: 'Cloud workstations and classroom media servers will undergo scheduled maintenance this Friday at 10:00 PM.', date: 'Yesterday', author: 'IT Support' }
-    ];
-    save(ANNOUNCE_KEY, ann);
-  }
+  // Pure Supabase System of Record: entity data loaded from cloud
+  if (!hrStore[EMP_KEY]) hrStore[EMP_KEY] = [];
+  if (!hrStore[ANNOUNCE_KEY]) hrStore[ANNOUNCE_KEY] = [];
 }
 initDefaultData();
 
@@ -5334,8 +5379,11 @@ function submitAddClass() {
   }
 }
 
-function deleteClassroom(classId) {
+async function deleteClassroom(classId) {
   if (confirm('Are you sure you want to remove this classroom module?')) {
+    if (window.SupabaseService) {
+      await window.SupabaseService.deleteClass(ACTIVE_ORG, classId).catch(console.warn);
+    }
     let classes = getClassesList();
     classes = classes.filter(c => c.id !== classId);
     saveClassesList(classes);
@@ -5364,6 +5412,14 @@ function approveClassRegistration(classId) {
     req.approvedBy = 'HR Directorate';
     req.approvedAt = Date.now();
     save(`${ACTIVE_ORG}_academic_registration_approvals`, approvals);
+  }
+
+  if (window.LucyBus) {
+    LucyBus.emit('CLASS_APPROVED', {
+      classId: c.id,
+      className: c.name,
+      approvedBy: 'HR Directorate'
+    }, { role: 'HR Directorate', sound: 'success' });
   }
 
   if (window.Toaster && typeof window.Toaster.success === 'function') {
@@ -5796,11 +5852,11 @@ function openEmpModalById(id) {
   if (emp) openTeacherModal(emp);
 }
 
-function deleteEmp(id) {
-  if (!confirm('Are you sure you want to remove this teacher from the directory?')) return;
+async function deleteEmp(id) {
+  if (!confirm('Are you sure you want to remove this teacher from the directory? Linked portal login credentials will also be permanently deleted from Supabase Cloud.')) return;
 
   if (window.SupabaseService && window.SupabaseConfig && window.SupabaseConfig.isConfigured()) {
-    window.SupabaseService.deleteTeacher(ACTIVE_ORG, id).catch(console.warn);
+    await window.SupabaseService.deleteTeacher(ACTIVE_ORG, id).catch(console.warn);
   }
 
   let teachers = read(EMP_KEY);
@@ -5810,7 +5866,7 @@ function deleteEmp(id) {
   renderDashboard();
   renderCharts();
   initPayrollSection();
-  showToast('Teacher record deleted');
+  showToast('Teacher record deleted and portal credentials revoked');
 }
 
 /* -------------------------------------------------------------
@@ -6253,8 +6309,12 @@ function submitStudentAdmission() {
   saveStudentDetailForm();
 }
 
-function deleteHRStudent(code) {
-  if (!confirm(`Are you sure you want to remove student profile (${code}) from institutional rosters?`)) return;
+async function deleteHRStudent(code) {
+  if (!confirm(`Are you sure you want to remove student profile (${code}) from institutional rosters and Supabase Cloud? Any linked student user login will also be permanently deleted.`)) return;
+
+  if (window.SupabaseService) {
+    await window.SupabaseService.deleteStudent(ACTIVE_ORG, code).catch(console.warn);
+  }
 
   let studs = read(STUD_KEY);
   if (Array.isArray(studs)) {
@@ -6278,15 +6338,19 @@ function deleteHRStudent(code) {
   renderDashboard();
 
   if (window.Toaster && typeof window.Toaster.info === 'function') {
-    window.Toaster.info('Student Record Removed', `Student (${code}) has been unenrolled.`);
+    window.Toaster.info('Student Record Removed', `Student (${code}) has been permanently deleted.`);
   } else {
     showToast(`Student record ${code} removed.`);
   }
 }
 
-function approveStudentRegistration(studentCodeOrId, classId) {
+async function approveStudentRegistration(studentCodeOrId, classId) {
   let classes = typeof getClassesList === 'function' ? getClassesList() : (read(CLASSES_STORAGE_KEY) || []);
   let approvedStudent = null;
+
+  if (window.SupabaseService) {
+    await window.SupabaseService.approveStudent(studentCodeOrId, 'HR Directorate').catch(console.warn);
+  }
 
   if (Array.isArray(classes)) {
     classes.forEach(c => {
@@ -6330,18 +6394,34 @@ function approveStudentRegistration(studentCodeOrId, classId) {
 
   const sName = approvedStudent ? [approvedStudent.firstName, approvedStudent.lastName].filter(Boolean).join(' ') || approvedStudent.student_name || studentCodeOrId : studentCodeOrId;
 
+  if (window.LucyBus) {
+    LucyBus.emit('STUDENT_APPROVED', {
+      studentCode: studentCodeOrId,
+      studentName: sName,
+      classId: classId
+    }, { role: 'HR Directorate', sound: 'success' });
+  }
+
   if (window.Toaster && typeof window.Toaster.success === 'function') {
     window.Toaster.success('Student Registration Approved', `Student '${sName}' has been officially registered and enrolled.`);
   } else {
     showToast(`Student '${sName}' approved.`);
   }
 
+  if (window.SupabaseService) {
+    const refreshedStudents = await window.SupabaseService.getStudents(ACTIVE_ORG).catch(() => null);
+    if (refreshedStudents) hrStore[STUD_KEY] = refreshedStudents;
+  }
   loadHRStudents();
   renderClassesSection();
 }
 
-function rejectStudentRegistration(studentCodeOrId, classId) {
+async function rejectStudentRegistration(studentCodeOrId, classId) {
   if (!confirm(`Are you sure you want to decline registration for student (${studentCodeOrId})?`)) return;
+
+  if (window.SupabaseService) {
+    await window.SupabaseService.rejectStudent(studentCodeOrId).catch(console.warn);
+  }
 
   let classes = typeof getClassesList === 'function' ? getClassesList() : (read(CLASSES_STORAGE_KEY) || []);
   if (Array.isArray(classes)) {
@@ -6388,40 +6468,50 @@ function rejectStudentRegistration(studentCodeOrId, classId) {
     showToast(`Student registration rejected.`);
   }
 
+  if (window.SupabaseService) {
+    const refreshedStudents = await window.SupabaseService.getStudents(ACTIVE_ORG).catch(() => null);
+    if (refreshedStudents) hrStore[STUD_KEY] = refreshedStudents;
+  }
   loadHRStudents();
   renderClassesSection();
 }
 
-function approveAllPendingStudents() {
+async function approveAllPendingStudents() {
   let count = 0;
   let classes = typeof getClassesList === 'function' ? getClassesList() : (read(CLASSES_STORAGE_KEY) || []);
   if (Array.isArray(classes)) {
-    classes.forEach(c => {
+    for (const c of classes) {
       if (Array.isArray(c.students)) {
-        c.students.forEach(s => {
+        for (const s of c.students) {
           if (s.approvalStatus === 'pending' || s.status === 'Pending HR Approval') {
             s.status = 'Active';
             s.approvalStatus = 'approved';
             s.approvedBy = 'HR Directorate';
             s.approvedAt = Date.now();
             count++;
+            if (window.SupabaseService) {
+              await window.SupabaseService.approveStudent(s.id || s.roll, 'HR Directorate').catch(console.warn);
+            }
           }
-        });
+        }
       }
-    });
+    }
     save(CLASSES_STORAGE_KEY, classes);
   }
 
   let studs = read(STUD_KEY);
   if (Array.isArray(studs)) {
-    studs.forEach(s => {
+    for (const s of studs) {
       if (s.approvalStatus === 'pending' || s.status === 'Pending HR Approval') {
         s.status = 'Active';
         s.approvalStatus = 'approved';
         s.approvedBy = 'HR Directorate';
         s.approvedAt = Date.now();
+        if (window.SupabaseService) {
+          await window.SupabaseService.approveStudent(s.id || s.roll, 'HR Directorate').catch(console.warn);
+        }
       }
-    });
+    }
     save(STUD_KEY, studs);
   }
 
@@ -6441,6 +6531,10 @@ function approveAllPendingStudents() {
     } else {
       showToast(`Approved ${count} students.`);
     }
+    if (window.SupabaseService) {
+      const refreshedStudents = await window.SupabaseService.getStudents(ACTIVE_ORG).catch(() => null);
+      if (refreshedStudents) hrStore[STUD_KEY] = refreshedStudents;
+    }
     loadHRStudents();
     renderClassesSection();
   }
@@ -6458,41 +6552,11 @@ document.getElementById('studentModal')?.addEventListener('click', (e) => {
 const USERS_STORAGE_KEY = 'organizations_users';
 
 function getSystemUsers() {
-  let users = read(USERS_STORAGE_KEY);
-  if (!Array.isArray(users) || users.length === 0) {
-    users = [
-      { org: ACTIVE_ORG, name: 'James Ntiamoah', email: 'admin@flawlessgraphics.com', role: 'admin', status: 'active', pass: 'Flawless@2026', createdAt: Date.now() - 86400000 * 30 },
-      { org: ACTIVE_ORG, name: 'Ama Serwaa', email: 'ama@flawless.org', role: 'hr', status: 'active', pass: 'Flawless@2026', linkedStaffId: 'e2', createdAt: Date.now() - 86400000 * 20 },
-      { org: ACTIVE_ORG, name: 'Kwame Boateng', email: 'kwame@flawless.org', role: 'teacher', status: 'active', pass: 'Flawless@2026', linkedStaffId: 'e3', createdAt: Date.now() - 86400000 * 15 },
-      { org: ACTIVE_ORG, name: 'Abena Mansa', email: 'abena@flawless.org', role: 'finance', status: 'active', pass: 'Flawless@2026', linkedStaffId: 'e4', createdAt: Date.now() - 86400000 * 10 },
-      { org: ACTIVE_ORG, name: 'Kofi Owusu', email: 'kofi@flawless.org', role: 'teacher', status: 'active', pass: 'Flawless@2026', linkedStaffId: 'e5', createdAt: Date.now() - 86400000 * 5 },
-      { org: ACTIVE_ORG, name: 'Daniel K. Mensah', email: 'daniel.mensah@flawless.org', role: 'teacher', status: 'pending_approval', pass: 'Teacher@2026', createdAt: Date.now() - 3600000 * 3, department: 'Academic Staff', designation: 'Senior Mathematics Instructor', phone: '+233 24 456 7890' }
-    ];
-    save(USERS_STORAGE_KEY, users);
-  } else {
-    // If no user has pending_approval and pending demo was not explicitly resolved, seed Daniel K. Mensah so actions are immediately available
-    const orgUsers = users.filter(u => !u.org || u.org === ACTIVE_ORG || u.org === 'FLAWLESS GRAPHICS');
-    const hasPending = orgUsers.some(u => {
-      const s = (u.status || '').toLowerCase();
-      return s === 'pending_approval' || s === 'pending';
-    });
-    const hasDaniel = users.some(u => (u.email || '').toLowerCase() === 'daniel.mensah@flawless.org');
-    if (!hasPending && !hasDaniel && !localStorage.getItem('hr_pending_resolved')) {
-      users.push({
-        org: ACTIVE_ORG,
-        name: 'Daniel K. Mensah',
-        email: 'daniel.mensah@flawless.org',
-        role: 'teacher',
-        status: 'pending_approval',
-        pass: 'Teacher@2026',
-        createdAt: Date.now() - 3600000 * 3,
-        department: 'Academic Staff',
-        designation: 'Senior Mathematics Instructor',
-        phone: '+233 24 456 7890'
-      });
-      save(USERS_STORAGE_KEY, users);
-    }
+  if (hrStore[USERS_STORAGE_KEY] && Array.isArray(hrStore[USERS_STORAGE_KEY])) {
+    return hrStore[USERS_STORAGE_KEY];
   }
+  let users = read(USERS_STORAGE_KEY);
+  if (!Array.isArray(users)) users = [];
   return users;
 }
 
@@ -6736,13 +6800,18 @@ function renderUsers() {
   }
 }
 
-function approveStaffUser(email) {
+async function approveStaffUser(email) {
   let users = getSystemUsers();
   const target = users.find(u => (u.email || '').toLowerCase() === email.toLowerCase());
   if (!target) return;
   target.status = 'active';
   target.approvedAt = Date.now();
+  target.approvedBy = 'HR Directorate';
   save(USERS_STORAGE_KEY, users);
+
+  if (window.SupabaseService) {
+    await window.SupabaseService.approveUser(target.id || target.email, 'HR Directorate').catch(console.warn);
+  }
 
   // Sync to employee roster if teacher
   const staffList = read(EMP_KEY) || [];
@@ -6750,19 +6819,23 @@ function approveStaffUser(email) {
   if (emp) {
     emp.status = 'Active';
   } else if ((target.role || '').toLowerCase() === 'teacher') {
-    staffList.push({
-      id: 'e' + (staffList.length + 1),
+    const newStaff = {
+      id: target.id || ('e' + (staffList.length + 1)),
       name: target.name,
       fullName: target.name,
-      role: target.designation || 'Mathematics Instructor',
-      position: target.designation || 'Mathematics Instructor',
+      role: target.designation || 'Academic Faculty Instructor',
+      position: target.designation || 'Academic Faculty Instructor',
       dept: target.department || 'Academic Staff',
       department: target.department || 'Academic Staff',
       email: target.email,
       salary: 4900,
       status: 'Active',
       photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80'
-    });
+    };
+    staffList.push(newStaff);
+    if (window.SupabaseService) {
+      window.SupabaseService.saveTeacher(ACTIVE_ORG, newStaff).catch(console.warn);
+    }
   }
   save(EMP_KEY, staffList);
 
@@ -6771,22 +6844,40 @@ function approveStaffUser(email) {
     localStorage.setItem('hr_pending_resolved', 'true');
   }
 
+  if (window.LucyBus) {
+    LucyBus.emit('STAFF_APPROVED', {
+      name: target.name,
+      email: target.email,
+      role: target.role
+    }, { role: 'HR Directorate', sound: 'success' });
+  }
+
   if (window.Toaster && typeof window.Toaster.success === 'function') {
     window.Toaster.success('Account Approved', `Granted active access for ${target.name} [${(target.role || '').toUpperCase()}].`);
   } else {
     showToast(`Account approved for ${target.name}`);
   }
+
+  if (window.SupabaseService) {
+    const updatedUsers = await window.SupabaseService.getUsers(ACTIVE_ORG);
+    hrStore[USERS_STORAGE_KEY] = updatedUsers;
+  }
   renderUsers();
 }
 
-function rejectStaffUser(email) {
+async function rejectStaffUser(email) {
   if (!confirm(`Are you sure you want to decline registration for (${email})?`)) return;
   let users = getSystemUsers();
   const target = users.find(u => (u.email || '').toLowerCase() === email.toLowerCase());
   if (!target) return;
   target.status = 'rejected';
   target.rejectedAt = Date.now();
+  target.rejectedBy = 'HR Directorate';
   save(USERS_STORAGE_KEY, users);
+
+  if (window.SupabaseService) {
+    await window.SupabaseService.rejectUser(target.id || target.email, 'HR Directorate').catch(console.warn);
+  }
 
   // Sync to employee roster
   const staffList = read(EMP_KEY) || [];
@@ -6801,10 +6892,22 @@ function rejectStaffUser(email) {
     localStorage.setItem('hr_pending_resolved', 'true');
   }
 
+  if (window.LucyBus) {
+    LucyBus.emit('STAFF_REJECTED', {
+      name: target.name,
+      email: target.email
+    }, { role: 'HR Directorate', sound: 'alert' });
+  }
+
   if (window.Toaster && typeof window.Toaster.info === 'function') {
     window.Toaster.info('Registration Declined', `Registration for ${target.name} has been rejected.`);
   } else {
     showToast(`Registration declined for ${target.name}`);
+  }
+
+  if (window.SupabaseService) {
+    const updatedUsers = await window.SupabaseService.getUsers(ACTIVE_ORG);
+    hrStore[USERS_STORAGE_KEY] = updatedUsers;
   }
   renderUsers();
 }
@@ -7613,7 +7716,7 @@ function toggleUserStatus(email) {
   }
 }
 
-function deleteUserAccount(email) {
+async function deleteUserAccount(email) {
   let users = getSystemUsers();
   const target = users.find(u => (u.email || '').toLowerCase() === email.toLowerCase());
   if (target && (target.role === 'admin' || (target.email || '').toLowerCase() === 'admin@flawlessgraphics.com')) {
@@ -7629,13 +7732,22 @@ function deleteUserAccount(email) {
     return;
   }
 
-  if (!confirm(`Are you sure you want to delete portal access account for (${email})?`)) return;
+  if (!confirm(`Are you sure you want to permanently delete portal access account for (${email}) from Supabase Cloud? Access will be immediately revoked across all portals.`)) return;
+
+  if (window.SupabaseService) {
+    try {
+      await window.SupabaseService.deleteUser(email);
+    } catch (err) {
+      console.warn('Failed to delete user in Supabase:', err);
+    }
+  }
+
   users = users.filter(u => (u.email || '').toLowerCase() !== email.toLowerCase());
   save(USERS_STORAGE_KEY, users);
   renderUsers();
 
   if (window.Toaster && typeof window.Toaster.info === 'function') {
-    window.Toaster.info('User Removed', `Account ${email} has been permanently deleted.`);
+    window.Toaster.info('User Removed', `Account ${email} has been permanently deleted from Supabase Cloud.`);
   } else {
     showToast(`User ${email} deleted.`);
   }
@@ -8232,7 +8344,10 @@ function handlePublishBroadcast(e) {
   showToast('Official Broadcast Published Across Staff Portals');
 }
 
-function deleteAnnouncement(targetId) {
+async function deleteAnnouncement(targetId) {
+  if (window.SupabaseService) {
+    await window.SupabaseService.deleteAnnouncement(ACTIVE_ORG, targetId).catch(console.warn);
+  }
   let ann = read(ANNOUNCE_KEY);
   if (typeof targetId === 'number') {
     ann.splice(targetId, 1);
@@ -8722,6 +8837,15 @@ function saveAttendancePunch(e) {
 
   records.unshift(newPunch);
   save(ATT_KEY, records);
+  if (window.LucyBus) {
+    LucyBus.emit('ATTENDANCE_LOGGED', {
+      teacherName: teacherName,
+      status: status,
+      inTime: inTime,
+      outTime: outTime,
+      duration: duration
+    }, { role: 'HR Directorate', sound: 'info' });
+  }
   closeAttendancePunchModal();
   renderAttendanceLogSection();
   showToast(`Punch recorded for ${teacherName}`);
@@ -9748,6 +9872,15 @@ function saveAcademicCalendarTerm(e) {
   }
 
   save(CALENDAR_KEY, terms);
+  if (window.LucyBus) {
+    LucyBus.emit('CALENDAR_SAVED', {
+      termTitle: title,
+      academicYear: year,
+      startDate: startDate,
+      endDate: endDate,
+      status: status
+    }, { role: 'HR Directorate', sound: 'success' });
+  }
   closeAcademicCalendarModal();
   renderAcademicCalendar();
 
@@ -10132,6 +10265,16 @@ function approveStudentAssessment(id) {
   save(ASSESS_KEY, assessments);
   renderStudentAssessments();
 
+  if (window.LucyBus) {
+    LucyBus.emit('ASSESSMENT_CERTIFIED', {
+      studentName: target.studentName,
+      studentRoll: target.studentRoll,
+      subject: target.subject,
+      grade: target.grade,
+      score: target.totalScore
+    }, { role: 'HR Directorate', sound: 'success' });
+  }
+
   if (window.Toaster && typeof window.Toaster.success === 'function') {
     window.Toaster.success(
       'Assessment Approved & Certified',
@@ -10145,106 +10288,9 @@ function approveStudentAssessment(id) {
 /* -------------------------------------------------------------
    INITIAL BOOTSTRAP
 ------------------------------------------------------------- */
-function bootstrapApp() {
+async function bootstrapApp() {
   try {
-    // Explicit global attachments
-    window.openAddStudentModal = openAddStudentModal;
-    window.openAddClassModal = openAddClassModal;
-    window.closeAddClassModal = closeAddClassModal;
-    window.openTeacherModal = openTeacherModal;
-    window.closeTeacherModal = closeTeacherModal;
-    window.closeStudentModal = closeStudentModal;
-    window.submitStudentAdmission = submitStudentAdmission;
-    window.deleteHRStudent = deleteHRStudent;
-    window.editHRStudent = editHRStudent;
-
-    // Academic Calendar & Staff Review Attachments
-    window.renderAcademicCalendar = renderAcademicCalendar;
-    window.openAcademicCalendarModal = openAcademicCalendarModal;
-    window.closeAcademicCalendarModal = closeAcademicCalendarModal;
-    window.saveAcademicCalendarTerm = saveAcademicCalendarTerm;
-    window.publishCalendarForStaffReview = publishCalendarForStaffReview;
-    window.deleteAcademicCalendarTerm = deleteAcademicCalendarTerm;
-
-    // Student Assessment QA & Certification Attachments
-    window.renderStudentAssessments = renderStudentAssessments;
-    window.openAssessmentDetailModal = openAssessmentDetailModal;
-    window.closeAssessmentDetailModal = closeAssessmentDetailModal;
-    window.warnLockedScore = warnLockedScore;
-    window.approveStudentAssessment = approveStudentAssessment;
-    window.submitAssessmentApproval = submitAssessmentApproval;
-
-    // Academic Registration Approvals Attachments
-    window.approveClassRegistration = approveClassRegistration;
-    window.rejectClassRegistration = rejectClassRegistration;
-    window.approveAllPendingClasses = approveAllPendingClasses;
-    window.approveStudentRegistration = approveStudentRegistration;
-    window.rejectStudentRegistration = rejectStudentRegistration;
-    window.approveAllPendingStudents = approveAllPendingStudents;
-
-    // Cross-Portal Broadcasts Attachments
-    window.renderAnnouncements = renderAnnouncements;
-    window.handlePublishBroadcast = handlePublishBroadcast;
-    window.deleteAnnouncement = deleteAnnouncement;
-    window.togglePinAnnouncement = togglePinAnnouncement;
-    window.filterBroadcasts = filterBroadcasts;
-
-    // Enterprise Settings Attachments
-    window.switchSettingsTab = switchSettingsTab;
-    window.renderSettingsSection = renderSettingsSection;
-    window.saveAllPortalSettings = saveAllPortalSettings;
-    window.handleLogoUpload = handleLogoUpload;
-    window.previewLogoFromUrl = previewLogoFromUrl;
-    window.selectThemeSwatch = selectThemeSwatch;
-    window.setDashboardThemeMode = setDashboardThemeMode;
-    window.setDashboardDensity = setDashboardDensity;
-    window.exportFullDatabaseBackup = exportFullDatabaseBackup;
-    window.restoreFullDatabaseBackup = restoreFullDatabaseBackup;
-    window.resetLocalCacheConfirm = resetLocalCacheConfirm;
-
-    // Native Attendance Desk Attachments
-    window.openAttendanceLogPanel = openAttendanceLogPanel;
-    window.renderAttendanceLogSection = renderAttendanceLogSection;
-    window.openAttendancePunchModal = openAttendancePunchModal;
-    window.closeAttendancePunchModal = closeAttendancePunchModal;
-    window.saveAttendancePunch = saveAttendancePunch;
-    window.markAllPresentToday = markAllPresentToday;
-    window.filterAttendanceLogs = filterAttendanceLogs;
-    window.resetAttendanceFilters = resetAttendanceFilters;
-    window.exportAttendanceCSV = exportAttendanceCSV;
-    window.printAttendanceSheet = printAttendanceSheet;
-
-    // Staff Payslip Generator Attachments
-    window.openPayslipGeneratorPanel = openPayslipGeneratorPanel;
-    window.renderPayslipGeneratorSection = renderPayslipGeneratorSection;
-    window.onPayslipEmployeeChange = onPayslipEmployeeChange;
-    window.recalculatePayslip = recalculatePayslip;
-    window.printPayslipDocument = printPayslipDocument;
-    window.emailDigitalPayslip = emailDigitalPayslip;
-    window.jumpToPayslip = jumpToPayslip;
-
-    // Salary Schedules Attachments
-    window.openSalarySchedulesPanel = openSalarySchedulesPanel;
-    window.renderSalarySchedulesSection = renderSalarySchedulesSection;
-    window.runPayrollBatchDisbursement = runPayrollBatchDisbursement;
-    window.exportSalarySchedulesCSV = exportSalarySchedulesCSV;
-    window.schedulePayDay = schedulePayDay;
-
-    // Workforce Reports Center Attachments
-    window.openReportsPanel = openReportsPanel;
-    window.renderReportsSection = renderReportsSection;
-    window.switchReportCategory = switchReportCategory;
-    window.exportReportCSV = exportReportCSV;
-    window.printReportView = printReportView;
-
-    // Direct event listener binding for all Add Student triggers
-    document.querySelectorAll('#openAddStudentBtn, #topAddStudentBtn, #navAddStudentBtn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        openAddStudentModal();
-      });
-    });
-
+    await loadHRCloudData();
     updateCloudSyncStatus();
     renderDashboard();
     renderCharts();

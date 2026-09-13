@@ -1,7 +1,7 @@
 /**
  * toaster.js
  * Centralized, Modern Pop-up Toaster Notification Engine
- * FLAWLESS GRAPHICS — LUCY™ Management System
+ * FLAWLESS GRAPHICS Management System
  */
 
 (function(window) {

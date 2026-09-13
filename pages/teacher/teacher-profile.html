@@ -1010,7 +1010,8 @@ const sessionCandidates = ['active_teacher','teacher_active_user','active_user',
 let teacher = null;
 for(const k of sessionCandidates){ const v = safeParse(localStorage.getItem(k)); if(v && (v.email || v.name)){ teacher = v; break; } }
 if(!teacher){ 
-  teacher = { name: 'Demo Teacher', email: 'teacher@flawless.org', org: 'FLAWLESS' };
+  const activeOrg = localStorage.getItem('active_org') || 'Organization';
+  teacher = { name: 'Teacher', email: 'teacher@' + activeOrg.toLowerCase().replace(/\s+/g,'') + '.edu', org: activeOrg };
   localStorage.setItem('active_teacher', JSON.stringify(teacher));
 }
 
@@ -1554,8 +1555,11 @@ function editStudent(classId, studentId){
   openStudentModal(classId, studentId);
 }
 
-function deleteStudent(classId, studentId){
-  if(!confirm('Are you sure you want to remove this student from the class?')) return;
+async function deleteStudent(classId, studentId){
+  if(!confirm('Are you sure you want to remove this student from the class and institutional cloud?')) return;
+  if(window.SupabaseService) {
+    await window.SupabaseService.deleteStudent(ACTIVE_ORG, studentId).catch(console.warn);
+  }
   const arr = getClasses(); const c = arr.find(x=>x.id===classId);
   if(!c) return;
   c.students = (c.students||[]).filter(s=>s.id!==studentId);

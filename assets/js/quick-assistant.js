@@ -1,5 +1,5 @@
 /**
- * FLAWLESS GRAPHICS — LUCY™ QUICK ASSISTANT HUB
+ * FLAWLESS GRAPHICS — QUICK ASSISTANT HUB
  * Handles Subscriptions, Help Desk, Interactive Project Tour, & Essential Features
  */
 
@@ -57,7 +57,7 @@
           <div class="assistant-header-title">
             <div class="brand-icon" id="assistantBrandIcon"><i class="fa-solid fa-shapes"></i></div>
             <div>
-              <h3 id="assistantHeaderTitle">LUCY™ Quick Assistant</h3>
+              <h3 id="assistantHeaderTitle">FLAWLESS Quick Assistant</h3>
               <p id="assistantSubTitle"><span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#10b981; margin-right:4px;"></span>Enterprise Hub • Operational</p>
             </div>
           </div>
@@ -166,7 +166,7 @@
                   <i class="fa-solid fa-chevron-down"></i>
                 </div>
                 <div class="help-faq-answer">
-                  LUCY™ is built local-first. If internet connectivity drops or Supabase credentials are not yet configured, all student profiles, fee collections, and staff records persist securely in browser storage and synchronize when back online.
+                  The system is built local-first. If internet connectivity drops or Supabase credentials are not yet configured, all student profiles, fee collections, and staff records persist securely in browser storage and synchronize when back online.
                 </div>
               </div>
 
@@ -200,7 +200,7 @@
             <div class="tour-banner-card">
               <i class="fa-solid fa-compass-drafting" style="font-size:28px; color:#72efdd; margin-bottom:8px;"></i>
               <h4 style="margin:0 0 4px; font-size:16px; font-weight:800;">Guided Interactive Tour</h4>
-              <p style="margin:0; font-size:11.5px; opacity:0.85;">Explore the core operational pillars of the LUCY™ Management Suite.</p>
+              <p style="margin:0; font-size:11.5px; opacity:0.85;">Explore the core operational pillars of the FLAWLESS Management Suite.</p>
               <button type="button" class="assistant-btn-primary" style="margin-top:12px; background:#72efdd; color:#1e1b4b;" onclick="window.QuickAssistant.startProjectTour()">
                 <i class="fa-solid fa-play"></i> Launch Guided Tour
               </button>
@@ -803,11 +803,11 @@
           success: 'Success',
           error: 'Notice',
           warning: 'Warning',
-          info: 'LUCY™ Assistant'
+          info: 'Flawless Assistant'
         };
         window.Toaster.show({
           type: type,
-          title: titleMap[type] || 'LUCY™ Assistant',
+          title: titleMap[type] || 'Flawless Assistant',
           message: msg
         });
       } else {

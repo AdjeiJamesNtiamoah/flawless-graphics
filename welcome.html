@@ -2,18 +2,24 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Workspace Hub — FLAWLESS GRAPHICS</title>
+<title>Unified Executive Workspace Hub — FLAWLESS GRAPHICS ERP</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Google Fonts: Plus Jakarta Sans -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <!-- Font Awesome Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<!-- Short Skeletal Loading Stylesheet -->
+<!-- Shared Design System & Skeleton Loading Stylesheet -->
+<link rel="stylesheet" href="assets/css/shared-design.css">
 <link rel="stylesheet" href="assets/css/skeleton.css">
 <!-- Floating Quick Assistant Stylesheet -->
 <link rel="stylesheet" href="assets/css/quick-assistant.css">
+<!-- Floating 3-Dots Quick Dock Stylesheet -->
+<link rel="stylesheet" href="assets/css/quick-dock.css">
+<!-- Pop-up Toaster System -->
+<link rel="stylesheet" href="assets/css/toaster.css">
+<script src="assets/js/toaster.js"></script>
 
 <style>
     * {
@@ -25,36 +31,49 @@
     body {
         font-family: 'Plus Jakarta Sans', sans-serif;
         background-color: #FAF7F2;
-        background: #FAF7F2;
+        background: radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.04) 0%, transparent 40%),
+                    radial-gradient(circle at 90% 80%, rgba(99, 91, 252, 0.05) 0%, transparent 40%),
+                    #FAF7F2;
         min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 10px 16px;
+        padding: 16px;
         color: #0F172A;
         overflow-x: hidden;
     }
 
+    /* Ambient Background Orbs */
+    .bg-orb {
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(80px);
+        pointer-events: none;
+        z-index: 0;
+    }
+    .orb-1 { width: 350px; height: 350px; background: rgba(37, 99, 235, 0.12); top: -60px; left: -60px; animation: floatCard 8s ease-in-out infinite alternate; }
+    .orb-2 { width: 400px; height: 400px; background: rgba(99, 91, 252, 0.1); bottom: -80px; right: -80px; animation: floatCard 10s ease-in-out infinite alternate-reverse; }
+
     /* Window Frame UI Container */
     .app-window {
         width: 100%;
-        max-width: 1000px;
-        max-height: calc(100vh - 20px);
-        background: rgba(55, 25, 110, 0.94);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-radius: 18px;
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.15);
+        max-width: 1120px;
+        background: #0B1120;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 20px;
+        box-shadow: 0 30px 60px -12px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08);
         overflow: hidden;
         display: flex;
         flex-direction: column;
-        animation: windowEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        animation: windowEntrance 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        z-index: 1;
+        position: relative;
     }
 
     @keyframes windowEntrance {
         from {
             opacity: 0;
-            transform: translateY(20px) scale(0.98);
+            transform: translateY(24px) scale(0.98);
         }
         to {
             opacity: 1;
@@ -64,12 +83,13 @@
 
     /* Mock Mac Top Bar */
     .window-header {
-        background: rgba(255, 255, 255, 0.05);
-        padding: 8px 18px;
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(12px);
+        padding: 12px 22px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .window-dots {
@@ -78,13 +98,13 @@
     }
 
     .dot {
-        width: 10px;
-        height: 10px;
+        width: 11px;
+        height: 11px;
         border-radius: 50%;
     }
-    .dot-1 { background: #9c8ce8; }
-    .dot-2 { background: #72efdd; }
-    .dot-3 { background: #92b0ff; }
+    .dot-1 { background: #ef4444; }
+    .dot-2 { background: #f59e0b; }
+    .dot-3 { background: #10b981; }
 
     .window-quick-nav {
         display: flex;
@@ -93,66 +113,96 @@
     }
     .window-nav-link {
         color: rgba(255, 255, 255, 0.75);
-        font-size: 11px;
+        font-size: 11.5px;
         font-weight: 600;
         text-decoration: none;
-        padding: 4px 10px;
-        border-radius: 12px;
+        padding: 5px 12px;
+        border-radius: 9999px;
         background: rgba(255, 255, 255, 0.06);
         border: 1px solid rgba(255, 255, 255, 0.1);
         display: inline-flex;
         align-items: center;
-        gap: 5px;
+        gap: 6px;
         transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     .window-nav-link:hover {
         color: #ffffff;
-        background: rgba(255, 255, 255, 0.16);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(114, 239, 221, 0.3);
-        border-color: rgba(114, 239, 221, 0.4);
+        background: rgba(255, 255, 255, 0.18);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+        border-color: rgba(37, 99, 235, 0.4);
     }
 
     .user-badge {
         display: flex;
         align-items: center;
         gap: 8px;
-        font-size: 11px;
+        font-size: 11.5px;
         font-weight: 600;
-        color: rgba(255, 255, 255, 0.8);
-        background: rgba(255, 255, 255, 0.1);
-        padding: 4px 12px;
-        border-radius: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+        background: rgba(37, 99, 235, 0.2);
+        padding: 5px 14px;
+        border-radius: 9999px;
+        border: 1px solid rgba(37, 99, 235, 0.4);
     }
 
     .user-badge i {
-        color: #72efdd;
+        color: #38bdf8;
     }
 
-    /* Main Split Body Layout - Left-side Navigation Placement */
-    .main-container {
+    /* Live Telemetry Ticker Ribbon */
+    .telemetry-ribbon {
+        background: rgba(2, 6, 23, 0.95);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 8px 24px;
         display: flex;
-        flex-direction: row-reverse; /* Moves navigation card to the LEFT side */
-        min-height: 480px;
-        position: relative;
-        overflow-y: auto;
-        scrollbar-width: thin;
-        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 11.5px;
+        color: rgba(255, 255, 255, 0.7);
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .telemetry-items {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    .telemetry-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .status-pulse-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #10b981;
+        animation: pulseLive 2s infinite;
+    }
+    .clock-badge {
+        font-family: monospace;
+        font-weight: 700;
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.1);
+        padding: 2px 8px;
+        border-radius: 4px;
     }
 
-    .main-container::-webkit-scrollbar {
-        width: 6px;
-    }
-    .main-container::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 3px;
+    /* Main Split Body Layout */
+    .main-container {
+        display: grid;
+        grid-template-columns: 340px 1fr;
+        min-height: 520px;
+        position: relative;
     }
 
     /* Left Hero Banner Section */
     .hero-section {
-        flex: 1;
-        padding: 24px 32px;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(11, 17, 32, 0.98) 100%);
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 32px 28px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -160,74 +210,25 @@
         overflow: hidden;
     }
 
-    /* Abstract Animated 3D Ribbons */
-    .ribbon-container {
-        position: absolute;
-        top: -40px;
-        left: -40px;
-        width: 320px;
-        height: 320px;
-        pointer-events: none;
-    }
-
-    .ribbon {
-        position: absolute;
-        border-radius: 50%;
-        border: 28px solid transparent;
-    }
-
-    .ribbon-1 {
-        width: 240px;
-        height: 240px;
-        border-top-color: #5ce1e6;
-        border-right-color: #5ce1e6;
-        transform: rotate(-25deg);
-        filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
-        animation: floatShape1 6s ease-in-out infinite alternate;
-    }
-
-    .ribbon-2 {
-        width: 200px;
-        height: 200px;
-        top: 30px;
-        left: 20px;
-        border-bottom-color: #8c52ff;
-        border-left-color: #8c52ff;
-        transform: rotate(15deg);
-        filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
-        animation: floatShape2 8s ease-in-out infinite alternate;
-    }
-
-    @keyframes floatShape1 {
-        0% { transform: rotate(-25deg) translateY(0px); }
-        100% { transform: rotate(-15deg) translateY(12px); }
-    }
-
-    @keyframes floatShape2 {
-        0% { transform: rotate(15deg) translateY(0px); }
-        100% { transform: rotate(25deg) translateY(-10px); }
-    }
-
     .brand-logo-container {
         display: flex;
         align-items: center;
         gap: 14px;
         z-index: 2;
-        margin-top: 10px;
     }
 
     .org-logo-preview {
-        width: 56px;
-        height: 56px;
-        border-radius: 14px;
-        background: rgba(255, 255, 255, 0.12);
+        width: 58px;
+        height: 58px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
         border: 1px solid rgba(255, 255, 255, 0.2);
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
         flex-shrink: 0;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
     }
 
     .org-logo-preview img {
@@ -237,56 +238,77 @@
     }
 
     .org-logo-preview i {
-        font-size: 28px;
+        font-size: 26px;
         color: #ffffff;
     }
 
     .brand-title {
-        font-size: 22px;
+        font-size: 20px;
         font-weight: 800;
-        letter-spacing: 0.5px;
+        letter-spacing: -0.3px;
         line-height: 1.2;
+        color: #ffffff;
     }
 
     .brand-subtitle {
         font-size: 11px;
-        color: rgba(255, 255, 255, 0.6);
+        color: rgba(255, 255, 255, 0.55);
         text-transform: uppercase;
         letter-spacing: 1px;
-        margin-top: 2px;
+        font-weight: 700;
+        margin-top: 3px;
     }
 
     .hero-text {
         z-index: 2;
-        margin-top: 16px;
-        max-width: 360px;
+        margin: 24px 0;
     }
 
     .hero-text h1 {
-        font-size: 22px;
-        font-weight: 500;
+        font-size: 24px;
+        font-weight: 700;
         line-height: 1.3;
         color: #ffffff;
+        letter-spacing: -0.5px;
     }
 
     .hero-text span {
         font-weight: 800;
-        background: linear-gradient(90deg, #ffffff, #a2e8dd);
+        background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
-    .hero-footer-link {
+    .hero-features {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
         margin-top: 16px;
+    }
+    .hero-feat-pill {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.75);
+    }
+    .hero-feat-pill i {
+        color: #38bdf8;
+        font-size: 13px;
+    }
+
+    .hero-footer-link {
         z-index: 2;
+        padding-top: 18px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .link-subtle {
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 12px;
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 11.5px;
         text-decoration: none;
-        font-weight: 500;
+        font-weight: 600;
         display: inline-flex;
         align-items: center;
         gap: 6px;
@@ -294,236 +316,211 @@
     }
 
     .link-subtle:hover {
-        color: #ffffff;
-        text-decoration: underline;
+        color: #38bdf8;
     }
 
     /* Right Navigation Portal Card */
     .form-section {
-        flex: 1;
-        padding: 16px 28px;
+        padding: 32px;
+        background: #0B1120;
         display: flex;
-        justify-content: center;
-        align-items: center;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
-    .card {
-        width: 100%;
-        max-width: 420px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        padding: 20px 24px;
-        backdrop-filter: blur(20px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    .section-heading {
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
     }
 
-    .card-header {
-        margin-bottom: 14px;
-    }
-
-    .card h2 {
-        font-size: 19px;
-        font-weight: 700;
+    .section-heading h2 {
+        font-size: 20px;
+        font-weight: 800;
         color: #ffffff;
+        letter-spacing: -0.3px;
     }
 
-    .card-desc {
-        font-size: 12px;
+    .section-heading .desc {
+        font-size: 12.5px;
         color: rgba(255, 255, 255, 0.6);
         margin-top: 3px;
     }
 
-    /* Portal Option Buttons - Floating Hover Physics */
-    .portal-actions {
+    /* 6-Grid Portal Action Cards */
+    .portal-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+    }
+
+    .portal-card-btn {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 14px;
+        padding: 16px 18px;
+        text-decoration: none;
         display: flex;
         flex-direction: column;
-        gap: 8px;
-    }
-
-    .btn-portal {
-        display: flex;
-        align-items: center;
         justify-content: space-between;
-        width: 100%;
-        padding: 10px 14px;
-        border-radius: 11px;
-        text-decoration: none;
-        font-size: 13px;
-        font-weight: 600;
-        transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
-        border: 1px solid transparent;
-        opacity: 0;
-        animation: btnSlideUp 0.5s ease forwards;
-        position: relative;
-    }
-
-    .btn-portal:nth-child(1) { animation-delay: 0.1s; }
-    .btn-portal:nth-child(2) { animation-delay: 0.2s; }
-    .btn-portal:nth-child(3) { animation-delay: 0.3s; }
-    .btn-portal:nth-child(4) { animation-delay: 0.4s; }
-
-    @keyframes btnSlideUp {
-        from {
-            opacity: 0;
-            transform: translateY(12px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .portal-info {
-        display: flex;
-        align-items: center;
         gap: 12px;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        overflow: hidden;
     }
 
-    .portal-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
+    .portal-card-btn:hover {
+        transform: translateY(-4px) scale(1.02);
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(56, 189, 248, 0.4);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35), 0 0 15px rgba(56, 189, 248, 0.15);
+    }
+
+    .portal-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .portal-card-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 14px;
+        font-size: 18px;
+        color: #ffffff;
         transition: transform 0.25s ease;
     }
 
-    /* Distinct Button Themes with Elevated Hover */
-    .btn-primary {
-        background: #a2e8dd;
-        color: #1a0836;
-        border-color: rgba(162, 232, 221, 0.4);
+    .portal-card-btn:hover .portal-card-icon {
+        transform: scale(1.1) rotate(-3deg);
     }
 
-    .btn-primary .portal-icon {
-        background: rgba(26, 8, 54, 0.1);
-        color: #1a0836;
-    }
-
-    .btn-primary:hover {
-        background: #8ce2d5;
-        transform: translateY(-4px) scale(1.02);
-        box-shadow: 0 10px 25px rgba(162, 232, 221, 0.4), 0 0 20px rgba(114, 239, 221, 0.3);
-        border-color: #72efdd;
-    }
-
-    .btn-secondary {
-        background: rgba(255, 255, 255, 0.08);
-        color: #ffffff;
-        border-color: rgba(255, 255, 255, 0.15);
-    }
-
-    .btn-secondary .portal-icon {
+    .portal-badge-tag {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 2px 7px;
+        border-radius: 4px;
         background: rgba(255, 255, 255, 0.1);
-        color: #a2e8dd;
+        color: rgba(255, 255, 255, 0.7);
     }
 
-    .btn-secondary:hover {
-        background: rgba(255, 255, 255, 0.18);
-        border-color: rgba(114, 239, 221, 0.5);
-        transform: translateY(-4px) scale(1.02);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 16px rgba(114, 239, 221, 0.25);
+    .portal-card-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #ffffff;
+        line-height: 1.2;
     }
 
-    .btn-portal:hover .portal-icon {
-        transform: scale(1.1) rotate(-4deg);
+    .portal-card-desc {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.55);
+        line-height: 1.35;
     }
 
-    .btn-portal .arrow-icon {
-        font-size: 12px;
-        transition: transform 0.2s ease;
-        opacity: 0.7;
-    }
-
-    .btn-portal:hover .arrow-icon {
-        transform: translateX(5px);
-        opacity: 1;
-    }
-
-    .card-footer {
-        margin-top: 14px;
-        padding-top: 10px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    .portal-card-footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        margin-top: 4px;
         font-size: 11px;
+        font-weight: 600;
+        color: #38bdf8;
+    }
+
+    /* Distinct Gradients for Icons */
+    .icon-admin { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
+    .icon-teacher { background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%); }
+    .icon-student { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+    .icon-finance { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+    .icon-hr { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); }
+    .icon-public { background: linear-gradient(135deg, #64748b 0%, #475569 100%); }
+
+    .hub-bottom-bar {
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 12px;
     }
 
     .btn-logout {
-        color: #ff9999;
+        color: #f87171;
         text-decoration: none;
         font-weight: 600;
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        transition: opacity 0.2s ease;
+        padding: 6px 12px;
+        border-radius: 8px;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.25);
+        transition: all 0.2s ease;
     }
-
     .btn-logout:hover {
-        opacity: 0.8;
-        text-decoration: underline;
+        background: rgba(239, 68, 68, 0.2);
+        color: #fca5a5;
     }
 
-    /* Responsive Layout Adjustments */
-    @media (max-width: 850px) {
+    /* Responsive */
+    @media (max-width: 900px) {
         .main-container {
-            flex-direction: column;
+            grid-template-columns: 1fr;
         }
         .hero-section {
-            padding: 30px;
+            border-right: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 24px;
         }
-        .ribbon-container {
-            transform: scale(0.7);
-            top: -60px;
-            left: -60px;
-        }
-        .brand-logo-container {
-            margin-top: 40px;
+        .portal-grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>
-  <!-- Floating 3-Dots Quick Dock Stylesheet -->
-  <link rel="stylesheet" href="assets/css/quick-dock.css">
-  <!-- Pop-up Toaster System -->
-  <link rel="stylesheet" href="assets/css/toaster.css">
-  <script src="assets/js/toaster.js"></script>
 </head>
 <body>
 
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+
 <!-- Short Skeletal Loading Placeholder -->
 <div id="skeletonLoader" class="skeleton-overlay">
-    <div class="skeleton-window" style="max-width: 1000px;">
+    <div class="skeleton-window" style="max-width: 1120px;">
         <div class="skeleton-header">
             <div class="skeleton-dots">
                 <span class="skeleton-dot"></span>
                 <span class="skeleton-dot"></span>
                 <span class="skeleton-dot"></span>
             </div>
-            <div class="skeleton-shimmer" style="width: 130px; height: 16px; border-radius: 6px;"></div>
+            <div class="skeleton-shimmer" style="width: 140px; height: 16px; border-radius: 6px;"></div>
         </div>
-        <div class="skeleton-body" style="flex-direction: row-reverse;">
-            <div class="skeleton-hero">
+        <div class="skeleton-body" style="grid-template-columns: 340px 1fr; display: grid;">
+            <div class="skeleton-hero" style="padding: 24px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <div class="skeleton-shimmer" style="width: 44px; height: 44px; border-radius: 10px;"></div>
+                    <div class="skeleton-shimmer" style="width: 48px; height: 48px; border-radius: 12px;"></div>
                     <div style="display: flex; flex-direction: column; gap: 6px;">
-                        <div class="skeleton-shimmer" style="width: 120px; height: 18px; border-radius: 4px;"></div>
-                        <div class="skeleton-shimmer" style="width: 140px; height: 11px; border-radius: 4px;"></div>
+                        <div class="skeleton-shimmer" style="width: 130px; height: 18px; border-radius: 4px;"></div>
+                        <div class="skeleton-shimmer" style="width: 110px; height: 12px; border-radius: 4px;"></div>
                     </div>
                 </div>
-                <div class="skeleton-shimmer" style="width: 85%; height: 24px; margin-top: 20px; border-radius: 6px;"></div>
-                <div class="skeleton-shimmer" style="width: 60%; height: 18px; border-radius: 6px;"></div>
+                <div class="skeleton-shimmer" style="width: 90%; height: 26px; margin-top: 24px; border-radius: 6px;"></div>
+                <div class="skeleton-shimmer" style="width: 65%; height: 20px; border-radius: 6px;"></div>
             </div>
-            <div class="skeleton-card" style="max-width: 420px;">
-                <div class="skeleton-shimmer" style="width: 150px; height: 20px; margin-bottom: 8px; border-radius: 5px;"></div>
-                <div class="skeleton-shimmer" style="width: 210px; height: 12px; margin-bottom: 16px; border-radius: 4px;"></div>
-                <div class="skeleton-shimmer" style="height: 38px; border-radius: 8px; margin-bottom: 8px;"></div>
-                <div class="skeleton-shimmer" style="height: 38px; border-radius: 8px; margin-bottom: 8px;"></div>
-                <div class="skeleton-shimmer" style="height: 38px; border-radius: 8px; margin-bottom: 8px;"></div>
-                <div class="skeleton-shimmer" style="height: 38px; border-radius: 8px; margin-bottom: 8px;"></div>
+            <div class="skeleton-card" style="padding: 24px;">
+                <div class="skeleton-shimmer" style="width: 160px; height: 20px; margin-bottom: 8px; border-radius: 5px;"></div>
+                <div class="skeleton-shimmer" style="width: 220px; height: 12px; margin-bottom: 20px; border-radius: 4px;"></div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="skeleton-shimmer" style="height: 90px; border-radius: 12px;"></div>
+                    <div class="skeleton-shimmer" style="height: 90px; border-radius: 12px;"></div>
+                    <div class="skeleton-shimmer" style="height: 90px; border-radius: 12px;"></div>
+                    <div class="skeleton-shimmer" style="height: 90px; border-radius: 12px;"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -539,129 +536,226 @@
                 <div class="dot dot-3"></div>
             </div>
             <nav class="window-quick-nav">
+                <a href="index.html" class="window-nav-link" style="color: #38bdf8;"><i class="fa-solid fa-sparkles"></i> Overview</a>
+                <a href="register.html" class="window-nav-link"><i class="fa-solid fa-building"></i> Register Org</a>
                 <a href="pages/public/home.html" class="window-nav-link"><i class="fa-solid fa-house"></i> Main Site</a>
-                <a href="index.html" class="window-nav-link"><i class="fa-solid fa-building"></i> Register Org</a>
                 <a href="site-login.html" class="window-nav-link"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
             </nav>
         </div>
         <div class="user-badge" id="userBadge" style="display: none;">
             <i class="fa-solid fa-circle-user"></i>
-            <span id="userName">User</span>
+            <span id="userName">Administrator</span>
+        </div>
+    </div>
+
+    <!-- Live Institutional Telemetry Ticker -->
+    <div class="telemetry-ribbon">
+        <div class="telemetry-items">
+            <div class="telemetry-item">
+                <span class="status-pulse-dot"></span>
+                <span>System Operational</span>
+            </div>
+            <div class="telemetry-item">
+                <span style="color: #64748b;">|</span>
+                <i class="fa-solid fa-calendar-check" style="color: #38bdf8;"></i>
+                <strong style="color: #ffffff;">Term 2 • 2025/2026 Academic Session</strong>
+            </div>
+            <div class="telemetry-item">
+                <span style="color: #64748b;">|</span>
+                <i class="fa-solid fa-graduation-cap" style="color: #10b981;"></i>
+                <span>1,240 Scholars Enrolled</span>
+            </div>
+            <div class="telemetry-item">
+                <span style="color: #64748b;">|</span>
+                <i class="fa-solid fa-shield-halved" style="color: #f59e0b;"></i>
+                <span>AES-256 Vault Active</span>
+            </div>
+        </div>
+        <div class="telemetry-item">
+            <span id="liveClock" class="clock-badge">12:00:00 UTC</span>
         </div>
     </div>
 
     <div class="main-container">
         <!-- Left Hero Banner -->
         <div class="hero-section">
-            <div class="ribbon-container">
-                <div class="ribbon ribbon-1"></div>
-                <div class="ribbon ribbon-2"></div>
-            </div>
-
-            <div class="brand-logo-container">
-                <div class="org-logo-preview" id="orgLogoBox">
-                    <i class="fa-solid fa-elephant"></i>
+            <div>
+                <div class="brand-logo-container">
+                    <div class="org-logo-preview" id="orgLogoBox">
+                        <i class="fa-solid fa-school"></i>
+                    </div>
+                    <div>
+                        <div class="brand-title" id="orgTitle">FLAWLESS GRAPHICS</div>
+                        <div class="brand-subtitle">Enterprise Academic Cloud</div>
+                    </div>
                 </div>
-                <div>
-                    <div class="brand-title" id="orgTitle">FLAWLESS GRAPHICS</div>
-                    <div class="brand-subtitle">Teacher & Classroom Network</div>
-                </div>
-            </div>
 
-            <div class="hero-text">
-                <h1>Welcome to your central <span>LUCY™ Management System</span></h1>
+                <div class="hero-text">
+                    <h1>World-Class <span>Institutional ERP</span> &amp; Learning Platform</h1>
+                    <p style="font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.5; margin-top: 8px;">
+                        Unified control plane connecting Super Admins, Educators, Scholars, Bursary Treasury, and Human Resources in real time.
+                    </p>
+                </div>
+
+                <div class="hero-features">
+                    <div class="hero-feat-pill">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>WAEC / National Curriculum Aligned</span>
+                    </div>
+                    <div class="hero-feat-pill">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Smart RFID Digital Identity Support</span>
+                    </div>
+                    <div class="hero-feat-pill">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Instant Bursary Clearance &amp; Payroll Engine</span>
+                    </div>
+                </div>
             </div>
 
             <div class="hero-footer-link">
-                <a href="#" class="link-subtle">
-                    <i class="fa-solid fa-circle-info"></i> System Requirements & Status
+                <a href="pages/public/services.html" class="link-subtle">
+                    <i class="fa-solid fa-circle-info"></i> View System Capabilities &amp; Architecture
                 </a>
             </div>
         </div>
 
-        <!-- Right Portal Actions Section -->
+        <!-- Right Portal Selection Section -->
         <div class="form-section">
-            <div class="card">
-                <div class="card-header">
-                    <h2>Select Workspace</h2>
-                    <div class="card-desc">Choose a portal to begin your active session</div>
+            <div>
+                <div class="section-heading">
+                    <div>
+                        <h2>Institutional Workstations</h2>
+                        <div class="desc">Select your designated portal to begin your active session</div>
+                    </div>
+                    <span style="font-size: 11px; color: #38bdf8; background: rgba(56, 189, 248, 0.1); padding: 4px 10px; border-radius: 9999px; border: 1px solid rgba(56, 189, 248, 0.2);">
+                        6 Workstations Online
+                    </span>
                 </div>
 
-                <div class="portal-actions">
-                    <!-- Super Admin Master Console -->
-                    <a href="pages/admin/admin-dashboard.html" class="btn-portal" id="portalAdminLink" style="background: linear-gradient(135deg, rgba(99, 91, 252, 0.35) 0%, rgba(6, 182, 212, 0.25) 100%); border: 1px solid rgba(99, 91, 252, 0.5); box-shadow: 0 4px 15px rgba(99, 91, 252, 0.25);">
-                        <div class="portal-info">
-                            <div class="portal-icon" style="background: linear-gradient(135deg, #635bfc 0%, #06b6d4 100%); color: #fff;">
+                <div class="portal-grid">
+                    <!-- 1. Super Admin Portal -->
+                    <a href="pages/admin/admin-dashboard.html" class="portal-card-btn" id="portalAdminLink">
+                        <div class="portal-card-top">
+                            <div class="portal-card-icon icon-admin">
                                 <i class="fa-solid fa-crown"></i>
                             </div>
-                            <div style="display:flex; flex-direction:column; gap:2px;">
-                                <span style="font-weight: 800; color:#fff;">Super Admin Portal</span>
-                                <span style="font-size: 11px; color: rgba(255,255,255,0.7);">Master Governance &amp; Multi-Tenant Console</span>
-                            </div>
+                            <span class="portal-badge-tag" style="background: rgba(99, 102, 241, 0.2); color: #a5b4fc;">Master</span>
                         </div>
-                        <i class="fa-solid fa-chevron-right arrow-icon" style="color: #635bfc;"></i>
+                        <div>
+                            <div class="portal-card-title">Super Admin Portal</div>
+                            <div class="portal-card-desc">Institutional governance, security &amp; multi-branch audit</div>
+                        </div>
+                        <div class="portal-card-footer">
+                            <span>Open Console</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </div>
                     </a>
 
-                    <!-- Continue to Website -->
-                    <a href="pages/public/home.html" class="btn-portal btn-primary">
-                        <div class="portal-info">
-                            <div class="portal-icon">
-                                <i class="fa-solid fa-globe"></i>
-                            </div>
-                            <span>Continue to Main Site</span>
-                        </div>
-                        <i class="fa-solid fa-arrow-right arrow-icon"></i>
-                    </a>
-
-                    <!-- HR Login & Registration -->
-                    <a href="pages/hr/hr-login.html" class="btn-portal btn-secondary" id="portalHrLink">
-                        <div class="portal-info">
-                            <div class="portal-icon">
-                                <i class="fa-solid fa-users-gear"></i>
-                            </div>
-                            <span>HR Management</span>
-                        </div>
-                        <i class="fa-solid fa-chevron-right arrow-icon"></i>
-                    </a>
-
-                    <!-- Teachers Login & Registration -->
-                    <a href="pages/teacher/teacher-login.html" class="btn-portal btn-secondary" id="portalTeacherLink">
-                        <div class="portal-info">
-                            <div class="portal-icon">
+                    <!-- 2. Teachers Portal -->
+                    <a href="pages/teacher/teacher-dashboard.html" class="portal-card-btn" id="portalTeacherLink">
+                        <div class="portal-card-top">
+                            <div class="portal-card-icon icon-teacher">
                                 <i class="fa-solid fa-chalkboard-user"></i>
                             </div>
-                            <span>Teachers Portal</span>
+                            <span class="portal-badge-tag" style="background: rgba(2, 132, 199, 0.2); color: #7dd3fc;">Faculty</span>
                         </div>
-                        <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                        <div>
+                            <div class="portal-card-title">Teachers Workstation</div>
+                            <div class="portal-card-desc">Live attendance, grading simulator &amp; lesson vaults</div>
+                        </div>
+                        <div class="portal-card-footer">
+                            <span>Open Workstation</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </div>
                     </a>
 
-                    <!-- Finance Login & Registration -->
-                    <a href="pages/finance/finance-login.html" class="btn-portal btn-secondary" id="portalFinanceLink">
-                        <div class="portal-info">
-                            <div class="portal-icon">
-                                <i class="fa-solid fa-wallet"></i>
-                            </div>
-                            <span>Finance Portal</span>
-                        </div>
-                        <i class="fa-solid fa-chevron-right arrow-icon"></i>
-                    </a>
-
-                    <!-- Student Portal -->
-                    <a href="pages/student/student-login.html" class="btn-portal btn-secondary" id="portalStudentLink" style="border-color: rgba(114, 239, 221, 0.35);">
-                        <div class="portal-info">
-                            <div class="portal-icon" style="background: rgba(114, 239, 221, 0.15); color: #72efdd;">
+                    <!-- 3. Student Portal -->
+                    <a href="pages/student/student-login.html" class="portal-card-btn" id="portalStudentLink">
+                        <div class="portal-card-top">
+                            <div class="portal-card-icon icon-student">
                                 <i class="fa-solid fa-graduation-cap"></i>
                             </div>
-                            <span>Student Portal</span>
+                            <span class="portal-badge-tag" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7;">Scholars</span>
                         </div>
-                        <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                        <div>
+                            <div class="portal-card-title">Student Academy</div>
+                            <div class="portal-card-desc">Smart RFID badge, WAEC simulator &amp; tuition ledger</div>
+                        </div>
+                        <div class="portal-card-footer">
+                            <span>Open Student Hub</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </div>
+                    </a>
+
+                    <!-- 4. Finance & Bursary Portal -->
+                    <a href="pages/finance/finance-dashboard.html" class="portal-card-btn" id="portalFinanceLink">
+                        <div class="portal-card-top">
+                            <div class="portal-card-icon icon-finance">
+                                <i class="fa-solid fa-wallet"></i>
+                            </div>
+                            <span class="portal-badge-tag" style="background: rgba(245, 158, 11, 0.2); color: #fcd34d;">Bursary</span>
+                        </div>
+                        <div>
+                            <div class="portal-card-title">Bursary &amp; Finance</div>
+                            <div class="portal-card-desc">Tuition ledger, exam clearance desk &amp; staff payroll</div>
+                        </div>
+                        <div class="portal-card-footer">
+                            <span>Open Treasury</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </div>
+                    </a>
+
+                    <!-- 5. HR Portal -->
+                    <a href="pages/hr/hr-dashboard.html" class="portal-card-btn" id="portalHrLink">
+                        <div class="portal-card-top">
+                            <div class="portal-card-icon icon-hr">
+                                <i class="fa-solid fa-users-gear"></i>
+                            </div>
+                            <span class="portal-badge-tag" style="background: rgba(236, 72, 153, 0.2); color: #f9a8d4;">Personnel</span>
+                        </div>
+                        <div>
+                            <div class="portal-card-title">Human Resources</div>
+                            <div class="portal-card-desc">Faculty directory, leave tracker &amp; appraisals</div>
+                        </div>
+                        <div class="portal-card-footer">
+                            <span>Open HR Hub</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </div>
+                    </a>
+
+                    <!-- 6. Public Web Portal -->
+                    <a href="pages/public/home.html" class="portal-card-btn">
+                        <div class="portal-card-top">
+                            <div class="portal-card-icon icon-public">
+                                <i class="fa-solid fa-globe"></i>
+                            </div>
+                            <span class="portal-badge-tag">Public</span>
+                        </div>
+                        <div>
+                            <div class="portal-card-title">Public Campus Site</div>
+                            <div class="portal-card-desc">Official institution homepage, prospectus &amp; inquiries</div>
+                        </div>
+                        <div class="portal-card-footer">
+                            <span>Visit Campus Site</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </div>
                     </a>
                 </div>
+            </div>
 
-                <div class="card-footer">
-                    <span style="color: rgba(255,255,255,0.5);">Session Active</span>
+            <div class="hub-bottom-bar">
+                <div style="display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.6);">
+                    <i class="fa-solid fa-lock" style="color: #10b981;"></i>
+                    <span>Authenticated Single Sign-On Active</span>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button type="button" onclick="openActivityRadarModal()"
+                        style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; font-size: 11.5px; font-weight: 700; padding: 6px 14px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
+                        <i class="fa-solid fa-wave-pulse"></i> Institutional Activity Radar
+                    </button>
                     <a href="site-login.html" class="btn-logout" onclick="logout()">
-                        <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+                        <i class="fa-solid fa-right-from-bracket"></i> Sign Out Session
                     </a>
                 </div>
             </div>
@@ -669,41 +763,137 @@
     </div>
 </div>
 
+<!-- MODAL: INSTITUTIONAL ACTIVITY RADAR & AUDIT LOG -->
+<div class="modal-overlay" id="activityRadarModal" onclick="if(event.target===this)closeActivityRadarModal()" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 20px;">
+    <div class="modal-box" style="background: #0B1120; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 25px 50px rgba(0,0,0,0.6); border-radius: 18px; max-width: 620px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 26px; color: #fff; position: relative;">
+        <button type="button" onclick="closeActivityRadarModal()" style="position: absolute; top: 18px; right: 18px; background: rgba(255,255,255,0.1); border: none; color: #fff; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-xmark"></i></button>
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(56,189,248,0.2); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                <i class="fa-solid fa-tower-broadcast"></i>
+            </div>
+            <div>
+                <h3 style="font-size: 19px; font-weight: 800; margin-bottom: 2px;">Institutional Activity Radar</h3>
+                <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin: 0;">Cross-portal audit stream &amp; real-time interaction telemetry</p>
+            </div>
+        </div>
+
+        <div id="activityRadarList" style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px;">
+            <!-- Rendered dynamically -->
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08);">
+            <span style="font-size: 11px; color: rgba(255,255,255,0.5);">Auto-synced with cloud database</span>
+            <button type="button" onclick="closeActivityRadarModal()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 7px 18px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">
+                Close Radar
+            </button>
+        </div>
+    </div>
+</div>
+
 <script src="assets/js/auth-session.js"></script>
+<script src="assets/js/realtime-bus.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+// Live Clock Updater
+function updateClock() {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-US', { hour12: false }) + " UTC";
+    const clockEl = document.getElementById("liveClock");
+    if (clockEl) clockEl.textContent = timeStr;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+function openActivityRadarModal() {
+    const modal = document.getElementById("activityRadarModal");
+    if (modal) {
+        modal.style.display = "flex";
+        renderActivityRadarList();
+    }
+}
+
+function closeActivityRadarModal() {
+    const modal = document.getElementById("activityRadarModal");
+    if (modal) modal.style.display = "none";
+}
+
+function renderActivityRadarList() {
+    const container = document.getElementById("activityRadarList");
+    if (!container) return;
+    const activities = window.LucyBus ? window.LucyBus.getRecentActivities(15) : [];
+    
+    if (!activities || activities.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 30px 10px; color: rgba(255,255,255,0.5); font-size: 12px;">
+                <i class="fa-solid fa-satellite-dish" style="font-size: 28px; margin-bottom: 8px; display: block; opacity: 0.4;"></i>
+                No logged activity events yet. Operations will stream here in real-time.
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = activities.map(act => `
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px; display: flex; gap: 12px; align-items: flex-start;">
+            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(56,189,248,0.15); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0;">
+                <i class="${window.LucyBus ? window.LucyBus.getEventIcon(act.type) : 'fa-solid fa-check'}"></i>
+            </div>
+            <div style="flex: 1; overflow: hidden;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                    <span style="font-size: 12.5px; font-weight: 800; color: #ffffff;">${act.title}</span>
+                    <span style="font-size: 10px; color: rgba(255,255,255,0.4);">${new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                </div>
+                <div style="font-size: 11.5px; color: rgba(255,255,255,0.7); line-height: 1.4;">${act.message}</div>
+                <div style="margin-top: 6px; display: flex; gap: 6px;">
+                    <span style="font-size: 9.5px; font-weight: 700; background: rgba(56,189,248,0.15); color: #7dd3fc; padding: 2px 7px; border-radius: 4px;">${act.module}</span>
+                    <span style="font-size: 9.5px; font-weight: 700; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); padding: 2px 7px; border-radius: 4px;">By: ${act.user || 'System'}</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Reactive listener when new activities occur
+function onActivityEvent() {
+    const modal = document.getElementById("activityRadarModal");
+    if (modal && modal.style.display === "flex") {
+        renderActivityRadarList();
+    }
+}
+window.addEventListener('lucy:activity', onActivityEvent);
+window.addEventListener('flawless:activity', onActivityEvent);
+
+document.addEventListener("DOMContentLoaded", async function() {
     try {
-        // Auto-synchronize session across all portals (HR, Teacher, Finance, Public)
-        const user = window.AuthSession ? window.AuthSession.requireAuth('site-login.html', true) : null;
-        if (user) {
-            // Display Active User Badge
-            if (user.name) {
-                document.getElementById("userName").textContent = user.name;
-                document.getElementById("userBadge").style.display = "flex";
+        let cloudOrgs = [];
+        if (window.SupabaseService) {
+            cloudOrgs = await window.SupabaseService.getOrganizations();
+        }
+        const orgTitle = document.getElementById("orgTitle");
+        const orgLogoBox = document.getElementById("orgLogoBox");
+        const userBadge = document.getElementById("userBadge");
+        const userName = document.getElementById("userName");
+
+        const user = window.AuthSession ? window.AuthSession.getUser() : null;
+        const validOrgNames = (cloudOrgs || []).map(o => (o.org_name || o.name || '').trim().toLowerCase());
+
+        if (user && user.org && validOrgNames.includes(user.org.trim().toLowerCase())) {
+            if (userName) userName.textContent = user.name || 'Administrator';
+            if (userBadge) userBadge.style.display = "flex";
+            if (orgTitle) orgTitle.textContent = user.org.toUpperCase();
+            if (user.logo && orgLogoBox) {
+                orgLogoBox.innerHTML = `<img src="${user.logo}" alt="${user.org}" style="width:100%; height:100%; object-fit:contain; border-radius:inherit;">`;
             }
-
-            // Display Registered Organization Name if available
-            if (user.org) {
-                document.getElementById("orgTitle").textContent = user.org.toUpperCase();
+        } else if (cloudOrgs && cloudOrgs.length > 0) {
+            const rootOrg = cloudOrgs[0];
+            const name = (rootOrg.org_name || rootOrg.name || 'FLAWLESS GRAPHICS').toUpperCase();
+            if (orgTitle) orgTitle.textContent = name;
+            if (rootOrg.logo_url && orgLogoBox) {
+                orgLogoBox.innerHTML = `<img src="${rootOrg.logo_url}" alt="${name}" style="width:100%; height:100%; object-fit:contain; border-radius:inherit;">`;
             }
-
-            // Display Saved Organization Logo if uploaded
-            if (user.logo) {
-                document.getElementById("orgLogoBox").innerHTML = `<img src="${user.logo}" alt="Organization Logo">`;
-            }
-
-            // Direct route to active dashboards for seamless authenticated navigation
-            const hrLink = document.getElementById("portalHrLink");
-            if (hrLink) hrLink.href = "pages/hr/hr-dashboard.html";
-
-            const teacherLink = document.getElementById("portalTeacherLink");
-            if (teacherLink) teacherLink.href = "pages/teacher/teacher-dashboard.html";
-
-            const financeLink = document.getElementById("portalFinanceLink");
-            if (financeLink) financeLink.href = "pages/finance/finance-dashboard.html";
+        } else {
+            if (orgTitle) orgTitle.textContent = "ORGANIZATION PLATFORM";
         }
     } catch (e) {
-        console.warn("Could not parse user session details:", e);
+        console.warn("Could not load organization session details:", e);
     }
 });
 
@@ -717,11 +907,9 @@ function logout() {
 }
 </script>
 
-<!-- Short Skeletal Loading Script -->
+<!-- Scripts -->
 <script src="assets/js/skeleton-loader.js"></script>
-<!-- Floating Quick Assistant Script -->
 <script src="assets/js/quick-assistant.js"></script>
-  <!-- Floating 3-Dots Quick Dock Script -->
-  <script src="assets/js/quick-dock.js"></script>
+<script src="assets/js/quick-dock.js"></script>
 </body>
 </html>

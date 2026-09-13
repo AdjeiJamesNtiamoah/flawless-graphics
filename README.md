@@ -1,4 +1,4 @@
-﻿# FLAWLESS GRAPHICS — LUCY™ Enterprise Management System
+# FLAWLESS GRAPHICS Enterprise Management System
 
 An integrated, modular web-based organizational management platform featuring multi-tenant registration, human resources administration, teacher and classroom management, and financial control.
 
@@ -65,21 +65,23 @@ flawless-graphics/
 │   └── finance/                     # Finance & Accounting Portal
 │       ├── finance-dashboard.html   # Financial ledger, payroll & budgeting
 │       └── finance-login.html       # Finance administration login
-├── index.html                       # Master Organization Onboarding & Registration
-├── site-login.html                  # Master Organization Sign In
-├── welcome.html                     # Central Workspace Selector & Navigation Hub
+├── index.html                       # Master Project Display, Architecture Showcase & Landing Gateway
+├── register.html                    # Master Institution Registration & Onboarding
+├── welcome.html                     # Central Unified Executive Workspace Selector & Multi-Role Hub
+├── site-login.html                  # Master Institutional Sign In & Dual-Mode Auth
 ├── manifest.json                    # PWA Web Application Manifest
 └── README.md                        # Documentation & Architecture Overview
 ```
 
 ---
 
-## 🚀 Key Modules & Capabilities
+## 🚀 Key Modules & Navigation Flow
 
-### 1. Master Onboarding & Authentication
-- **Organization Registration (`index.html`)**: Interactive Mac-inspired window UI for registering company details, uploading brand logos, and creating master admin credentials.
-- **Organization Sign In (`site-login.html`)**: SHA-256 encrypted authentication with session persistence.
-- **Central Workspace Hub (`welcome.html`)**: Dynamic workspace switcher granting access to Public Site, HR Portal, Teacher Portal, and Finance Portal.
+### 1. User Journey & Master Flow Architecture
+- **Master Platform Showcase (`index.html`)**: The premier entry gateway displaying platform capabilities, live system KPIs, the 6 core pillars, and seamless routing to registration, login, and the executive hub.
+- **Institution Onboarding (`register.html`)**: Interactive Mac-inspired window UI for registering school details, uploading brand logos, configuring master Super Admin credentials with OTP verification, and transitioning to the executive hub.
+- **Unified Executive Hub (`welcome.html`)**: Central switchboard routing authenticated personnel to Super Admin, Teacher, Student, Finance, and HR workstations.
+- **Institutional Gateway (`site-login.html`)**: SHA-256 encrypted multi-role authentication with OTP verification.
 
 ### 2. Public Facing Website (`pages/public/`)
 - Modern, animated responsive website showcasing company services, live KPI counters, department payroll summaries, and contact channels.

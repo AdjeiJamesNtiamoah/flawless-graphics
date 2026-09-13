@@ -5,7 +5,6 @@ const path = require('path');
 function checkHtmlFile(filePath) {
   console.log(`Checking ${path.basename(filePath)}...`);
   const html = fs.readFileSync(filePath, 'utf8');
-  // Match script blocks without src
   const scriptRegex = /<script\b(?![^>]*\bsrc\b)[^>]*>([\s\S]*?)<\/script>/gi;
   let match;
   let count = 0;
@@ -22,6 +21,16 @@ function checkHtmlFile(filePath) {
   }
 }
 
-checkHtmlFile('d:/flawless-graphics/pages/hr/hr-dashboard.html');
-checkHtmlFile('d:/flawless-graphics/pages/admin/admin-dashboard.html');
-checkHtmlFile('d:/flawless-graphics/pages/teacher/teacher-dashboard.html');
+const files = [
+  'd:/flawless-graphics/site-login.html',
+  'd:/flawless-graphics/pages/student/student-login.html',
+  'd:/flawless-graphics/pages/teacher/teacher-login.html',
+  'd:/flawless-graphics/pages/hr/hr-login.html',
+  'd:/flawless-graphics/pages/finance/finance-login.html',
+  'd:/flawless-graphics/pages/hr/hr-dashboard.html',
+  'd:/flawless-graphics/pages/admin/admin-dashboard.html',
+  'd:/flawless-graphics/pages/teacher/teacher-dashboard.html'
+];
+
+files.forEach(f => checkHtmlFile(f));
+console.log('🎉 ALL SCRIPTS HAVE PERFECT SYNTAX!');

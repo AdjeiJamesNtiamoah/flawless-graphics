@@ -1,0 +1,3125 @@
+const fs = require('fs');
+const path = require('path');
+
+const targetFile = path.join(__dirname, '..', 'pages', 'finance', 'finance-dashboard.html');
+
+const htmlContent = `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FLAWLESS GRAPHICS — Financial & Bursary Control System</title>
+
+  <!-- Route Guard Check via Unified AuthSession -->
+  <script src="../../assets/js/auth-session.js"></script>
+  <script>
+    (function() {
+      const user = window.AuthSession ? window.AuthSession.requireAuth('finance-login.html', true) : null;
+    })();
+  </script>
+
+  <!-- Supabase Cloud Integration -->
+  <script src="../../assets/js/supabase-config.js"></script>
+  <script src="../../assets/js/supabase-client.js"></script>
+
+  <!-- Typography & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Animations & Charts -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <!-- Short Skeletal Loading Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/skeleton.css">
+  <!-- Floating Quick Assistant Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
+  <!-- Floating 3-Dots Quick Dock Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/quick-dock.css">
+  <!-- Pop-up Toaster System -->
+  <link rel="stylesheet" href="../../assets/css/toaster.css">
+  <script src="../../assets/js/toaster.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --bg-outer: #FAF7F2;
+      --card-bg: rgba(255, 255, 255, 0.98);
+      --card-border: #E2DDD5;
+      --nav-bg: #0B1120;
+      --nav-hover: rgba(255, 255, 255, 0.09);
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --accent: #2563EB;
+      --accent-gradient: linear-gradient(135deg, #2563EB 0%, #06B6D4 100%);
+      --glass-glow: rgba(37, 99, 235, 0.08);
+      --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
+      --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.06);
+      --shadow-lg: 0 16px 36px rgba(15, 23, 42, 0.08);
+      --radius-xl: 20px;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --success: #10B981;
+      --danger: #EF4444;
+      --warning: #F59E0B;
+      --purple: #8B5CF6;
+      --input-bg: #FFFFFF;
+      --input-border: #CBD5E1;
+    }
+
+    .dark {
+      --bg-outer: #0F172A;
+      --card-bg: rgba(30, 41, 59, 0.95);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --nav-bg: #070B14;
+      --nav-hover: rgba(255, 255, 255, 0.08);
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --accent: #38BDF8;
+      --accent-gradient: linear-gradient(135deg, #0284C7 0%, #6366F1 100%);
+      --glass-glow: rgba(56, 189, 248, 0.12);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 20px 45px rgba(0, 0, 0, 0.6);
+      --input-bg: rgba(15, 23, 42, 0.8);
+      --input-border: rgba(255, 255, 255, 0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease; }
+
+    body {
+      background-color: var(--bg-outer);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient background glow */
+    body::before, body::after {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: var(--accent-gradient);
+      filter: blur(140px);
+      opacity: 0.07;
+      z-index: -1;
+      pointer-events: none;
+    }
+    body::before { top: -100px; left: -100px; }
+    body::after { bottom: 0; right: -100px; }
+
+    /* VERTICAL LEFT SIDEBAR */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 270px;
+      height: 100vh;
+      z-index: 1000;
+      backdrop-filter: blur(16px);
+      background: var(--nav-bg);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 22px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+      color: #fff;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 18px;
+      width: 100%;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+      padding: 4px 8px;
+    }
+    .brand:hover .logo-circle { transform: scale(1.05) rotate(-3deg); }
+    .logo-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+      transition: transform 0.25s ease;
+      flex-shrink: 0;
+    }
+    header h1 { font-size: 13.5px; font-weight: 800; letter-spacing: 0.5px; margin: 0; line-height: 1.2; }
+    .brand-sub { font-size: 10px; color: #94A3B8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .session-badge {
+      background: rgba(37, 99, 235, 0.15);
+      border: 1px solid rgba(37, 99, 235, 0.35);
+      color: #60A5FA;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    nav { width: 100%; margin-top: 4px; }
+    nav ul { list-style: none; display: flex; flex-direction: column; gap: 4px; width: 100%; margin: 0; padding: 0; }
+    nav li { width: 100%; }
+    nav a {
+      color: #94A3B8;
+      text-decoration: none;
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+    nav a i { width: 18px; text-align: center; font-size: 14px; opacity: 0.85; }
+    nav a:hover {
+      color: #FFFFFF;
+      background: var(--nav-hover);
+      transform: translateX(3px);
+    }
+    nav a.active {
+      color: #FFFFFF;
+      background: var(--accent-gradient);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+      font-weight: 700;
+    }
+    nav a.active i { opacity: 1; }
+
+    .nav-divider {
+      font-size: 10px;
+      font-weight: 800;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 10px 10px 4px 10px;
+    }
+
+    .header-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+      margin-top: auto;
+      width: 100%;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .btn-action {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .btn-action:hover {
+      background: rgba(255, 255, 255, 0.14);
+      transform: translateY(-1px);
+    }
+    .btn-action.logout:hover { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #EF4444; }
+    .btn-action.success-btn { background: var(--success); border: none; color: #fff; }
+    .btn-action.success-btn:hover { background: #059669; }
+    .btn-action.warning-btn { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #F59E0B; }
+    .btn-action.warning-btn:hover { background: rgba(245, 158, 11, 0.25); }
+
+    /* TOP STATS BAR IN MAIN */
+    .top-bursary-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 14px 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* MAIN WORKSPACE LAYOUT */
+    main {
+      margin-left: 270px;
+      max-width: calc(100% - 270px);
+      width: calc(100% - 270px);
+      margin-top: 20px;
+      margin-bottom: 32px;
+      padding: 0 28px;
+      flex: 1;
+      box-sizing: border-box;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .glass-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .page-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .page-title h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+
+    /* METRICS GRID */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .metric-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 18px 16px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.25s ease;
+    }
+    .metric-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: rgba(37, 99, 235, 0.4);
+    }
+    .metric-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: var(--glass-glow);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .metric-info .label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .metric-info .val {
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    /* BUDGET / TERM PROGRESS BAR */
+    .budget-progress-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow-sm);
+    }
+    .budget-bar-track {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.2);
+      overflow: hidden;
+      margin-top: 10px;
+      position: relative;
+    }
+    .budget-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #10B981, #06B6D4, #2563EB);
+      width: 0%;
+      transition: width 1s ease;
+    }
+    .live-pulse {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #10B981;
+      background: rgba(16, 185, 129, 0.12);
+      padding: 3px 8px;
+      border-radius: 20px;
+    }
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10B981;
+      animation: pulse 1.6s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.9); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.4; }
+      100% { transform: scale(0.9); opacity: 1; }
+    }
+
+    /* CHARTS */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr;
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+    @media (max-width: 1100px) {
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+
+    /* TABLES */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      background: var(--card-bg);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+    th {
+      background: rgba(15, 23, 42, 0.03);
+      padding: 12px 14px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .dark th { background: rgba(255, 255, 255, 0.03); }
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--card-border);
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: rgba(37, 99, 235, 0.02); }
+
+    /* STATUS BADGES */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .badge.success { background: rgba(16, 185, 129, 0.12); color: #059669; }
+    .badge.pending { background: rgba(245, 158, 11, 0.14); color: #D97706; }
+    .badge.danger { background: rgba(239, 68, 68, 0.12); color: #DC2626; }
+    .badge.info { background: rgba(37, 99, 235, 0.12); color: #2563EB; }
+    .badge.purple { background: rgba(139, 92, 246, 0.12); color: #7C3AED; }
+
+    /* FILTER PILLS */
+    .filter-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .filter-pill {
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .filter-pill:hover { border-color: var(--accent); color: var(--text-main); }
+    .filter-pill.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    }
+
+    /* FORMS & INPUTS */
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 11.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .form-input, .form-select, .chat-search {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text-main);
+      font-size: 13px;
+      outline: none;
+      box-sizing: border-box;
+    }
+    .form-input:focus, .form-select:focus, .chat-search:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--glass-glow);
+    }
+
+    /* MODAL SYSTEM */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 540px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 26px;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+    }
+
+    /* CHAT WORKSTATION */
+    .chat-layout { display: grid; grid-template-columns: 260px 1fr; height: 500px; border: 1px solid var(--card-border); border-radius: var(--radius-lg); overflow: hidden; }
+    .chat-sidebar { border-right: 1px solid var(--card-border); padding: 14px; background: rgba(15, 23, 42, 0.02); display: flex; flex-direction: column; }
+    .contact-list { list-style: none; overflow-y: auto; flex: 1; margin-top: 10px; }
+    .contact-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: var(--radius-md); cursor: pointer; margin-bottom: 4px; }
+    .contact-item:hover, .contact-item.active { background: rgba(37, 99, 235, 0.08); }
+    .contact-item.active .name { color: var(--accent); font-weight: 700; }
+    .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--accent-gradient); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; position: relative; flex-shrink: 0; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #10B981; position: absolute; bottom: 0; right: 0; border: 2px solid #fff; }
+    .chat-window { display: flex; flex-direction: column; background: var(--card-bg); }
+    .chat-header { padding: 14px 18px; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; }
+    .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .message-bubble { max-width: 75%; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.4; }
+    .message-bubble.incoming { background: rgba(15, 23, 42, 0.05); align-self: flex-start; }
+    .message-bubble.outgoing { background: var(--accent-gradient); color: #fff; align-self: flex-end; }
+    .message-time { font-size: 10px; opacity: 0.7; margin-top: 4px; text-align: right; }
+    .chat-input-area { display: flex; gap: 10px; padding: 12px; border-top: 1px solid var(--card-border); }
+    .chat-input { flex: 1; padding: 10px 14px; border-radius: 20px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-main); outline: none; font-size: 13px; }
+
+    /* AUDIT TRAIL */
+    .audit-list { list-style: none; }
+    .audit-item { padding: 10px 14px; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; }
+    .audit-item:last-child { border-bottom: none; }
+
+    /* PRINT RECEIPT / VOUCHER STYLING */
+    @media print {
+      body * { visibility: hidden; }
+      #printableReceiptArea, #printableReceiptArea *,
+      #printableHallPassArea, #printableHallPassArea *,
+      #printablePayslipArea, #printablePayslipArea *,
+      #printableReminderArea, #printableReminderArea * { visibility: visible; }
+      #printableReceiptArea, #printableHallPassArea, #printablePayslipArea, #printableReminderArea {
+        position: absolute; left: 0; top: 0; width: 100%; color: #000; background: #fff; padding: 20px;
+      }
+      .no-print { display: none !important; }
+    }
+
+    footer {
+      margin-left: 270px;
+      max-width: calc(100% - 270px);
+      width: calc(100% - 270px);
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--card-border);
+      box-sizing: border-box;
+    }
+
+    @media (max-width: 960px) {
+      header {
+        position: static;
+        width: 100%;
+        height: auto;
+      }
+      .header-left { flex-direction: row; flex-wrap: wrap; }
+      nav ul { flex-direction: row; flex-wrap: wrap; }
+      nav a { width: auto; }
+      .header-actions { flex-direction: row; flex-wrap: wrap; }
+      main, footer {
+        margin-left: 0;
+        max-width: 100%;
+        width: 100%;
+        padding: 0 16px;
+      }
+      .chat-layout { grid-template-columns: 1fr; height: auto; }
+      .chat-sidebar { height: 200px; }
+      .chat-window { height: 350px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Short Skeletal Loading Placeholder -->
+<div id="skeletonLoader" class="skeleton-dashboard-overlay">
+  <aside class="skeleton-sidebar">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+      <div class="skeleton-shimmer-dark" style="width: 40px; height: 40px; border-radius: 10px;"></div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div class="skeleton-shimmer-dark" style="width: 120px; height: 16px; border-radius: 4px;"></div>
+        <div class="skeleton-shimmer-dark" style="width: 90px; height: 11px; border-radius: 4px;"></div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px;">
+      <div class="skeleton-shimmer-dark" style="height: 38px; border-radius: 10px;"></div>
+      <div class="skeleton-shimmer-dark" style="height: 38px; border-radius: 10px;"></div>
+      <div class="skeleton-shimmer-dark" style="height: 38px; border-radius: 10px;"></div>
+      <div class="skeleton-shimmer-dark" style="height: 38px; border-radius: 10px;"></div>
+      <div class="skeleton-shimmer-dark" style="height: 38px; border-radius: 10px;"></div>
+    </div>
+  </aside>
+
+  <main class="skeleton-main">
+    <div class="skeleton-topbar">
+      <div>
+        <div class="skeleton-shimmer-light" style="width: 210px; height: 26px; border-radius: 6px; margin-bottom: 6px;"></div>
+        <div class="skeleton-shimmer-light" style="width: 290px; height: 13px; border-radius: 4px;"></div>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <div class="skeleton-shimmer-light" style="width: 140px; height: 36px; border-radius: 10px;"></div>
+        <div class="skeleton-shimmer-light" style="width: 130px; height: 36px; border-radius: 10px;"></div>
+      </div>
+    </div>
+
+    <div class="skeleton-kpis">
+      <div class="skeleton-kpi-card"><div class="skeleton-shimmer-light" style="width: 44px; height: 44px; border-radius: 12px;"></div><div style="flex:1; display:flex; flex-direction:column; gap:6px;"><div class="skeleton-shimmer-light" style="width:75px; height:10px;"></div><div class="skeleton-shimmer-light" style="width:85px; height:20px;"></div></div></div>
+      <div class="skeleton-kpi-card"><div class="skeleton-shimmer-light" style="width: 44px; height: 44px; border-radius: 12px;"></div><div style="flex:1; display:flex; flex-direction:column; gap:6px;"><div class="skeleton-shimmer-light" style="width:70px; height:10px;"></div><div class="skeleton-shimmer-light" style="width:65px; height:20px;"></div></div></div>
+      <div class="skeleton-kpi-card"><div class="skeleton-shimmer-light" style="width: 44px; height: 44px; border-radius: 12px;"></div><div style="flex:1; display:flex; flex-direction:column; gap:6px;"><div class="skeleton-shimmer-light" style="width:80px; height:10px;"></div><div class="skeleton-shimmer-light" style="width:90px; height:20px;"></div></div></div>
+      <div class="skeleton-kpi-card"><div class="skeleton-shimmer-light" style="width: 44px; height: 44px; border-radius: 12px;"></div><div style="flex:1; display:flex; flex-direction:column; gap:6px;"><div class="skeleton-shimmer-light" style="width:85px; height:10px;"></div><div class="skeleton-shimmer-light" style="width:75px; height:20px;"></div></div></div>
+    </div>
+  </main>
+</div>
+
+  <!-- HEADER / VERTICAL SIDEBAR -->
+  <header>
+    <div class="header-left">
+      <a href="../../welcome.html" class="brand">
+        <div class="logo-circle">FG</div>
+        <div>
+          <h1>FLAWLESS GRAPHICS</h1>
+          <div class="brand-sub">Office of the Bursar</div>
+        </div>
+      </a>
+
+      <!-- Active Academic Session Badge -->
+      <div class="session-badge">
+        <span><i class="fa-solid fa-graduation-cap"></i> AY 2026/2027</span>
+        <span style="font-weight: 800; color: #10B981;">• TERM 2</span>
+      </div>
+
+      <nav>
+        <div class="nav-divider">Bursary Operations</div>
+        <ul>
+          <li><a id="navDashboard" class="active" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-pie"></i> Treasury & Hub</a></li>
+          <li><a id="navStudentBilling" onclick="switchTab('studentBilling')"><i class="fa-solid fa-receipt"></i> Student Fees & Billing</a></li>
+          <li><a id="navClearanceDesk" onclick="switchTab('clearanceDesk')"><i class="fa-solid fa-id-card-clip"></i> Exam Clearance Desk</a></li>
+          <li><a id="navApproval" onclick="switchTab('approval')"><i class="fa-solid fa-file-invoice-dollar"></i> Faculty & Staff Payroll</a></li>
+        </ul>
+
+        <div class="nav-divider">Institutional Control</div>
+        <ul>
+          <li><a id="navFeeTariff" onclick="switchTab('feeTariff')"><i class="fa-solid fa-table-list"></i> Fee Tariff Schedule</a></li>
+          <li><a id="navScholarships" onclick="switchTab('scholarships')"><i class="fa-solid fa-award"></i> Scholarships & Grants</a></li>
+          <li><a id="navMessaging" onclick="switchTab('messaging')"><i class="fa-solid fa-comments"></i> Bursary Chat</a></li>
+          <li><a id="navSettings" onclick="switchTab('settings')"><i class="fa-solid fa-sliders"></i> System Settings</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="header-actions">
+      <!-- Live Sync Status Badge -->
+      <button class="btn-action" id="cloudSyncBtn" onclick="openCloudModal()" title="Supabase Cloud Synchronization" style="border: 1px solid rgba(16, 185, 129, 0.4); color: #10b981; background: rgba(16, 185, 129, 0.08); border-radius: 9999px; padding: 6px 12px; font-weight: 700; font-size: 11.5px; display: inline-flex; align-items: center; gap: 7px; cursor: pointer;">
+        <i class="fa-solid fa-cloud" id="cloudSyncIcon"></i> <span id="cloudSyncLabel">Connect Supabase</span>
+      </button>
+
+      <!-- Notifications Arrived Trigger -->
+      <button class="btn-action" id="financeTopbarNotifBtn" onclick="if(window.QuickDock){window.QuickDock.openNotifications();}" title="Notifications Arrived" style="border: 1px solid rgba(251, 191, 36, 0.4); color: #fbbf24; background: rgba(251, 191, 36, 0.08); border-radius: 9999px; padding: 6px 12px; font-weight: 700; font-size: 11.5px; display: inline-flex; align-items: center; gap: 7px; cursor: pointer;">
+        <i class="fa-solid fa-bell"></i> <span>Notifications</span>
+        <span id="financeTopbarNotifBadge" style="background:#fbbf24; color:#0f172a; padding:1px 6px; font-size:10.5px; font-weight:800; border-radius:10px;">0</span>
+      </button>
+
+      <!-- Currency Switcher -->
+      <div style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; padding: 2px 8px;">
+        <span style="font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.6); margin-right: 4px;">CURR:</span>
+        <select id="currSelect" onchange="changeCurrency(this.value)" style="background: transparent; border: none; color: #fff; font-size: 11.5px; font-weight: 700; cursor: pointer; outline: none;">
+          <option value="GHS" style="background:#0b0f19; color:#fff;">GHS (GH₵)</option>
+          <option value="USD" style="background:#0b0f19; color:#fff;">USD ($)</option>
+          <option value="EUR" style="background:#0b0f19; color:#fff;">EUR (€)</option>
+          <option value="GBP" style="background:#0b0f19; color:#fff;">GBP (£)</option>
+        </select>
+      </div>
+
+      <button class="btn-action" id="themeBtn" onclick="toggleTheme()">
+        <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
+      </button>
+
+      <button class="btn-action logout" id="logoutBtn" onclick="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main>
+    <!-- TOP STATS BAR -->
+    <div class="top-bursary-bar" data-aos="fade-down" data-aos-duration="500">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <div class="org-badge" id="displayOrg" style="font-size: 12px; background: var(--glass-glow); border: 1px solid var(--card-border); padding: 5px 12px; border-radius: 20px; font-weight: 700; color: var(--accent);">
+          <i class="fa-solid fa-school"></i> Institution: Flawless Graphics Academy
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted);">
+          <span>Academic Term:</span>
+          <select id="termSelect" onchange="switchAcademicTerm(this.value)" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-main); font-weight: 700; font-size: 12px; border-radius: 6px; padding: 4px 8px; outline: none; cursor: pointer;">
+            <option value="Term 2">2026/2027 • Term 2 (Current Active)</option>
+            <option value="Term 1">2026/2027 • Term 1 (Archived)</option>
+            <option value="Term 3">2026/2027 • Term 3 (Upcoming Billing)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <button class="btn-action success-btn" style="padding: 7px 14px; font-size: 12px; width:auto;" onclick="openModal('studentFeeModal')">
+          <i class="fa-solid fa-receipt"></i> Collect Student Fee
+        </button>
+        <button class="btn-action" style="background: var(--accent-gradient); padding: 7px 14px; font-size: 12px; width:auto;" onclick="openPrepareSalaryModal()">
+          <i class="fa-solid fa-hand-holding-dollar"></i> Prepare Payroll
+        </button>
+        <button class="btn-action warning-btn" style="padding: 7px 14px; font-size: 12px; width:auto;" onclick="openModal('invoiceModal')">
+          <i class="fa-solid fa-file-invoice"></i> Generate Invoice
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 1. WORKSTATION: TREASURY & OVERVIEW HUB   -->
+    <!-- ========================================== -->
+    <div id="tabDashboard" class="tab-content active">
+      <div class="page-title">
+        <div>
+          <h2>Institutional Treasury & Financial Overview</h2>
+          <div style="font-size:13px; color:var(--text-muted)">Real-time ledger overview, tuition realization, staff compensation & liquidity</div>
+        </div>
+      </div>
+
+      <!-- 6 METRICS CARDS -->
+      <div class="metrics-grid" data-aos="fade-up" data-aos-duration="600">
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fa-solid fa-vault"></i></div>
+          <div class="metric-info">
+            <div class="label">Operating Budget (Annual)</div>
+            <div class="val"><span class="curr">GH₵</span> <span id="valBudget">650,000.00</span></div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon" style="color:#10B981; background:rgba(16,185,129,0.12)"><i class="fa-solid fa-graduation-cap"></i></div>
+          <div class="metric-info">
+            <div class="label">Tuition Fees Collected</div>
+            <div class="val"><span class="curr">GH₵</span> <span id="valTotalFees">184,500.00</span></div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon" style="color:#EF4444; background:rgba(239,68,68,0.12)"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+          <div class="metric-info">
+            <div class="label">Outstanding Arrears</div>
+            <div class="val"><span class="curr">GH₵</span> <span id="valArrears">48,200.00</span></div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon" style="color:#8B5CF6; background:rgba(139,92,246,0.12)"><i class="fa-solid fa-award"></i></div>
+          <div class="metric-info">
+            <div class="label">Bursary Aid Disbursed</div>
+            <div class="val"><span class="curr">GH₵</span> <span id="valScholarships">32,500.00</span></div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon" style="color:#F59E0B; background:rgba(245,158,11,0.12)"><i class="fa-solid fa-users-gear"></i></div>
+          <div class="metric-info">
+            <div class="label">Staff Payroll (Monthly)</div>
+            <div class="val"><span class="curr">GH₵</span> <span id="valPayroll">36,200.00</span></div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon" style="color:#06B6D4; background:rgba(6,182,212,0.12)"><i class="fa-solid fa-piggy-bank"></i></div>
+          <div class="metric-info">
+            <div class="label">Institutional Net Liquidity</div>
+            <div class="val"><span class="curr">GH₵</span> <span id="valLiquidity">512,800.00</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TERM TUITION REALIZATION PROGRESS BAR -->
+      <div class="budget-progress-container" data-aos="fade-up" data-aos-duration="650">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="live-pulse"><span class="live-dot"></span> LIVE TREASURY</div>
+            <strong style="font-size: 13.5px;">Term 2 Tuition Realization Progress (Collection Target: <span class="curr">GH₵</span> 200,000.00)</strong>
+          </div>
+          <div style="font-size: 12.5px; color: var(--text-muted);">
+            Realized Inflow: <strong><span class="curr">GH₵</span> <span id="budgetSpentVal">184,500.00</span></strong> / <span class="curr">GH₵</span> 200,000.00 
+            (<span id="budgetPercentVal" style="color: #10B981; font-weight: 800;">92.3%</span> Collected)
+          </div>
+        </div>
+        <div class="budget-bar-track">
+          <div class="budget-bar-fill" id="budgetBarFill" style="width: 92.3%;"></div>
+        </div>
+      </div>
+
+      <!-- CHARTS -->
+      <div class="charts-grid">
+        <div class="glass-card" data-aos="fade-right" data-aos-duration="700">
+          <h3 style="font-size:15px; font-weight:800; margin-bottom:14px;"><i class="fa-solid fa-chart-line"></i> Institutional Cash Flow (2026 Academic Year)</h3>
+          <div style="position:relative; width:100%; height:250px;">
+            <canvas id="cashFlowChart"></canvas>
+          </div>
+        </div>
+
+        <div class="glass-card" data-aos="fade-left" data-aos-duration="700">
+          <h3 style="font-size:15px; font-weight:800; margin-bottom:14px;"><i class="fa-solid fa-chart-pie"></i> Institutional Expenditure Allocation</h3>
+          <div style="position:relative; width:100%; height:250px;">
+            <canvas id="expenseAllocationChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECENT GENERAL LEDGER TRANSACTIONS TABLE -->
+      <div class="glass-card" data-aos="fade-up" data-aos-duration="750">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h3 style="font-size:16px; font-weight:800;">General Ledger & Institutional Disbursements</h3>
+            <div style="font-size:12px; color:var(--text-muted)">Accounts payable, departmental logistics, and capital expenditures</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button class="btn-action" style="padding:7px 12px; font-size:12px; width:auto;" onclick="exportLedgerCSV()"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+            <button class="btn-action" style="background:var(--accent-gradient); padding:7px 14px; font-size:12px; width:auto;" onclick="openModal('disbursementModal')">+ Record Expense</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Voucher #</th>
+                <th>Expense Category</th>
+                <th>Beneficiary / Vendor</th>
+                <th>Date</th>
+                <th>Amount (<span class="curr">GHS</span>)</th>
+                <th>Payment Mode</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="transactionBody">
+              <tr>
+                <td><strong>#TR-8924</strong></td>
+                <td>Adobe Campus Software Licenses</td>
+                <td>Adobe Systems Africa</td>
+                <td>2026-08-28</td>
+                <td>8,400.00</td>
+                <td>Bank Transfer</td>
+                <td><span class="badge success"><i class="fa-solid fa-check"></i> Certified Paid</span></td>
+              </tr>
+              <tr>
+                <td><strong>#TR-8923</strong></td>
+                <td>Design Studio Apple Workstation Care</td>
+                <td>iStore Ghana Tech</td>
+                <td>2026-08-25</td>
+                <td>4,650.00</td>
+                <td>Corporate Cheque</td>
+                <td><span class="badge success"><i class="fa-solid fa-check"></i> Certified Paid</span></td>
+              </tr>
+              <tr>
+                <td><strong>#TR-8922</strong></td>
+                <td>Campus High-Speed Fiber Optics</td>
+                <td>Telecel Enterprise</td>
+                <td>2026-08-20</td>
+                <td>2,200.00</td>
+                <td>Direct Debit</td>
+                <td><span class="badge success"><i class="fa-solid fa-check"></i> Certified Paid</span></td>
+              </tr>
+              <tr>
+                <td><strong>#TR-8921</strong></td>
+                <td>Faculty & Staff Payroll Disbursement</td>
+                <td>Stanbic Bank Payroll Clearing</td>
+                <td>2026-08-01</td>
+                <td id="tablePayrollVal">36,200.00</td>
+                <td>ACH Wire Transfer</td>
+                <td><span class="badge success"><i class="fa-solid fa-check"></i> Processed</span></td>
+              </tr>
+              <tr>
+                <td><strong>#TR-8920</strong></td>
+                <td>Library Print Compendiums & Art Books</td>
+                <td>Epp Books Services Accra</td>
+                <td>2026-07-28</td>
+                <td>3,150.00</td>
+                <td>Mobile Money</td>
+                <td><span class="badge pending"><i class="fa-solid fa-clock"></i> Audit Verification</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 2. WORKSTATION: STUDENT BILLING & FEES     -->
+    <!-- ========================================== -->
+    <div id="tabStudentBilling" class="tab-content">
+      <div class="page-title">
+        <div>
+          <h2>Student Accounts & Bursary Billing Ledger</h2>
+          <div style="font-size:13px; color:var(--text-muted)">Monitor student tuition fees, lab dues, outstanding balances, and issue official receipts</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <button class="btn-action success-btn" style="padding:8px 16px; font-size:12px; width:auto;" onclick="openModal('studentFeeModal')">
+            <i class="fa-solid fa-plus-circle"></i> Record Fee Payment
+          </button>
+          <button class="btn-action" style="padding:8px 14px; font-size:12px; width:auto;" onclick="exportFeeCSV()">
+            <i class="fa-solid fa-file-csv"></i> Export Student Ledger
+          </button>
+        </div>
+      </div>
+
+      <!-- STUDENT BILLING SEARCH & FILTERS -->
+      <div class="glass-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+          <div style="display:flex; gap:10px; flex:1; max-width:480px;">
+            <input type="text" id="feeSearchInput" placeholder="Search by student name, roll number, or receipt #..." oninput="filterFeeRecords()" class="chat-search" style="font-size:12.5px;">
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <select id="feeGradeFilter" onchange="filterFeeRecords()" class="form-select" style="width:auto; font-size:12px; padding:6px 12px;">
+              <option value="All">All Grades / Levels</option>
+              <option value="Level 100">Level 100 / Grade 10</option>
+              <option value="Level 200">Level 200 / Grade 11</option>
+              <option value="Level 300">Level 300 / Grade 12</option>
+            </select>
+            <select id="feeStatusFilter" onchange="filterFeeRecords()" class="form-select" style="width:auto; font-size:12px; padding:6px 12px;">
+              <option value="All">All Financial Statuses</option>
+              <option value="Cleared">Cleared (Full Payment)</option>
+              <option value="Partial">Partial Payment</option>
+              <option value="Arrears">Arrears / Defaulter</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="filter-pills">
+          <button class="filter-pill active" onclick="filterFeeCategory('All', this)">All Categories</button>
+          <button class="filter-pill" onclick="filterFeeCategory('Tuition Fee', this)">Tuition Fees</button>
+          <button class="filter-pill" onclick="filterFeeCategory('Facility & Lab Fee', this)">Facility & Lab</button>
+          <button class="filter-pill" onclick="filterFeeCategory('Examination Fee', this)">Examination Fee</button>
+          <button class="filter-pill" onclick="filterFeeCategory('Library Fee', this)">Library & Dues</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Receipt ID</th>
+                <th>Student Name</th>
+                <th>Roll / ID #</th>
+                <th>Grade / Class</th>
+                <th>Fee Category</th>
+                <th>Billed (<span class="curr">GHS</span>)</th>
+                <th>Amount Paid (<span class="curr">GHS</span>)</th>
+                <th>Balance Due (<span class="curr">GHS</span>)</th>
+                <th>Clearance</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="studentFeeBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 3. WORKSTATION: EXAM CLEARANCE DESK        -->
+    <!-- ========================================== -->
+    <div id="tabClearanceDesk" class="tab-content">
+      <div class="page-title">
+        <div>
+          <h2>Bursary Exam Financial Clearance Desk</h2>
+          <div style="font-size:13px; color:var(--text-muted)">Verify student examination eligibility, inspect Smart ID RFID credentials, and issue Hall Passes</div>
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <div style="max-width: 680px; margin-bottom: 24px;">
+          <label class="form-label">Student ID, Roll Number, or Smart ID RFID UID Lookup</label>
+          <div style="display:flex; gap:10px;">
+            <input type="text" id="clearanceLookupInput" placeholder="e.g. STU-2026-088, E0:04:01:71:96:65, or Kwame" class="form-input" style="font-size:13px;">
+            <button class="btn-action success-btn" style="width:auto; padding:8px 20px; white-space:nowrap;" onclick="performClearanceLookup()">
+              <i class="fa-solid fa-magnifying-glass"></i> Verify Clearance
+            </button>
+          </div>
+          <div style="font-size:11.5px; color:var(--text-muted); margin-top:6px;">
+            <i class="fa-solid fa-circle-info"></i> Tip: Try searching <strong>STU-2026-088</strong> (Ebenezer Addo), <strong>STU-2026-042</strong> (Akosua Serwaa), or <strong>STU-2026-061</strong> (Yaa Asantewaa).
+          </div>
+        </div>
+
+        <div id="clearanceResultContainer" style="display:none;">
+          <div style="display:grid; grid-template-columns: 280px 1fr; gap:20px; background:rgba(15, 23, 42, 0.02); border:1px solid var(--card-border); border-radius:var(--radius-lg); padding:20px;">
+            <!-- Student Avatar & Profile -->
+            <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding-right:16px; border-right:1px solid var(--card-border);">
+              <div id="cStudentAvatar" style="width:80px; height:80px; border-radius:50%; background:var(--accent-gradient); color:#fff; display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:800; margin-bottom:12px; box-shadow:0 4px 14px rgba(37,99,235,0.3);">
+                EA
+              </div>
+              <h3 id="cStudentName" style="font-size:16px; font-weight:800; margin-bottom:4px;">Ebenezer Addo</h3>
+              <div id="cStudentId" style="font-family:monospace; font-size:12px; background:rgba(0,0,0,0.06); padding:2px 8px; border-radius:4px; margin-bottom:8px;">STU-2026-088</div>
+              <div id="cStudentProgramme" style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Diploma in Graphic Design • Level 200</div>
+              <div id="cClearanceBadge" class="badge success" style="font-size:12px; padding:6px 14px;">
+                <i class="fa-solid fa-check-circle"></i> CLEARED FOR EXAMS
+              </div>
+            </div>
+
+            <!-- Financial Balance & Clearance Control -->
+            <div style="display:flex; flex-direction:column; justify-content:space-between;">
+              <div>
+                <h4 style="font-size:14px; font-weight:800; margin-bottom:14px; color:var(--accent);">Financial Account & Fee Breakdown</h4>
+                <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-bottom:16px;">
+                  <div style="background:var(--input-bg); border:1px solid var(--card-border); border-radius:10px; padding:12px;">
+                    <div style="font-size:10.5px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Total Term Billed</div>
+                    <div style="font-size:16px; font-weight:800;"><span class="curr">GH₵</span> <span id="cBilledAmt">4,800.00</span></div>
+                  </div>
+                  <div style="background:var(--input-bg); border:1px solid var(--card-border); border-radius:10px; padding:12px;">
+                    <div style="font-size:10.5px; font-weight:800; color:#10B981; text-transform:uppercase;">Verified Paid</div>
+                    <div style="font-size:16px; font-weight:800; color:#10B981;"><span class="curr">GH₵</span> <span id="cPaidAmt">4,800.00</span></div>
+                  </div>
+                  <div style="background:var(--input-bg); border:1px solid var(--card-border); border-radius:10px; padding:12px;">
+                    <div style="font-size:10.5px; font-weight:800; color:#EF4444; text-transform:uppercase;">Arrears / Balance</div>
+                    <div style="font-size:16px; font-weight:800; color:#EF4444;"><span class="curr">GH₵</span> <span id="cBalanceAmt">0.00</span></div>
+                  </div>
+                </div>
+
+                <div style="font-size:12px; color:var(--text-muted); line-height:1.5; margin-bottom:16px;">
+                  Institutional Policy: Students with arrears below GHS 200.00 or with approved Bursary Clearance may sit for the end-of-term WAEC & Academy Examinations.
+                </div>
+              </div>
+
+              <!-- Action Controls -->
+              <div style="display:flex; gap:10px; flex-wrap:wrap; border-top:1px solid var(--card-border); padding-top:14px;">
+                <button id="toggleClearanceBtn" class="btn-action" style="background:var(--accent-gradient); width:auto; padding:8px 16px;" onclick="toggleStudentClearance()">
+                  <i class="fa-solid fa-stamp"></i> Toggle Clearance Status
+                </button>
+                <button class="btn-action success-btn" style="width:auto; padding:8px 16px;" onclick="printExamHallPass()">
+                  <i class="fa-solid fa-print"></i> Generate Official Hall Pass
+                </button>
+                <button class="btn-action warning-btn" style="width:auto; padding:8px 16px;" onclick="openFeeReminderModal()">
+                  <i class="fa-solid fa-bell"></i> Send Fee Reminder Notice
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 4. WORKSTATION: FACULTY & STAFF PAYROLL    -->
+    <!-- ========================================== -->
+    <div id="tabApproval" class="tab-content">
+      <div class="page-title">
+        <div>
+          <h2>Faculty & Staff Compensation Payroll Workflow</h2>
+          <div style="font-size:13px; color:var(--text-muted)">Authorize individual teacher payouts, calculate statutory SSNIT/PAYE deductions, or execute batch approvals</div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-action success-btn" style="width:auto; padding:8px 18px;" onclick="approveAllPayroll()">
+            <i class="fa-solid fa-check-double"></i> Authorize Batch Wire Transfer
+          </button>
+        </div>
+      </div>
+
+      <!-- PAYROLL METRICS -->
+      <div class="metrics-grid" data-aos="fade-up" data-aos-duration="600">
+        <div class="metric-card">
+          <div class="metric-icon"><i class="fa-solid fa-clock"></i></div>
+          <div class="metric-info">
+            <div class="label">Pending Authorization</div>
+            <div class="val"><span class="curr">GHS</span> <span id="valPendingPayroll">0.00</span></div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon" style="color:#10B981; background:rgba(16,185,129,0.12)"><i class="fa-solid fa-check-circle"></i></div>
+          <div class="metric-info">
+            <div class="label">Authorized & Disbursed</div>
+            <div class="val"><span class="curr">GHS</span> <span id="valApprovedSum">0.00</span></div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon" style="color:#8B5CF6; background:rgba(139,92,246,0.12)"><i class="fa-solid fa-shield-halved"></i></div>
+          <div class="metric-info">
+            <div class="label">Statutory SSNIT & Tax Withheld</div>
+            <div class="val"><span class="curr">GHS</span> <span id="valTaxWithheld">4,887.00</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAYROLL TABLE -->
+      <div class="glass-card" data-aos="fade-up" data-aos-duration="700">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Faculty / Staff Member</th>
+                <th>Department & Rank</th>
+                <th>Base Salary (<span class="curr">GHS</span>)</th>
+                <th>Teaching Allowance</th>
+                <th>SSNIT & Tax (13.5%)</th>
+                <th>Net Payable (<span class="curr">GHS</span>)</th>
+                <th>Disbursement Status</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="payrollApprovalBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 5. WORKSTATION: FEE TARIFF MATRIX          -->
+    <!-- ========================================== -->
+    <div id="tabFeeTariff" class="tab-content">
+      <div class="page-title">
+        <div>
+          <h2>Institutional Fee Tariff Schedule (2026/2027)</h2>
+          <div style="font-size:13px; color:var(--text-muted)">Approved statutory tuition rates, laboratory levies, WAEC certification fees, and PTA dues</div>
+        </div>
+        <button class="btn-action" style="background:var(--accent-gradient); width:auto; padding:8px 16px;" onclick="openTariffEditModal()">
+          <i class="fa-solid fa-pen-to-square"></i> Adjust Fee Tariff
+        </button>
+      </div>
+
+      <div class="glass-card">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Academic Programme / Department</th>
+                <th>Grade Level</th>
+                <th>Term Tuition (<span class="curr">GHS</span>)</th>
+                <th>Studio & Lab Levy</th>
+                <th>Creative Software License</th>
+                <th>WAEC / Exam Fee</th>
+                <th>PTA / Development Levy</th>
+                <th>Total Term Bill (<span class="curr">GHS</span>)</th>
+              </tr>
+            </thead>
+            <tbody id="feeTariffBody">
+              <tr>
+                <td><strong>Graphic Design & Visual Arts</strong></td>
+                <td>Level 100 / Grade 10</td>
+                <td>2,800.00</td>
+                <td>450.00</td>
+                <td>350.00</td>
+                <td>300.00</td>
+                <td>150.00</td>
+                <td><strong>4,050.00</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Graphic Design & Visual Arts</strong></td>
+                <td>Level 200 / Grade 11</td>
+                <td>3,200.00</td>
+                <td>600.00</td>
+                <td>400.00</td>
+                <td>350.00</td>
+                <td>150.00</td>
+                <td><strong>4,700.00</strong></td>
+              </tr>
+              <tr>
+                <td><strong>UI/UX Design & Front-End Code</strong></td>
+                <td>Level 200 / Grade 11</td>
+                <td>3,500.00</td>
+                <td>750.00</td>
+                <td>450.00</td>
+                <td>350.00</td>
+                <td>150.00</td>
+                <td><strong>5,200.00</strong></td>
+              </tr>
+              <tr>
+                <td><strong>3D Modeling & Motion Graphics</strong></td>
+                <td>Level 300 / Grade 12</td>
+                <td>3,800.00</td>
+                <td>900.00</td>
+                <td>500.00</td>
+                <td>400.00</td>
+                <td>150.00</td>
+                <td><strong>5,750.00</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 6. WORKSTATION: SCHOLARSHIPS & AID FUND    -->
+    <!-- ========================================== -->
+    <div id="tabScholarships" class="tab-content">
+      <div class="page-title">
+        <div>
+          <h2>Scholarships & Financial Aid Grants</h2>
+          <div style="font-size:13px; color:var(--text-muted)">Institutional tuition waivers, endowment grants, and corporate sponsorships</div>
+        </div>
+        <button class="btn-action success-btn" style="width:auto; padding:8px 16px;" onclick="openModal('awardScholarshipModal')">
+          <i class="fa-solid fa-plus-circle"></i> Award Scholarship / Grant
+        </button>
+      </div>
+
+      <div class="glass-card">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Award ID</th>
+                <th>Recipient Student</th>
+                <th>Student ID</th>
+                <th>Scholarship / Grant Scheme</th>
+                <th>Endowment Sponsor</th>
+                <th>Tuition Waiver</th>
+                <th>Award Date</th>
+                <th>Standing</th>
+              </tr>
+            </thead>
+            <tbody id="scholarshipsTableBody">
+              <tr>
+                <td><strong>#SCH-2026-01</strong></td>
+                <td>Akosua Serwaa</td>
+                <td>STU-2026-042</td>
+                <td>Presidential Creative Merit Scholarship</td>
+                <td>Flawless Graphics Foundation</td>
+                <td><strong>50% Waiver (GHS 2,400.00)</strong></td>
+                <td>2026-08-15</td>
+                <td><span class="badge success"><i class="fa-solid fa-check"></i> Active</span></td>
+              </tr>
+              <tr>
+                <td><strong>#SCH-2026-02</strong></td>
+                <td>Kwabena Darko</td>
+                <td>STU-2026-105</td>
+                <td>STEM & Digital Arts Inclusion Grant</td>
+                <td>Ministry of Education Ghana</td>
+                <td><strong>Full Tuition (GHS 3,500.00)</strong></td>
+                <td>2026-08-16</td>
+                <td><span class="badge success"><i class="fa-solid fa-check"></i> Active</span></td>
+              </tr>
+              <tr>
+                <td><strong>#SCH-2026-03</strong></td>
+                <td>Yaa Asantewaa</td>
+                <td>STU-2026-061</td>
+                <td>Young Female Technologists Bursary</td>
+                <td>Africa Tech Aid Endowment</td>
+                <td><strong>GHS 1,500.00 Term Credit</strong></td>
+                <td>2026-08-18</td>
+                <td><span class="badge success"><i class="fa-solid fa-check"></i> Active</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 7. WORKSTATION: BURSARY COMMUNICATIONS     -->
+    <!-- ========================================== -->
+    <div id="tabMessaging" class="tab-content">
+      <div class="glass-card">
+        <div class="chat-layout">
+          <!-- SIDEBAR CONTACTS -->
+          <div class="chat-sidebar">
+            <input type="text" class="chat-search" placeholder="Search team members..." id="searchContact" oninput="filterContacts()">
+            <ul class="contact-list" id="contactList">
+              <li class="contact-item active" onclick="selectContact(this, 'Kofi Mensah', 'Chief Accountant')">
+                <div class="avatar">KM <div class="status-dot"></div></div>
+                <div class="contact-info">
+                  <div class="name">Kofi Mensah</div>
+                  <div style="font-size:11px; color:var(--text-muted);">Chief Accountant</div>
+                </div>
+              </li>
+              <li class="contact-item" onclick="selectContact(this, 'Ama Osei', 'Payroll Specialist')">
+                <div class="avatar" style="background:linear-gradient(135deg,#10B981,#059669)">AO <div class="status-dot"></div></div>
+                <div class="contact-info">
+                  <div class="name">Ama Osei</div>
+                  <div style="font-size:11px; color:var(--text-muted);">Payroll Specialist</div>
+                </div>
+              </li>
+              <li class="contact-item" onclick="selectContact(this, 'Dr. Samuel Boakye', 'Academic Dean')">
+                <div class="avatar" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9)">SB <div class="status-dot" style="background:#F59E0B"></div></div>
+                <div class="contact-info">
+                  <div class="name">Dr. Samuel Boakye</div>
+                  <div style="font-size:11px; color:var(--text-muted);">Academic Dean</div>
+                </div>
+              </li>
+            </ul>
+            <button class="btn-action" style="background:var(--accent-gradient); width:100%; justify-content:center; margin-top:10px; font-size:12px;" onclick="openModal('newMessageModal')">+ New Direct Message</button>
+          </div>
+
+          <!-- CHAT WINDOW -->
+          <div class="chat-window">
+            <div class="chat-header">
+              <div>
+                <h3 id="activeChatName" style="font-size:15px; font-weight:800;">Kofi Mensah</h3>
+                <span id="activeChatRole" style="font-size:11.5px; color:var(--text-muted)">Chief Accountant</span>
+              </div>
+              <button class="btn-action" style="width:auto; padding:6px 12px;" onclick="alert('Calling module integrated with VoIP.')"><i class="fa-solid fa-phone"></i></button>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+              <div class="message-bubble incoming">
+                Hello Bursar! Have you reconciled the Term 2 software licensing invoice with Adobe yet?
+                <div class="message-time">10:14 AM</div>
+              </div>
+              <div class="message-bubble outgoing">
+                Yes Kofi, verifying voucher #TR-8924 right now. Will authorize disbursement today.
+                <div class="message-time">10:16 AM</div>
+              </div>
+            </div>
+
+            <form class="chat-input-area" id="chatForm" onsubmit="sendMessage(event)">
+              <input type="text" class="chat-input" id="chatInput" placeholder="Type a message to finance team..." required>
+              <button type="submit" class="btn-action" style="background:var(--accent-gradient); border-radius:20px; width:auto; padding:0 16px;"><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 8. WORKSTATION: SYSTEM SETTINGS & AUDIT    -->
+    <!-- ========================================== -->
+    <div id="tabSettings" class="tab-content">
+      <div class="glass-card">
+        <h3 style="font-size:18px; font-weight:800; margin-bottom:18px;">Bursary System & Portal Settings</h3>
+        
+        <form id="settingsForm" onsubmit="saveSettings(event)">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
+            <div>
+              <h4 style="font-size:13.5px; font-weight:700; margin-bottom:12px; color:var(--accent);">Admin Profile & Currency</h4>
+              <div class="form-group">
+                <label class="form-label">Administrator Display Name</label>
+                <input type="text" class="form-input" id="setAdminName" value="Chief Financial Officer / Bursar">
+              </div>
+              <div class="form-group">
+                <label class="form-label">System Currency Display</label>
+                <select class="form-select" id="setCurrency" onchange="updateCurrencySymbol(this.value)">
+                  <option value="GHS">GHS (Ghanaian Cedi - GH₵)</option>
+                  <option value="USD">USD ($ - US Dollar)</option>
+                  <option value="EUR">EUR (€ - Euro)</option>
+                  <option value="GBP">GBP (£ - British Pound)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">SSNIT Pension Deduction Rate (%)</label>
+                <input type="number" class="form-input" id="setTaxRate" value="13.5" step="0.1" onchange="updateTaxRate(this.value)">
+              </div>
+            </div>
+
+            <div>
+              <h4 style="font-size:13.5px; font-weight:700; margin-bottom:12px; color:var(--accent);">Payment Gateways & MoMo</h4>
+              <div class="form-group">
+                <label class="form-label">Default Payment Gateway</label>
+                <select class="form-select" id="payment-provider" required>
+                  <option value="paystack">Paystack / MTN Mobile Money / Telecel Cash</option>
+                  <option value="stripe">Stripe Card Processing</option>
+                  <option value="bank">Stanbic Bank Direct Transfer API</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Public / Webhook API Key</label>
+                <input type="text" class="form-input" id="api-key" value="pk_live_flawless_994218a" placeholder="pk_live_...">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Enforce Two-Factor Authentication (2FA)</label>
+                <select class="form-select" id="set2FA">
+                  <option value="enabled">Enabled (Enforced for Bursary Transfers)</option>
+                  <option value="disabled">Disabled</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <h4 style="font-size:13.5px; font-weight:700; margin-bottom:12px; color:var(--accent);">Data Backup & Disaster Recovery</h4>
+              <div class="form-group">
+                <label class="form-label">Export Institutional Ledger</label>
+                <button type="button" class="btn-action" style="width:100%; justify-content:center; background:var(--glass-glow); border-color:var(--card-border); color:var(--text-main);" onclick="exportData()">
+                  <i class="fa-solid fa-download"></i> Download Complete Financial JSON Backup
+                </button>
+              </div>
+              <div class="form-group" style="margin-top:20px;">
+                <button type="button" class="btn-action logout" style="width:100%; justify-content:center;" onclick="purgeSystem()">
+                  <i class="fa-solid fa-trash"></i> Reset All Saved Session Data
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:20px; text-align:right;">
+            <button type="submit" class="btn-action" style="background:var(--accent-gradient); width:auto; padding:10px 24px; font-size:13px; display:inline-flex;">Save Configuration</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- AUDIT LOG SECTION -->
+      <div class="glass-card" data-aos="fade-up" data-aos-duration="700">
+        <h3 style="font-size:16px; font-weight:800; margin-bottom:14px;"><i class="fa-solid fa-shield-halved"></i> Bursary Activity & Audit Trail</h3>
+        <ul class="audit-list" id="auditList">
+          <!-- Rendered via JS -->
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========================================== -->
+  <!-- MODALS                                     -->
+  <!-- ========================================== -->
+
+  <!-- 1. RECORD STUDENT FEE MODAL -->
+  <div class="modal-overlay" id="studentFeeModal">
+    <div class="modal-card">
+      <h3 style="font-size:17px; font-weight:800; margin-bottom:16px;"><i class="fa-solid fa-graduation-cap"></i> Record Student Fee Payment</h3>
+      <form id="studentFeeForm" onsubmit="addStudentFee(event)">
+        <div class="form-group">
+          <label class="form-label">Select Enrolled Student</label>
+          <select id="studentSelect" class="form-select" onchange="handleStudentSelect(this)">
+            <option value="">Loading student roster...</option>
+          </select>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label class="form-label">Student ID #</label>
+            <input type="text" id="feeStudentId" class="form-input" placeholder="e.g. STU-2026-088" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Student Full Name</label>
+            <input type="text" id="feeStudentName" class="form-input" placeholder="e.g. Ebenezer Addo" required>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label class="form-label">Grade / Class Level</label>
+            <input type="text" id="feeGrade" class="form-input" placeholder="e.g. Level 200 / Grade 11" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fee Category</label>
+            <select id="feeCategory" class="form-select" required>
+              <option value="Tuition Fee">Tuition Fee</option>
+              <option value="Facility & Lab Fee">Facility & Lab Fee</option>
+              <option value="Examination Fee">Examination Fee</option>
+              <option value="Library Fee">Library Fee</option>
+              <option value="Sports & Extra-curricular">Sports & Extra-curricular</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label class="form-label">Amount Paid (<span class="curr">GHS</span>)</label>
+            <input type="number" id="feeAmount" class="form-input" step="0.01" min="1" placeholder="0.00" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Payment Method</label>
+            <select id="feeMethod" class="form-select">
+              <option value="Bank Transfer">Bank Transfer (Stanbic/GCB)</option>
+              <option value="Mobile Money (MoMo)">MTN MoMo / Telecel Cash</option>
+              <option value="Credit / Debit Card">Credit / Debit Card</option>
+              <option value="Connected Gateway">Paystack Connected Gateway</option>
+              <option value="Cash">Cash at Bursary Counter</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+          <button type="button" class="btn-action" style="width:auto; padding:8px 16px; color:var(--text-main); background:var(--input-bg); border-color:var(--card-border);" onclick="closeModal('studentFeeModal')">Cancel</button>
+          <button type="submit" class="btn-action success-btn" style="width:auto; padding:8px 20px;">Save Payment Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. LUXURY OFFICIAL RECEIPT MODAL -->
+  <div class="modal-overlay" id="receiptModal">
+    <div class="modal-card" style="max-width: 520px; background: #fff; color: #0f172a; border-radius: 18px; box-shadow: 0 30px 60px rgba(0,0,0,0.4);">
+      <div id="printableReceiptArea" style="padding: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 14px;">
+          <div>
+            <div style="font-size: 17px; font-weight: 900; letter-spacing: -0.5px; color: #0f172a;" id="receiptOrgTitle">FLAWLESS GRAPHICS ACADEMY</div>
+            <div style="font-size: 11px; color: #64748b; font-weight: 600;">Office of the Bursar &bull; Treasury Control</div>
+            <div style="font-size: 10px; color: #94a3b8;">Official Electronic Payment Receipt</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="background: #0f172a; color: #fff; padding: 4px 10px; font-size: 10.5px; font-weight: 800; border-radius: 6px; letter-spacing: 0.5px;">OFFICIAL RECEIPT</div>
+            <div style="font-size: 10px; color: #64748b; margin-top: 4px;">VERIFIED & CERTIFIED</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #f8fafc; border-radius: 8px; padding: 10px; margin-bottom: 14px; font-size: 11.5px; border: 1px solid #e2e8f0;">
+          <div><span style="color: #64748b;">Receipt #:</span> <strong id="rNum" style="color: #0f172a;">-</strong></div>
+          <div><span style="color: #64748b;">Date:</span> <strong id="rDate" style="color: #0f172a;">-</strong></div>
+          <div><span style="color: #64748b;">Student ID:</span> <strong id="rStuId" style="color: #0f172a;">-</strong></div>
+          <div><span style="color: #64748b;">Student Name:</span> <strong id="rStuName" style="color: #0f172a;">-</strong></div>
+        </div>
+
+        <table style="width: 100%; font-size: 12px; margin-bottom: 14px; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 1px solid #cbd5e1; text-align: left;">
+              <th style="padding: 6px 4px; color: #64748b; font-weight: 700;">ITEM DESCRIPTION</th>
+              <th style="padding: 6px 4px; color: #64748b; font-weight: 700; text-align: right;">AMOUNT</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px dashed #e2e8f0;">
+              <td style="padding: 8px 4px;"><strong id="rCat">Tuition Fee</strong><br><small style="color: #64748b;">Academic Year 2026/2027 • Term 2</small></td>
+              <td style="padding: 8px 4px; text-align: right; font-weight: 700;"><span class="curr">GH₵</span> <span id="rAmt">0.00</span></td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr style="border-top: 2px solid #0f172a;">
+              <td style="padding: 8px 4px; font-size: 13px; font-weight: 800;">TOTAL AMOUNT PAID</td>
+              <td style="padding: 8px 4px; text-align: right; font-size: 15px; font-weight: 900; color: #0f172a;"><span class="curr">GH₵</span> <span id="rTotalAmt">0.00</span></td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 16px; padding-top: 8px;">
+          <div>
+            <div style="display: inline-block; padding: 3px 8px; border: 2px solid #10b981; color: #10b981; font-weight: 900; font-size: 10px; border-radius: 6px; text-transform: uppercase;">
+              PAID &bull; BURSARY SEAL
+            </div>
+            <div style="font-size: 9px; color: #94a3b8; margin-top: 4px;">Hash: FG-BURSARY-SECURE-STAMP-2026</div>
+          </div>
+          <div style="text-align: right; font-size: 9.5px; color: #64748b;">
+            <div style="border-bottom: 1px solid #94a3b8; width: 130px; margin-bottom: 4px;"></div>
+            Authorized Cashier Signature
+          </div>
+        </div>
+      </div>
+
+      <div class="no-print" style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px; border-top: 1px solid #e2e8f0; padding-top: 14px;">
+        <button class="btn-action" style="background: #e2e8f0; color: #0f172a; border: none; width:auto; padding:6px 14px;" onclick="closeModal('receiptModal')">Close</button>
+        <button class="btn-action success-btn" style="width:auto; padding:6px 16px;" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Official Receipt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. OFFICIAL EXAM HALL PASS MODAL -->
+  <div class="modal-overlay" id="examHallPassModal">
+    <div class="modal-card" style="max-width: 500px; background: #fff; color: #0f172a; border-radius: 16px;">
+      <div id="printableHallPassArea" style="padding: 12px; border: 2px solid #0f172a; border-radius: 12px; position: relative;">
+        <div style="text-align: center; border-bottom: 2px solid #0f172a; padding-bottom: 10px; margin-bottom: 12px;">
+          <h2 style="font-size: 16px; font-weight: 900; letter-spacing: 0.5px;">FLAWLESS GRAPHICS ACADEMY</h2>
+          <div style="font-size: 11px; font-weight: 700; color: #2563EB;">OFFICIAL EXAMINATION HALL CLEARANCE PERMIT</div>
+          <div style="font-size: 10px; color: #64748B;">Academic Year 2026/2027 &bull; Term 2 Final Exams</div>
+        </div>
+
+        <div style="display: flex; gap: 14px; align-items: center; margin-bottom: 14px;">
+          <div id="hpAvatar" style="width: 70px; height: 70px; border-radius: 8px; background: #0f172a; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; flex-shrink: 0;">
+            EA
+          </div>
+          <div style="font-size: 12px; line-height: 1.5;">
+            <div>Name: <strong id="hpName">Ebenezer Addo</strong></div>
+            <div>Student ID: <strong id="hpId" style="font-family:monospace;">STU-2026-088</strong></div>
+            <div>Programme: <strong id="hpProgramme">Graphic Design & Media</strong></div>
+            <div>Standing: <span class="badge success" style="font-size: 10px;">BURSARY CERTIFIED &bull; CLEARED</span></div>
+          </div>
+        </div>
+
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; font-size: 11px; margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+            <span>Outstanding Balance:</span>
+            <strong style="color: #10B981;">GH₵ 0.00 (Fully Paid)</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span>Authorization Reference:</span>
+            <strong style="font-family: monospace;">FG-EXAM-CLEAR-99420</strong>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; font-size: 9.5px; color: #64748B;">
+          <div>
+            <div style="font-family: monospace; font-size: 8px;">VERIFIED VIA SMART ID RFID</div>
+            <div>Security Hash: SEC-FG-HALLPASS-2026</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="border-bottom: 1px solid #0f172a; width: 120px; margin-bottom: 4px;"></div>
+            Dean of Examinations / Bursar
+          </div>
+        </div>
+      </div>
+
+      <div class="no-print" style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+        <button class="btn-action" style="background:#e2e8f0; color:#0f172a; border:none; width:auto; padding:6px 14px;" onclick="closeModal('examHallPassModal')">Close</button>
+        <button class="btn-action success-btn" style="width:auto; padding:6px 16px;" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Hall Pass</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. PARENT FEE REMINDER DEMAND NOTICE MODAL -->
+  <div class="modal-overlay" id="feeReminderModal">
+    <div class="modal-card" style="max-width: 520px; background: #fff; color: #0f172a;">
+      <div id="printableReminderArea" style="padding: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f172a; padding-bottom: 10px; margin-bottom: 14px;">
+          <div>
+            <h3 style="font-size: 16px; font-weight: 900;">FLAWLESS GRAPHICS ACADEMY</h3>
+            <div style="font-size: 11px; color: #64748b;">Office of the Bursar &bull; Tuition Demand Notice</div>
+          </div>
+          <span class="badge danger">PAYMENT ADVISORY</span>
+        </div>
+
+        <div style="font-size: 12px; line-height: 1.6; margin-bottom: 14px;">
+          <p>Dear Parent / Guardian of <strong id="remStudentName">Student Name</strong> (ID: <span id="remStudentId" style="font-family:monospace;">-</span>),</p>
+          <p style="margin-top: 6px;">This is an official advisory regarding the outstanding tuition and lab balance for Academic Term 2:</p>
+          
+          <div style="background: #FEF2F2; border: 1px solid #F87171; border-radius: 8px; padding: 12px; margin: 10px 0;">
+            <div style="font-size: 11px; color: #991B1B; font-weight: 700;">TOTAL OUTSTANDING BALANCE:</div>
+            <div style="font-size: 20px; font-weight: 900; color: #B91C1C;"><span class="curr">GH₵</span> <span id="remArrearsAmt">1,200.00</span></div>
+            <div style="font-size: 11px; color: #7F1D1D; margin-top: 4px;">Payment Due Date: <strong>14 Days from Notice</strong></div>
+          </div>
+
+          <p>Please remit payment via <strong>Stanbic Bank Paybill (Code: FG-ACADEMY)</strong> or <strong>MTN MoMo Merchant ID: 055-123-4567</strong> to ensure seamless issuance of your ward's Examination Hall Permit.</p>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; font-size: 10px; color: #64748B; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+          <div>Tel: +233 (0) 302 456 789 &bull; finance@flawless.edu.gh</div>
+          <div style="text-align: right;">Head Bursar & Treasury Officer</div>
+        </div>
+      </div>
+
+      <div class="no-print" style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px; border-top:1px solid #e2e8f0; padding-top:12px;">
+        <button class="btn-action" style="background:#e2e8f0; color:#0f172a; border:none; width:auto; padding:6px 14px;" onclick="closeModal('feeReminderModal')">Close</button>
+        <button class="btn-action success-btn" style="width:auto; padding:6px 16px;" onclick="dispatchFeeReminderNotification()">
+          <i class="fa-solid fa-paper-plane"></i> Dispatch SMS / Email Notice
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. STAFF OFFICIAL PAYSLIP MODAL -->
+  <div class="modal-overlay" id="payslipModal">
+    <div class="modal-card" style="max-width: 520px; background: #fff; color: #0f172a;">
+      <div id="printablePayslipArea" style="padding: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0f172a; padding-bottom: 10px; margin-bottom: 12px;">
+          <div>
+            <h3 style="font-size: 16px; font-weight: 900;">FLAWLESS GRAPHICS ACADEMY</h3>
+            <div style="font-size: 11px; color: #64748b;">Human Resources & Bursary Compensation Division</div>
+            <div style="font-size: 10px; color: #94a3b8;">Official Confidential Staff Payslip</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="background: #0f172a; color: #fff; padding: 4px 8px; font-size: 10px; font-weight: 800; border-radius: 4px;">CONFIDENTIAL</div>
+            <div style="font-size: 10px; color: #64748b; margin-top: 4px;" id="psMonth">August 2026</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; font-size: 11.5px; margin-bottom: 12px;">
+          <div>Employee: <strong id="psName">-</strong></div>
+          <div>Role: <strong id="psRole">-</strong></div>
+          <div>Employee ID: <strong id="psEmpId" style="font-family: monospace;">-</strong></div>
+          <div>Bank Account: <strong style="font-family: monospace;">Stanbic Bank &bull;&bull;&bull;&bull; 4019</strong></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 11.5px; margin-bottom: 14px;">
+          <!-- Earnings -->
+          <div>
+            <div style="font-size: 11px; font-weight: 800; color: #10B981; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 6px;">EARNINGS</div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>Basic Salary:</span> <span id="psGross">0.00</span></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>Teaching Allowance:</span> <span>450.00</span></div>
+            <div style="display:flex; justify-content:space-between; font-weight:700; border-top:1px dashed #cbd5e1; padding-top:4px;"><span>Gross Pay:</span> <span id="psGrossTotal">0.00</span></div>
+          </div>
+          <!-- Deductions -->
+          <div>
+            <div style="font-size: 11px; font-weight: 800; color: #EF4444; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 6px;">STATUTORY DEDUCTIONS</div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>SSNIT Tier 1 & 2 (13.5%):</span> <span id="psDed">0.00</span></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>GRA PAYE Income Tax:</span> <span>Included</span></div>
+            <div style="display:flex; justify-content:space-between; font-weight:700; border-top:1px dashed #cbd5e1; padding-top:4px;"><span>Total Deductions:</span> <span id="psDedTotal">0.00</span></div>
+          </div>
+        </div>
+
+        <div style="background: #0f172a; color: #fff; border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <span style="font-size: 12px; font-weight: 700;">NET TAKE-HOME PAY (DISBURSED):</span>
+          <span style="font-size: 16px; font-weight: 900;"><span class="curr">GH₵</span> <span id="psNet">0.00</span></span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; font-size: 9.5px; color: #64748B;">
+          <div>Disbursed via Stanbic Bank Clearing ACH Ref: TXN-PAYROLL-8841</div>
+          <div style="text-align: right;">Bursar Signature & Stamp</div>
+        </div>
+      </div>
+
+      <div class="no-print" style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px; border-top:1px solid #e2e8f0; padding-top:12px;">
+        <button class="btn-action" style="background:#e2e8f0; color:#0f172a; border:none; width:auto; padding:6px 14px;" onclick="closeModal('payslipModal')">Close</button>
+        <button class="btn-action success-btn" style="width:auto; padding:6px 16px;" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Payslip</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. AWARD SCHOLARSHIP MODAL -->
+  <div class="modal-overlay" id="awardScholarshipModal">
+    <div class="modal-card">
+      <h3 style="font-size:17px; font-weight:800; margin-bottom:14px;"><i class="fa-solid fa-award"></i> Award Scholarship or Financial Aid</h3>
+      <form id="scholarshipForm" onsubmit="handleAwardScholarship(event)">
+        <div class="form-group">
+          <label class="form-label">Recipient Student</label>
+          <select id="schStudentSelect" class="form-select" required>
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Scholarship / Bursary Scheme Name</label>
+          <input type="text" id="schName" class="form-input" placeholder="e.g. Academic Excellence Grant, Needy Student Bursary" required>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label class="form-label">Endowment Sponsor</label>
+            <input type="text" id="schSponsor" class="form-input" placeholder="e.g. Flawless Foundation, MoE Ghana" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tuition Waiver / Credit Amount (<span class="curr">GHS</span>)</label>
+            <input type="number" id="schAmount" class="form-input" min="100" step="50" placeholder="1500.00" required>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px;">
+          <button type="button" class="btn-action" style="background:var(--input-bg); color:var(--text-main); border-color:var(--card-border); width:auto; padding:6px 14px;" onclick="closeModal('awardScholarshipModal')">Cancel</button>
+          <button type="submit" class="btn-action success-btn" style="width:auto; padding:6px 18px;">Confirm Award</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 7. PREPARE SALARY PAYMENT MODAL -->
+  <div class="modal-overlay" id="prepareSalaryModal">
+    <div class="modal-card">
+      <h3 style="font-size:17px; font-weight:800; margin-bottom:14px;"><i class="fa-solid fa-hand-holding-dollar"></i> Prepare Faculty Payroll Batch</h3>
+      <form id="prepareSalaryForm" onsubmit="processPreparedSalary(event)">
+        <div class="form-group">
+          <label class="form-label">Pay Period Month</label>
+          <input type="month" id="salaryPayPeriod" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Staff Members Included in Batch</label>
+          <div style="max-height:160px; overflow-y:auto; border:1px solid var(--card-border); border-radius:var(--radius-md); padding:8px; background:var(--input-bg);" id="salaryTeacherList">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Applied Statutory SSNIT/Tax Rate (%)</label>
+          <input type="number" id="salaryTaxRate" class="form-input" step="0.1" value="13.5" required>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px;">
+          <button type="button" class="btn-action" style="background:var(--input-bg); color:var(--text-main); border-color:var(--card-border); width:auto; padding:6px 14px;" onclick="closeModal('prepareSalaryModal')">Cancel</button>
+          <button type="submit" class="btn-action" style="background:var(--accent-gradient); width:auto; padding:6px 18px;">Submit for Clearance</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 8. GENERAL DISBURSEMENT MODAL -->
+  <div class="modal-overlay" id="disbursementModal">
+    <div class="modal-card">
+      <h3 style="font-size:17px; font-weight:800; margin-bottom:14px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Record Institutional Expense</h3>
+      <form id="disbursementForm" onsubmit="addDisbursement(event)">
+        <div class="form-group">
+          <label class="form-label">Expense Category</label>
+          <input type="text" id="disbCategory" class="form-input" placeholder="e.g. Creative Software Licenses, Campus Utilities" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Beneficiary / Vendor</label>
+          <input type="text" id="disbBeneficiary" class="form-input" placeholder="e.g. Adobe Systems, Telecel, Stationery Hub" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Disbursement Amount (<span class="curr">GHS</span>)</label>
+          <input type="number" id="disbAmount" class="form-input" step="0.01" min="1" required>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px;">
+          <button type="button" class="btn-action" style="background:var(--input-bg); color:var(--text-main); border-color:var(--card-border); width:auto; padding:6px 14px;" onclick="closeModal('disbursementModal')">Cancel</button>
+          <button type="submit" class="btn-action" style="background:var(--accent-gradient); width:auto; padding:6px 18px;">Record Expense</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 9. CREATE OFFICIAL INVOICE MODAL -->
+  <div class="modal-overlay" id="invoiceModal">
+    <div class="modal-card" style="max-width: 580px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h3 style="font-size: 17px; font-weight: 800;"><i class="fa-solid fa-file-invoice"></i> Generate Institutional Invoice</h3>
+        <button onclick="closeModal('invoiceModal')" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px;">&times;</button>
+      </div>
+      
+      <form id="invoiceForm" onsubmit="generateInvoice(event)">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label class="form-label">Client / Sponsor / Student *</label>
+            <input type="text" id="invClient" class="form-input" placeholder="e.g. Kwame Mensah or Corporate Sponsor" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contact Email / Phone</label>
+            <input type="text" id="invContact" class="form-input" placeholder="e.g. sponsor@corporate.com">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label class="form-label">Invoice Date</label>
+            <input type="date" id="invDate" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Payment Due Date</label>
+            <input type="date" id="invDueDate" class="form-input" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Line Item Description *</label>
+          <input type="text" id="invDesc" class="form-input" placeholder="e.g. Term 2 Graphic Design Studio & Lab Tuition" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label class="form-label">Rate (<span class="curr">GH₵</span>)</label>
+            <input type="number" id="invRate" class="form-input" step="0.01" min="1" placeholder="4700.00" oninput="calcInvoiceTotal()" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Quantity</label>
+            <input type="number" id="invQty" class="form-input" min="1" value="1" oninput="calcInvoiceTotal()" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Total (<span class="curr">GH₵</span>)</label>
+            <input type="text" id="invTotal" class="form-input" style="font-weight: 800;" readonly value="4700.00">
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
+          <button type="button" class="btn-action" style="background:var(--input-bg); color:var(--text-main); border-color:var(--card-border); width:auto; padding:6px 14px;" onclick="closeModal('invoiceModal')">Cancel</button>
+          <button type="submit" class="btn-action success-btn" style="width:auto; padding:6px 18px;"><i class="fa-solid fa-print"></i> Generate & Print Invoice</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 10. NEW DIRECT MESSAGE MODAL -->
+  <div class="modal-overlay" id="newMessageModal">
+    <div class="modal-card">
+      <h3 style="font-size:17px; font-weight:800; margin-bottom:14px;"><i class="fa-solid fa-message"></i> New Direct Message</h3>
+      <form id="newMessageForm" onsubmit="startNewChat(event)">
+        <div class="form-group">
+          <label class="form-label">Recipient Name</label>
+          <input type="text" id="newRecipientName" class="form-input" placeholder="e.g. Dr. Samuel Boakye" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Recipient Role</label>
+          <input type="text" id="newRecipientRole" class="form-input" placeholder="e.g. Academic Dean" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Initial Message</label>
+          <input type="text" id="newInitialMessage" class="form-input" placeholder="Type bursary advisory..." required>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+          <button type="button" class="btn-action" style="background:var(--input-bg); color:var(--text-main); border-color:var(--card-border); width:auto; padding:6px 14px;" onclick="closeModal('newMessageModal')">Cancel</button>
+          <button type="submit" class="btn-action" style="background:var(--accent-gradient); width:auto; padding:6px 18px;">Start Conversation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 11. SUPABASE CLOUD SYNC MODAL -->
+  <div class="modal-overlay" id="cloudModalBackdrop">
+    <div class="modal-card" style="max-width: 520px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(16, 185, 129, 0.15);color:#10b981;display:flex;align-items:center;justify-content:center;font-size:16px">
+            <i class="fa-solid fa-cloud"></i>
+          </div>
+          <div>
+            <h3 style="margin:0;font-size:16px;font-weight:800">Supabase Cloud Sync</h3>
+            <div style="font-size:11px;color:var(--text-muted)">Target Project: <strong>AdjeiJamesNtiamoah</strong></div>
+          </div>
+        </div>
+        <button onclick="closeCloudModal()" style="background:none;border:none;font-size:18px;color:var(--text-muted);cursor:pointer">&times;</button>
+      </div>
+
+      <div style="background:var(--input-bg);border-radius:10px;padding:12px;border:1px solid var(--card-border);margin-bottom:14px;font-size:12px;color:var(--text-muted);line-height:1.5">
+        Synchronize student fee records, general ledger disbursements, and staff payroll vouchers directly to cloud PostgreSQL tables.
+        <div id="cloudStatusMsg" style="margin-top:6px;font-size:11.5px;font-weight:700;display:none"></div>
+      </div>
+
+      <form onsubmit="handleSaveCloudConfig(event)">
+        <div class="form-group">
+          <label class="form-label">Supabase Project URL *</label>
+          <input id="sb_url" class="form-input" placeholder="https://xxxxxxxxxxxxxxxxxxxx.supabase.co" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Supabase Anon Public API Key *</label>
+          <input id="sb_key" type="password" class="form-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." required>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-top:16px">
+          <button type="button" class="btn-action" id="testConnBtn" style="width:auto; padding:6px 14px;" onclick="handleTestCloud()"><i class="fa-solid fa-plug"></i> Test Connection</button>
+          <div style="display:flex;gap:8px">
+            <button type="button" class="btn-action" style="background:var(--input-bg); color:var(--text-main); border-color:var(--card-border); width:auto; padding:6px 14px;" onclick="handleResetCloud()">Reset</button>
+            <button type="submit" class="btn-action success-btn" style="width:auto; padding:6px 16px;"><i class="fa-solid fa-check"></i> Save & Connect</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    &copy; 2026 FLAWLESS GRAPHICS ACADEMY &bull; Office of the Bursar &bull; Institutional Financial & Bursary Control System
+  </footer>
+
+  <!-- AOS ANIMATION SCRIPT -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+  <!-- APP JAVASCRIPT LOGIC -->
+  <script>
+    // GLOBAL BURSARY STATE
+    let currentCurrency = 'GHS';
+    let currentTaxRate = 13.5;
+    let currentActiveTerm = 'Term 2';
+    let currentFeeFilter = 'All';
+    let feeSearchQuery = '';
+    let fetchedStudents = [];
+    let currentAuditedStudent = null;
+
+    const CURRENCY_SYMBOLS = { GHS: 'GH₵', USD: '$', EUR: '€', GBP: '£' };
+    const CURRENCY_RATES = { GHS: 1.0, USD: 0.065, EUR: 0.060, GBP: 0.052 };
+
+    // INITIAL INSTITUTIONAL DATA
+    let defaultFacultyStaff = [
+      { id: 'EMP-01', name: 'Kwame Mensah', role: 'Lead Graphic Design Instructor', dept: 'Visual Arts', gross: 9500, approved: true },
+      { id: 'EMP-02', name: 'Abena Appiah', role: 'Senior UX/UI Design Lecturer', dept: 'Digital Tech', gross: 10200, approved: true },
+      { id: 'EMP-03', name: 'Kofi Mensah', role: 'Chief Financial Officer / Bursar', dept: 'Finance & Treasury', gross: 11500, approved: false },
+      { id: 'EMP-04', name: 'Ama Osei', role: 'Senior Payroll Specialist', dept: 'Finance & HR', gross: 7800, approved: false },
+      { id: 'EMP-05', name: 'Dr. Samuel Boakye', role: 'Dean of Academic Affairs', dept: 'Academics', gross: 12000, approved: false }
+    ];
+
+    let defaultStudentAccounts = [
+      { id: 'REC-1001', name: 'Ebenezer Addo', studentId: 'STU-2026-088', rfid: 'E0:04:01:71:96:65', grade: 'Level 200', programme: 'Diploma in Graphic Design', cat: 'Tuition Fee', date: '2026-08-18', billed: 4800, amount: 4800, status: 'Cleared' },
+      { id: 'REC-1002', name: 'Akosua Serwaa', studentId: 'STU-2026-042', rfid: 'E0:04:01:88:21:40', grade: 'Level 100', programme: 'Certificate in UI/UX Design', cat: 'Tuition Fee', date: '2026-08-19', billed: 4050, amount: 3200, status: 'Partial' },
+      { id: 'REC-1003', name: 'Kwabena Darko', studentId: 'STU-2026-105', rfid: 'E0:04:01:99:11:32', grade: 'Level 200', programme: 'Diploma in Graphic Design', cat: 'Facility & Lab Fee', date: '2026-08-20', billed: 4700, amount: 4700, status: 'Cleared' },
+      { id: 'REC-1004', name: 'Yaa Asantewaa', studentId: 'STU-2026-061', rfid: 'E0:04:01:34:55:12', grade: 'Level 300', programme: '3D Motion Graphics Degree', cat: 'Tuition Fee', date: '2026-08-21', billed: 5750, amount: 3500, status: 'Partial' },
+      { id: 'REC-1005', name: 'Osei Tutu', studentId: 'STU-2026-093', rfid: 'E0:04:01:12:44:88', grade: 'Level 100', programme: 'Certificate in Visual Arts', cat: 'Tuition Fee', date: '2026-08-22', billed: 4050, amount: 1500, status: 'Arrears' },
+      { id: 'REC-1006', name: 'Samuel Kofi Mensah', studentId: 'STU-2026-001', rfid: 'E0:04:01:45:90:11', grade: 'Level 200', programme: 'Diploma in Graphic Design', cat: 'Tuition Fee', date: '2026-08-24', billed: 4700, amount: 4700, status: 'Cleared' }
+    ];
+
+    let defaultScholarships = [
+      { id: 'SCH-2026-01', name: 'Akosua Serwaa', studentId: 'STU-2026-042', scheme: 'Presidential Creative Merit Scholarship', sponsor: 'Flawless Graphics Foundation', waiver: '50% Waiver (GHS 2,400.00)', amount: 2400, date: '2026-08-15', status: 'Active' },
+      { id: 'SCH-2026-02', name: 'Kwabena Darko', studentId: 'STU-2026-105', scheme: 'STEM & Digital Arts Inclusion Grant', sponsor: 'Ministry of Education Ghana', waiver: 'Full Tuition (GHS 3,500.00)', amount: 3500, date: '2026-08-16', status: 'Active' },
+      { id: 'SCH-2026-03', name: 'Yaa Asantewaa', studentId: 'STU-2026-061', scheme: 'Young Female Technologists Bursary', sponsor: 'Africa Tech Aid Endowment', waiver: 'GHS 1,500.00 Term Credit', amount: 1500, date: '2026-08-18', status: 'Active' }
+    ];
+
+    let auditLogs = [
+      { msg: 'Treasury system initialization & AY 2026/2027 Term 2 ledger opened', date: '2026-08-20' },
+      { msg: 'Operating budget verified and allocated (GHS 650,000.00)', date: '2026-08-21' },
+      { msg: 'Term 2 Fee Tariff Schedule published for Visual Arts & Tech faculties', date: '2026-08-22' }
+    ];
+
+    let cashFlowChartObj = null;
+    let expenseChartObj = null;
+
+    // NUMERIC ANIMATION
+    function animateValue(id, start, end, duration = 650) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const range = end - start;
+      const minTimer = 25;
+      let stepTime = Math.abs(Math.floor(duration / (Math.abs(range) || 1)));
+      stepTime = Math.max(stepTime, minTimer);
+      const startTime = Date.now();
+      const endTime = startTime + duration;
+      
+      function run() {
+        const now = Date.now();
+        const remaining = Math.max((endTime - now) / duration, 0);
+        const value = end - (remaining * range);
+        el.innerText = value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (now < endTime) {
+          requestAnimationFrame(run);
+        } else {
+          el.innerText = end.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+      }
+      requestAnimationFrame(run);
+    }
+
+    // MULTI-CURRENCY CONVERTER
+    function changeCurrency(curr) {
+      currentCurrency = curr;
+      const sym = CURRENCY_SYMBOLS[curr] || curr;
+      document.querySelectorAll('.curr').forEach(el => el.innerText = sym);
+      renderAll();
+    }
+
+    function switchAcademicTerm(term) {
+      currentActiveTerm = term;
+      addAuditLog('Active bursary term switched to: ' + term);
+      if (window.Toaster) {
+        window.Toaster.info('Academic Term Switched', 'Displaying financial ledger for ' + term);
+      }
+      renderAll();
+    }
+
+    // BOOTSTRAP FINANCE PORTAL
+    function bootstrapFinance() {
+      if (window.AOS) window.AOS.init({ duration: 500, once: true });
+
+      const activeOrg = localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || 'Flawless Graphics Academy';
+      const dispOrg = document.getElementById('displayOrg');
+      if (dispOrg) dispOrg.innerHTML = '<i class="fa-solid fa-school"></i> Institution: ' + activeOrg;
+      const rOrg = document.getElementById('receiptOrgTitle');
+      if (rOrg) rOrg.innerText = activeOrg.toUpperCase();
+
+      if (!localStorage.getItem('fg_payroll')) {
+        localStorage.setItem('fg_payroll', JSON.stringify(defaultFacultyStaff));
+      }
+      if (!localStorage.getItem('fg_student_fees')) {
+        localStorage.setItem('fg_student_fees', JSON.stringify(defaultStudentAccounts));
+      }
+      if (!localStorage.getItem('fg_scholarships')) {
+        localStorage.setItem('fg_scholarships', JSON.stringify(defaultScholarships));
+      }
+      if (!localStorage.getItem('fg_audit')) {
+        localStorage.setItem('fg_audit', JSON.stringify(auditLogs));
+      }
+
+      const todayMonth = new Date().toISOString().slice(0, 7);
+      const payPeriod = document.getElementById('salaryPayPeriod');
+      if (payPeriod) payPeriod.value = todayMonth;
+
+      const invDate = document.getElementById('invDate');
+      const invDueDate = document.getElementById('invDueDate');
+      const nowStr = new Date().toISOString().split('T')[0];
+      if (invDate) invDate.value = nowStr;
+      if (invDueDate) {
+        const due = new Date();
+        due.setDate(due.getDate() + 14);
+        invDueDate.value = due.toISOString().split('T')[0];
+      }
+
+      updateCloudSyncStatus();
+      renderAll();
+      initCharts();
+      fetchStudents();
+
+      // Pre-select first student for exam clearance demo
+      setTimeout(() => {
+        const input = document.getElementById('clearanceLookupInput');
+        if (input && !input.value) {
+          input.value = 'STU-2026-088';
+          performClearanceLookup();
+        }
+      }, 200);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootstrapFinance);
+    } else {
+      bootstrapFinance();
+    }
+
+    // POPULATE ROSTER
+    async function fetchStudents() {
+      const select = document.getElementById('studentSelect');
+      const schSelect = document.getElementById('schStudentSelect');
+      const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
+
+      if (select) {
+        select.innerHTML = '<option value="">-- Choose Enrolled Student --</option>';
+        feeData.forEach(s => {
+          select.innerHTML += \`<option value="\${s.studentId}">\${s.name} (\${s.studentId} - \${s.grade})</option>\`;
+        });
+      }
+
+      if (schSelect) {
+        schSelect.innerHTML = '<option value="">-- Choose Beneficiary Student --</option>';
+        feeData.forEach(s => {
+          schSelect.innerHTML += \`<option value="\${s.studentId}">\${s.name} (\${s.studentId})</option>\`;
+        });
+      }
+    }
+
+    function handleStudentSelect(selectEl) {
+      const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
+      const student = feeData.find(s => s.studentId === selectEl.value);
+      if (student) {
+        document.getElementById('feeStudentId').value = student.studentId;
+        document.getElementById('feeStudentName').value = student.name;
+        document.getElementById('feeGrade').value = student.grade;
+      }
+    }
+
+    // NAVIGATION TABS
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('nav a').forEach(el => el.classList.remove('active'));
+
+      const tabEl = document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+      const navEl = document.getElementById('nav' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+      if (tabEl) tabEl.classList.add('active');
+      if (navEl) navEl.classList.add('active');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // THEME TOGGLE
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+      const isDark = document.body.classList.contains('dark');
+      document.getElementById('themeText').innerText = isDark ? 'Light' : 'Dark';
+      const icon = document.querySelector('#themeBtn i');
+      if (icon) icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      if (cashFlowChartObj) {
+        cashFlowChartObj.destroy();
+        expenseChartObj.destroy();
+        initCharts();
+      }
+    }
+
+    // LOGOUT
+    function logout() {
+      if (confirm('Are you sure you want to log out of the Bursary portal?')) {
+        if (window.AuthSession && typeof window.AuthSession.logout === 'function') {
+          window.AuthSession.logout('finance-login.html');
+        } else {
+          window.location.href = 'finance-login.html';
+        }
+      }
+    }
+
+    // STUDENT BILLING FILTERS & TABLE
+    function filterFeeCategory(cat, btn) {
+      currentFeeFilter = cat;
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderFeeTable();
+    }
+
+    function filterFeeRecords() {
+      feeSearchQuery = (document.getElementById('feeSearchInput')?.value || '').toLowerCase().trim();
+      renderFeeTable();
+    }
+
+    function renderFeeTable() {
+      const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
+      const feeBody = document.getElementById('studentFeeBody');
+      if (!feeBody) return;
+      feeBody.innerHTML = '';
+      const rate = CURRENCY_RATES[currentCurrency] || 1.0;
+
+      const gradeFilter = document.getElementById('feeGradeFilter')?.value || 'All';
+      const statusFilter = document.getElementById('feeStatusFilter')?.value || 'All';
+
+      const filtered = feeData.filter(item => {
+        const matchCat = (currentFeeFilter === 'All' || item.cat === currentFeeFilter);
+        const matchGrade = (gradeFilter === 'All' || item.grade === gradeFilter);
+        const matchStatus = (statusFilter === 'All' || item.status === statusFilter);
+        const matchSearch = !feeSearchQuery || 
+          (item.name && item.name.toLowerCase().includes(feeSearchQuery)) || 
+          (item.studentId && item.studentId.toLowerCase().includes(feeSearchQuery)) || 
+          (item.id && item.id.toLowerCase().includes(feeSearchQuery));
+        return matchCat && matchGrade && matchStatus && matchSearch;
+      });
+
+      if (filtered.length === 0) {
+        feeBody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:30px; color:var(--text-muted);"><i class="fa-solid fa-folder-open" style="font-size:22px; display:block; margin-bottom:8px; opacity:0.6;"></i> No student billing records found matching query</td></tr>';
+        return;
+      }
+
+      filtered.forEach(item => {
+        const billed = (parseFloat(item.billed || item.amount) * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+        const paid = (parseFloat(item.amount) * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+        const balanceNum = Math.max(0, parseFloat(item.billed || item.amount) - parseFloat(item.amount));
+        const balance = (balanceNum * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+
+        let statusBadge = '<span class="badge success"><i class="fa-solid fa-check"></i> Cleared</span>';
+        if (item.status === 'Partial' || (balanceNum > 0 && balanceNum < 1500)) {
+          statusBadge = '<span class="badge pending"><i class="fa-solid fa-circle-half-stroke"></i> Partial</span>';
+        } else if (item.status === 'Arrears' || balanceNum >= 1500) {
+          statusBadge = '<span class="badge danger"><i class="fa-solid fa-triangle-exclamation"></i> Arrears</span>';
+        }
+
+        feeBody.innerHTML += \`
+          <tr>
+            <td><strong>\${item.id}</strong></td>
+            <td><strong>\${item.name}</strong></td>
+            <td><span style="font-family:monospace; background:rgba(0,0,0,0.05); padding:2px 6px; border-radius:4px; font-size:12px;">\${item.studentId}</span></td>
+            <td>\${item.grade}</td>
+            <td><span class="badge info">\${item.cat}</span></td>
+            <td>\${billed}</td>
+            <td><strong style="color:#10B981;">\${paid}</strong></td>
+            <td><strong style="color:\${balanceNum > 0 ? '#EF4444' : '#10B981'};">\${balance}</strong></td>
+            <td>\${statusBadge}</td>
+            <td style="text-align:right; white-space:nowrap;">
+              <button class="btn-action" style="padding:4px 8px; font-size:11px; display:inline-flex; width:auto; margin-right:4px;" onclick="viewReceiptById('\${item.id}')" title="View Official Receipt"><i class="fa-solid fa-receipt"></i></button>
+              <button class="btn-action success-btn" style="padding:4px 8px; font-size:11px; display:inline-flex; width:auto; margin-right:4px;" onclick="quickExamClearance('\${item.studentId}')" title="Exam Clearance Desk"><i class="fa-solid fa-id-card-clip"></i></button>
+              <button class="btn-action warning-btn" style="padding:4px 8px; font-size:11px; display:inline-flex; width:auto;" onclick="quickFeeReminder('\${item.studentId}')" title="Send Reminder Notice"><i class="fa-solid fa-envelope"></i></button>
+            </td>
+          </tr>
+        \`;
+      });
+    }
+
+    // MAIN RENDER CONTROLLER
+    function renderAll() {
+      const payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];
+      const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
+      const schData = JSON.parse(localStorage.getItem('fg_scholarships')) || [];
+      const auditData = JSON.parse(localStorage.getItem('fg_audit')) || [];
+      const rate = CURRENCY_RATES[currentCurrency] || 1.0;
+
+      // 1. Render Student Fees Table
+      renderFeeTable();
+
+      let totalFeesSum = 0;
+      let totalArrearsSum = 0;
+      feeData.forEach(item => {
+        totalFeesSum += parseFloat(item.amount || 0);
+        const bill = parseFloat(item.billed || item.amount);
+        const paid = parseFloat(item.amount || 0);
+        totalArrearsSum += Math.max(0, bill - paid);
+      });
+
+      let totalSchSum = 0;
+      schData.forEach(s => {
+        totalSchSum += parseFloat(s.amount || 0);
+      });
+
+      // 2. Render Payroll Approval Table
+      const payrollBody = document.getElementById('payrollApprovalBody');
+      if (payrollBody) {
+        payrollBody.innerHTML = '';
+        let grossTotal = 0;
+        let pendingTotal = 0;
+        let approvedTotal = 0;
+        let totalDeductions = 0;
+
+        payrollData.forEach((emp, i) => {
+          const gross = parseFloat(emp.gross);
+          const deductions = gross * (currentTaxRate / 100);
+          const net = gross - deductions;
+
+          grossTotal += gross;
+          totalDeductions += deductions;
+          if (emp.approved) {
+            approvedTotal += net;
+          } else {
+            pendingTotal += net;
+          }
+
+          const convertedGross = (gross * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+          const convertedDed = (deductions * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+          const convertedNet = (net * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+
+          payrollBody.innerHTML += \`
+            <tr>
+              <td><strong>\${emp.name}</strong></td>
+              <td>\${emp.role} <br><small style="color:var(--text-muted)">\${emp.dept || 'Academic'}</small></td>
+              <td>\${convertedGross}</td>
+              <td>GH₵ 450.00</td>
+              <td>\${convertedDed}</td>
+              <td><strong style="color:var(--accent);">\${convertedNet}</strong></td>
+              <td>
+                <span class="badge \${emp.approved ? 'success' : 'pending'}">
+                  \${emp.approved ? '<i class="fa-solid fa-check"></i> Disbursed' : '<i class="fa-solid fa-clock"></i> Pending Authorization'}
+                </span>
+              </td>
+              <td style="text-align:right; white-space:nowrap;">
+                <button class="btn-action" style="padding:4px 8px; font-size:11px; display:inline-flex; width:auto; margin-right:4px;" onclick="viewStaffPayslip(\${i})" title="View Staff Payslip"><i class="fa-solid fa-file-invoice"></i> Payslip</button>
+                \${!emp.approved 
+                  ? \`<button class="btn-action success-btn" style="padding:4px 10px; font-size:11px; display:inline-flex; width:auto;" onclick="approveIndividualPayroll(\${i})">Authorize</button>\`
+                  : \`<span style="font-size:11px; color:var(--success); font-weight:700;"><i class="fa-solid fa-check-double"></i> Paid</span>\`}
+              </td>
+            </tr>
+          \`;
+        });
+
+        const tblPay = document.getElementById('tablePayrollVal');
+        if (tblPay) tblPay.innerText = (grossTotal * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+        const valPend = document.getElementById('valPendingPayroll');
+        if (valPend) valPend.innerText = (pendingTotal * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+        const valApp = document.getElementById('valApprovedSum');
+        if (valApp) valApp.innerText = (approvedTotal * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+        const valTax = document.getElementById('valTaxWithheld');
+        if (valTax) valTax.innerText = (totalDeductions * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+
+        // 3. Update Key Metrics with Numeric Animation
+        const budgetCap = 650000 * rate;
+        const convertedTotalFees = totalFeesSum * rate;
+        const convertedArrears = totalArrearsSum * rate;
+        const convertedSch = totalSchSum * rate;
+        const convertedGross = grossTotal * rate;
+        const newLiquidity = (budgetCap + totalFeesSum - approvedTotal) * rate;
+
+        animateValue('valBudget', 0, budgetCap);
+        animateValue('valTotalFees', 0, convertedTotalFees);
+        animateValue('valArrears', 0, convertedArrears);
+        animateValue('valScholarships', 0, convertedSch);
+        animateValue('valPayroll', 0, convertedGross);
+        animateValue('valLiquidity', 0, newLiquidity);
+
+        // 4. Update Term Progress Bar
+        const collectionPercent = Math.min(((totalFeesSum / 200000) * 100), 100).toFixed(1);
+        const barFill = document.getElementById('budgetBarFill');
+        if (barFill) barFill.style.width = collectionPercent + '%';
+        const pctEl = document.getElementById('budgetPercentVal');
+        if (pctEl) pctEl.innerText = collectionPercent + '%';
+        const spentEl = document.getElementById('budgetSpentVal');
+        if (spentEl) spentEl.innerText = convertedTotalFees.toLocaleString('en-US', {minimumFractionDigits: 2});
+      }
+
+      // 5. Render Audit Logs
+      const auditContainer = document.getElementById('auditList');
+      if (auditContainer) {
+        auditContainer.innerHTML = '';
+        auditData.slice(-6).reverse().forEach(log => {
+          auditContainer.innerHTML += \`
+            <li class="audit-item">
+              <span><i class="fa-solid fa-circle-check" style="color:var(--accent); margin-right:8px;"></i> \${log.msg}</span>
+              <span style="color:var(--text-muted); font-size:11px;">\${log.date}</span>
+            </li>
+          \`;
+        });
+      }
+    }
+
+    // AUDIT LOG RECORDER
+    function addAuditLog(msg) {
+      const logs = JSON.parse(localStorage.getItem('fg_audit')) || [];
+      logs.push({ msg, date: new Date().toISOString().split('T')[0] });
+      localStorage.setItem('fg_audit', JSON.stringify(logs));
+    }
+
+    // MODAL HELPERS
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active');
+    }
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('active');
+    }
+
+    // RECORD STUDENT FEE ACTION
+    async function addStudentFee(e) {
+      e.preventDefault();
+      const studentId = document.getElementById('feeStudentId').value.trim();
+      const name = document.getElementById('feeStudentName').value.trim();
+      const grade = document.getElementById('feeGrade').value.trim();
+      const cat = document.getElementById('feeCategory').value;
+      const method = document.getElementById('feeMethod').value;
+      const amount = parseFloat(document.getElementById('feeAmount').value);
+
+      const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
+      const newRec = {
+        id: 'REC-' + Math.floor(1000 + Math.random() * 9000),
+        name,
+        studentId,
+        grade,
+        cat,
+        method,
+        date: new Date().toISOString().split('T')[0],
+        billed: amount,
+        amount,
+        status: 'Cleared'
+      };
+
+      feeData.unshift(newRec);
+      localStorage.setItem('fg_student_fees', JSON.stringify(feeData));
+      addAuditLog(\`Student Fee collected: \${name} (\${amount} GHS - \${cat})\`);
+
+      closeModal('studentFeeModal');
+      document.getElementById('studentFeeForm').reset();
+      renderAll();
+      viewReceiptById(newRec.id);
+      if (window.Toaster) {
+        window.Toaster.success('Fee Collected', \`GHS \${amount.toLocaleString()} received for \${name}\`);
+      }
+    }
+
+    // OFFICIAL RECEIPT VIEWER
+    function viewReceiptById(id) {
+      const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
+      const rec = feeData.find(r => r.id === id);
+      if (!rec) return;
+
+      const rate = CURRENCY_RATES[currentCurrency] || 1.0;
+      const convertedAmt = (parseFloat(rec.amount) * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      document.getElementById('rNum').innerText = rec.id;
+      document.getElementById('rDate').innerText = rec.date;
+      document.getElementById('rStuId').innerText = rec.studentId;
+      document.getElementById('rStuName').innerText = rec.name;
+      document.getElementById('rCat').innerText = rec.cat;
+      document.getElementById('rAmt').innerText = convertedAmt;
+      document.getElementById('rTotalAmt').innerText = convertedAmt;
+
+      openModal('receiptModal');
+    }
+
+    // EXAM FINANCIAL CLEARANCE DESK LOGIC
+    function performClearanceLookup() {
+      const q = (document.getElementById('clearanceLookupInput')?.value || '').trim().toLowerCase();
+      if (!q) return;
+
+      const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
+      const student = feeData.find(s => 
+        (s.studentId && s.studentId.toLowerCase().includes(q)) || 
+        (s.rfid && s.rfid.toLowerCase().includes(q)) || 
+        (s.name && s.name.toLowerCase().includes(q))
+      );
+
+      const resultBox = document.getElementById('clearanceResultContainer');
+      if (!student) {
+        if (window.Toaster) {
+          window.Toaster.warning('Student Not Found', 'No student matching "' + q + '" was found in bursary records.');
+        } else {
+          alert('No student found matching query.');
+        }
+        return;
+      }
+
+      currentAuditedStudent = student;
+      resultBox.style.display = 'block';
+
+      const initials = student.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      document.getElementById('cStudentAvatar').innerText = initials;
+      document.getElementById('cStudentName').innerText = student.name;
+      document.getElementById('cStudentId').innerText = student.studentId + (student.rfid ? ' • RFID: ' + student.rfid : '');
+      document.getElementById('cStudentProgramme').innerText = (student.programme || 'Diploma Programme') + ' • ' + student.grade;
+
+      const billed = parseFloat(student.billed || student.amount);
+      const paid = parseFloat(student.amount || 0);
+      const bal = Math.max(0, billed - paid);
+
+      document.getElementById('cBilledAmt').innerText = billed.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('cPaidAmt').innerText = paid.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('cBalanceAmt').innerText = bal.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      const badge = document.getElementById('cClearanceBadge');
+      if (bal === 0 || student.status === 'Cleared') {
+        badge.className = 'badge success';
+        badge.innerHTML = '<i class="fa-solid fa-check-circle"></i> CLEARED FOR EXAMS';
+      } else {
+        badge.className = 'badge danger';
+        badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ARREARS PENDING (HOLD)';
+      }
+    }
+
+    function toggleStudentClearance() {
+      if (!currentAuditedStudent) return;
+      currentAuditedStudent.status = (currentAuditedStudent.status === 'Cleared') ? 'Arrears' : 'Cleared';
+
+      const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
+      const idx = feeData.findIndex(s => s.studentId === currentAuditedStudent.studentId);
+      if (idx !== -1) {
+        feeData[idx].status = currentAuditedStudent.status;
+        localStorage.setItem('fg_student_fees', JSON.stringify(feeData));
+      }
+
+      addAuditLog(\`Exam clearance status toggled for \${currentAuditedStudent.name}: \${currentAuditedStudent.status}\`);
+      performClearanceLookup();
+      renderAll();
+      if (window.Toaster) {
+        window.Toaster.success('Clearance Updated', \`Status set to \${currentAuditedStudent.status}\`);
+      }
+    }
+
+    function printExamHallPass() {
+      if (!currentAuditedStudent) return;
+      const initials = currentAuditedStudent.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      document.getElementById('hpAvatar').innerText = initials;
+      document.getElementById('hpName').innerText = currentAuditedStudent.name;
+      document.getElementById('hpId').innerText = currentAuditedStudent.studentId;
+      document.getElementById('hpProgramme').innerText = (currentAuditedStudent.programme || 'Graphic Arts') + ' • ' + currentAuditedStudent.grade;
+      openModal('examHallPassModal');
+    }
+
+    function quickExamClearance(studentId) {
+      switchTab('clearanceDesk');
+      const input = document.getElementById('clearanceLookupInput');
+      if (input) {
+        input.value = studentId;
+        performClearanceLookup();
+      }
+    }
+
+    function quickFeeReminder(studentId) {
+      const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
+      const s = feeData.find(st => st.studentId === studentId);
+      if (!s) return;
+      currentAuditedStudent = s;
+      openFeeReminderModal();
+    }
+
+    function openFeeReminderModal() {
+      if (!currentAuditedStudent) return;
+      document.getElementById('remStudentName').innerText = currentAuditedStudent.name;
+      document.getElementById('remStudentId').innerText = currentAuditedStudent.studentId;
+      const billed = parseFloat(currentAuditedStudent.billed || currentAuditedStudent.amount);
+      const paid = parseFloat(currentAuditedStudent.amount || 0);
+      const arrears = Math.max(0, billed - paid);
+      document.getElementById('remArrearsAmt').innerText = arrears.toLocaleString('en-US', {minimumFractionDigits: 2});
+      openModal('feeReminderModal');
+    }
+
+    function dispatchFeeReminderNotification() {
+      if (!currentAuditedStudent) return;
+      addAuditLog(\`Parent fee demand notice dispatched for \${currentAuditedStudent.name} (\${currentAuditedStudent.studentId})\`);
+      closeModal('feeReminderModal');
+      if (window.Toaster) {
+        window.Toaster.success('Demand Notice Sent', \`SMS & Email advisory dispatched to guardian of \${currentAuditedStudent.name}\`);
+      }
+    }
+
+    // STAFF PAYSLIP VIEWER
+    function viewStaffPayslip(index) {
+      const payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];
+      const emp = payrollData[index];
+      if (!emp) return;
+
+      const rate = CURRENCY_RATES[currentCurrency] || 1.0;
+      const gross = parseFloat(emp.gross);
+      const ded = gross * (currentTaxRate / 100);
+      const net = gross - ded;
+
+      document.getElementById('psName').innerText = emp.name;
+      document.getElementById('psRole').innerText = emp.role;
+      document.getElementById('psEmpId').innerText = emp.id;
+      document.getElementById('psGross').innerText = (gross * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('psGrossTotal').innerText = ((gross + 450) * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('psDed').innerText = (ded * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('psDedTotal').innerText = (ded * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('psNet').innerText = (net * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      openModal('payslipModal');
+    }
+
+    // PAYROLL ACTIONS
+    function openPrepareSalaryModal() {
+      const payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];
+      const container = document.getElementById('salaryTeacherList');
+      if (!container) return;
+      container.innerHTML = '';
+
+      payrollData.forEach(emp => {
+        container.innerHTML += \`
+          <div style="display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px dashed var(--card-border); font-size:12px;">
+            <input type="checkbox" id="chk_\${emp.id}" value="\${emp.id}" checked>
+            <label for="chk_\${emp.id}"><strong>\${emp.name}</strong> — \${emp.role} (GH₵ \${emp.gross.toLocaleString()})</label>
+          </div>
+        \`;
+      });
+
+      openModal('prepareSalaryModal');
+    }
+
+    function processPreparedSalary(e) {
+      e.preventDefault();
+      const period = document.getElementById('salaryPayPeriod').value;
+      const appliedTax = document.getElementById('salaryTaxRate').value;
+      
+      currentTaxRate = parseFloat(appliedTax);
+      const setTax = document.getElementById('setTaxRate');
+      if (setTax) setTax.value = currentTaxRate;
+
+      let payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];
+      payrollData = payrollData.map(emp => {
+        const chk = document.getElementById('chk_' + emp.id);
+        if (chk && chk.checked) {
+          return { ...emp, approved: false };
+        }
+        return emp;
+      });
+
+      localStorage.setItem('fg_payroll', JSON.stringify(payrollData));
+      addAuditLog(\`Payroll batch prepared for period \${period} with tax deduction \${currentTaxRate}%\`);
+
+      closeModal('prepareSalaryModal');
+      renderAll();
+      switchTab('approval');
+      if (window.Toaster) {
+        window.Toaster.info('Payroll Prepared', 'Staff payroll batch submitted for Bursar authorization');
+      }
+    }
+
+    function approveIndividualPayroll(index) {
+      const payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];
+      payrollData[index].approved = true;
+      localStorage.setItem('fg_payroll', JSON.stringify(payrollData));
+      addAuditLog(\`Salary payout authorized for \${payrollData[index].name}\`);
+      renderAll();
+      if (window.Toaster) {
+        window.Toaster.success('Salary Approved', \`Wire transfer cleared for \${payrollData[index].name}\`);
+      }
+    }
+
+    function approveAllPayroll() {
+      let payrollData = JSON.parse(localStorage.getItem('fg_payroll')) || [];
+      payrollData = payrollData.map(emp => ({ ...emp, approved: true }));
+      localStorage.setItem('fg_payroll', JSON.stringify(payrollData));
+      addAuditLog('Batch salary disbursement authorized for all active faculty & staff');
+      renderAll();
+      if (window.Toaster) {
+        window.Toaster.success('Salaries Authorized', 'All staff compensation batches approved for bank wire transfer!');
+      } else {
+        alert('All pending staff salaries have been authorized.');
+      }
+    }
+
+    // GENERAL DISBURSEMENT ACTIONS
+    function addDisbursement(e) {
+      e.preventDefault();
+      const cat = document.getElementById('disbCategory').value;
+      const ben = document.getElementById('disbBeneficiary').value;
+      const amount = parseFloat(document.getElementById('disbAmount').value);
+
+      const table = document.getElementById('transactionBody');
+      const tr = document.createElement('tr');
+      const rate = CURRENCY_RATES[currentCurrency] || 1.0;
+      const converted = (amount * rate).toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      tr.innerHTML = \`
+        <td><strong>#TR-\${Math.floor(1000 + Math.random() * 9000)}</strong></td>
+        <td>\${cat}</td>
+        <td>\${ben}</td>
+        <td>\${new Date().toISOString().split('T')[0]}</td>
+        <td>\${converted}</td>
+        <td>Bank Transfer</td>
+        <td><span class="badge success"><i class="fa-solid fa-check"></i> Certified Paid</span></td>
+      \`;
+      table.prepend(tr);
+
+      addAuditLog(\`Institutional expense recorded: \${ben} (\${amount} GHS) - \${cat}\`);
+      closeModal('disbursementModal');
+      document.getElementById('disbursementForm').reset();
+      if (window.Toaster) {
+        window.Toaster.success('Expense Recorded', \`GHS \${amount.toLocaleString()} voucher recorded for \${ben}\`);
+      }
+    }
+
+    // SCHOLARSHIP AWARD ACTIONS
+    function handleAwardScholarship(e) {
+      e.preventDefault();
+      const studentId = document.getElementById('schStudentSelect').value;
+      const scheme = document.getElementById('schName').value;
+      const sponsor = document.getElementById('schSponsor').value;
+      const amount = parseFloat(document.getElementById('schAmount').value);
+
+      const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
+      const student = feeData.find(s => s.studentId === studentId);
+      const studentName = student ? student.name : 'Enrolled Student';
+
+      const schData = JSON.parse(localStorage.getItem('fg_scholarships')) || [];
+      const newAward = {
+        id: 'SCH-2026-0' + (schData.length + 1),
+        name: studentName,
+        studentId,
+        scheme,
+        sponsor,
+        waiver: \`Credit (GHS \${amount.toLocaleString()})\`,
+        amount,
+        date: new Date().toISOString().split('T')[0],
+        status: 'Active'
+      };
+
+      schData.unshift(newAward);
+      localStorage.setItem('fg_scholarships', JSON.stringify(schData));
+
+      // Append to table
+      const tbody = document.getElementById('scholarshipsTableBody');
+      if (tbody) {
+        tbody.innerHTML = \`
+          <tr>
+            <td><strong>#\${newAward.id}</strong></td>
+            <td>\${newAward.name}</td>
+            <td>\${newAward.studentId}</td>
+            <td>\${newAward.scheme}</td>
+            <td>\${newAward.sponsor}</td>
+            <td><strong>\${newAward.waiver}</strong></td>
+            <td>\${newAward.date}</td>
+            <td><span class="badge success"><i class="fa-solid fa-check"></i> Active</span></td>
+          </tr>
+        \` + tbody.innerHTML;
+      }
+
+      addAuditLog(\`Scholarship awarded to \${studentName}: GHS \${amount} (\${scheme})\`);
+      closeModal('awardScholarshipModal');
+      document.getElementById('scholarshipForm').reset();
+      renderAll();
+      if (window.Toaster) {
+        window.Toaster.success('Scholarship Awarded', \`GHS \${amount.toLocaleString()} granted to \${studentName}\`);
+      }
+    }
+
+    function openTariffEditModal() {
+      if (window.Toaster) {
+        window.Toaster.info('Tariff Matrix', 'Fee tariff modifications are locked to Academic Council review.');
+      } else {
+        alert('Tariff Matrix modifications require Academic Council signoff.');
+      }
+    }
+
+    // CSV EXPORTS
+    function exportFeeCSV() {
+      const feeData = JSON.parse(localStorage.getItem('fg_student_fees')) || [];
+      let csv = "Receipt ID,Student Name,Student ID,Class Grade,Fee Category,Billed,Paid,Status\\n";
+      feeData.forEach(r => {
+        csv += \`"\${r.id}","\${r.name}","\${r.studentId}","\${r.grade}","\${r.cat}","\${r.billed || r.amount}","\${r.amount}","\${r.status}"\\n\`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = \`FG_Student_Fees_Ledger_\${new Date().toISOString().split('T')[0]}.csv\`;
+      link.click();
+    }
+
+    function exportLedgerCSV() {
+      const table = document.getElementById('transactionBody');
+      let csv = "Voucher ID,Category,Beneficiary,Date,Amount,Mode,Status\\n";
+      table.querySelectorAll('tr').forEach(tr => {
+        const cells = tr.querySelectorAll('td');
+        if (cells.length >= 6) {
+          csv += \`"\${cells[0].innerText}","\${cells[1].innerText}","\${cells[2].innerText}","\${cells[3].innerText}","\${cells[4].innerText}","\${cells[5]?.innerText || 'Bank Transfer'}","\${cells[6]?.innerText || 'Paid'}"\\n\`;
+        }
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = \`FG_Institutional_General_Ledger_\${new Date().toISOString().split('T')[0]}.csv\`;
+      link.click();
+    }
+
+    // INVOICE LOGIC
+    function calcInvoiceTotal() {
+      const rate = parseFloat(document.getElementById('invRate').value) || 0;
+      const qty = parseInt(document.getElementById('invQty').value) || 1;
+      const total = rate * qty;
+      document.getElementById('invTotal').value = total.toLocaleString('en-US', {minimumFractionDigits: 2});
+    }
+
+    function generateInvoice(e) {
+      e.preventDefault();
+      const client = document.getElementById('invClient').value.trim();
+      const desc = document.getElementById('invDesc').value.trim();
+      const date = document.getElementById('invDate').value;
+      const rate = parseFloat(document.getElementById('invRate').value) || 0;
+      const qty = parseInt(document.getElementById('invQty').value) || 1;
+      const total = rate * qty;
+
+      document.getElementById('rNum').innerText = 'INV-' + Math.floor(10000 + Math.random() * 90000);
+      document.getElementById('rDate').innerText = date;
+      document.getElementById('rStuId').innerText = 'ACAD-CLI';
+      document.getElementById('rStuName').innerText = client;
+      document.getElementById('rCat').innerText = \`\${desc} (Qty: \${qty})\`;
+      document.getElementById('rAmt').innerText = total.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('rTotalAmt').innerText = total.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      closeModal('invoiceModal');
+      openModal('receiptModal');
+    }
+
+    // CHAT SYSTEM
+    function selectContact(el, name, role) {
+      document.querySelectorAll('.contact-item').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('activeChatName').innerText = name;
+      document.getElementById('activeChatRole').innerText = role;
+
+      const chatContainer = document.getElementById('chatMessages');
+      chatContainer.innerHTML = \`
+        <div class="message-bubble incoming">
+          Hello Bursar! Have you reconciled the Term 2 software licensing invoice with Adobe yet?
+          <div class="message-time">10:14 AM</div>
+        </div>
+      \`;
+    }
+
+    function filterContacts() {
+      const q = document.getElementById('searchContact').value.toLowerCase();
+      document.querySelectorAll('.contact-item').forEach(item => {
+        const name = item.querySelector('.name').innerText.toLowerCase();
+        item.style.display = name.includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    function sendMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const chatContainer = document.getElementById('chatMessages');
+      const bubble = document.createElement('div');
+      bubble.className = 'message-bubble outgoing';
+      bubble.innerHTML = \`
+        \${text}
+        <div class="message-time">\${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+      \`;
+      chatContainer.appendChild(bubble);
+      input.value = '';
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+
+      setTimeout(() => {
+        const reply = document.createElement('div');
+        reply.className = 'message-bubble incoming';
+        reply.innerHTML = \`
+          Received and entered in bursary communications ledger.
+          <div class="message-time">\${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+        \`;
+        chatContainer.appendChild(reply);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }, 900);
+    }
+
+    function startNewChat(e) {
+      e.preventDefault();
+      const name = document.getElementById('newRecipientName').value;
+      const role = document.getElementById('newRecipientRole').value;
+      const msg = document.getElementById('newInitialMessage').value;
+
+      const list = document.getElementById('contactList');
+      const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
+      const li = document.createElement('li');
+      li.className = 'contact-item active';
+      li.onclick = function() { selectContact(this, name, role); };
+      li.innerHTML = \`
+        <div class="avatar" style="background:var(--accent-gradient)">\${initials} <div class="status-dot"></div></div>
+        <div class="contact-info">
+          <div class="name">\${name}</div>
+          <div style="font-size:11px; color:var(--text-muted)">\${role}</div>
+        </div>
+      \`;
+
+      document.querySelectorAll('.contact-item').forEach(c => c.classList.remove('active'));
+      list.prepend(li);
+
+      document.getElementById('activeChatName').innerText = name;
+      document.getElementById('activeChatRole').innerText = role;
+
+      const chatContainer = document.getElementById('chatMessages');
+      chatContainer.innerHTML = \`
+        <div class="message-bubble outgoing">
+          \${msg}
+          <div class="message-time">\${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+        </div>
+      \`;
+
+      closeModal('newMessageModal');
+      document.getElementById('newMessageForm').reset();
+      switchTab('messaging');
+    }
+
+    // SETTINGS ACTIONS
+    function updateCurrencySymbol(val) {
+      changeCurrency(val);
+    }
+
+    function updateTaxRate(val) {
+      currentTaxRate = parseFloat(val) || 0;
+      renderAll();
+    }
+
+    async function saveSettings(e) {
+      e.preventDefault();
+      addAuditLog('Institutional bursary configuration & tax parameters updated');
+      if (window.Toaster) {
+        window.Toaster.success('Settings Saved', 'Bursary portal preferences updated successfully!');
+      } else {
+        alert('Settings saved successfully.');
+      }
+    }
+
+    function exportData() {
+      const exportObj = {
+        payroll: JSON.parse(localStorage.getItem('fg_payroll')),
+        studentFees: JSON.parse(localStorage.getItem('fg_student_fees')),
+        scholarships: JSON.parse(localStorage.getItem('fg_scholarships')),
+        audit: JSON.parse(localStorage.getItem('fg_audit'))
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "FG_Bursary_Financial_Ledger_2026.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function purgeSystem() {
+      if (confirm('WARNING: This will reset all local bursary records and restored defaults. Continue?')) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
+
+    // SUPABASE CLOUD SYNC UI
+    function updateCloudSyncStatus() {
+      const isConn = window.SupabaseConfig && window.SupabaseConfig.isConfigured();
+      const label = document.getElementById('cloudSyncLabel');
+      const icon = document.getElementById('cloudSyncIcon');
+      const btn = document.getElementById('cloudSyncBtn');
+      if (!label || !btn) return;
+
+      if (isConn) {
+        label.textContent = 'Supabase Cloud: Active';
+        icon.className = 'fa-solid fa-cloud-check';
+        btn.style.color = '#10b981';
+        btn.style.borderColor = '#10b981';
+        btn.style.background = 'rgba(16, 185, 129, 0.15)';
+      } else {
+        label.textContent = 'Connect Supabase';
+        icon.className = 'fa-solid fa-cloud';
+        btn.style.color = '#10b981';
+        btn.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        btn.style.background = 'rgba(16, 185, 129, 0.08)';
+      }
+    }
+
+    function openCloudModal() {
+      const modal = document.getElementById('cloudModalBackdrop');
+      if (window.SupabaseConfig) {
+        document.getElementById('sb_url').value = window.SupabaseConfig.getUrl();
+        document.getElementById('sb_key').value = window.SupabaseConfig.getAnonKey();
+      }
+      modal.classList.add('active');
+    }
+
+    function closeCloudModal() {
+      document.getElementById('cloudModalBackdrop').classList.remove('active');
+    }
+
+    async function handleTestCloud() {
+      const url = document.getElementById('sb_url').value.trim();
+      const key = document.getElementById('sb_key').value.trim();
+      const statusEl = document.getElementById('cloudStatusMsg');
+      const btn = document.getElementById('testConnBtn');
+      statusEl.style.display = 'block';
+      statusEl.style.color = 'var(--accent)';
+      statusEl.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Testing connection to Supabase...';
+      btn.disabled = true;
+
+      const res = await window.SupabaseConfig.testConnection(url, key);
+      btn.disabled = false;
+
+      if (res.success) {
+        statusEl.style.color = 'var(--success)';
+        statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + res.message;
+      } else {
+        statusEl.style.color = 'var(--danger)';
+        statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + (res.error || 'Connection failed');
+      }
+    }
+
+    function handleSaveCloudConfig(e) {
+      e.preventDefault();
+      const url = document.getElementById('sb_url').value.trim();
+      const key = document.getElementById('sb_key').value.trim();
+      window.SupabaseConfig.saveCredentials(url, key, true);
+      updateCloudSyncStatus();
+      closeCloudModal();
+      if (window.Toaster) {
+        window.Toaster.success('Cloud Connected', 'Supabase PostgreSQL sync credentials saved!');
+      } else {
+        alert('Supabase cloud configuration saved!');
+      }
+    }
+
+    function handleResetCloud() {
+      if (confirm('Disconnect Supabase and revert to local storage?')) {
+        window.SupabaseConfig.resetCredentials();
+        document.getElementById('sb_url').value = '';
+        document.getElementById('sb_key').value = '';
+        updateCloudSyncStatus();
+      }
+    }
+
+    // CHART VISUALIZATIONS
+    function initCharts() {
+      if (!window.Chart) return;
+      const isDark = document.body.classList.contains('dark');
+      const textColor = isDark ? '#94A3B8' : '#64748B';
+      const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+
+      const ctx1 = document.getElementById('cashFlowChart');
+      if (ctx1) {
+        if (cashFlowChartObj) cashFlowChartObj.destroy();
+        const grad1 = ctx1.getContext('2d').createLinearGradient(0, 0, 0, 220);
+        grad1.addColorStop(0, 'rgba(16, 185, 129, 0.32)');
+        grad1.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
+        const grad2 = ctx1.getContext('2d').createLinearGradient(0, 0, 0, 220);
+        grad2.addColorStop(0, 'rgba(239, 68, 68, 0.22)');
+        grad2.addColorStop(1, 'rgba(239, 68, 68, 0.0)');
+
+        cashFlowChartObj = new Chart(ctx1.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+            datasets: [
+              {
+                label: 'Tuition Fees & Inflow',
+                data: [42000, 58000, 36000, 68000, 75000, 48000, 62000, 84000],
+                borderColor: '#10B981',
+                borderWidth: 3,
+                backgroundColor: grad1,
+                pointBackgroundColor: '#10B981',
+                pointBorderColor: '#fff',
+                pointHoverRadius: 6,
+                fill: true,
+                tension: 0.4
+              },
+              {
+                label: 'Payroll & Campus Outflow',
+                data: [32000, 35000, 37000, 36000, 41000, 38000, 42000, 44600],
+                borderColor: '#EF4444',
+                borderWidth: 3,
+                backgroundColor: grad2,
+                pointBackgroundColor: '#EF4444',
+                pointBorderColor: '#fff',
+                pointHoverRadius: 6,
+                fill: true,
+                tension: 0.4
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { color: textColor, font: { weight: '600', size: 11.5 } } }
+            },
+            scales: {
+              x: { ticks: { color: textColor }, grid: { display: false } },
+              y: { ticks: { color: textColor }, grid: { color: gridColor } }
+            }
+          }
+        });
+      }
+
+      const ctx2 = document.getElementById('expenseAllocationChart');
+      if (ctx2) {
+        if (expenseChartObj) expenseChartObj.destroy();
+        expenseChartObj = new Chart(ctx2.getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Faculty Salaries (52%)', 'Creative Lab ICT (16%)', 'Campus Utilities (14%)', 'Student Welfare (10%)', 'WAEC Levies (8%)'],
+            datasets: [{
+              data: [52, 16, 14, 10, 8],
+              backgroundColor: ['#2563EB', '#06B6D4', '#F59E0B', '#10B981', '#8B5CF6'],
+              borderWidth: 0,
+              hoverOffset: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { color: textColor, font: { size: 10.5, weight: '600' } } }
+            },
+            cutout: '66%'
+          }
+        });
+      }
+    }
+  </script>
+  <!-- Short Skeletal Loading Script -->
+  <script src="../../assets/js/skeleton-loader.js"></script>
+  <!-- Floating Quick Assistant Script -->
+  <script src="../../assets/js/quick-assistant.js"></script>
+  <!-- Floating 3-Dots Quick Dock Script -->
+  <script src="../../assets/js/quick-dock.js"></script>
+</body>
+</html>
+`;
+
+fs.writeFileSync(targetFile, htmlContent, 'utf8');
+console.log('SUCCESS: Written enhanced pages/finance/finance-dashboard.html');
+console.log('File size:', fs.statSync(targetFile).size, 'bytes');

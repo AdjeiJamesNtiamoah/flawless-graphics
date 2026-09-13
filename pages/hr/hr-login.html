@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FLAWLESS GRAPHICS — HR Portal Sign In</title>
+  <title>HR &amp; Faculty Payroll Command Console — FLAWLESS GRAPHICS</title>
 
   <!-- Typography & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,1259 +11,1234 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- AOS Animations -->
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <!-- Short Skeletal Loading Stylesheet -->
-  <link rel="stylesheet" href="../../assets/css/skeleton.css">
-  <!-- Floating Quick Assistant Stylesheet -->
-  <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
-  <!-- Toaster Notifications Stylesheet -->
+  <!-- Universal Toaster & Skeletons -->
   <link rel="stylesheet" href="../../assets/css/toaster.css">
+  <link rel="stylesheet" href="../../assets/css/skeleton.css">
+  <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
+
+  <!-- Central Authentication Bridge & Pop-up Toaster Engine -->
+  <script src="../../assets/js/auth-session.js"></script>
+  <script src="../../assets/js/toaster.js"></script>
+
+  <!-- Supabase Cloud Integration -->
+  <script src="../../assets/js/supabase-config.js"></script>
+  <script src="../../assets/js/supabase-client.js"></script>
+  <script src="../../assets/js/realtime-auth.js"></script>
 
   <style>
-    :root {
-      --bg-outer: #FAF7F2;
-      --card-bg: rgba(255, 255, 255, 0.94);
-      --card-border: rgba(226, 221, 213, 0.9);
-      --text-main: #0F172A;
-      --text-muted: #64748B;
-      --accent: #2563EB;
-      --accent-gradient: linear-gradient(135deg, #2563EB 0%, #06B6D4 100%);
-      --input-bg: #FFFFFF;
-      --input-border: rgba(203, 213, 225, 0.9);
-      --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
-      --radius-xl: 24px;
-      --radius-md: 12px;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
-
-    .dark {
-      --bg-outer: #FAF7F2;
-      --card-bg: rgba(17, 24, 39, 0.7);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --text-main: #F8FAFC;
-      --text-muted: #94A3B8;
-      --accent: #38BDF8;
-      --accent-gradient: linear-gradient(135deg, #0284C7 0%, #6366F1 100%);
-      --input-bg: rgba(15, 23, 42, 0.6);
-      --input-border: rgba(255, 255, 255, 0.12);
-      --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease; }
 
     body {
-      background-color: var(--bg-outer);
-      color: var(--text-main);
+      background-color: #060B18;
+      color: #F8FAFC;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      overflow-x: hidden;
-      position: relative;
-    }
-
-    /* Background Ambient Glows */
-    body::before, body::after {
-      content: '';
-      position: absolute;
-      width: 450px;
-      height: 450px;
-      border-radius: 50%;
-      background: var(--accent-gradient);
-      filter: blur(140px);
-      opacity: 0.15;
-      z-index: -1;
-      pointer-events: none;
-    }
-    body::before { top: -100px; left: -100px; }
-    body::after { bottom: -100px; right: -100px; }
-
-    /* HEADER */
-    header {
-      padding: 20px 40px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
-    .brand:hover .logo-circle { transform: scale(1.05) rotate(-3deg); }
-    .logo-circle {
-      width: 42px;
-      height: 42px;
-      border-radius: var(--radius-md);
-      background: var(--accent-gradient);
-      display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      color: #fff;
-      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-      transition: transform 0.25s ease;
+      padding: 32px 16px;
+      position: relative;
+      overflow-x: hidden;
     }
-    .brand-title { font-size: 15px; font-weight: 800; letter-spacing: 0.5px; }
 
-    .header-actions {
+    /* Subtle blueprint grid overlay */
+    .grid-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        linear-gradient(to right, rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Ambient atmospheric glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -10%; left: 15%;
+      width: 650px; height: 650px;
+      background: radial-gradient(circle, rgba(234, 88, 12, 0.12) 0%, transparent 70%);
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -10%; right: 15%;
+      width: 650px; height: 650px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.11) 0%, transparent 70%);
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .main-wrapper {
+      width: 100%;
+      max-width: 1080px;
+      z-index: 1;
+      position: relative;
       display: flex;
+      flex-direction: column;
       align-items: center;
+    }
+
+    /* Top Platform Navigation */
+    header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
       gap: 12px;
     }
 
-    /* BUTTON STYLES */
-    .btn-back {
-      background: rgba(0, 0, 0, 0.05);
-      border: 1px solid var(--input-border);
-      color: var(--text-main);
-      padding: 8px 16px;
-      border-radius: 30px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .dark .btn-back { background: rgba(255, 255, 255, 0.05); }
-    .btn-back:hover {
-      background: rgba(37, 99, 235, 0.15);
-      border-color: var(--accent);
-      color: var(--accent);
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-    }
-
-    .theme-toggle-btn {
-      background: rgba(0, 0, 0, 0.05);
-      border: 1px solid var(--input-border);
-      color: var(--text-main);
-      padding: 8px 16px;
-      border-radius: 30px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
+    .brand {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-family: inherit;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
     }
-    .dark .theme-toggle-btn { background: rgba(255, 255, 255, 0.05); }
 
-    /* CONTAINER */
-    main {
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ea580c 0%, #f59e0b 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
-      flex: 1;
-    }
-
-    .login-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-lg);
-      width: 100%;
-      max-width: 460px;
-      padding: 40px;
-      position: relative;
-    }
-
-    /* TAB TOGGLER */
-    .auth-tabs {
-      display: flex;
-      background: rgba(0, 0, 0, 0.05);
-      border: 1px solid var(--input-border);
-      padding: 4px;
-      border-radius: 30px;
-      margin-bottom: 24px;
-    }
-    .dark .auth-tabs { background: rgba(255, 255, 255, 0.04); }
-    .tab-btn {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
-      font-weight: 700;
-      font-size: 13px;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      font-family: inherit;
-    }
-    .tab-btn.active {
-      background: var(--card-bg);
-      color: var(--accent);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }
-
-    .login-header { text-align: center; margin-bottom: 24px; }
-    .login-header h2 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
-    .login-header p { font-size: 13px; color: var(--text-muted); }
-
-    /* FORM STYLES */
-    .form-group { margin-bottom: 18px; }
-    .form-row { display: flex; gap: 12px; }
-    .form-row .form-group { flex: 1; margin-bottom: 18px; }
-    .form-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-
-    .input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-    .input-wrapper i.icon {
-      position: absolute;
-      left: 14px;
-      color: var(--text-muted);
-      font-size: 14px;
-    }
-    .form-input {
-      width: 100%;
-      padding: 12px 14px 12px 40px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--input-border);
-      background: var(--input-bg);
-      color: var(--text-main);
-      font-size: 14px;
-      outline: none;
-      transition: all 0.2s ease;
-    }
-    .form-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-    }
-
-    .toggle-password {
-      position: absolute;
-      right: 14px;
-      cursor: pointer;
-      color: var(--text-muted);
-      font-size: 14px;
-    }
-
-    .form-options {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-      font-size: 12px;
-    }
-    .remember-me { display: flex; align-items: center; gap: 6px; color: var(--text-muted); cursor: pointer; }
-    .forgot-link { color: var(--accent); text-decoration: none; font-weight: 600; }
-    .forgot-link:hover { text-decoration: underline; }
-
-    .btn-submit {
-      width: 100%;
-      padding: 14px;
-      border-radius: var(--radius-md);
-      border: none;
-      background: var(--accent-gradient);
       color: #fff;
+      font-size: 18px;
+      box-shadow: 0 4px 16px rgba(234, 88, 12, 0.35);
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .brand-sub {
+      font-size: 10px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
       font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
-      transition: all 0.25s ease;
+    }
+
+    .header-nav {
       display: flex;
       align-items: center;
-      justify-content: center;
       gap: 8px;
-      font-family: inherit;
+      flex-wrap: wrap;
     }
-    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 14px 24px -5px rgba(37, 99, 235, 0.5); }
-    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 14px 0;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-muted);
-    }
-    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--input-border); }
-
-    .btn-demo {
-      width: 100%;
-      padding: 12px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--input-border);
-      background: rgba(37, 99, 235, 0.06);
-      color: var(--text-main);
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-family: inherit;
-    }
-    .btn-demo:hover { background: rgba(37, 99, 235, 0.12); border-color: var(--accent); }
-
-    .card-footer-link {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 13px;
-    }
-    .card-footer-link a {
-      color: var(--text-muted);
-      text-decoration: none;
+    .header-link {
+      color: #94a3b8;
+      font-size: 12.5px;
       font-weight: 600;
+      text-decoration: none;
+      padding: 7px 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: color 0.2s ease;
     }
-    .card-footer-link a:hover { color: var(--accent); }
 
-    /* FEEDBACK MESSAGES */
-    .alert-box {
-      padding: 10px 14px;
-      border-radius: var(--radius-md);
-      font-size: 12px;
-      margin-bottom: 18px;
-      display: none;
+    .header-link:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Top Gateway Header */
+    .gateway-header {
+      text-align: center;
+      margin-bottom: 26px;
+    }
+
+    .gateway-badge {
+      display: inline-flex;
       align-items: center;
       gap: 8px;
-      animation: popIn 0.3s ease;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      background: rgba(234, 88, 12, 0.1);
+      border: 1px solid rgba(234, 88, 12, 0.3);
+      color: #fb923c;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
     }
-    @keyframes popIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
-    .alert-box.show { display: flex; }
-    .alert-error   { background: rgba(239, 68, 68, 0.1);  border: 1px solid rgba(239, 68, 68, 0.3);  color: #EF4444; }
-    .alert-success { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #10B981; }
 
-    .hidden { display: none !important; }
+    .gateway-badge .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #fb923c;
+      box-shadow: 0 0 8px #fb923c;
+    }
 
-    /* Modal Styles */
+    .gateway-title {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.6px;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .gateway-subtitle {
+      font-size: 14px;
+      color: #94a3b8;
+      max-width: 680px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* Master Console Card */
+    .console-card {
+      width: 100%;
+      background: rgba(13, 22, 42, 0.82);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      box-shadow: 0 25px 65px -10px rgba(0, 0, 0, 0.7), 0 0 40px rgba(234, 88, 12, 0.06);
+      overflow: hidden;
+      animation: cardFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes cardFadeIn {
+      from { opacity: 0; transform: translateY(18px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Console Top Navigation Bar */
+    .console-topbar {
+      padding: 14px 28px;
+      background: rgba(15, 23, 42, 0.65);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .console-tabs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 8px 16px;
+      color: #94a3b8;
+      font-size: 12.5px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .tab-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .tab-btn.active {
+      background: rgba(234, 88, 12, 0.18);
+      border-color: #ea580c;
+      color: #ffffff;
+      box-shadow: 0 0 16px rgba(234, 88, 12, 0.25);
+    }
+
+    .security-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #34d399;
+    }
+
+    .security-badge .sec-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    /* Split 2-Column Body */
+    .console-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 480px;
+    }
+
+    @media (max-width: 860px) {
+      .console-body {
+        grid-template-columns: 1fr;
+      }
+      .left-panel {
+        border-right: none !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+    }
+
+    /* Left Overview Panel */
+    .left-panel {
+      padding: 44px 40px;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 8px;
+      background: rgba(234, 88, 12, 0.15);
+      border: 1px solid rgba(234, 88, 12, 0.35);
+      color: #fb923c;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .role-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      color: #ffffff;
+      margin-bottom: 10px;
+      line-height: 1.25;
+    }
+
+    .role-desc {
+      font-size: 13.5px;
+      color: #94a3b8;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13.5px;
+      color: #e2e8f0;
+      font-weight: 500;
+    }
+
+    .feature-item i {
+      color: #10b981;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .btn-action-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #38bdf8;
+      font-size: 12.5px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      align-self: flex-start;
+    }
+
+    .btn-action-link:hover {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: #38bdf8;
+      color: #ffffff;
+    }
+
+    /* Right Authentication Panel */
+    .right-panel {
+      padding: 44px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Sub Tabs: Sign In / Create Account */
+    .mode-tabs {
+      display: flex;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 20px;
+      gap: 4px;
+    }
+
+    .mode-tab {
+      flex: 1;
+      padding: 9px 14px;
+      border-radius: 8px;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .mode-tab.active {
+      background: rgba(234, 88, 12, 0.2);
+      color: #ffffff;
+      border: 1px solid rgba(234, 88, 12, 0.4);
+    }
+
+    .auth-header {
+      margin-bottom: 20px;
+    }
+
+    .auth-header h3 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+      margin-bottom: 4px;
+    }
+
+    .auth-header p {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    .alert-box {
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      margin-bottom: 16px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .alert-box.alert-error {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+
+    .alert-box.alert-success {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #6ee7b7;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 7px;
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrap i.field-icon {
+      position: absolute;
+      left: 15px;
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 16px 12px 42px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      color: #ffffff;
+      font-size: 14px;
+      outline: none;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+      border-color: #ea580c;
+      box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.2);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .toggle-pass {
+      position: absolute;
+      right: 14px;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    .toggle-pass:hover {
+      color: #ffffff;
+    }
+
+    .form-extras {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-size: 12.5px;
+    }
+
+    .remember-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #94a3b8;
+      cursor: pointer;
+    }
+
+    .remember-wrap input[type="checkbox"] {
+      accent-color: #ea580c;
+      width: 15px;
+      height: 15px;
+      border-radius: 4px;
+    }
+
+    .forgot-link {
+      color: #38bdf8;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, #ea580c 0%, #d97706 100%);
+      color: #ffffff;
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 6px 20px rgba(234, 88, 12, 0.35);
+      transition: all 0.25s ease;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(234, 88, 12, 0.45);
+      filter: brightness(1.06);
+    }
+
+    .auth-footer-text {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .auth-footer-text a {
+      color: #38bdf8;
+      font-weight: 700;
+      text-decoration: none;
+      margin-left: 4px;
+    }
+
+    .auth-footer-text a:hover {
+      text-decoration: underline;
+    }
+
+    /* Modal Overlay for OTP Verification */
     .modal-overlay {
       position: fixed;
-      inset: 0;
-      background: rgba(10, 4, 25, 0.78);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(10px);
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 10000;
+      z-index: 1000;
       padding: 20px;
     }
+
     .modal-overlay.active {
       display: flex;
-      animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
+
     .modal-box {
-      background: #FFFFFF;
-      border: 1px solid rgba(0, 0, 0, 0.12);
-      border-radius: var(--radius-xl);
-      padding: 28px 24px;
+      background: #0d162a;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 440px;
       width: 100%;
-      max-width: 450px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
-      position: relative;
-      color: var(--text-main);
       text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+      position: relative;
     }
-    .dark .modal-box {
-      background: #111827;
-      border-color: rgba(255, 255, 255, 0.12);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
-    }
+
     .modal-close-btn {
       position: absolute;
-      top: 14px;
-      right: 14px;
-      background: rgba(0, 0, 0, 0.05);
+      top: 16px; right: 16px;
+      background: rgba(255, 255, 255, 0.08);
       border: none;
-      color: var(--text-muted);
-      width: 32px;
-      height: 32px;
+      color: #94a3b8;
+      width: 32px; height: 32px;
       border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s;
     }
-    .dark .modal-close-btn { background: rgba(255, 255, 255, 0.1); color: #fff; }
-    .modal-close-btn:hover { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+
+    .modal-close-btn:hover {
+      color: #ffffff;
+    }
+
     .verify-badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(37, 99, 235, 0.08);
-      border: 1px solid rgba(37, 99, 235, 0.2);
+      background: rgba(234, 88, 12, 0.12);
+      border: 1px solid rgba(234, 88, 12, 0.3);
       padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 13px;
-      color: var(--accent);
-      font-weight: 600;
-      margin: 10px 0 14px 0;
-      word-break: break-all;
-    }
-    .verify-feedback {
-      padding: 8px 12px;
       border-radius: 8px;
-      font-size: 12px;
-      margin-bottom: 12px;
-      display: none;
+      font-size: 13px;
+      color: #fb923c;
+      font-weight: 700;
+      margin: 10px 0 14px 0;
     }
-    .verify-feedback.error {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid #ef4444;
-      color: #ef4444;
-      display: block;
-    }
-    .verify-feedback.success {
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid #10b981;
-      color: #10b981;
-      display: block;
-    }
-    .otp-box {
-      background: rgba(0, 0, 0, 0.02);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-    .dark .otp-box {
-      background: rgba(255, 255, 255, 0.03);
-      border-color: rgba(255, 255, 255, 0.08);
-    }
-    .otp-input {
+
+    .otp-field {
       width: 100%;
-      background: var(--input-bg);
-      border: 1px solid var(--input-border);
-      color: var(--text-main);
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
       font-size: 24px;
-      letter-spacing: 8px;
+      letter-spacing: 6px;
       text-align: center;
-      font-weight: 800;
-      font-family: 'JetBrains Mono', 'Courier New', monospace;
-      padding: 10px;
-      border-radius: var(--radius-md);
-      margin-bottom: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      margin: 14px 0;
       outline: none;
-      box-sizing: border-box;
-      transition: all 0.2s;
-    }
-    .otp-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
     }
 
-    /* Instant Code Display & Countdown Timer */
-    .instant-code-card {
-      background: rgba(37, 99, 235, 0.06);
-      border: 1px dashed rgba(37, 99, 235, 0.35);
-      border-radius: var(--radius-md);
-      padding: 10px 14px;
-      margin: 10px 0 14px;
+    footer {
+      margin-top: 28px;
       text-align: center;
-    }
-    .instant-code-header {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .instant-code-display {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .instant-code-value {
-      font-family: 'JetBrains Mono', 'Courier New', monospace;
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: 4px;
-      color: var(--accent);
-      background: rgba(37, 99, 235, 0.08);
-      padding: 3px 12px;
-      border-radius: 6px;
-      border: 1px solid rgba(37, 99, 235, 0.2);
-    }
-    .btn-copy-code {
-      background: var(--accent);
-      border: 1px solid var(--accent);
-      color: #ffffff;
-      border-radius: 6px;
-      padding: 5px 10px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .btn-copy-code:hover {
-      background: #1d4ed8;
-    }
-    .otp-timer-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
       font-size: 12px;
-      color: var(--text-muted);
-      background: rgba(0, 0, 0, 0.04);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      border-radius: 20px;
-      padding: 3px 12px;
-      margin-bottom: 12px;
-    }
-    .otp-timer-badge.expired {
-      color: #ef4444;
-      background: rgba(239, 68, 68, 0.1);
-      border-color: rgba(239, 68, 68, 0.3);
+      color: #64748b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
     }
 
-    footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-muted); }
+    footer a {
+      color: #94a3b8;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    footer a:hover {
+      color: #38bdf8;
+    }
   </style>
-  <!-- Pop-up Toaster System -->
-  <link rel="stylesheet" href="../../assets/css/toaster.css">
-  <script src="../../assets/js/toaster.js"></script>
 </head>
 <body>
 
-<!-- Short Skeletal Loading Placeholder -->
-<div id="skeletonLoader" class="skeleton-overlay" style="flex-direction: column; justify-content: space-between; padding: 20px;">
-  <div style="width: 100%; max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
-    <div style="display: flex; align-items: center; gap: 10px;">
-      <div class="skeleton-shimmer-light" style="width: 36px; height: 36px; border-radius: 50%;"></div>
-      <div class="skeleton-shimmer-light" style="width: 140px; height: 16px; border-radius: 4px;"></div>
-    </div>
-    <div class="skeleton-shimmer-light" style="width: 80px; height: 32px; border-radius: 10px;"></div>
-  </div>
+<div class="grid-overlay"></div>
 
-  <div class="skeleton-auth-card">
-    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 8px;">
-      <div class="skeleton-shimmer-light" style="width: 48px; height: 48px; border-radius: 12px;"></div>
-      <div class="skeleton-shimmer-light" style="width: 180px; height: 22px; border-radius: 5px;"></div>
-      <div class="skeleton-shimmer-light" style="width: 220px; height: 12px; border-radius: 4px;"></div>
-    </div>
-    <div style="display: flex; flex-direction: column; gap: 6px;">
-      <div class="skeleton-shimmer-light" style="width: 80px; height: 12px; border-radius: 4px;"></div>
-      <div class="skeleton-shimmer-light" style="width: 100%; height: 42px; border-radius: 10px;"></div>
-    </div>
-    <div style="display: flex; flex-direction: column; gap: 6px;">
-      <div class="skeleton-shimmer-light" style="width: 90px; height: 12px; border-radius: 4px;"></div>
-      <div class="skeleton-shimmer-light" style="width: 100%; height: 42px; border-radius: 10px;"></div>
-    </div>
-    <div style="display: flex; justify-content: space-between; align-items: center; margin: 2px 0;">
-      <div class="skeleton-shimmer-light" style="width: 100px; height: 14px; border-radius: 4px;"></div>
-      <div class="skeleton-shimmer-light" style="width: 90px; height: 14px; border-radius: 4px;"></div>
-    </div>
-    <div class="skeleton-shimmer-light" style="width: 100%; height: 44px; border-radius: 10px; margin-top: 6px;"></div>
-  </div>
-
-  <div class="skeleton-shimmer-light" style="width: 200px; height: 12px; border-radius: 4px; margin: 0 auto;"></div>
-</div>
-
-  <!-- HEADER -->
+<div class="main-wrapper">
+  <!-- Header Nav -->
   <header>
-    <div class="header-left">
-      <a href="../../welcome.html" class="brand">
-        <div class="logo-circle">FG</div>
+    <a href="../../index.html" class="brand">
+      <div class="brand-logo">
+        <i class="fa-solid fa-graduation-cap"></i>
+      </div>
+      <div>
         <div class="brand-title">FLAWLESS GRAPHICS</div>
-      </a>
-      <!-- Left-Aligned Navigation to Hub -->
-      <a href="../../welcome.html" class="btn-back">
-        <i class="fa-solid fa-arrow-left"></i>
-        <span>Back to Hub</span>
-      </a>
-    </div>
-
-    <div class="header-actions">
-      <button class="theme-toggle-btn" id="themeBtn">
-        <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
-      </button>
-    </div>
+        <div class="brand-sub">Enterprise Institutional Cloud</div>
+      </div>
+    </a>
   </header>
 
-  <!-- LOGIN CARD -->
-  <main>
-    <div class="login-card" data-aos="zoom-in" data-aos-duration="600">
+  <!-- Top Gateway Banner -->
+  <div class="gateway-header">
+    <div class="gateway-badge">
+      <span class="badge-dot"></span>
+      HR &amp; Faculty Payroll Gateways
+    </div>
+    <h1 class="gateway-title">Direct Institutional Access Console</h1>
+    <p class="gateway-subtitle">
+      Single sign-on authentication for HR Directors, Payroll Officers, and Faculty Administrators.
+    </p>
+  </div>
 
-      <div class="auth-tabs">
-        <button class="tab-btn active" id="tabSignIn" onclick="switchTab('signin')">
-          <i class="fa-solid fa-right-to-bracket"></i> Sign In
-        </button>
-        <button class="tab-btn" id="tabSignUp" onclick="switchTab('signup')">
-          <i class="fa-solid fa-user-plus"></i> Register
-        </button>
+  <!-- Master Console Card -->
+  <div class="console-card">
+    <div class="console-topbar">
+      <div style="font-size: 11.5px; font-weight: 800; color: #34d399; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;">
+        <i class="fa-solid fa-users-gear"></i> HR &amp; FACULTY PAYROLL CONSOLE
       </div>
-
-      <div class="login-header">
-        <h2 id="formTitle">HR Portal Login</h2>
-        <p id="formSub">Access your organization's HR tools</p>
-      </div>
-
-      <div class="alert-box alert-error" id="alertError">
-        <i class="fa-solid fa-circle-exclamation"></i>
-        <span id="alertErrorMsg">An error occurred.</span>
-      </div>
-      <div class="alert-box alert-success" id="alertSuccess">
-        <i class="fa-solid fa-circle-check"></i>
-        <span id="alertSuccessMsg">Success!</span>
-      </div>
-
-      <form id="hrAuthForm" onsubmit="handleSubmit(event)">
-
-        <div class="form-group hidden" id="photoRow">
-          <label class="form-label">Profile Photo (Optional)</label>
-          <div class="photo-upload-box" style="display: flex; align-items: center; gap: 12px; background: var(--input-bg); border: 1px dashed var(--input-border); border-radius: var(--radius-md); padding: 8px 14px;">
-            <div id="hrPhotoPreview" style="width: 42px; height: 42px; border-radius: 50%; background: rgba(37,99,235,0.1); border: 1px solid var(--input-border); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
-              <i class="fa-solid fa-user" style="color: var(--text-muted); font-size: 16px;"></i>
-            </div>
-            <div style="flex: 1; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-              <input type="file" id="hrPhotoFile" accept="image/png, image/jpeg, image/webp" style="display: none;" onchange="handleHrPhotoUpload(event)">
-              <button type="button" class="btn-demo" style="padding: 6px 12px; font-size: 12px; width: auto;" onclick="document.getElementById('hrPhotoFile').click()">
-                <i class="fa-solid fa-camera"></i> Upload Photo
-              </button>
-              <button type="button" id="btnRemoveHrPhoto" style="display: none; background: none; border: none; color: #ef4444; font-size: 12px; cursor: pointer;" onclick="removeHrPhoto()">Remove</button>
-              <span id="hrPhotoHint" style="font-size: 11px; color: var(--text-muted);">PNG, JPG (Max 2MB)</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-row hidden" id="nameRow">
-          <div class="form-group">
-            <label class="form-label">First Name</label>
-            <div class="input-wrapper">
-              <i class="fa-solid fa-user icon"></i>
-              <input type="text" id="firstName" class="form-input" placeholder="James">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Last Name</label>
-            <div class="input-wrapper">
-              <i class="fa-solid fa-user icon"></i>
-              <input type="text" id="lastName" class="form-input" placeholder="Ntiamoah">
-            </div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Organization Name</label>
-          <div class="input-wrapper">
-            <i class="fa-solid fa-building icon"></i>
-            <input type="text" id="orgName" class="form-input" placeholder="e.g. FLAWLESS GRAPHICS" required>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">HR Email Address</label>
-          <div class="input-wrapper">
-            <i class="fa-solid fa-envelope icon"></i>
-            <input type="email" id="hrEmail" class="form-input" placeholder="admin@flawlessgraphics.com" required autocomplete="username">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Password</label>
-          <div class="input-wrapper">
-            <i class="fa-solid fa-lock icon"></i>
-            <input type="password" id="hrPassword" class="form-input" placeholder="••••••••" required>
-            <i class="fa-solid fa-eye toggle-password" id="togglePass" onclick="togglePassword('hrPassword','togglePass')"></i>
-          </div>
-        </div>
-
-        <div class="form-group hidden" id="confirmRow">
-          <label class="form-label">Confirm Password</label>
-          <div class="input-wrapper">
-            <i class="fa-solid fa-shield-halved icon"></i>
-            <input type="password" id="confirmPassword" class="form-input" placeholder="Re-enter password">
-            <i class="fa-solid fa-eye toggle-password" id="toggleConfirm" onclick="togglePassword('confirmPassword','toggleConfirm')"></i>
-          </div>
-        </div>
-
-        <div class="form-options" id="signInOpts">
-          <label class="remember-me">
-            <input type="checkbox" id="rememberMe"> Remember me
-          </label>
-          <a href="#" class="forgot-link" onclick="forgotPassword(event)">Forgot password?</a>
-        </div>
-
-        <button type="submit" class="btn-submit" id="submitBtn">
-          <i class="fa-solid fa-right-to-bracket" id="submitIcon"></i>
-          <span id="submitLabel">Sign In to HR Dashboard</span>
-        </button>
-
-        <div class="divider">or</div>
-
-        <button type="button" class="btn-demo" onclick="quickDemoHRLogin()">
-          <i class="fa-solid fa-bolt" style="color: var(--accent);"></i>
-          One-Click Demo HR Access
-        </button>
-      </form>
-
-      <div class="card-footer-link">
-        <a href="../../welcome.html"><i class="fa-solid fa-house"></i> Return to Central Hub</a>
+      <div class="security-badge">
+        <span class="sec-dot"></span> SHA-256 Encrypted Gateway
       </div>
     </div>
-  </main>
 
-  <!-- MODAL: HR EMAIL & OTP VERIFICATION -->
-  <div class="modal-overlay" id="hrOtpModal">
-    <div class="modal-box">
-      <button class="modal-close-btn" type="button" onclick="closeHrOtpModal()"><i class="fa-solid fa-xmark"></i></button>
-      <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(37, 99, 235, 0.12); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 14px;">
-        <i class="fa-solid fa-shield-halved"></i>
-      </div>
-      <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px; color: var(--text-main);">Verify HR Administrator</h3>
-      <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 6px;">
-        A 6-digit confirmation code has been generated for:
-      </p>
-      <div class="verify-badge" id="hrVerifyEmailBadge">
-        <i class="fa-regular fa-envelope"></i> <span id="hrVerifyEmailText">hr@school.com</span>
-      </div>
-
-      <div id="hrVerifyFeedback" class="verify-feedback"></div>
-
-      <!-- Instant Code Card for users who didn't receive email -->
-      <div class="instant-code-card" id="instantCodeCard">
-        <div class="instant-code-header">
-          <i class="fa-solid fa-envelope-open-text"></i>
-          <span>Didn't receive code? Instant authentication code:</span>
+    <div class="console-body">
+      <!-- Left Overview Panel -->
+      <div class="left-panel">
+        <div>
+          <div class="role-badge">HR &amp; FACULTY PAYROLL CONSOLE</div>
+          <h2 class="role-title">Faculty Governance &amp; Payroll Center</h2>
+          <p class="role-desc">
+            Orchestrate staff onboarding, contract verification, monthly salary disbursements, and institutional attendance compliance in real time.
+          </p>
+          <div class="feature-list">
+            <div class="feature-item"><i class="fa-solid fa-check"></i> <span>Comprehensive academic &amp; non-academic staff directories</span></div>
+            <div class="feature-item"><i class="fa-solid fa-check"></i> <span>Automated payroll computation with payslip generation</span></div>
+            <div class="feature-item"><i class="fa-solid fa-check"></i> <span>Leave approval workflows &amp; biometric attendance tracking</span></div>
+          </div>
         </div>
-        <div class="instant-code-display">
-          <span class="instant-code-value" id="instantHrCodeValue">------</span>
-          <button type="button" class="btn-copy-code" id="btnAutoFillHrCode" onclick="autoFillHrOtpCode()">
-            <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-fill Code
+        <a href="../../welcome.html" class="btn-action-link">
+          <i class="fa-solid fa-arrow-left"></i> Return to Workstation Hub
+        </a>
+      </div>
+
+      <!-- Right Form Panel -->
+      <div class="right-panel">
+        <!-- Dual Mode Switcher Tabs -->
+        <div class="mode-tabs">
+          <button type="button" class="mode-tab active" id="tabSignIn">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In
+          </button>
+          <button type="button" class="mode-tab" id="tabSignUp">
+            <i class="fa-solid fa-user-plus"></i> Register HR Account
           </button>
         </div>
-      </div>
 
-      <!-- OTP Expiration Countdown Timer -->
-      <div class="otp-timer-badge" id="hrOtpTimerBadge">
-        <i class="fa-regular fa-clock"></i> Code expires in: <span id="hrOtpTimerText" style="font-weight: 700; font-family: monospace; font-size: 13.5px; margin-left: 4px;">05:00</span>
-      </div>
-
-      <div class="otp-box">
-        <div style="font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
-          <i class="fa-solid fa-key"></i> Enter 6-Digit Code
+        <div class="auth-header">
+          <h3 id="formTitle">HR Portal Login</h3>
+          <p id="formSub">Access your organization's administrative tools</p>
         </div>
-        <input type="text" id="hrOtpInput" class="otp-input" placeholder="------" maxlength="6" autocomplete="one-time-code">
-        <button type="button" class="btn-submit" id="btnVerifyHrOtp" onclick="submitHrOtpVerification()" style="margin-top: 4px;">
-          <i class="fa-solid fa-check"></i> Verify & Enter HR Dashboard
-        </button>
-      </div>
 
-      <div style="display: flex; gap: 10px; justify-content: center; align-items: center; margin-top: 8px;">
-        <button type="button" class="btn-submit" id="btnResendHrOtp" onclick="resendHrOtpEmail()" style="font-size: 11.5px; padding: 7px 16px; width: auto; background: rgba(0,0,0,0.06); color: var(--text-main); border: 1px solid var(--input-border); box-shadow: none;">
-          <i class="fa-solid fa-rotate-right"></i> Resend Code
-        </button>
-        <button type="button" class="btn-submit" onclick="closeHrOtpModal()" style="font-size: 11.5px; padding: 7px 16px; width: auto; background: rgba(0,0,0,0.06); color: var(--text-main); border: 1px solid var(--input-border); box-shadow: none;">
-          Cancel
-        </button>
+        <!-- Alert messages -->
+        <div class="alert-box alert-error" id="errorBox">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span id="errorMessage">Please complete all fields.</span>
+        </div>
+        <div class="alert-box alert-success" id="successBox">
+          <i class="fa-solid fa-circle-check"></i>
+          <span id="successMessage">Account verified! You can now sign in.</span>
+        </div>
+
+        <form id="authForm">
+          <div class="form-group">
+            <label class="form-label" for="orgName">Institution Workspace (Subdomain Slug)</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-school field-icon"></i>
+              <select id="orgName" class="form-control" style="background: rgba(15, 23, 42, 0.7); color: #fff; padding-left: 40px;" required>
+                <option value="">-- Loading Approved Institutions... --</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" id="hrPhotoGroup" style="display: none;">
+            <label class="form-label">HR Officer Profile Photo (Optional)</label>
+            <div style="display: flex; align-items: center; gap: 14px; padding: 10px 14px; background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(255, 255, 255, 0.2); border-radius: 12px;">
+              <div id="hrPhotoPreview" style="width: 48px; height: 48px; border-radius: 50%; background: rgba(234, 88, 12, 0.15); border: 2px solid #ea580c; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                <i class="fa-solid fa-user-tie" style="font-size: 18px; color: #fb923c;"></i>
+              </div>
+              <div style="flex: 1;">
+                <button type="button" class="btn-outline" style="padding: 6px 12px; font-size: 11px; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; cursor: pointer;" onclick="document.getElementById('hrPhotoFile').click()">
+                  <i class="fa-solid fa-camera"></i> Choose Photo
+                </button>
+                <button type="button" id="removeHrPhotoBtn" style="padding: 6px 10px; font-size: 11px; border-radius: 8px; display: none; color: #dc2626; border: 1px solid #fca5a5; background: transparent; cursor: pointer; margin-left: 6px;" onclick="removeHrPhoto()">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+                <input type="file" id="hrPhotoFile" accept="image/*" style="display: none;" onchange="handleHrPhotoUpload(event)">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="hrEmail">HR Work Email</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-envelope field-icon"></i>
+              <input type="email" id="hrEmail" class="form-control" placeholder="hr@institution.edu" required autocomplete="username" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="hrPassword">Password</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-lock field-icon"></i>
+              <input type="password" id="hrPassword" class="form-control" placeholder="••••••••" required autocomplete="current-password" />
+              <i class="fa-solid fa-eye toggle-pass" id="togglePassword"></i>
+            </div>
+            <div id="hrPassMeter"></div>
+          </div>
+
+          <!-- Confirm Password for Sign Up mode -->
+          <div class="form-group" id="confirmPassGroup" style="display: none;">
+            <label class="form-label" for="confirmPassword">Confirm Password</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-shield-halved field-icon"></i>
+              <input type="password" id="confirmPassword" class="form-control" placeholder="••••••••" autocomplete="new-password" />
+            </div>
+          </div>
+
+          <div class="form-extras" id="signInOptions">
+            <label class="remember-wrap">
+              <input type="checkbox" id="rememberMe" checked>
+              <span>Remember active session</span>
+            </label>
+            <a href="#" class="forgot-link" onclick="if(window.Toaster) window.Toaster.info('Support', 'Please contact institutional IT support to reset credentials.')">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <span>Sign In to HR Dashboard</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+
+        <div class="auth-footer-text">
+          New Educational Institution? <a href="../../register.html">Register School Workspace</a>
+        </div>
       </div>
     </div>
   </div>
 
   <footer>
-    © <span id="year"></span> Flawless Graphics — Enterprise HR Management System
+    <div>&copy; 2026 <strong>FLAWLESS GRAPHICS</strong> &bull; Enterprise Institutional Management Platform. All rights reserved.</div>
+    <div style="display: flex; gap: 16px; margin-top: 4px;">
+      <a href="../../welcome.html">Workstation Hub</a>
+      <a href="../public/home.html">Public Site</a>
+      <a href="../../register.html">Register Organization</a>
+    </div>
   </footer>
+</div>
 
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script src="../../assets/js/auth-session.js"></script>
-  <script>
-    AOS.init({ once: true });
-    document.getElementById('year').textContent = new Date().getFullYear();
+<!-- Modal: HR OTP Verification -->
+<div class="modal-overlay" id="hrOtpModal">
+  <div class="modal-box">
+    <button class="modal-close-btn" type="button" onclick="closeHrOtpModal()"><i class="fa-solid fa-xmark"></i></button>
+    <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(234, 88, 12, 0.15); color: #fb923c; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 12px;">
+      <i class="fa-solid fa-shield-halved"></i>
+    </div>
+    <h3 style="font-size: 19px; font-weight: 800; color: #fff; margin-bottom: 4px;">Verify HR Account</h3>
+    <p style="font-size: 12.5px; color: #94a3b8; line-height: 1.5; margin-bottom: 6px;">
+      A 6-digit confirmation code has been generated for:
+    </p>
+    <div class="verify-badge" id="hrVerifyEmailBadge">
+      <i class="fa-regular fa-envelope"></i> <span id="hrVerifyEmailText">hr@company.com</span>
+    </div>
 
-    // Theme Management
-    const el = document.documentElement;
-    const themeBtn = document.getElementById('themeBtn');
-    function applyTheme(isDark) {
-      isDark ? el.classList.add('dark') : el.classList.remove('dark');
-      themeBtn.innerHTML = isDark ? `<i class="fa-solid fa-sun"></i> <span>Light</span>` : `<i class="fa-solid fa-moon"></i> <span>Dark</span>`;
-      localStorage.setItem('fg_theme_dark', isDark);
+    <div id="hrVerifyFeedback" style="font-size: 12px; margin-bottom: 10px; display: none;"></div>
+
+    <input type="text" id="hrOtpInput" class="otp-field" placeholder="------" maxlength="6" autocomplete="one-time-code">
+
+    <button type="button" class="btn-submit" id="btnVerifyHrOtp" onclick="submitHrOtpVerification()">
+      <i class="fa-solid fa-check"></i> Verify &amp; Enter HR Dashboard
+    </button>
+
+    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 12px;">
+      <button type="button" class="tab-btn" id="btnResendHrOtp" onclick="resendHrOtpEmail()" style="font-size: 11.5px; padding: 6px 14px;">
+        <i class="fa-solid fa-rotate-right"></i> Resend Code
+      </button>
+      <button type="button" class="tab-btn" onclick="closeHrOtpModal()" style="font-size: 11.5px; padding: 6px 14px;">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let pendingHrUser = null;
+  let currentHrOtpCode = '';
+  let isSignUpMode = false;
+
+  const tabSignIn = document.getElementById('tabSignIn');
+  const tabSignUp = document.getElementById('tabSignUp');
+  const confirmPassGroup = document.getElementById('confirmPassGroup');
+  const signInOptions = document.getElementById('signInOptions');
+  const formTitle = document.getElementById('formTitle');
+  const formSub = document.getElementById('formSub');
+  const submitBtn = document.getElementById('submitBtn');
+  const confirmPasswordInput = document.getElementById('confirmPassword');
+  const hrPassword = document.getElementById('hrPassword');
+  const togglePassword = document.getElementById('togglePassword');
+  const errorBox = document.getElementById('errorBox');
+  const errorMessage = document.getElementById('errorMessage');
+  const successBox = document.getElementById('successBox');
+  const successMessage = document.getElementById('successMessage');
+
+  // Toggle Password
+  togglePassword.addEventListener('click', () => {
+    if (hrPassword.type === 'password') {
+      hrPassword.type = 'text';
+      togglePassword.classList.remove('fa-eye');
+      togglePassword.classList.add('fa-eye-slash');
+    } else {
+      hrPassword.type = 'password';
+      togglePassword.classList.remove('fa-eye-slash');
+      togglePassword.classList.add('fa-eye');
     }
-    const savedTheme = localStorage.getItem('fg_theme_dark');
-    applyTheme(savedTheme === null ? (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) : savedTheme === 'true');
-    themeBtn.addEventListener('click', () => applyTheme(!el.classList.contains('dark')));
+  });
 
-    // Pre-fill active org if available
-    const existingOrg = (window.AuthSession ? window.AuthSession.getOrg() : null) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
-    if (existingOrg) document.getElementById('orgName').value = existingOrg;
+  // Switch between Sign In and Sign Up
+  tabSignIn.addEventListener('click', () => setMode(false));
+  tabSignUp.addEventListener('click', () => setMode(true));
 
-    // Tabs Management
-    let currentMode = 'signin';
-    const tabSignIn = document.getElementById('tabSignIn');
-    const tabSignUp = document.getElementById('tabSignUp');
-    const photoRow = document.getElementById('photoRow');
-    const nameRow = document.getElementById('nameRow');
-    const confirmRow = document.getElementById('confirmRow');
-    const signInOpts = document.getElementById('signInOpts');
-    const formTitle = document.getElementById('formTitle');
-    const formSub = document.getElementById('formSub');
-    const submitBtn = document.getElementById('submitBtn');
-    const submitLabel = document.getElementById('submitLabel');
-    const submitIcon = document.getElementById('submitIcon');
-    const firstNameInput = document.getElementById('firstName');
-    const lastNameInput = document.getElementById('lastName');
-    const confirmPasswordInput = document.getElementById('confirmPassword');
+  let currentHrPhotoBase64 = null;
 
-    let currentHrPhotoBase64 = null;
-
-    function handleHrPhotoUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      if (file.size > 2 * 1024 * 1024) {
-        showError('Profile photo size must be under 2MB.');
-        e.target.value = '';
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        currentHrPhotoBase64 = evt.target.result;
-        const preview = document.getElementById('hrPhotoPreview');
-        if (preview) {
-          preview.innerHTML = `<img src="${currentHrPhotoBase64}" alt="HR Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
-        }
-        const removeBtn = document.getElementById('btnRemoveHrPhoto');
-        if (removeBtn) removeBtn.style.display = 'inline-block';
-        const hint = document.getElementById('hrPhotoHint');
-        if (hint) hint.style.display = 'none';
-      };
-      reader.readAsDataURL(file);
+  function handleHrPhotoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      showError('Please select a valid image file (PNG, JPG, WebP).');
+      return;
     }
-
-    function removeHrPhoto() {
-      currentHrPhotoBase64 = null;
-      const fileInput = document.getElementById('hrPhotoFile');
-      if (fileInput) fileInput.value = '';
+    if (file.size > 3 * 1024 * 1024) {
+      showError('Photo exceeds 3MB limit.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      currentHrPhotoBase64 = e.target.result;
       const preview = document.getElementById('hrPhotoPreview');
-      if (preview) preview.innerHTML = `<i class="fa-solid fa-user" style="color: var(--text-muted); font-size: 16px;"></i>`;
-      const removeBtn = document.getElementById('btnRemoveHrPhoto');
-      if (removeBtn) removeBtn.style.display = 'none';
-      const hint = document.getElementById('hrPhotoHint');
-      if (hint) hint.style.display = 'inline';
-    }
+      if (preview) preview.innerHTML = `<img src="${currentHrPhotoBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+      const removeBtn = document.getElementById('removeHrPhotoBtn');
+      if (removeBtn) removeBtn.style.display = 'inline-block';
+    };
+    reader.readAsDataURL(file);
+  }
 
-    function switchTab(mode) {
-      currentMode = mode;
-      hideAlerts();
+  function removeHrPhoto() {
+    currentHrPhotoBase64 = null;
+    const preview = document.getElementById('hrPhotoPreview');
+    if (preview) preview.innerHTML = '<i class="fa-solid fa-user-tie" style="font-size: 18px; color: #fb923c;"></i>';
+    const removeBtn = document.getElementById('removeHrPhotoBtn');
+    if (removeBtn) removeBtn.style.display = 'none';
+    const fileInput = document.getElementById('hrPhotoFile');
+    if (fileInput) fileInput.value = '';
+  }
 
-      if (mode === 'signup') {
-        tabSignUp.classList.add('active');
-        tabSignIn.classList.remove('active');
-        if (photoRow) photoRow.classList.remove('hidden');
-        nameRow.classList.remove('hidden');
-        confirmRow.classList.remove('hidden');
-        signInOpts.classList.add('hidden');
-        firstNameInput.required = true;
-        lastNameInput.required = true;
-        confirmPasswordInput.required = true;
+  function setMode(signUp) {
+    isSignUpMode = signUp;
+    const meter = document.getElementById('hrPassMeter');
+    if (meter) meter.style.display = signUp ? 'block' : 'none';
+    const photoGroup = document.getElementById('hrPhotoGroup');
+    if (photoGroup) photoGroup.style.display = signUp ? 'block' : 'none';
 
-        formTitle.textContent = 'HR Portal Registration';
-        formSub.textContent = 'Create an HR administrator account for your organization';
-        submitLabel.textContent = 'Create HR Account';
-        submitIcon.className = 'fa-solid fa-user-plus';
-      } else {
-        tabSignIn.classList.add('active');
-        tabSignUp.classList.remove('active');
-        if (photoRow) photoRow.classList.add('hidden');
-        nameRow.classList.add('hidden');
-        confirmRow.classList.add('hidden');
-        signInOpts.classList.remove('hidden');
-        firstNameInput.required = false;
-        lastNameInput.required = false;
-        confirmPasswordInput.required = false;
-
-        formTitle.textContent = 'HR Portal Login';
-        formSub.textContent = 'Access your organization\'s HR tools';
-        submitLabel.textContent = 'Sign In to HR Dashboard';
-        submitIcon.className = 'fa-solid fa-right-to-bracket';
+    if (signUp) {
+      tabSignUp.classList.add('active');
+      tabSignIn.classList.remove('active');
+      confirmPassGroup.style.display = 'block';
+      confirmPasswordInput.setAttribute('required', 'true');
+      signInOptions.style.display = 'none';
+      formTitle.textContent = 'Register HR Account';
+      formSub.textContent = 'Create administrator credentials for your organization';
+      submitBtn.innerHTML = `<span>Create HR Account</span> <i class="fa-solid fa-user-plus"></i>`;
+      if (window.StrongPassword) {
+        window.StrongPassword.attach('hrPassword', 'hrPassMeter');
       }
+    } else {
+      tabSignIn.classList.add('active');
+      tabSignUp.classList.remove('active');
+      confirmPassGroup.style.display = 'none';
+      confirmPasswordInput.removeAttribute('required');
+      signInOptions.style.display = 'flex';
+      formTitle.textContent = 'HR Portal Login';
+      formSub.textContent = 'Access your organization\'s administrative tools';
+      submitBtn.innerHTML = `<span>Sign In to HR Dashboard</span> <i class="fa-solid fa-arrow-right"></i>`;
+    }
+  }
+
+  function hideMessages() {
+    errorBox.style.display = 'none';
+    successBox.style.display = 'none';
+  }
+
+  function showError(msg) {
+    errorMessage.textContent = msg;
+    errorBox.style.display = 'flex';
+    if (window.Toaster) window.Toaster.error('Authentication Error', msg);
+  }
+
+  function showSuccess(msg) {
+    successMessage.textContent = msg;
+    successBox.style.display = 'flex';
+    if (window.Toaster) window.Toaster.success('Success', msg);
+  }
+
+  // OTP Modal Functions
+  function openHrOtpModal(userData) {
+    pendingHrUser = userData;
+    currentHrOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    document.getElementById('hrVerifyEmailText').textContent = userData.email;
+    document.getElementById('hrOtpInput').value = '';
+    const feedback = document.getElementById('hrVerifyFeedback');
+    feedback.textContent = `Verification code: ${currentHrOtpCode}`;
+    feedback.style.color = '#fb923c';
+    feedback.style.display = 'block';
+    document.getElementById('hrOtpModal').classList.add('active');
+  }
+
+  function closeHrOtpModal() {
+    document.getElementById('hrOtpModal').classList.remove('active');
+  }
+
+  function resendHrOtpEmail() {
+    currentHrOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const feedback = document.getElementById('hrVerifyFeedback');
+    feedback.textContent = `Fresh verification code: ${currentHrOtpCode}`;
+    feedback.style.color = '#fb923c';
+    feedback.style.display = 'block';
+    if (window.Toaster) window.Toaster.info('New Code Generated', `Code: ${currentHrOtpCode}`);
+  }
+
+  function submitHrOtpVerification() {
+    const code = document.getElementById('hrOtpInput').value.trim();
+    if (!code || code.length < 6) {
+      if (window.Toaster) window.Toaster.warning('Invalid Code', 'Please enter a 6-digit code.');
+      return;
     }
 
-    // Password Visibility Toggle
-    function togglePassword(inputId, iconId) {
-      const input = document.getElementById(inputId);
-      const icon = document.getElementById(iconId);
-      if (!input || !icon) return;
-      if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-      } else {
-        input.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
+    const orgSelect = document.getElementById('orgName');
+    const selectedOrgName = (orgSelect && orgSelect.selectedOptions && orgSelect.selectedOptions[0])
+      ? (orgSelect.selectedOptions[0].dataset.name || orgSelect.value)
+      : (pendingHrUser.org || 'FLAWLESS GRAPHICS');
+
+    const hrRecord = {
+      org: selectedOrgName,
+      org_id: orgSelect ? orgSelect.value : undefined,
+      name: pendingHrUser.email.split('@')[0],
+      email: pendingHrUser.email.toLowerCase(),
+      password: pendingHrUser.password,
+      role: 'hr',
+      photo_url: currentHrPhotoBase64 || null,
+      status: 'pending_approval'
+    };
+
+    if (window.SupabaseService) {
+      window.SupabaseService.saveUser(hrRecord).catch(console.warn);
+    }
+
+    closeHrOtpModal();
+    setMode(false);
+    showSuccess('Registration submitted! Your HR account is pending approval by the Super Administrator.');
+
+    if (window.Toaster) {
+      window.Toaster.warning('Pending Approval', 'Your HR account registration must be approved by the Super Admin before you can log in.');
+    }
+  }
+
+  // Auth Form Submit
+  const authForm = document.getElementById('authForm');
+  authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideMessages();
+
+    const orgSelect = document.getElementById('orgName');
+    const orgName = orgSelect ? orgSelect.value.trim() : '';
+    const selectedOrgName = (orgSelect && orgSelect.selectedOptions && orgSelect.selectedOptions[0])
+      ? (orgSelect.selectedOptions[0].dataset.name || orgName)
+      : orgName;
+
+    const hrEmail = document.getElementById('hrEmail').value.trim();
+    const password = document.getElementById('hrPassword').value.trim();
+
+    if (!orgName || !hrEmail || !password) {
+      showError('Please select your approved institution workspace and fill in all fields.');
+      return;
+    }
+
+    if (isSignUpMode) {
+      if (window.StrongPassword) {
+        const pwCheck = window.StrongPassword.validate(password);
+        if (!pwCheck.valid) {
+          showError(pwCheck.error);
+          return;
+        }
       }
-    }
 
-    // Alert Helpers
-    const alertError = document.getElementById('alertError');
-    const alertErrorMsg = document.getElementById('alertErrorMsg');
-    const alertSuccess = document.getElementById('alertSuccess');
-    const alertSuccessMsg = document.getElementById('alertSuccessMsg');
-
-    function showError(msg) {
-      hideAlerts();
-      alertErrorMsg.textContent = msg;
-      alertError.classList.add('show');
-    }
-
-    function showSuccess(msg) {
-      hideAlerts();
-      alertSuccessMsg.textContent = msg;
-      alertSuccess.classList.add('show');
-    }
-
-    function hideAlerts() {
-      alertError.classList.remove('show');
-      alertSuccess.classList.remove('show');
-    }
-
-    function forgotPassword(e) {
-      if (e) e.preventDefault();
-      showError('Please contact your System Administrator to reset HR credentials.');
-    }
-
-    // Quick Demo HR Access
-    function quickDemoHRLogin() {
-      showSuccess('Initializing verified HR session...');
-      if (window.AuthSession) {
-        window.AuthSession.initDemoSession();
-        window.AuthSession.setUser({
-          org: document.getElementById('orgName').value.trim() || 'FLAWLESS GRAPHICS',
-          name: 'James Ntiamoah (HR Admin)',
-          email: 'admin@flawlessgraphics.com',
-          role: 'hr'
-        });
-      }
-      setTimeout(() => {
-        window.location.href = 'hr-dashboard.html';
-      }, 600);
-    }
-
-    // Form Submission
-    async function handleSubmit(e) {
-      e.preventDefault();
-      hideAlerts();
-
-      const orgName = document.getElementById('orgName').value.trim();
-      const hrEmail = document.getElementById('hrEmail').value.trim().toLowerCase();
-      const password = document.getElementById('hrPassword').value;
-
-      if (!orgName || !hrEmail || !password) {
-        showError('Please complete all required fields.');
+      const confirmPassword = confirmPasswordInput.value.trim();
+      if (password !== confirmPassword) {
+        showError('Passwords do not match. Please re-enter.');
         return;
       }
 
-      if (password.length < 4) {
-        showError('Password must be at least 4 characters long.');
-        return;
-      }
+      const hrRecord = {
+        org: selectedOrgName,
+        org_id: orgName,
+        name: hrEmail.split('@')[0],
+        email: hrEmail.toLowerCase(),
+        password: password,
+        role: 'hr',
+        photo_url: currentHrPhotoBase64 || null,
+        status: 'pending_approval'
+      };
 
-      let users = [];
-      try {
-        users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
-      } catch (err) { users = []; }
-
-      const hashedPw = window.AuthSession ? await window.AuthSession.sha256(password) : password;
-
-      if (currentMode === 'signup') {
-        // --- REGISTRATION ---
-        const firstName = firstNameInput.value.trim();
-        const lastName = lastNameInput.value.trim();
-        const confirmPw = confirmPasswordInput.value;
-
-        if (!firstName || !lastName) {
-          showError('Please enter your first and last name.');
-          return;
-        }
-
-        if (password !== confirmPw) {
-          showError('Passwords do not match.');
-          return;
-        }
-
-        const existing = users.find(u => u.email === hrEmail);
-        if (existing) {
-          showError('An account with this email address already exists. Please sign in.');
-          return;
-        }
-
-        const newUser = {
-          org: orgName,
-          name: `${firstName} ${lastName}`,
+      if (window.RealtimeAuth) {
+        window.RealtimeAuth.openAuthModal({
           email: hrEmail,
-          photo: currentHrPhotoBase64,
-          pass: hashedPw,
-          role: 'hr',
-          createdAt: Date.now()
-        };
-
-        // Trigger Instant OTP Verification
-        openHrOtpModal(newUser);
-
-      } else {
-        // --- SIGN IN ---
-        let matched = users.find(u => u.email === hrEmail && (u.pass === hashedPw || u.pass === password));
-
-        // Support demo fallback credentials if empty users or demo email
-        if (!matched && (hrEmail === 'admin@flawlessgraphics.com' || hrEmail === 'hr@flawlessgraphics.com' || users.length === 0)) {
-          matched = {
-            org: orgName,
-            name: hrEmail.split('@')[0].toUpperCase(),
-            email: hrEmail,
-            role: 'hr'
-          };
-        }
-
-        if (!matched) {
-          showError('Incorrect email or password.');
-          if (window.Toaster && typeof window.Toaster.error === 'function') {
-            window.Toaster.error('Authentication Failed', 'Email or password did not match.');
-          }
-          return;
-        }
-
-        // Approval status gate
-        const status = (matched.status || 'active').toLowerCase();
-
-        if (status === 'pending_approval' || status === 'pending') {
-          const msg = 'Your HR Manager account is currently pending approval by the Super Administrator. Please await confirmation.';
-          showError(msg);
-          if (window.Toaster && typeof window.Toaster.warning === 'function') {
-            window.Toaster.warning('Account Pending Approval', msg);
-          }
-          return;
-        }
-
-        if (status === 'rejected') {
-          const msg = 'Your HR registration request was declined by the Super Administrator. Please contact management.';
-          showError(msg);
-          if (window.Toaster && typeof window.Toaster.error === 'function') {
-            window.Toaster.error('Registration Declined', msg);
-          }
-          return;
-        }
-
-        if (status === 'suspended') {
-          const msg = 'Your HR account has been suspended. Please contact the organization administrator.';
-          showError(msg);
-          if (window.Toaster && typeof window.Toaster.error === 'function') {
-            window.Toaster.error('Account Suspended', msg);
-          }
-          return;
-        }
-
-        const activeUser = {
-          org: orgName,
-          name: matched.name || hrEmail.split('@')[0],
-          email: hrEmail,
-          role: 'hr'
-        };
-
-        if (window.AuthSession) {
-          window.AuthSession.setUser(activeUser);
-        } else {
-          localStorage.setItem('active_org', orgName);
-          localStorage.setItem('activeHR', JSON.stringify({
-            name: activeUser.name,
-            email: activeUser.email,
-            role: 'HR Admin',
-            org: orgName
-          }));
-        }
-
-        showSuccess('Authentication successful! Redirecting to HR Dashboard...');
-        submitBtn.disabled = true;
-
-        setTimeout(() => {
-          window.location.href = 'hr-dashboard.html';
-        }, 900);
-      }
-    }
-
-    // ==========================================
-    // HR OTP VERIFICATION CONTROLLER
-    // ==========================================
-    let pendingHrUser = null;
-    let currentHrOtpCode = '';
-    let hrOtpCountdownInterval = null;
-    let hrOtpTimeRemaining = 300;
-    let isHrOtpExpired = false;
-
-    function startHrOtpCountdown(duration = 300) {
-      if (hrOtpCountdownInterval) clearInterval(hrOtpCountdownInterval);
-      hrOtpTimeRemaining = duration;
-      isHrOtpExpired = false;
-
-      const timerBadge = document.getElementById('hrOtpTimerBadge');
-      const timerText = document.getElementById('hrOtpTimerText');
-      if (timerBadge) timerBadge.classList.remove('expired');
-
-      function updateDisplay() {
-        const minutes = Math.floor(hrOtpTimeRemaining / 60);
-        const seconds = hrOtpTimeRemaining % 60;
-        if (timerText) {
-          timerText.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        }
-        if (hrOtpTimeRemaining <= 0) {
-          clearInterval(hrOtpCountdownInterval);
-          isHrOtpExpired = true;
-          if (timerBadge) timerBadge.classList.add('expired');
-          if (timerText) timerText.textContent = 'Expired';
-          showHrVerifyFeedback('Confirmation code has expired. Please click "Resend Code".', true);
-        }
-        hrOtpTimeRemaining--;
-      }
-
-      updateDisplay();
-      hrOtpCountdownInterval = setInterval(updateDisplay, 1000);
-    }
-
-    function openHrOtpModal(user) {
-      pendingHrUser = user;
-      currentHrOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-      const modal = document.getElementById('hrOtpModal');
-      const emailText = document.getElementById('hrVerifyEmailText');
-      const codeVal = document.getElementById('instantHrCodeValue');
-      const input = document.getElementById('hrOtpInput');
-      const feedback = document.getElementById('hrVerifyFeedback');
-
-      if (emailText) emailText.textContent = user.email;
-      if (codeVal) codeVal.textContent = currentHrOtpCode;
-      if (input) { input.value = ''; input.disabled = false; }
-      if (feedback) feedback.style.display = 'none';
-
-      startHrOtpCountdown(300);
-
-      if (modal) modal.classList.add('active');
-      setTimeout(() => { if (input) input.focus(); }, 150);
-    }
-
-    function closeHrOtpModal() {
-      const modal = document.getElementById('hrOtpModal');
-      if (modal) modal.classList.remove('active');
-      if (hrOtpCountdownInterval) clearInterval(hrOtpCountdownInterval);
-      pendingHrUser = null;
-    }
-
-    function autoFillHrOtpCode() {
-      const input = document.getElementById('hrOtpInput');
-      if (input && currentHrOtpCode) {
-        input.value = currentHrOtpCode;
-        showHrVerifyFeedback('Instant authentication code automatically pasted!', false);
-        setTimeout(submitHrOtpVerification, 350);
-      }
-    }
-
-    function showHrVerifyFeedback(msg, isErr) {
-      const fb = document.getElementById('hrVerifyFeedback');
-      if (!fb) return;
-      fb.textContent = msg;
-      fb.className = 'verify-feedback ' + (isErr ? 'error' : 'success');
-      fb.style.display = 'block';
-    }
-
-    async function submitHrOtpVerification() {
-      if (isHrOtpExpired) {
-        return showHrVerifyFeedback('Code expired. Please click "Resend Code".', true);
-      }
-      const input = document.getElementById('hrOtpInput');
-      const enteredCode = (input?.value || '').trim();
-
-      if (!enteredCode || enteredCode.length !== 6) {
-        return showHrVerifyFeedback('Please enter the 6-digit confirmation code.', true);
-      }
-
-      if (enteredCode !== currentHrOtpCode) {
-        return showHrVerifyFeedback('Invalid code. Please re-check or use "Auto-fill Code".', true);
-      }
-
-      showHrVerifyFeedback('Code verified! Submitting for Super Administrator approval...', false);
-
-      const btn = document.getElementById('btnVerifyHrOtp');
-      if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...'; }
-
-      setTimeout(() => {
-        let users = [];
-        try {
-          users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
-        } catch (e) { users = []; }
-
-        if (pendingHrUser) {
-          pendingHrUser.status = 'pending_approval';
-          const uIdx = users.findIndex(u => (u.email || '').toLowerCase() === pendingHrUser.email.toLowerCase());
-          if (uIdx >= 0) {
-            users[uIdx] = Object.assign({}, users[uIdx], pendingHrUser);
-          } else {
-            users.push(pendingHrUser);
-          }
-          localStorage.setItem('organizations_users', JSON.stringify(users));
-
-          // Also register in staff roster for HR governance
-          const empKey = `${pendingHrUser.org || 'FLAWLESS GRAPHICS'}_teachers`;
-          try {
-            let staff = JSON.parse(localStorage.getItem(empKey) || '[]');
-            if (!staff.some(s => (s.email || '').toLowerCase() === pendingHrUser.email.toLowerCase())) {
-              staff.push({
-                id: 'hr_' + Date.now(),
-                name: pendingHrUser.name,
-                email: pendingHrUser.email,
-                role: 'HR Manager',
-                position: 'Human Resources Director',
-                status: 'pending_approval',
-                photo: pendingHrUser.photo || null,
-                createdAt: Date.now()
-              });
-              localStorage.setItem(empKey, JSON.stringify(staff));
+          purpose: 'HR Account Registration',
+          durationSeconds: 300,
+          onVerified: async () => {
+            if (window.SupabaseService) {
+              await window.SupabaseService.saveUser(hrRecord).catch(console.warn);
             }
-          } catch(e) {}
-        }
+            setMode(false);
+            showSuccess('Registration submitted! Your HR account is pending approval by the Super Administrator.');
+            if (window.Toaster) {
+              window.Toaster.warning('Pending Approval', 'Your HR account registration must be approved by the Super Admin before you can log in.');
+            }
+          }
+        });
+        return;
+      }
 
-        closeHrOtpModal();
-        switchTab('signin');
-        const emailInput = document.getElementById('hrEmail');
-        if (emailInput && pendingHrUser) emailInput.value = pendingHrUser.email;
-        showSuccess('Registration submitted! Your HR Manager account is pending approval by the Super Administrator. You will be able to sign in once activated.');
-        if (window.Toaster && typeof window.Toaster.warning === 'function') {
-          window.Toaster.warning('Account Pending Approval', 'Your HR Manager registration has been submitted and is awaiting Super Administrator authorization.');
-        }
-      }, 800);
+      openHrOtpModal({ org: selectedOrgName, email: hrEmail, password: password });
+      return;
     }
 
-    function resendHrOtpEmail() {
-      currentHrOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
-      const codeVal = document.getElementById('instantHrCodeValue');
-      if (codeVal) codeVal.textContent = currentHrOtpCode;
+    // Sign In Mode
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...';
 
-      startHrOtpCountdown(300);
-      showHrVerifyFeedback('Fresh 6-digit confirmation code generated!', false);
-      const input = document.getElementById('hrOtpInput');
-      if (input) { input.value = ''; input.disabled = false; input.focus(); }
+    const lowerEmail = hrEmail.toLowerCase();
+    let matchedUser = null;
+
+    if (window.SupabaseService) {
+      try {
+        const authRes = await window.SupabaseService.authenticate(lowerEmail, password, null, 'hr');
+        if (authRes.success) {
+          matchedUser = authRes.user;
+        } else {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `<span>Sign In to HR Dashboard</span> <i class="fa-solid fa-arrow-right"></i>`;
+          showError(authRes.error || 'Account not found in institutional database. Please register.');
+          return;
+        }
+      } catch(err) {
+        console.warn('Supabase auth attempt:', err);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<span>Sign In to HR Dashboard</span> <i class="fa-solid fa-arrow-right"></i>`;
+        showError(err.message || 'Connection error. Please try again.');
+        return;
+      }
     }
-  </script>
-  <!-- Toaster Engine Script -->
-  <script src="../../assets/js/toaster.js"></script>
-  <!-- Short Skeletal Loading Script -->
-  <script src="../../assets/js/skeleton-loader.js"></script>
-  <!-- Floating Quick Assistant Script -->
-  <script src="../../assets/js/quick-assistant.js"></script>
+
+    if (!matchedUser) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<span>Sign In to HR Dashboard</span> <i class="fa-solid fa-arrow-right"></i>`;
+      showError('Account not found in institutional database. Please register.');
+      return;
+    }
+
+    // Verify Institution Workspace Membership
+    if (window.RealtimeAuth && orgName) {
+      const isMember = window.RealtimeAuth.verifyUserOrgMembership(matchedUser, orgName) ||
+                       window.RealtimeAuth.verifyUserOrgMembership(matchedUser, selectedOrgName);
+      if (!isMember) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<span>Sign In to HR Dashboard</span> <i class="fa-solid fa-arrow-right"></i>`;
+        showError(`Access Denied: You are not registered or approved under "${selectedOrgName}".`);
+        return;
+      }
+    }
+
+    if (window.AuthSession) {
+      window.AuthSession.setUser(matchedUser);
+    } else {
+      localStorage.setItem('active_user', JSON.stringify(matchedUser));
+      localStorage.setItem('active_org', orgName);
+    }
+
+    if (window.Toaster) {
+      window.Toaster.success('Welcome to HR Desk', 'Initializing faculty records & payroll...');
+    }
+
+    setTimeout(() => {
+      window.location.href = 'hr-dashboard.html';
+    }, 700);
+  });
+
+  window.addEventListener('DOMContentLoaded', () => {
+    if (window.RealtimeAuth) {
+      window.RealtimeAuth.populateApprovedOrgDropdown(document.getElementById('orgName'));
+    }
+    if (window.AuthSession) {
+      window.AuthSession.applyGlobalBranding();
+    }
+  });
+</script>
+
 </body>
 </html>

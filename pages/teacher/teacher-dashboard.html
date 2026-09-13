@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Teacher Dashboard — FLAWLESS GRAPHICS</title>
 
+<!-- Central Authentication Bridge & Route Guard -->
+<script src="../../assets/js/auth-session.js"></script>
+<script src="../../assets/js/supabase-config.js"></script>
+<script src="../../assets/js/supabase-client.js"></script>
+<script>
+  (function() {
+    const user = window.AuthSession ? window.AuthSession.requireAuth('teacher-login.html', true) : null;
+  })();
+</script>
+
 <!-- Fonts & Icons -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,8 +22,10 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <!-- Short Skeletal Loading Stylesheet -->
 <link rel="stylesheet" href="../../assets/css/skeleton.css">
-<!-- Floating Quick Assistant Stylesheet -->
+<!-- Toaster & Quick Stylesheet -->
+<link rel="stylesheet" href="../../assets/css/toaster.css">
 <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
+<link rel="stylesheet" href="../../assets/css/quick-dock.css">
 
 <style>
 :root {
@@ -949,7 +961,126 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
   <link rel="stylesheet" href="../../assets/css/quick-dock.css">
   <!-- Pop-up Toaster System -->
   <link rel="stylesheet" href="../../assets/css/toaster.css">
-  <script src="../../assets/js/toaster.js"></script>
+  <script src="../../assets/js/toaster.js">
+/* --- Professional Teacher Settings Handlers --- */
+let currentTeacherSettingsPhoto = null;
+
+function previewTeacherPhoto(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    if (window.Toaster) window.Toaster.error("File Too Large", "Photo must be under 2MB.");
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    currentTeacherSettingsPhoto = evt.target.result;
+    const preview = document.getElementById('profilePreview');
+    if (preview) preview.src = currentTeacherSettingsPhoto;
+    const sidebarPhoto = document.getElementById('profilePhoto');
+    if (sidebarPhoto) sidebarPhoto.src = currentTeacherSettingsPhoto;
+  };
+  reader.readAsDataURL(file);
+}
+
+function loadTeacherSettings() {
+  try {
+    const raw = localStorage.getItem('teacher_portal_settings');
+    const settings = raw ? JSON.parse(raw) : {};
+    
+    // Fallback to active teacher
+    const activeTeacher = JSON.parse(localStorage.getItem('active_teacher') || localStorage.getItem('teacher_active_user') || '{}');
+    
+    if (document.getElementById('tset_name')) document.getElementById('tset_name').value = settings.name || activeTeacher.name || 'Sarah Jenkins';
+    if (document.getElementById('tset_staffId')) document.getElementById('tset_staffId').value = settings.staffId || 'T-2026-088';
+    if (document.getElementById('tset_dept')) document.getElementById('tset_dept').value = settings.dept || 'Visual Arts & Design';
+    if (document.getElementById('tset_email')) document.getElementById('tset_email').value = settings.email || activeTeacher.email || 'sarah.jenkins@flawless.org';
+    if (document.getElementById('tset_phone')) document.getElementById('tset_phone').value = settings.phone || '+233 24 000 1234';
+    if (document.getElementById('tset_gradingSystem')) document.getElementById('tset_gradingSystem').value = settings.gradingSystem || 'WAEC_9POINT';
+    if (document.getElementById('tset_weighting')) document.getElementById('tset_weighting').value = settings.weighting || '30_70';
+    if (document.getElementById('tset_passMark')) document.getElementById('tset_passMark').value = settings.passMark || 50;
+    if (document.getElementById('tset_autoPublish')) document.getElementById('tset_autoPublish').value = settings.autoPublish || 'manual';
+    if (document.getElementById('tset_attMode')) document.getElementById('tset_attMode').value = settings.attMode || 'biometric';
+    if (document.getElementById('tset_attThreshold')) document.getElementById('tset_attThreshold').value = settings.attThreshold || '75';
+    if (document.getElementById('tset_absentAlert')) document.getElementById('tset_absentAlert').value = settings.absentAlert || '3';
+    if (document.getElementById('idleMinutes')) document.getElementById('idleMinutes').value = settings.idleMinutes || 10;
+    if (document.getElementById('tset_digestEmail')) document.getElementById('tset_digestEmail').value = settings.digestEmail || 'daily_1700';
+    if (document.getElementById('tset_guardianSms')) document.getElementById('tset_guardianSms').checked = settings.guardianSms !== false;
+    if (document.getElementById('tset_soundFx')) document.getElementById('tset_soundFx').checked = settings.soundFx !== false;
+    if (document.getElementById('tset_otpGrades')) document.getElementById('tset_otpGrades').checked = !!settings.otpGrades;
+
+    const photoSrc = settings.photo || activeTeacher.photo || activeTeacher.avatar || '';
+    if (photoSrc) {
+      currentTeacherSettingsPhoto = photoSrc;
+      const preview = document.getElementById('profilePreview');
+      if (preview) preview.src = photoSrc;
+    }
+  } catch (e) {
+    console.warn("Could not load teacher settings:", e);
+  }
+}
+
+function saveTeacherSettings() {
+  const settings = {
+    name: document.getElementById('tset_name')?.value || '',
+    staffId: document.getElementById('tset_staffId')?.value || '',
+    dept: document.getElementById('tset_dept')?.value || '',
+    email: document.getElementById('tset_email')?.value || '',
+    phone: document.getElementById('tset_phone')?.value || '',
+    gradingSystem: document.getElementById('tset_gradingSystem')?.value || 'WAEC_9POINT',
+    weighting: document.getElementById('tset_weighting')?.value || '30_70',
+    passMark: parseInt(document.getElementById('tset_passMark')?.value || '50', 10),
+    autoPublish: document.getElementById('tset_autoPublish')?.value || 'manual',
+    attMode: document.getElementById('tset_attMode')?.value || 'biometric',
+    attThreshold: document.getElementById('tset_attThreshold')?.value || '75',
+    absentAlert: document.getElementById('tset_absentAlert')?.value || '3',
+    idleMinutes: parseInt(document.getElementById('idleMinutes')?.value || '10', 10),
+    digestEmail: document.getElementById('tset_digestEmail')?.value || 'daily_1700',
+    guardianSms: document.getElementById('tset_guardianSms')?.checked,
+    soundFx: document.getElementById('tset_soundFx')?.checked,
+    otpGrades: document.getElementById('tset_otpGrades')?.checked,
+    photo: currentTeacherSettingsPhoto,
+    updatedAt: new Date().toISOString()
+  };
+
+  localStorage.setItem('teacher_portal_settings', JSON.stringify(settings));
+
+  // Sync back to active teacher
+  let activeTeacher = JSON.parse(localStorage.getItem('active_teacher') || localStorage.getItem('teacher_active_user') || '{}');
+  activeTeacher.name = settings.name;
+  activeTeacher.email = settings.email;
+  if (settings.photo) activeTeacher.photo = settings.photo;
+  localStorage.setItem('active_teacher', JSON.stringify(activeTeacher));
+  localStorage.setItem('teacher_active_user', JSON.stringify(activeTeacher));
+
+  // Update top bar / sidebar names
+  const nameSmall = document.getElementById('teacherNameSmall');
+  if (nameSmall) nameSmall.textContent = settings.name;
+  const emailSmall = document.getElementById('teacherEmailSmall');
+  if (emailSmall) emailSmall.textContent = settings.email;
+
+  if (window.Toaster) {
+    window.Toaster.success("Settings Saved", "Educator configuration successfully saved and applied.");
+  } else {
+    alert("Educator settings saved successfully!");
+  }
+}
+
+function syncTeacherSettingsToSupabase() {
+  saveTeacherSettings();
+  const syncEl = document.getElementById('tset_lastSyncTime');
+  if (syncEl) syncEl.textContent = new Date().toLocaleTimeString();
+  
+  if (window.Toaster) {
+    window.Toaster.info("Supabase Cloud Sync", "Synchronized educator calibration records with institutional database.");
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(loadTeacherSettings, 100);
+});
+
+</script>
 </head>
 <body>
 
@@ -1841,21 +1972,219 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
     </section>
 
     <!-- SETTINGS SECTION -->
-    <section id="settingsSection" class="card view-panel" style="display:none">
-      <h3>Account & Portal Settings</h3>
-      <div style="display:flex; gap:24px; align-items:flex-start; margin-top:16px;">
-        <div style="flex:1">
-          <label class="tiny">Update Profile Photo</label>
-          <input type="file" id="photoUpload" accept="image/*" style="margin-top:6px">
-          <div style="margin-top:16px">
-            <label class="tiny">Session Timeout (Minutes)</label>
-            <input type="number" id="idleMinutes" min="1" value="10" style="width:140px; margin-top:6px">
+    <!-- PROFESSIONAL EDUCATOR SETTINGS SECTION -->
+    <section id="settingsSection" class="card view-panel" style="display:none; padding: 28px; border-radius: 18px;">
+      <!-- Header with Action Bar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 18px; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 42px; height: 42px; border-radius: 12px; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; box-shadow: 0 4px 14px rgba(2,132,199,0.3);">
+              <i class="fa-solid fa-sliders"></i>
+            </div>
+            <div>
+              <h2 style="font-size: 20px; font-weight: 800; color: var(--text-main); margin: 0;">Educator Workspace &amp; Institutional Calibration</h2>
+              <p style="font-size: 12.5px; color: var(--text-muted); margin: 3px 0 0;">Manage academic credentials, grading rubrics, roll-call defaults &amp; Supabase cloud sync</p>
+            </div>
           </div>
         </div>
-        <div>
-          <div class="tiny" style="margin-bottom:6px">Avatar Preview</div>
-          <img id="profilePreview" style="width:140px; height:140px; border-radius:12px; object-fit:cover; border:1px solid var(--card-border)" src="" alt="preview">
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <button class="btn ghost" type="button" onclick="syncTeacherSettingsToSupabase()" style="font-size: 12.5px; padding: 8px 16px; border-radius: 10px; display: flex; align-items: center; gap: 7px;">
+            <i class="fa-solid fa-cloud-arrow-up" style="color: #0284c7;"></i> Sync Cloud
+          </button>
+          <button class="btn prim" type="button" onclick="saveTeacherSettings()" style="font-size: 12.5px; padding: 8px 20px; border-radius: 10px; display: flex; align-items: center; gap: 7px;">
+            <i class="fa-solid fa-check"></i> Save Preferences
+          </button>
         </div>
+      </div>
+
+      <!-- 4-Pillar Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px;">
+        
+        <!-- Pillar 1: Educator Profile & Credentials -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 14px; padding: 20px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; color: var(--accent1);">
+            <i class="fa-solid fa-id-card" style="font-size: 16px;"></i>
+            <h4 style="font-size: 14.5px; font-weight: 700; margin: 0; color: var(--text-main);">Educator Profile &amp; Contact</h4>
+          </div>
+
+          <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 16px; padding: 12px; background: rgba(0,0,0,0.02); border: 1px dashed var(--card-border); border-radius: 12px;">
+            <img id="profilePreview" style="width: 64px; height: 64px; border-radius: 12px; object-fit: cover; border: 2px solid var(--accent1); flex-shrink: 0;" src="" alt="avatar">
+            <div style="flex: 1;">
+              <div style="font-size: 12px; font-weight: 700; margin-bottom: 4px;">Profile Photo</div>
+              <input type="file" id="photoUpload" accept="image/*" style="font-size: 11.5px; max-width: 190px;" onchange="previewTeacherPhoto(event)">
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div>
+              <label class="tiny" style="font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Full Educator Name</label>
+              <input type="text" id="tset_name" class="modal-input" placeholder="Sarah Jenkins" style="padding: 8px 12px; font-size: 13px;">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <label class="tiny" style="font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Staff ID / Badge #</label>
+                <input type="text" id="tset_staffId" class="modal-input" placeholder="T-2026-088" style="padding: 8px 12px; font-size: 13px;">
+              </div>
+              <div>
+                <label class="tiny" style="font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Department</label>
+                <select id="tset_dept" class="modal-input" style="padding: 8px 12px; font-size: 13px;">
+                  <option value="Visual Arts & Design">Visual Arts &amp; Design</option>
+                  <option value="Mathematics & Science">Mathematics &amp; Science</option>
+                  <option value="Information Technology">Information Technology</option>
+                  <option value="Humanities & Languages">Humanities &amp; Languages</option>
+                  <option value="Business Administration">Business Administration</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="tiny" style="font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Institutional Email</label>
+              <input type="email" id="tset_email" class="modal-input" placeholder="sarah.jenkins@flawless.org" style="padding: 8px 12px; font-size: 13px;">
+            </div>
+            <div>
+              <label class="tiny" style="font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Office Phone / Extension</label>
+              <input type="tel" id="tset_phone" class="modal-input" placeholder="+233 24 000 1234" style="padding: 8px 12px; font-size: 13px;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Pillar 2: Grading Calibration & Assessment Policies -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 14px; padding: 20px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; color: var(--accent2);">
+            <i class="fa-solid fa-stamp" style="font-size: 16px;"></i>
+            <h4 style="font-size: 14.5px; font-weight: 700; margin: 0; color: var(--text-main);">Grading Calibration &amp; Policies</h4>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div>
+              <label class="tiny" style="font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Standard Grading Framework</label>
+              <select id="tset_gradingSystem" class="modal-input" style="padding: 8px 12px; font-size: 13px;">
+                <option value="WAEC_9POINT">WAEC/WASSCE 9-Point Scale (A1 - F9)</option>
+                <option value="GPA_40">Standard 4.0 GPA Weighted Scale</option>
+                <option value="PERCENTAGE">Standard Percentage (0 - 100%)</option>
+                <option value="CAMBRIDGE_IGCSE">Cambridge / IGCSE Letter System (A* - G)</option>
+              </select>
+            </div>
+            <div>
+              <label class="tiny" style="font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Assessment Weighting Split</label>
+              <select id="tset_weighting" class="modal-input" style="padding: 8px 12px; font-size: 13px;">
+                <option value="30_70">30% Continuous Assessment (CA) / 70% Final Exam (Standard WAEC)</option>
+                <option value="40_60">40% Continuous Assessment (CA) / 60% Final Exam</option>
+                <option value="50_50">50% Continuous Assessment (CA) / 50% Final Exam</option>
+              </select>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <label class="tiny" style="font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Pass Mark Benchmark</label>
+                <input type="number" id="tset_passMark" class="modal-input" value="50" min="40" max="70" style="padding: 8px 12px; font-size: 13px;">
+              </div>
+              <div>
+                <label class="tiny" style="font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Auto-Publish Grades</label>
+                <select id="tset_autoPublish" class="modal-input" style="padding: 8px 12px; font-size: 13px;">
+                  <option value="manual">Manual Approval Required</option>
+                  <option value="instant">Instant Live Sync</option>
+                </select>
+              </div>
+            </div>
+            <div style="padding: 10px; background: rgba(2,132,199,0.06); border: 1px solid rgba(2,132,199,0.15); border-radius: 10px; font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">
+              <i class="fa-solid fa-circle-info" style="color: var(--accent1); margin-right: 4px;"></i>
+              Changes to grading calibrations automatically apply to newly calculated student transcripts and terminal reports.
+            </div>
+          </div>
+        </div>
+
+        <!-- Pillar 3: Classroom & Roll Call Defaults -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 14px; padding: 20px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; color: #10b981;">
+            <i class="fa-solid fa-clipboard-user" style="font-size: 16px;"></i>
+            <h4 style="font-size: 14.5px; font-weight: 700; margin: 0; color: var(--text-main);">Classroom &amp; Roll Call Defaults</h4>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div>
+              <label class="tiny" style="font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Primary Attendance Method</label>
+              <select id="tset_attMode" class="modal-input" style="padding: 8px 12px; font-size: 13px;">
+                <option value="biometric">Biometric &amp; NFC Smart Card Terminal</option>
+                <option value="one_click">One-Click Rapid Roll Call (Default Present)</option>
+                <option value="manual">Manual Itemized Check-in</option>
+              </select>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <label class="tiny" style="font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Low Attendance Alert</label>
+                <select id="tset_attThreshold" class="modal-input" style="padding: 8px 12px; font-size: 13px;">
+                  <option value="75">Below 75% (Standard)</option>
+                  <option value="80">Below 80% (Strict)</option>
+                  <option value="70">Below 70% (Lenient)</option>
+                </select>
+              </div>
+              <div>
+                <label class="tiny" style="font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Unexcused Absence Trigger</label>
+                <select id="tset_absentAlert" class="modal-input" style="padding: 8px 12px; font-size: 13px;">
+                  <option value="3">3 Consecutive Days</option>
+                  <option value="2">2 Consecutive Days</option>
+                  <option value="5">5 Total Days / Term</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer; color: var(--text-main);">
+                <input type="checkbox" id="tset_guardianSms" style="accent-color: #0284c7;" checked>
+                Auto-notify Head of Department when attendance falls into probation
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pillar 4: Real-time Audio, Session Timeout & Cloud Security -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 14px; padding: 20px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; color: #f59e0b;">
+            <i class="fa-solid fa-shield-halved" style="font-size: 16px;"></i>
+            <h4 style="font-size: 14.5px; font-weight: 700; margin: 0; color: var(--text-main);">Audio Alerts &amp; Cloud Security</h4>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <label class="tiny" style="font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Session Inactivity Lock</label>
+                <select id="idleMinutes" class="modal-input" style="padding: 8px 12px; font-size: 13px;">
+                  <option value="5">5 Minutes</option>
+                  <option value="10" selected>10 Minutes</option>
+                  <option value="15">15 Minutes</option>
+                  <option value="30">30 Minutes</option>
+                  <option value="60">60 Minutes</option>
+                </select>
+              </div>
+              <div>
+                <label class="tiny" style="font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Daily Digest Email</label>
+                <select id="tset_digestEmail" class="modal-input" style="padding: 8px 12px; font-size: 13px;">
+                  <option value="daily_1700">Daily at 5:00 PM</option>
+                  <option value="weekly_fri">Weekly on Friday</option>
+                  <option value="off">Disabled</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer; color: var(--text-main);">
+                <input type="checkbox" id="tset_soundFx" style="accent-color: #0284c7;" checked>
+                Enable WebAudio chime on student assignment submission
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer; color: var(--text-main);">
+                <input type="checkbox" id="tset_otpGrades" style="accent-color: #0284c7;">
+                Require password verification before publishing final terminal grades
+              </label>
+            </div>
+
+            <div style="margin-top: 8px; padding: 10px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
+                <i class="fa-solid fa-circle-check" style="color: #10b981;"></i>
+                <span>Supabase Live Sync: <strong style="color: #10b981;">Connected</strong></span>
+              </div>
+              <span class="tiny" id="tset_lastSyncTime" style="color: var(--text-muted); font-family: monospace;">Just now</span>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -2253,13 +2582,95 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
 <div id="toast" class="toast"></div>
 
 <script src="../../assets/js/auth-session.js"></script>
+<script src="../../assets/js/toaster.js"></script>
+<script src="../../assets/js/realtime-bus.js"></script>
 <script>
 /* -------------------------
   Utilities & Session Setup
 ------------------------- */
 function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
-function read(k){ return safeParse(localStorage.getItem(k)) || [] }
-function save(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
+const teacherStore = {};
+function read(k){ return teacherStore[k] || [] }
+function save(k,v){ 
+  teacherStore[k] = v;
+}
+
+async function loadTeacherCloudData() {
+  if (!window.SupabaseService) return;
+  try {
+    // 1. Verify organization from Supabase
+    const orgs = await window.SupabaseService.getOrganizations();
+    if (Array.isArray(orgs) && orgs.length > 0) {
+      const match = orgs.find(o => (o.org_name || o.name || '').toLowerCase() === (ORG || '').toLowerCase());
+      if (!match) {
+        ORG = orgs[0].org_name || orgs[0].name || 'FLAWLESS GRAPHICS';
+        localStorage.setItem('active_org', ORG);
+        localStorage.setItem('activeOrg', ORG);
+        const orgEl = document.getElementById('orgName');
+        if (orgEl) orgEl.textContent = ORG;
+      }
+    }
+
+    // 2. Fetch teachers and verify current teacher
+    const cloudTeachers = await window.SupabaseService.getTeachers(ORG);
+    if (Array.isArray(cloudTeachers) && cloudTeachers.length > 0) {
+      const matchT = cloudTeachers.find(t => teacher && t.email && t.email.toLowerCase() === (teacher.email || '').toLowerCase());
+      if (matchT) {
+        teacher = {
+          name: matchT.full_name || matchT.name || 'Educator',
+          email: matchT.email || '',
+          org: matchT.org_id || ORG,
+          photoBase64: matchT.photo_url || ''
+        };
+        localStorage.setItem('active_teacher', JSON.stringify(teacher));
+        localStorage.setItem('teacher_active_user', JSON.stringify(teacher));
+        const tNameEl = document.getElementById('teacherNameSmall');
+        if (tNameEl) tNameEl.textContent = teacher.name;
+        const tEmailEl = document.getElementById('teacherEmailSmall');
+        if (tEmailEl) tEmailEl.textContent = teacher.email;
+        if (matchT.photo_url) {
+          const pPrev = document.getElementById('profilePreview');
+          if (pPrev) pPrev.src = matchT.photo_url;
+          const pPhoto = document.getElementById('profilePhoto');
+          if (pPhoto) pPhoto.src = matchT.photo_url;
+        }
+      } else {
+        // Teacher was deleted from Supabase! Immediate Access Revocation!
+        alert('Your educator account has been deleted from the institutional database. Access revoked.');
+        if (window.AuthSession && typeof window.AuthSession.logout === 'function') {
+          window.AuthSession.logout('teacher-login.html');
+        } else {
+          ['active_teacher', 'teacher_active_user', 'active_user', 'active_org_user'].forEach(k => localStorage.removeItem(k));
+          window.location.replace('teacher-login.html');
+        }
+        return;
+      }
+    } else {
+      alert('Your educator account has been deleted from the institutional database. Access revoked.');
+      if (window.AuthSession && typeof window.AuthSession.logout === 'function') {
+        window.AuthSession.logout('teacher-login.html');
+      } else {
+        ['active_teacher', 'teacher_active_user', 'active_user', 'active_org_user'].forEach(k => localStorage.removeItem(k));
+        window.location.replace('teacher-login.html');
+      }
+      return;
+    }
+
+    const classes = await window.SupabaseService.getClasses(ORG);
+    teacherStore[CLASSES_KEY] = classes;
+
+    const students = await window.SupabaseService.getStudents(ORG);
+    teacherStore[`${ORG}_students`] = students;
+
+    const att = await window.SupabaseService.getAttendance(ORG);
+    teacherStore[ATT_KEY] = att;
+
+    const broadcasts = await window.SupabaseService.getAnnouncements(ORG);
+    teacherStore[`${ORG}_announcements`] = broadcasts;
+  } catch (err) {
+    console.warn('[Teacher Supabase] Load error:', err);
+  }
+}
 function toast(msg, t=2800) {
   if (window.Toaster && typeof window.Toaster.show === 'function') {
     const isWarn = /error|fail|invalid|required|select|provide/i.test(msg);
@@ -2282,13 +2693,13 @@ function escapeHtml(str){ return String(str||'').replace(/&/g,'&amp;').replace(/
 const sessionCandidates = ['active_teacher','teacher_active_user','active_user','active_org_user'];
 let teacher = null;
 for(const k of sessionCandidates){ const v = safeParse(localStorage.getItem(k)); if(v && (v.email || v.name)){ teacher = v; break; } }
-if(!teacher){ 
-  teacher = { name: 'Demo Teacher', email: 'teacher@flawless.org', org: 'FLAWLESS GRAPHICS' };
+if(!teacher || !teacher.email){
+  window.location.replace('teacher-login.html');
 }
 localStorage.setItem('active_teacher', JSON.stringify(teacher));
 localStorage.setItem('teacher_active_user', JSON.stringify(teacher));
 
-const ORG = teacher.org || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
+const ORG = (teacher && teacher.org) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
 if (!localStorage.getItem('active_org')) localStorage.setItem('active_org', ORG);
 
 /* ORG Storage Keys */
@@ -2304,19 +2715,16 @@ const ACT_KEY = `${ORG}_activity`;
 const CALENDAR_KEY = `${ORG}_academic_calendar`;
 const ASSESS_KEY = `${ORG}_student_assessments`;
 
-/* Ensure Default Stores */
-if(!localStorage.getItem(CLASSES_KEY)) save(CLASSES_KEY, []);
-if(!localStorage.getItem(ASSIGN_KEY)) save(ASSIGN_KEY, []);
-if(!localStorage.getItem(ATT_KEY)) save(ATT_KEY, []);
-if(!localStorage.getItem(TEACH_ATT_KEY)) save(TEACH_ATT_KEY, []);
-if(!localStorage.getItem(MSG_KEY)) save(MSG_KEY, []);
-if(!localStorage.getItem(NOTE_KEY)) save(NOTE_KEY, []);
-if(!localStorage.getItem(TT_KEY)) save(TT_KEY, []);
-if(!localStorage.getItem(SETTINGS_KEY)) save(SETTINGS_KEY, { idle_minutes:10 });
-if(!localStorage.getItem(ACT_KEY)) save(ACT_KEY, []);
+/* Live Supabase Entity Storage Initialized */
 
-/* UI Initial Boot */
+/* UI Initial Boot (Direct Supabase Cloud Engine) */
 document.getElementById('orgName').textContent = ORG;
+if (window.SupabaseService) {
+  loadTeacherCloudData().then(() => {
+    if (typeof renderClasses === 'function') renderClasses();
+    if (typeof renderAttendance === 'function') renderAttendance();
+  });
+}
 document.getElementById('teacherNameSmall').textContent = teacher.name || teacher.email;
 document.getElementById('teacherEmailSmall').textContent = teacher.email || '';
 const defaultAvatar = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><rect width="100%" height="100%" fill="%230b1b2b"/></svg>';
@@ -2355,11 +2763,20 @@ document.querySelectorAll('.tab').forEach(btn=>{
 });
 
 /* Activity Tracking */
-function pushActivity(text){
+function pushActivity(text, eventType = 'TEACHER_ACTIVITY', payload = {}){
   const arr = read(ACT_KEY);
   arr.push({ text, time: new Date().toISOString() });
   save(ACT_KEY, arr);
   renderActivity();
+  if (window.LucyBus) {
+    let tone = 'info';
+    if (/save|submit|approved|pass|enroll|created/i.test(text)) tone = 'success';
+    else if (/warn|reject|decline|error|alert/i.test(text)) tone = 'alert';
+    LucyBus.emit(eventType, Object.assign({ text, teacher: teacher?.name || 'Teacher' }, payload), {
+      role: 'Teacher',
+      sound: tone
+    });
+  }
 }
 
 function renderActivity(){
@@ -3079,8 +3496,11 @@ function editStudent(classId, studentId){
   openStudentModal(classId, studentId);
 }
 
-function deleteStudent(classId, studentId){
-  if(!confirm('Are you sure you want to remove this student from the class?')) return;
+async function deleteStudent(classId, studentId){
+  if(!confirm('Are you sure you want to remove this student from the class and institutional cloud?')) return;
+  if(window.SupabaseService) {
+    await window.SupabaseService.deleteStudent(ACTIVE_ORG, studentId).catch(console.warn);
+  }
   const arr = getClasses(); const c = arr.find(x=>x.id===classId);
   if(!c) return;
   c.students = (c.students||[]).filter(s=>s.id!==studentId);

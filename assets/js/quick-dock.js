@@ -829,6 +829,19 @@
         });
       }
 
+      // Incorporate dynamic live events from LucyBus across all portals
+      try {
+        const liveNotifs = JSON.parse(localStorage.getItem('lucy_live_notifications') || '[]');
+        liveNotifs.forEach(item => {
+          if (!list.some(existing => existing.id === item.id)) {
+            const isRead = readIds.includes(item.id);
+            // Match category if appropriate, or default to tab1
+            const category = item.category || config.tab1Filter;
+            list.unshift(Object.assign({}, item, { category: category, unread: !isRead }));
+          }
+        });
+      } catch (err) {}
+
       return list;
     }
 

@@ -1,7 +1,7 @@
-﻿/**
+/**
  * school-messenger.js
- * Centralized Cross-User School Communication Engine
- * FLAWLESS GRAPHICS — LUCY™ Management System
+ * Universal Floating Real-Time Academic Messenger & Notification Center
+ * FLAWLESS GRAPHICS Enterprise Management System
  */
 
 (function(window) {
