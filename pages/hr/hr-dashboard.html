@@ -5006,16 +5006,7 @@ const CLASSES_STORAGE_KEY = `${ACTIVE_ORG}_classes`;
 
 function getClassesList() {
   let classes = read(CLASSES_STORAGE_KEY);
-  if (!classes || classes.length === 0) {
-    classes = [
-      { id: 'cls_1', code: 'CLS-10A', name: 'Grade 10 - Graphic Arts & Visual Identity', subject: 'Graphic Design', grade: 'Grade 10', teacherName: 'Sarah Jenkins', teacherEmail: 's.jenkins@flawless.org', room: 'Media Studio 201', schedule: 'Mon, Wed, Fri • 08:30 AM', capacity: 30, enrolled: 28, status: 'Assigned' },
-      { id: 'cls_2', code: 'CLS-11B', name: 'Grade 11 - Web Systems & Client Architecture', subject: 'Frontend Dev', grade: 'Grade 11', teacherName: 'Kwame Boateng', teacherEmail: 'k.boateng@flawless.org', room: 'Computer Lab 3', schedule: 'Tue, Thu • 10:00 AM', capacity: 25, enrolled: 24, status: 'Assigned' },
-      { id: 'cls_3', code: 'CLS-12A', name: 'Grade 12 - Digital Animation & 3D Modeling', subject: '3D & VFX', grade: 'Grade 12', teacherName: 'Kofi Owusu', teacherEmail: 'k.owusu@flawless.org', room: 'Studio 105', schedule: 'Mon, Thu • 01:00 PM', capacity: 20, enrolled: 18, status: 'Assigned' },
-      { id: 'cls_4', code: 'CLS-09C', name: 'Grade 9 - Fundamental Design Principles', subject: 'Art Fundamentals', grade: 'Grade 9', teacherName: 'James Ntiamoah', teacherEmail: 'admin@flawlessgraphics.com', room: 'Room 102', schedule: 'Wed, Fri • 11:15 AM', capacity: 32, enrolled: 30, status: 'Assigned' },
-      { id: 'cls_5', code: 'CLS-10B', name: 'Grade 10 - UI/UX Interactive Prototyping', subject: 'User Experience', grade: 'Grade 10', teacherName: '', teacherEmail: '', room: 'Design Lab 4', schedule: 'Tue, Fri • 02:00 PM', capacity: 25, enrolled: 22, status: 'Unassigned' }
-    ];
-    save(CLASSES_STORAGE_KEY, classes);
-  }
+  if (!Array.isArray(classes)) classes = [];
   return classes;
 }
 
@@ -5024,23 +5015,15 @@ function saveClassesList(list) {
 }
 
 function getAvailableTeachers() {
-  const registeredTeachers = read('teachers');
-  const defaults = [
-    { name: 'Sarah Jenkins', email: 's.jenkins@flawless.org', role: 'Teacher • Graphic Arts' },
-    { name: 'James Ntiamoah', email: 'admin@flawlessgraphics.com', role: 'HR Lead & Instructor' },
-    { name: 'Kwame Boateng', email: 'k.boateng@flawless.org', role: 'Teacher • Web Systems' },
-    { name: 'Kofi Owusu', email: 'k.owusu@flawless.org', role: 'Teacher • 3D Animation' }
-  ];
-
+  const registeredTeachers = read(EMP_KEY) || read('teachers') || [];
   const map = new Map();
-  defaults.forEach(t => map.set(t.email.toLowerCase(), t));
   if (Array.isArray(registeredTeachers)) {
     registeredTeachers.forEach(t => {
       if (t && t.email) {
         map.set(t.email.toLowerCase(), {
           name: t.name || t.fullName || t.email.split('@')[0],
           email: t.email,
-          role: t.role ? `Teacher • ${t.role}` : 'Certified Educator'
+          role: t.role ? `Teacher • ${t.role}` : (t.position || 'Certified Educator')
         });
       }
     });
@@ -5944,15 +5927,6 @@ function getEnrolledStudentsList() {
     }
   });
 
-  if (merged.length === 0) {
-    merged = [
-      { id: 's_101', enrollment_code: 'STU-2026-001', roll: 'STU-2026-001', firstName: 'Samuel', middleName: 'Kofi', lastName: 'Mensah', student_name: 'Samuel Kofi Mensah', class_name: 'Grade 11 - Web Systems & Client Architecture', classId: 'cls_2', gender: 'Male', dob: '2008-04-12', bloodGroup: 'O+', status: 'Active', term: '2026 - Term 1', enrollmentDate: '2026-01-15', guardianName: 'Mary Mensah', guardianRel: 'Mother', phone: '+233 24 123 4567', guardianEmail: 'mary.mensah@example.com', address: 'House No. 24, Ring Road, Accra', emergencyPhone: '+233 20 987 6543', medicalNotes: 'None', notes: 'Prefers front seat; excellent in web architecture', photo: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=120&auto=format&fit=crop&q=80' },
-      { id: 's_102', enrollment_code: 'STU-2026-002', roll: 'STU-2026-002', firstName: 'Yaa', middleName: '', lastName: 'Asantewaa', student_name: 'Yaa Asantewaa', class_name: 'Grade 10 - Graphic Arts & Visual Identity', classId: 'cls_1', gender: 'Female', dob: '2009-02-18', bloodGroup: 'A+', status: 'Active', term: '2026 - Term 1', enrollmentDate: '2026-01-15', guardianName: 'Nana Asantewaa', guardianRel: 'Mother', phone: '+233 24 222 3344', guardianEmail: 'nana.asantewaa@example.com', address: 'Plot 12, Airport Residential Area', emergencyPhone: '+233 24 888 2233', medicalNotes: 'Mild asthma (inhaler with student)', notes: 'Art competition first place winner', photo: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&auto=format&fit=crop&q=80' },
-      { id: 's_103', enrollment_code: 'STU-2026-003', roll: 'STU-2026-003', firstName: 'Kwabena', middleName: 'J.', lastName: 'Darko', student_name: 'Kwabena J. Darko', class_name: 'Grade 12 - Digital Animation & 3D Modeling', classId: 'cls_3', gender: 'Male', dob: '2007-11-20', bloodGroup: 'B+', status: 'Active', term: '2026 - Term 1', enrollmentDate: '2026-01-15', guardianName: 'Samuel Darko', guardianRel: 'Father', phone: '+233 55 333 4455', guardianEmail: 'samuel.darko@example.com', address: 'Block 4, Cantonments, Accra', emergencyPhone: '+233 27 777 3344', medicalNotes: 'None', notes: 'Lead 3D animator student club', photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80' },
-      { id: 's_104', enrollment_code: 'STU-2026-004', roll: 'STU-2026-004', firstName: 'Akua', middleName: 'Serwaa', lastName: 'Donkor', student_name: 'Akua Serwaa Donkor', class_name: 'Grade 10 - UI/UX Interactive Prototyping', classId: 'cls_5', gender: 'Female', dob: '2008-08-30', bloodGroup: 'O+', status: 'Scholarship', term: '2026 - Term 1', enrollmentDate: '2026-01-16', guardianName: 'Mercy Donkor', guardianRel: 'Mother', phone: '+233 26 444 5566', guardianEmail: 'mercy.donkor@example.com', address: 'Spintex Road, Community 18', emergencyPhone: '+233 26 666 4455', medicalNotes: 'Penicillin allergy', notes: 'Full institutional scholarship recipient', photo: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=120&auto=format&fit=crop&q=80' }
-    ];
-    save(STUD_KEY, merged);
-  }
   return merged;
 }
 
@@ -7011,17 +6985,7 @@ window.updatePendingBanners = updatePendingBanners;
 function getAppraisalReviews() {
   try {
     let revs = read(PERF_KEY);
-    if (!Array.isArray(revs) || revs.length === 0) {
-      revs = [
-        { teacherName: "James Ntiamoah", department: "Executive & Design", position: "Creative Director", kpi: 98, rating: "4.9", grade: "Exceptional", date: "2026-08-15", notes: "Exemplary creative direction and brand leadership across enterprise campaigns." },
-        { teacherName: "Ama Serwaa", department: "Operations", position: "HR Manager", kpi: 95, rating: "4.8", grade: "Exceeds Standards", date: "2026-08-18", notes: "Exceptional personnel management and streamlined onboarding workflow." },
-        { teacherName: "Kwame Boateng", department: "Academic Staff", position: "Lead Instructor", kpi: 94, rating: "4.7", grade: "Exceeds Standards", date: "2026-08-20", notes: "Curriculum delivery benchmarks exceeded; consistently high student engagement." },
-        { teacherName: "Abena Mansa", department: "Finance", position: "Chief Accountant", kpi: 96, rating: "4.8", grade: "Exceeds Standards", date: "2026-08-22", notes: "Flawless audit reconciliation and timely payroll disbursements." },
-        { teacherName: "Kofi Owusu", department: "Digital Media", position: "Senior Designer", kpi: 91, rating: "4.6", grade: "Strong Delivery", date: "2026-08-25", notes: "High creative throughput across institutional media projects." },
-        { teacherName: "Esi Badu", department: "Academic Staff", position: "Science Educator", kpi: 92, rating: "4.7", grade: "Strong Delivery", date: "2026-08-28", notes: "Positive student satisfaction and excellent lab course evaluations." }
-      ];
-      save(PERF_KEY, revs);
-    }
+    if (!Array.isArray(revs)) revs = [];
     return revs;
   } catch(e) {
     return [];
@@ -9577,68 +9541,7 @@ async function handleMigrateCloud() {
 ------------------------------------------------------------- */
 function getAcademicCalendar() {
   let cal = read(CALENDAR_KEY);
-  if (!Array.isArray(cal) || cal.length === 0) {
-    cal = [
-      {
-        id: 'term_2026_1',
-        title: 'Term 1 — Creative Foundations & Systems Architecture',
-        year: '2026',
-        startDate: '2026-01-12',
-        endDate: '2026-04-10',
-        caWindow: 'Feb 16 - Feb 27, 2026',
-        caDeadline: '2026-02-27',
-        examWindow: 'Mar 23 - Apr 03, 2026',
-        examStart: '2026-03-23',
-        examEnd: '2026-04-03',
-        staffReviewWindow: 'Apr 06 - Apr 10, 2026',
-        staffReviewStart: '2026-04-06',
-        staffReviewEnd: '2026-04-10',
-        directives: 'All faculty instructors must audit and finalize continuous assessment scores. Student assessment reviews open for certification.',
-        status: 'Published for Staff Review',
-        publishedAt: Date.now() - 86400000 * 2,
-        publishedBy: 'HR Administration'
-      },
-      {
-        id: 'term_2026_2',
-        title: 'Term 2 — Advanced Engineering & Interactive Media',
-        year: '2026',
-        startDate: '2026-05-04',
-        endDate: '2026-08-07',
-        caWindow: 'Jun 08 - Jun 19, 2026',
-        caDeadline: '2026-06-19',
-        examWindow: 'Jul 20 - Jul 31, 2026',
-        examStart: '2026-07-20',
-        examEnd: '2026-07-31',
-        staffReviewWindow: 'Aug 03 - Aug 07, 2026',
-        staffReviewStart: '2026-08-03',
-        staffReviewEnd: '2026-08-07',
-        directives: 'Mid-year faculty alignment. Course progression audit and instructional review window.',
-        status: 'Draft',
-        publishedAt: null,
-        publishedBy: null
-      },
-      {
-        id: 'term_2026_3',
-        title: 'Term 3 — Industry Capstone & Portfolio Certification',
-        year: '2026',
-        startDate: '2026-09-07',
-        endDate: '2026-12-11',
-        caWindow: 'Oct 12 - Oct 23, 2026',
-        caDeadline: '2026-10-23',
-        examWindow: 'Nov 23 - Dec 04, 2026',
-        examStart: '2026-11-23',
-        examEnd: '2026-12-04',
-        staffReviewWindow: 'Dec 07 - Dec 11, 2026',
-        staffReviewStart: '2026-12-07',
-        staffReviewEnd: '2026-12-11',
-        directives: 'Senior student exhibition jury, portfolio grading verification, and final annual graduation sign-off.',
-        status: 'Draft',
-        publishedAt: null,
-        publishedBy: null
-      }
-    ];
-    save(CALENDAR_KEY, cal);
-  }
+  if (!Array.isArray(cal)) cal = [];
   return cal;
 }
 
@@ -9941,99 +9844,7 @@ function deleteAcademicCalendarTerm(termId) {
 ------------------------------------------------------------- */
 function getStudentAssessments() {
   let assessments = read(ASSESS_KEY);
-  if (!Array.isArray(assessments) || assessments.length === 0) {
-    assessments = [
-      {
-        id: 'as_101',
-        studentId: 's_101',
-        studentRoll: 'STU-2026-001',
-        studentName: 'Samuel Kofi Mensah',
-        className: 'Grade 11 - Web Systems & Client Architecture',
-        subject: 'Web Systems & Client Architecture',
-        teacherName: 'Kwame Boateng',
-        teacherEmail: 'kwame@flawless.org',
-        assessmentTitle: 'Term 1 Mid-Term Comprehensive Assessment',
-        term: '2026 - Term 1',
-        caScore: 28,
-        examScore: 63,
-        totalScore: 91,
-        grade: 'A+',
-        teacherRemarks: 'Exemplary architectural understanding of CSS Grid, flexbox responsive layouts, and DOM manipulation.',
-        status: 'Awaiting HR Certification',
-        submittedAt: Date.now() - 86400000 * 3,
-        certifiedAt: null,
-        certifiedBy: null,
-        hrNotes: ''
-      },
-      {
-        id: 'as_102',
-        studentId: 's_102',
-        studentRoll: 'STU-2026-002',
-        studentName: 'Yaa Asantewaa',
-        className: 'Grade 10 - Graphic Arts & Visual Identity',
-        subject: 'Graphic Arts & Visual Identity',
-        teacherName: 'Kofi Owusu',
-        teacherEmail: 'kofi@flawless.org',
-        assessmentTitle: 'Term 1 Brand Identity Practical Portfolio',
-        term: '2026 - Term 1',
-        caScore: 26,
-        examScore: 61,
-        totalScore: 87,
-        grade: 'A',
-        teacherRemarks: 'Superb vector graphics execution and color balance. Demonstrated strong mastery of design hierarchy.',
-        status: 'Awaiting HR Certification',
-        submittedAt: Date.now() - 86400000 * 2,
-        certifiedAt: null,
-        certifiedBy: null,
-        hrNotes: ''
-      },
-      {
-        id: 'as_103',
-        studentId: 's_103',
-        studentRoll: 'STU-2026-003',
-        studentName: 'Kwabena J. Darko',
-        className: 'Grade 12 - Digital Animation & 3D Modeling',
-        subject: 'Digital Animation & 3D Modeling',
-        teacherName: 'James Ntiamoah',
-        teacherEmail: 'james@flawless.org',
-        assessmentTitle: 'Term 1 3D Character Rigging & Animation',
-        term: '2026 - Term 1',
-        caScore: 29,
-        examScore: 66,
-        totalScore: 95,
-        grade: 'A+',
-        teacherRemarks: 'Outstanding kinematic rigging and lighting composition. Portfolio ready for international festival submission.',
-        status: 'Approved & Certified',
-        submittedAt: Date.now() - 86400000 * 5,
-        certifiedAt: Date.now() - 86400000 * 1,
-        certifiedBy: 'Ama Serwaa (HR Manager)',
-        hrNotes: 'Officially certified for academic records and institutional transcripts.'
-      },
-      {
-        id: 'as_104',
-        studentId: 's_104',
-        studentRoll: 'STU-2026-004',
-        studentName: 'Akua Serwaa Donkor',
-        className: 'Grade 10 - UI/UX Interactive Prototyping',
-        subject: 'UI/UX Interactive Prototyping',
-        teacherName: 'Esi Badu',
-        teacherEmail: 'esi@flawless.org',
-        assessmentTitle: 'Term 1 User Research & High-Fidelity Prototype',
-        term: '2026 - Term 1',
-        caScore: 25,
-        examScore: 57,
-        totalScore: 82,
-        grade: 'B+',
-        teacherRemarks: 'Great user journey mapping and wireframe fidelity. Keep refining interactive micro-transitions.',
-        status: 'Awaiting HR Certification',
-        submittedAt: Date.now() - 86400000 * 1,
-        certifiedAt: null,
-        certifiedBy: null,
-        hrNotes: ''
-      }
-    ];
-    save(ASSESS_KEY, assessments);
-  }
+  if (!Array.isArray(assessments)) assessments = [];
   return assessments;
 }
 

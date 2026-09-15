@@ -2888,49 +2888,8 @@ function renderClasses(){
 
   let arr = getClasses();
 
-  // Ensure default teacher classes if empty
-  if (!arr || !arr.length) {
-    arr = [
-      {
-        id: 'c_demo_sci10',
-        name: 'Grade 10 - Science A',
-        subject: 'Integrated Chemistry',
-        room: 'Lab 2 (Science Wing)',
-        syllabusPct: 68,
-        students: [
-          { id: 's_101', firstName: 'Samuel', middleName: 'Kofi', lastName: 'Mensah', roll: 'STU-2026-101', gender: 'Male', status: 'Active', guardianName: 'Mary Mensah', phone: '+233 24 100 1111' },
-          { id: 's_102', firstName: 'Amina', middleName: '', lastName: 'Bello', roll: 'STU-2026-102', gender: 'Female', status: 'Active', guardianName: 'Alhaji Bello', phone: '+233 20 222 3344' },
-          { id: 's_103', firstName: 'Kwesi', middleName: 'J.', lastName: 'Appiah', roll: 'STU-2026-103', gender: 'Male', status: 'Active', guardianName: 'Grace Appiah', phone: '+233 55 333 4455' },
-          { id: 's_104', firstName: 'Fatima', middleName: '', lastName: 'Suleiman', roll: 'STU-2026-104', gender: 'Female', status: 'Active', guardianName: 'Ibrahim Suleiman', phone: '+233 24 555 6677' }
-        ]
-      },
-      {
-        id: 'c_demo_sci11',
-        name: 'Grade 11 - Science B',
-        subject: 'Elective Physics',
-        room: 'Lab 1 (Tech Block)',
-        syllabusPct: 58,
-        students: [
-          { id: 's_201', firstName: 'Emmanuel', middleName: 'O.', lastName: 'Osei', roll: 'STU-2026-201', gender: 'Male', status: 'Active', guardianName: 'Patrick Osei', phone: '+233 20 777 8899' },
-          { id: 's_202', firstName: 'Abigail', middleName: 'Afia', lastName: 'Darko', roll: 'STU-2026-202', gender: 'Female', status: 'Active', guardianName: 'Cecilia Darko', phone: '+233 54 888 9900' },
-          { id: 's_203', firstName: 'Kofi', middleName: 'Boateng', lastName: 'Sarpong', roll: 'STU-2026-203', gender: 'Male', status: 'Active', guardianName: 'Dr. Sarpong', phone: '+233 24 999 0011' }
-        ]
-      },
-      {
-        id: 'c_demo_math12',
-        name: 'Grade 12 - Senior Math',
-        subject: 'Core Mathematics',
-        room: 'Room 304',
-        syllabusPct: 82,
-        students: [
-          { id: 's_301', firstName: 'Michael', middleName: '', lastName: 'Quaye', roll: 'STU-2026-301', gender: 'Male', status: 'Active', guardianName: 'Vida Quaye', phone: '+233 20 112 2334' },
-          { id: 's_302', firstName: 'Efua', middleName: 'Akoto', lastName: 'Gyasi', roll: 'STU-2026-302', gender: 'Female', status: 'Active', guardianName: 'Nana Gyasi', phone: '+233 27 223 3445' },
-          { id: 's_303', firstName: 'David', middleName: 'K.', lastName: 'Acheampong', roll: 'STU-2026-303', gender: 'Male', status: 'Active', guardianName: 'Janet Acheampong', phone: '+233 55 445 5667' }
-        ]
-      }
-    ];
-    saveClasses(arr);
-  }
+  // Clean slate: only show real classes registered under active organization
+  if (!Array.isArray(arr)) arr = [];
 
   arr.forEach((c, i) => {
     const studentCount = (c.students || []).length;
@@ -4018,61 +3977,7 @@ function switchAssessMode(mode) {
 
 function getStudentAssessmentsForTeacher() {
   let list = safeParse(localStorage.getItem(ASSESS_KEY));
-  if (!list || !Array.isArray(list) || !list.length) {
-    list = [
-      {
-        id: 'as_101',
-        studentId: 's_101',
-        studentName: 'Samuel Kofi Mensah',
-        studentRoll: 'STU-2026-101',
-        className: 'Grade 10 - Science A',
-        subject: 'Integrated Chemistry',
-        teacherName: teacher.name || 'Faculty Instructor',
-        caScore: 26,
-        examScore: 62,
-        totalScore: 88,
-        grade: 'A1',
-        status: 'Approved & Certified',
-        teacherRemarks: 'Excellent mastery of stoichiometry and organic principles.',
-        submittedAt: Date.now() - 86400000 * 3,
-        certifiedAt: Date.now() - 86400000 * 2
-      },
-      {
-        id: 'as_102',
-        studentId: 's_102',
-        studentName: 'Amina Bello',
-        studentRoll: 'STU-2026-102',
-        className: 'Grade 10 - Science A',
-        subject: 'Integrated Chemistry',
-        teacherName: teacher.name || 'Faculty Instructor',
-        caScore: 24,
-        examScore: 48,
-        totalScore: 72,
-        grade: 'B2',
-        status: 'Approved & Certified',
-        teacherRemarks: 'Good grasp of chemical equations and lab reports.',
-        submittedAt: Date.now() - 86400000 * 3,
-        certifiedAt: Date.now() - 86400000 * 2
-      },
-      {
-        id: 'as_103',
-        studentId: 's_103',
-        studentName: 'Kwesi J. Appiah',
-        studentRoll: 'STU-2026-103',
-        className: 'Grade 10 - Science A',
-        subject: 'Integrated Chemistry',
-        teacherName: teacher.name || 'Faculty Instructor',
-        caScore: 21,
-        examScore: 45,
-        totalScore: 66,
-        grade: 'B3',
-        status: 'Awaiting HR Certification',
-        teacherRemarks: 'Consistent performance; recommended for extra kinetics drills.',
-        submittedAt: Date.now() - 86400000
-      }
-    ];
-    save(ASSESS_KEY, list);
-  }
+  if (!list || !Array.isArray(list)) list = [];
   return list;
 }
 

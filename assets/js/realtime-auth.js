@@ -261,11 +261,11 @@
             }
 
             const entered = (enteredCode || '').toString().trim();
-            if (!entered || entered.length !== 6) {
+            if (!entered || entered.length < 6 || entered.length > 10) {
                 return {
                     success: false,
                     expired: false,
-                    error: 'Please enter a valid 6-digit authentication code.'
+                    error: 'Please enter a valid authentication code.'
                 };
             }
 
@@ -282,7 +282,7 @@
             return {
                 success: false,
                 expired: false,
-                error: 'Invalid 6-digit authentication code. Please check your email and re-enter.'
+                error: 'Invalid authentication code. Please check your email and re-enter.'
             };
         },
 
@@ -308,6 +308,13 @@
                             success: true,
                             email: cleanEmail,
                             purpose: session ? session.purpose : 'Identity Verification'
+                        };
+                    }
+                    if (cloudRes && cloudRes.error) {
+                        return {
+                            success: false,
+                            expired: (cloudRes.error || '').toLowerCase().includes('expired'),
+                            error: cloudRes.error
                         };
                     }
                 } catch (_) {}
@@ -357,7 +364,7 @@
                 verifyBtn.innerHTML = '<i class="fa-solid fa-shield-check"></i> Verify &amp; Proceed';
             }
             if (feedback) {
-                feedback.textContent = `A 6-digit authentication code has been dispatched to ${cleanEmail}. Please check your inbox.`;
+                feedback.textContent = `An authentication code has been dispatched to ${cleanEmail}. Please check your inbox.`;
                 feedback.className = 'rta-feedback info';
                 feedback.style.display = 'block';
             }
@@ -419,7 +426,7 @@
 
             const feedback = document.getElementById('rtaFeedback');
             if (feedback) {
-                feedback.textContent = `Fresh 6-digit verification code dispatched to ${sess.email}!`;
+                feedback.textContent = `Fresh verification code dispatched to ${sess.email}!`;
                 feedback.className = 'rta-feedback info';
                 feedback.style.display = 'block';
             }
@@ -584,13 +591,13 @@
 
                     <div class="rta-inbox-alert">
                         <i class="fa-solid fa-envelope-circle-check" style="color: #38bdf8; font-size: 15px;"></i>
-                        <span>Please check your email inbox for your 6-digit verification code.</span>
+                        <span>Please check your email inbox for your verification code.</span>
                     </div>
 
                     <div id="rtaFeedback" class="rta-feedback" style="display: none;"></div>
 
                     <div class="rta-input-wrap">
-                        <input type="text" id="rtaOtpInput" class="rta-otp-input" placeholder="------" maxlength="6" autocomplete="one-time-code"
+                        <input type="text" id="rtaOtpInput" class="rta-otp-input" placeholder="--------" maxlength="10" autocomplete="one-time-code"
                                onkeydown="if(event.key==='Enter'){event.preventDefault();window.RealtimeAuth.submitModalVerification();}">
                     </div>
 
@@ -770,39 +777,81 @@
         populateApprovedOrgDropdown: async function (selectElement, selectedValue = null) {
             if (!selectElement) return;
             try {
-                selectElement.innerHTML = '<option value="">-- Loading Approved Institutions... --</option>';
+                // Determine preferred active organization from parameters or storage
+                const preferredOrg = (selectedValue || 
+                    (window.AuthSession && typeof window.AuthSession.getOrg === 'function' ? window.AuthSession.getOrg() : null) || 
+                    localStorage.getItem('active_org') || 
+                    localStorage.getItem('activeOrg') || 
+                    '').trim();
+
                 let orgs = [];
                 if (window.SupabaseService && typeof window.SupabaseService.getApprovedOrganizations === 'function') {
                     orgs = await window.SupabaseService.getApprovedOrganizations();
                 }
 
+                // If no approved orgs from cloud, fallback to local active_org / default
                 if (!orgs || orgs.length === 0) {
-                    const localOrg = localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
+                    const localOrg = preferredOrg || 'FLAWLESS GRAPHICS';
                     orgs = [{ org_name: localOrg, name: localOrg, org_id: 'fg-main', status: 'Active' }];
                 }
 
+                // Ensure root / default exists if needed
+                const hasRoot = orgs.some(o => ((o.org_name || o.name || '').toUpperCase() === 'FLAWLESS GRAPHICS') || ((o.org_id || o.slug || '') === 'fg-main'));
+                if (!hasRoot && (!orgs || orgs.length === 0)) {
+                    orgs.unshift({ org_name: 'FLAWLESS GRAPHICS', name: 'FLAWLESS GRAPHICS', org_id: 'fg-main', status: 'Active' });
+                }
+
                 selectElement.innerHTML = '<option value="">-- Select Approved Institution Workspace --</option>';
-                orgs.forEach(org => {
+                let matchedIndex = -1;
+
+                orgs.forEach((org, idx) => {
                     const name = org.org_name || org.name || 'Educational Institution';
-                    const slug = org.org_id || org.slug || 'main';
+                    const slug = org.org_id || org.slug || (name ? name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') : 'workspace');
                     const opt = document.createElement('option');
                     opt.value = slug;
                     opt.dataset.name = name;
                     opt.dataset.slug = slug;
                     opt.textContent = `${name} (${slug})`;
-                    if (selectedValue && (selectedValue === slug || selectedValue === name)) {
+
+                    const prefClean = preferredOrg.toLowerCase();
+                    const slugClean = slug.toLowerCase();
+                    const nameClean = name.toLowerCase();
+
+                    if (prefClean && (prefClean === slugClean || prefClean === nameClean || prefClean.includes(nameClean) || nameClean.includes(prefClean))) {
                         opt.selected = true;
+                        matchedIndex = idx + 1;
                     }
                     selectElement.appendChild(opt);
                 });
 
-                // Auto-select if only 1 institution exists and none explicitly selected
-                if (orgs.length === 1 && !selectedValue) {
+                // Auto-select matched active organization or default if only 1 exists
+                if (matchedIndex > 0) {
+                    selectElement.selectedIndex = matchedIndex;
+                } else if (orgs.length === 1) {
                     selectElement.selectedIndex = 1;
+                }
+
+                // Listen to dropdown changes to sync active institution workspace
+                if (!selectElement._hasOrgChangeListener) {
+                    selectElement._hasOrgChangeListener = true;
+                    selectElement.addEventListener('change', () => {
+                        const selOpt = selectElement.selectedOptions && selectElement.selectedOptions[0];
+                        if (selOpt && selOpt.value) {
+                            const newOrgName = selOpt.dataset.name || selOpt.textContent;
+                            if (newOrgName && !newOrgName.includes('-- Select Approved')) {
+                                localStorage.setItem('active_org', newOrgName);
+                                if (window.AuthSession && typeof window.AuthSession.setOrgName === 'function') {
+                                    window.AuthSession.setOrgName(newOrgName);
+                                }
+                            }
+                        }
+                    });
                 }
             } catch (err) {
                 console.warn('[RealtimeAuth] Error populating org dropdown:', err);
-                selectElement.innerHTML = '<option value="fg-main" selected>FLAWLESS GRAPHICS (fg-main)</option>';
+                if (!selectElement.options || selectElement.options.length <= 1) {
+                    selectElement.innerHTML = '<option value="fg-main" selected>FLAWLESS GRAPHICS (fg-main)</option>';
+                }
             }
         },
 

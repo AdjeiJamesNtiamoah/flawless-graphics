@@ -1965,35 +1965,36 @@
     const CURRENCY_SYMBOLS = { GHS: 'GH₵', USD: '$', EUR: '€', GBP: '£' };
     const CURRENCY_RATES = { GHS: 1.0, USD: 0.065, EUR: 0.060, GBP: 0.052 };
 
-    // INITIAL INSTITUTIONAL DATA
-    let defaultFacultyStaff = [
+    // INITIAL INSTITUTIONAL DATA (Clean slate for new institution workspaces)
+    const isRootOrg = (ACTIVE_ORG || '').toUpperCase() === 'FLAWLESS GRAPHICS';
+    let defaultFacultyStaff = isRootOrg ? [
       { id: 'EMP-01', name: 'Kwame Mensah', role: 'Lead Graphic Design Instructor', dept: 'Visual Arts', gross: 9500, approved: true },
       { id: 'EMP-02', name: 'Abena Appiah', role: 'Senior UX/UI Design Lecturer', dept: 'Digital Tech', gross: 10200, approved: true },
       { id: 'EMP-03', name: 'Kofi Mensah', role: 'Chief Financial Officer / Bursar', dept: 'Finance & Treasury', gross: 11500, approved: false },
       { id: 'EMP-04', name: 'Ama Osei', role: 'Senior Payroll Specialist', dept: 'Finance & HR', gross: 7800, approved: false },
       { id: 'EMP-05', name: 'Dr. Samuel Boakye', role: 'Dean of Academic Affairs', dept: 'Academics', gross: 12000, approved: false }
-    ];
+    ] : [];
 
-    let defaultStudentAccounts = [
+    let defaultStudentAccounts = isRootOrg ? [
       { id: 'REC-1001', name: 'Ebenezer Addo', studentId: 'STU-2026-088', rfid: 'E0:04:01:71:96:65', grade: 'Level 200', programme: 'Diploma in Graphic Design', cat: 'Tuition Fee', date: '2026-08-18', billed: 4800, amount: 4800, status: 'Cleared' },
       { id: 'REC-1002', name: 'Akosua Serwaa', studentId: 'STU-2026-042', rfid: 'E0:04:01:88:21:40', grade: 'Level 100', programme: 'Certificate in UI/UX Design', cat: 'Tuition Fee', date: '2026-08-19', billed: 4050, amount: 3200, status: 'Partial' },
       { id: 'REC-1003', name: 'Kwabena Darko', studentId: 'STU-2026-105', rfid: 'E0:04:01:99:11:32', grade: 'Level 200', programme: 'Diploma in Graphic Design', cat: 'Facility & Lab Fee', date: '2026-08-20', billed: 4700, amount: 4700, status: 'Cleared' },
       { id: 'REC-1004', name: 'Yaa Asantewaa', studentId: 'STU-2026-061', rfid: 'E0:04:01:34:55:12', grade: 'Level 300', programme: '3D Motion Graphics Degree', cat: 'Tuition Fee', date: '2026-08-21', billed: 5750, amount: 3500, status: 'Partial' },
       { id: 'REC-1005', name: 'Osei Tutu', studentId: 'STU-2026-093', rfid: 'E0:04:01:12:44:88', grade: 'Level 100', programme: 'Certificate in Visual Arts', cat: 'Tuition Fee', date: '2026-08-22', billed: 4050, amount: 1500, status: 'Arrears' },
       { id: 'REC-1006', name: 'Samuel Kofi Mensah', studentId: 'STU-2026-001', rfid: 'E0:04:01:45:90:11', grade: 'Level 200', programme: 'Diploma in Graphic Design', cat: 'Tuition Fee', date: '2026-08-24', billed: 4700, amount: 4700, status: 'Cleared' }
-    ];
+    ] : [];
 
-    let defaultScholarships = [
+    let defaultScholarships = isRootOrg ? [
       { id: 'SCH-2026-01', name: 'Akosua Serwaa', studentId: 'STU-2026-042', scheme: 'Presidential Creative Merit Scholarship', sponsor: 'Flawless Graphics Foundation', waiver: '50% Waiver (GHS 2,400.00)', amount: 2400, date: '2026-08-15', status: 'Active' },
       { id: 'SCH-2026-02', name: 'Kwabena Darko', studentId: 'STU-2026-105', scheme: 'STEM & Digital Arts Inclusion Grant', sponsor: 'Ministry of Education Ghana', waiver: 'Full Tuition (GHS 3,500.00)', amount: 3500, date: '2026-08-16', status: 'Active' },
       { id: 'SCH-2026-03', name: 'Yaa Asantewaa', studentId: 'STU-2026-061', scheme: 'Young Female Technologists Bursary', sponsor: 'Africa Tech Aid Endowment', waiver: 'GHS 1,500.00 Term Credit', amount: 1500, date: '2026-08-18', status: 'Active' }
-    ];
+    ] : [];
 
-    let auditLogs = [
+    let auditLogs = isRootOrg ? [
       { msg: 'Treasury system initialization & AY 2026/2027 Term 2 ledger opened', date: '2026-08-20' },
       { msg: 'Operating budget verified and allocated (GHS 650,000.00)', date: '2026-08-21' },
       { msg: 'Term 2 Fee Tariff Schedule published for Visual Arts & Tech faculties', date: '2026-08-22' }
-    ];
+    ] : [];
 
     let cashFlowChartObj = null;
     let expenseChartObj = null;

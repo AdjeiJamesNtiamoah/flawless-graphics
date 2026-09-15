@@ -493,353 +493,73 @@
 
     // Get notifications tailored for portal context
     function getNotifications() {
+      const readIds = getReadNotifIds();
       const list = [];
-      const storageKey = getReadNotifStorageKey(config.role);
-      const readIds = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      const activeOrg = (window.AuthSession && typeof window.AuthSession.getOrg === 'function' ? window.AuthSession.getOrg() : null) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
 
-      // -------------------------------------------------------------
-      // 1. SUPER ADMIN NOTIFICATIONS
-      // -------------------------------------------------------------
-      if (config.role === 'Super Admin') {
-        // Pending registration approvals from organizations_users
-        try {
-          const users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
-          const pendingUsers = users.filter(u => {
-            const s = (u.status || '').toLowerCase();
-            return s === 'pending_approval' || s === 'pending';
-          });
-          pendingUsers.forEach(u => {
-            list.push({
-              id: 'admin_user_' + (u.id || u.email),
-              category: 'approvals',
-              icon: 'fa-solid fa-user-clock',
-              iconTheme: 'amber',
-              title: 'User Registration Arrived',
-              msg: `${u.name || u.email} requested access as ${(u.role || 'Staff').toUpperCase()} (${u.org || 'All Orgs'}) & awaits approval.`,
-              time: u.registeredAt ? formatNotifTime(u.registeredAt) : 'Pending',
-              actionLabel: 'Approve Now',
-              actionType: 'approve_user',
-              userEmail: u.email,
-              unread: true
-            });
-          });
-        } catch (err) {
-          console.warn('Error reading pending users for admin:', err);
-        }
-
-        // Operational & Health Telemetry
-        const adminAlerts = [
-          {
-            id: 'admin_alert_cloud_sync',
-            category: 'system',
-            icon: 'fa-solid fa-cloud-arrow-up',
-            iconTheme: 'green',
-            title: 'Cloud DB Sync Telemetry',
-            msg: 'Continuous cloud sync active across all tenants. 0 errors detected in last 24 hours.',
-            time: 'Live',
-            actionLabel: 'Check Health',
-            actionType: 'navigate',
-            section: 'health'
-          },
-          {
-            id: 'admin_alert_backup',
-            category: 'system',
-            icon: 'fa-solid fa-database',
-            iconTheme: 'purple',
-            title: 'Disaster Recovery Snapshot',
-            msg: 'Automated disaster recovery backup verified and encrypted in secure storage.',
-            time: '1h ago',
-            actionLabel: 'Inspect Backup',
-            actionType: 'navigate',
-            section: 'backup'
-          },
-          {
-            id: 'admin_alert_broadcast',
-            category: 'system',
-            icon: 'fa-solid fa-bullhorn',
-            iconTheme: 'blue',
-            title: 'Broadcast Console Telemetry',
-            msg: 'Super Admin institutional directive delivered across Teacher, HR & Finance channels.',
-            time: '2h ago',
-            actionLabel: 'Open Console',
-            actionType: 'navigate',
-            section: 'broadcasts'
-          }
-        ];
-
-        adminAlerts.forEach(item => {
-          const isRead = readIds.includes(item.id);
-          list.push(Object.assign({}, item, { unread: !isRead }));
+      // 1. Pending registration approvals from real organizations_users / Supabase
+      try {
+        const users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
+        const pendingUsers = users.filter(u => {
+          const s = (u.status || '').toLowerCase();
+          const uOrg = (u.org || u.org_id || '').toLowerCase().trim();
+          const orgMatch = !uOrg || uOrg === activeOrg.toLowerCase().trim() || activeOrg === 'FLAWLESS GRAPHICS';
+          return orgMatch && (s === 'pending_approval' || s === 'pending');
         });
-      }
+        pendingUsers.forEach(u => {
+          list.push({
+            id: 'user_' + (u.id || u.email),
+            category: config.tab1Filter || 'approvals',
+            icon: 'fa-solid fa-user-clock',
+            iconTheme: 'amber',
+            title: 'Registration Request Arrived',
+            msg: `${u.name || u.email} registered as ${u.role ? u.role.toUpperCase() : 'Staff'} & awaits approval.`,
+            time: u.registeredAt ? formatNotifTime(u.registeredAt) : 'Pending',
+            actionLabel: 'Review Request',
+            actionType: 'approve_user',
+            userEmail: u.email,
+            unread: true
+          });
+        });
+      } catch (err) {}
 
-      // -------------------------------------------------------------
-      // 2. TEACHER NOTIFICATIONS
-      // -------------------------------------------------------------
-      else if (config.role === 'Teacher') {
-        // Broadcasts / Directives published by HR or Super Admin
-        let activeOrg = localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
-        try {
-          const activeTeacher = JSON.parse(localStorage.getItem('active_teacher') || '{}');
-          if (activeTeacher.org) activeOrg = activeTeacher.org;
-        } catch (e) {}
-
+      // 2. Real Announcements for active workspace
+      try {
         const annKey = `${activeOrg}_announcements`;
-        const announcements = JSON.parse(localStorage.getItem(annKey) || localStorage.getItem('FLAWLESS_GRAPHICS_announcements') || '[]');
-        if (Array.isArray(announcements) && announcements.length > 0) {
-          announcements.slice(0, 3).forEach(b => {
-            const bId = 'teacher_bc_' + (b.id || b.title);
+        const annList = JSON.parse(localStorage.getItem(annKey) || localStorage.getItem('announcements') || '[]');
+        if (Array.isArray(annList) && annList.length > 0) {
+          annList.slice(0, 5).forEach(ann => {
+            const bId = 'ann_' + (ann.id || ann.title);
             const isRead = readIds.includes(bId);
             list.push({
               id: bId,
-              category: 'directives',
+              category: config.tab2Filter || 'system',
               icon: 'fa-solid fa-bullhorn',
-              iconTheme: 'amber',
-              title: 'Directive: ' + (b.title || 'Official Directive'),
-              msg: b.message || b.content || 'Executive directive published for academic staff review.',
-              time: b.date ? formatNotifTime(b.date) : 'Recent',
-              actionLabel: 'Read Directive',
+              iconTheme: 'blue',
+              title: ann.title || 'Institutional Announcement',
+              msg: ann.message || ann.body || ann.content || 'New announcement broadcasted.',
+              time: ann.date ? formatNotifTime(ann.date) : 'Recent',
+              actionLabel: 'View Notice',
               actionType: 'navigate',
-              section: 'broadcasts',
+              section: 'announcements',
               unread: !isRead
             });
           });
-        } else {
-          const isRead = readIds.includes('teacher_directive_default');
-          list.push({
-            id: 'teacher_directive_default',
-            category: 'directives',
-            icon: 'fa-solid fa-bullhorn',
-            iconTheme: 'amber',
-            title: 'Executive Directive Arrived',
-            msg: 'Official Academic Calendar & Assessment Schedules published for staff review.',
-            time: 'Today',
-            actionLabel: 'Read Directive',
-            actionType: 'navigate',
-            section: 'broadcasts',
-            unread: !isRead
-          });
         }
+      } catch (err) {}
 
-        // Teacher Class & Assessment alerts
-        const teacherAlerts = [
-          {
-            id: 'teacher_alert_submissions',
-            category: 'classes',
-            icon: 'fa-solid fa-book-open',
-            iconTheme: 'green',
-            title: 'Student Coursework Arrived',
-            msg: '8 new student assignment submissions uploaded in Visual Arts 101 awaiting grading.',
-            time: '45m ago',
-            actionLabel: 'Grade Submissions',
-            actionType: 'navigate',
-            section: 'assignments'
-          },
-          {
-            id: 'teacher_alert_calendar',
-            category: 'classes',
-            icon: 'fa-solid fa-calendar-days',
-            iconTheme: 'purple',
-            title: 'Academic Schedule Update',
-            msg: 'Mid-term student assessment window opens next Monday. Verify assessment rubrics.',
-            time: '2h ago',
-            actionLabel: 'View Timetable',
-            actionType: 'navigate',
-            section: 'timetable'
-          }
-        ];
-
-        teacherAlerts.forEach(item => {
-          const isRead = readIds.includes(item.id);
-          list.push(Object.assign({}, item, { unread: !isRead }));
-        });
-      }
-
-      // -------------------------------------------------------------
-      // 3. FINANCE NOTIFICATIONS
-      // -------------------------------------------------------------
-      else if (config.role === 'Finance') {
-        const financeAlerts = [
-          {
-            id: 'finance_alert_tuition_pay',
-            category: 'collections',
-            icon: 'fa-solid fa-graduation-cap',
-            iconTheme: 'green',
-            title: 'Tuition Fee Payment Arrived',
-            msg: 'Student tuition receipt of GHS 1,450.00 confirmed and posted to student receivables.',
-            time: '20m ago',
-            actionLabel: 'View Collections',
-            actionType: 'navigate',
-            section: 'dashboard'
-          },
-          {
-            id: 'finance_alert_payroll_disb',
-            category: 'disbursements',
-            icon: 'fa-solid fa-hand-holding-dollar',
-            iconTheme: 'blue',
-            title: 'Payroll Disbursement Clearance',
-            msg: 'Monthly staff compensation batch computed by HR awaits bursar authorization.',
-            time: '1h ago',
-            actionLabel: 'Disburse Payroll',
-            actionType: 'navigate',
-            section: 'approval'
-          },
-          {
-            id: 'finance_alert_invoice',
-            category: 'disbursements',
-            icon: 'fa-solid fa-file-invoice-dollar',
-            iconTheme: 'purple',
-            title: 'Departmental Invoice Arrived',
-            msg: 'Campus equipment maintenance invoice (GHS 850.00) submitted for payment clearance.',
-            time: '3h ago',
-            actionLabel: 'Review Invoice',
-            actionType: 'navigate',
-            section: 'approval'
-          }
-        ];
-
-        financeAlerts.forEach(item => {
-          const isRead = readIds.includes(item.id);
-          list.push(Object.assign({}, item, { unread: !isRead }));
-        });
-      }
-
-      // -------------------------------------------------------------
-      // 4. STUDENT NOTIFICATIONS
-      // -------------------------------------------------------------
-      else if (config.role === 'Student') {
-        const studentAlerts = [
-          {
-            id: 'stu_alert_assignment_1',
-            category: 'coursework',
-            icon: 'fa-solid fa-clock-rotate-left',
-            iconTheme: 'amber',
-            title: 'Upcoming Coursework Deadline',
-            msg: 'Responsive Web Architecture Project due tomorrow at 11:59 PM.',
-            time: 'Due Soon',
-            actionLabel: 'Submit Now',
-            actionType: 'navigate',
-            section: 'assignments'
-          },
-          {
-            id: 'stu_alert_waec_grades',
-            category: 'grades',
-            icon: 'fa-solid fa-award',
-            iconTheme: 'green',
-            title: 'Continuous Assessment Certified',
-            msg: 'Mid-term CA marks approved by HR Directorate. Current average: 88% (A1).',
-            time: 'Today',
-            actionLabel: 'View Grades',
-            actionType: 'navigate',
-            section: 'grades'
-          },
-          {
-            id: 'stu_alert_directive',
-            category: 'grades',
-            icon: 'fa-solid fa-bullhorn',
-            iconTheme: 'blue',
-            title: 'WAEC Examination Window Published',
-            msg: 'Final exam schedule and revision milestones released by faculty office.',
-            time: '2h ago',
-            actionLabel: 'View Timetable',
-            actionType: 'navigate',
-            section: 'timetable'
-          }
-        ];
-
-        studentAlerts.forEach(item => {
-          const isRead = readIds.includes(item.id);
-          list.push(Object.assign({}, item, { unread: !isRead }));
-        });
-      }
-
-      // -------------------------------------------------------------
-      // 5. HR & WORKSPACE NOTIFICATIONS (DEFAULT)
-      // -------------------------------------------------------------
-      else {
-        // Pending registration approvals from organizations_users
-        try {
-          const users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
-          const pendingUsers = users.filter(u => {
-            const s = (u.status || '').toLowerCase();
-            return s === 'pending_approval' || s === 'pending';
-          });
-          pendingUsers.forEach(u => {
-            list.push({
-              id: 'user_' + (u.id || u.email),
-              category: 'approvals',
-              icon: 'fa-solid fa-user-clock',
-              iconTheme: 'amber',
-              title: 'Staff Registration Arrived',
-              msg: `${u.name || u.email} registered as ${u.role ? u.role.toUpperCase() : 'Staff'} & awaits your approval.`,
-              time: u.registeredAt ? formatNotifTime(u.registeredAt) : 'Pending',
-              actionLabel: 'Approve Now',
-              actionType: 'approve_user',
-              userEmail: u.email,
-              unread: true
-            });
-          });
-        } catch (err) {
-          console.warn('Error reading pending users:', err);
-        }
-
-        // Operational notifications for HR
-        const defaultAlerts = [
-          {
-            id: 'alert_att_today',
-            category: 'staff',
-            icon: 'fa-solid fa-clipboard-user',
-            iconTheme: 'green',
-            title: 'Daily Staff Attendance',
-            msg: 'Morning check-in sheet finalized with 96% staff presence recorded.',
-            time: '30m ago',
-            actionLabel: 'View Attendance',
-            actionType: 'navigate',
-            section: 'teachers'
-          },
-          {
-            id: 'alert_leave_req',
-            category: 'staff',
-            icon: 'fa-solid fa-calendar-check',
-            iconTheme: 'purple',
-            title: 'Staff Leave Request',
-            msg: 'Academic leave application submitted for review (3 days medical).',
-            time: '1h ago',
-            actionLabel: 'Inspect Request',
-            actionType: 'navigate',
-            section: 'teachers'
-          },
-          {
-            id: 'alert_payroll_batch',
-            category: 'staff',
-            icon: 'fa-solid fa-file-invoice-dollar',
-            iconTheme: 'blue',
-            title: 'Payroll Computation Batch',
-            msg: 'Monthly salary disbursements ready for HR verification and sign-off.',
-            time: '3h ago',
-            actionLabel: 'Open Payroll',
-            actionType: 'navigate',
-            section: 'payroll'
-          }
-        ];
-
-        defaultAlerts.forEach(item => {
-          const isRead = readIds.includes(item.id);
-          list.push(Object.assign({}, item, { unread: !isRead }));
-        });
-      }
-
-      // Incorporate dynamic live events from LucyBus across all portals
+      // 3. Dynamic live events from LucyBus for active workspace
       try {
         const liveNotifs = JSON.parse(localStorage.getItem('lucy_live_notifications') || '[]');
-        liveNotifs.forEach(item => {
-          if (!list.some(existing => existing.id === item.id)) {
-            const isRead = readIds.includes(item.id);
-            // Match category if appropriate, or default to tab1
-            const category = item.category || config.tab1Filter;
-            list.unshift(Object.assign({}, item, { category: category, unread: !isRead }));
-          }
-        });
+        if (Array.isArray(liveNotifs)) {
+          liveNotifs.forEach(item => {
+            if (!list.some(existing => existing.id === item.id)) {
+              const isRead = readIds.includes(item.id);
+              const category = item.category || config.tab1Filter;
+              list.unshift(Object.assign({}, item, { category: category, unread: !isRead }));
+            }
+          });
+        }
       } catch (err) {}
 
       return list;

@@ -887,7 +887,7 @@
         </div>
         <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">Verify Teacher Account</h3>
         <p style="font-size: 12.5px; color: rgba(255,255,255,0.7); line-height: 1.5; margin-bottom: 6px;">
-            A 6-digit confirmation code has been generated for:
+            A confirmation code has been generated for:
         </p>
         <div class="verify-badge" id="verifyEmailBadge">
             <i class="fa-regular fa-envelope"></i> <span id="verifyEmailText">teacher@school.com</span>
@@ -902,7 +902,7 @@
                 <span>Didn't receive code? Instant authentication code:</span>
             </div>
             <div class="instant-code-display">
-                <span class="instant-code-value" id="instantCodeValue">------</span>
+                <span class="instant-code-value" id="instantCodeValue">--------</span>
                 <button type="button" class="btn-copy-code" id="btnAutoFillCode" onclick="autoFillOtpCode()">
                     <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-fill Code
                 </button>
@@ -916,9 +916,9 @@
 
         <div class="otp-box">
             <div style="font-size: 12px; font-weight: 600; color: #a2e8dd; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                <i class="fa-solid fa-key"></i> Enter 6-Digit Code
+                <i class="fa-solid fa-key"></i> Enter Code
             </div>
-            <input type="text" id="otpInput" class="otp-input" placeholder="------" maxlength="6" autocomplete="one-time-code">
+            <input type="text" id="otpInput" class="otp-input" placeholder="--------" maxlength="10" autocomplete="one-time-code">
             <button type="button" class="btn-submit" id="btnVerifyOtp" onclick="submitOtpVerification()" style="margin-top: 4px;">
                 <i class="fa-solid fa-check"></i> Verify & Enter Classroom
             </button>
@@ -1091,8 +1091,8 @@ function submitOtpVerification() {
     const code = otpInput.value.trim();
     const btn = document.getElementById("btnVerifyOtp");
 
-    if (!code || code.length < 6) {
-        return showVerifyFeedback("Please enter the 6-digit verification code.", true);
+    if (!code || code.length < 6 || code.length > 10) {
+        return showVerifyFeedback("Please enter the verification code.", true);
     }
 
     if (code !== currentOtpCode && code !== "123456") {

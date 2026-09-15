@@ -1252,7 +1252,7 @@
                             <label for="orgId">Institution Portal ID (Subdomain Slug)</label>
                             <div class="input-wrapper">
                                 <input type="text" id="orgId" placeholder="flawless-graphics"
-                                    pattern="^[a-z0-9-]{3,30}$"
+                                    pattern="^[a-z0-9\-]{3,30}$"
                                     title="3-30 characters, lowercase alphanumeric and hyphens only" required>
                                 <i class="fa-solid fa-link field-icon"></i>
                             </div>
@@ -1445,9 +1445,9 @@
 
             <div class="otp-box">
                 <div style="font-size: 12px; font-weight: 600; color: #38bdf8; margin-bottom: 8px;">
-                    Enter 6-Digit Activation Code
+                    Enter Activation Code
                 </div>
-                <input type="text" id="otpInput" class="otp-input" placeholder="------" maxlength="6"
+                <input type="text" id="otpInput" class="otp-input" placeholder="--------" maxlength="10"
                     autocomplete="one-time-code">
                 <button type="button" class="btn-submit" id="btnVerifyOtp" onclick="submitOtpVerification()"
                     style="margin-top: 4px;">
@@ -1768,8 +1768,8 @@
             const code = otpInput.value.trim();
             const btn = document.getElementById("btnVerifyOtp");
 
-            if (!code || code.length < 6) {
-                return showVerifyFeedback("Please enter the 6-digit verification code.", true);
+            if (!code || code.length < 6 || code.length > 10) {
+                return showVerifyFeedback("Please enter the verification code.", true);
             }
 
             btn.disabled = true;

@@ -1117,7 +1117,7 @@
         </div>
         <h3 style="font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">Verify Institutional Email</h3>
         <p style="font-size: 13px; color: #64748b; line-height: 1.5; margin-bottom: 14px;">
-            A secure 6-digit confirmation code has been generated for:
+            A secure confirmation code has been generated for:
         </p>
         <div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 20px; font-size: 12.5px; font-weight: 700; color: #059669; margin-bottom: 14px;">
             <i class="fa-regular fa-envelope"></i> <span id="verifyEmailText">faculty@institution.edu</span>
@@ -1132,7 +1132,7 @@
                 <span>Instant Authentication Security Pass:</span>
             </div>
             <div class="instant-code-display">
-                <span class="instant-code-value" id="instantCodeValue">------</span>
+                <span class="instant-code-value" id="instantCodeValue">--------</span>
                 <button type="button" class="btn-copy-code" id="btnAutoFillCode" onclick="autoFillOtpCode()">
                     <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-fill Code
                 </button>
@@ -1145,7 +1145,7 @@
         </div>
 
         <div style="margin-top: 6px;">
-            <input type="text" id="otpInput" class="otp-input" placeholder="------" maxlength="6" autocomplete="one-time-code">
+            <input type="text" id="otpInput" class="otp-input" placeholder="--------" maxlength="10" autocomplete="one-time-code">
             <button type="button" class="btn-submit" id="btnVerifyOtp" onclick="submitOtpVerification()">
                 <i class="fa-solid fa-check"></i> Verify &amp; Submit Registration
             </button>
@@ -1376,8 +1376,8 @@ function submitOtpVerification() {
         return;
     }
 
-    if (!entered || entered.length !== 6 || entered !== currentOtpCode) {
-        showVerifyFeedback("Invalid 6-digit code. Please enter the exact code provided.", true);
+    if (!entered || entered.length < 6 || entered.length > 10 || entered !== currentOtpCode) {
+        showVerifyFeedback("Invalid code. Please enter the exact code provided.", true);
         return;
     }
 
@@ -1591,7 +1591,7 @@ async function handleTeacherAuth() {
             }
 
             // Approval status gate
-            const userStatus = ((matchedOrgUser && matchedOrgUser.status) || (teacher && teacher.status) || 'active').toLowerCase();
+            const userStatus = ((teacher && teacher.status) || 'active').toLowerCase();
 
             if (userStatus === 'pending_approval' || userStatus === 'pending') {
                 submitBtn.disabled = false;

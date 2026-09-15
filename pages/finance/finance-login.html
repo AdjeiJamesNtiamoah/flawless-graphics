@@ -893,7 +893,7 @@
     </div>
     <h3 style="font-size: 19px; font-weight: 800; color: #fff; margin-bottom: 4px;">Verify Finance Account</h3>
     <p style="font-size: 12.5px; color: #94a3b8; line-height: 1.5; margin-bottom: 6px;">
-      A 6-digit confirmation code has been generated for:
+      A confirmation code has been generated for:
     </p>
     <div class="verify-badge" id="financeVerifyEmailBadge">
       <i class="fa-regular fa-envelope"></i> <span id="financeVerifyEmailText">finance@company.com</span>
@@ -901,7 +901,7 @@
 
     <div id="financeVerifyFeedback" style="font-size: 12px; margin-bottom: 10px; display: none;"></div>
 
-    <input type="text" id="financeOtpInput" class="otp-field" placeholder="------" maxlength="6" autocomplete="one-time-code">
+    <input type="text" id="financeOtpInput" class="otp-field" placeholder="--------" maxlength="10" autocomplete="one-time-code">
 
     <button type="button" class="btn-submit" id="btnVerifyFinanceOtp" onclick="submitFinanceOtpVerification()">
       <i class="fa-solid fa-check"></i> Verify &amp; Enter Finance Dashboard
@@ -1065,8 +1065,8 @@
 
   function submitFinanceOtpVerification() {
     const code = document.getElementById('financeOtpInput').value.trim();
-    if (!code || code.length < 6) {
-      if (window.Toaster) window.Toaster.warning('Invalid Code', 'Please enter a 6-digit code.');
+    if (!code || code.length < 6 || code.length > 10) {
+      if (window.Toaster) window.Toaster.warning('Invalid Code', 'Please enter your verification code.');
       return;
     }
 

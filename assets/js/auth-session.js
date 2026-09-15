@@ -146,18 +146,15 @@
                     const cachedOrg = localStorage.getItem(ACTIVE_ORG_KEY) || localStorage.getItem('activeOrg');
 
                     if (cachedOrg && Array.isArray(cloudOrgs) && cloudOrgs.length > 0) {
-                        const matched = cloudOrgs.find(o => 
-                            (o.org_name || o.name || '').trim().toLowerCase() === cachedOrg.trim().toLowerCase()
-                        );
+                        const cleanCached = cachedOrg.trim().toLowerCase();
+                        const matched = cloudOrgs.find(o => {
+                            const oName = (o.org_name || o.name || '').trim().toLowerCase();
+                            const oSlug = (o.slug || o.org_id || '').trim().toLowerCase();
+                            return oName === cleanCached || oSlug === cleanCached || cleanCached.includes(oName) || (oName && oName.includes(cleanCached));
+                        });
                         if (matched) {
                             org = matched.org_name || matched.name;
                             logo = matched.logo_url || matched.logo_path || matched.logo || localStorage.getItem('active_org_logo');
-                        } else {
-                            // Cached org does not exist in Supabase! Purge it!
-                            localStorage.removeItem(ACTIVE_ORG_KEY);
-                            localStorage.removeItem('activeOrg');
-                            localStorage.removeItem('active_org_logo');
-                            localStorage.removeItem('org_logo');
                         }
                     }
                 } catch (e) {
@@ -165,17 +162,25 @@
                 }
             }
 
-            // If no verified organization from Supabase, preserve default template text & icons
+            if (!org) {
+                const user = this.getUser();
+                org = (user && user.org) || localStorage.getItem(ACTIVE_ORG_KEY) || localStorage.getItem('activeOrg');
+                logo = (user && user.logo) || localStorage.getItem('active_org_logo') || localStorage.getItem('org_logo');
+            }
+
+            // If no verified organization from Supabase or storage, preserve default template text & icons
             if (!org) return;
 
-            // 1. Text branding targets
+            // 1. Text branding targets (strictly exclude SELECT, INPUT, and TEXTAREA elements)
             const textSelectors = [
                 '#orgTitle', '#headerOrgTitle', '#orgNameDisplay', '#summaryOrgName', '#orgName',
                 '.brand-title', '.org-title-text', '.header-org-title'
             ];
             textSelectors.forEach(sel => {
                 document.querySelectorAll(sel).forEach(el => {
-                    if (el && !el.getAttribute('data-preserve-title')) {
+                    if (!el) return;
+                    if (el.tagName === 'SELECT' || el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') return;
+                    if (!el.getAttribute('data-preserve-title')) {
                         el.textContent = org.toUpperCase();
                     }
                 });
@@ -184,7 +189,7 @@
             // Specific header checks where brand names are displayed
             document.querySelectorAll('.brand, .brand-wrapper, .brand-logo-container').forEach(brandEl => {
                 const title = brandEl.querySelector('h1, h2, .brand-title, #orgName, #headerOrgTitle, #orgTitle, span.org-name');
-                if (title && !title.getAttribute('data-preserve-title')) {
+                if (title && title.tagName !== 'SELECT' && title.tagName !== 'INPUT' && title.tagName !== 'TEXTAREA' && !title.getAttribute('data-preserve-title')) {
                     title.textContent = org.toUpperCase();
                 }
             });
@@ -475,29 +480,22 @@
                     }
                 }
 
-                // 2. Verify Organization existence in live Supabase
-                const cachedOrg = (localStorage.getItem(ACTIVE_ORG_KEY) || localStorage.getItem('activeOrg') || '').trim();
-                const userOrg = currentUser && currentUser.org ? currentUser.org.trim() : null;
-                const orgToCheck = userOrg || cachedOrg;
+                // 2. Verify Organization existence in live Supabase (for active dashboard sessions)
+                if (isDashboardPage() && currentUser) {
+                    const userOrg = currentUser && currentUser.org ? currentUser.org.trim() : null;
+                    const cachedOrg = (localStorage.getItem(ACTIVE_ORG_KEY) || localStorage.getItem('activeOrg') || '').trim();
+                    const orgToCheck = userOrg || cachedOrg;
 
-                if (orgToCheck && orgToCheck.toUpperCase() !== 'FLAWLESS GRAPHICS') {
-                    const cloudOrg = await window.SupabaseService.getOrganization(orgToCheck);
-                    if (!cloudOrg) {
-                        // Organization was deleted from Supabase! Immediate Access Revocation!
-                        console.warn(`[AuthSession] Institution '${orgToCheck}' was deleted from Supabase Cloud. Revoking access.`);
-                        localStorage.removeItem(ACTIVE_ORG_KEY);
-                        localStorage.removeItem('activeOrg');
-                        localStorage.removeItem('active_org_logo');
-                        localStorage.removeItem('org_logo');
-
-                        if (currentUser && currentUser.org && currentUser.org.toLowerCase() === orgToCheck.toLowerCase()) {
-                            AuthSession.logout(null);
-                            if (isDashboardPage()) {
+                    if (orgToCheck && orgToCheck.toUpperCase() !== 'FLAWLESS GRAPHICS') {
+                        const cloudOrg = await window.SupabaseService.getOrganization(orgToCheck);
+                        if (!cloudOrg) {
+                            console.warn(`[AuthSession] Institution '${orgToCheck}' was not verified in Supabase Cloud.`);
+                            if (currentUser && currentUser.org && currentUser.org.toLowerCase() === orgToCheck.toLowerCase()) {
+                                AuthSession.logout(null);
                                 alert(`Institution '${orgToCheck}' has been deleted from the institutional system. Access revoked.`);
                                 window.location.replace(getHomeUrl());
                                 return false;
                             }
-                            return false;
                         }
                     }
                 }

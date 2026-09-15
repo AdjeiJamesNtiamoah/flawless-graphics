@@ -112,7 +112,21 @@
         }
         // Try query by org_name
         const byName = await this.query(`organizations?org_name=eq.${encodeURIComponent(orgId)}&limit=1`);
-        return Array.isArray(byName) && byName.length > 0 ? byName[0] : null;
+        if (Array.isArray(byName) && byName.length > 0) return byName[0];
+
+        // Search through all organizations with normalized comparison
+        const all = await this.getOrganizations();
+        if (Array.isArray(all) && all.length > 0) {
+          const target = String(orgId).trim().toLowerCase();
+          const match = all.find(o => {
+            const n = (o.org_name || o.name || '').trim().toLowerCase();
+            const s = (o.slug || o.org_id || '').trim().toLowerCase();
+            const id = (o.id || '').trim().toLowerCase();
+            return n === target || s === target || id === target || (n && target && (n.includes(target) || target.includes(n)));
+          });
+          if (match) return match;
+        }
+        return null;
       } catch (err) {
         console.error('[Supabase] Failed to fetch organization:', err.message);
         return null;
@@ -160,7 +174,7 @@
         if (!Array.isArray(data)) return [];
         return data.filter(org => {
           const st = (org.status || '').toLowerCase().trim();
-          return st === 'approved' || st === 'active';
+          return st === 'approved' || st === 'active' || st === '';
         });
       } catch (err) {
         console.warn('[Supabase] Failed to fetch approved organizations:', err.message);
@@ -669,16 +683,22 @@
     /**
      * Verify OTP token against Supabase Auth GoTrue endpoint
      */
-    async verifyEmailOtp(email, token) {
+    async verifyEmailOtp(email, token, type = null) {
       const cleanEmail = (email || '').trim().toLowerCase();
-      const cleanToken = (token || '').trim();
+      const cleanToken = (token || '').toString().trim().replace(/\s+/g, '');
       if (!cleanEmail || !cleanToken) return { success: false, error: 'Email and code are required' };
 
       const baseUrl = Config.getUrl().replace(/\/$/, '');
       const key = Config.getAnonKey();
 
-      // Try type: 'email' then type: 'signup'
-      const types = ['email', 'signup'];
+      // In Supabase GoTrue Auth:
+      // For existing users, /auth/v1/otp generates 'recovery' tokens ("User recovery requested")
+      // For passwordless magic link / email OTP it generates 'email'
+      // For unconfirmed signups it generates 'signup'
+      const isNumericOtp = /^\d{6,10}$/.test(cleanToken);
+      const types = isNumericOtp ? ['recovery', 'email', 'signup'] : ['recovery', 'email', 'signup', 'magiclink'];
+      let lastError = null;
+
       for (const t of types) {
         try {
           const res = await fetch(`${baseUrl}/auth/v1/verify`, {
@@ -694,14 +714,32 @@
               type: t
             })
           });
+          const data = await res.json().catch(() => ({}));
+          console.info(`[SupabaseAuth] Verification attempt (type: ${t}):`, res.status, data);
           if (res.ok) {
-            const data = await res.json();
+            if (data && data.access_token) {
+              try {
+                localStorage.setItem('fg_supabase_session', JSON.stringify(data));
+                localStorage.setItem('fg_supabase_token', data.access_token);
+              } catch (_) {}
+            }
             return { success: true, data: data };
+          } else {
+            lastError = data.msg || data.message || data.error_description || null;
           }
-        } catch (_) {}
+        } catch (e) {
+          lastError = e.message;
+        }
       }
 
-      return { success: false, error: 'Invalid or expired cloud OTP token' };
+      return { success: false, error: lastError || 'Invalid or expired verification code.' };
+    }
+
+    /**
+     * Alias for verifyEmailOtp to ensure compatibility with all auth callers
+     */
+    async verifyOtp(email, token, type = null) {
+      return this.verifyEmailOtp(email, token, type);
     }
 
     /* =============================================================
