@@ -1197,7 +1197,7 @@ function switchTeacherTab(mode) {
     document.getElementById('formSubtitle').textContent = isSignIn 
         ? 'Enter your institutional credentials to access your classroom suite.'
         : 'Create your faculty credentials to manage student rosters and coursework.';
-    document.getElementById('submitLabel').textContent = isSignIn ? 'Sign In to Classroom Suite' : 'Submit Registration for Approval';
+    document.getElementById('submitLabel').textContent = isSignIn ? 'Sign In to Classroom Suite' : 'Register Educator Account';
 
     document.getElementById('footerTogglePrompt').textContent = isSignIn 
         ? "Don't have an educator account?" 
@@ -1385,9 +1385,9 @@ function submitOtpVerification() {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying...';
 
-    showVerifyFeedback("Account verified! Submitting for Human Resources approval...", false);
+    showVerifyFeedback("Account verified! Activating educator account...", false);
 
-    pendingTeacherData.status = 'pending_approval';
+    pendingTeacherData.status = 'active';
 
     // 1. Persist to live Supabase Cloud database
     if (window.SupabaseService) {
@@ -1399,7 +1399,7 @@ function submitOtpVerification() {
             org_id: activeOrg,
             department: 'Academic Staff',
             position: 'Teacher / Educator',
-            status: 'pending_approval',
+            status: 'active',
             photo_url: pendingTeacherData.photo || null
         }).catch(e => console.warn('Supabase teacher sync warning:', e));
 
@@ -1410,7 +1410,7 @@ function submitOtpVerification() {
             org: activeOrg,
             role: 'teacher',
             photo_url: pendingTeacherData.photo || null,
-            status: 'pending_approval'
+            status: 'active'
         }).catch(e => console.warn('Supabase user sync warning:', e));
     }
 
@@ -1432,7 +1432,7 @@ function submitOtpVerification() {
                 email: pendingTeacherData.email,
                 role: 'Teacher',
                 position: 'Educator / Teacher',
-                status: 'pending_approval',
+                status: 'active',
                 photo: pendingTeacherData.photo || null,
                 createdAt: Date.now()
             });
@@ -1445,9 +1445,9 @@ function submitOtpVerification() {
         switchTeacherTab('signin');
         const emailInput = document.getElementById('email');
         if (emailInput) emailInput.value = pendingTeacherData.email;
-        showMessage("Registration submitted successfully! Your account is awaiting authorization by the HR Directorate. You will be able to log in once approved.", false);
-        if (window.Toaster && typeof window.Toaster.warning === 'function') {
-            window.Toaster.warning("Account Pending Approval", "Your Teacher account has been registered and submitted to Human Resources for authorization.");
+        showMessage("Registration submitted successfully! Your educator account is active. You can now sign in.", false);
+        if (window.Toaster && typeof window.Toaster.success === 'function') {
+            window.Toaster.success("Account Ready", "Your Teacher account is active. You can now sign in.");
         }
     }, 900);
 }
@@ -1590,17 +1590,8 @@ async function handleTeacherAuth() {
                 }
             }
 
-            // Approval status gate
+            // Approval status check
             const userStatus = ((teacher && teacher.status) || 'active').toLowerCase();
-
-            if (userStatus === 'pending_approval' || userStatus === 'pending') {
-                submitBtn.disabled = false;
-                const msg = "Your Teacher account is currently pending approval by the HR Directorate. Please await authorization.";
-                if (window.Toaster && typeof window.Toaster.warning === 'function') {
-                    window.Toaster.warning("Account Pending Approval", msg);
-                }
-                return showMessage(msg, true);
-            }
 
             if (userStatus === 'rejected') {
                 submitBtn.disabled = false;

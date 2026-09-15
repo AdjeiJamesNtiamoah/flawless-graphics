@@ -1777,16 +1777,12 @@
       const kpiUsers = document.getElementById('kpi_users');
       if (kpiUsers) kpiUsers.textContent = users.length;
 
-      // Pending Approval Count & Banner
-      const pendingUsers = users.filter(u => {
-        const s = (u.status || 'active').toLowerCase();
-        return s === 'pending_approval' || s === 'pending';
-      });
+      // Pending Approval Count & Banner (Super Admin strictly handles institutional authorizations)
       const pendingOrgs = (adminState.allOrgs || []).filter(o => {
         const s = (o.status || '').toLowerCase();
         return s === 'pending_approval' || s === 'pending';
       });
-      const pendingCount = pendingUsers.length + pendingOrgs.length;
+      const pendingCount = pendingOrgs.length;
 
       const pBanner = document.getElementById('pendingRegistrationsBanner');
       const pBadge = document.getElementById('pendingApprovalCounterBadge');
@@ -1797,7 +1793,7 @@
         if (pBanner) pBanner.style.display = 'flex';
         if (pBadge) pBadge.style.display = 'inline-flex';
         if (pText) pText.textContent = pendingCount;
-        if (pSub) pSub.textContent = `${pendingUsers.length} user account(s) and ${pendingOrgs.length} institution(s) awaiting Super Admin review and authorization.`;
+        if (pSub) pSub.textContent = `${pendingOrgs.length} institution workspace(s) awaiting Super Admin review and authorization.`;
       } else {
         if (pBanner) pBanner.style.display = 'none';
         if (pBadge) pBadge.style.display = 'none';
@@ -1942,7 +1938,8 @@
           '<span class="badge badge-cyan"><i class="fa-solid fa-chalkboard-user"></i> Teacher</span>'));
 
         const uStat = (u.status || 'active').toLowerCase();
-        const isPending = uStat === 'pending_approval' || uStat === 'pending';
+        const isExcludedFromApproval = role === 'teacher' || role === 'student' || role === 'finance';
+        const isPending = !isExcludedFromApproval && (uStat === 'pending_approval' || uStat === 'pending');
         const isSusp = uStat === 'suspended';
         const isRej = uStat === 'rejected';
 

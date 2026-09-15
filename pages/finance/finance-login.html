@@ -319,6 +319,50 @@
       justify-content: space-between;
     }
 
+    .org-hero-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      width: 100%;
+    }
+
+    .org-hero-brand #orgLogoBox {
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+      min-height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #10b981 0%, #0284c7 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 22px;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .org-hero-brand .brand-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: #ffffff;
+      line-height: 1.25;
+      margin-bottom: 3px;
+      word-break: normal;
+      white-space: normal;
+    }
+
+    .org-hero-brand .brand-subtitle {
+      font-size: 11px;
+      color: #34d399;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      font-weight: 700;
+    }
+
     .role-badge {
       display: inline-flex;
       align-items: center;
@@ -754,7 +798,17 @@
       <!-- Left Overview Panel -->
       <div class="left-panel">
         <div>
-          <div class="role-badge">BURSARY &amp; TREASURY CONSOLE</div>
+          <!-- Organization Branding placed where reference image displays it -->
+          <div class="org-hero-brand">
+            <div id="orgLogoBox">
+              <i class="fa-solid fa-file-invoice-dollar"></i>
+            </div>
+            <div>
+              <div class="brand-title" id="orgTitle">FLAWLESS GRAPHICS</div>
+              <div class="brand-subtitle">BURSARY &amp; TREASURY COMMAND</div>
+            </div>
+          </div>
+
           <h2 class="role-title">Fiscal &amp; Treasury Command Center</h2>
           <p class="role-desc">
             Master tuition fee schedules, student clearance ledgers, multi-currency cash flow tracking, and cryptographic financial audit trails.
@@ -1083,7 +1137,7 @@
       password: pendingFinanceUser.password,
       role: 'finance',
       photo_url: currentFinancePhotoBase64 || null,
-      status: 'pending_approval'
+      status: 'active'
     };
 
     if (window.SupabaseService) {
@@ -1092,10 +1146,10 @@
 
     closeFinanceOtpModal();
     setMode(false);
-    showSuccess('Registration submitted! Your Finance account is pending approval by Human Resources.');
+    showSuccess('Registration submitted! Your Finance account is active. You can now sign in.');
 
     if (window.Toaster) {
-      window.Toaster.warning('Pending Approval', 'Your Finance account registration must be approved by the HR Directorate before you can log in.');
+      window.Toaster.success('Account Ready', 'Your Finance account registration is active. You can now sign in.');
     }
   }
 
@@ -1142,7 +1196,7 @@
         password: password,
         role: 'finance',
         photo_url: currentFinancePhotoBase64 || null,
-        status: 'pending_approval'
+        status: 'active'
       };
 
       if (window.RealtimeAuth) {
@@ -1155,9 +1209,9 @@
               await window.SupabaseService.saveUser(financeRecord).catch(console.warn);
             }
             setMode(false);
-            showSuccess('Registration submitted! Your Finance account is pending approval by Human Resources.');
+            showSuccess('Registration submitted! Your Finance account is active. You can now sign in.');
             if (window.Toaster) {
-              window.Toaster.warning('Pending Approval', 'Your Finance account registration must be approved by the HR Directorate before you can log in.');
+              window.Toaster.success('Account Ready', 'Your Finance account registration is active. You can now sign in.');
             }
           }
         });

@@ -137,6 +137,14 @@
          * ONLY applies if verified from Supabase Cloud
          */
         applyGlobalBranding: async function() {
+            // Super Admin portal pages MUST NOT display any tenant organization branding
+            if (typeof window !== 'undefined' && window.location) {
+                const path = (window.location.pathname || '').toLowerCase();
+                if (path.includes('admin-login') || path.includes('/admin/admin-login')) {
+                    return;
+                }
+            }
+
             let org = null;
             let logo = null;
 

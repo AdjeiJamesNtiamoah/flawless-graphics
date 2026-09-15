@@ -1103,9 +1103,9 @@ function submitOtpVerification() {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying...';
 
-    showVerifyFeedback("Account verified! Submitting for Human Resources approval...", false);
+    showVerifyFeedback("Account verified! Activating educator account...", false);
 
-    pendingTeacherData.status = 'pending_approval';
+    pendingTeacherData.status = 'active';
 
     // 1. Master organizations_users
     try {
@@ -1134,7 +1134,7 @@ function submitOtpVerification() {
                 email: pendingTeacherData.email,
                 role: 'Teacher',
                 position: 'Educator / Teacher',
-                status: 'pending_approval',
+                status: 'active',
                 photo: pendingTeacherData.photo || null,
                 createdAt: Date.now()
             });
@@ -1144,9 +1144,9 @@ function submitOtpVerification() {
 
     setTimeout(() => {
         closeVerificationModal();
-        showMessage("Registration submitted successfully! Your account is awaiting approval by Human Resources. Redirecting to portal sign-in...", false);
-        if (window.Toaster && typeof window.Toaster.warning === 'function') {
-            window.Toaster.warning("Account Pending Approval", "Your Teacher registration has been submitted and is awaiting Human Resources authorization.");
+        showMessage("Registration submitted successfully! Your educator account is active. Redirecting to portal sign-in...", false);
+        if (window.Toaster && typeof window.Toaster.success === 'function') {
+            window.Toaster.success("Account Ready", "Your Teacher account is active. Redirecting to sign in...");
         }
         setTimeout(() => {
             window.location.href = "teacher-login.html";

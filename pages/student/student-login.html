@@ -671,12 +671,12 @@
             </div>
 
             <div class="brand-logo">
-                <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #72efdd 0%, #48cae4 100%); display: flex; align-items: center; justify-content: center; color: #0b1c2d; font-size: 20px; box-shadow: 0 4px 14px rgba(114,239,221,0.35);">
+                <div id="orgLogoBox" style="width: 48px; height: 48px; min-width: 48px; min-height: 48px; border-radius: 12px; background: linear-gradient(135deg, #72efdd 0%, #48cae4 100%); display: flex; align-items: center; justify-content: center; color: #0b1c2d; font-size: 20px; box-shadow: 0 4px 14px rgba(114,239,221,0.35); overflow: hidden; flex-shrink: 0;">
                     <i class="fa-solid fa-graduation-cap"></i>
                 </div>
                 <div>
-                    <div class="brand-title">STUDENT PORTAL</div>
-                    <div class="brand-subtitle">Academic Workspace & Curriculum Hub</div>
+                    <div class="brand-title" id="orgTitle">STUDENT PORTAL</div>
+                    <div class="brand-subtitle">Academic Workspace &amp; Curriculum Hub</div>
                 </div>
             </div>
 
@@ -1157,7 +1157,7 @@ async function handleStudentAuth() {
                 const authRes = await window.SupabaseService.authenticate(ident, pw, null, 'student');
                 if (authRes.success) {
                     found = authRes.user;
-                } else if (!authRes.status || (authRes.status !== 'pending_approval' && authRes.status !== 'pending')) {
+                } else {
                     const cloudStudents = await window.SupabaseService.getStudents();
                     found = cloudStudents.find(s => 
                         (s.roll && s.roll.toLowerCase() === ident) || 
@@ -1165,10 +1165,6 @@ async function handleStudentAuth() {
                         (s.email && s.email.toLowerCase() === ident) ||
                         (s.guardianEmail && s.guardianEmail.toLowerCase() === ident)
                     );
-                } else {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace';
-                    return showMessage(authRes.error || 'Student admission is awaiting approval by Human Resources.', true);
                 }
             } catch(e) {
                 console.warn('Student Supabase auth check:', e);
@@ -1293,7 +1289,8 @@ async function handleStudentAuth() {
                     org_id: selectedOrgName,
                     class_id: newStudent.classId,
                     class_name: newStudent.className,
-                    status: 'pending_approval',
+                    status: 'Active',
+                    approvalStatus: 'approved',
                     photo: newStudent.photo
                 }).catch(console.warn);
 
@@ -1305,7 +1302,7 @@ async function handleStudentAuth() {
                     org_id: selectedOrgSlug,
                     role: 'student',
                     photo_url: newStudent.photo,
-                    status: 'pending_approval'
+                    status: 'active'
                 }).catch(console.warn);
             }
 
@@ -1325,12 +1322,14 @@ async function handleStudentAuth() {
                 }
             } catch(e) {}
 
+            newStudent.status = 'Active';
+            newStudent.approvalStatus = 'approved';
             students.push(newStudent);
             localStorage.setItem(STUD_KEY, JSON.stringify(students));
 
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Submit Student Enrollment';
-            showMessage('Registration submitted successfully! Your account is Pending HR Approval before official activation.', false);
+            showMessage('Registration submitted successfully! Your student account is active. You can now sign in.', false);
             setTimeout(() => { switchTab('signin'); }, 2000);
         };
 

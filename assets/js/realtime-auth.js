@@ -811,6 +811,10 @@
                     opt.value = slug;
                     opt.dataset.name = name;
                     opt.dataset.slug = slug;
+                    const logoUrl = org.logo_url || org.logo || org.logo_path || '';
+                    if (logoUrl) {
+                        opt.dataset.logo = logoUrl;
+                    }
                     opt.textContent = `${name} (${slug})`;
 
                     const prefClean = preferredOrg.toLowerCase();
@@ -831,6 +835,14 @@
                     selectElement.selectedIndex = 1;
                 }
 
+                // Immediately apply branding for the initially selected option
+                const initOpt = selectElement.selectedOptions && selectElement.selectedOptions[0];
+                if (initOpt && initOpt.value) {
+                    const initName = initOpt.dataset.name || initOpt.textContent.replace(/\s*\([^)]*\)$/, '').trim();
+                    const initLogo = initOpt.dataset.logo || '';
+                    this.applyOrgBranding(initName, initLogo);
+                }
+
                 // Listen to dropdown changes to sync active institution workspace
                 if (!selectElement._hasOrgChangeListener) {
                     selectElement._hasOrgChangeListener = true;
@@ -838,11 +850,9 @@
                         const selOpt = selectElement.selectedOptions && selectElement.selectedOptions[0];
                         if (selOpt && selOpt.value) {
                             const newOrgName = selOpt.dataset.name || selOpt.textContent;
+                            const newOrgLogo = selOpt.dataset.logo || '';
                             if (newOrgName && !newOrgName.includes('-- Select Approved')) {
-                                localStorage.setItem('active_org', newOrgName);
-                                if (window.AuthSession && typeof window.AuthSession.setOrgName === 'function') {
-                                    window.AuthSession.setOrgName(newOrgName);
-                                }
+                                this.applyOrgBranding(newOrgName, newOrgLogo);
                             }
                         }
                     });
@@ -852,6 +862,56 @@
                 if (!selectElement.options || selectElement.options.length <= 1) {
                     selectElement.innerHTML = '<option value="fg-main" selected>FLAWLESS GRAPHICS (fg-main)</option>';
                 }
+            }
+        },
+
+        /**
+         * Helper to immediately reflect selected organization branding (Name and Logo) across the UI
+         */
+        applyOrgBranding: function (orgName, logoUrl = null) {
+            // Super Admin portal pages MUST NOT display any tenant organization branding
+            if (typeof window !== 'undefined' && window.location) {
+                const path = (window.location.pathname || '').toLowerCase();
+                if (path.includes('admin-login') || path.includes('/admin/admin-login')) {
+                    return;
+                }
+            }
+
+            if (!orgName) return;
+            const cleanOrg = orgName.replace(/\s*\([^)]*\)$/, '').trim();
+            if (!cleanOrg || cleanOrg.includes('-- Select Approved')) return;
+
+            localStorage.setItem('active_org', cleanOrg);
+            localStorage.setItem('activeOrg', cleanOrg);
+            if (logoUrl) {
+                localStorage.setItem('active_org_logo', logoUrl);
+                localStorage.setItem('org_logo', logoUrl);
+            }
+            if (window.AuthSession && typeof window.AuthSession.setOrgName === 'function') {
+                window.AuthSession.setOrgName(cleanOrg);
+            }
+
+            // 1. Update text elements: #orgTitle, #headerOrgTitle, .brand-title
+            document.querySelectorAll('#orgTitle, #headerOrgTitle, .brand-title, .header-org-title').forEach(el => {
+                if (el && el.tagName !== 'SELECT' && el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA') {
+                    if (el.getAttribute('data-preserve-title') === 'true') return;
+                    el.textContent = cleanOrg.toUpperCase();
+                }
+            });
+
+            // 2. Update logo elements: #orgLogoBox, #headerOrgLogo
+            const effectiveLogo = logoUrl || localStorage.getItem('active_org_logo') || localStorage.getItem('org_logo');
+            if (effectiveLogo) {
+                document.querySelectorAll('#orgLogoBox, #headerOrgLogo').forEach(el => {
+                    if (el) {
+                        if (el.getAttribute('data-preserve-logo') === 'true') return;
+                        el.innerHTML = `<img src="${effectiveLogo}" alt="${cleanOrg}" style="width:100%; height:100%; object-fit:contain; border-radius:inherit; display:block;">`;
+                    }
+                });
+            }
+
+            if (window.AuthSession && typeof window.AuthSession.applyGlobalBranding === 'function') {
+                window.AuthSession.applyGlobalBranding();
             }
         },
 

@@ -5932,35 +5932,10 @@ function getEnrolledStudentsList() {
 
 function loadHRStudents() {
   const studs = getEnrolledStudentsList();
-  const pendingStudents = studs.filter(s => s.approvalStatus === 'pending' || s.status === 'Pending HR Approval');
   const bannerEl = document.getElementById('studentPendingApprovalBanner');
   if (bannerEl) {
-    if (pendingStudents.length > 0) {
-      bannerEl.style.display = 'flex';
-      bannerEl.style.alignItems = 'center';
-      bannerEl.style.justifyContent = 'space-between';
-      bannerEl.style.flexWrap = 'wrap';
-      bannerEl.style.gap = '12px';
-      bannerEl.innerHTML = `
-        <div style="display:flex; align-items:center; gap:12px;">
-          <div style="width:38px; height:38px; border-radius:10px; background:rgba(245,158,11,0.25); color:#f59e0b; display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0;">
-            <i class="fa-solid fa-user-clock"></i>
-          </div>
-          <div>
-            <div style="font-weight:800; font-size:13.5px; color:var(--text);">Faculty Student Registration Requests (${pendingStudents.length} Pending Approval)</div>
-            <div class="small" style="color:var(--muted);">Teachers have submitted student registrations awaiting HR validation and official enrollment.</div>
-          </div>
-        </div>
-        <div style="display:flex; gap:8px;">
-          <button class="btn btn-sm" style="background:#10b981; border-color:#059669; color:#fff; font-weight:800; padding:6px 14px; font-size:12px;" onclick="approveAllPendingStudents()">
-            <i class="fa-solid fa-check-double"></i> Approve All Students
-          </button>
-        </div>
-      `;
-    } else {
-      bannerEl.style.display = 'none';
-      bannerEl.innerHTML = '';
-    }
+    bannerEl.style.display = 'none';
+    bannerEl.innerHTML = '';
   }
 
   const tbody = document.getElementById('studentTableBody');
@@ -6546,6 +6521,8 @@ function renderUsers() {
   }).length;
   const pending = orgUsers.filter(u => {
     const s = (u.status || 'active').toLowerCase();
+    const r = (u.role || '').toLowerCase();
+    if (r === 'teacher' || r === 'student' || r === 'finance') return false;
     return s === 'pending_approval' || s === 'pending';
   }).length;
   const teachers = orgUsers.filter(u => (u.role || '').toLowerCase() === 'teacher').length;
@@ -6578,6 +6555,8 @@ function renderUsers() {
   const queueCount = document.getElementById('pendingQueueCountText');
   const pendingUsers = orgUsers.filter(u => {
     const s = (u.status || 'active').toLowerCase();
+    const r = (u.role || '').toLowerCase();
+    if (r === 'teacher' || r === 'student' || r === 'finance') return false;
     return s === 'pending_approval' || s === 'pending';
   });
 
@@ -6908,59 +6887,20 @@ function filterHrPendingStaff() {
 }
 
 function seedSamplePendingUser() {
-  let users = getSystemUsers();
-  const seedCandidates = [
-    { name: 'Daniel K. Mensah', email: 'daniel.mensah@flawless.org', role: 'teacher', dept: 'Academic Staff', desig: 'Senior Mathematics Instructor' },
-    { name: 'Akosua Agyeman', email: 'akosua.agyeman@flawless.org', role: 'teacher', dept: 'Academic Staff', desig: 'English Literature Instructor' },
-    { name: 'Emmanuel Osei', email: 'emmanuel.osei@flawless.org', role: 'teacher', dept: 'Digital Media', desig: 'Graphics & Media Instructor' },
-    { name: 'Grace Addo', email: 'grace.addo@flawless.org', role: 'finance', dept: 'Finance', desig: 'Assistant Bursar' }
-  ];
-  
-  let candidate = seedCandidates.find(c => !users.some(u => (u.email || '').toLowerCase() === c.email.toLowerCase() && (u.status === 'pending_approval' || u.status === 'pending')));
-  if (!candidate) {
-    const rNum = Math.floor(100 + Math.random() * 900);
-    candidate = {
-      name: `Applicant ${rNum}`,
-      email: `applicant${rNum}@flawless.org`,
-      role: 'teacher',
-      dept: 'Academic Staff',
-      desig: 'Staff Instructor'
-    };
-  }
-
-  const existingIdx = users.findIndex(u => (u.email || '').toLowerCase() === candidate.email.toLowerCase());
-  if (existingIdx >= 0) {
-    users[existingIdx].status = 'pending_approval';
-    users[existingIdx].createdAt = Date.now();
-  } else {
-    users.unshift({
-      org: ACTIVE_ORG,
-      name: candidate.name,
-      email: candidate.email,
-      role: candidate.role,
-      status: 'pending_approval',
-      pass: 'Staff@2026',
-      createdAt: Date.now(),
-      department: candidate.dept,
-      designation: candidate.desig,
-      phone: '+233 24 456 7890'
-    });
-  }
-  save(USERS_STORAGE_KEY, users);
-  localStorage.removeItem('hr_pending_resolved');
-  if (window.Toaster && typeof window.Toaster.info === 'function') {
-    window.Toaster.info('Registration Simulated', `Pending request for ${candidate.name} created.`);
-  } else {
-    showToast(`Pending request created for ${candidate.name}`);
-  }
-  renderUsers();
+  // Disabled: do not display or seed registered teachers, students, or finance for approval
+  return;
 }
 window.seedSamplePendingUser = seedSamplePendingUser;
 
 function updatePendingBanners() {
   try {
     const users = getSystemUsers();
-    const pending = users.filter(u => u.status === 'pending_approval' || u.status === 'pending');
+    const pending = users.filter(u => {
+      const s = (u.status || '').toLowerCase();
+      const r = (u.role || '').toLowerCase();
+      if (r === 'teacher' || r === 'student' || r === 'finance') return false;
+      return s === 'pending_approval' || s === 'pending';
+    });
     const pendingCount = pending.length;
     const subText = `${pendingCount} registration request(s) awaiting administrative review and approval.`;
 
