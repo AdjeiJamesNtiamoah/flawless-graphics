@@ -1015,7 +1015,7 @@
                 </div>
 
                 <h2 id="formTitle">Educator Sign In</h2>
-                <div class="card-subtitle" id="formSubtitle">Enter your institutional credentials to access your classroom suite.</div>
+                <div class="card-subtitle" id="formSubtitle">Enter your email &amp; password to access your classroom suite.</div>
 
                 <div id="msg" class="msg"></div>
 
@@ -1040,9 +1040,9 @@
 
                     <div class="form-group hidden" id="teacherPhotoGroup">
                         <label>Educator Profile Photo (Optional)</label>
-                        <div style="display: flex; align-items: center; gap: 14px; margin-top: 6px; padding: 10px 14px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px;">
-                            <div id="teacherPhotoPreview" style="width: 48px; height: 48px; border-radius: 50%; background: #ecfdf5; border: 2px solid #10b981; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
-                                <i class="fa-solid fa-user-tie" style="font-size: 18px; color: #059669;"></i>
+                        <div style="display: flex; align-items: center; gap: 14px; margin-top: 6px; padding: 10px 14px; background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(255, 255, 255, 0.2); border-radius: 12px;">
+                            <div id="teacherPhotoPreview" style="width: 48px; height: 48px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                                <i class="fa-solid fa-user-tie" style="font-size: 18px; color: #10b981;"></i>
                             </div>
                             <div style="flex: 1;">
                                 <div style="display: flex; gap: 8px;">
@@ -1059,9 +1059,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="email">Institutional Email</label>
+                        <label for="email">Teacher Email Address</label>
                         <div class="input-wrapper">
-                            <input type="email" id="email" placeholder="faculty@institution.edu" required>
+                            <input type="email" id="email" placeholder="e.g. adjeijames175@gmail.com" required>
                             <i class="fa-regular fa-envelope field-icon"></i>
                         </div>
                     </div>
@@ -1112,15 +1112,15 @@
 <div class="modal-overlay" id="verificationModal">
     <div class="modal-container">
         <button class="modal-close-btn" type="button" onclick="closeVerificationModal()"><i class="fa-solid fa-xmark"></i></button>
-        <div style="width: 54px; height: 54px; border-radius: 50%; background: #ecfdf5; border: 2px solid #10b981; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; color: #059669; font-size: 22px;">
+        <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; color: #34d399; font-size: 22px;">
             <i class="fa-solid fa-shield-halved"></i>
         </div>
-        <h3 style="font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">Verify Institutional Email</h3>
-        <p style="font-size: 13px; color: #64748b; line-height: 1.5; margin-bottom: 14px;">
+        <h3 style="font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 6px;">Verify Email Address</h3>
+        <p style="font-size: 13px; color: #94a3b8; line-height: 1.5; margin-bottom: 14px;">
             A secure confirmation code has been generated for:
         </p>
-        <div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 20px; font-size: 12.5px; font-weight: 700; color: #059669; margin-bottom: 14px;">
-            <i class="fa-regular fa-envelope"></i> <span id="verifyEmailText">faculty@institution.edu</span>
+        <div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; font-size: 12.5px; font-weight: 700; color: #34d399; margin-bottom: 14px;">
+            <i class="fa-regular fa-envelope"></i> <span id="verifyEmailText">teacher@gmail.com</span>
         </div>
 
         <div id="verifyFeedback" class="verify-feedback"></div>
@@ -1195,7 +1195,7 @@ function switchTeacherTab(mode) {
 
     document.getElementById('formTitle').textContent = isSignIn ? 'Educator Sign In' : 'Register Educator Account';
     document.getElementById('formSubtitle').textContent = isSignIn 
-        ? 'Enter your institutional credentials to access your classroom suite.'
+        ? 'Enter your email & password to access your classroom suite.'
         : 'Create your faculty credentials to manage student rosters and coursework.';
     document.getElementById('submitLabel').textContent = isSignIn ? 'Sign In to Classroom Suite' : 'Register Educator Account';
 
@@ -1399,7 +1399,7 @@ function submitOtpVerification() {
             org_id: activeOrg,
             department: 'Academic Staff',
             position: 'Teacher / Educator',
-            status: 'active',
+            status: 'pending_approval',
             photo_url: pendingTeacherData.photo || null
         }).catch(e => console.warn('Supabase teacher sync warning:', e));
 
@@ -1410,12 +1410,13 @@ function submitOtpVerification() {
             org: activeOrg,
             role: 'teacher',
             photo_url: pendingTeacherData.photo || null,
-            status: 'active'
+            status: 'pending_approval'
         }).catch(e => console.warn('Supabase user sync warning:', e));
     }
 
     // Keep temporary in-memory representation for UI feedback
     const list = getTeachers();
+    pendingTeacherData.status = 'pending_approval';
     const tIdx = list.findIndex(t => (t.email || '').toLowerCase() === pendingTeacherData.email.toLowerCase());
     if (tIdx >= 0) list[tIdx] = pendingTeacherData;
     else list.push(pendingTeacherData);
@@ -1432,7 +1433,7 @@ function submitOtpVerification() {
                 email: pendingTeacherData.email,
                 role: 'Teacher',
                 position: 'Educator / Teacher',
-                status: 'active',
+                status: 'pending_approval',
                 photo: pendingTeacherData.photo || null,
                 createdAt: Date.now()
             });
@@ -1445,9 +1446,9 @@ function submitOtpVerification() {
         switchTeacherTab('signin');
         const emailInput = document.getElementById('email');
         if (emailInput) emailInput.value = pendingTeacherData.email;
-        showMessage("Registration submitted successfully! Your educator account is active. You can now sign in.", false);
-        if (window.Toaster && typeof window.Toaster.success === 'function') {
-            window.Toaster.success("Account Ready", "Your Teacher account is active. You can now sign in.");
+        showMessage("Registration submitted successfully! Your account is awaiting Human Resources approval.", false);
+        if (window.Toaster && typeof window.Toaster.info === 'function') {
+            window.Toaster.info("Registration Submitted", "Your Educator registration is awaiting Human Resources approval.");
         }
     }, 900);
 }
@@ -1491,7 +1492,7 @@ async function handleTeacherAuth() {
             }
 
             if (!email || !email.includes("@")) {
-                showMessage("Please enter a valid institutional email.");
+                showMessage("Please enter a valid email address.");
                 submitBtn.disabled = false;
                 return;
             }
@@ -1542,6 +1543,12 @@ async function handleTeacherAuth() {
                     onVerified: async () => {
                         pendingTeacherData = newTeacher;
                         submitOtpVerification();
+                        window.RealtimeAuth.watchPendingApproval({
+                            email: newTeacher.email,
+                            role: 'teacher',
+                            org: selectedOrgName,
+                            targetUrl: 'teacher-dashboard.html'
+                        });
                     }
                 });
             } else {
@@ -1549,31 +1556,39 @@ async function handleTeacherAuth() {
             }
             return;
 
-        } else {
-            // Sign In Mode
-            const orgSelect = document.getElementById("teacherOrgSelect");
-            const selectedOrgSlug = orgSelect ? orgSelect.value : "";
-            const selectedOrgName = (orgSelect && orgSelect.selectedOptions && orgSelect.selectedOptions[0]) 
-                ? (orgSelect.selectedOptions[0].dataset.name || selectedOrgSlug) 
-                : selectedOrgSlug;
+    } else {
+        // Sign In Mode
+        const orgSelect = document.getElementById("teacherOrgSelect");
+        const selectedOrgSlug = orgSelect ? orgSelect.value : "";
+        const selectedOrgName = (orgSelect && orgSelect.selectedOptions && orgSelect.selectedOptions[0]) 
+            ? (orgSelect.selectedOptions[0].dataset.name || selectedOrgSlug) 
+            : selectedOrgSlug;
 
-            let teacher = null;
-            if (window.SupabaseService) {
-                try {
-                    const authRes = await window.SupabaseService.authenticate(email, pw, null, 'teacher');
-                    if (authRes.success) {
-                        teacher = authRes.user;
-                    } else {
-                        submitBtn.disabled = false;
-                        const errMsg = authRes.error || "Incorrect email or password. Please verify your credentials.";
-                        return showMessage(errMsg, true);
-                    }
-                } catch(err) {
-                    console.warn('Teacher Supabase auth check:', err);
+        let teacher = null;
+        if (window.SupabaseService) {
+            try {
+                const authRes = await window.SupabaseService.authenticate(email, pw, null, 'teacher');
+                if (authRes.success) {
+                    teacher = authRes.user;
+                } else {
                     submitBtn.disabled = false;
-                    return showMessage(err.message || "Connection error. Please try again.", true);
+                    const errMsg = authRes.error || "Incorrect email or password. Please verify your credentials.";
+                    if (authRes.status === 'pending_approval' && window.RealtimeAuth) {
+                        window.RealtimeAuth.watchPendingApproval({
+                            email: email,
+                            role: 'teacher',
+                            org: selectedOrgName,
+                            targetUrl: 'teacher-dashboard.html'
+                        });
+                    }
+                    return showMessage(errMsg, true);
                 }
+            } catch(err) {
+                console.warn('Teacher Supabase auth check:', err);
+                submitBtn.disabled = false;
+                return showMessage(err.message || "Connection error. Please try again.", true);
             }
+        }
 
             if (!teacher) {
                 submitBtn.disabled = false;

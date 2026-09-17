@@ -25,11 +25,96 @@
   class SupabaseRestClient {
     constructor() {
       this.client = null;
+      this._cache = new Map();
+      this._inFlight = new Map();
+      this._cacheTtl = 2000; // 2s memory deduplication cache for instant real-time reactivity
       this.initClient();
 
       window.addEventListener('fg:supabase-config-changed', () => {
+        this.clearCache();
         this.initClient();
       });
+
+      // Cross-tab real-time sync listener
+      if (typeof window !== 'undefined') {
+        window.addEventListener('storage', (e) => {
+          if (e.key === 'fg_realtime_sync_ping' && e.newValue) {
+            this.clearCache();
+            try {
+              const parsed = JSON.parse(e.newValue);
+              window.dispatchEvent(new CustomEvent('fg:realtime-change', { detail: parsed }));
+            } catch (_) {}
+          }
+        });
+      }
+    }
+
+    clearCache() {
+      this._cache.clear();
+    }
+
+    /**
+     * Universal Instant Real-Time Dispatcher
+     * Broadcasts mutations across DOM, tabs, Supabase Realtime Channels, and LucyBus
+     */
+    broadcastChange(action, table, data = {}) {
+      this.clearCache();
+
+      const payload = {
+        action: action,
+        table: table,
+        data: data,
+        timestamp: Date.now()
+      };
+
+      // 1. Dispatch DOM CustomEvent
+      try {
+        window.dispatchEvent(new CustomEvent('fg:realtime-change', { detail: payload }));
+      } catch (_) {}
+
+      // 2. Broadcast across browser tabs via localStorage
+      try {
+        localStorage.setItem('fg_realtime_sync_ping', JSON.stringify(payload));
+      } catch (_) {}
+
+      // 3. Broadcast via Supabase Realtime Channel if available
+      try {
+        const client = this.getClient();
+        if (client && typeof client.channel === 'function') {
+          const ch = client.channel('fg-portal-live-sync');
+          ch.send({
+            type: 'broadcast',
+            event: 'portal-sync',
+            payload: payload
+          }).catch(() => {});
+        }
+      } catch (_) {}
+
+      // 4. Emit to LucyBus for audio, toaster, and dock counter
+      try {
+        if (window.LucyBus && typeof window.LucyBus.emit === 'function') {
+          if (action === 'USER_REGISTERED' || action === 'USER_SAVED') {
+            window.LucyBus.emit('USER_REGISTERED', {
+              title: 'New Account Registration',
+              message: `${data.name || data.email || 'User'} registered for ${data.org || 'Institutional Portal'}.`,
+              role: data.role || 'user',
+              org: data.org
+            }, { sound: true, toast: false, notify: true });
+          } else if (action === 'USER_APPROVED') {
+            window.LucyBus.emit('USER_APPROVED', {
+              title: 'User Account Approved',
+              message: `Access granted for ${data.name || data.email || 'User'}.`,
+              role: data.role || 'user'
+            }, { sound: true, toast: true, notify: true });
+          } else if (action === 'ORG_REGISTERED' || action === 'ORG_SAVED') {
+            window.LucyBus.emit('INSTITUTION_REGISTERED', {
+              title: 'New Institution Workspace',
+              message: `New institution workspace provisioned: ${data.org_name || data.name || 'Workspace'}.`,
+              role: 'Super Admin'
+            }, { sound: true, toast: true, notify: true });
+          }
+        }
+      } catch (_) {}
     }
 
     initClient() {
@@ -52,41 +137,84 @@
     }
 
     /**
-     * Standard REST fetch request to Supabase PostgREST endpoint
+     * Standard REST fetch request to Supabase PostgREST endpoint with In-Memory Caching & Deduplication
      */
     async query(endpoint, method = 'GET', body = null, extraHeaders = {}) {
       if (!Config.isConfigured()) {
         throw new Error('Supabase project is not configured. Please check your Supabase credentials.');
       }
 
-      const baseUrl = Config.getUrl().replace(/\/$/, '');
-      const url = `${baseUrl}/rest/v1/${endpoint}`;
-      const key = Config.getAnonKey();
+      const isGet = method.toUpperCase() === 'GET';
 
-      const headers = Object.assign({
-        'apikey': key,
-        'Authorization': `Bearer ${key}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation'
-      }, extraHeaders);
-
-      const options = { method, headers };
-      if (body !== null && body !== undefined) {
-        options.body = JSON.stringify(body);
+      // Cache invalidation on data mutations (POST, PATCH, DELETE, PUT)
+      if (!isGet) {
+        this.clearCache();
       }
 
-      const res = await fetch(url, options);
-      if (!res.ok) {
-        let errText = res.statusText;
-        try {
-          const errJson = await res.json();
-          errText = errJson.message || errJson.error || JSON.stringify(errJson);
-        } catch (_) {}
-        throw new Error(`Supabase Error (${res.status}): ${errText}`);
+      // Check In-Memory Cache for GET requests
+      const cacheKey = `${endpoint}`;
+      if (isGet) {
+        const cached = this._cache.get(cacheKey);
+        if (cached && (Date.now() - cached.timestamp < this._cacheTtl)) {
+          return JSON.parse(JSON.stringify(cached.data));
+        }
+
+        // Deduplicate simultaneous identical in-flight requests
+        if (this._inFlight.has(cacheKey)) {
+          return this._inFlight.get(cacheKey);
+        }
       }
 
-      if (res.status === 204) return [];
-      return await res.json();
+      const execFetch = async () => {
+        const baseUrl = Config.getUrl().replace(/\/$/, '');
+        const url = `${baseUrl}/rest/v1/${endpoint}`;
+        const key = Config.getAnonKey();
+
+        const headers = Object.assign({
+          'apikey': key,
+          'Authorization': `Bearer ${key}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        }, extraHeaders);
+
+        const options = { method, headers };
+        if (body !== null && body !== undefined) {
+          options.body = JSON.stringify(body);
+        }
+
+        const res = await fetch(url, options);
+        if (!res.ok) {
+          let errText = res.statusText;
+          try {
+            const errJson = await res.json();
+            errText = errJson.message || errJson.error || JSON.stringify(errJson);
+          } catch (_) {}
+          throw new Error(`Supabase Error (${res.status}): ${errText}`);
+        }
+
+        if (res.status === 204) return [];
+        const result = await res.json();
+
+        // Save to cache for GET requests
+        if (isGet) {
+          this._cache.set(cacheKey, {
+            data: result,
+            timestamp: Date.now()
+          });
+        }
+
+        return result;
+      };
+
+      if (isGet) {
+        const fetchPromise = execFetch().finally(() => {
+          this._inFlight.delete(cacheKey);
+        });
+        this._inFlight.set(cacheKey, fetchPromise);
+        return fetchPromise;
+      }
+
+      return execFetch();
     }
 
     /* =============================================================
@@ -151,7 +279,9 @@
         const res = await this.query('organizations', 'POST', payload, {
           'Prefer': 'resolution=merge-duplicates,return=representation'
         });
-        return Array.isArray(res) && res.length > 0 ? res[0] : payload;
+        const saved = Array.isArray(res) && res.length > 0 ? res[0] : payload;
+        this.broadcastChange(saved.status === 'pending_approval' ? 'ORG_REGISTERED' : 'ORG_SAVED', 'organizations', saved);
+        return saved;
       } catch (err) {
         console.error('[Supabase] Failed to save organization:', err.message);
         throw err;
@@ -190,7 +320,9 @@
           status: 'Active',
           updated_at: new Date().toISOString()
         }, { 'Prefer': 'return=representation' });
-        return Array.isArray(res) && res.length > 0 ? res[0] : true;
+        const result = Array.isArray(res) && res.length > 0 ? res[0] : true;
+        this.broadcastChange('ORG_APPROVED', 'organizations', { id: orgIdOrName, status: 'Active' });
+        return result;
       } catch (err) {
         console.error('[Supabase] Failed to approve organization:', err.message);
         throw err;
@@ -205,7 +337,9 @@
           status: 'Rejected',
           updated_at: new Date().toISOString()
         }, { 'Prefer': 'return=representation' });
-        return Array.isArray(res) && res.length > 0 ? res[0] : true;
+        const result = Array.isArray(res) && res.length > 0 ? res[0] : true;
+        this.broadcastChange('ORG_REJECTED', 'organizations', { id: orgIdOrName, status: 'Rejected' });
+        return result;
       } catch (err) {
         console.error('[Supabase] Failed to reject organization:', err.message);
         throw err;
@@ -259,6 +393,7 @@
           }
         } catch(e) {}
 
+        this.broadcastChange('ORG_DELETED', 'organizations', { id: orgId, name: orgName });
         return true;
       } catch (err) {
         console.error('[Supabase] Failed to delete organization:', err.message);
@@ -322,7 +457,9 @@
         const res = await this.query('users', 'POST', payload, {
           'Prefer': 'resolution=merge-duplicates,return=representation'
         });
-        return Array.isArray(res) && res.length > 0 ? res[0] : payload;
+        const saved = Array.isArray(res) && res.length > 0 ? res[0] : payload;
+        this.broadcastChange(saved.status === 'pending_approval' ? 'USER_REGISTERED' : 'USER_SAVED', 'users', saved);
+        return saved;
       } catch (err) {
         console.error('[Supabase] Failed to save user:', err.message);
         throw err;
@@ -375,6 +512,7 @@
           }
         } catch(e) {}
 
+        this.broadcastChange('USER_DELETED', 'users', { id: cleanVal, email });
         return true;
       } catch (err) {
         console.error('[Supabase] Failed to delete user:', err.message);
@@ -422,7 +560,9 @@
             }).catch(() => {});
           }
         }
-        return Array.isArray(res) && res.length > 0 ? res[0] : true;
+        const result = Array.isArray(res) && res.length > 0 ? res[0] : true;
+        this.broadcastChange('USER_APPROVED', 'users', { id: userIdOrEmail, approved_by: approvedBy, status: 'active' });
+        return result;
       } catch (err) {
         console.error('[Supabase] Failed to approve user:', err.message);
         throw err;
@@ -440,7 +580,9 @@
           approved_by: rejectedBy,
           updated_at: new Date().toISOString()
         }, { 'Prefer': 'return=representation' });
-        return Array.isArray(res) && res.length > 0 ? res[0] : true;
+        const result = Array.isArray(res) && res.length > 0 ? res[0] : true;
+        this.broadcastChange('USER_REJECTED', 'users', { id: userIdOrEmail, rejected_by: rejectedBy, status: 'rejected' });
+        return result;
       } catch (err) {
         console.error('[Supabase] Failed to reject user:', err.message);
         throw err;
@@ -771,7 +913,9 @@
             approved_at: new Date().toISOString()
           }).catch(() => {});
         }
-        return Array.isArray(res) && res.length > 0 ? res[0] : true;
+        const result = Array.isArray(res) && res.length > 0 ? res[0] : true;
+        this.broadcastChange('TEACHER_APPROVED', 'teachers', { id: teacherId, status: 'Active' });
+        return result;
       } catch (err) {
         console.error('[Supabase] Failed to approve teacher:', err.message);
         throw err;
@@ -784,7 +928,9 @@
           status: 'Rejected',
           updated_at: new Date().toISOString()
         }, { 'Prefer': 'return=representation' });
-        return Array.isArray(res) && res.length > 0 ? res[0] : true;
+        const result = Array.isArray(res) && res.length > 0 ? res[0] : true;
+        this.broadcastChange('TEACHER_REJECTED', 'teachers', { id: teacherId, status: 'Rejected' });
+        return result;
       } catch (err) {
         console.error('[Supabase] Failed to reject teacher:', err.message);
         throw err;
@@ -825,7 +971,9 @@
             approved_at: new Date().toISOString()
           }).catch(() => {});
         }
-        return Array.isArray(res) && res.length > 0 ? res[0] : true;
+        const result = Array.isArray(res) && res.length > 0 ? res[0] : true;
+        this.broadcastChange('STUDENT_APPROVED', 'students', { id: studentIdOrEmailOrRoll, status: 'Active' });
+        return result;
       } catch (err) {
         console.error('[Supabase] Failed to approve student:', err.message);
         throw err;
@@ -844,7 +992,9 @@
           status: 'Rejected',
           updated_at: new Date().toISOString()
         }, { 'Prefer': 'return=representation' });
-        return Array.isArray(res) && res.length > 0 ? res[0] : true;
+        const result = Array.isArray(res) && res.length > 0 ? res[0] : true;
+        this.broadcastChange('STUDENT_REJECTED', 'students', { id: studentIdOrEmailOrRoll, status: 'Rejected' });
+        return result;
       } catch (err) {
         console.error('[Supabase] Failed to reject student:', err.message);
         throw err;
@@ -901,7 +1051,9 @@
         const res = await this.query('teachers', 'POST', payload, {
           'Prefer': 'resolution=merge-duplicates,return=representation'
         });
-        return Array.isArray(res) && res.length > 0 ? res[0] : payload;
+        const saved = Array.isArray(res) && res.length > 0 ? res[0] : payload;
+        this.broadcastChange('TEACHER_SAVED', 'teachers', saved);
+        return saved;
       } catch (err) {
         console.error('[Supabase] Failed to save teacher:', err.message);
         throw err;
@@ -940,6 +1092,7 @@
           }
         } catch(e) {}
 
+        this.broadcastChange('TEACHER_DELETED', 'teachers', { id: teacherId, orgId, email });
         return true;
       } catch (err) {
         console.error('[Supabase] Failed to delete teacher:', err.message);
@@ -1012,7 +1165,9 @@
         const res = await this.query('students', 'POST', payload, {
           'Prefer': 'resolution=merge-duplicates,return=representation'
         });
-        return Array.isArray(res) && res.length > 0 ? res[0] : payload;
+        const saved = Array.isArray(res) && res.length > 0 ? res[0] : payload;
+        this.broadcastChange('STUDENT_SAVED', 'students', saved);
+        return saved;
       } catch (err) {
         console.error('[Supabase] Failed to save student:', err.message);
         throw err;
@@ -1054,6 +1209,7 @@
           }
         } catch(e) {}
 
+        this.broadcastChange('STUDENT_DELETED', 'students', { id: studentId, orgId, email });
         return true;
       } catch (err) {
         console.error('[Supabase] Failed to delete student:', err.message);
@@ -1112,7 +1268,9 @@
         const res = await this.query('classes', 'POST', payload, {
           'Prefer': 'resolution=merge-duplicates,return=representation'
         });
-        return Array.isArray(res) && res.length > 0 ? res[0] : payload;
+        const saved = Array.isArray(res) && res.length > 0 ? res[0] : payload;
+        this.broadcastChange('CLASS_SAVED', 'classes', saved);
+        return saved;
       } catch (err) {
         console.error('[Supabase] Failed to save class:', err.message);
         throw err;
@@ -1133,6 +1291,7 @@
           }
         } catch(e) {}
 
+        this.broadcastChange('CLASS_DELETED', 'classes', { id: classId, orgId });
         return true;
       } catch (err) {
         console.error('[Supabase] Failed to delete class:', err.message);

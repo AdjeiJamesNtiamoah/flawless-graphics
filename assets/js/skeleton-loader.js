@@ -17,17 +17,13 @@
     });
   }
 
-  // Short, polished skeleton duration: 420ms
+  // Instantaneous, snappiest dismissal when DOM is interactive
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(dismissSkeleton, 420);
-    });
+    document.addEventListener('DOMContentLoaded', dismissSkeleton, { once: true });
   } else {
-    setTimeout(dismissSkeleton, 420);
+    dismissSkeleton();
   }
 
   // Safety fallback
-  window.addEventListener('load', () => {
-    setTimeout(dismissSkeleton, 420);
-  });
+  window.addEventListener('load', dismissSkeleton, { once: true });
 })();

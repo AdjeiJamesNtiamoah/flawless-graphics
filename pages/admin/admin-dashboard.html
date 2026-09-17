@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
 
   <!-- Universal Toaster & Loading Styles -->
   <link rel="stylesheet" href="../../assets/css/toaster.css">
@@ -19,13 +19,13 @@
   <link rel="stylesheet" href="../../assets/css/quick-dock.css">
 
   <!-- Central Authentication Bridge & Pop-up Toaster Engine -->
-  <script src="../../assets/js/auth-session.js"></script>
-  <script src="../../assets/js/toaster.js"></script>
-  <script src="../../assets/js/realtime-bus.js"></script>
+  <script src="../../assets/js/auth-session.js" defer></script>
+  <script src="../../assets/js/toaster.js" defer></script>
+  <script src="../../assets/js/realtime-bus.js" defer></script>
 
   <!-- Supabase Cloud Integration -->
-  <script src="../../assets/js/supabase-config.js"></script>
-  <script src="../../assets/js/supabase-client.js"></script>
+  <script src="../../assets/js/supabase-config.js" defer></script>
+  <script src="../../assets/js/supabase-client.js" defer></script>
 
   <style>
     :root {
@@ -736,6 +736,7 @@
         <a href="../../welcome.html" class="btn-top ghost" title="Return to Workspace Hub">
           <i class="fa-solid fa-grip"></i> Hub
         </a>
+        <div id="topRightProfileContainer" class="fg-top-profile-container"></div>
       </div>
     </header>
 
@@ -1475,9 +1476,16 @@
           if (adminEmail !== 'admin@flawlessgraphics.com') {
             const liveUser = await window.SupabaseService.getUserByEmail(adminEmail);
             if (!liveUser) {
-              alert('Your administrator account has been deleted from the institutional database. Access revoked.');
-              if (window.AuthSession) {
-                window.AuthSession.logout('admin-login.html');
+              if (window.AuthSession && typeof window.AuthSession.showAccountCutoutNotice === 'function') {
+                window.AuthSession.showAccountCutoutNotice({
+                  title: 'Admin Account Deleted',
+                  reason: 'Your administrator account has been deleted from the institutional database by system authorities. Access is revoked.',
+                  email: adminEmail,
+                  name: (activeAdminUser && activeAdminUser.name) || 'Administrator',
+                  org: (activeAdminUser && activeAdminUser.org) || 'Institutional Workspace',
+                  role: 'Admin',
+                  redirectUrl: 'admin-login.html'
+                });
               } else {
                 localStorage.clear();
                 window.location.replace('admin-login.html');
@@ -2644,6 +2652,23 @@
     window.rejectUserAccount = rejectUserAccount;
     window.refreshAllStats = refreshAllStats;
     window.renderMasterUsersTable = renderMasterUsersTable;
+
+    // --- UNIVERSAL REAL-TIME MULTI-PORTAL SYNC LISTENER ---
+    window.addEventListener('fg:realtime-change', async (e) => {
+      console.info('[SuperAdminDashboard] Real-time mutation event received:', e.detail);
+      try {
+        await loadAllAdminData();
+        renderTenantsGrid();
+        renderPendingTenants();
+        renderMasterUsersTable();
+        refreshAllStats();
+        if (window.QuickDock && typeof window.QuickDock.refreshNotifications === 'function') {
+          window.QuickDock.refreshNotifications();
+        }
+      } catch (err) {
+        console.warn('Realtime refresh notice:', err);
+      }
+    });
   </script>
   <!-- Floating 3-Dots Quick Dock & Notifications Script -->
   <script src="../../assets/js/quick-dock.js"></script>

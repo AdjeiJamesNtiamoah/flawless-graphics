@@ -1209,10 +1209,16 @@
               await window.SupabaseService.saveUser(hrRecord).catch(console.warn);
             }
             setMode(false);
-            showSuccess('Registration submitted! Your HR account is pending approval by the Super Administrator.');
+            showSuccess('Registration submitted! Live connection active — you will be automatically signed in as soon as the Super Administrator approves your account.');
             if (window.Toaster) {
-              window.Toaster.warning('Pending Approval', 'Your HR account registration must be approved by the Super Admin before you can log in.');
+              window.Toaster.info('Pending Authorization', 'Live real-time connection active. Auto-signing in once approved.');
             }
+            window.RealtimeAuth.watchPendingApproval({
+              email: hrEmail,
+              role: 'hr',
+              org: selectedOrgName,
+              targetUrl: 'hr-dashboard.html'
+            });
           }
         });
         return;
@@ -1238,6 +1244,14 @@
           submitBtn.disabled = false;
           submitBtn.innerHTML = `<span>Sign In to HR Dashboard</span> <i class="fa-solid fa-arrow-right"></i>`;
           showError(authRes.error || 'Account not found in institutional database. Please register.');
+          if (authRes.status === 'pending_approval' && window.RealtimeAuth) {
+            window.RealtimeAuth.watchPendingApproval({
+              email: lowerEmail,
+              role: 'hr',
+              org: selectedOrgName,
+              targetUrl: 'hr-dashboard.html'
+            });
+          }
           return;
         }
       } catch(err) {

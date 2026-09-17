@@ -703,16 +703,6 @@
         <!-- Right Form Section -->
         <div class="form-section">
             <div class="card">
-                <!-- Dual-mode Auth Tabs -->
-                <div class="auth-tabs">
-                    <button type="button" class="tab-btn active" id="tabSignIn" onclick="switchTab('signin')">
-                        <i class="fa-solid fa-right-to-bracket"></i> Student Sign In
-                    </button>
-                    <button type="button" class="tab-btn" id="tabSignUp" onclick="switchTab('signup')">
-                        <i class="fa-solid fa-user-plus"></i> New Student
-                    </button>
-                </div>
-
                 <h2 id="formTitle">Student Access</h2>
                 <div class="card-subtitle" id="formSubtitle">Enter your Student Roll Number or registered email</div>
 
@@ -729,76 +719,7 @@
                         </div>
                     </div>
 
-                    <!-- Self Registration Extra Fields -->
-                    <div id="signupFields" style="display: none;">
-                        <div class="form-group" id="studentPhotoGroup">
-                            <label>Student Profile Photo (Optional)</label>
-                            <div style="display: flex; align-items: center; gap: 14px; padding: 10px 14px; background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(255, 255, 255, 0.2); border-radius: 12px; margin-bottom: 12px;">
-                                <div id="studentPhotoPreview" style="width: 48px; height: 48px; border-radius: 50%; background: rgba(56, 189, 248, 0.15); border: 2px solid #38bdf8; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
-                                    <i class="fa-solid fa-user-graduate" style="font-size: 18px; color: #38bdf8;"></i>
-                                </div>
-                                <div style="flex: 1;">
-                                    <button type="button" class="btn-outline" style="padding: 6px 12px; font-size: 11px; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; cursor: pointer;" onclick="document.getElementById('studentPhotoFile').click()">
-                                        <i class="fa-solid fa-camera"></i> Choose Photo
-                                    </button>
-                                    <button type="button" id="removeStudentPhotoBtn" style="padding: 6px 10px; font-size: 11px; border-radius: 8px; display: none; color: #dc2626; border: 1px solid #fca5a5; background: transparent; cursor: pointer; margin-left: 6px;" onclick="removeStudentPhoto()">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                    <input type="file" id="studentPhotoFile" accept="image/*" style="display: none;" onchange="handleStudentPhotoUpload(event)">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="firstName">First Name</label>
-                                <div class="input-wrapper">
-                                    <input type="text" id="firstName" placeholder="Kwame">
-                                    <i class="fa-solid fa-user field-icon"></i>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="lastName">Last Name</label>
-                                <div class="input-wrapper">
-                                    <input type="text" id="lastName" placeholder="Asante">
-                                    <i class="fa-solid fa-user field-icon"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="regClass">Enrolling Class / Stream</label>
-                            <div class="input-wrapper">
-                                <select id="regClass">
-                                    <option value="cls_2">Grade 11 - Web Systems & Client Architecture</option>
-                                    <option value="cls_1">Grade 10 - Graphic Arts & Visual Identity</option>
-                                    <option value="cls_3">Grade 12 - Digital Animation & 3D Modeling</option>
-                                    <option value="cls_4">Grade 9 - Fundamental Design Principles</option>
-                                    <option value="cls_5">Grade 10 - UI/UX Interactive Prototyping</option>
-                                </select>
-                                <i class="fa-solid fa-school field-icon"></i>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="guardianName">Guardian Name</label>
-                                <div class="input-wrapper">
-                                    <input type="text" id="guardianName" placeholder="Mary Mensah">
-                                    <i class="fa-solid fa-person-breastfeeding field-icon"></i>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="emergencyPhone">Guardian Phone</label>
-                                <div class="input-wrapper">
-                                    <input type="text" id="emergencyPhone" placeholder="+233 24 123 4567">
-                                    <i class="fa-solid fa-phone field-icon"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Common Sign-In Identifier (Roll or Email) -->
+                    <!-- Sign-In Identifier (Roll or Email) -->
                     <div class="form-group">
                         <label for="identifier" id="labelIdentifier">Student Roll Number / Email</label>
                         <div class="input-wrapper">
@@ -814,7 +735,6 @@
                             <i class="fa-solid fa-lock field-icon"></i>
                             <i class="fa-regular fa-eye-slash toggle-pw" id="togglePw" onclick="togglePasswordVisibility()"></i>
                         </div>
-                        <div id="studentPassMeter"></div>
                     </div>
 
                     <button type="submit" id="submitBtn" class="btn-submit">
@@ -1064,60 +984,6 @@ function showMessage(text, isError = true) {
     el.style.display = 'block';
 }
 
-function switchTab(mode) {
-    currentMode = mode;
-    document.getElementById('tabSignIn').classList.toggle('active', mode === 'signin');
-    document.getElementById('tabSignUp').classList.toggle('active', mode === 'signup');
-    document.getElementById('signupFields').style.display = (mode === 'signup' ? 'block' : 'none');
-    document.getElementById('demoPickerCard').style.display = (mode === 'signin' ? 'block' : 'none');
-    document.getElementById('formTitle').textContent = (mode === 'signin' ? 'Student Access' : 'New Student Registration');
-    document.getElementById('formSubtitle').textContent = (mode === 'signin' ? 'Enter your Student Roll Number or registered email' : 'Register your student profile for institutional enrollment');
-    document.getElementById('labelIdentifier').textContent = (mode === 'signin' ? 'Student Roll Number / Email' : 'Institutional Email (Optional)');
-    document.getElementById('submitBtn').innerHTML = (mode === 'signin' ? '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace' : '<i class="fa-solid fa-user-plus"></i> Submit Student Enrollment');
-
-    const meter = document.getElementById('studentPassMeter');
-    if (meter) meter.style.display = (mode === 'signup' ? 'block' : 'none');
-    if (mode === 'signup' && window.StrongPassword) {
-        window.StrongPassword.attach('password', 'studentPassMeter');
-    }
-
-    document.getElementById('msg').style.display = 'none';
-}
-
-let currentStudentPhotoBase64 = null;
-
-function handleStudentPhotoUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-        showMessage('Please select a valid image file (PNG, JPG, WebP).');
-        return;
-    }
-    if (file.size > 3 * 1024 * 1024) {
-        showMessage('Photo exceeds 3MB limit.');
-        return;
-    }
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        currentStudentPhotoBase64 = e.target.result;
-        const preview = document.getElementById('studentPhotoPreview');
-        if (preview) preview.innerHTML = `<img src="${currentStudentPhotoBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
-        const removeBtn = document.getElementById('removeStudentPhotoBtn');
-        if (removeBtn) removeBtn.style.display = 'inline-block';
-    };
-    reader.readAsDataURL(file);
-}
-
-function removeStudentPhoto() {
-    currentStudentPhotoBase64 = null;
-    const preview = document.getElementById('studentPhotoPreview');
-    if (preview) preview.innerHTML = '<i class="fa-solid fa-user-graduate" style="font-size: 18px; color: #38bdf8;"></i>';
-    const removeBtn = document.getElementById('removeStudentPhotoBtn');
-    if (removeBtn) removeBtn.style.display = 'none';
-    const fileInput = document.getElementById('studentPhotoFile');
-    if (fileInput) fileInput.value = '';
-}
-
 function togglePasswordVisibility() {
     const inp = document.getElementById('password');
     const icon = document.getElementById('togglePw');
@@ -1142,213 +1008,83 @@ async function handleStudentAuth() {
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...';
 
-    const students = getStoredStudents();
+    const orgSelect = document.getElementById('studentOrgSelect');
+    const selectedOrgSlug = orgSelect ? orgSelect.value.trim() : '';
+    const selectedOrgName = (orgSelect && orgSelect.selectedOptions && orgSelect.selectedOptions[0]) 
+        ? (orgSelect.selectedOptions[0].dataset.name || selectedOrgSlug) 
+        : selectedOrgSlug;
 
-    if (currentMode === 'signin') {
-        const orgSelect = document.getElementById('studentOrgSelect');
-        const selectedOrgSlug = orgSelect ? orgSelect.value.trim() : '';
-        const selectedOrgName = (orgSelect && orgSelect.selectedOptions && orgSelect.selectedOptions[0]) 
-            ? (orgSelect.selectedOptions[0].dataset.name || selectedOrgSlug) 
-            : selectedOrgSlug;
-
-        let found = null;
-        if (window.SupabaseService) {
-            try {
-                const authRes = await window.SupabaseService.authenticate(ident, pw, null, 'student');
-                if (authRes.success) {
-                    found = authRes.user;
-                } else {
-                    const cloudStudents = await window.SupabaseService.getStudents();
-                    found = cloudStudents.find(s => 
-                        (s.roll && s.roll.toLowerCase() === ident) || 
-                        (s.enrollment_code && s.enrollment_code.toLowerCase() === ident) || 
-                        (s.email && s.email.toLowerCase() === ident) ||
-                        (s.guardianEmail && s.guardianEmail.toLowerCase() === ident)
-                    );
-                }
-            } catch(e) {
-                console.warn('Student Supabase auth check:', e);
+    let found = null;
+    if (window.SupabaseService) {
+        try {
+            const authRes = await window.SupabaseService.authenticate(ident, pw, null, 'student');
+            if (authRes.success) {
+                found = authRes.user;
+            } else {
+                const cloudStudents = await window.SupabaseService.getStudents();
+                found = cloudStudents.find(s => 
+                    (s.roll && s.roll.toLowerCase() === ident) || 
+                    (s.enrollment_code && s.enrollment_code.toLowerCase() === ident) || 
+                    (s.email && s.email.toLowerCase() === ident) ||
+                    (s.guardianEmail && s.guardianEmail.toLowerCase() === ident)
+                );
             }
+        } catch(e) {
+            console.warn('Student Supabase auth check:', e);
         }
-
-        if (!found) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace';
-            return showMessage('No student account found in institutional database. Please register.');
-        }
-
-        // Verify Institution Workspace Membership
-        if (window.RealtimeAuth && selectedOrgSlug) {
-            const isMember = window.RealtimeAuth.verifyUserOrgMembership(found, selectedOrgSlug) ||
-                             window.RealtimeAuth.verifyUserOrgMembership(found, selectedOrgName);
-            if (!isMember) {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace';
-                return showMessage(`Access Denied: You are not registered or approved under "${selectedOrgName}".`, true);
-            }
-        }
-
-        // Check if student requires HR approval
-        if (found.status === 'Pending HR Approval' || found.approvalStatus === 'pending') {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace';
-            return showMessage('Your student registration is currently pending HR approval. Please wait for the HR Directorate to sign off on your enrollment.', true);
-        }
-
-        if (found.status === 'Suspended' || found.status === 'Inactive') {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace';
-            return showMessage('This student account is currently inactive or suspended. Please contact the academic office.', true);
-        }
-
-        // Authenticate student session
-        authenticateStudentSession(found);
-
-    } else {
-        // Self registration flow
-        const orgSelect = document.getElementById('studentOrgSelect');
-        const selectedOrgSlug = orgSelect ? orgSelect.value.trim() : '';
-        const selectedOrgName = (orgSelect && orgSelect.selectedOptions && orgSelect.selectedOptions[0]) 
-            ? (orgSelect.selectedOptions[0].dataset.name || selectedOrgSlug) 
-            : 'FLAWLESS GRAPHICS';
-
-        if (!selectedOrgSlug) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Submit Student Enrollment';
-            return showMessage('Please select an approved educational institution workspace.');
-        }
-
-        const fName = (document.getElementById('firstName').value || '').trim();
-        const lName = (document.getElementById('lastName').value || '').trim();
-        const classId = document.getElementById('regClass').value;
-        const gName = (document.getElementById('guardianName').value || '').trim();
-        const gPhone = (document.getElementById('emergencyPhone').value || '').trim();
-
-        if (!fName || !lName) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Submit Student Enrollment';
-            return showMessage('Please provide both your First and Last name.');
-        }
-
-        if (window.StrongPassword) {
-            const pwCheck = window.StrongPassword.validate(pw);
-            if (!pwCheck.valid) {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Submit Student Enrollment';
-                return showMessage(pwCheck.error, true);
-            }
-        }
-
-        const newRoll = 'STU-2026-' + Math.floor(100 + Math.random() * 900);
-        const smartId = createStudentSmartId(newRoll, `${fName} ${lName}`);
-        const studentEmail = ident.includes('@') ? ident : `${fName.toLowerCase()}.${lName.toLowerCase()}@student.flawless.edu`;
-        const newStudent = {
-            id: 's_' + Date.now(),
-            roll: newRoll,
-            enrollment_code: newRoll,
-            smartIdNumber: smartId.smartIdNumber,
-            rfidUid: smartId.rfidUid,
-            barcode: smartId.barcode,
-            qrData: smartId.qrData,
-            issueDate: smartId.issueDate,
-            expiryDate: smartId.expiryDate,
-            securityHash: smartId.securityHash,
-            firstName: fName,
-            middleName: '',
-            lastName: lName,
-            name: `${fName} ${lName}`,
-            email: studentEmail,
-            org: selectedOrgName,
-            org_id: selectedOrgSlug,
-            classId: classId,
-            className: document.getElementById('regClass').selectedOptions[0].text,
-            grade: 'Grade 10',
-            gender: 'Undisclosed',
-            dob: '2008-01-01',
-            bloodGroup: 'Unknown',
-            status: 'Pending HR Approval',
-            approvalStatus: 'pending',
-            guardianName: gName,
-            guardianRel: 'Guardian',
-            emergencyPhone: gPhone,
-            attendanceRate: 100,
-            attendanceStreak: 0,
-            gpa: 3.5,
-            submittedAt: Date.now(),
-            photo: currentStudentPhotoBase64 || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
-        };
-
-        const completeEnrollment = () => {
-            // Direct Cloud Supabase Enrollment
-            if (window.SupabaseService) {
-                window.SupabaseService.createStudent({
-                    name: newStudent.name,
-                    full_name: newStudent.name,
-                    roll: newStudent.roll,
-                    email: newStudent.email,
-                    org_id: selectedOrgName,
-                    class_id: newStudent.classId,
-                    class_name: newStudent.className,
-                    status: 'Active',
-                    approvalStatus: 'approved',
-                    photo: newStudent.photo
-                }).catch(console.warn);
-
-                window.SupabaseService.saveUser({
-                    name: newStudent.name,
-                    email: newStudent.email,
-                    password: pw,
-                    org: selectedOrgName,
-                    org_id: selectedOrgSlug,
-                    role: 'student',
-                    photo_url: newStudent.photo,
-                    status: 'active'
-                }).catch(console.warn);
-            }
-
-            // Also register into central AuthSession directory with Smart ID
-            try {
-                if (window.AuthSession && typeof window.AuthSession.saveRegisteredUser === 'function') {
-                    window.AuthSession.saveRegisteredUser({
-                        org: selectedOrgName,
-                        id: newStudent.id,
-                        name: newStudent.name,
-                        email: newStudent.email,
-                        role: 'student',
-                        roll: newStudent.roll,
-                        smartId: smartId,
-                        smartIdNumber: smartId.smartIdNumber
-                    });
-                }
-            } catch(e) {}
-
-            newStudent.status = 'Active';
-            newStudent.approvalStatus = 'approved';
-            students.push(newStudent);
-            localStorage.setItem(STUD_KEY, JSON.stringify(students));
-
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Submit Student Enrollment';
-            showMessage('Registration submitted successfully! Your student account is active. You can now sign in.', false);
-            setTimeout(() => { switchTab('signin'); }, 2000);
-        };
-
-        if (window.RealtimeAuth) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Submit Student Enrollment';
-            window.RealtimeAuth.openAuthModal({
-                email: studentEmail,
-                purpose: 'Student Enrollment Verification',
-                durationSeconds: 300,
-                onVerified: async () => {
-                    completeEnrollment();
-                }
-            });
-            return;
-        }
-
-        completeEnrollment();
     }
+
+    if (!found) {
+        // Fallback local students check
+        const students = getStoredStudents();
+        found = students.find(s => 
+            (s.roll && s.roll.toLowerCase() === ident) || 
+            (s.enrollment_code && s.enrollment_code.toLowerCase() === ident) || 
+            (s.email && s.email.toLowerCase() === ident) ||
+            (s.guardianEmail && s.guardianEmail.toLowerCase() === ident)
+        );
+    }
+
+    if (!found) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace';
+        return showMessage('No student account found in institutional database.');
+    }
+
+    // Verify Institution Workspace Membership
+    if (window.RealtimeAuth && selectedOrgSlug) {
+        const isMember = window.RealtimeAuth.verifyUserOrgMembership(found, selectedOrgSlug) ||
+                         window.RealtimeAuth.verifyUserOrgMembership(found, selectedOrgName);
+        if (!isMember) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace';
+            return showMessage(`Access Denied: You are not registered or approved under "${selectedOrgName}".`, true);
+        }
+    }
+
+    // Check if student requires HR approval
+    if (found.status === 'Pending HR Approval' || found.approvalStatus === 'pending' || found.status === 'pending_approval') {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace';
+        if (window.RealtimeAuth) {
+            window.RealtimeAuth.watchPendingApproval({
+                email: found.email || (found.guardianEmail) || ident,
+                role: 'student',
+                org: selectedOrgName,
+                targetUrl: 'student-dashboard.html'
+            });
+        }
+        return showMessage('Your student registration is awaiting HR approval. Live connection active — you will be automatically signed in once approved.', true);
+    }
+
+    if (found.status === 'Suspended' || found.status === 'Inactive') {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace';
+        return showMessage('This student account is currently inactive or suspended. Please contact the academic office.', true);
+    }
+
+    // Authenticate student session
+    authenticateStudentSession(found);
 }
 
 function authenticateStudentSession(student) {

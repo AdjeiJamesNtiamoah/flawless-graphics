@@ -925,6 +925,182 @@
             const userOrg = (user.org || user.org_id || user.organization || '').toLowerCase().trim();
             const userOrgName = (user.org_name || '').toLowerCase().trim();
             return userOrg === val || userOrgName === val || val === 'all' || val === 'fg-main';
+        },
+
+        /**
+         * Universal Real-Time Pending Approval Watchdog
+         * Automatically detects when an account/organization is approved and signs the user in
+         * with ZERO page refresh.
+         */
+        watchPendingApproval: function (options) {
+            const email = (options.email || '').trim().toLowerCase();
+            const role = (options.role || '').toLowerCase();
+            const org = options.org || null;
+            const targetUrl = options.targetUrl || null;
+            const onApproved = typeof options.onApproved === 'function' ? options.onApproved : null;
+            const onRejected = typeof options.onRejected === 'function' ? options.onRejected : null;
+            const container = options.containerId ? document.getElementById(options.containerId) : null;
+
+            if (!email) return null;
+
+            // Stop any existing watcher for this email
+            if (this._activeWatchers && this._activeWatchers[email]) {
+                clearInterval(this._activeWatchers[email].interval);
+                window.removeEventListener('fg:realtime-change', this._activeWatchers[email].listener);
+            }
+            if (!this._activeWatchers) this._activeWatchers = {};
+
+            // Render live waiting indicator if container provided
+            if (container) {
+                container.innerHTML = `
+                    <div class="pending-approval-card" style="margin-top: 14px; padding: 14px 18px; border-radius: 14px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.35); color: #fbbf24; display: flex; align-items: center; justify-content: space-between; gap: 12px; animation: pulseGlow 2s infinite ease-in-out;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(245, 158, 11, 0.2); border: 1.5px solid #f59e0b; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <i class="fa-solid fa-clock-rotate-left" style="font-size: 16px; color: #fbbf24;"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: 13px; font-weight: 800; color: #fff; letter-spacing: -0.2px;">Awaiting Authorization</div>
+                                <div style="font-size: 11px; color: #cbd5e1; display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                                    <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #34d399; box-shadow: 0 0 8px #34d399;"></span>
+                                    <span>Live connection active &bull; Auto-login when approved</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; background: rgba(15, 23, 42, 0.6); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); white-space: nowrap;">
+                            <i class="fa-solid fa-bolt" style="color: #38bdf8;"></i> No refresh needed
+                        </div>
+                    </div>
+                `;
+            }
+
+            let isResolved = false;
+
+            const handleSuccess = (user) => {
+                if (isResolved) return;
+                isResolved = true;
+                if (this._activeWatchers && this._activeWatchers[email]) {
+                    clearInterval(this._activeWatchers[email].interval);
+                    window.removeEventListener('fg:realtime-change', this._activeWatchers[email].listener);
+                    delete this._activeWatchers[email];
+                }
+
+                if (container) {
+                    container.innerHTML = `
+                        <div style="margin-top: 14px; padding: 14px 18px; border-radius: 14px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); border: 1.5px solid #10b981; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <i class="fa-solid fa-circle-check" style="font-size: 18px; color: #34d399;"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: 13px; font-weight: 800; color: #fff;">Authorization Granted!</div>
+                                <div style="font-size: 11.5px; color: #6ee7b7;">Signing you into your workspace...</div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (window.LucyBus && typeof window.LucyBus.emit === 'function') {
+                    window.LucyBus.emit('USER_APPROVED', {
+                        name: user.name || user.fullName || email,
+                        email: email,
+                        role: user.role || role
+                    }, { role: user.role || role, sound: true, toast: true });
+                }
+
+                if (window.Toaster) {
+                    window.Toaster.success('Access Granted!', `Your account has been authorized. Entering dashboard...`);
+                }
+
+                // Auto-set session
+                if (window.AuthSession) {
+                    window.AuthSession.setUser(user);
+                } else {
+                    localStorage.setItem('active_user', JSON.stringify(user));
+                    localStorage.setItem('active_org_user', JSON.stringify(user));
+                }
+
+                if (onApproved) {
+                    onApproved(user);
+                } else if (targetUrl) {
+                    setTimeout(() => {
+                        window.location.href = targetUrl;
+                    }, 800);
+                }
+            };
+
+            const handleRejection = (user) => {
+                if (isResolved) return;
+                isResolved = true;
+                if (this._activeWatchers && this._activeWatchers[email]) {
+                    clearInterval(this._activeWatchers[email].interval);
+                    window.removeEventListener('fg:realtime-change', this._activeWatchers[email].listener);
+                    delete this._activeWatchers[email];
+                }
+
+                if (container) {
+                    container.innerHTML = `
+                        <div style="margin-top: 14px; padding: 14px 18px; border-radius: 14px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; display: flex; align-items: center; gap: 12px;">
+                            <i class="fa-solid fa-circle-xmark" style="font-size: 20px; color: #ef4444;"></i>
+                            <div>
+                                <div style="font-size: 13px; font-weight: 800; color: #fff;">Registration Declined</div>
+                                <div style="font-size: 11.5px; color: #fca5a5;">Please contact your institutional administrator.</div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (window.Toaster) {
+                    window.Toaster.error('Registration Declined', 'Your access request was declined.');
+                }
+
+                if (onRejected) onRejected(user);
+            };
+
+            // 1. Direct Realtime Event listener
+            const realtimeListener = (e) => {
+                const detail = e.detail || {};
+                const dData = detail.data || {};
+                const matchEmail = (dData.email || dData.id || '').toString().toLowerCase() === email;
+                
+                if (matchEmail || detail.table === 'users' || detail.action === 'USER_APPROVED' || detail.action === 'USER_REJECTED') {
+                    // Check Supabase immediately
+                    checkStatus();
+                }
+            };
+
+            // 2. Direct Polling Check
+            const checkStatus = async () => {
+                if (isResolved || !window.SupabaseService) return;
+                try {
+                    const u = await window.SupabaseService.getUserByEmail(email);
+                    if (u) {
+                        const st = (u.status || '').toLowerCase().trim();
+                        if (st === 'active' || st === 'approved') {
+                            handleSuccess(u);
+                        } else if (st === 'rejected' || st === 'declined') {
+                            handleRejection(u);
+                        }
+                    }
+                } catch (_) {}
+            };
+
+            window.addEventListener('fg:realtime-change', realtimeListener);
+            const interval = setInterval(checkStatus, 2500);
+
+            this._activeWatchers[email] = {
+                interval: interval,
+                listener: realtimeListener
+            };
+
+            // Initial immediate check
+            checkStatus();
+
+            return {
+                stop: () => {
+                    clearInterval(interval);
+                    window.removeEventListener('fg:realtime-change', realtimeListener);
+                    if (this._activeWatchers) delete this._activeWatchers[email];
+                }
+            };
         }
     };
 

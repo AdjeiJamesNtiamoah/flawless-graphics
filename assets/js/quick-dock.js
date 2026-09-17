@@ -780,11 +780,7 @@
       }
     }
 
-    // 2-Minute Snooze Interval: rings every 120,000ms until all notifications are read
-    const SNOOZE_INTERVAL_MS = 2 * 60 * 1000; // 2 minutes
-    let snoozeTimer = null;
-    let lastKnownUnreadCount = -1;
-
+    // Event-Driven Notification Checker (Zero idle background CPU drain)
     function checkSnooze() {
       const allNotifs = getNotifications();
       const unreads = allNotifs.filter(n => n.unread);
@@ -794,8 +790,7 @@
     }
 
     function initSnoozeTimer() {
-      if (snoozeTimer) clearInterval(snoozeTimer);
-      snoozeTimer = setInterval(checkSnooze, SNOOZE_INTERVAL_MS);
+      // Event-driven: no background interval loop needed
     }
 
     // Direct 1-click approve from notification card
