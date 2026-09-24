@@ -611,6 +611,8 @@
       .chat-window { height: 350px; }
     }
   </style>
+  <link rel="stylesheet" href="../../assets/css/cascading-nav.css">
+  <link rel="stylesheet" href="../../assets/css/slide-over.css">
 </head>
 <body>
 
@@ -691,6 +693,9 @@
     </div>
 
     <div class="header-actions">
+        <button type="button" class="btn-action" onclick="SlideOver.openNotifications()"><i class="fa-solid fa-bell"></i> Audit &amp; Alerts</button>
+        <button type="button" class="btn-action" onclick="SlideOver.openGuide('finance')"><i class="fa-solid fa-book-open"></i> Treasury Guide</button>
+        <button type="button" class="btn-action" onclick="SlideOver.openWorkspaceDirectory()"><i class="fa-solid fa-building-columns"></i> Workspaces</button>
       <!-- Live Sync Status Badge -->
       <button class="btn-action" id="cloudSyncBtn" onclick="openCloudModal()" title="Supabase Cloud Synchronization" style="border: 1px solid rgba(16, 185, 129, 0.4); color: #10b981; background: rgba(16, 185, 129, 0.08); border-radius: 9999px; padding: 6px 12px; font-weight: 700; font-size: 11.5px; display: inline-flex; align-items: center; gap: 7px; cursor: pointer;">
         <i class="fa-solid fa-cloud" id="cloudSyncIcon"></i> <span id="cloudSyncLabel">Connect Supabase</span>
@@ -3241,5 +3246,7 @@
   <script src="../../assets/js/quick-assistant.js"></script>
   <!-- Floating 3-Dots Quick Dock Script -->
   <script src="../../assets/js/quick-dock.js"></script>
+  <script src="../../assets/js/cascading-nav.js" defer></script>
+  <script src="../../assets/js/slide-over.js"></script>
 </body>
 </html>

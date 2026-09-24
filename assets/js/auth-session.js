@@ -660,13 +660,26 @@
         /**
          * Render Top-Right Profile Widget with Live Online Indicator
          * Universally injects a luxury glassmorphic profile pill & interactive card
+         * STRICTLY displayed on only the 5 authenticated portals: Finance, HR, Super Admin, Student, and Teacher
          */
         renderTopRightProfileWidget: function() {
             if (typeof document === 'undefined') return;
 
-            // Don't render on public login / splash / registration pages
             const path = (window.location.pathname || '').toLowerCase();
-            if (path.includes('-login') || path.includes('register') || path.includes('signup') || path.includes('landing.html')) {
+
+            // STRICT REQUIREMENT: Display on ONLY finance, hr, super admin, student and teacher portals
+            const isPortalPage = path.includes('/pages/finance/') || 
+                                 path.includes('/pages/hr/') || 
+                                 path.includes('/pages/admin/') || 
+                                 path.includes('/pages/student/') || 
+                                 path.includes('/pages/teacher/');
+
+            if (!isPortalPage) {
+                return;
+            }
+
+            // Don't render on unauthenticated login / splash / registration pages inside portals
+            if (path.includes('-login') || path.includes('register') || path.includes('signup') || path.includes('landing.html') || path.endsWith('/teacher.html')) {
                 return;
             }
 
@@ -732,10 +745,10 @@
                 styleEl.textContent = `
                     @keyframes fgOnlineRadarPulse {
                         0% {
-                            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.8), 0 0 8px rgba(16, 185, 129, 0.5);
+                            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.9), 0 0 10px rgba(16, 185, 129, 0.6);
                         }
                         70% {
-                            box-shadow: 0 0 0 7px rgba(16, 185, 129, 0), 0 0 12px rgba(16, 185, 129, 0);
+                            box-shadow: 0 0 0 9px rgba(16, 185, 129, 0), 0 0 14px rgba(16, 185, 129, 0);
                         }
                         100% {
                             box-shadow: 0 0 0 0 rgba(16, 185, 129, 0), 0 0 0 rgba(16, 185, 129, 0);
@@ -762,27 +775,25 @@
                         display: inline-flex;
                         align-items: center;
                         justify-content: center;
-                        padding: 3px;
-                        background: rgba(15, 23, 42, 0.75);
-                        backdrop-filter: blur(16px);
-                        -webkit-backdrop-filter: blur(16px);
-                        border: 1.5px solid rgba(255, 255, 255, 0.16);
+                        padding: 0;
+                        background: transparent;
+                        border: none;
                         border-radius: 50%;
-                        box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+                        box-shadow: none;
                         cursor: pointer;
                         user-select: none;
-                        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+                        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
                     }
                     .fg-top-profile-pill:hover, .fg-top-profile-pill.active {
-                        background: rgba(30, 41, 59, 0.95);
-                        border-color: rgba(99, 102, 241, 0.7);
+                        background: transparent;
+                        border: none;
                         transform: scale(1.06);
-                        box-shadow: 0 0 18px rgba(99, 102, 241, 0.4), 0 6px 20px rgba(0, 0, 0, 0.4);
+                        box-shadow: none;
                     }
                     .fg-avatar-wrap {
                         position: relative;
-                        width: 38px;
-                        height: 38px;
+                        width: 48px;
+                        height: 48px;
                         border-radius: 50%;
                         flex-shrink: 0;
                     }
@@ -792,8 +803,8 @@
                         border-radius: 50%;
                         object-fit: cover;
                         display: block;
-                        border: 1.5px solid rgba(255, 255, 255, 0.25);
-                        box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+                        border: none;
+                        box-shadow: 0 4px 14px rgba(0,0,0,0.3);
                     }
                     .fg-avatar-initials {
                         width: 100%;
@@ -802,39 +813,39 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        font-size: 14px;
+                        font-size: 16px;
                         font-weight: 800;
                         color: #ffffff;
                         background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
-                        border: 1.5px solid rgba(255, 255, 255, 0.3);
+                        border: none;
                         letter-spacing: 0.5px;
-                        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+                        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
                     }
                     .fg-online-dot {
                         position: absolute;
-                        bottom: -1px;
-                        right: -1px;
-                        width: 11px;
-                        height: 11px;
+                        bottom: 0px;
+                        right: 0px;
+                        width: 14px;
+                        height: 14px;
                         background: #10b981;
-                        border: 2px solid #0b1120;
+                        border: none;
                         border-radius: 50%;
-                        animation: fgOnlineRadarPulse 2.2s infinite ease-out;
+                        animation: fgOnlineRadarPulse 2s infinite ease-out;
                         z-index: 2;
                     }
 
                     /* Interactive Luxury Dropdown Card */
                     .fg-profile-dropdown {
                         position: absolute;
-                        top: calc(100% + 10px);
+                        top: calc(100% + 12px);
                         right: 0;
-                        width: 290px;
-                        background: rgba(15, 23, 42, 0.94);
+                        width: 295px;
+                        background: rgba(15, 23, 42, 0.95);
                         backdrop-filter: blur(24px);
                         -webkit-backdrop-filter: blur(24px);
-                        border: 1px solid rgba(255, 255, 255, 0.14);
+                        border: 1px solid rgba(255, 255, 255, 0.15);
                         border-radius: 18px;
-                        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+                        box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.08);
                         padding: 16px;
                         display: none;
                         flex-direction: column;
@@ -854,8 +865,8 @@
                     }
                     .fg-dropdown-avatar {
                         position: relative;
-                        width: 46px;
-                        height: 46px;
+                        width: 52px;
+                        height: 52px;
                         border-radius: 50%;
                         flex-shrink: 0;
                     }
@@ -958,7 +969,7 @@
 
             const dropdownAvatarHtml = photo
                 ? `<img src="${photo}" alt="${this.escapeHtml(name)}" class="fg-avatar-img" style="border-width:2.5px;">`
-                : `<div class="fg-avatar-initials" style="font-size:16px;">${initials}</div>`;
+                : `<div class="fg-avatar-initials" style="font-size:17px;">${initials}</div>`;
 
             const widgetHtml = `
                 <div class="fg-top-profile-pill standalone" id="fgTopProfilePill" title="Active Session: ${this.escapeHtml(name)} (${roleLabel})">

@@ -499,12 +499,24 @@
 
       // 1. Pending registration approvals from real organizations_users / Supabase
       try {
-        const users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
+        let users = [];
+        if (window.hrStore && Array.isArray(window.hrStore['organizations_users'])) {
+          users = window.hrStore['organizations_users'];
+        } else if (window.__masterUsersList && Array.isArray(window.__masterUsersList)) {
+          users = window.__masterUsersList;
+        } else {
+          try {
+            users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
+          } catch (_) { users = []; }
+        }
         const pendingUsers = users.filter(u => {
           const s = (u.status || '').toLowerCase();
+          const r = (u.role || '').toLowerCase();
           const uOrg = (u.org || u.org_id || '').toLowerCase().trim();
           const orgMatch = !uOrg || uOrg === activeOrg.toLowerCase().trim() || activeOrg === 'FLAWLESS GRAPHICS';
-          return orgMatch && (s === 'pending_approval' || s === 'pending');
+          if (!orgMatch) return false;
+          if (config.role === 'HR' && (r === 'admin' || r === 'super_admin' || r === 'superadmin' || r === 'hr')) return false;
+          return s === 'pending_approval' || s === 'pending';
         });
         pendingUsers.forEach(u => {
           list.push({
@@ -864,9 +876,18 @@
       });
     }
 
+    // Realtime and storage listeners to detect notification arrivals immediately
+    window.addEventListener('fg:realtime-change', () => {
+      renderNotifications();
+      if (typeof window.updatePendingBanners === 'function') window.updatePendingBanners();
+      if (typeof window.refreshAllStats === 'function') window.refreshAllStats();
+    });
+
     // Storage listener to detect notification arrivals from other tabs
     window.addEventListener('storage', (e) => {
       if (
+        e.key === 'fg_realtime_sync_ping' ||
+        e.key === 'lucy_live_notifications' ||
         e.key === 'organizations_users' ||
         (e.key && e.key.includes('_read_notif_ids')) ||
         (e.key && e.key.includes('_announcements')) ||

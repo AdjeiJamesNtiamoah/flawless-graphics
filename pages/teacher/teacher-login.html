@@ -1385,9 +1385,9 @@ function submitOtpVerification() {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying...';
 
-    showVerifyFeedback("Account verified! Activating educator account...", false);
+    showVerifyFeedback("Email verified! Submitting registration for Human Resources authorization...", false);
 
-    pendingTeacherData.status = 'active';
+    pendingTeacherData.status = 'pending_approval';
 
     // 1. Persist to live Supabase Cloud database
     if (window.SupabaseService) {

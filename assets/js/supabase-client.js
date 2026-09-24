@@ -43,6 +43,7 @@
             try {
               const parsed = JSON.parse(e.newValue);
               window.dispatchEvent(new CustomEvent('fg:realtime-change', { detail: parsed }));
+              this.dispatchLucyBusEvent(parsed.action, parsed.data);
             } catch (_) {}
           }
         });
@@ -51,6 +52,85 @@
 
     clearCache() {
       this._cache.clear();
+    }
+
+    setupRealtimeChannel() {
+      const client = this.getClient();
+      if (!client || typeof client.channel !== 'function') return;
+      if (this._liveChannel) return;
+      try {
+        this._liveChannel = client.channel('fg-portal-live-sync');
+        this._liveChannel
+          .on('broadcast', { event: 'portal-sync' }, (resp) => {
+            if (!resp || !resp.payload) return;
+            const payload = resp.payload;
+            this.clearCache();
+            window.dispatchEvent(new CustomEvent('fg:realtime-change', { detail: payload }));
+            this.dispatchLucyBusEvent(payload.action, payload.data);
+          })
+          .subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+              console.info('[Supabase Realtime] Subscribed to fg-portal-live-sync channel');
+            }
+          });
+      } catch (err) {
+        console.warn('[Supabase Realtime] Channel setup notice:', err.message);
+      }
+    }
+
+    /**
+     * Dispatch LucyBus live notification, audio chime, and toaster popups
+     */
+    dispatchLucyBusEvent(action, data = {}) {
+      if (!window.LucyBus || typeof window.LucyBus.emit !== 'function') return;
+      const role = (data.role || 'staff').toLowerCase();
+      const name = data.name || (data.email ? data.email.split('@')[0] : 'Staff Applicant');
+      const org = data.org || data.org_id || 'School Workspace';
+
+      if (action === 'USER_REGISTERED' || action === 'USER_SAVED') {
+        const isPending = data.status === 'pending_approval' || data.status === 'pending';
+        if (isPending) {
+          const roleLabel = role === 'teacher' ? 'Teacher / Educator' : (role === 'finance' ? 'Finance Officer' : (role === 'hr' ? 'HR Administrator' : role.toUpperCase()));
+          const targetRole = (role === 'teacher' || role === 'finance') ? 'HR' : 'Super Admin';
+          window.LucyBus.emit('USER_REGISTERED', {
+            title: `New ${roleLabel} Registration`,
+            message: `${name} registered for ${org} & awaits HR review.`,
+            role: role,
+            targetRole: targetRole,
+            org: org,
+            userEmail: data.email
+          }, { sound: true, toast: true, notify: true });
+        }
+      } else if (action === 'USER_APPROVED' || action === 'TEACHER_APPROVED') {
+        window.LucyBus.emit('USER_APPROVED', {
+          title: 'Account Approved',
+          message: `Access authorization granted for ${name} [${role.toUpperCase()}].`,
+          role: role,
+          org: org
+        }, { sound: true, toast: true, notify: true });
+      } else if (action === 'USER_REJECTED' || action === 'TEACHER_REJECTED') {
+        window.LucyBus.emit('USER_REJECTED', {
+          title: 'Registration Declined',
+          message: `Registration request for ${name} [${role.toUpperCase()}] was declined.`,
+          role: role,
+          org: org
+        }, { sound: true, toast: true, notify: true, tone: 'alert' });
+      } else if (action === 'ORG_REGISTERED' || action === 'ORG_SAVED') {
+        if (data.status === 'pending_approval' || data.status === 'pending') {
+          window.LucyBus.emit('INSTITUTION_REGISTERED', {
+            title: 'New Institution Workspace',
+            message: `Workspace "${data.org_name || data.name || org}" registered and awaits Super Admin authorization.`,
+            role: 'Super Admin',
+            targetRole: 'Super Admin'
+          }, { sound: true, toast: true, notify: true });
+        }
+      } else if (action === 'ORG_APPROVED') {
+        window.LucyBus.emit('ORG_APPROVED', {
+          title: 'Institution Workspace Approved',
+          message: `Workspace "${data.org_name || data.name || data.id}" has been authorized by Super Admin.`,
+          role: 'Super Admin'
+        }, { sound: true, toast: true, notify: true });
+      }
     }
 
     /**
@@ -79,10 +159,11 @@
 
       // 3. Broadcast via Supabase Realtime Channel if available
       try {
-        const client = this.getClient();
-        if (client && typeof client.channel === 'function') {
-          const ch = client.channel('fg-portal-live-sync');
-          ch.send({
+        if (!this._liveChannel) {
+          this.setupRealtimeChannel();
+        }
+        if (this._liveChannel && typeof this._liveChannel.send === 'function') {
+          this._liveChannel.send({
             type: 'broadcast',
             event: 'portal-sync',
             payload: payload
@@ -92,28 +173,7 @@
 
       // 4. Emit to LucyBus for audio, toaster, and dock counter
       try {
-        if (window.LucyBus && typeof window.LucyBus.emit === 'function') {
-          if (action === 'USER_REGISTERED' || action === 'USER_SAVED') {
-            window.LucyBus.emit('USER_REGISTERED', {
-              title: 'New Account Registration',
-              message: `${data.name || data.email || 'User'} registered for ${data.org || 'Institutional Portal'}.`,
-              role: data.role || 'user',
-              org: data.org
-            }, { sound: true, toast: false, notify: true });
-          } else if (action === 'USER_APPROVED') {
-            window.LucyBus.emit('USER_APPROVED', {
-              title: 'User Account Approved',
-              message: `Access granted for ${data.name || data.email || 'User'}.`,
-              role: data.role || 'user'
-            }, { sound: true, toast: true, notify: true });
-          } else if (action === 'ORG_REGISTERED' || action === 'ORG_SAVED') {
-            window.LucyBus.emit('INSTITUTION_REGISTERED', {
-              title: 'New Institution Workspace',
-              message: `New institution workspace provisioned: ${data.org_name || data.name || 'Workspace'}.`,
-              role: 'Super Admin'
-            }, { sound: true, toast: true, notify: true });
-          }
-        }
+        this.dispatchLucyBusEvent(action, data);
       } catch (_) {}
     }
 
@@ -122,6 +182,7 @@
         try {
           this.client = window.supabase.createClient(Config.getUrl(), Config.getAnonKey());
           console.info('Supabase JS SDK initialized successfully');
+          this.setupRealtimeChannel();
         } catch (e) {
           console.warn('Supabase SDK initialization notice, using REST API:', e.message);
           this.client = null;
@@ -266,6 +327,8 @@
         id: orgData.id || undefined,
         org_name: orgData.org_name || orgData.org || orgData.name || 'FLAWLESS GRAPHICS',
         name: orgData.name || orgData.org_name || 'FLAWLESS GRAPHICS',
+        org_id: orgData.org_id || orgData.slug || null,
+        code: orgData.code || (orgData.slug ? orgData.slug.toUpperCase() : null),
         admin_name: orgData.admin_name || orgData.name || orgData.fullName || 'Admin',
         email: (orgData.email || '').trim().toLowerCase(),
         phone: orgData.phone || null,
@@ -285,6 +348,90 @@
       } catch (err) {
         console.error('[Supabase] Failed to save organization:', err.message);
         throw err;
+      }
+    }
+
+    /**
+     * Send real 6-digit OTP verification code to user's email via Supabase Auth
+     */
+    async sendEmailOtp(email) {
+      const cleanEmail = (email || '').trim().toLowerCase();
+      if (!cleanEmail) throw new Error('Email address is required.');
+
+      const baseUrl = Config.getUrl().replace(/\/$/, '');
+      const key = Config.getAnonKey();
+
+      const res = await fetch(`${baseUrl}/auth/v1/otp`, {
+        method: 'POST',
+        headers: {
+          'apikey': key,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: cleanEmail,
+          create_user: true
+        })
+      });
+
+      if (!res.ok) {
+        let errText = 'Failed to dispatch verification code';
+        try {
+          const errJson = await res.json();
+          errText = errJson.msg || errJson.message || errJson.error_description || errText;
+        } catch (_) {}
+        throw new Error(errText);
+      }
+
+      return { success: true, email: cleanEmail };
+    }
+
+    /**
+     * Verify the 6-digit code received by the user in their email inbox
+     */
+    async verifyEmailOtp(email, token) {
+      const cleanEmail = (email || '').trim().toLowerCase();
+      const cleanToken = (token || '').toString().trim();
+
+      if (!cleanEmail) return { success: false, error: 'Email address is required.' };
+      if (!cleanToken || cleanToken.length !== 6) {
+        return { success: false, error: 'Please enter the exact 6-digit code received in your email.' };
+      }
+
+      const baseUrl = Config.getUrl().replace(/\/$/, '');
+      const key = Config.getAnonKey();
+
+      try {
+        const res = await fetch(`${baseUrl}/auth/v1/verify`, {
+          method: 'POST',
+          headers: {
+            'apikey': key,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            type: 'email',
+            email: cleanEmail,
+            token: cleanToken
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          return {
+            success: true,
+            session: data,
+            user: data.user
+          };
+        } else {
+          const errorMsg = data.msg || data.message || data.error_description || 'Invalid or expired authorization code.';
+          return {
+            success: false,
+            error: errorMsg.includes('expired')
+              ? 'Authorization code has expired. Please click Resend Code.'
+              : 'Incorrect code. Please enter the exact 6 digits sent to your email.'
+          };
+        }
+      } catch (err) {
+        return { success: false, error: 'Network error verifying code: ' + err.message };
       }
     }
 

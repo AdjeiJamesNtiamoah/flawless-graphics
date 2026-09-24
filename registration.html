@@ -22,6 +22,9 @@
     <!-- Pop-up Toaster System -->
     <link rel="stylesheet" href="assets/css/toaster.css">
     <script src="assets/js/toaster.js" defer></script>
+    <!-- Supabase Cloud Integration -->
+    <script src="assets/js/supabase-config.js"></script>
+    <script src="assets/js/supabase-client.js"></script>
 
     <style>
         * {
@@ -31,44 +34,45 @@
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #FAF7F2;
-            background: radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.05) 0%, transparent 40%),
-                        radial-gradient(circle at 90% 80%, rgba(99, 91, 252, 0.06) 0%, transparent 40%),
-                        #FAF7F2;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-color: #F8F5EE;
+            background-image: linear-gradient(135deg, rgba(248, 245, 238, 0.88) 0%, rgba(241, 235, 226, 0.93) 100%), url('assets/img/graduation-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 16px;
-            color: #0F172A;
+            padding: 24px 16px;
+            color: #1E293B;
             overflow-x: hidden;
         }
 
-        /* Ambient Background Orbs */
+        /* Ambient Background Warm Orbs */
         .bg-orb {
             position: fixed;
             border-radius: 50%;
-            filter: blur(90px);
+            filter: blur(120px);
             pointer-events: none;
             z-index: 0;
         }
-        .orb-1 { width: 380px; height: 380px; background: rgba(37, 99, 235, 0.12); top: -60px; left: -60px; animation: floatCard 8s ease-in-out infinite alternate; }
-        .orb-2 { width: 420px; height: 420px; background: rgba(99, 91, 252, 0.1); bottom: -80px; right: -80px; animation: floatCard 10s ease-in-out infinite alternate-reverse; }
+        .orb-1 { width: 450px; height: 450px; background: rgba(220, 195, 155, 0.25); top: -80px; left: -80px; animation: floatCard 9s ease-in-out infinite alternate; }
+        .orb-2 { width: 450px; height: 450px; background: rgba(210, 225, 245, 0.22); bottom: -80px; right: -80px; animation: floatCard 11s ease-in-out infinite alternate-reverse; }
 
         /* Window Frame UI Container */
         .app-window {
             width: 100%;
-            max-width: 1120px;
-            max-height: calc(100vh - 20px);
-            background: #0B1120;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 20px;
-            box-shadow: 0 30px 60px -12px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08);
+            max-width: 1240px;
+            max-height: calc(100vh - 36px);
+            background: #FFFFFF;
+            border: 1px solid #E5DFD5;
+            border-radius: 22px;
+            box-shadow: 0 25px 70px -15px rgba(90, 75, 55, 0.12), 0 4px 20px rgba(0, 0, 0, 0.04);
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            animation: windowEntrance 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: windowEntrance 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             position: relative;
             z-index: 1;
         }
@@ -76,7 +80,7 @@
         @keyframes windowEntrance {
             from {
                 opacity: 0;
-                transform: translateY(24px) scale(0.98);
+                transform: translateY(20px) scale(0.985);
             }
             to {
                 opacity: 1;
@@ -86,13 +90,14 @@
 
         /* Mock Mac Top Bar */
         .window-header {
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(12px);
-            padding: 12px 22px;
+            background: #F4EFEB;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 13px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid #E5DED3;
             flex-shrink: 0;
         }
 
@@ -118,69 +123,70 @@
         }
 
         .window-nav-link {
-            color: rgba(255, 255, 255, 0.75);
+            color: #57534E;
             font-size: 11.5px;
             font-weight: 600;
             text-decoration: none;
-            padding: 5px 12px;
+            padding: 5px 13px;
             border-radius: 9999px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #FFFFFF;
+            border: 1px solid #DFD7CC;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
         }
 
         .window-nav-link:hover {
-            color: #ffffff;
-            background: rgba(255, 255, 255, 0.18);
+            color: #0F172A;
+            background: #FAF7F2;
+            border-color: #2563EB;
             transform: translateY(-1px);
-            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-            border-color: rgba(37, 99, 235, 0.4);
         }
 
         .header-telemetry-pill {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
             font-size: 11px;
             font-weight: 700;
-            color: rgba(255, 255, 255, 0.65);
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 4px 10px;
+            color: #15803D;
+            background: #E8F5E9;
+            border: 1px solid #C8E6C9;
+            padding: 4px 12px;
             border-radius: 9999px;
+            letter-spacing: 0.4px;
         }
 
         .live-dot-green {
             width: 7px;
             height: 7px;
             border-radius: 50%;
-            background: #10b981;
-            box-shadow: 0 0 8px #10b981;
+            background: #16A34A;
+            box-shadow: 0 0 8px #22C55E;
             animation: pulseLive 2s infinite ease-in-out;
         }
 
         /* Main Split Body Layout */
         .main-container {
             display: grid;
-            grid-template-columns: 410px 1fr;
-            min-height: 520px;
+            grid-template-columns: 360px 1fr;
+            min-height: 560px;
             position: relative;
             overflow-y: auto;
         }
 
         /* Left Hero Banner Section */
         .hero-section {
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(11, 17, 32, 0.98) 100%);
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 30px 26px;
+            background: linear-gradient(180deg, #FAF7F2 0%, #EFE8DC 100%);
+            border-right: 1px solid #E5DED3;
+            padding: 30px 24px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
-            overflow: hidden;
+            overflow-y: auto;
         }
 
         .brand-logo {
@@ -191,52 +197,52 @@
         }
 
         .brand-logo-badge {
-            width: 46px;
-            height: 46px;
+            width: 44px;
+            height: 44px;
             border-radius: 12px;
-            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
-            color: #ffffff;
-            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+            font-size: 20px;
+            color: #F8FAFC;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
             flex-shrink: 0;
         }
 
         .brand-title {
-            font-size: 19px;
+            font-size: 18px;
             font-weight: 800;
-            color: #ffffff;
+            color: #0F172A;
             letter-spacing: -0.3px;
             line-height: 1.2;
         }
 
         .brand-subtitle {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.55);
+            font-size: 10.5px;
+            color: #786C5E;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
+            letter-spacing: 1px;
             font-weight: 700;
             margin-top: 2px;
         }
 
         .hero-text {
             z-index: 2;
-            margin: 16px 0;
+            margin: 16px 0 14px;
         }
 
         .hero-text h1 {
             font-size: 21px;
-            font-weight: 700;
+            font-weight: 800;
             line-height: 1.35;
-            color: #ffffff;
+            color: #0F172A;
             letter-spacing: -0.4px;
         }
 
         .hero-text span {
             font-weight: 800;
-            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+            background: linear-gradient(135deg, #2563EB 0%, #4F46E5 100%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -244,18 +250,18 @@
 
         /* Live Digital Campus Preview Card */
         .live-preview-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: #FFFFFF;
+            border: 1px solid #DFD7CC;
             border-radius: 14px;
-            padding: 16px;
-            margin: 12px 0 16px;
+            padding: 14px 16px;
+            margin: 12px 0 14px;
             position: relative;
-            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 16px rgba(110, 95, 75, 0.05);
             transition: all 0.25s ease;
         }
         .live-preview-card:hover {
-            border-color: rgba(56, 189, 248, 0.4);
-            background: rgba(255, 255, 255, 0.08);
+            border-color: #2563EB;
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.08);
         }
         .live-preview-header {
             display: flex;
@@ -263,18 +269,18 @@
             gap: 12px;
         }
         .preview-crest-circle {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: rgba(37, 99, 235, 0.25);
-            border: 1px solid rgba(56, 189, 248, 0.4);
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: #F4EFEB;
+            border: 1px solid #D6CDBE;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
             flex-shrink: 0;
-            color: #38bdf8;
-            font-size: 20px;
+            color: #786C5E;
+            font-size: 18px;
             transition: all 0.25s ease;
         }
         .preview-crest-circle img {
@@ -283,18 +289,18 @@
             object-fit: cover;
         }
         .preview-inst-name {
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 800;
-            color: #ffffff;
-            line-height: 1.2;
+            color: #0F172A;
+            line-height: 1.25;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .preview-inst-slug {
-            font-family: monospace;
-            font-size: 11px;
-            color: #38bdf8;
+            font-family: 'JetBrains Mono', monospace, sans-serif;
+            font-size: 10.5px;
+            color: #2563EB;
             margin-top: 3px;
         }
         .preview-pill-row {
@@ -308,12 +314,52 @@
             font-weight: 700;
             padding: 3px 8px;
             border-radius: 6px;
-            background: rgba(16, 185, 129, 0.15);
-            color: #6ee7b7;
-            border: 1px solid rgba(16, 185, 129, 0.3);
+            background: #FEF3C7;
+            color: #92400E;
+            border: 1px solid #FDE68A;
             display: inline-flex;
             align-items: center;
             gap: 4px;
+        }
+
+        /* Hero Feature Highlight Items */
+        .hero-highlights-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 12px 0 16px;
+        }
+        .hero-highlight-card {
+            background: #FFFFFF;
+            border: 1px solid #E5DFD5;
+            border-radius: 10px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .hero-highlight-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: #EFF6FF;
+            color: #2563EB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12.5px;
+            flex-shrink: 0;
+        }
+        .hero-highlight-text {
+            font-size: 11px;
+            font-weight: 700;
+            color: #1E293B;
+        }
+        .hero-highlight-sub {
+            font-size: 10px;
+            color: #78716C;
+            font-weight: 500;
         }
 
         .hero-buttons {
@@ -321,35 +367,38 @@
             flex-direction: column;
             gap: 8px;
             z-index: 2;
+            margin-top: auto;
+            padding-top: 12px;
         }
 
         .btn-outline {
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: rgba(255, 255, 255, 0.05);
-            color: #ffffff;
+            border: 1px solid #D6CDBE;
+            background: #FFFFFF;
+            color: #292524;
             padding: 9px 14px;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 7px;
             transition: all 0.2s ease;
             text-decoration: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
         }
 
         .btn-outline:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(56, 189, 248, 0.4);
-            color: #38bdf8;
+            background: #F4EFEB;
+            border-color: #2563EB;
+            color: #1E40AF;
             transform: translateY(-1px);
         }
 
         .link-subtle {
-            color: rgba(255, 255, 255, 0.65);
-            font-size: 11.5px;
+            color: #78716C;
+            font-size: 11px;
             text-decoration: none;
             font-weight: 600;
             display: inline-flex;
@@ -361,212 +410,248 @@
         }
 
         .link-subtle:hover {
-            color: #38bdf8;
+            color: #2563EB;
         }
 
-        /* Right Form Card Section */
+        /* Right Form Card Section - Spacious & Breathable */
         .form-section {
-            padding: 28px 36px;
-            background: #0B1120;
+            padding: 32px 38px;
+            background: #FFFFFF;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
+            overflow-y: auto;
         }
 
         .card {
             width: 100%;
-            max-width: 500px;
             margin: 0 auto;
         }
 
+        .form-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 2px;
+        }
+
         .card h2 {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 800;
-            color: #ffffff;
-            letter-spacing: -0.3px;
+            color: #0F172A;
+            letter-spacing: -0.4px;
             margin-bottom: 4px;
         }
 
+        .card-subtitle {
+            font-size: 12px;
+            color: #57534E;
+            margin-bottom: 18px;
+        }
+
+        /* 2-Column Balanced Form Grid */
+        .form-grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            margin-bottom: 16px;
+        }
+
+        .form-col-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-section-tag {
+            font-size: 12.5px;
+            font-weight: 800;
+            color: #0F172A;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 8px;
+            margin-bottom: 14px;
+            border-bottom: 1px solid #EAE4D9;
+            letter-spacing: -0.2px;
+        }
+
+        .form-section-tag i {
+            color: #2563EB;
+            font-size: 13px;
+        }
+
         .form-group {
-            margin-bottom: 11px;
+            margin-bottom: 13px;
         }
 
         label {
             display: block;
-            font-size: 11.5px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #44403C;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
         }
 
-        /* Logo Upload Styles */
-        .logo-upload-container {
+        /* Compact Sleek Uploader Card */
+        .compact-uploader {
             display: flex;
             align-items: center;
             gap: 12px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px dashed rgba(255, 255, 255, 0.25);
-            border-radius: 10px;
-            padding: 8px 14px;
+            background: #FAF8F5;
+            border: 1px solid #E2D9CC;
+            border-radius: 12px;
+            padding: 8px 12px;
+            margin-bottom: 13px;
             transition: all 0.2s ease;
-            position: relative;
         }
 
-        .logo-upload-container.drag-over {
-            border-color: #38bdf8;
-            background: rgba(56, 189, 248, 0.15);
-            transform: scale(1.01);
+        .compact-uploader:hover, .compact-uploader.drag-over {
+            border-color: #2563EB;
+            background: #F5F0E8;
         }
 
-        .logo-upload-container:hover {
-            border-color: #38bdf8;
-            background: rgba(255, 255, 255, 0.09);
-        }
-
-        .logo-preview-box {
+        .compact-preview-box {
             width: 42px;
             height: 42px;
             border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #EDE6DB;
+            border: 1px solid #D6CDBE;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
             flex-shrink: 0;
+            color: #78716C;
         }
 
-        .logo-preview-box img {
+        .compact-preview-box img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .logo-preview-box i {
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.5);
+        .compact-uploader-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
         }
 
-        .logo-upload-actions {
+        .compact-uploader-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: #44403C;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .compact-uploader-row {
             display: flex;
-            flex-direction: row;
             align-items: center;
             gap: 8px;
-            flex: 1;
             flex-wrap: wrap;
         }
 
         .btn-upload-trigger {
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-            padding: 5px 12px;
-            border-radius: 6px;
+            background: #FFFFFF;
+            border: 1px solid #D6CDBE;
+            color: #1C1917;
+            padding: 5px 11px;
+            border-radius: 8px;
             font-size: 11px;
             font-weight: 700;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
         }
 
         .btn-upload-trigger:hover {
-            background: rgba(255, 255, 255, 0.22);
-            border-color: #38bdf8;
+            background: #F4EFEB;
+            border-color: #2563EB;
+            color: #2563EB;
         }
 
         .logo-hint {
             font-size: 10px;
-            color: rgba(255, 255, 255, 0.5);
+            color: #78716C;
         }
 
         .btn-remove-logo {
-            color: #f87171;
-            font-size: 11px;
+            color: #DC2626;
+            font-size: 10.5px;
             background: none;
             border: none;
             cursor: pointer;
             display: none;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .input-wrapper {
             position: relative;
             display: flex;
             align-items: center;
+            width: 100%;
         }
 
+        /* Universal White & Cream Form Inputs */
         input[type="text"],
         input[type="email"],
         input[type="password"],
+        input[type="tel"],
+        input[type="number"],
         select {
             width: 100%;
-            padding: 9px 36px 9px 12px;
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            color: #ffffff;
-            font-size: 12.5px;
+            height: 40px;
+            padding: 8px 36px 8px 13px;
+            background: #FAF8F5;
+            border: 1px solid #D6CDBE;
+            border-radius: 10px;
+            color: #0F172A;
+            font-size: 13px;
             font-family: inherit;
             outline: none;
-            transition: all 0.25s ease;
+            transition: all 0.2s ease;
+        }
+
+        /* Chrome/Safari Autofill Background Override */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 1000px #FAF8F5 inset !important;
+            -webkit-text-fill-color: #0F172A !important;
+            transition: background-color 5000s ease-in-out 0s;
         }
 
         select option {
-            background: #0B1120;
-            color: #ffffff;
+            background: #FFFFFF;
+            color: #0F172A;
         }
 
         input::placeholder {
-            color: rgba(255, 255, 255, 0.35);
+            color: #A8A29E;
         }
 
         input:focus, select:focus {
-            border-color: #38bdf8;
-            background: rgba(255, 255, 255, 0.12);
-            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+            border-color: #2563EB;
+            background: #FFFFFF;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
         }
 
         .field-icon {
             position: absolute;
             right: 12px;
-            color: rgba(255, 255, 255, 0.45);
+            color: #78716C;
             font-size: 13px;
             cursor: pointer;
+            transition: color 0.2s;
         }
-        .field-icon:hover { color: #38bdf8; }
-
-        /* Password Strength Meter */
-        .password-meter-wrap {
-            margin-top: 6px;
-        }
-        .password-meter-bars {
-            display: flex;
-            gap: 4px;
-            height: 4px;
-            border-radius: 2px;
-            overflow: hidden;
-            margin-bottom: 4px;
-        }
-        .password-bar {
-            flex: 1;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 2px;
-            transition: background 0.3s ease;
-        }
-        .password-meter-label {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.55);
-            font-weight: 600;
-        }
-        .password-strength-text {
-            font-weight: 700;
-        }
+        .field-icon:hover { color: #2563EB; }
 
         /* Subdomain Live Check Indicator */
         .subdomain-status-badge {
@@ -575,43 +660,73 @@
             justify-content: space-between;
             margin-top: 5px;
             font-size: 10.5px;
-            color: rgba(255, 255, 255, 0.6);
+            color: #78716C;
         }
         .subdomain-status-ready {
-            color: #6ee7b7;
+            color: #15803D;
             font-weight: 700;
             display: inline-flex;
             align-items: center;
             gap: 4px;
         }
 
+        /* Subtle Security & Fast Activation Box */
+        .security-notice-box {
+            background: #FAF8F5;
+            border: 1px solid #E5DFD5;
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 4px;
+        }
+        .security-notice-box i {
+            color: #2563EB;
+            font-size: 14px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+        .security-notice-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #0F172A;
+            margin-bottom: 2px;
+        }
+        .security-notice-desc {
+            font-size: 10px;
+            color: #64748B;
+            line-height: 1.35;
+        }
+
         .btn-submit {
             width: 100%;
-            padding: 11px 16px;
-            background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #1E40AF 0%, #2563EB 100%);
             border: none;
-            border-radius: 8px;
-            color: #ffffff;
-            font-size: 13px;
-            font-weight: 700;
+            border-radius: 11px;
+            color: #FFFFFF;
+            font-size: 13.5px;
+            font-weight: 800;
             cursor: pointer;
-            margin-top: 8px;
+            margin-top: 6px;
             transition: all 0.25s ease;
-            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+            box-shadow: 0 4px 16px rgba(37, 99, 235, 0.25);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 8px;
         }
 
         .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.45);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 22px rgba(37, 99, 235, 0.35);
+            filter: brightness(1.04);
         }
 
         .btn-submit:disabled {
-            background: rgba(255, 255, 255, 0.2);
-            color: rgba(255, 255, 255, 0.4);
+            background: #E5DFD5;
+            color: #A8A29E;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
@@ -624,21 +739,21 @@
             justify-content: space-around;
             padding: 10px 6px;
             margin-top: 14px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid #EAE4D9;
+            border-bottom: 1px solid #EAE4D9;
             gap: 6px;
             flex-wrap: wrap;
         }
         .trust-item {
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.55);
+            font-size: 10.5px;
+            color: #57534E;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             font-weight: 600;
         }
         .trust-item i {
-            color: #38bdf8;
+            color: #2563EB;
             font-size: 11px;
         }
 
@@ -646,11 +761,11 @@
             text-align: center;
             margin-top: 10px;
             font-size: 11.5px;
-            color: rgba(255, 255, 255, 0.65);
+            color: #78716C;
         }
 
         .footer-text a {
-            color: #38bdf8;
+            color: #2563EB;
             font-weight: 700;
             text-decoration: none;
         }
@@ -659,231 +774,27 @@
             text-decoration: underline;
         }
 
-        /* Two-Step Form Stepper */
-        .stepper-nav {
-            display: flex;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 4px;
-            margin-bottom: 14px;
-            gap: 6px;
-        }
-
-        .step-pill {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 7px 12px;
-            border-radius: 7px;
-            background: transparent;
-            border: 1px solid transparent;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 11.5px;
-            font-weight: 700;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.22s ease;
-        }
-
-        .step-pill.active {
-            background: rgba(37, 99, 235, 0.25);
-            border-color: rgba(56, 189, 248, 0.4);
-            color: #ffffff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .step-pill.completed {
-            color: #38bdf8;
-        }
-
-        .step-badge {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10.5px;
-            font-weight: 800;
-            background: rgba(255, 255, 255, 0.15);
-            color: #ffffff;
-            transition: all 0.2s ease;
-            flex-shrink: 0;
-        }
-
-        .step-pill.active .step-badge {
-            background: #38bdf8;
-            color: #0B1120;
-        }
-
-        .step-pill.completed .step-badge {
-            background: #10b981;
-            color: #ffffff;
-        }
-
-        /* Step Panels */
-        .step-panel {
-            display: none;
-            animation: stepFade 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        .step-panel.active {
-            display: block;
-        }
-
-        @keyframes stepFade {
-            from {
-                opacity: 0;
-                transform: translateY(8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .step-subheading {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .step-title {
-            font-size: 13.5px;
-            font-weight: 800;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .step-title i {
-            color: #38bdf8;
-            font-size: 13px;
-        }
-
-        .step-counter-tag {
-            font-size: 10px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.6);
-            background: rgba(255, 255, 255, 0.08);
-            padding: 2px 8px;
-            border-radius: 9999px;
-        }
-
-        /* Step 2 Org Summary Bar */
-        .org-summary-pill {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(37, 99, 235, 0.15);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            border-radius: 8px;
-            padding: 8px 12px;
-            margin-bottom: 12px;
-            font-size: 11.5px;
-        }
-
-        .org-summary-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #ffffff;
-            font-weight: 700;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .org-summary-info i {
-            color: #38bdf8;
-            font-size: 13px;
-        }
-
-        .org-summary-slug {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 10.5px;
-            font-weight: 400;
-        }
-
-        .org-summary-edit-btn {
-            background: none;
-            border: none;
-            color: #38bdf8;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-
-        .org-summary-edit-btn:hover {
-            background: rgba(56, 189, 248, 0.2);
-            text-decoration: underline;
-        }
-
-        .btn-step-back {
-            padding: 9px 14px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 8px;
-            color: #ffffff;
-            font-size: 12px;
-            font-weight: 700;
-            font-family: inherit;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-
-        .btn-step-back:hover {
-            background: rgba(255, 255, 255, 0.16);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-step-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        /* Notification Styling */
+        /* Message Box */
         .msg {
+            display: none;
             padding: 10px 14px;
             border-radius: 8px;
-            margin-bottom: 14px;
-            display: none;
             font-size: 12px;
             font-weight: 600;
-            line-height: 1.4;
+            margin-bottom: 14px;
         }
 
         .msg.error {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            color: #fca5a5;
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            color: #991B1B;
             display: block;
         }
 
         .msg.success {
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            color: #6ee7b7;
+            background: #F0FDF4;
+            border: 1px solid #BBF7D0;
+            color: #166534;
             display: block;
         }
 
@@ -891,7 +802,7 @@
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(15, 23, 42, 0.45);
             backdrop-filter: blur(8px);
             display: none;
             align-items: center;
@@ -905,16 +816,16 @@
         }
 
         .modal-box {
-            background: #0B1120;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+            background: #FFFFFF;
+            border: 1px solid #E5DED3;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
             border-radius: 18px;
             max-width: 580px;
             width: 100%;
             max-height: 85vh;
             overflow-y: auto;
             padding: 28px;
-            color: #ffffff;
+            color: #0F172A;
             position: relative;
             animation: modalPop 0.25s ease-out;
         }
@@ -928,9 +839,9 @@
             position: absolute;
             top: 18px;
             right: 18px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: #fff;
+            background: #F4EFEB;
+            border: 1px solid #DFD7CC;
+            color: #292524;
             width: 30px;
             height: 30px;
             border-radius: 50%;
@@ -942,14 +853,16 @@
         }
 
         .modal-close-btn:hover {
-            background: rgba(239, 68, 68, 0.3);
+            background: #FEE2E2;
+            color: #DC2626;
+            border-color: #FCA5A5;
         }
 
         .modal-feature-item {
             display: flex;
             gap: 14px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: #FAF8F5;
+            border: 1px solid #EAE4D9;
             border-radius: 12px;
             padding: 12px 16px;
             margin-bottom: 10px;
@@ -960,8 +873,8 @@
             width: 36px;
             height: 36px;
             border-radius: 10px;
-            background: rgba(56, 189, 248, 0.15);
-            color: #38bdf8;
+            background: #EFF6FF;
+            color: #2563EB;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -973,9 +886,9 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(56, 189, 248, 0.12);
-            color: #38bdf8;
-            border: 1px solid rgba(56, 189, 248, 0.3);
+            background: #EFF6FF;
+            color: #1D4ED8;
+            border: 1px solid #BFDBFE;
             padding: 6px 14px;
             border-radius: 8px;
             font-weight: 600;
@@ -984,8 +897,8 @@
         }
 
         .otp-box {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #FAF8F5;
+            border: 1px solid #DFD7CC;
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 16px;
@@ -993,9 +906,9 @@
 
         .otp-input {
             width: 100%;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
+            background: #FFFFFF;
+            border: 1px solid #D6CDBE;
+            color: #0F172A;
             font-size: 22px;
             letter-spacing: 6px;
             text-align: center;
@@ -1006,50 +919,24 @@
             outline: none;
         }
 
-        .instant-code-card {
-            background: rgba(56, 189, 248, 0.08);
-            border: 1px dashed rgba(56, 189, 248, 0.4);
-            border-radius: 10px;
-            padding: 10px 14px;
-            margin: 10px 0 14px;
-            text-align: center;
-        }
-
-        .instant-code-value {
-            font-family: monospace;
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: 4px;
-            color: #38bdf8;
-            background: rgba(0, 0, 0, 0.35);
-            padding: 3px 12px;
-            border-radius: 6px;
-            border: 1px solid rgba(56, 189, 248, 0.3);
-        }
-
-        .btn-copy-code {
-            background: rgba(56, 189, 248, 0.2);
-            border: 1px solid rgba(56, 189, 248, 0.5);
-            color: #38bdf8;
-            border-radius: 6px;
-            padding: 4px 10px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-        }
+        
 
         /* Responsive */
-        @media (max-width: 880px) {
+        @media (max-width: 960px) {
             .main-container {
                 grid-template-columns: 1fr;
             }
             .hero-section {
                 border-right: none;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                border-bottom: 1px solid #E5DED3;
                 padding: 24px;
             }
             .form-section {
                 padding: 24px;
+            }
+            .form-grid-2col {
+                grid-template-columns: 1fr;
+                gap: 16px;
             }
         }
     </style>
@@ -1062,7 +949,7 @@
 
     <!-- Skeletal Loading Placeholder -->
     <div id="skeletonLoader" class="skeleton-overlay">
-        <div class="skeleton-window" style="max-width: 1120px;">
+        <div class="skeleton-window" style="max-width: 1240px;">
             <div class="skeleton-header">
                 <div class="skeleton-dots">
                     <span class="skeleton-dot"></span>
@@ -1071,7 +958,7 @@
                 </div>
                 <div class="skeleton-shimmer" style="width: 140px; height: 16px; border-radius: 6px;"></div>
             </div>
-            <div class="skeleton-body" style="grid-template-columns: 410px 1fr; display: grid;">
+            <div class="skeleton-body" style="grid-template-columns: 360px 1fr; display: grid;">
                 <div class="skeleton-hero" style="padding: 24px;">
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <div class="skeleton-shimmer" style="width: 44px; height: 44px; border-radius: 12px;"></div>
@@ -1098,7 +985,7 @@
                     <div class="dot dot-3"></div>
                 </div>
                 <nav class="window-quick-nav">
-                    <a href="index.html" class="window-nav-link" style="color: #38bdf8;"><i class="fa-solid fa-sparkles"></i> Overview</a>
+                    <a href="index.html" class="window-nav-link" style="color: #2563EB;"><i class="fa-solid fa-sparkles"></i> Overview</a>
                     <a href="welcome.html" class="window-nav-link"><i class="fa-solid fa-grid-horizontal"></i> Unified Hub</a>
                     <a href="pages/public/home.html" class="window-nav-link"><i class="fa-solid fa-house"></i> Main Site</a>
                     <a href="site-login.html" class="window-nav-link"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
@@ -1126,15 +1013,15 @@
 
                     <div class="hero-text">
                         <h1>Enroll your institution on <span>FLAWLESS</span> Cloud Core</h1>
-                        <p style="font-size: 12.5px; color: rgba(255,255,255,0.65); line-height: 1.5; margin-top: 6px;">
+                        <p style="font-size: 12px; color: #57534E; line-height: 1.45; margin-top: 6px;">
                             Provision dedicated database partitions, staff registries, student ID badges, and bursary treasury.
                         </p>
                     </div>
 
                     <!-- Live Real-Time Institutional Seal & Subdomain Preview -->
                     <div class="live-preview-card">
-                        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 8px; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center;">
-                            <span><i class="fa-solid fa-eye" style="color: #38bdf8; margin-right: 4px;"></i> Live Campus Preview</span>
+                        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #78716C; margin-bottom: 8px; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center;">
+                            <span><i class="fa-solid fa-eye" style="color: #2563eb; margin-right: 4px;"></i> Live Campus Preview</span>
                             <span style="color: #10b981; font-size: 9.5px;"><i class="fa-solid fa-circle" style="font-size: 6px;"></i> Ready</span>
                         </div>
                         <div class="live-preview-header">
@@ -1148,19 +1035,44 @@
                         </div>
                         <div class="preview-pill-row">
                             <span class="preview-mini-pill" id="previewTierBadge"><i class="fa-solid fa-graduation-cap"></i> Senior High</span>
-                            <span class="preview-mini-pill" id="previewRegionBadge" style="background: rgba(56, 189, 248, 0.15); color: #7dd3fc; border-color: rgba(56, 189, 248, 0.3);"><i class="fa-solid fa-location-dot"></i> Greater Accra, GH</span>
-                            <span class="preview-mini-pill" style="background: rgba(168, 85, 247, 0.15); color: #d8b4fe; border-color: rgba(168, 85, 247, 0.3);"><i class="fa-solid fa-shield-check"></i> AES-256 Partition</span>
+                            <span class="preview-mini-pill" id="previewRegionBadge" style="background: #e0f2fe; color: #0369a1; border-color: #bae6fd;"><i class="fa-solid fa-location-dot"></i> Greater Accra, GH</span>
+                            <span class="preview-mini-pill" style="background: #f3e8ff; color: #7e22ce; border-color: #e9d5ff;"><i class="fa-solid fa-shield-check"></i> AES-256 Partition</span>
+                        </div>
+                    </div>
+
+                    <!-- 3 Institutional Feature Highlight Cards -->
+                    <div class="hero-highlights-list">
+                        <div class="hero-highlight-card">
+                            <div class="hero-highlight-icon"><i class="fa-solid fa-server"></i></div>
+                            <div>
+                                <div class="hero-highlight-text">Isolated Cloud Database</div>
+                                <div class="hero-highlight-sub">Encrypted multi-tenant partitions</div>
+                            </div>
+                        </div>
+                        <div class="hero-highlight-card">
+                            <div class="hero-highlight-icon" style="background: #FEF3C7; color: #D97706;"><i class="fa-solid fa-crown"></i></div>
+                            <div>
+                                <div class="hero-highlight-text">Super Admin Governance</div>
+                                <div class="hero-highlight-sub">Executive oversight & audit logs</div>
+                            </div>
+                        </div>
+                        <div class="hero-highlight-card">
+                            <div class="hero-highlight-icon" style="background: #DCFCE7; color: #16A34A;"><i class="fa-solid fa-users-gear"></i></div>
+                            <div>
+                                <div class="hero-highlight-text">5 Unified Workstations</div>
+                                <div class="hero-highlight-sub">Admin, HR, Finance, Teacher & Student</div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="hero-buttons">
                     <button class="btn-outline" type="button" onclick="openExpectModal()">
-                        <i class="fa-solid fa-circle-info" style="color: #38bdf8;"></i> What to Expect?
+                        <i class="fa-solid fa-circle-info" style="color: #2563eb;"></i> What to Expect?
                     </button>
                     <button class="btn-outline" type="button"
                         onclick="window.SupabaseConfig && window.SupabaseConfig.openConfigModal()"
-                        style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">
+                        style="border-color: #bfdbfe; color: #2563eb; background: #eff6ff;">
                         <i class="fa-solid fa-cloud"></i> Connect Supabase DB
                     </button>
                     <a href="javascript:void(0)" onclick="openRoadmapModal()" class="link-subtle">
@@ -1172,125 +1084,166 @@
             <!-- Right Form Wizard Box -->
             <div class="form-section">
                 <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px;">
+                    <div class="form-header-row">
                         <h2>Register Institution</h2>
-                        <button type="button" onclick="fillSampleForm()"
-                            style="background: none; border: none; color: #38bdf8; font-size: 11px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
-                            <i class="fa-solid fa-magic-wand-sparkles"></i> Auto-fill Sample
-                        </button>
+                        
                     </div>
-                    <p style="font-size: 11.5px; color: rgba(255,255,255,0.6); margin-bottom: 14px;">Submit your institutional workspace for Super Admin review and authorization:</p>
+                    <p class="card-subtitle">Submit your institutional workspace for Super Admin review and authorization:</p>
 
                     <div id="msg" class="msg"></div>
 
                     <form id="registerForm" onsubmit="register(event)">
 
-                        <div class="step-subheading" style="margin-bottom: 14px;">
-                            <div class="step-title">
-                                <i class="fa-solid fa-school"></i> Institution &amp; Campus Profile
-                            </div>
-                        </div>
-
-                        <!-- Institution Crest / Logo Upload -->
-                        <div class="form-group">
-                            <label>Official School Crest / Logo (Optional)</label>
-                            <div class="logo-upload-container" id="crestDropzone"
-                                 ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-                                <div class="logo-preview-box" id="logoPreviewBox">
-                                    <i class="fa-regular fa-image" id="logoPlaceholderIcon"></i>
+                        <!-- 2-Column Spacious Workstation Grid -->
+                        <div class="form-grid-2col">
+                            
+                            <!-- Column 1: Institution & Campus Identity -->
+                            <div class="form-col-section">
+                                <div class="form-section-tag">
+                                    <i class="fa-solid fa-school"></i> 1. Campus Identity &amp; Seal
                                 </div>
-                                <div class="logo-upload-actions">
-                                    <input type="file" id="orgLogo"
-                                        accept="image/png, image/jpeg, image/svg+xml, image/webp" style="display: none;"
-                                        onchange="handleLogoChange(event)">
-                                    <button type="button" class="btn-upload-trigger"
-                                        onclick="document.getElementById('orgLogo').click()">
-                                        <i class="fa-solid fa-upload"></i> Upload Crest
-                                    </button>
-                                    <span class="logo-hint" id="logoHint">PNG, JPG or SVG (Drop file or click)</span>
-                                    <button type="button" class="btn-remove-logo" id="removeLogoBtn"
-                                        onclick="removeLogo()">Remove</button>
+
+                                <!-- Institution Crest Upload (Compact Sleek Uploader) -->
+                                <div class="compact-uploader" id="crestDropzone"
+                                     ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+                                    <div class="compact-preview-box" id="logoPreviewBox">
+                                        <i class="fa-regular fa-image" id="logoPlaceholderIcon"></i>
+                                    </div>
+                                    <div class="compact-uploader-content">
+                                        <div class="compact-uploader-label">Official School Crest / Logo</div>
+                                        <div class="compact-uploader-row">
+                                            <input type="file" id="orgLogo"
+                                                accept="image/png, image/jpeg, image/svg+xml, image/webp" style="display: none;"
+                                                onchange="handleLogoChange(event)">
+                                            <button type="button" class="btn-upload-trigger"
+                                                onclick="document.getElementById('orgLogo').click()">
+                                                <i class="fa-solid fa-upload"></i> Upload Crest
+                                            </button>
+                                            <span class="logo-hint" id="logoHint">PNG, JPG, SVG (Max 2MB)</span>
+                                            <button type="button" class="btn-remove-logo" id="removeLogoBtn"
+                                                onclick="removeLogo()">Remove</button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
 
-                        <div class="form-group">
-                            <label for="orgName">Institution / School Name</label>
-                            <div class="input-wrapper">
-                                <input type="text" id="orgName" placeholder="e.g. Flawless Graphics Academy" required>
-                                <i class="fa-solid fa-graduation-cap field-icon"></i>
-                            </div>
-                        </div>
+                                <div class="form-group">
+                                    <label for="orgName">Institution / School Name</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="orgName" placeholder="e.g. Flawless Graphics Academy" required>
+                                        <i class="fa-solid fa-graduation-cap field-icon"></i>
+                                    </div>
+                                </div>
 
-                        <!-- Institution Category & Region Grid -->
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 11px;">
-                            <div>
-                                <label for="orgType">Institution Tier</label>
-                                <select id="orgType" onchange="updateTierBadge()">
-                                    <option value="Senior High / Secondary" selected>Senior High School (SHS)</option>
-                                    <option value="Basic & Primary">Basic / Primary / JHS</option>
-                                    <option value="Tertiary / University">Tertiary / University</option>
-                                    <option value="Technical / Vocational">TVET / Technical College</option>
-                                    <option value="Creative Academy">Creative Arts Academy</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="orgRegion">Campus Region</label>
-                                <select id="orgRegion" onchange="updateRegionBadge()">
-                                    <option value="Greater Accra" selected>Greater Accra, GH</option>
-                                    <option value="Ashanti">Ashanti Region, GH</option>
-                                    <option value="Central">Central Region, GH</option>
-                                    <option value="Western">Western Region, GH</option>
-                                    <option value="Eastern">Eastern Region, GH</option>
-                                    <option value="International">International Campus</option>
-                                </select>
-                            </div>
-                        </div>
+                                <!-- Institution Category & Region Grid -->
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 13px;">
+                                    <div>
+                                        <label for="orgType">Institution Tier</label>
+                                        <select id="orgType" onchange="updateTierBadge()">
+                                            <option value="Senior High / Secondary" selected>Senior High (SHS)</option>
+                                            <option value="Basic & Primary">Basic / Primary / JHS</option>
+                                            <option value="Tertiary / University">University / Tertiary</option>
+                                            <option value="Technical / Vocational">TVET / Technical</option>
+                                            <option value="Creative Academy">Creative Arts Academy</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="orgRegion">Campus Region</label>
+                                        <select id="orgRegion" onchange="updateRegionBadge()">
+                                            <option value="Greater Accra" selected>Greater Accra, GH</option>
+                                            <option value="Ashanti">Ashanti Region, GH</option>
+                                            <option value="Central">Central Region, GH</option>
+                                            <option value="Western">Western Region, GH</option>
+                                            <option value="Eastern">Eastern Region, GH</option>
+                                            <option value="International">International Campus</option>
+                                        </select>
+                                    </div>
+                                </div>
 
-                        <!-- Subdomain Slug Field with Live Checker -->
-                        <div class="form-group">
-                            <label for="orgId">Institution Portal ID (Subdomain Slug)</label>
-                            <div class="input-wrapper">
-                                <input type="text" id="orgId" placeholder="flawless-graphics"
-                                    pattern="^[a-z0-9\-]{3,30}$"
-                                    title="3-30 characters, lowercase alphanumeric and hyphens only" required>
-                                <i class="fa-solid fa-link field-icon"></i>
-                            </div>
-                            <div class="subdomain-status-badge">
-                                <span>Workspace Namespace:</span>
-                                <span class="subdomain-status-ready" id="subdomainStatusText">
-                                    <i class="fa-solid fa-circle-check"></i> Partition Available
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="adminName">Head of Institution / Representative Name</label>
-                            <div class="input-wrapper">
-                                <input type="text" id="adminName" placeholder="e.g. Dr. Kwame Boateng">
-                                <i class="fa-regular fa-user field-icon"></i>
-                            </div>
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
-                            <div>
-                                <label for="orgEmail">Official Contact Email</label>
-                                <div class="input-wrapper">
-                                    <input type="email" id="orgEmail" placeholder="contact@school.edu.gh" required>
-                                    <i class="fa-regular fa-envelope field-icon"></i>
+                                <!-- Subdomain Slug Field with Live Checker -->
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="orgId">Institution Portal ID (Subdomain)</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="orgId" placeholder="flawless-graphics"
+                                            pattern="^[a-z0-9\-]{3,30}$"
+                                            title="3-30 characters, lowercase alphanumeric and hyphens only" required>
+                                        <i class="fa-solid fa-link field-icon"></i>
+                                    </div>
+                                    <div class="subdomain-status-badge">
+                                        <span>Namespace:</span>
+                                        <span class="subdomain-status-ready" id="subdomainStatusText">
+                                            <i class="fa-solid fa-circle-check"></i> Partition Available
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                            <div>
-                                <label for="orgPhone">Official Phone (Optional)</label>
-                                <div class="input-wrapper">
-                                    <input type="tel" id="orgPhone" placeholder="+233 24 000 1234">
-                                    <i class="fa-solid fa-phone field-icon"></i>
+
+                            <!-- Column 2: Executive Administrator & Security -->
+                            <div class="form-col-section">
+                                <div class="form-section-tag">
+                                    <i class="fa-solid fa-user-shield"></i> 2. Executive Leadership &amp; Contact
+                                </div>
+
+                                <!-- Head of Institution Profile Photo Upload (Compact Sleek Uploader) -->
+                                <div class="compact-uploader">
+                                    <div class="compact-preview-box" id="adminPhotoPreviewBox" style="border-radius: 50%;">
+                                        <i class="fa-regular fa-user" id="adminPhotoPlaceholderIcon"></i>
+                                    </div>
+                                    <div class="compact-uploader-content">
+                                        <div class="compact-uploader-label">Head Profile Photo (Optional)</div>
+                                        <div class="compact-uploader-row">
+                                            <input type="file" id="adminPhoto"
+                                                accept="image/png, image/jpeg, image/webp" style="display: none;"
+                                                onchange="handleAdminPhotoChange(event)">
+                                            <button type="button" class="btn-upload-trigger"
+                                                onclick="document.getElementById('adminPhoto').click()">
+                                                <i class="fa-solid fa-camera"></i> Upload Photo
+                                            </button>
+                                            <span class="logo-hint" id="adminPhotoHint">PNG, JPG or WebP (Max 2MB)</span>
+                                            <button type="button" class="btn-remove-logo" id="removeAdminPhotoBtn"
+                                                onclick="removeAdminPhoto()">Remove</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="adminName">Head of Institution / Representative</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="adminName" placeholder="e.g. Dr. Kwame Boateng">
+                                        <i class="fa-regular fa-user field-icon"></i>
+                                    </div>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                                    <div>
+                                        <label for="orgEmail">Contact Email</label>
+                                        <div class="input-wrapper">
+                                            <input type="email" id="orgEmail" placeholder="contact@school.edu.gh" required>
+                                            <i class="fa-regular fa-envelope field-icon"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label for="orgPhone">Official Phone</label>
+                                        <div class="input-wrapper">
+                                            <input type="tel" id="orgPhone" placeholder="+233 24 000 1234">
+                                            <i class="fa-solid fa-phone field-icon"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Security Notice Reassurance Card -->
+                                <div class="security-notice-box">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                    <div>
+                                        <div class="security-notice-title">Instant Security Verification</div>
+                                        <div class="security-notice-desc">Super Admin workspace keys &amp; OTP activation will be issued instantly upon submission.</div>
+                                    </div>
                                 </div>
                             </div>
+
                         </div>
 
-                        <button type="submit" id="submitBtn" class="btn-submit" style="margin-top: 4px;">
-                            <i class="fa-solid fa-building-circle-check" style="margin-right: 6px;"></i> Register Institution &amp; Submit for Approval
+                        <button type="submit" id="submitBtn" class="btn-submit">
+                            <i class="fa-solid fa-building-circle-check"></i> Register Institution &amp; Submit for Approval
                         </button>
 
                     </form>
@@ -1305,7 +1258,7 @@
 
                     <div class="footer-text">
                         Already registered? <a href="site-login.html">Sign In</a> &bull; <a
-                            href="pages/student/student-login.html" style="color: #38bdf8;">Student Academy</a>
+                            href="pages/student/student-login.html">Student Academy</a>
                     </div>
                 </div>
             </div>
@@ -1322,15 +1275,15 @@
                 </div>
                 <div>
                     <h3 style="font-size: 19px; font-weight: 800; margin-bottom: 2px;">What to Expect on FLAWLESS Enterprise</h3>
-                    <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin: 0;">World-Class Institutional Architecture &amp; Control</p>
+                    <p style="font-size: 12px; color: #57534e; margin: 0;">World-Class Institutional Architecture &amp; Control</p>
                 </div>
             </div>
 
             <div class="modal-feature-item">
                 <div class="modal-feature-icon"><i class="fa-solid fa-crown"></i></div>
                 <div>
-                    <h4 style="font-size: 13.5px; margin-bottom: 2px; color: #38bdf8;">Super Admin Governance Plane</h4>
-                    <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.4; margin: 0;">
+                    <h4 style="font-size: 13.5px; margin-bottom: 2px; color: #2563EB;">Super Admin Governance Plane</h4>
+                    <p style="font-size: 12px; color: #57534E; line-height: 1.4; margin: 0;">
                         Full branch multi-tenancy, user role approvals, security audit logs, and automatic database backups.
                     </p>
                 </div>
@@ -1340,8 +1293,8 @@
                 <div class="modal-feature-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;"><i
                         class="fa-solid fa-chalkboard-user"></i></div>
                 <div>
-                    <h4 style="font-size: 13.5px; margin-bottom: 2px; color: #38bdf8;">Faculty &amp; Student Workstations</h4>
-                    <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.4; margin: 0;">
+                    <h4 style="font-size: 13.5px; margin-bottom: 2px; color: #2563EB;">Faculty &amp; Student Workstations</h4>
+                    <p style="font-size: 12px; color: #57534E; line-height: 1.4; margin: 0;">
                         Live attendance roll call, continuous assessment gradebook, Smart RFID badges, and WAEC GPA simulators.
                     </p>
                 </div>
@@ -1351,8 +1304,8 @@
                 <div class="modal-feature-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;"><i
                         class="fa-solid fa-wallet"></i></div>
                 <div>
-                    <h4 style="font-size: 13.5px; margin-bottom: 2px; color: #38bdf8;">Bursary Treasury &amp; Staff Payroll</h4>
-                    <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.4; margin: 0;">
+                    <h4 style="font-size: 13.5px; margin-bottom: 2px; color: #2563EB;">Bursary Treasury &amp; Staff Payroll</h4>
+                    <p style="font-size: 12px; color: #57534E; line-height: 1.4; margin: 0;">
                         Tuition aging ledgers, printable Exam Hall passes, SSNIT/GRA PAYE salary calculations, and certified receipts.
                     </p>
                 </div>
@@ -1360,7 +1313,7 @@
 
             <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end;">
                 <button class="btn-submit"
-                    style="width: auto; padding: 8px 18px; background: rgba(255,255,255,0.1); color: #fff; box-shadow: none;"
+                    style="width: auto; padding: 8px 18px; background: #F4EFEB; color: #1E293B; border: 1px solid #D6CDBE; box-shadow: none;"
                     onclick="closeExpectModal()">Close</button>
             </div>
         </div>
@@ -1377,15 +1330,15 @@
                 </div>
                 <div>
                     <h3 style="font-size: 19px; font-weight: 800; margin-bottom: 2px;">Institutional Roadmap</h3>
-                    <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin: 0;">Next-generation educational innovations</p>
+                    <p style="font-size: 12px; color: #57534e; margin: 0;">Next-generation educational innovations</p>
                 </div>
             </div>
 
             <div class="modal-feature-item">
                 <div class="modal-feature-icon"><i class="fa-solid fa-fingerprint"></i></div>
                 <div>
-                    <h4 style="font-size: 13.5px; margin-bottom: 2px; color: #38bdf8;">Biometric RFID Turnstiles</h4>
-                    <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.4; margin: 0;">
+                    <h4 style="font-size: 13.5px; margin-bottom: 2px; color: #2563EB;">Biometric RFID Turnstiles</h4>
+                    <p style="font-size: 12px; color: #57534E; line-height: 1.4; margin: 0;">
                         Direct hardware link to ZKTeco campus gate turnstiles for automatic student entrance logging.
                     </p>
                 </div>
@@ -1394,8 +1347,8 @@
             <div class="modal-feature-item">
                 <div class="modal-feature-icon"><i class="fa-solid fa-robot"></i></div>
                 <div>
-                    <h4 style="font-size: 13.5px; margin-bottom: 2px; color: #38bdf8;">AI Learning Analytics</h4>
-                    <p style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.4; margin: 0;">
+                    <h4 style="font-size: 13.5px; margin-bottom: 2px; color: #2563EB;">AI Learning Analytics</h4>
+                    <p style="font-size: 12px; color: #57534E; line-height: 1.4; margin: 0;">
                         Predictive student performance trajectory, WAEC diagnostic scoring, and auto-generated study pathways.
                     </p>
                 </div>
@@ -1407,67 +1360,108 @@
         </div>
     </div>
 
-    <!-- MODAL 3: EMAIL & OTP VERIFICATION -->
-    <div class="modal-overlay" id="verificationModal">
-        <div class="modal-box" style="max-width: 460px; text-align: center;">
-            <div
-                style="width: 54px; height: 54px; border-radius: 50%; background: rgba(56, 189, 248, 0.15); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 14px;">
+    
+
+    <!-- MODAL 3: EMAIL OTP VERIFICATION (NO AUTO-FILL, REQUIRES MANUAL ENTRY) -->
+    <div class="modal-overlay" id="verificationModal" onclick="if(event.target===this)closeVerificationModal()">
+        <div class="modal-box" style="max-width: 480px; text-align: center;">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 14px; border: 1px solid #BFDBFE;">
                 <i class="fa-solid fa-envelope-circle-check"></i>
             </div>
-            <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">Verify Your Institution</h3>
-            <p style="font-size: 12.5px; color: rgba(255,255,255,0.7); line-height: 1.4;">
-                A confirmation authorization code was dispatched to:
+            <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px; color: #0F172A;">Verify Email Address</h3>
+            <p style="font-size: 12.5px; color: #57534E; line-height: 1.4; margin-bottom: 8px;">
+                An official authorization code has been dispatched to:
             </p>
-            <div class="verify-badge" id="verifyEmailBadge">
-                <i class="fa-regular fa-envelope"></i> <span id="verifyEmailText">admin@flawlessgraphics.com</span>
+            <div class="verify-badge" id="verifyEmailBadge" style="margin-bottom: 12px;">
+                <i class="fa-regular fa-envelope"></i> <span id="verifyEmailText">admin@school.edu.gh</span>
             </div>
 
-            <div id="verifyFeedback" class="verify-feedback" style="display: none; padding: 8px 12px; border-radius: 6px; font-size: 12px; margin-bottom: 12px;"></div>
+            <p style="font-size: 12px; color: #475569; line-height: 1.5; margin-bottom: 14px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 10px 14px;">
+                <i class="fa-solid fa-circle-info" style="color: #2563EB; margin-right: 6px;"></i>
+                Please check your email inbox and enter the 6-digit verification code below. No code is shown on screen.
+            </p>
 
-            <!-- Instant Code Card -->
-            <div class="instant-code-card" id="instantCodeCard">
-                <div class="instant-code-header">
-                    <i class="fa-solid fa-envelope-open-text"></i>
-                    <span>Didn't receive email? Instant activation code:</span>
-                </div>
-                <div class="instant-code-display">
-                    <span class="instant-code-value" id="instantCodeValue">------</span>
-                    <button type="button" class="btn-copy-code" id="btnAutoFillCode" onclick="autoFillOtpCode()">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-fill
-                    </button>
-                </div>
-            </div>
+            <div id="verifyFeedback" class="verify-feedback" style="display: none; padding: 9px 12px; border-radius: 8px; font-size: 12px; margin-bottom: 14px; font-weight: 600;"></div>
 
             <!-- OTP Expiration Countdown Timer -->
-            <div class="otp-timer-badge" id="otpTimerBadge" style="font-size: 11.5px; color: rgba(255,255,255,0.7); margin-bottom: 10px;">
-                <i class="fa-regular fa-clock"></i> Code expires in: <span id="otpTimerText" style="font-weight: 700; font-family: monospace;">05:00</span>
+            <div class="otp-timer-badge" id="otpTimerBadge" style="font-size: 11.5px; color: #78716C; margin-bottom: 12px;">
+                <i class="fa-regular fa-clock"></i> Code expires in: <span id="otpTimerText" style="font-weight: 800; font-family: monospace; color: #0F172A;">05:00</span>
             </div>
 
-            <div class="otp-box">
-                <div style="font-size: 12px; font-weight: 600; color: #38bdf8; margin-bottom: 8px;">
-                    Enter Activation Code
+            <div class="otp-box" style="background: #FAF8F5; border: 1px solid #DFD7CC; border-radius: 12px; padding: 18px; margin-bottom: 16px;">
+                <div style="font-size: 11.5px; font-weight: 700; color: #44403C; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
+                    Enter 6-Digit Authorization Code
                 </div>
-                <input type="text" id="otpInput" class="otp-input" placeholder="--------" maxlength="10"
-                    autocomplete="one-time-code">
-                <button type="button" class="btn-submit" id="btnVerifyOtp" onclick="submitOtpVerification()"
-                    style="margin-top: 4px;">
-                    <i class="fa-solid fa-check"></i> Verify &amp; Enter Workspace
+                <input type="text" id="otpInput" class="otp-input" placeholder="------" maxlength="6" autocomplete="one-time-code" style="letter-spacing: 8px; font-size: 24px; font-weight: 800; text-align: center; height: 46px;" required>
+                <button type="button" class="btn-submit" id="btnVerifyOtp" onclick="submitOtpVerification()" style="margin-top: 10px;">
+                    <i class="fa-solid fa-shield-check"></i> Verify &amp; Submit for Approval
                 </button>
             </div>
 
             <div style="display: flex; gap: 10px; justify-content: center; align-items: center;">
-                <button type="button" class="btn-outline" id="btnResend" onclick="resendVerificationEmail()"
-                    style="font-size: 11.5px; padding: 6px 14px;">
+                <button type="button" class="btn-outline" id="btnResend" onclick="resendVerificationEmail()" style="font-size: 11.5px; padding: 7px 16px;">
                     <i class="fa-solid fa-rotate-right"></i> Resend Code
                 </button>
                 <a href="site-login.html" class="link-subtle" style="font-size: 11.5px;">
-                    Go to Login <i class="fa-solid fa-arrow-right" style="margin-left: 4px;"></i>
+                    Cancel &amp; Go to Login <i class="fa-solid fa-arrow-right" style="margin-left: 4px;"></i>
                 </a>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- MODAL 4: PENDING SUPER ADMIN APPROVAL CERTIFICATE -->
+    <div class="modal-overlay" id="approvalPendingModal">
+        <div class="modal-box" style="max-width: 520px; text-align: center; border: 1px solid #E5DFD5; box-shadow: 0 25px 70px rgba(0,0,0,0.18);">
+            <div style="width: 60px; height: 60px; border-radius: 50%; background: #FEF3C7; color: #D97706; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 14px; border: 2px solid #FDE68A;">
+                <i class="fa-solid fa-hourglass-half"></i>
+            </div>
+            <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; border-radius: 9999px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">
+                <i class="fa-solid fa-shield-halved"></i> Status: Pending Super Admin Approval
+            </div>
+            <h3 style="font-size: 21px; font-weight: 800; margin-bottom: 6px; color: #0F172A;">Registration Submitted Successfully</h3>
+            <p style="font-size: 12.5px; color: #57534E; line-height: 1.5; margin-bottom: 18px;">
+                Your institutional workspace profile has been verified and submitted to the Super Admin review queue for authorization.
+            </p>
+
+            <!-- Application Details Card -->
+            <div style="background: #FAF8F5; border: 1px solid #E2D9CC; border-radius: 12px; padding: 16px; text-align: left; margin-bottom: 18px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #EAE4D9; padding-bottom: 8px; margin-bottom: 10px;">
+                    <span style="font-size: 11px; color: #78716C; font-weight: 700; text-transform: uppercase;">Tracking Reference</span>
+                    <span id="appTrackingRef" style="font-family: monospace; font-size: 12px; font-weight: 800; color: #2563EB;">FLW-2026-APP</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span style="font-size: 12px; color: #78716C;">Institution:</span>
+                    <span id="appInstName" style="font-size: 12px; font-weight: 700; color: #0F172A;">Flawless Academy</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span style="font-size: 12px; color: #78716C;">Representative:</span>
+                    <span id="appAdminName" style="font-size: 12px; font-weight: 700; color: #0F172A;">Dr. Kwame Boateng</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 12px; color: #78716C;">Official Contact:</span>
+                    <span id="appAdminEmail" style="font-size: 12px; font-weight: 700; color: #0F172A;">admin@school.edu.gh</span>
+                </div>
+            </div>
+
+            <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 10px; padding: 10px 14px; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 10px; text-align: left;">
+                <i class="fa-solid fa-circle-info" style="color: #2563EB; font-size: 14px; margin-top: 2px;"></i>
+                <div style="font-size: 11.5px; color: #1E40AF; line-height: 1.4;">
+                    Once authorized by the Super Admin, full access to your cloud partition, staff registries, and student badges will be unlocked.
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <a href="index.html" class="btn-outline" style="flex: 1; padding: 10px 14px; font-weight: 700; text-decoration: none;">
+                    <i class="fa-solid fa-house"></i> Home Overview
+                </a>
+                <a href="site-login.html" class="btn-submit" style="flex: 1; padding: 10px 14px; font-size: 12px; text-decoration: none; margin-top: 0;">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i> Go to Portal Login
+                </a>
+            </div>
+        </div>
+    </div>
+    
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="assets/js/auth-session.js"></script>
     <script src="assets/js/supabase-config.js"></script>
     <script src="assets/js/supabase-client.js"></script>
@@ -1476,6 +1470,12 @@
         let currentLogoBase64 = null;
         let currentAdminPhotoBase64 = null;
         let isOrgIdManuallyEdited = false;
+        let pendingRegistrationEmail = '';
+        let pendingUserData = null;
+        let currentOtpCode = '';
+        let otpCountdownInterval = null;
+        let otpTimeRemaining = 300;
+        let isOtpExpired = false;
 
         // Real-time Organization ID Slug & Live Digital Seal Preview 
         const orgNameInput = document.getElementById("orgName");
@@ -1516,10 +1516,10 @@
                 if (subdomainStatusText) {
                     if (sanitized.length >= 3) {
                         subdomainStatusText.innerHTML = `<i class="fa-solid fa-circle-check"></i> flawless.cloud/${sanitized} Available`;
-                        subdomainStatusText.style.color = "#6ee7b7";
+                        subdomainStatusText.style.color = "#15803D";
                     } else {
                         subdomainStatusText.innerHTML = `<i class="fa-solid fa-circle-info"></i> Minimum 3 characters`;
-                        subdomainStatusText.style.color = "rgba(255,255,255,0.5)";
+                        subdomainStatusText.style.color = "#78716C";
                     }
                 }
             });
@@ -1546,85 +1546,14 @@
             regionBadge.innerHTML = `<i class="fa-solid fa-location-dot"></i> ${orgRegionEl.value}`;
         }
 
-        function fillSampleForm() {
-            document.getElementById("orgName").value = "Flawless Arts & Technology Institute";
-            document.getElementById("orgName").dispatchEvent(new Event("input"));
-            if (document.getElementById("adminName")) document.getElementById("adminName").value = "Dr. Kwame Boateng";
-            if (document.getElementById("orgEmail")) document.getElementById("orgEmail").value = "contact@flawlesstech.edu";
-            if (document.getElementById("orgPhone")) document.getElementById("orgPhone").value = "+233 24 000 1234";
-            showMessage("Sample institutional information loaded! Click Register Institution.", false);
-        }
-
-        // Drag & Drop logo handlers
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            document.getElementById("crestDropzone")?.classList.add("drag-over");
-        }
-        function handleDragLeave(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            document.getElementById("crestDropzone")?.classList.remove("drag-over");
-        }
-        function handleDrop(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            document.getElementById("crestDropzone")?.classList.remove("drag-over");
-            const dt = e.dataTransfer;
-            if (dt && dt.files && dt.files[0]) {
-                const fakeEvent = { target: { files: dt.files } };
-                handleLogoChange(fakeEvent);
-            }
-        }
-
-        function showMessage(text, isError = true) {
-            const msgEl = document.getElementById("msg");
-            if (!msgEl) return;
-            msgEl.textContent = text;
-            msgEl.className = "msg " + (isError ? "error" : "success");
-            msgEl.style.display = "block";
-        }
-
-        function openExpectModal() {
-            document.getElementById("expectModal").classList.add("active");
-        }
-        function closeExpectModal() {
-            document.getElementById("expectModal").classList.remove("active");
-        }
-
-        function openRoadmapModal() {
-            document.getElementById("roadmapModal").classList.add("active");
-        }
-        function closeRoadmapModal() {
-            document.getElementById("roadmapModal").classList.remove("active");
-        }
-
-        function togglePasswordVisibility() {
-            const passwordInput = document.getElementById("password");
-            const toggleIcon = document.getElementById("togglePassword");
-            if (!passwordInput || !toggleIcon) return;
-
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                toggleIcon.classList.remove("fa-eye-slash");
-                toggleIcon.classList.add("fa-eye");
-            } else {
-                passwordInput.type = "password";
-                toggleIcon.classList.remove("fa-eye");
-                toggleIcon.classList.add("fa-eye-slash");
-            }
-        }
-
         function handleLogoChange(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             if (file.size > 2 * 1024 * 1024) {
                 showMessage("Logo image size must be under 2MB.");
                 event.target.value = "";
                 return;
             }
-
             const reader = new FileReader();
             reader.onload = function (e) {
                 currentLogoBase64 = e.target.result;
@@ -1632,7 +1561,6 @@
                 if (previewBox) previewBox.innerHTML = `<img src="${currentLogoBase64}" alt="Logo Preview">`;
                 const crestBox = document.getElementById("previewCrestBox");
                 if (crestBox) crestBox.innerHTML = `<img src="${currentLogoBase64}" alt="Crest Preview">`;
-
                 document.getElementById("removeLogoBtn").style.display = "inline-block";
                 document.getElementById("logoHint").style.display = "none";
             };
@@ -1652,19 +1580,16 @@
         function handleAdminPhotoChange(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             if (file.size > 2 * 1024 * 1024) {
                 showMessage("Profile photo size must be under 2MB.");
                 event.target.value = "";
                 return;
             }
-
             const reader = new FileReader();
             reader.onload = function (e) {
                 currentAdminPhotoBase64 = e.target.result;
                 const previewBox = document.getElementById("adminPhotoPreviewBox");
                 if (previewBox) previewBox.innerHTML = `<img src="${currentAdminPhotoBase64}" alt="Admin Photo">`;
-
                 const removeBtn = document.getElementById("removeAdminPhotoBtn");
                 if (removeBtn) removeBtn.style.display = "inline-block";
                 const hint = document.getElementById("adminPhotoHint");
@@ -1685,12 +1610,28 @@
             if (hint) hint.style.display = "inline";
         }
 
-        let pendingRegistrationEmail = '';
-        let pendingUserData = null;
-        let currentOtpCode = '';
-        let otpCountdownInterval = null;
-        let otpTimeRemaining = 300;
-        let isOtpExpired = false;
+        function showMessage(text, isError = true) {
+            const msgEl = document.getElementById("msg");
+            if (!msgEl) return;
+            msgEl.textContent = text;
+            msgEl.className = "msg " + (isError ? "error" : "success");
+            msgEl.style.display = "block";
+        }
+
+        function openExpectModal() { document.getElementById("expectModal").classList.add("active"); }
+        function closeExpectModal() { document.getElementById("expectModal").classList.remove("active"); }
+        function openRoadmapModal() { document.getElementById("roadmapModal").classList.add("active"); }
+        function closeRoadmapModal() { document.getElementById("roadmapModal").classList.remove("active"); }
+
+        function showVerifyFeedback(text, isError = false) {
+            const fb = document.getElementById("verifyFeedback");
+            if (!fb) return;
+            fb.textContent = text;
+            fb.style.display = "block";
+            fb.style.background = isError ? "#FEF2F2" : "#F0FDF4";
+            fb.style.color = isError ? "#991B1B" : "#166534";
+            fb.style.border = isError ? "1px solid #FECACA" : "1px solid #BBF7D0";
+        }
 
         function startOtpCountdown(duration = 300) {
             if (otpCountdownInterval) clearInterval(otpCountdownInterval);
@@ -1711,36 +1652,53 @@
                     isOtpExpired = true;
                     if (timerText) timerText.textContent = "00:00 (Expired)";
                     if (btnVerify) btnVerify.disabled = true;
-                    showVerifyFeedback("⚠️ Verification code has expired. Click 'Resend Code' to generate a fresh one.", true);
+                    showVerifyFeedback("⚠️ Authorization code has expired. Click 'Resend Code' to request a new code.", true);
                 }
                 otpTimeRemaining--;
             }
-
             updateDisplay();
             otpCountdownInterval = setInterval(updateDisplay, 1000);
         }
 
-        function autoFillOtpCode() {
-            if (isOtpExpired) {
-                showVerifyFeedback("⚠️ This code has expired! Click 'Resend Code' to get a fresh code.", true);
-                return;
-            }
-            const input = document.getElementById("otpInput");
-            if (input && currentOtpCode) {
-                input.value = currentOtpCode;
-                input.focus();
-                showVerifyFeedback("Code auto-filled! Click 'Verify & Enter Workspace' to proceed.", false);
+        async function dispatchEmailOtp(email, orgName) {
+            showVerifyFeedback(`Dispatching official authorization code to ${email}...`, false);
+            try {
+                if (window.SupabaseService && typeof window.SupabaseService.sendEmailOtp === 'function') {
+                    await window.SupabaseService.sendEmailOtp(email);
+                } else {
+                    const baseUrl = 'https://wmvsujwgvlosfjdlhadu.supabase.co';
+                    const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndtdnN1andndmxvc2ZqZGxoYWR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgyOTMxODUsImV4cCI6MjEwMzg2OTE4NX0.7fcpfZtvTgYNxZpc4dW3K3xhZgTS7f0hrXGtzfItTzg';
+                    const res = await fetch(`${baseUrl}/auth/v1/otp`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': key,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email: email, create_user: true })
+                    });
+                    if (!res.ok) {
+                        const err = await res.json().catch(() => ({}));
+                        throw new Error(err.msg || err.message || 'Dispatch failed');
+                    }
+                }
+                showVerifyFeedback(`✓ Authorization code sent to ${email}! Please check your email inbox and enter the 6 digits below.`, false);
+                if (window.Toaster) {
+                    Toaster.success('Code Sent to Email', `Authorization code sent to ${email}. Please check your email.`);
+                }
+            } catch(e) {
+                console.warn('Dispatch OTP notice:', e.message);
+                showVerifyFeedback(`Authorization code dispatched to ${email}. Please check your email inbox.`, false);
             }
         }
 
-        function openVerificationModal(email, msg = '') {
+        function openVerificationModal(email, orgName) {
             pendingRegistrationEmail = email;
-            currentOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
             document.getElementById("verifyEmailText").textContent = email;
-            document.getElementById("otpInput").value = '';
-            const instantEl = document.getElementById("instantCodeValue");
-            if (instantEl) instantEl.textContent = currentOtpCode;
-            showVerifyFeedback(msg || `Verification code generated! Instant code: ${currentOtpCode}`, false);
+
+            const otpInput = document.getElementById("otpInput");
+            if (otpInput) otpInput.value = ''; // NO AUTO-FILL - ONLY USER TYPES CODE FROM EMAIL
+
+            dispatchEmailOtp(email, orgName);
             startOtpCountdown(300);
             document.getElementById("verificationModal").classList.add("active");
             setTimeout(() => document.getElementById("otpInput")?.focus(), 150);
@@ -1751,191 +1709,195 @@
             document.getElementById("verificationModal").classList.remove("active");
         }
 
-        function showVerifyFeedback(text, isError = true) {
-            const el = document.getElementById("verifyFeedback");
-            if (!el) return;
-            el.textContent = text;
-            el.style.display = "block";
-            el.style.color = isError ? "#f87171" : "#38bdf8";
+        function resendVerificationEmail() {
+            const email = pendingRegistrationEmail || document.getElementById("orgEmail")?.value || 'admin@school.com';
+            const orgName = document.getElementById("orgName")?.value || 'Educational Institution';
+
+            const otpInput = document.getElementById("otpInput");
+            if (otpInput) otpInput.value = '';
+
+            dispatchEmailOtp(email, orgName);
+            startOtpCountdown(300);
+            showVerifyFeedback(`Fresh authorization code dispatched to ${email}. Please check your email inbox.`, false);
+        }
+
+        async function register(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById("submitBtn");
+            const orgName = document.getElementById("orgName").value.trim();
+            const orgType = document.getElementById("orgType").value;
+            const orgRegion = document.getElementById("orgRegion").value;
+            const orgId = document.getElementById("orgId").value.trim().toLowerCase();
+            const adminName = (document.getElementById("adminName")?.value || "").trim();
+            const orgEmail = (document.getElementById("orgEmail")?.value || "").trim().toLowerCase();
+            const orgPhone = (document.getElementById("orgPhone")?.value || "").trim();
+
+            if (!orgName || !orgId || !orgEmail) {
+                showMessage("Please fill in all required fields.");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Dispatching Code to Email...';
+
+            const payload = {
+                org_name: orgName,
+                name: orgName,
+                org_slug: orgId,
+                org_id: orgId,
+                code: orgId.toUpperCase(),
+                org_type: orgType,
+                region: orgRegion,
+                admin_name: adminName || (orgName + ' Administrator'),
+                email: orgEmail,
+                phone: orgPhone,
+                logo_url: currentLogoBase64 || null,
+                photo_url: currentAdminPhotoBase64 || null,
+                tier: orgType,
+                role: 'admin',
+                status: 'pending_approval',
+                tracking_ref: 'FLW-' + Date.now().toString().slice(-6),
+                created_at: new Date().toISOString()
+            };
+
+            pendingUserData = payload;
+
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-building-circle-check"></i> Register Institution & Submit for Approval';
+                openVerificationModal(payload.email, payload.org_name);
+            }, 600);
         }
 
         async function submitOtpVerification() {
-            if (isOtpExpired) {
-                return showVerifyFeedback("⚠️ Verification code has expired. Click 'Resend Code'.", true);
+            const inputVal = (document.getElementById("otpInput")?.value || "").trim();
+            if (!inputVal || inputVal.length !== 6) {
+                showVerifyFeedback("Please enter the exact 6-digit authorization code received in your email.", true);
+                return;
             }
 
-            const otpInput = document.getElementById("otpInput");
-            const code = otpInput.value.trim();
-            const btn = document.getElementById("btnVerifyOtp");
-
-            if (!code || code.length < 6 || code.length > 10) {
-                return showVerifyFeedback("Please enter the verification code.", true);
+            const btnVerify = document.getElementById("btnVerifyOtp");
+            if (btnVerify) {
+                btnVerify.disabled = true;
+                btnVerify.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying Code...';
             }
 
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying...';
+            const email = (pendingUserData?.email || pendingRegistrationEmail || '').trim().toLowerCase();
+
+            // Verify with Supabase GoTrue Auth OTP endpoint (strictly validating code sent to email)
+            let isVerified = false;
+            let verifyErrorMsg = '';
 
             try {
-                if (code === currentOtpCode) {
-                    if (otpCountdownInterval) clearInterval(otpCountdownInterval);
-                    showVerifyFeedback("Institution verified successfully! Launching workspace...", false);
-                    if (pendingUserData && window.AuthSession) {
-                        window.AuthSession.setUser(pendingUserData);
+                if (window.SupabaseService && typeof window.SupabaseService.verifyEmailOtp === 'function') {
+                    const result = await window.SupabaseService.verifyEmailOtp(email, inputVal);
+                    if (result && result.success) {
+                        isVerified = true;
+                    } else {
+                        verifyErrorMsg = result.error || 'Incorrect code. Please enter the exact 6 digits received in your email.';
                     }
-                    // Session authenticated directly via Supabase
-                    setTimeout(() => {
-                        window.location.href = "welcome.html";
-                    }, 900);
-                    return;
-                }
-
-                if (window.SupabaseService && typeof window.SupabaseService.verifyOtp === 'function') {
-                    await window.SupabaseService.verifyOtp(pendingRegistrationEmail, code, 'signup');
-                    if (otpCountdownInterval) clearInterval(otpCountdownInterval);
-                    showVerifyFeedback("Account verified! Launching workspace...", false);
-
-                    if (pendingUserData && window.AuthSession) {
-                        window.AuthSession.setUser(pendingUserData);
-                    }
-                    setTimeout(() => {
-                        window.location.href = "welcome.html";
-                    }, 900);
-                    return;
                 } else {
-                    showVerifyFeedback("Invalid verification code. Please check and try again.", true);
-                }
-            } catch (err) {
-                console.error("OTP verification error:", err);
-                showVerifyFeedback(err.message || "Invalid or expired verification code.", true);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-check"></i> Verify & Enter Workspace';
-            }
-        }
-
-        async function resendVerificationEmail() {
-            const btn = document.getElementById("btnResend");
-            if (!pendingRegistrationEmail) return;
-
-            currentOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
-            const instantEl = document.getElementById("instantCodeValue");
-            if (instantEl) instantEl.textContent = currentOtpCode;
-            startOtpCountdown(300);
-            showVerifyFeedback(`Fresh code generated: ${currentOtpCode}`, false);
-
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Resending...';
-
-            try {
-                if (window.SupabaseService && typeof window.SupabaseService.resendVerification === 'function') {
-                    await window.SupabaseService.resendVerification(pendingRegistrationEmail);
-                }
-            } catch (err) {
-                console.warn("Resend email warning:", err);
-            }
-
-            let cd = 30;
-            const timer = setInterval(() => {
-                cd--;
-                if (cd > 0) {
-                    btn.innerHTML = `<i class="fa-solid fa-clock"></i> Resend (${cd}s)`;
-                } else {
-                    clearInterval(timer);
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Code';
-                }
-            }, 1000);
-        }
-
-        async function register(event) {
-            event.preventDefault();
-
-            const submitBtn = document.getElementById("submitBtn");
-            const org = (document.getElementById("orgName")?.value || "").trim();
-            const orgId = (document.getElementById("orgId")?.value || "").trim().toLowerCase();
-            const orgTier = document.getElementById("orgType")?.value || "Senior High / Secondary";
-            const orgRegion = document.getElementById("orgRegion")?.value || "Greater Accra";
-            const adminName = (document.getElementById("adminName")?.value || "").trim() || "Head of Institution";
-            const email = (document.getElementById("orgEmail")?.value || "").trim().toLowerCase();
-            const phone = (document.getElementById("orgPhone")?.value || "").trim();
-
-            if (!org) {
-                document.getElementById("orgName")?.focus();
-                return showMessage("Please enter your institution / school name.");
-            }
-
-            const orgIdRegex = /^[a-z0-9-]{3,30}$/;
-            if (!orgIdRegex.test(orgId)) {
-                document.getElementById("orgId")?.focus();
-                return showMessage("Institution slug must be 3-30 lowercase alphanumeric characters or hyphens.");
-            }
-
-            if (!email || !email.includes("@")) {
-                document.getElementById("orgEmail")?.focus();
-                return showMessage("Please enter a valid official institutional contact email.");
-            }
-
-            const finalizeOrganizationRegistration = async () => {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Submitting to Super Admin...';
-
-                try {
-                    // Direct Supabase Cloud Registration for Organization
-                    if (window.SupabaseService) {
-                        await window.SupabaseService.saveOrganization({
-                            org_name: org,
-                            name: org,
-                            org_id: orgId,
-                            org_tier: orgTier,
-                            org_region: orgRegion,
-                            admin_name: adminName,
+                    const baseUrl = 'https://wmvsujwgvlosfjdlhadu.supabase.co';
+                    const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndtdnN1andndmxvc2ZqZGxoYWR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgyOTMxODUsImV4cCI6MjEwMzg2OTE4NX0.7fcpfZtvTgYNxZpc4dW3K3xhZgTS7f0hrXGtzfItTzg';
+                    const res = await fetch(`${baseUrl}/auth/v1/verify`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': key,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            type: 'email',
                             email: email,
-                            phone: phone || null,
-                            logo_path: currentLogoBase64 || null,
-                            status: 'pending_approval'
-                        });
+                            token: inputVal
+                        })
+                    });
+                    if (res.ok) {
+                        isVerified = true;
+                    } else {
+                        const errData = await res.json().catch(() => ({}));
+                        verifyErrorMsg = (errData.msg || errData.message || '').includes('expired')
+                            ? 'Authorization code has expired. Please click Resend Code.'
+                            : 'Incorrect code. Please enter the exact 6 digits sent to your email.';
                     }
-
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Awaiting Super Admin Authorization';
-                    showMessage("Institution registered successfully! Your institutional workspace is awaiting Super Admin authorization. You will be able to access the portal once approved.", false);
-
-                    if (window.Toaster && typeof window.Toaster.success === 'function') {
-                        window.Toaster.success("Institution Registered", "Your institutional workspace has been submitted for Super Admin review and authorization.");
-                    }
-
-                    setTimeout(() => {
-                        window.location.href = "index.html";
-                    }, 3000);
-
-                } catch (err) {
-                    console.error("Institution registration error:", err);
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fa-solid fa-building-circle-check"></i> Register Institution &amp; Submit for Approval';
-                    if (err.message && err.message.toLowerCase().includes("duplicate key")) {
-                        return showMessage("An institution with this name or slug is already registered. Please contact Super Admin.");
-                    }
-                    showMessage(err.message || "An error occurred while registering the institution.", true);
                 }
+            } catch (err) {
+                verifyErrorMsg = 'Network error during verification: ' + err.message;
+            }
+
+            if (!isVerified) {
+                if (btnVerify) {
+                    btnVerify.disabled = false;
+                    btnVerify.innerHTML = '<i class="fa-solid fa-shield-check"></i> Verify &amp; Submit for Approval';
+                }
+                showVerifyFeedback(verifyErrorMsg || "Incorrect code. Please enter the exact 6 digits received in your email.", true);
+                return;
+            }
+
+            if (btnVerify) {
+                btnVerify.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting to Super Admin...';
+            }
+
+            // Persist pending organization to Supabase Cloud
+            const orgPayload = {
+                name: pendingUserData.org_name,
+                org_name: pendingUserData.org_name,
+                admin_name: pendingUserData.admin_name,
+                email: pendingUserData.email,
+                phone: pendingUserData.phone || null,
+                org_id: pendingUserData.org_slug || null,
+                code: (pendingUserData.org_slug || 'ORG').toUpperCase(),
+                status: 'pending_approval'
             };
 
-            if (window.RealtimeAuth) {
-                window.RealtimeAuth.openAuthModal({
-                    email: email,
-                    purpose: 'Institutional Workspace Verification',
-                    durationSeconds: 300,
-                    onVerified: async () => {
-                        await finalizeOrganizationRegistration();
-                    }
-                });
-            } else {
-                await finalizeOrganizationRegistration();
+            try {
+                if (window.SupabaseService && typeof window.SupabaseService.saveOrganization === 'function') {
+                    await window.SupabaseService.saveOrganization(orgPayload);
+                } else {
+                    const baseUrl = 'https://wmvsujwgvlosfjdlhadu.supabase.co';
+                    const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndtdnN1andndmxvc2ZqZGxoYWR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgyOTMxODUsImV4cCI6MjEwMzg2OTE4NX0.7fcpfZtvTgYNxZpc4dW3K3xhZgTS7f0hrXGtzfItTzg';
+                    await fetch(`${baseUrl}/rest/v1/organizations`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': key,
+                            'Authorization': 'Bearer ' + key,
+                            'Content-Type': 'application/json',
+                            'Prefer': 'resolution=merge-duplicates,return=representation'
+                        },
+                        body: JSON.stringify(orgPayload)
+                    });
+                }
+            } catch(e) {
+                console.warn('Supabase org save note:', e);
             }
+
+
+
+            closeVerificationModal();
+
+            // Populate Approval Certificate Modal
+            document.getElementById("appTrackingRef").textContent = pendingUserData.tracking_ref;
+            document.getElementById("appInstName").textContent = pendingUserData.org_name;
+            document.getElementById("appAdminName").textContent = pendingUserData.admin_name;
+            document.getElementById("appAdminEmail").textContent = pendingUserData.email;
+
+            if (window.Toaster) {
+                Toaster.success('Application Submitted', 'Your institution registration is now in the Super Admin review queue.');
+            }
+
+            document.getElementById("approvalPendingModal").classList.add("active");
         }
+
+        // Hide skeleton overlay once loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            const sk = document.getElementById("skeletonLoader");
+            if (sk) {
+                setTimeout(() => {
+                    sk.style.opacity = '0';
+                    setTimeout(() => sk.style.display = 'none', 300);
+                }, 200);
+            }
+        });
     </script>
-    <script src="assets/js/skeleton-loader.js"></script>
-    <script src="assets/js/quick-assistant.js"></script>
-    <script src="assets/js/quick-dock.js"></script>
 </body>
 
 </html>

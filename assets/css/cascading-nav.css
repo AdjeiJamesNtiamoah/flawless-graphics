@@ -1,0 +1,217 @@
+/**
+ * cascading-nav.css
+ * Universal Luxury Cascading & Flyout Sub-Navigation Engine
+ * FLAWLESS GRAPHICS ERP Platform
+ */
+
+/* --- Parent Menu Item Enhancements --- */
+.sidebar, .app-sidebar, header nav {
+    position: relative;
+    overflow: visible !important; /* Allow flyout to float outside sidebar bounds */
+}
+
+.nav-item-wrapper {
+    position: relative;
+    width: 100%;
+    margin-bottom: 4px;
+}
+
+.nav-btn.has-flyout,
+.tab.has-flyout,
+nav ul li a.has-flyout {
+    position: relative;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100%;
+}
+
+.nav-item-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.flyout-chevron {
+    font-size: 10.5px;
+    color: rgba(255, 255, 255, 0.45);
+    transition: transform 0.22s ease, color 0.22s ease;
+    margin-left: 6px;
+    flex-shrink: 0;
+}
+
+.nav-btn:hover .flyout-chevron,
+.tab:hover .flyout-chevron,
+nav ul li a:hover .flyout-chevron {
+    color: #38bdf8;
+    transform: translateX(2px);
+}
+
+/* --- The Cascading Flyout Menu Panel --- */
+.nav-flyout-menu {
+    position: fixed;
+    width: 260px;
+    background: rgba(13, 20, 36, 0.96);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 16px;
+    box-shadow: 0 20px 45px -8px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.06), 0 8px 24px rgba(56, 189, 248, 0.08);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 100002;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(10px) scale(0.97);
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
+                visibility 0.2s;
+    pointer-events: none;
+}
+
+/* Open / Active State */
+.nav-item-wrapper:hover > .nav-flyout-menu,
+.nav-flyout-menu.active,
+.nav-flyout-menu:hover {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0) scale(1);
+    pointer-events: auto;
+}
+
+/* Flyout Header */
+.flyout-header {
+    padding: 6px 10px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.flyout-title {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.flyout-badge {
+    font-size: 9.5px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    background: rgba(56, 189, 248, 0.15);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+/* Flyout Child Items */
+.flyout-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: 10px;
+    color: #e2e8f0;
+    text-decoration: none;
+    font-size: 12.5px;
+    font-weight: 600;
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+}
+
+.flyout-item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.flyout-item-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11.5px;
+    color: #94a3b8;
+    transition: all 0.18s ease;
+    flex-shrink: 0;
+}
+
+.flyout-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(3px);
+}
+
+.flyout-item:hover .flyout-item-icon {
+    background: rgba(56, 189, 248, 0.2);
+    color: #38bdf8;
+}
+
+.flyout-item.active {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(56, 189, 248, 0.25) 100%);
+    border-color: rgba(99, 102, 241, 0.4);
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.flyout-item.active .flyout-item-icon {
+    background: #6366f1;
+    color: #ffffff;
+}
+
+.flyout-tag {
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #64748b;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 2px 6px;
+    border-radius: 5px;
+}
+
+/* Light Mode / Cream Compatibility for Light Portals */
+.light-mode .nav-flyout-menu,
+[data-theme="light"] .nav-flyout-menu {
+    background: rgba(255, 255, 255, 0.97);
+    border-color: #e2ddd5;
+    box-shadow: 0 16px 40px -8px rgba(90, 75, 55, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.light-mode .flyout-title,
+[data-theme="light"] .flyout-title {
+    color: #475569;
+}
+
+.light-mode .flyout-item,
+[data-theme="light"] .flyout-item {
+    color: #1e293b;
+}
+
+.light-mode .flyout-item:hover,
+[data-theme="light"] .flyout-item:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}

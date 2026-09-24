@@ -15,6 +15,8 @@
   <link rel="stylesheet" href="../../assets/css/toaster.css">
   <link rel="stylesheet" href="../../assets/css/skeleton.css">
   <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
+  <!-- Universal Slide-Over Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/slide-over.css">
 
   <!-- Central Authentication Bridge & Pop-up Toaster Engine -->
   <script src="../../assets/js/auth-session.js"></script>
@@ -33,8 +35,12 @@
     }
 
     body {
-      background-color: #060B18;
-      color: #F8FAFC;
+      background-color: #F8F5EE;
+      background-image: linear-gradient(135deg, rgba(248, 245, 238, 0.88) 0%, rgba(241, 235, 226, 0.93) 100%), url('../../assets/img/graduation-bg.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #1E293B;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -125,13 +131,13 @@
       font-size: 16px;
       font-weight: 800;
       letter-spacing: -0.3px;
-      color: #ffffff;
+      color: #0F172A;
       line-height: 1.2;
     }
 
     .brand-sub {
       font-size: 10px;
-      color: #94a3b8;
+      color: #64748B;
       text-transform: uppercase;
       letter-spacing: 0.8px;
       font-weight: 700;
@@ -145,24 +151,25 @@
     }
 
     .header-link {
-      color: #94a3b8;
+      color: #57534E;
       font-size: 12.5px;
       font-weight: 600;
       text-decoration: none;
       padding: 7px 14px;
       border-radius: 10px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: #FFFFFF;
+      border: 1px solid #DFD7CC;
       transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
 
     .header-link:hover {
-      color: #ffffff;
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
+      color: #0F172A;
+      background: #FAF7F2;
+      border-color: #D1C7B7;
     }
 
     /* Top Gateway Header */
@@ -177,34 +184,35 @@
       gap: 8px;
       padding: 6px 16px;
       border-radius: 9999px;
-      background: rgba(56, 189, 248, 0.08);
-      border: 1px solid rgba(56, 189, 248, 0.28);
-      color: #38bdf8;
+      background: #FFFFFF;
+      border: 1.5px solid rgba(124, 58, 237, 0.35);
+      color: #7c3aed;
       font-size: 11.5px;
       font-weight: 700;
       letter-spacing: 1px;
       text-transform: uppercase;
       margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
 
     .gateway-badge .badge-dot {
       width: 6px; height: 6px;
       border-radius: 50%;
-      background: #38bdf8;
-      box-shadow: 0 0 8px #38bdf8;
+      background: #7c3aed;
+      box-shadow: 0 0 8px rgba(124, 58, 237, 0.5);
     }
 
     .gateway-title {
       font-size: 32px;
       font-weight: 800;
       letter-spacing: -0.6px;
-      color: #ffffff;
+      color: #0F172A;
       margin-bottom: 8px;
     }
 
     .gateway-subtitle {
       font-size: 14px;
-      color: #94a3b8;
+      color: #475569;
       max-width: 680px;
       margin: 0 auto;
       line-height: 1.5;
@@ -213,12 +221,10 @@
     /* Master Console Card */
     .console-card {
       width: 100%;
-      background: rgba(13, 22, 42, 0.82);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 24px;
-      box-shadow: 0 25px 65px -10px rgba(0, 0, 0, 0.7), 0 0 40px rgba(147, 51, 234, 0.06);
+      background: #FFFFFF;
+      border: 1px solid #E5DFD5;
+      border-radius: 22px;
+      box-shadow: 0 25px 70px -15px rgba(90, 75, 55, 0.12), 0 4px 20px rgba(0, 0, 0, 0.04);
       overflow: hidden;
       animation: cardFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
@@ -231,8 +237,8 @@
     /* Console Top Navigation Bar */
     .console-topbar {
       padding: 14px 28px;
-      background: rgba(15, 23, 42, 0.65);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: #F4EFEB;
+      border-bottom: 1px solid #E5DED3;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -248,11 +254,11 @@
     }
 
     .tab-btn {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: #FFFFFF;
+      border: 1px solid #DFD7CC;
       border-radius: 12px;
       padding: 8px 16px;
-      color: #94a3b8;
+      color: #57534E;
       font-size: 12.5px;
       font-weight: 600;
       text-decoration: none;
@@ -260,19 +266,21 @@
       align-items: center;
       gap: 8px;
       transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
 
     .tab-btn:hover {
-      color: #ffffff;
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.18);
+      color: #0F172A;
+      background: #FAF7F2;
+      border-color: #D1C7B7;
     }
 
     .tab-btn.active {
-      background: rgba(2, 132, 199, 0.22);
-      border-color: #38bdf8;
-      color: #ffffff;
-      box-shadow: 0 0 16px rgba(56, 189, 248, 0.2);
+      background: #FFFFFF;
+      border-color: #7c3aed;
+      color: #0F172A;
+      box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2);
+      font-weight: 700;
     }
 
     .security-badge {
@@ -281,21 +289,21 @@
       gap: 8px;
       font-size: 12px;
       font-weight: 600;
-      color: #34d399;
+      color: #059669;
     }
 
     .security-badge .sec-dot {
       width: 7px; height: 7px;
       border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 8px #10b981;
+      background: #059669;
+      box-shadow: 0 0 8px rgba(5, 150, 105, 0.5);
     }
 
     /* Split 2-Column Body */
     .console-body {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      min-height: 440px;
+      min-height: 480px;
     }
 
     @media (max-width: 860px) {
@@ -304,14 +312,15 @@
       }
       .left-panel {
         border-right: none !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom: 1px solid #EAE3D8;
       }
     }
 
     /* Left Panel */
     .left-panel {
       padding: 44px 40px;
-      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      border-right: 1px solid #EAE3D8;
+      background: #FAF7F2;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -323,9 +332,9 @@
       gap: 6px;
       padding: 5px 12px;
       border-radius: 8px;
-      background: rgba(147, 51, 234, 0.15);
-      border: 1px solid rgba(147, 51, 234, 0.35);
-      color: #c084fc;
+      background: rgba(124, 58, 237, 0.1);
+      border: 1px solid rgba(124, 58, 237, 0.3);
+      color: #7c3aed;
       font-size: 11px;
       font-weight: 800;
       letter-spacing: 0.8px;
@@ -337,14 +346,14 @@
       font-size: 26px;
       font-weight: 800;
       letter-spacing: -0.4px;
-      color: #ffffff;
+      color: #0F172A;
       margin-bottom: 10px;
       line-height: 1.25;
     }
 
     .role-desc {
       font-size: 13.5px;
-      color: #94a3b8;
+      color: #475569;
       line-height: 1.6;
       margin-bottom: 24px;
     }
@@ -361,12 +370,12 @@
       align-items: center;
       gap: 12px;
       font-size: 13.5px;
-      color: #e2e8f0;
+      color: #1E293B;
       font-weight: 500;
     }
 
     .feature-item i {
-      color: #10b981;
+      color: #7c3aed;
       font-size: 14px;
       flex-shrink: 0;
     }
@@ -377,20 +386,21 @@
       gap: 8px;
       padding: 10px 18px;
       border-radius: 10px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #38bdf8;
+      background: #FFFFFF;
+      border: 1px solid #DFD7CC;
+      color: #0284c7;
       font-size: 12.5px;
       font-weight: 600;
       text-decoration: none;
       transition: all 0.2s ease;
       align-self: flex-start;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
 
     .btn-action-link:hover {
-      background: rgba(56, 189, 248, 0.12);
-      border-color: #38bdf8;
-      color: #ffffff;
+      background: #FAF7F2;
+      border-color: #0284c7;
+      color: #0369a1;
     }
 
     /* Right Panel: Form */
@@ -399,6 +409,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      background: #FFFFFF;
     }
 
     .auth-header {
@@ -408,14 +419,14 @@
     .auth-header h3 {
       font-size: 22px;
       font-weight: 800;
-      color: #ffffff;
+      color: #0F172A;
       letter-spacing: -0.3px;
       margin-bottom: 6px;
     }
 
     .auth-header p {
       font-size: 13px;
-      color: #94a3b8;
+      color: #64748B;
     }
 
     .form-group {
@@ -426,7 +437,7 @@
       display: block;
       font-size: 11px;
       font-weight: 700;
-      color: #94a3b8;
+      color: #475569;
       text-transform: uppercase;
       letter-spacing: 0.8px;
       margin-bottom: 8px;
@@ -441,17 +452,17 @@
     .input-wrap i.field-icon {
       position: absolute;
       left: 15px;
-      color: #64748b;
+      color: #64748B;
       font-size: 14px;
     }
 
     .form-control {
       width: 100%;
       padding: 13px 16px 13px 42px;
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: #FAF8F5;
+      border: 1.5px solid #DDD5C7;
       border-radius: 10px;
-      color: #ffffff;
+      color: #0F172A;
       font-size: 14px;
       outline: none;
       font-family: inherit;
@@ -459,22 +470,22 @@
     }
 
     .form-control:focus {
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
-      background: rgba(15, 23, 42, 0.9);
+      border-color: #7c3aed;
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+      background: #FFFFFF;
     }
 
     .toggle-pass {
       position: absolute;
       right: 14px;
-      color: #64748b;
+      color: #64748B;
       cursor: pointer;
       font-size: 14px;
       transition: color 0.2s;
     }
 
     .toggle-pass:hover {
-      color: #ffffff;
+      color: #0F172A;
     }
 
     .form-extras {
@@ -489,19 +500,19 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      color: #94a3b8;
+      color: #475569;
       cursor: pointer;
     }
 
     .remember-wrap input[type="checkbox"] {
-      accent-color: #38bdf8;
+      accent-color: #7c3aed;
       width: 15px;
       height: 15px;
       border-radius: 4px;
     }
 
     .forgot-link {
-      color: #38bdf8;
+      color: #0284c7;
       text-decoration: none;
       font-weight: 600;
       transition: color 0.2s;
@@ -516,7 +527,7 @@
       padding: 14px 20px;
       border-radius: 12px;
       border: none;
-      background: linear-gradient(135deg, #0284c7 0%, #9333ea 100%);
+      background: linear-gradient(135deg, #0284c7 0%, #7c3aed 100%);
       color: #ffffff;
       font-size: 14.5px;
       font-weight: 700;
@@ -525,13 +536,13 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
-      box-shadow: 0 6px 20px rgba(147, 51, 234, 0.35);
+      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.35);
       transition: all 0.25s ease;
     }
 
     .btn-submit:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(147, 51, 234, 0.45);
+      box-shadow: 0 8px 25px rgba(124, 58, 237, 0.45);
       filter: brightness(1.06);
     }
 
@@ -539,11 +550,11 @@
       text-align: center;
       margin-top: 18px;
       font-size: 12px;
-      color: #94a3b8;
+      color: #64748B;
     }
 
     .auth-footer-text a {
-      color: #38bdf8;
+      color: #0284c7;
       font-weight: 700;
       text-decoration: none;
       margin-left: 4px;
@@ -565,13 +576,13 @@
     }
 
     footer a {
-      color: #94a3b8;
+      color: #64748B;
       text-decoration: none;
       transition: color 0.2s;
     }
 
     footer a:hover {
-      color: #38bdf8;
+      color: #0284c7;
     }
   </style>
 </head>
@@ -591,6 +602,12 @@
         <div class="brand-sub">Enterprise Institutional Cloud</div>
       </div>
     </a>
+    <div class="header-nav">
+      <a href="../../index.html" class="header-link"><i class="fa-solid fa-house"></i> Overview</a>
+      <a href="../../welcome.html" class="header-link"><i class="fa-solid fa-grid-horizontal"></i> Workstations</a>
+      <button type="button" class="header-link" onclick="SlideOver.openWorkspaceDirectory()" style="cursor: pointer;"><i class="fa-solid fa-server"></i> Workspaces</button>
+      <button type="button" class="header-link" onclick="SlideOver.openGuide('admin')" style="cursor: pointer;"><i class="fa-solid fa-book-open"></i> Admin Guide</button>
+    </div>
   </header>
 
   <!-- Top Gateway Banner -->
@@ -669,7 +686,7 @@
               <input type="checkbox" id="rememberCreds" checked>
               <span>Remember credentials</span>
             </label>
-            <a href="#" class="forgot-link" onclick="if(window.Toaster) window.Toaster.info('Password Recovery', 'Please contact system IT support to reset administrative credentials.')">Forgot Password?</a>
+            <a href="#" class="forgot-link" onclick="SlideOver.openForgotPassword('admin'); return false;">Forgot Password?</a>
           </div>
 
           <button type="submit" class="btn-submit" id="submitBtn">
@@ -686,9 +703,10 @@
 
   <footer>
     <div>&copy; 2026 <strong>FLAWLESS GRAPHICS</strong> &bull; Enterprise Institutional Management Platform. All rights reserved.</div>
-    <div style="display: flex; gap: 16px; margin-top: 4px;">
+    <div style="display: flex; gap: 16px; margin-top: 4px; flex-wrap: wrap; justify-content: center;">
       <a href="../../welcome.html">Workstation Hub</a>
-      <a href="../public/home.html">Public Site</a>
+      <a href="#" onclick="SlideOver.openGuide('admin'); return false;" style="color: #0284c7; font-weight: 600;"><i class="fa-solid fa-book-open"></i> Admin Guide</a>
+      <a href="#" onclick="SlideOver.openWorkspaceDirectory(); return false;" style="color: #0284c7; font-weight: 600;"><i class="fa-solid fa-network-wired"></i> Institutional Clusters</a>
       <a href="../../register.html">Register Organization</a>
     </div>
   </footer>
@@ -837,6 +855,7 @@
     }
   });
 </script>
-
+<!-- Universal Slide-Over Script -->
+<script src="../../assets/js/slide-over.js"></script>
 </body>
 </html>

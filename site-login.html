@@ -12,6 +12,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <!-- Universal Toaster -->
 <link rel="stylesheet" href="assets/css/toaster.css">
+<!-- Universal Slide-Over Stylesheet -->
+<link rel="stylesheet" href="assets/css/slide-over.css">
 <script src="assets/js/toaster.js" defer></script>
 <script src="assets/js/auth-session.js" defer></script>
 
@@ -29,8 +31,12 @@
 
     body {
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        background-color: #060B18;
-        color: #F8FAFC;
+        background-color: #F8F5EE;
+        background-image: linear-gradient(135deg, rgba(248, 245, 238, 0.88) 0%, rgba(241, 235, 226, 0.93) 100%), url('assets/img/graduation-bg.jpg');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: #1E293B;
         min-height: 100vh;
         display: flex;
         flex-direction: column;
@@ -97,34 +103,35 @@
         gap: 8px;
         padding: 6px 16px;
         border-radius: 9999px;
-        background: rgba(56, 189, 248, 0.08);
-        border: 1px solid rgba(56, 189, 248, 0.28);
-        color: #38bdf8;
+        background: #FFFFFF;
+        border: 1.5px solid rgba(2, 132, 199, 0.35);
+        color: #0284c7;
         font-size: 11.5px;
         font-weight: 700;
         letter-spacing: 1px;
         text-transform: uppercase;
         margin-bottom: 14px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
 
     .gateway-badge .badge-dot {
         width: 6px; height: 6px;
         border-radius: 50%;
-        background: #38bdf8;
-        box-shadow: 0 0 8px #38bdf8;
+        background: #0284c7;
+        box-shadow: 0 0 8px rgba(2, 132, 199, 0.5);
     }
 
     .gateway-title {
         font-size: 32px;
         font-weight: 800;
         letter-spacing: -0.6px;
-        color: #ffffff;
+        color: #0F172A;
         margin-bottom: 8px;
     }
 
     .gateway-subtitle {
         font-size: 14px;
-        color: #94a3b8;
+        color: #475569;
         max-width: 680px;
         margin: 0 auto;
         line-height: 1.5;
@@ -133,12 +140,10 @@
     /* Master Console Card */
     .console-card {
         width: 100%;
-        background: rgba(13, 22, 42, 0.82);
-        backdrop-filter: blur(24px);
-        -webkit-backdrop-filter: blur(24px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 24px;
-        box-shadow: 0 25px 65px -10px rgba(0, 0, 0, 0.7), 0 0 40px rgba(56, 189, 248, 0.06);
+        background: #FFFFFF;
+        border: 1px solid #E5DFD5;
+        border-radius: 22px;
+        box-shadow: 0 25px 70px -15px rgba(90, 75, 55, 0.12), 0 4px 20px rgba(0, 0, 0, 0.04);
         overflow: hidden;
         animation: cardFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
@@ -151,8 +156,8 @@
     /* Console Top Navigation Bar */
     .console-topbar {
         padding: 14px 28px;
-        background: rgba(15, 23, 42, 0.65);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        background: #F4EFEB;
+        border-bottom: 1px solid #E5DED3;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -168,11 +173,11 @@
     }
 
     .tab-btn {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: #FFFFFF;
+        border: 1px solid #DFD7CC;
         border-radius: 12px;
         padding: 8px 16px;
-        color: #94a3b8;
+        color: #57534E;
         font-size: 12.5px;
         font-weight: 600;
         cursor: pointer;
@@ -180,19 +185,21 @@
         align-items: center;
         gap: 8px;
         transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
 
     .tab-btn:hover {
-        color: #ffffff;
-        background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(255, 255, 255, 0.18);
+        color: #0F172A;
+        background: #FAF7F2;
+        border-color: #D1C7B7;
     }
 
     .tab-btn.active {
-        background: rgba(2, 132, 199, 0.22);
-        border-color: #38bdf8;
-        color: #ffffff;
-        box-shadow: 0 0 16px rgba(56, 189, 248, 0.2);
+        background: #FFFFFF;
+        border-color: #0284c7;
+        color: #0F172A;
+        box-shadow: 0 2px 8px rgba(2, 132, 199, 0.2);
+        font-weight: 700;
     }
 
     .security-badge {
@@ -201,21 +208,21 @@
         gap: 8px;
         font-size: 12px;
         font-weight: 600;
-        color: #34d399;
+        color: #059669;
     }
 
     .security-badge .sec-dot {
         width: 7px; height: 7px;
         border-radius: 50%;
-        background: #10b981;
-        box-shadow: 0 0 8px #10b981;
+        background: #059669;
+        box-shadow: 0 0 8px rgba(5, 150, 105, 0.5);
     }
 
     /* Split 2-Column Body */
     .console-body {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        min-height: 440px;
+        min-height: 480px;
     }
 
     @media (max-width: 860px) {
@@ -224,14 +231,15 @@
         }
         .left-panel {
             border-right: none !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid #EAE3D8;
         }
     }
 
     /* Left Panel: Role Overview */
     .left-panel {
         padding: 44px 40px;
-        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        border-right: 1px solid #EAE3D8;
+        background: #FAF7F2;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -243,9 +251,9 @@
         gap: 6px;
         padding: 5px 12px;
         border-radius: 8px;
-        background: rgba(147, 51, 234, 0.15);
-        border: 1px solid rgba(147, 51, 234, 0.35);
-        color: #c084fc;
+        background: rgba(124, 58, 237, 0.1);
+        border: 1px solid rgba(124, 58, 237, 0.3);
+        color: #7c3aed;
         font-size: 11px;
         font-weight: 800;
         letter-spacing: 0.8px;
@@ -257,14 +265,14 @@
         font-size: 26px;
         font-weight: 800;
         letter-spacing: -0.4px;
-        color: #ffffff;
+        color: #0F172A;
         margin-bottom: 10px;
         line-height: 1.25;
     }
 
     .role-desc {
         font-size: 13.5px;
-        color: #94a3b8;
+        color: #475569;
         line-height: 1.6;
         margin-bottom: 24px;
     }
@@ -281,12 +289,12 @@
         align-items: center;
         gap: 12px;
         font-size: 13.5px;
-        color: #e2e8f0;
+        color: #1E293B;
         font-weight: 500;
     }
 
     .feature-item i {
-        color: #10b981;
+        color: #0284c7;
         font-size: 14px;
         flex-shrink: 0;
     }
@@ -297,20 +305,21 @@
         gap: 8px;
         padding: 10px 18px;
         border-radius: 10px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        color: #38bdf8;
+        background: #FFFFFF;
+        border: 1px solid #DFD7CC;
+        color: #0284c7;
         font-size: 12.5px;
         font-weight: 600;
         text-decoration: none;
         transition: all 0.2s ease;
         align-self: flex-start;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
 
     .btn-fullscreen:hover {
-        background: rgba(56, 189, 248, 0.12);
-        border-color: #38bdf8;
-        color: #ffffff;
+        background: #FAF7F2;
+        border-color: #0284c7;
+        color: #0369a1;
     }
 
     /* Right Panel: Authentication Form */
@@ -319,6 +328,7 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
+        background: #FFFFFF;
     }
 
     .auth-header {
@@ -328,14 +338,14 @@
     .auth-header h3 {
         font-size: 22px;
         font-weight: 800;
-        color: #ffffff;
+        color: #0F172A;
         letter-spacing: -0.3px;
         margin-bottom: 6px;
     }
 
     .auth-header p {
         font-size: 13px;
-        color: #94a3b8;
+        color: #64748B;
     }
 
     .form-group {
@@ -346,7 +356,7 @@
         display: block;
         font-size: 11px;
         font-weight: 700;
-        color: #94a3b8;
+        color: #475569;
         text-transform: uppercase;
         letter-spacing: 0.8px;
         margin-bottom: 8px;
@@ -361,17 +371,17 @@
     .input-wrap i.field-icon {
         position: absolute;
         left: 15px;
-        color: #64748b;
+        color: #64748B;
         font-size: 14px;
     }
 
     .form-control {
         width: 100%;
         padding: 13px 16px 13px 42px;
-        background: rgba(15, 23, 42, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: #FAF8F5;
+        border: 1.5px solid #DDD5C7;
         border-radius: 10px;
-        color: #ffffff;
+        color: #0F172A;
         font-size: 14px;
         outline: none;
         font-family: inherit;
@@ -379,22 +389,22 @@
     }
 
     .form-control:focus {
-        border-color: #38bdf8;
-        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
-        background: rgba(15, 23, 42, 0.9);
+        border-color: #0284c7;
+        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        background: #FFFFFF;
     }
 
     .toggle-pass {
         position: absolute;
         right: 14px;
-        color: #64748b;
+        color: #64748B;
         cursor: pointer;
         font-size: 14px;
         transition: color 0.2s;
     }
 
     .toggle-pass:hover {
-        color: #ffffff;
+        color: #0F172A;
     }
 
     .form-extras {
@@ -409,19 +419,19 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        color: #94a3b8;
+        color: #475569;
         cursor: pointer;
     }
 
     .remember-wrap input[type="checkbox"] {
-        accent-color: #38bdf8;
+        accent-color: #0284c7;
         width: 15px;
         height: 15px;
         border-radius: 4px;
     }
 
     .forgot-link {
-        color: #38bdf8;
+        color: #0284c7;
         text-decoration: none;
         font-weight: 600;
         transition: color 0.2s;
@@ -436,7 +446,7 @@
         padding: 14px 20px;
         border-radius: 12px;
         border: none;
-        background: linear-gradient(135deg, #0284c7 0%, #9333ea 100%);
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
         color: #ffffff;
         font-size: 14.5px;
         font-weight: 700;
@@ -445,13 +455,13 @@
         align-items: center;
         justify-content: center;
         gap: 10px;
-        box-shadow: 0 6px 20px rgba(147, 51, 234, 0.35);
+        box-shadow: 0 6px 20px rgba(2, 132, 199, 0.35);
         transition: all 0.25s ease;
     }
 
     .btn-submit:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(147, 51, 234, 0.45);
+        box-shadow: 0 8px 25px rgba(2, 132, 199, 0.45);
         filter: brightness(1.06);
     }
 
@@ -459,11 +469,11 @@
         text-align: center;
         margin-top: 18px;
         font-size: 12px;
-        color: #94a3b8;
+        color: #64748B;
     }
 
     .auth-footer-text a {
-        color: #38bdf8;
+        color: #0284c7;
         font-weight: 700;
         text-decoration: none;
         margin-left: 4px;
@@ -491,40 +501,42 @@
     }
 
     .modal-box {
-        background: #0d162a;
-        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: #FFFFFF;
+        border: 1px solid #E5DFD5;
         border-radius: 20px;
         padding: 32px;
         max-width: 440px;
         width: 100%;
         text-align: center;
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+        box-shadow: 0 25px 60px rgba(90, 75, 55, 0.18);
         position: relative;
     }
 
     .modal-close {
         position: absolute;
         top: 16px; right: 16px;
-        background: rgba(255, 255, 255, 0.08);
-        border: none;
-        color: #94a3b8;
+        background: #F4EFEB;
+        border: 1px solid #DDD5C7;
+        color: #64748B;
         width: 32px; height: 32px;
         border-radius: 50%;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: all 0.2s;
     }
 
     .modal-close:hover {
-        color: #ffffff;
+        color: #0F172A;
+        background: #EAE3D8;
     }
 
     .otp-field {
         width: 100%;
-        background: rgba(15, 23, 42, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: #fff;
+        background: #FAF8F5;
+        border: 1.5px solid #DDD5C7;
+        color: #0F172A;
         font-size: 24px;
         letter-spacing: 6px;
         text-align: center;
@@ -533,6 +545,13 @@
         font-weight: 700;
         margin: 16px 0;
         outline: none;
+        transition: all 0.2s;
+    }
+
+    .otp-field:focus {
+        border-color: #0284c7;
+        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        background: #FFFFFF;
     }
 </style>
 </head>
@@ -543,19 +562,21 @@
 <div class="main-wrapper">
     <!-- Top Platform Nav -->
     <header style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 28px; flex-wrap: wrap; gap: 12px;">
-        <a href="index.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff;">
-            <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #0284c7, #9333ea); display: flex; align-items: center; justify-content: center; font-size: 17px; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);">
+        <a href="index.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #0F172A;">
+            <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #0284c7, #9333ea); display: flex; align-items: center; justify-content: center; font-size: 17px; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35); color: #fff;">
                 <i class="fa-solid fa-graduation-cap"></i>
             </div>
             <div>
-                <div style="font-weight: 800; font-size: 15px; letter-spacing: -0.2px;">FLAWLESS GRAPHICS</div>
-                <div style="font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700;">Enterprise ERP</div>
+                <div style="font-weight: 800; font-size: 15px; letter-spacing: -0.2px; color: #0F172A;">FLAWLESS GRAPHICS</div>
+                <div style="font-size: 10px; color: #64748B; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700;">Enterprise ERP</div>
             </div>
         </a>
-        <nav style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <nav style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <a href="index.html" class="tab-btn" style="text-decoration: none;"><i class="fa-solid fa-house"></i> Overview</a>
             <a href="welcome.html" class="tab-btn" style="text-decoration: none;"><i class="fa-solid fa-grid-horizontal"></i> Unified Hub</a>
-            <a href="register.html" class="tab-btn" style="text-decoration: none; background: rgba(56, 189, 248, 0.12); border-color: rgba(56, 189, 248, 0.3); color: #38bdf8;"><i class="fa-solid fa-building-circle-check"></i> Register Org</a>
+            <button type="button" class="tab-btn" onclick="SlideOver.openWorkspaceDirectory()" style="text-decoration: none; cursor: pointer;"><i class="fa-solid fa-server"></i> Workspaces</button>
+            <button type="button" class="tab-btn" onclick="SlideOver.openGuide(currentRole)" style="text-decoration: none; cursor: pointer;"><i class="fa-solid fa-book-open"></i> Guide</button>
+            <a href="register.html" class="tab-btn" style="text-decoration: none; background: #0284c7; border-color: #0284c7; color: #FFFFFF;"><i class="fa-solid fa-building-circle-check"></i> Register Org</a>
         </nav>
     </header>
 
@@ -575,7 +596,7 @@
     <div class="console-card">
         <!-- Top Console Header Bar -->
         <div class="console-topbar">
-            <div style="font-size: 11.5px; font-weight: 800; color: #34d399; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;">
+            <div style="font-size: 11.5px; font-weight: 800; color: #059669; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;">
                 <i class="fa-solid fa-shield-halved" id="topbarIcon"></i> <span id="topbarTitle">SUPER ADMINISTRATOR CONSOLE</span>
             </div>
             <div class="security-badge">
@@ -663,7 +684,7 @@
                             <input type="checkbox" id="rememberCreds" checked>
                             <span>Remember credentials</span>
                         </label>
-                        <a href="#" class="forgot-link" onclick="handleForgotPassword()">Forgot Password?</a>
+                        <a href="#" class="forgot-link" onclick="handleForgotPassword(); return false;">Forgot Password?</a>
                     </div>
 
                     <button type="submit" class="btn-submit" id="btnSubmitConsole">
@@ -678,19 +699,30 @@
             </div>
         </div>
     </div>
+
+    <!-- Platform Footer -->
+    <footer style="margin-top: 28px; text-align: center; font-size: 12px; color: #64748B; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+        <div>© 2026 <strong>FLAWLESS GRAPHICS</strong> • Institutional Access Console</div>
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;">
+            <a href="welcome.html" style="color: #64748B; text-decoration: none;">Workstation Hub</a>
+            <a href="#" onclick="SlideOver.openGuide(currentRole); return false;" style="color: #0284c7; text-decoration: none; font-weight: 600;"><i class="fa-solid fa-book-open"></i> Operating Guide</a>
+            <a href="#" onclick="SlideOver.openWorkspaceDirectory(); return false;" style="color: #0284c7; text-decoration: none; font-weight: 600;"><i class="fa-solid fa-network-wired"></i> Institutional Clusters</a>
+            <a href="register.html" style="color: #64748B; text-decoration: none;">Register Organization</a>
+        </div>
+    </footer>
 </div>
 
 <!-- Modal: OTP Verification -->
 <div class="modal-overlay" id="verificationModal">
     <div class="modal-box">
         <button type="button" class="modal-close" onclick="closeVerificationModal()"><i class="fa-solid fa-xmark"></i></button>
-        <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(56,189,248,0.15); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 12px;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(2, 132, 199, 0.12); color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 12px;">
             <i class="fa-solid fa-shield-halved"></i>
         </div>
-        <h3 style="font-size: 19px; font-weight: 800; color: #fff; margin-bottom: 4px;">Security Code Verification</h3>
-        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 12px;">A cryptographic verification code was generated for your session:</p>
-        <div style="display: inline-block; padding: 4px 12px; background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); border-radius: 6px; color: #38bdf8; font-size: 12.5px; font-weight: 700; margin-bottom: 12px;" id="verifyEmailText">user@company.com</div>
-        <div id="verifyFeedback" style="font-size: 12px; color: #10b981; margin-bottom: 8px;"></div>
+        <h3 style="font-size: 19px; font-weight: 800; color: #0F172A; margin-bottom: 4px;">Security Code Verification</h3>
+        <p style="font-size: 13px; color: #475569; margin-bottom: 12px;">A cryptographic verification code was generated for your session:</p>
+        <div style="display: inline-block; padding: 4px 12px; background: rgba(2, 132, 199, 0.1); border: 1px solid rgba(2, 132, 199, 0.3); border-radius: 6px; color: #0284c7; font-size: 12.5px; font-weight: 700; margin-bottom: 12px;" id="verifyEmailText">user@company.com</div>
+        <div id="verifyFeedback" style="font-size: 12px; color: #059669; margin-bottom: 8px;"></div>
         <input type="text" id="otpInput" class="otp-field" placeholder="--------" maxlength="10">
         <button type="button" class="btn-submit" onclick="submitOtpVerification()" style="margin-top: 6px;">
             <i class="fa-solid fa-check"></i> Verify &amp; Launch Console
@@ -1047,6 +1079,14 @@ function submitOtpVerification() {
     }
 }
 
+function handleForgotPassword() {
+    if (window.SlideOver) {
+        window.SlideOver.openForgotPassword(currentRole || 'admin');
+    } else if (window.Toaster) {
+        window.Toaster.info('Password Recovery', 'Please contact your institutional administrator for credential resets.');
+    }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     switchConsoleRole('admin');
     if (window.RealtimeAuth && typeof window.RealtimeAuth.populateApprovedOrgDropdown === 'function') {
@@ -1058,5 +1098,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+<!-- Universal Slide-Over Script -->
+<script src="assets/js/slide-over.js"></script>
 </body>
 </html>

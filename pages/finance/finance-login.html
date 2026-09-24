@@ -34,8 +34,12 @@
     }
 
     body {
-      background-color: #060B18;
-      color: #F8FAFC;
+      background-color: #F8F5EE;
+      background-image: linear-gradient(135deg, rgba(248, 245, 238, 0.88) 0%, rgba(241, 235, 226, 0.93) 100%), url('../../assets/img/graduation-bg.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #0F172A;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -46,25 +50,25 @@
       overflow-x: hidden;
     }
 
-    /* Subtle blueprint grid overlay */
+    /* Subtle warm grid overlay */
     .grid-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
       background-image: 
-        linear-gradient(to right, rgba(56, 189, 248, 0.05) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+        linear-gradient(to right, rgba(180, 160, 140, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(180, 160, 140, 0.08) 1px, transparent 1px);
       background-size: 32px 32px;
       pointer-events: none;
       z-index: 0;
     }
 
-    /* Ambient atmospheric glow */
+    /* Soft ambient emerald/teal warmth */
     body::before {
       content: '';
       position: fixed;
       top: -10%; left: 15%;
       width: 650px; height: 650px;
-      background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(5, 150, 105, 0.08) 0%, transparent 70%);
       filter: blur(90px);
       pointer-events: none;
       z-index: 0;
@@ -74,7 +78,7 @@
       position: fixed;
       bottom: -10%; right: 15%;
       width: 650px; height: 650px;
-      background: radial-gradient(circle, rgba(56, 189, 248, 0.11) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(2, 132, 199, 0.07) 0%, transparent 70%);
       filter: blur(90px);
       pointer-events: none;
       z-index: 0;
@@ -110,29 +114,29 @@
     }
 
     .brand-logo {
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       border-radius: 12px;
-      background: linear-gradient(135deg, #10b981 0%, #0284c7 100%);
+      background: linear-gradient(135deg, #059669 0%, #0284c7 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       color: #fff;
-      font-size: 18px;
-      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+      font-size: 19px;
+      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25);
     }
 
     .brand-title {
       font-size: 16px;
       font-weight: 800;
       letter-spacing: -0.3px;
-      color: #ffffff;
+      color: #0F172A;
       line-height: 1.2;
     }
 
     .brand-sub {
-      font-size: 10px;
-      color: #94a3b8;
+      font-size: 10.5px;
+      color: #64748B;
       text-transform: uppercase;
       letter-spacing: 0.8px;
       font-weight: 700;
@@ -146,24 +150,27 @@
     }
 
     .header-link {
-      color: #94a3b8;
+      color: #475569;
       font-size: 12.5px;
       font-weight: 600;
       text-decoration: none;
-      padding: 7px 14px;
+      padding: 8px 16px;
       border-radius: 10px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: #FFFFFF;
+      border: 1px solid #E5DFD5;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
       transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      cursor: pointer;
     }
 
     .header-link:hover {
-      color: #ffffff;
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
+      color: #059669;
+      background: #FAF7F2;
+      border-color: #059669;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.12);
     }
 
     /* Top Gateway Header */
@@ -178,9 +185,9 @@
       gap: 8px;
       padding: 6px 16px;
       border-radius: 9999px;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: #34d399;
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      color: #059669;
       font-size: 11.5px;
       font-weight: 700;
       letter-spacing: 1px;
@@ -189,37 +196,35 @@
     }
 
     .gateway-badge .badge-dot {
-      width: 6px; height: 6px;
+      width: 7px; height: 7px;
       border-radius: 50%;
-      background: #34d399;
-      box-shadow: 0 0 8px #34d399;
+      background: #059669;
+      box-shadow: 0 0 8px #059669;
     }
 
     .gateway-title {
       font-size: 32px;
       font-weight: 800;
       letter-spacing: -0.6px;
-      color: #ffffff;
+      color: #0F172A;
       margin-bottom: 8px;
     }
 
     .gateway-subtitle {
       font-size: 14px;
-      color: #94a3b8;
+      color: #64748B;
       max-width: 680px;
       margin: 0 auto;
       line-height: 1.5;
     }
 
-    /* Master Console Card */
+    /* Master Console Card — White & Cream theme */
     .console-card {
       width: 100%;
-      background: rgba(13, 22, 42, 0.82);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #FFFFFF;
+      border: 1px solid #E5DFD5;
       border-radius: 24px;
-      box-shadow: 0 25px 65px -10px rgba(0, 0, 0, 0.7), 0 0 40px rgba(16, 185, 129, 0.06);
+      box-shadow: 0 20px 45px -12px rgba(45, 35, 25, 0.12), 0 4px 16px rgba(0, 0, 0, 0.04);
       overflow: hidden;
       animation: cardFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
@@ -232,8 +237,8 @@
     /* Console Top Navigation Bar */
     .console-topbar {
       padding: 14px 28px;
-      background: rgba(15, 23, 42, 0.65);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: #F4EFEB;
+      border-bottom: 1px solid #E5DFD5;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -241,56 +246,20 @@
       gap: 14px;
     }
 
-    .console-tabs {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .tab-btn {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 8px 16px;
-      color: #94a3b8;
-      font-size: 12.5px;
-      font-weight: 600;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-
-    .tab-btn:hover {
-      color: #ffffff;
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.18);
-    }
-
-    .tab-btn.active {
-      background: rgba(16, 185, 129, 0.18);
-      border-color: #10b981;
-      color: #ffffff;
-      box-shadow: 0 0 16px rgba(16, 185, 129, 0.2);
-    }
-
     .security-badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       font-size: 12px;
-      font-weight: 600;
-      color: #34d399;
+      font-weight: 700;
+      color: #059669;
     }
 
     .security-badge .sec-dot {
       width: 7px; height: 7px;
       border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 8px #10b981;
+      background: #059669;
+      box-shadow: 0 0 8px rgba(5, 150, 105, 0.6);
     }
 
     /* Split 2-Column Body */
@@ -306,14 +275,15 @@
       }
       .left-panel {
         border-right: none !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom: 1px solid #E5DFD5;
       }
     }
 
-    /* Left Overview Panel */
+    /* Left Overview Panel — Soft Cream Warmth */
     .left-panel {
       padding: 44px 40px;
-      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      background: #FAF7F2;
+      border-right: 1px solid #E5DFD5;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -333,13 +303,13 @@
       min-width: 48px;
       min-height: 48px;
       border-radius: 12px;
-      background: linear-gradient(135deg, #10b981 0%, #0284c7 100%);
+      background: linear-gradient(135deg, #059669 0%, #0284c7 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       color: #fff;
       font-size: 22px;
-      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25);
       overflow: hidden;
       flex-shrink: 0;
     }
@@ -348,19 +318,17 @@
       font-size: 20px;
       font-weight: 800;
       letter-spacing: -0.3px;
-      color: #ffffff;
+      color: #0F172A;
       line-height: 1.25;
       margin-bottom: 3px;
-      word-break: normal;
-      white-space: normal;
     }
 
     .org-hero-brand .brand-subtitle {
       font-size: 11px;
-      color: #34d399;
+      color: #059669;
       text-transform: uppercase;
       letter-spacing: 1.2px;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .role-badge {
@@ -369,9 +337,9 @@
       gap: 6px;
       padding: 5px 12px;
       border-radius: 8px;
-      background: rgba(16, 185, 129, 0.15);
-      border: 1px solid rgba(16, 185, 129, 0.35);
-      color: #34d399;
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      color: #059669;
       font-size: 11px;
       font-weight: 800;
       letter-spacing: 0.8px;
@@ -383,14 +351,14 @@
       font-size: 26px;
       font-weight: 800;
       letter-spacing: -0.4px;
-      color: #ffffff;
+      color: #0F172A;
       margin-bottom: 10px;
       line-height: 1.25;
     }
 
     .role-desc {
       font-size: 13.5px;
-      color: #94a3b8;
+      color: #475569;
       line-height: 1.6;
       margin-bottom: 24px;
     }
@@ -407,12 +375,12 @@
       align-items: center;
       gap: 12px;
       font-size: 13.5px;
-      color: #e2e8f0;
+      color: #334155;
       font-weight: 500;
     }
 
     .feature-item i {
-      color: #10b981;
+      color: #059669;
       font-size: 14px;
       flex-shrink: 0;
     }
@@ -423,25 +391,28 @@
       gap: 8px;
       padding: 10px 18px;
       border-radius: 10px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #38bdf8;
+      background: #FFFFFF;
+      border: 1px solid #E5DFD5;
+      color: #059669;
       font-size: 12.5px;
-      font-weight: 600;
+      font-weight: 700;
       text-decoration: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
       transition: all 0.2s ease;
       align-self: flex-start;
+      cursor: pointer;
     }
 
     .btn-action-link:hover {
-      background: rgba(56, 189, 248, 0.12);
-      border-color: #38bdf8;
-      color: #ffffff;
+      background: #FAF7F2;
+      border-color: #059669;
+      transform: translateY(-1px);
     }
 
     /* Right Authentication Panel */
     .right-panel {
       padding: 44px 40px;
+      background: #FFFFFF;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -450,8 +421,8 @@
     /* Sub Tabs: Sign In / Create Account */
     .mode-tabs {
       display: flex;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #FAF7F2;
+      border: 1px solid #E5DFD5;
       border-radius: 12px;
       padding: 4px;
       margin-bottom: 20px;
@@ -464,7 +435,7 @@
       border-radius: 8px;
       background: transparent;
       border: none;
-      color: #94a3b8;
+      color: #64748B;
       font-size: 12.5px;
       font-weight: 700;
       cursor: pointer;
@@ -476,9 +447,10 @@
     }
 
     .mode-tab.active {
-      background: rgba(16, 185, 129, 0.2);
-      color: #ffffff;
-      border: 1px solid rgba(16, 185, 129, 0.4);
+      background: #FFFFFF;
+      color: #059669;
+      border: 1px solid #A7F3D0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
 
     .auth-header {
@@ -488,14 +460,14 @@
     .auth-header h3 {
       font-size: 22px;
       font-weight: 800;
-      color: #ffffff;
+      color: #0F172A;
       letter-spacing: -0.3px;
       margin-bottom: 4px;
     }
 
     .auth-header p {
       font-size: 13px;
-      color: #94a3b8;
+      color: #64748B;
     }
 
     .alert-box {
@@ -509,15 +481,15 @@
     }
 
     .alert-box.alert-error {
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid rgba(239, 68, 68, 0.4);
-      color: #fca5a5;
+      background: #FEF2F2;
+      border: 1px solid #FCA5A5;
+      color: #DC2626;
     }
 
     .alert-box.alert-success {
-      background: rgba(16, 185, 129, 0.15);
-      border: 1px solid rgba(16, 185, 129, 0.4);
-      color: #6ee7b7;
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      color: #059669;
     }
 
     .form-group {
@@ -528,7 +500,7 @@
       display: block;
       font-size: 11px;
       font-weight: 700;
-      color: #94a3b8;
+      color: #475569;
       text-transform: uppercase;
       letter-spacing: 0.8px;
       margin-bottom: 7px;
@@ -543,17 +515,17 @@
     .input-wrap i.field-icon {
       position: absolute;
       left: 15px;
-      color: #64748b;
+      color: #94A3B8;
       font-size: 14px;
     }
 
     .form-control {
       width: 100%;
       padding: 12px 16px 12px 42px;
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: #FAF8F5;
+      border: 1px solid #E5DFD5;
       border-radius: 10px;
-      color: #ffffff;
+      color: #0F172A;
       font-size: 14px;
       outline: none;
       font-family: inherit;
@@ -561,22 +533,27 @@
     }
 
     .form-control:focus {
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
-      background: rgba(15, 23, 42, 0.9);
+      border-color: #059669;
+      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+      background: #FFFFFF;
+    }
+
+    select.form-control option {
+      background: #FFFFFF;
+      color: #0F172A;
     }
 
     .toggle-pass {
       position: absolute;
       right: 14px;
-      color: #64748b;
+      color: #94A3B8;
       cursor: pointer;
       font-size: 14px;
       transition: color 0.2s;
     }
 
     .toggle-pass:hover {
-      color: #ffffff;
+      color: #0F172A;
     }
 
     .form-extras {
@@ -591,19 +568,19 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      color: #94a3b8;
+      color: #475569;
       cursor: pointer;
     }
 
     .remember-wrap input[type="checkbox"] {
-      accent-color: #10b981;
+      accent-color: #059669;
       width: 15px;
       height: 15px;
       border-radius: 4px;
     }
 
     .forgot-link {
-      color: #38bdf8;
+      color: #059669;
       text-decoration: none;
       font-weight: 600;
       transition: color 0.2s;
@@ -627,13 +604,13 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
-      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+      box-shadow: 0 6px 20px rgba(5, 150, 105, 0.25);
       transition: all 0.25s ease;
     }
 
     .btn-submit:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.45);
+      box-shadow: 0 8px 25px rgba(5, 150, 105, 0.35);
       filter: brightness(1.06);
     }
 
@@ -641,11 +618,11 @@
       text-align: center;
       margin-top: 18px;
       font-size: 12px;
-      color: #94a3b8;
+      color: #64748B;
     }
 
     .auth-footer-text a {
-      color: #38bdf8;
+      color: #059669;
       font-weight: 700;
       text-decoration: none;
       margin-left: 4px;
@@ -659,8 +636,8 @@
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.78);
-      backdrop-filter: blur(10px);
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(8px);
       display: none;
       align-items: center;
       justify-content: center;
@@ -673,23 +650,23 @@
     }
 
     .modal-box {
-      background: #0d162a;
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: #FFFFFF;
+      border: 1px solid #E5DFD5;
       border-radius: 20px;
       padding: 32px;
       max-width: 440px;
       width: 100%;
       text-align: center;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 25px 60px rgba(15, 23, 42, 0.2);
       position: relative;
     }
 
     .modal-close-btn {
       position: absolute;
       top: 16px; right: 16px;
-      background: rgba(255, 255, 255, 0.08);
-      border: none;
-      color: #94a3b8;
+      background: #FAF7F2;
+      border: 1px solid #E5DFD5;
+      color: #64748B;
       width: 32px; height: 32px;
       border-radius: 50%;
       cursor: pointer;
@@ -699,28 +676,29 @@
     }
 
     .modal-close-btn:hover {
-      color: #ffffff;
+      color: #0F172A;
+      background: #F4EFEB;
     }
 
     .verify-badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
       padding: 6px 14px;
       border-radius: 8px;
       font-size: 13px;
-      color: #34d399;
+      color: #059669;
       font-weight: 700;
       margin: 10px 0 14px 0;
     }
 
     .otp-field {
       width: 100%;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #fff;
+      background: #FAF8F5;
+      border: 2px solid #E5DFD5;
+      color: #0F172A;
       font-size: 24px;
       letter-spacing: 6px;
       text-align: center;
@@ -731,11 +709,17 @@
       outline: none;
     }
 
+    .otp-field:focus {
+      border-color: #059669;
+      background: #FFFFFF;
+      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+    }
+
     footer {
       margin-top: 28px;
       text-align: center;
       font-size: 12px;
-      color: #64748b;
+      color: #64748B;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -743,15 +727,17 @@
     }
 
     footer a {
-      color: #94a3b8;
+      color: #475569;
       text-decoration: none;
       transition: color 0.2s;
     }
 
     footer a:hover {
-      color: #38bdf8;
+      color: #059669;
     }
   </style>
+  <!-- Universal Slide-Over Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/slide-over.css">
 </head>
 <body>
 
@@ -856,7 +842,7 @@
             <label class="form-label" for="orgName">Institution Workspace (Subdomain Slug)</label>
             <div class="input-wrap">
               <i class="fa-solid fa-school field-icon"></i>
-              <select id="orgName" class="form-control" style="background: rgba(15, 23, 42, 0.7); color: #fff; padding-left: 40px;" required>
+              <select id="orgName" class="form-control" style="background: #FAF8F5; color: #0F172A; padding-left: 40px;" required>
                 <option value="">-- Loading Approved Institutions... --</option>
               </select>
             </div>
@@ -912,7 +898,7 @@
               <input type="checkbox" id="rememberMe" checked>
               <span>Remember active session</span>
             </label>
-            <a href="#" class="forgot-link" onclick="if(window.Toaster) window.Toaster.info('Support', 'Please contact institutional IT support to reset credentials.')">Forgot password?</a>
+            <a href="#" class="forgot-link" onclick="event.preventDefault(); SlideOver.openForgotPassword('finance');">Forgot password?</a>
           </div>
 
           <button type="submit" class="btn-submit" id="submitBtn">
@@ -945,8 +931,8 @@
     <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); color: #34d399; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 12px;">
       <i class="fa-solid fa-shield-halved"></i>
     </div>
-    <h3 style="font-size: 19px; font-weight: 800; color: #fff; margin-bottom: 4px;">Verify Finance Account</h3>
-    <p style="font-size: 12.5px; color: #94a3b8; line-height: 1.5; margin-bottom: 6px;">
+    <h3 style="font-size: 19px; font-weight: 800; color: #0F172A; margin-bottom: 4px;">Verify Finance Account</h3>
+    <p style="font-size: 12.5px; color: #475569; line-height: 1.5; margin-bottom: 6px;">
       A confirmation code has been generated for:
     </p>
     <div class="verify-badge" id="financeVerifyEmailBadge">
@@ -1137,7 +1123,7 @@
       password: pendingFinanceUser.password,
       role: 'finance',
       photo_url: currentFinancePhotoBase64 || null,
-      status: 'active'
+      status: 'pending_approval'
     };
 
     if (window.SupabaseService) {
@@ -1146,10 +1132,10 @@
 
     closeFinanceOtpModal();
     setMode(false);
-    showSuccess('Registration submitted! Your Finance account is active. You can now sign in.');
+    showSuccess('Registration submitted successfully! Your account is awaiting Human Resources authorization.');
 
     if (window.Toaster) {
-      window.Toaster.success('Account Ready', 'Your Finance account registration is active. You can now sign in.');
+      window.Toaster.info('Registration Submitted', 'Your Finance account is awaiting Human Resources authorization.');
     }
   }
 
@@ -1196,7 +1182,7 @@
         password: password,
         role: 'finance',
         photo_url: currentFinancePhotoBase64 || null,
-        status: 'active'
+        status: 'pending_approval'
       };
 
       if (window.RealtimeAuth) {
@@ -1209,9 +1195,9 @@
               await window.SupabaseService.saveUser(financeRecord).catch(console.warn);
             }
             setMode(false);
-            showSuccess('Registration submitted! Your Finance account is active. You can now sign in.');
+            showSuccess('Registration submitted successfully! Your account is awaiting Human Resources authorization.');
             if (window.Toaster) {
-              window.Toaster.success('Account Ready', 'Your Finance account registration is active. You can now sign in.');
+              window.Toaster.info('Registration Submitted', 'Your Finance account is awaiting Human Resources authorization.');
             }
           }
         });
@@ -1237,7 +1223,16 @@
         } else {
           submitBtn.disabled = false;
           submitBtn.innerHTML = `<span>Sign In to Finance Dashboard</span> <i class="fa-solid fa-arrow-right"></i>`;
-          showError(authRes.error || 'Account not found in institutional database. Please register.');
+          const errMsg = authRes.error || 'Account not found in institutional database. Please register.';
+          if (authRes.status === 'pending_approval' && window.RealtimeAuth) {
+            window.RealtimeAuth.watchPendingApproval({
+              email: lowerEmail,
+              role: 'finance',
+              org: selectedOrgName,
+              targetUrl: 'finance-dashboard.html'
+            });
+          }
+          showError(errMsg);
           return;
         }
       } catch(err) {
@@ -1294,5 +1289,7 @@
   });
 </script>
 
+  <!-- Universal Slide-Over Controller Engine -->
+  <script src="../../assets/js/slide-over.js"></script>
 </body>
 </html>

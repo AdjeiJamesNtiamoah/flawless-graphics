@@ -623,6 +623,8 @@
       background: #FAF7F2;
     }
   </style>
+  <link rel="stylesheet" href="../../assets/css/cascading-nav.css">
+  <link rel="stylesheet" href="../../assets/css/slide-over.css">
 </head>
 <body>
 
@@ -722,11 +724,12 @@
       </div>
 
       <div class="topbar-right">
-        <button type="button" class="btn-top ghost" id="adminTopbarNotifBtn" onclick="if(window.QuickDock){window.QuickDock.openNotifications();}" title="Notifications Arrived" style="display:inline-flex; align-items:center; gap:8px;">
+        <button type="button" class="btn-top ghost" id="adminTopbarNotifBtn" onclick="SlideOver.openNotifications()" title="Notifications Arrived" style="display:inline-flex; align-items:center; gap:8px;">
           <i class="fa-solid fa-bell" style="color:var(--accent-gold);"></i>
           <span class="hide-collapsed" style="font-weight:700;">Notifications</span>
           <span class="badge badge-warning" id="adminTopbarNotifBadge" style="padding:2px 7px; font-size:11px; border-radius:10px;">0</span>
         </button>
+        <button type="button" class="btn-top ghost" onclick="SlideOver.openGuide('admin')" title="Admin Operating Guide"><i class="fa-solid fa-book-open"></i> Guide</button>
         <button type="button" class="btn-top ghost" onclick="openBackupExportModal()" title="Export Database Snapshot">
           <i class="fa-solid fa-download"></i> Backup Snapshot
         </button>
@@ -761,15 +764,15 @@
         <div id="pendingRegistrationsBanner" style="display:none; margin-bottom:24px; background:linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.08) 100%); border:1px solid rgba(245, 158, 11, 0.35); border-radius:var(--radius); padding:16px 20px; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
           <div style="display:flex; align-items:center; gap:14px;">
             <div style="width:42px; height:42px; border-radius:12px; background:var(--accent-gold-bg); color:var(--accent-gold); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">
-              <i class="fa-solid fa-user-clock"></i>
+              <i class="fa-solid fa-building-circle-check"></i>
             </div>
             <div>
-              <div style="font-weight:800; font-size:14px; color:var(--text);" id="pendingBannerTitle">Pending User Registration Requests</div>
-              <div style="font-size:12.5px; color:var(--muted);" id="pendingBannerSub">There are accounts awaiting administrative review and authorization.</div>
+              <div style="font-weight:800; font-size:14px; color:var(--text);" id="pendingBannerTitle">Pending Institutional Registrations (<span id="pendingApprovalCountText">0</span>)</div>
+              <div style="font-size:12.5px; color:var(--muted);" id="pendingBannerSub">There are institutions awaiting Super Admin review and authorization.</div>
             </div>
           </div>
           <div style="display:flex; gap:8px;">
-            <button class="btn-top primary" style="background:var(--accent-gold); border-color:var(--accent-gold); font-size:12px; padding:7px 14px;" onclick="filterPendingUsers()"><i class="fa-solid fa-list-check"></i> Review Approvals</button>
+            <button class="btn-top primary" style="background:var(--accent-gold); border-color:var(--accent-gold); font-size:12px; padding:7px 14px;" onclick="switchSection('tenants')"><i class="fa-solid fa-list-check"></i> Review Approvals</button>
           </div>
         </div>
 
@@ -1498,6 +1501,7 @@
         // 1. Organizations from Supabase
         const orgs = await window.SupabaseService.getOrganizations();
         adminState.allOrgs = Array.isArray(orgs) ? orgs : [];
+
         const activeOrgs = adminState.allOrgs.filter(o => (o.status || 'Active').toLowerCase() === 'active');
         if (activeOrgs.length > 0) {
           adminState.tenants = activeOrgs.map(o => ({
@@ -2672,5 +2676,7 @@
   </script>
   <!-- Floating 3-Dots Quick Dock & Notifications Script -->
   <script src="../../assets/js/quick-dock.js"></script>
+  <script src="../../assets/js/cascading-nav.js" defer></script>
+  <script src="../../assets/js/slide-over.js"></script>
 </body>
 </html>

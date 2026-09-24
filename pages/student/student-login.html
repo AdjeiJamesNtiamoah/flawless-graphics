@@ -22,17 +22,21 @@
         box-sizing: border-box;
         margin: 0;
         padding: 0;
-    }    body {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        background-color: #060B18;
-        background: #060B18;
+    }
+    body {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background-color: #F8F5EE;
+        background-image: linear-gradient(135deg, rgba(248, 245, 238, 0.88) 0%, rgba(241, 235, 226, 0.93) 100%), url('../../assets/img/graduation-bg.jpg');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
         min-height: 100vh;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         padding: 32px 16px;
-        color: #F8FAFC;
+        color: #0F172A;
         overflow-x: hidden;
         position: relative;
     }
@@ -42,8 +46,8 @@
         position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
         background-image: 
-            linear-gradient(to right, rgba(56, 189, 248, 0.05) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+            linear-gradient(to right, rgba(180, 160, 140, 0.08) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(180, 160, 140, 0.08) 1px, transparent 1px);
         background-size: 32px 32px;
         pointer-events: none;
         z-index: 0;
@@ -54,7 +58,7 @@
         position: fixed;
         top: -10%; left: 15%;
         width: 650px; height: 650px;
-        background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
         filter: blur(90px);
         pointer-events: none;
         z-index: 0;
@@ -64,7 +68,7 @@
         position: fixed;
         bottom: -10%; right: 15%;
         width: 650px; height: 650px;
-        background: radial-gradient(circle, rgba(6, 182, 212, 0.11) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(6, 182, 212, 0.07) 0%, transparent 70%);
         filter: blur(90px);
         pointer-events: none;
         z-index: 0;
@@ -80,6 +84,69 @@
         align-items: center;
     }
 
+    /* Top Platform Navigation */
+    .platform-header {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .brand-top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .brand-top-logo {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 19px;
+        box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
+    }
+
+    .header-nav {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .header-link {
+        color: #475569;
+        font-size: 12.5px;
+        font-weight: 600;
+        text-decoration: none;
+        padding: 8px 16px;
+        border-radius: 10px;
+        background: #FFFFFF;
+        border: 1px solid #E5DFD5;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+    }
+
+    .header-link:hover {
+        color: #4f46e5;
+        background: #FAF7F2;
+        border-color: #4f46e5;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.12);
+    }
+
     /* Top Gateway Header */
     .gateway-header {
         text-align: center;
@@ -92,9 +159,9 @@
         gap: 8px;
         padding: 6px 16px;
         border-radius: 9999px;
-        background: rgba(99, 102, 241, 0.1);
-        border: 1px solid rgba(99, 102, 241, 0.3);
-        color: #818cf8;
+        background: #EEF2FF;
+        border: 1px solid #C7D2FE;
+        color: #4f46e5;
         font-size: 11.5px;
         font-weight: 700;
         letter-spacing: 1px;
@@ -103,38 +170,36 @@
     }
 
     .gateway-badge .badge-dot {
-        width: 6px; height: 6px;
+        width: 7px; height: 7px;
         border-radius: 50%;
-        background: #818cf8;
-        box-shadow: 0 0 8px #818cf8;
+        background: #4f46e5;
+        box-shadow: 0 0 8px #4f46e5;
     }
 
     .gateway-title {
         font-size: 32px;
         font-weight: 800;
         letter-spacing: -0.6px;
-        color: #ffffff;
+        color: #0F172A;
         margin-bottom: 8px;
     }
 
     .gateway-subtitle {
         font-size: 14px;
-        color: #94a3b8;
+        color: #64748B;
         max-width: 680px;
         margin: 0 auto;
         line-height: 1.5;
     }
 
-    /* Window Frame Container */
+    /* Window Frame Container — White & Cream theme */
     .app-window {
         width: 100%;
         max-width: 1060px;
-        background: rgba(13, 22, 42, 0.82);
-        backdrop-filter: blur(24px);
-        -webkit-backdrop-filter: blur(24px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: #FFFFFF;
+        border: 1px solid #E5DFD5;
         border-radius: 24px;
-        box-shadow: 0 25px 65px -10px rgba(0, 0, 0, 0.7), 0 0 40px rgba(99, 102, 241, 0.06);
+        box-shadow: 0 20px 45px -12px rgba(45, 35, 25, 0.12), 0 4px 16px rgba(0, 0, 0, 0.04);
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -152,56 +217,14 @@
         }
     }
 
-    /* Mock Mac Header Bar */
+    /* Window Header / Console Topbar */
     .window-header {
-        background: rgba(15, 23, 42, 0.65);
+        background: #F4EFEB;
         padding: 14px 28px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .window-dots {
-        display: flex;
-        gap: 8px;
-    }
-
-    .dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-    }
-    .dot-1 { background: #ef4444; }
-    .dot-2 { background: #f59e0b; }
-    .dot-3 { background: #10b981; }
-
-    .window-quick-nav {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
-
-    .window-nav-link {
-        color: #94a3b8;
-        font-size: 11px;
-        font-weight: 600;
-        text-decoration: none;
-        padding: 6px 14px;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        transition: all 0.25s ease;
-    }
-
-    .window-nav-link:hover {
-        color: #ffffff;
-        background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.2);
+        border-bottom: 1px solid #E5DFD5;
     }
 
     .security-badge {
@@ -209,15 +232,15 @@
         align-items: center;
         gap: 8px;
         font-size: 12px;
-        font-weight: 600;
-        color: #34d399;
+        font-weight: 700;
+        color: #4f46e5;
     }
     .security-badge .sec-dot {
         width: 7px;
         height: 7px;
         border-radius: 50%;
-        background: #10b981;
-        box-shadow: 0 0 8px #10b981;
+        background: #4f46e5;
+        box-shadow: 0 0 8px rgba(79, 70, 229, 0.6);
         display: inline-block;
     }
 
@@ -233,9 +256,13 @@
         .main-container {
             flex-direction: column;
         }
+        .hero-section {
+            border-right: none !important;
+            border-bottom: 1px solid #E5DFD5;
+        }
     }
 
-    /* Left Hero Section */
+    /* Left Hero Section — Warm Cream Background */
     .hero-section {
         flex: 1.1;
         padding: 38px 40px;
@@ -244,40 +271,8 @@
         justify-content: space-between;
         position: relative;
         overflow: hidden;
-        background: transparent;
-        border-right: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .ribbon-container {
-        position: absolute;
-        top: -20px;
-        left: -20px;
-        width: 240px;
-        height: 240px;
-        pointer-events: none;
-        opacity: 0.65;
-    }
-
-    .ribbon {
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(50px);
-    }
-
-    .ribbon-1 {
-        width: 180px;
-        height: 180px;
-        background: rgba(2, 132, 199, 0.18);
-        top: 20px;
-        left: 20px;
-    }
-
-    .ribbon-2 {
-        width: 140px;
-        height: 140px;
-        background: rgba(99, 102, 241, 0.15);
-        bottom: 30px;
-        right: 30px;
+        background: #FAF7F2;
+        border-right: 1px solid #E5DFD5;
     }
 
     .brand-logo {
@@ -291,13 +286,13 @@
         font-size: 20px;
         font-weight: 800;
         letter-spacing: 0.5px;
-        color: #ffffff;
+        color: #0F172A;
         line-height: 1.2;
     }
 
     .brand-subtitle {
         font-size: 11px;
-        color: #818cf8;
+        color: #4f46e5;
         text-transform: uppercase;
         letter-spacing: 1.5px;
         font-weight: 700;
@@ -313,11 +308,11 @@
         font-size: 27px;
         font-weight: 800;
         line-height: 1.35;
-        color: #ffffff;
+        color: #0F172A;
     }
 
     .hero-text span {
-        background: linear-gradient(90deg, #38bdf8, #818cf8);
+        background: linear-gradient(90deg, #0284c7, #4f46e5);
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -332,21 +327,21 @@
     }
 
     .feature-pill {
-        background: rgba(15, 23, 42, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: #FFFFFF;
+        border: 1px solid #E5DFD5;
         border-radius: 12px;
         padding: 10px 14px;
         display: flex;
         align-items: center;
         gap: 10px;
-        color: #e2e8f0;
+        color: #334155;
         font-size: 12px;
         font-weight: 600;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
     }
 
     .feature-pill i {
-        color: #818cf8;
+        color: #4f46e5;
         font-size: 14px;
     }
 
@@ -359,25 +354,26 @@
     }
 
     .btn-outline {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        color: #38bdf8;
+        background: #FFFFFF;
+        border: 1px solid #E5DFD5;
+        color: #4f46e5;
         padding: 8px 16px;
         border-radius: 10px;
         font-size: 12px;
-        font-weight: 600;
+        font-weight: 700;
         cursor: pointer;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         gap: 6px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
         transition: all 0.25s ease;
     }
 
     .btn-outline:hover {
-        background: rgba(56, 189, 248, 0.12);
-        border-color: #38bdf8;
-        color: #ffffff;
+        background: #FAF7F2;
+        border-color: #4f46e5;
+        transform: translateY(-1px);
     }
 
     /* Right Form Section */
@@ -387,7 +383,7 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        background: transparent;
+        background: #FFFFFF;
     }
 
     .card {
@@ -400,12 +396,12 @@
     /* Auth Mode Tabs */
     .auth-tabs {
         display: flex;
-        background: rgba(15, 23, 42, 0.8);
+        background: #FAF7F2;
         border-radius: 12px;
         padding: 4px;
         gap: 6px;
         margin-bottom: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid #E5DFD5;
     }
 
     .tab-btn {
@@ -413,7 +409,7 @@
         padding: 8px 14px;
         border: none;
         background: transparent;
-        color: #94a3b8;
+        color: #64748B;
         font-size: 12.5px;
         font-weight: 700;
         border-radius: 9px;
@@ -426,22 +422,22 @@
     }
 
     .tab-btn.active {
-        background: rgba(99, 102, 241, 0.2);
-        color: #ffffff;
-        border: 1px solid rgba(99, 102, 241, 0.4);
-        box-shadow: 0 2px 10px rgba(99, 102, 241, 0.25);
+        background: #FFFFFF;
+        color: #4f46e5;
+        border: 1px solid #C7D2FE;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
 
     .card h2 {
         font-size: 22px;
         font-weight: 800;
-        color: #ffffff;
+        color: #0F172A;
         margin-bottom: 4px;
     }
 
     .card-subtitle {
         font-size: 12px;
-        color: #94a3b8;
+        color: #64748B;
         margin-bottom: 18px;
     }
 
@@ -453,15 +449,15 @@
         display: none;
     }
     .msg.error {
-        background: rgba(239, 68, 68, 0.15);
-        border: 1px solid rgba(239, 68, 68, 0.4);
-        color: #fca5a5;
+        background: #FEF2F2;
+        border: 1px solid #FCA5A5;
+        color: #DC2626;
         display: block;
     }
     .msg.success {
-        background: rgba(16, 185, 129, 0.15);
-        border: 1px solid rgba(16, 185, 129, 0.4);
-        color: #6ee7b7;
+        background: #ECFDF5;
+        border: 1px solid #A7F3D0;
+        color: #059669;
         display: block;
     }
 
@@ -474,7 +470,7 @@
         display: block;
         font-size: 11px;
         font-weight: 700;
-        color: #94a3b8;
+        color: #475569;
         margin-bottom: 6px;
         text-transform: uppercase;
         letter-spacing: 0.8px;
@@ -486,11 +482,11 @@
 
     .input-wrapper input, .input-wrapper select {
         width: 100%;
-        background: rgba(15, 23, 42, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: #FAF8F5;
+        border: 1px solid #E5DFD5;
         border-radius: 10px;
         padding: 10px 14px 10px 38px;
-        color: #ffffff;
+        color: #0F172A;
         font-size: 13px;
         font-family: inherit;
         outline: none;
@@ -498,9 +494,14 @@
     }
 
     .input-wrapper input:focus, .input-wrapper select:focus {
-        border-color: #818cf8;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-        background: rgba(15, 23, 42, 0.9);
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        background: #FFFFFF;
+    }
+
+    .input-wrapper select option {
+        background: #FFFFFF;
+        color: #0F172A;
     }
 
     .input-wrapper .field-icon {
@@ -508,7 +509,7 @@
         left: 13px;
         top: 50%;
         transform: translateY(-50%);
-        color: #64748b;
+        color: #94A3B8;
         font-size: 13px;
     }
 
@@ -517,13 +518,13 @@
         right: 13px;
         top: 50%;
         transform: translateY(-50%);
-        color: #64748b;
+        color: #94A3B8;
         font-size: 13px;
         cursor: pointer;
     }
 
     .input-wrapper .toggle-pw:hover {
-        color: #ffffff;
+        color: #0F172A;
     }
 
     .form-row {
@@ -535,7 +536,7 @@
     /* Submit Button */
     .btn-submit {
         width: 100%;
-        background: linear-gradient(135deg, #0284c7 0%, #6366f1 100%);
+        background: linear-gradient(135deg, #4f46e5 0%, #0284c7 100%);
         color: #ffffff;
         border: none;
         padding: 12px 18px;
@@ -547,14 +548,14 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35);
+        box-shadow: 0 6px 18px rgba(79, 70, 229, 0.25);
         transition: all 0.25s ease;
         margin-top: 8px;
     }
 
     .btn-submit:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 24px rgba(99, 102, 241, 0.45);
+        box-shadow: 0 10px 24px rgba(79, 70, 229, 0.35);
         filter: brightness(1.05);
     }
 
@@ -562,8 +563,8 @@
     .modal-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.78);
-        backdrop-filter: blur(10px);
+        background: rgba(15, 23, 42, 0.65);
+        backdrop-filter: blur(8px);
         display: none;
         align-items: center;
         justify-content: center;
@@ -575,33 +576,42 @@
     }
 
     .modal-box {
-        background: #0d162a;
-        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: #FFFFFF;
+        border: 1px solid #E5DFD5;
         border-radius: 20px;
         width: 100%;
         max-width: 440px;
         padding: 26px 28px;
-        box-shadow: 0 24px 50px rgba(0, 0, 0, 0.8);
+        box-shadow: 0 24px 50px rgba(15, 23, 42, 0.2);
         position: relative;
         text-align: center;
-        color: #ffffff;
+        color: #0F172A;
     }
 
     .modal-close-btn {
         position: absolute;
         top: 16px;
         right: 18px;
-        background: transparent;
-        border: none;
-        color: #94a3b8;
-        font-size: 16px;
+        background: #FAF7F2;
+        border: 1px solid #E5DFD5;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        color: #64748B;
+        font-size: 14px;
         cursor: pointer;
-        transition: color 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
     }
     .modal-close-btn:hover {
-        color: #ffffff;
+        color: #0F172A;
+        background: #F4EFEB;
     }
 </style>
+  <!-- Universal Slide-Over Stylesheet -->
+  <link rel="stylesheet" href="../../assets/css/slide-over.css">
 </head>
 
 <body>
@@ -634,6 +644,28 @@
 <div class="grid-overlay"></div>
 
 <div class="main-wrapper">
+    <header class="platform-header">
+        <a href="../../index.html" class="brand-top">
+            <div class="brand-top-logo">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div>
+                <div style="font-size: 16px; font-weight: 800; color: #0F172A; line-height: 1.2;">FLAWLESS GRAPHICS</div>
+                <div style="font-size: 10.5px; color: #64748B; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700;">Student Academic Cloud</div>
+            </div>
+        </a>
+        <div class="header-nav">
+            <button type="button" class="header-link" onclick="SlideOver.openGuide('student')">
+                <i class="fa-solid fa-book-open"></i> Student Guide
+            </button>
+            <button type="button" class="header-link" onclick="SlideOver.openWorkspaceDirectory()">
+                <i class="fa-solid fa-building-columns"></i> Workspaces
+            </button>
+            <a href="../../site-login.html" class="header-link">
+                <i class="fa-solid fa-layer-group"></i> All Portals
+            </a>
+        </div>
+    </header>
     <!-- Top Gateway Header -->
     <div class="gateway-header">
         <div class="gateway-badge">
@@ -695,48 +727,125 @@
             </div>
 
             <div class="hero-buttons">
-                <a href="../public/home.html" class="btn-outline"><i class="fa-solid fa-compass"></i> Campus Tour</a>
-                <a href="../../welcome.html" class="btn-outline"><i class="fa-solid fa-arrow-left"></i> Workspace Hub</a>
+                <button type="button" class="btn-outline" onclick="SlideOver.openGuide('student')"><i class="fa-solid fa-book-open"></i> Student Guide</button>
+                <button type="button" class="btn-outline" onclick="SlideOver.openWorkspaceDirectory()"><i class="fa-solid fa-building-columns"></i> Directory</button>
             </div>
         </div>
 
         <!-- Right Form Section -->
         <div class="form-section">
             <div class="card">
+                <!-- Dual Mode Switcher Tabs -->
+                <div class="auth-tabs">
+                    <button type="button" class="tab-btn active" id="tabSignIn" onclick="switchMode('signin')">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In
+                    </button>
+                    <button type="button" class="tab-btn" id="tabRegister" onclick="switchMode('register')">
+                        <i class="fa-solid fa-user-plus"></i> Register Student Account
+                    </button>
+                </div>
+
                 <h2 id="formTitle">Student Access</h2>
                 <div class="card-subtitle" id="formSubtitle">Enter your Student Roll Number or registered email</div>
 
                 <div id="msg" class="msg"></div>
 
-                <form id="studentAuthForm" onsubmit="event.preventDefault(); handleStudentAuth();">
+                <form id="studentAuthForm" onsubmit="event.preventDefault(); onFormSubmit();">
                     <div class="form-group" id="studentOrgGroup">
                         <label for="studentOrgSelect">Institution Workspace (Subdomain Slug)</label>
                         <div class="input-wrapper">
-                            <select id="studentOrgSelect" style="width: 100%; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; padding: 11px 14px 11px 40px; color: #ffffff; font-size: 13.5px; outline: none;" required>
+                            <select id="studentOrgSelect" style="width: 100%; background: #FAF8F5; border: 1px solid #E5DFD5; border-radius: 10px; padding: 11px 14px 11px 40px; color: #0F172A; font-size: 13.5px; outline: none;" required>
                                 <option value="">-- Loading Approved Institutions... --</option>
                             </select>
                             <i class="fa-solid fa-school field-icon"></i>
                         </div>
                     </div>
 
+                    <!-- Student Profile Photo Upload Field (Registration Mode) -->
+                    <div class="form-group" id="studentPhotoGroup" style="display: none;">
+                        <label>Student Profile Photo</label>
+                        <div style="display: flex; align-items: center; gap: 14px; padding: 10px 14px; background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(255, 255, 255, 0.2); border-radius: 12px;">
+                            <div id="studentPhotoPreview" style="width: 48px; height: 48px; border-radius: 50%; background: rgba(56, 189, 248, 0.15); border: 2px solid #38bdf8; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                                <i class="fa-solid fa-user-graduate" style="font-size: 18px; color: #38bdf8;"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <button type="button" class="btn-outline" style="padding: 6px 12px; font-size: 11px; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; cursor: pointer;" onclick="document.getElementById('studentPhotoFile').click()">
+                                    <i class="fa-solid fa-camera"></i> Upload Photo
+                                </button>
+                                <button type="button" id="removeStudentPhotoBtn" style="padding: 6px 10px; font-size: 11px; border-radius: 8px; display: none; color: #dc2626; border: 1px solid #fca5a5; background: transparent; cursor: pointer; margin-left: 6px;" onclick="removeStudentPhoto()">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                                <input type="file" id="studentPhotoFile" accept="image/*" style="display: none;" onchange="handleStudentPhotoUpload(event)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student Full Name (Registration Mode) -->
+                    <div class="form-group" id="studentNameGroup" style="display: none;">
+                        <label for="studentFullName">Full Legal Name</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="studentFullName" placeholder="e.g. Kwame Mensah">
+                            <i class="fa-solid fa-user field-icon"></i>
+                        </div>
+                    </div>
+
+                    <!-- Academic Grade / Class (Registration Mode) -->
+                    <div class="form-group" id="studentClassGroup" style="display: none;">
+                        <label for="studentClassSelect">Academic Class / Grade</label>
+                        <div class="input-wrapper">
+                            <select id="studentClassSelect" style="width: 100%; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; padding: 11px 14px 11px 40px; color: #ffffff; font-size: 13.5px; outline: none;">
+                                <option value="cls_1|Grade 10 - Graphic Arts & Visual Identity">Grade 10 - Graphic Arts &amp; Visual Identity</option>
+                                <option value="cls_5|Grade 10 - UI/UX Interactive Prototyping">Grade 10 - UI/UX Interactive Prototyping</option>
+                                <option value="cls_2|Grade 11 - Web Systems & Client Architecture">Grade 11 - Web Systems &amp; Client Architecture</option>
+                                <option value="cls_3|Grade 12 - Digital Animation & 3D Modeling">Grade 12 - Digital Animation &amp; 3D Modeling</option>
+                            </select>
+                            <i class="fa-solid fa-graduation-cap field-icon"></i>
+                        </div>
+                    </div>
+
                     <!-- Sign-In Identifier (Roll or Email) -->
-                    <div class="form-group">
+                    <div class="form-group" id="identifierGroup">
                         <label for="identifier" id="labelIdentifier">Student Roll Number / Email</label>
                         <div class="input-wrapper">
-                            <input type="text" id="identifier" placeholder="STU-2026-001 or student@flawless.edu" required autocomplete="username">
+                            <input type="text" id="identifier" placeholder="STU-2026-001 or student@flawless.edu" autocomplete="username">
                             <i class="fa-solid fa-id-badge field-icon"></i>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="password">Security Password</label>
+                    <!-- Email for Registration -->
+                    <div class="form-group" id="regEmailGroup" style="display: none;">
+                        <label for="regEmail">Student Email Address</label>
                         <div class="input-wrapper">
-                            <input type="password" id="password" placeholder="Enter password (default: student123)" required autocomplete="current-password">
-                            <i class="fa-solid fa-lock field-icon"></i>
-                            <i class="fa-regular fa-eye-slash toggle-pw" id="togglePw" onclick="togglePasswordVisibility()"></i>
+                            <input type="email" id="regEmail" placeholder="student@institution.edu" autocomplete="email">
+                            <i class="fa-solid fa-envelope field-icon"></i>
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        <label for="password" id="labelPassword">Security Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="password" placeholder="Enter password" required autocomplete="current-password">
+                            <i class="fa-solid fa-lock field-icon"></i>
+                            <i class="fa-regular fa-eye-slash toggle-pw" id="togglePw" onclick="togglePasswordVisibility('password', 'togglePw')"></i>
+                        </div>
+                    </div>
+
+                    <!-- Confirm Password (Registration Mode) -->
+                    <div class="form-group" id="confirmPasswordGroup" style="display: none;">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="confirmPassword" placeholder="Re-enter password" autocomplete="new-password">
+                            <i class="fa-solid fa-shield-halved field-icon"></i>
+                            <i class="fa-regular fa-eye-slash toggle-pw" id="toggleConfirmPw" onclick="togglePasswordVisibility('confirmPassword', 'toggleConfirmPw')"></i>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; margin-bottom: 12px; font-size: 12px;">
+                        <label style="display: flex; align-items: center; gap: 6px; color: #475569; cursor: pointer;">
+                            <input type="checkbox" id="rememberStudent" checked style="accent-color: #4f46e5;"> Remember me
+                        </label>
+                        <a href="#" onclick="event.preventDefault(); SlideOver.openForgotPassword('student');" style="color: #4f46e5; font-weight: 600; text-decoration: none;">Forgot Password?</a>
+                    </div>
                     <button type="submit" id="submitBtn" class="btn-submit">
                         <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace
                     </button>
@@ -754,14 +863,14 @@
         <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(56, 189, 248, 0.12); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 14px; border: 1px solid rgba(56, 189, 248, 0.3);">
             <i class="fa-solid fa-shield-halved"></i>
         </div>
-        <h3 style="font-size: 19px; font-weight: 800; color: #ffffff; margin-bottom: 6px;">Student Identity Verification</h3>
-        <p style="font-size: 12.5px; color: #94a3b8; line-height: 1.5; margin-bottom: 14px;">
+        <h3 style="font-size: 19px; font-weight: 800; color: #0F172A; margin-bottom: 6px;">Student Identity Verification</h3>
+        <p style="font-size: 12.5px; color: #475569; line-height: 1.5; margin-bottom: 14px;">
             Please confirm your one-time authentication code.
         </p>
-        <div style="font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 800; letter-spacing: 6px; color: #38bdf8; background: rgba(15, 23, 42, 0.8); padding: 8px 16px; border-radius: 10px; border: 1px solid rgba(56, 189, 248, 0.35); display: inline-block; margin-bottom: 14px;" id="demoOtpDisplay">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 800; letter-spacing: 6px; color: #38bdf8; background: #FAF8F5; padding: 8px 16px; border-radius: 10px; border: 1px solid #C7D2FE; display: inline-block; margin-bottom: 14px;" id="demoOtpDisplay">
             724819
         </div>
-        <input type="text" id="otpInput" style="width: 100%; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 18px; letter-spacing: 4px; padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(15, 23, 42, 0.8); color: #ffffff; margin-bottom: 12px; outline: none;" placeholder="--------" maxlength="10">
+        <input type="text" id="otpInput" style="width: 100%; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 18px; letter-spacing: 4px; padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); background: #FAF8F5; color: #0F172A; border-color: #E5DFD5; margin-bottom: 12px; outline: none;" placeholder="--------" maxlength="10">
         <button type="button" class="btn-submit" onclick="submitOtpCode()" style="margin-top: 0;">
             <i class="fa-solid fa-check"></i> Verify & Enter Workspace
         </button>
@@ -781,7 +890,259 @@ const STUD_KEY = `${ORG}_students`;
 const CLASSES_KEY = `${ORG}_classes`;
 
 let currentMode = 'signin';
+let currentStudentPhotoBase64 = null;
 let pendingOtpStudent = null;
+
+function handleStudentPhotoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+        showMessage('Please select a valid image file (PNG, JPG, WebP).', true);
+        return;
+    }
+    if (file.size > 3 * 1024 * 1024) {
+        showMessage('Photo exceeds 3MB limit.', true);
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        currentStudentPhotoBase64 = e.target.result;
+        const preview = document.getElementById('studentPhotoPreview');
+        if (preview) preview.innerHTML = `<img src="${currentStudentPhotoBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+        const removeBtn = document.getElementById('removeStudentPhotoBtn');
+        if (removeBtn) removeBtn.style.display = 'inline-block';
+    };
+    reader.readAsDataURL(file);
+}
+
+function removeStudentPhoto() {
+    currentStudentPhotoBase64 = null;
+    const preview = document.getElementById('studentPhotoPreview');
+    if (preview) preview.innerHTML = '<i class="fa-solid fa-user-graduate" style="font-size: 18px; color: #38bdf8;"></i>';
+    const removeBtn = document.getElementById('removeStudentPhotoBtn');
+    if (removeBtn) removeBtn.style.display = 'none';
+    const fileInput = document.getElementById('studentPhotoFile');
+    if (fileInput) fileInput.value = '';
+}
+
+function switchMode(mode) {
+    currentMode = mode;
+    const tabSignIn = document.getElementById('tabSignIn');
+    const tabRegister = document.getElementById('tabRegister');
+    const formTitle = document.getElementById('formTitle');
+    const formSubtitle = document.getElementById('formSubtitle');
+    const submitBtn = document.getElementById('submitBtn');
+
+    const photoGroup = document.getElementById('studentPhotoGroup');
+    const nameGroup = document.getElementById('studentNameGroup');
+    const classGroup = document.getElementById('studentClassGroup');
+    const identifierGroup = document.getElementById('identifierGroup');
+    const regEmailGroup = document.getElementById('regEmailGroup');
+    const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
+
+    const identifierInput = document.getElementById('identifier');
+    const nameInput = document.getElementById('studentFullName');
+    const regEmailInput = document.getElementById('regEmail');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+
+    const msg = document.getElementById('msg');
+    if (msg) msg.style.display = 'none';
+
+    if (mode === 'register') {
+        tabRegister.classList.add('active');
+        tabSignIn.classList.remove('active');
+
+        formTitle.textContent = 'Register Student Account';
+        formSubtitle.textContent = 'Enroll and create student credentials with institutional smart ID';
+
+        photoGroup.style.display = 'block';
+        nameGroup.style.display = 'block';
+        classGroup.style.display = 'block';
+        identifierGroup.style.display = 'none';
+        regEmailGroup.style.display = 'block';
+        confirmPasswordGroup.style.display = 'block';
+
+        if (identifierInput) identifierInput.removeAttribute('required');
+        if (nameInput) nameInput.setAttribute('required', 'true');
+        if (regEmailInput) regEmailInput.setAttribute('required', 'true');
+        if (confirmPasswordInput) confirmPasswordInput.setAttribute('required', 'true');
+
+        submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Register & Create Student ID';
+    } else {
+        tabSignIn.classList.add('active');
+        tabRegister.classList.remove('active');
+
+        formTitle.textContent = 'Student Access';
+        formSubtitle.textContent = 'Enter your Student Roll Number or registered email';
+
+        photoGroup.style.display = 'none';
+        nameGroup.style.display = 'none';
+        classGroup.style.display = 'none';
+        identifierGroup.style.display = 'block';
+        regEmailGroup.style.display = 'none';
+        confirmPasswordGroup.style.display = 'none';
+
+        if (identifierInput) identifierInput.setAttribute('required', 'true');
+        if (nameInput) nameInput.removeAttribute('required');
+        if (regEmailInput) regEmailInput.removeAttribute('required');
+        if (confirmPasswordInput) confirmPasswordInput.removeAttribute('required');
+
+        submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace';
+    }
+}
+
+function onFormSubmit() {
+    if (currentMode === 'register') {
+        handleStudentRegistration();
+    } else {
+        handleStudentAuth();
+    }
+}
+
+function togglePasswordVisibility(inputId = 'password', iconId = 'togglePw') {
+    const inp = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (!inp || !icon) return;
+    if (inp.type === 'password') {
+        inp.type = 'text';
+        icon.className = 'fa-regular fa-eye toggle-pw';
+    } else {
+        inp.type = 'password';
+        icon.className = 'fa-regular fa-eye-slash toggle-pw';
+    }
+}
+
+function showMessage(text, isError = true) {
+    const el = document.getElementById('msg');
+    if (!el) return;
+    el.textContent = text;
+    el.className = 'msg ' + (isError ? 'error' : 'success');
+    el.style.display = 'block';
+}
+
+async function handleStudentRegistration() {
+    const orgSelect = document.getElementById('studentOrgSelect');
+    const selectedOrgSlug = orgSelect ? orgSelect.value.trim() : '';
+    const selectedOrgName = (orgSelect && orgSelect.selectedOptions && orgSelect.selectedOptions[0]) 
+        ? (orgSelect.selectedOptions[0].dataset.name || selectedOrgSlug) 
+        : (selectedOrgSlug || 'FLAWLESS GRAPHICS');
+
+    const fullName = (document.getElementById('studentFullName').value || '').trim();
+    const email = (document.getElementById('regEmail').value || '').trim().toLowerCase();
+    const password = document.getElementById('password').value || '';
+    const confirmPassword = document.getElementById('confirmPassword').value || '';
+    const classVal = (document.getElementById('studentClassSelect').value || 'cls_1|Grade 10 - Graphic Arts & Visual Identity').split('|');
+    const classId = classVal[0];
+    const className = classVal[1] || 'Grade 10';
+    const submitBtn = document.getElementById('submitBtn');
+
+    if (!selectedOrgSlug && !selectedOrgName) {
+        return showMessage('Please select your approved institution workspace.', true);
+    }
+    if (!fullName) {
+        return showMessage('Please enter student full legal name.', true);
+    }
+    if (!email) {
+        return showMessage('Please enter a valid student email address.', true);
+    }
+    if (!password) {
+        return showMessage('Please enter a secure password.', true);
+    }
+    if (password !== confirmPassword) {
+        return showMessage('Passwords do not match. Please re-enter.', true);
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Registering Student Account...';
+
+    const nameParts = fullName.split(' ');
+    const firstName = nameParts[0] || 'Student';
+    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : 'Scholar';
+    const rollNum = `STU-2026-${Math.floor(100 + Math.random() * 900)}`;
+
+    const smartId = createStudentSmartId(rollNum, fullName);
+
+    const newStudent = {
+        id: 's_' + Date.now().toString(36),
+        roll: rollNum,
+        enrollment_code: rollNum,
+        smartIdNumber: smartId.smartIdNumber,
+        rfidUid: smartId.rfidUid,
+        barcode: smartId.barcode,
+        qrData: smartId.qrData,
+        issueDate: smartId.issueDate,
+        expiryDate: smartId.expiryDate,
+        securityHash: smartId.securityHash,
+        name: fullName,
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: password,
+        org: selectedOrgName,
+        org_id: selectedOrgSlug,
+        classId: classId,
+        className: className,
+        grade: className.split('-')[0].trim(),
+        gender: 'Not Specified',
+        status: 'Active',
+        approvalStatus: 'approved',
+        attendanceRate: 100.0,
+        attendanceStreak: 1,
+        gpa: 4.00,
+        photo: currentStudentPhotoBase64 || null,
+        photo_url: currentStudentPhotoBase64 || null,
+        createdAt: Date.now()
+    };
+
+    // Save student user to Supabase Cloud
+    if (window.SupabaseService) {
+        try {
+            await window.SupabaseService.saveUser({
+                org: selectedOrgName,
+                org_id: selectedOrgSlug,
+                name: fullName,
+                email: email,
+                password: password,
+                role: 'student',
+                roll: rollNum,
+                classId: classId,
+                className: className,
+                photo: currentStudentPhotoBase64 || null,
+                photo_url: currentStudentPhotoBase64 || null,
+                status: 'approved'
+            }).catch(console.warn);
+
+            if (typeof window.SupabaseService.saveStudent === 'function') {
+                await window.SupabaseService.saveStudent(newStudent).catch(console.warn);
+            }
+        } catch(e) {
+            console.warn('Supabase student save warning:', e);
+        }
+    }
+
+    // Save to local roster
+    try {
+        const students = getStoredStudents();
+        const existingIdx = students.findIndex(s => s.email && s.email.toLowerCase() === email);
+        if (existingIdx >= 0) {
+            students[existingIdx] = { ...students[existingIdx], ...newStudent };
+        } else {
+            students.push(newStudent);
+        }
+        localStorage.setItem(STUD_KEY, JSON.stringify(students));
+    } catch(e) {}
+
+    if (window.Toaster) {
+        window.Toaster.success('Registration Successful', `Welcome, ${fullName}! Student ID: ${smartId.smartIdNumber}`);
+    }
+
+    showMessage(`Registration successful! Generated Student Smart ID: ${smartId.smartIdNumber}. Launching workspace...`, false);
+
+    setTimeout(() => {
+        authenticateStudentSession(newStudent);
+    }, 600);
+}
 
 // Smart ID Generator Helper for Students
 function createStudentSmartId(roll, name) {
@@ -1163,5 +1524,7 @@ window.addEventListener('DOMContentLoaded', () => {
 <script src="../../assets/js/skeleton-loader.js"></script>
 <!-- Floating Quick Assistant Script -->
 <script src="../../assets/js/quick-assistant.js"></script>
+  <!-- Universal Slide-Over Controller Engine -->
+  <script src="../../assets/js/slide-over.js"></script>
 </body>
 </html>

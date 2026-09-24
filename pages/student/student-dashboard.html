@@ -1238,6 +1238,8 @@
     border-radius: 6px;
   }
 </style>
+  <link rel="stylesheet" href="../../assets/css/cascading-nav.css">
+  <link rel="stylesheet" href="../../assets/css/slide-over.css">
 </head>
 
 <body>
@@ -1319,7 +1321,7 @@
 
     <!-- Notification Bell -->
     <div style="position: relative;">
-      <button type="button" class="notif-bell-btn" id="notifBellBtn" onclick="toggleNotificationPopover()">
+      <button type="button" class="notif-bell-btn" onclick="SlideOver.openNotifications()" id="notifBellBtn" onclick="toggleNotificationPopover()">
         <i class="fa-regular fa-bell"></i>
         <span class="notif-badge" id="notifCountBadge">3</span>
       </button>
@@ -4149,5 +4151,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 </script>
+  <script src="../../assets/js/cascading-nav.js" defer></script>
+  <script src="../../assets/js/slide-over.js"></script>
 </body>
 </html>
