@@ -35,10 +35,11 @@
                     radial-gradient(circle at 90% 80%, rgba(99, 91, 252, 0.05) 0%, transparent 40%),
                     #FAF7F2;
         min-height: 100vh;
+        min-height: 100dvh;
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 16px;
+        padding: clamp(8px, 2.5vw, 20px) clamp(6px, 2vw, 16px);
         color: #0F172A;
         overflow-x: hidden;
     }
@@ -58,10 +59,10 @@
     .app-window {
         width: 100%;
         max-width: 1120px;
-        background: #0B1120;
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: #FFFFFF;
+        border: 1px solid #E8E2D8;
         border-radius: 20px;
-        box-shadow: 0 30px 60px -12px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.06);
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -83,13 +84,13 @@
 
     /* Mock Mac Top Bar */
     .window-header {
-        background: rgba(15, 23, 42, 0.85);
+        background: #FAF7F2;
         backdrop-filter: blur(12px);
         padding: 12px 22px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom: 1px solid #E8E2D8;
     }
 
     .window-dots {
@@ -468,7 +469,21 @@
         color: #fca5a5;
     }
 
-    /* Responsive */
+    /* ==========================================================================
+       RESPONSIVE DESIGN SUITE — ALL TARGET DEVICES
+       Supports: JioPhone 2 (240px), Foldables, Tablets, Smart Displays & Phones
+       ========================================================================== */
+
+    /* Touch Smart Display (Nest Hub Max 1280x800) */
+    @media (max-height: 850px) and (min-width: 1024px) {
+        body { padding: 12px 16px; }
+        .hero-section { padding: 22px 24px; }
+        .portal-grid { gap: 10px; }
+        .portal-card-btn { padding: 12px 14px; gap: 8px; }
+        .hub-bottom-bar { margin-top: 14px; padding-top: 10px; }
+    }
+
+    /* Tablets & Foldables Unfolded (iPad Mini 768px, Galaxy Tab S4 711px/800px, Surface Pro 7/10 912px, Surface Duo dual 1114px, Z Fold unfolded 768px-820px) */
     @media (max-width: 900px) {
         .main-container {
             grid-template-columns: 1fr;
@@ -476,11 +491,97 @@
         .hero-section {
             border-right: none;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 24px;
+            padding: 22px 20px;
         }
         .portal-grid {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
         }
+    }
+
+    /* Standard Smartphones (iPhone SE/12-16, Pixel 7/8/9/10, Galaxy A55/S8/S20, Moto G, Surface Duo single 540px) */
+    @media (max-width: 580px) {
+        .portal-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .window-header {
+            padding: 10px 14px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .window-dots {
+            display: none;
+        }
+        .window-quick-nav {
+            width: 100%;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .telemetry-ribbon {
+            padding: 8px 14px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+        }
+        .telemetry-items {
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .hero-section {
+            padding: 18px 14px;
+        }
+        .brand-logo-container {
+            gap: 10px;
+        }
+        .org-logo-preview {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+        }
+        .org-title {
+            font-size: 16px;
+        }
+        .hub-title {
+            font-size: 20px;
+        }
+        .hub-desc {
+            font-size: 12.5px;
+        }
+        .portal-card-btn {
+            padding: 14px;
+            min-height: 44px;
+        }
+        .hub-bottom-bar {
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        .btn-logout {
+            width: 100%;
+            justify-content: center;
+            min-height: 42px;
+        }
+    }
+
+    /* Ultra-Compact Feature Phones (JioPhone 2: 240x320px) */
+    @media (max-width: 320px) {
+        body { padding: 4px; }
+        .app-window { border-radius: 12px; }
+        .window-header { padding: 8px 6px; }
+        .window-nav-link { font-size: 10px; padding: 4px 6px; }
+        .telemetry-ribbon { padding: 6px 8px; font-size: 10px; }
+        .hero-section { padding: 12px 8px; }
+        .org-logo-preview { width: 38px; height: 38px; }
+        .org-title { font-size: 14px; }
+        .hub-title { font-size: 17px; }
+        .hub-desc { font-size: 11.5px; }
+        .portal-card-btn { padding: 10px; border-radius: 10px; }
+        .portal-card-icon { width: 34px; height: 34px; font-size: 14px; }
+        .portal-card-title { font-size: 13px; }
+        .portal-card-desc { font-size: 10.5px; }
+        .portal-card-footer { font-size: 10px; }
     }
 </style>
 </head>
@@ -636,7 +737,7 @@
 
                 <div class="portal-grid">
                     <!-- 1. Super Admin Portal -->
-                    <a href="pages/admin/admin-dashboard.html" class="portal-card-btn" id="portalAdminLink">
+                    <a href="pages/admin/super-admin.html" class="portal-card-btn" id="portalAdminLink">
                         <div class="portal-card-top">
                             <div class="portal-card-icon icon-admin">
                                 <i class="fa-solid fa-crown"></i>

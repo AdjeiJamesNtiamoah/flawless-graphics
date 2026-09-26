@@ -86,10 +86,10 @@
       }
     };
 
-    if (currentPath.includes('/pages/admin/')) {
+    if (currentPath.includes('/pages/admin/') || currentPath.includes('super-admin') || currentPath.includes('admin-dashboard')) {
       role = 'Super Admin';
       roleDesc = 'End Super Admin session securely';
-      loginTarget = 'admin-login.html';
+      loginTarget = currentPath.includes('/pages/admin/') ? 'admin-login.html' : 'pages/admin/admin-login.html';
       panelSub = 'Super Admin Telemetry & User Governance';
       tab1Filter = 'approvals';
       tab1Label = 'Approvals';
@@ -101,14 +101,14 @@
           window.switchSection('users');
           if (typeof window.filterPendingUsers === 'function') window.filterPendingUsers();
         } else {
-          window.location.href = 'admin-dashboard.html';
+          window.location.href = currentPath.includes('/pages/admin/') ? 'admin-dashboard.html' : 'pages/admin/admin-dashboard.html';
         }
       };
       messagesAction = function () {
         if (typeof window.switchSection === 'function') {
           window.switchSection('broadcasts');
         } else {
-          window.location.href = 'admin-dashboard.html';
+          window.location.href = currentPath.includes('/pages/admin/') ? 'admin-dashboard.html' : 'pages/admin/admin-dashboard.html';
         }
       };
     } else if (currentPath.includes('/pages/teacher/')) {

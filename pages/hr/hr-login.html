@@ -1331,6 +1331,22 @@
     if (window.AuthSession) {
       window.AuthSession.applyGlobalBranding();
     }
+
+    const params = new URLSearchParams(window.location.search);
+    const err = params.get('error');
+    if (err === 'pending_approval') {
+      showError('Access Pending Approval: Your HR administrator account has not yet been approved by the Super Administrator. Access is restricted.');
+      if (window.Toaster) {
+        window.Toaster.warning('Authorization Required', 'Your registration is awaiting Administrator approval before access is granted.');
+      }
+    } else if (err === 'unauthorized_role') {
+      showError('Access Denied: Your current account role does not have approved permissions to access the HR Management Portal.');
+      if (window.Toaster) {
+        window.Toaster.error('Access Restricted', 'HR administrator clearance is required.');
+      }
+    } else if (err === 'unauthorized' || err === 'revoked') {
+      showError('Session Required: Please sign in with an approved HR administrator account to continue.');
+    }
   });
 </script>
 

@@ -38,11 +38,12 @@
         background-attachment: fixed;
         color: #1E293B;
         min-height: 100vh;
+        min-height: 100dvh;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 32px 16px;
+        padding: clamp(12px, 3vw, 32px) clamp(8px, 2.5vw, 16px);
         position: relative;
         overflow-x: hidden;
     }
@@ -225,14 +226,89 @@
         min-height: 480px;
     }
 
+    /* Touch Displays with 800px or less height (e.g. Google Nest Hub Max 1280x800) */
+    @media (max-height: 850px) and (min-width: 1024px) {
+        body { padding: 14px 16px; }
+        .gateway-header { margin-bottom: 14px; }
+        .gateway-title { font-size: 26px; margin-bottom: 4px; }
+        .gateway-subtitle { font-size: 12.5px; }
+        .console-body { min-height: 420px; }
+        .left-panel, .right-panel { padding: 26px 30px; }
+        .feature-list { margin-bottom: 18px; gap: 8px; }
+    }
+
+    /* Tablets & Phones (<= 860px) */
     @media (max-width: 860px) {
         .console-body {
             grid-template-columns: 1fr;
+            min-height: auto;
+        }
+        .right-panel {
+            order: 1;
+            padding: clamp(22px, 4vw, 36px) clamp(16px, 3.5vw, 30px);
         }
         .left-panel {
+            order: 2;
             border-right: none !important;
-            border-bottom: 1px solid #EAE3D8;
+            border-top: 1px solid #EAE3D8;
+            padding: clamp(20px, 4vw, 32px) clamp(16px, 3.5vw, 30px);
         }
+        .console-tabs {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            flex-wrap: nowrap !important;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding-bottom: 6px;
+            width: 100%;
+        }
+        .console-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        .tab-btn {
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+    }
+
+    /* Standard Smartphones (iPhone SE/12-16, Pixel 7/8/9/10, Galaxy A55/S8/S20, Moto G) */
+    @media (max-width: 520px) {
+        .gateway-header { margin-bottom: 18px; }
+        .gateway-title { font-size: clamp(20px, 6vw, 25px); }
+        .gateway-subtitle { font-size: 12.5px; }
+        .console-topbar {
+            padding: 12px 16px;
+            gap: 8px;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .form-control {
+            font-size: 16px;
+            padding: 12px 14px 12px 38px;
+        }
+        .btn-submit {
+            padding: 13px 18px;
+            font-size: 14px;
+            min-height: 46px;
+        }
+    }
+
+    /* Ultra-Compact Feature Phones (JioPhone 2: 240x320px) */
+    @media (max-width: 320px) {
+        body { padding: 6px 4px; }
+        .console-card { border-radius: 12px; }
+        .console-topbar { padding: 10px 8px; }
+        .left-panel, .right-panel { padding: 14px 8px; }
+        .tab-btn { padding: 6px 10px; font-size: 11px; gap: 5px; }
+        .form-extras { flex-direction: column; align-items: flex-start; gap: 8px; }
+        .feature-list { gap: 8px; margin-bottom: 18px; }
+        .feature-item { font-size: 11.5px; }
+        .role-title { font-size: 18px; }
+        .role-desc { font-size: 11.5px; }
+        .modal-box { padding: 18px 12px; }
+        .otp-field { font-size: 18px; letter-spacing: 3px; padding: 8px; }
     }
 
     /* Left Panel: Role Overview */
@@ -754,7 +830,7 @@ const ROLE_CONFIGS = {
         defaultEmail: 'admin@flawlessgraphics.com',
         labelPass: 'MASTER PASSWORD',
         submitText: 'Sign In to Super Admin Console',
-        targetDashboard: 'pages/admin/admin-dashboard.html'
+        targetDashboard: 'super-admin.html'
     },
     finance: {
         icon: 'fa-solid fa-file-invoice-dollar',

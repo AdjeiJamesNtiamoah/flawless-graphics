@@ -22,18 +22,20 @@
 
 <style>
     :root {
-        --bg-dark: #070B14;
-        --card-bg: rgba(15, 23, 42, 0.85);
-        --card-border: rgba(255, 255, 255, 0.1);
+        --bg-cream: #FAF7F2;
+        --bg-cream-soft: #F5EFEB;
+        --card-bg: #FFFFFF;
+        --card-border: #E8E2D8;
         --accent-cyan: #0284c7;
-        --accent-indigo: #6366f1;
-        --accent-teal: #14b8a6;
-        --accent-gold: #f59e0b;
-        --accent-rose: #ec4899;
-        --accent-gradient: linear-gradient(135deg, #0284c7 0%, #6366f1 50%, #a855f7 100%);
-        --text-main: #FFFFFF;
-        --text-muted: #94A3B8;
-        --glow-shadow: 0 20px 45px -10px rgba(2, 132, 199, 0.35);
+        --accent-indigo: #4f46e5;
+        --accent-teal: #059669;
+        --accent-gold: #d97706;
+        --accent-rose: #e11d48;
+        --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #0284c7 100%);
+        --text-main: #0F172A;
+        --text-muted: #64748B;
+        --text-soft: #94A3B8;
+        --glow-shadow: 0 14px 34px -6px rgba(79, 70, 229, 0.16);
     }
 
     * {
@@ -44,15 +46,15 @@
 
     body {
         font-family: 'Plus Jakarta Sans', sans-serif;
-        background-color: var(--bg-dark);
+        background-color: var(--bg-cream);
         color: var(--text-main);
         min-height: 100vh;
         overflow-x: hidden;
         background-image: 
-            radial-gradient(circle at 15% 15%, rgba(2, 132, 199, 0.15) 0%, transparent 45%),
-            radial-gradient(circle at 85% 25%, rgba(99, 102, 241, 0.14) 0%, transparent 45%),
-            radial-gradient(circle at 50% 85%, rgba(20, 184, 166, 0.1) 0%, transparent 50%),
-            linear-gradient(180deg, #070b14 0%, #0b1120 100%);
+            radial-gradient(circle at 15% 15%, rgba(2, 132, 199, 0.04) 0%, transparent 45%),
+            radial-gradient(circle at 85% 25%, rgba(79, 70, 229, 0.04) 0%, transparent 45%),
+            radial-gradient(circle at 50% 85%, rgba(5, 150, 105, 0.03) 0%, transparent 50%),
+            linear-gradient(180deg, #FAF7F2 0%, #F5EFEB 100%);
         background-attachment: fixed;
     }
 
@@ -65,8 +67,8 @@
         height: 100vh;
         background-size: 40px 40px;
         background-image: 
-            linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            linear-gradient(to right, rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
         pointer-events: none;
         z-index: 0;
     }
@@ -86,7 +88,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 24px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom: 1px solid var(--card-border);
     }
 
     .brand-group {
@@ -94,7 +96,7 @@
         align-items: center;
         gap: 14px;
         text-decoration: none;
-        color: #ffffff;
+        color: var(--text-main);
     }
 
     .brand-logo-badge {
@@ -106,7 +108,7 @@
         align-items: center;
         justify-content: center;
         font-size: 22px;
-        color: #ffffff;
+        color: var(--text-main);
         box-shadow: 0 8px 20px rgba(2, 132, 199, 0.4);
     }
 
@@ -120,7 +122,7 @@
     .brand-text span {
         font-size: 11px;
         font-weight: 600;
-        color: #38bdf8;
+        color: #4f46e5;
         letter-spacing: 1.5px;
         text-transform: uppercase;
     }
@@ -135,9 +137,9 @@
     .btn-nav-outline {
         padding: 9px 18px;
         border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        background: rgba(255, 255, 255, 0.04);
-        color: #ffffff;
+        border: 1px solid var(--card-border);
+        background: #FFFFFF;
+        color: var(--text-main);
         font-size: 13px;
         font-weight: 600;
         text-decoration: none;
@@ -145,11 +147,12 @@
         align-items: center;
         gap: 8px;
         transition: all 0.25s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
     }
 
     .btn-nav-outline:hover {
-        background: rgba(255, 255, 255, 0.12);
-        border-color: rgba(255, 255, 255, 0.35);
+        background: #F5EFEB;
+        border-color: #cbd5e1;
         transform: translateY(-2px);
     }
 
@@ -157,21 +160,21 @@
         padding: 9px 20px;
         border-radius: 10px;
         background: var(--accent-gradient);
-        color: #ffffff;
+        color: #FFFFFF;
         font-size: 13px;
         font-weight: 700;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        box-shadow: 0 4px 16px rgba(2, 132, 199, 0.35);
+        box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
         transition: all 0.25s ease;
         border: none;
     }
 
     .btn-nav-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(2, 132, 199, 0.5);
+        box-shadow: 0 8px 20px rgba(79, 70, 229, 0.35);
     }
 
     /* Hero Section */
@@ -186,9 +189,9 @@
         gap: 8px;
         padding: 6px 14px;
         border-radius: 9999px;
-        background: rgba(2, 132, 199, 0.12);
-        border: 1px solid rgba(56, 189, 248, 0.3);
-        color: #38bdf8;
+        background: rgba(79, 70, 229, 0.08);
+        border: 1px solid rgba(79, 70, 229, 0.2);
+        color: #4f46e5;
         font-size: 12px;
         font-weight: 700;
         letter-spacing: 0.5px;
@@ -200,8 +203,8 @@
         width: 7px;
         height: 7px;
         border-radius: 50%;
-        background: #38bdf8;
-        box-shadow: 0 0 10px #38bdf8;
+        background: #4f46e5;
+        box-shadow: 0 0 10px rgba(79, 70, 229, 0.5);
         animation: pulseLive 1.8s infinite;
     }
 
@@ -211,11 +214,11 @@
         line-height: 1.15;
         letter-spacing: -0.5px;
         margin-bottom: 18px;
-        color: #ffffff;
+        color: var(--text-main);
     }
 
     .hero-title .gradient-text {
-        background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+        background: linear-gradient(135deg, #0284c7 0%, #4f46e5 50%, #7c3aed 100%);
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -223,7 +226,7 @@
 
     .hero-description {
         font-size: 17px;
-        color: #94a3b8;
+        color: var(--text-muted);
         max-width: 780px;
         margin: 0 auto 36px;
         line-height: 1.6;
@@ -242,30 +245,30 @@
     .btn-hero-register {
         padding: 16px 36px;
         border-radius: 14px;
-        background: linear-gradient(135deg, #0284c7 0%, #6366f1 100%);
-        color: #ffffff;
+        background: linear-gradient(135deg, #4f46e5 0%, #0284c7 100%);
+        color: #FFFFFF;
         font-size: 16px;
         font-weight: 800;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         gap: 12px;
-        box-shadow: 0 12px 30px rgba(2, 132, 199, 0.45);
+        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.28);
         transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        border: none;
     }
 
     .btn-hero-register:hover {
         transform: translateY(-3px) scale(1.02);
-        box-shadow: 0 20px 45px rgba(2, 132, 199, 0.6);
+        box-shadow: 0 18px 36px rgba(79, 70, 229, 0.38);
     }
 
     .btn-hero-hub {
         padding: 16px 30px;
         border-radius: 14px;
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        color: #ffffff;
+        background: #FFFFFF;
+        border: 1px solid var(--card-border);
+        color: var(--text-main);
         font-size: 16px;
         font-weight: 700;
         text-decoration: none;
@@ -273,12 +276,12 @@
         align-items: center;
         gap: 10px;
         transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
     }
 
     .btn-hero-hub:hover {
-        background: rgba(255, 255, 255, 0.12);
-        border-color: rgba(255, 255, 255, 0.35);
+        background: #F5EFEB;
+        border-color: #cbd5e1;
         transform: translateY(-3px);
     }
 
@@ -287,12 +290,11 @@
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 16px;
-        background: rgba(15, 23, 42, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: #FFFFFF;
+        border: 1px solid var(--card-border);
         border-radius: 18px;
         padding: 20px 28px;
-        backdrop-filter: blur(16px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
         margin-bottom: 60px;
     }
 
@@ -312,22 +314,22 @@
         font-size: 20px;
     }
 
-    .telemetry-icon.blue { background: rgba(2, 132, 199, 0.15); color: #38bdf8; border: 1px solid rgba(2, 132, 199, 0.3); }
-    .telemetry-icon.purple { background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); }
-    .telemetry-icon.green { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-    .telemetry-icon.gold { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .telemetry-icon.blue { background: rgba(2, 132, 199, 0.08); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.2); }
+    .telemetry-icon.purple { background: rgba(79, 70, 229, 0.08); color: #4f46e5; border: 1px solid rgba(79, 70, 229, 0.2); }
+    .telemetry-icon.green { background: rgba(5, 150, 105, 0.08); color: #059669; border: 1px solid rgba(5, 150, 105, 0.2); }
+    .telemetry-icon.gold { background: rgba(217, 119, 6, 0.08); color: #d97706; border: 1px solid rgba(217, 119, 6, 0.2); }
 
     .telemetry-text .number {
         font-size: 20px;
         font-weight: 800;
-        color: #ffffff;
+        color: var(--text-main);
         font-family: 'JetBrains Mono', monospace;
     }
 
     .telemetry-text .label {
         font-size: 12px;
         font-weight: 600;
-        color: #94a3b8;
+        color: var(--text-muted);
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
@@ -341,13 +343,13 @@
     .section-header h3 {
         font-size: 28px;
         font-weight: 800;
-        color: #ffffff;
+        color: var(--text-main);
         margin-bottom: 8px;
     }
 
     .section-header p {
         font-size: 15px;
-        color: #94a3b8;
+        color: var(--text-muted);
     }
 
     .workstations-grid {
@@ -358,17 +360,17 @@
     }
 
     .workstation-card {
-        background: rgba(15, 23, 42, 0.75);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: #FFFFFF;
+        border: 1px solid var(--card-border);
         border-radius: 18px;
         padding: 26px;
-        backdrop-filter: blur(12px);
         transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         position: relative;
         overflow: hidden;
+        box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
     }
 
     .workstation-card::before {
@@ -385,8 +387,8 @@
 
     .workstation-card:hover {
         transform: translateY(-6px);
-        border-color: rgba(56, 189, 248, 0.4);
-        box-shadow: 0 20px 40px -10px rgba(2, 132, 199, 0.25);
+        border-color: rgba(79, 70, 229, 0.3);
+        box-shadow: 0 16px 36px -4px rgba(79, 70, 229, 0.12);
     }
 
     .workstation-card:hover::before {
@@ -411,13 +413,13 @@
     .card-title {
         font-size: 18px;
         font-weight: 800;
-        color: #ffffff;
+        color: var(--text-main);
         margin-bottom: 8px;
     }
 
     .card-desc {
         font-size: 13.5px;
-        color: #94a3b8;
+        color: var(--text-muted);
         line-height: 1.55;
     }
 
@@ -431,14 +433,14 @@
 
     .card-features-list li {
         font-size: 12.5px;
-        color: #cbd5e1;
+        color: #334155;
         display: flex;
         align-items: center;
         gap: 8px;
     }
 
     .card-features-list li i {
-        color: #38bdf8;
+        color: #4f46e5;
         font-size: 11px;
     }
 
@@ -448,24 +450,24 @@
         gap: 8px;
         font-size: 13px;
         font-weight: 700;
-        color: #38bdf8;
+        color: #4f46e5;
         text-decoration: none;
         transition: gap 0.2s ease;
     }
 
     .workstation-card:hover .card-link {
         gap: 12px;
-        color: #7dd3fc;
+        color: #4338ca;
     }
 
     /* Final Action Banner */
     .action-banner {
-        background: linear-gradient(135deg, rgba(2, 132, 199, 0.2) 0%, rgba(99, 102, 241, 0.2) 50%, rgba(15, 23, 42, 0.8) 100%);
-        border: 1px solid rgba(56, 189, 248, 0.35);
+        background: #FFFFFF;
+        border: 1px solid var(--card-border);
         border-radius: 22px;
         padding: 44px;
         text-align: center;
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 4px 24px rgba(15, 23, 42, 0.04);
         margin-bottom: 60px;
         position: relative;
         overflow: hidden;
@@ -474,13 +476,13 @@
     .action-banner h3 {
         font-size: 28px;
         font-weight: 900;
-        color: #ffffff;
+        color: var(--text-main);
         margin-bottom: 10px;
     }
 
     .action-banner p {
         font-size: 15px;
-        color: #cbd5e1;
+        color: #334155;
         max-width: 650px;
         margin: 0 auto 28px;
     }
@@ -488,7 +490,7 @@
     /* Footer */
     .footer {
         padding: 30px 0 40px;
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        border-top: 1px solid var(--card-border);
         display: flex;
         justify-content: center;
         text-align: center;
@@ -499,21 +501,285 @@
         font-size: 13px;
     }
 
-    /* Responsive */
-    @media (max-width: 992px) {
-        .workstations-grid { grid-template-columns: repeat(2, 1fr); }
-        .telemetry-bar { grid-template-columns: repeat(2, 1fr); }
+    .hide-mobile {
+        display: inline;
+    }
+
+    .btn-banner-cta {
+        padding: 16px 36px;
+        font-size: 16px;
+    }
+
+    /* ==========================================================================
+       RESPONSIVE DESIGN SYSTEM — ALL DEVICE SUITES
+       Supports: JioPhone 2 (240px), Foldables (Z Fold 5/6, Surface Duo, Pixel Fold),
+       Phones (iPhone SE/12-16 Pro Max, Pixels, Galaxies, Moto G),
+       Tablets (iPad Mini, Tab S4, Surface Pro 7/10, iPad Pro 13),
+       Smart Displays (Nest Hub Max 1280x800) & Zenbook Fold
+       ========================================================================== */
+
+    /* Touch Displays with 800px or less height (e.g. Google Nest Hub Max 1280x800) */
+    @media (max-height: 850px) and (min-width: 1024px) {
+        .hero { padding: 36px 0 24px; }
+        .hero-title { font-size: 38px; margin-bottom: 12px; }
+        .hero-description { margin-bottom: 24px; font-size: 15px; }
+        .telemetry-bar { margin-bottom: 36px; padding: 16px 22px; }
+        .workstations-grid { margin-bottom: 36px; gap: 16px; }
+        .workstation-card { padding: 20px; }
+        .action-banner { padding: 32px 24px; margin-bottom: 36px; }
+    }
+
+    /* Large Tablets & Desktop Widescreens (iPad Pro 13, Surface Pro 10, Zenbook Fold) */
+    @media (min-width: 1025px) {
+        .workstations-grid { grid-template-columns: repeat(3, 1fr); gap: 22px; }
+        .telemetry-bar { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    /* Tablets & Foldables Unfolded (iPad Mini 768px, Galaxy Tab S4 711px/800px, Surface Pro 7/10 912px, Surface Duo dual 1114px, Z Fold unfolded 768px-820px) */
+    @media (max-width: 1024px) and (min-width: 681px) {
+        .container { padding: 0 20px; }
+        .workstations-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+        .telemetry-bar { grid-template-columns: repeat(2, 1fr); gap: 14px; }
         .hero-title { font-size: 38px; }
     }
 
-    @media (max-width: 640px) {
-        .workstations-grid { grid-template-columns: 1fr; }
-        .telemetry-bar { grid-template-columns: 1fr; }
-        .hero-title { font-size: 30px; }
-        .hero-description { font-size: 15px; }
-        .action-banner { padding: 30px 20px; }
+    /* Standard & Large Smartphones (iPhone 14/15/16 Pro Max, Pixel 7/8/9/10, Galaxy A55/S8/S20, Moto G, Surface Duo single 540px, Facebook on Android) */
+    @media (max-width: 680px) {
+        .container { padding: 0 16px; }
+        .navbar {
+            flex-wrap: wrap;
+            gap: 14px;
+            padding: 16px 0;
+        }
+        .brand-group {
+            gap: 10px;
+        }
+        .brand-logo-badge {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            border-radius: 12px;
+        }
+        .brand-text h1 {
+            font-size: 17px;
+        }
+        .brand-text span {
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+        .nav-actions {
+            width: 100%;
+            display: flex;
+            gap: 8px;
+        }
+        .btn-nav-outline, .btn-nav-primary {
+            flex: 1 1 auto;
+            justify-content: center;
+            padding: 10px 12px;
+            font-size: 12.5px;
+            text-align: center;
+            white-space: nowrap;
+            min-height: 44px;
+        }
+        .hero {
+            padding: 34px 0 26px;
+        }
+        .hero-badge {
+            font-size: 11px;
+            padding: 5px 12px;
+            margin-bottom: 16px;
+            letter-spacing: 0.3px;
+        }
+        .hero-title {
+            font-size: clamp(24px, 7vw, 34px);
+            line-height: 1.2;
+            margin-bottom: 14px;
+        }
+        .hero-title .hide-mobile {
+            display: none;
+        }
+        .hero-description {
+            font-size: 14.5px;
+            margin-bottom: 24px;
+            line-height: 1.55;
+        }
+        .workstations-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+        .workstation-card {
+            padding: 20px;
+        }
+        .telemetry-bar {
+            grid-template-columns: repeat(2, 1fr);
+            padding: 16px 14px;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+        .telemetry-item {
+            gap: 10px;
+        }
+        .telemetry-icon {
+            width: 38px;
+            height: 38px;
+            font-size: 16px;
+            border-radius: 10px;
+        }
+        .telemetry-text .number {
+            font-size: 17px;
+        }
+        .telemetry-text .label {
+            font-size: 10px;
+        }
+        .action-banner {
+            padding: 28px 18px;
+            margin-bottom: 40px;
+        }
+        .action-banner h3 {
+            font-size: 22px;
+        }
+        .action-banner p {
+            font-size: 14px;
+            margin-bottom: 22px;
+        }
+        .btn-banner-cta {
+            width: 100%;
+            justify-content: center;
+            padding: 14px 20px;
+            font-size: 14.5px;
+            box-sizing: border-box;
+        }
     }
 
+    /* Narrow Smartphones & Foldable Cover Screens (iPhone SE 375px, Moto G4 360px, Galaxy S8+ 360px, Galaxy Z Fold 5/6 cover 344px) */
+    @media (max-width: 400px) {
+        .container {
+            padding: 0 12px;
+        }
+        .telemetry-bar {
+            grid-template-columns: 1fr;
+            padding: 14px 12px;
+        }
+        .btn-nav-outline, .btn-nav-primary {
+            font-size: 11.5px;
+            padding: 8px 10px;
+            gap: 6px;
+        }
+        .brand-text h1 {
+            font-size: 15.5px;
+        }
+        .brand-text span {
+            font-size: 9px;
+        }
+    }
+
+    /* Ultra-Compact Feature Phones (JioPhone 2: 240x320px) */
+    @media (max-width: 320px) {
+        .container {
+            padding: 0 8px;
+        }
+        .navbar {
+            flex-direction: column;
+            align-items: stretch;
+            text-align: center;
+            gap: 10px;
+            padding: 10px 0;
+        }
+        .brand-group {
+            justify-content: center;
+        }
+        .nav-actions {
+            flex-direction: column;
+            width: 100%;
+            gap: 6px;
+        }
+        .btn-nav-outline, .btn-nav-primary {
+            width: 100%;
+            font-size: 11px;
+            padding: 8px 6px;
+        }
+        .hero {
+            padding: 20px 0 16px;
+        }
+        .hero-title {
+            font-size: 19px;
+            line-height: 1.25;
+        }
+        .hero-description {
+            font-size: 12px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+        .hero-badge {
+            font-size: 9px;
+            padding: 4px 8px;
+            margin-bottom: 12px;
+        }
+        .telemetry-bar {
+            padding: 10px 8px;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .telemetry-icon {
+            width: 32px;
+            height: 32px;
+            font-size: 14px;
+        }
+        .telemetry-text .number {
+            font-size: 15px;
+        }
+        .telemetry-text .label {
+            font-size: 9px;
+        }
+        .workstations-grid {
+            margin-bottom: 24px;
+            gap: 12px;
+        }
+        .workstation-card {
+            padding: 14px 10px;
+        }
+        .card-icon {
+            width: 38px;
+            height: 38px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .card-title {
+            font-size: 15px;
+        }
+        .card-desc {
+            font-size: 11.5px;
+        }
+        .card-features-list {
+            margin: 10px 0 14px;
+            gap: 6px;
+        }
+        .card-features-list li {
+            font-size: 10.5px;
+            gap: 6px;
+        }
+        .action-banner {
+            padding: 16px 10px;
+            margin-bottom: 24px;
+            border-radius: 14px;
+        }
+        .action-banner h3 {
+            font-size: 16px;
+        }
+        .action-banner p {
+            font-size: 11.5px;
+            margin-bottom: 16px;
+        }
+        .btn-banner-cta {
+            padding: 10px 12px;
+            font-size: 12px;
+        }
+        .footer {
+            padding: 16px 0 24px;
+            font-size: 11px;
+        }
+    }
 </style>
 </head>
 <body>
@@ -551,7 +817,7 @@
         </div>
 
         <h2 class="hero-title">
-            The World-Class Operating System for <br>
+            The World-Class Operating System for <br class="hide-mobile">
             <span class="gradient-text">Modern Educational Institutions</span>
         </h2>
 
@@ -614,7 +880,7 @@
         <!-- 1. Super Admin Command Center -->
         <div class="workstation-card">
             <div class="card-top">
-                <div class="card-icon" style="background: rgba(2,132,199,0.15); color: #38bdf8;">
+                <div class="card-icon" style="background: rgba(2,132,199,0.15); color: #4f46e5;">
                     <i class="fa-solid fa-shield-halved"></i>
                 </div>
                 <h4 class="card-title">Super Admin Command</h4>
@@ -625,7 +891,7 @@
                     <li><i class="fa-solid fa-check"></i> Live cloud telemetry &amp; security heartbeats</li>
                 </ul>
             </div>
-            <a href="pages/admin/admin-login.html" class="card-link">Super Admin Sign In <i class="fa-solid fa-arrow-right"></i></a>
+            <a href="pages/admin/super-admin.html" class="card-link" onclick="handleAdminPortalLaunch(event)">Super Admin Console <i class="fa-solid fa-arrow-right"></i></a>
         </div>
 
         <!-- 2. Teacher & Classroom Portal -->
@@ -718,7 +984,7 @@
     <div class="action-banner">
         <h3>Ready to Transform Your School Operations?</h3>
         <p>Join hundreds of forward-thinking institutions using FLAWLESS GRAPHICS to streamline administration, grading, and finance.</p>
-        <a href="register.html" class="btn-hero-register" style="padding: 16px 40px; font-size: 16.5px;">
+        <a href="register.html" class="btn-hero-register btn-banner-cta">
             <i class="fa-solid fa-building"></i>
             <span>Register Your Institution Now</span>
             <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i>
@@ -733,7 +999,21 @@
     </footer>
 </div>
 
+<script src="assets/js/auth-session.js"></script>
 <script>
+function handleAdminPortalLaunch(event) {
+    if (event) event.preventDefault();
+    const user = window.AuthSession ? window.AuthSession.getUser() : null;
+    const role = (user && user.role ? user.role : '').toLowerCase();
+    const status = (user && user.status ? user.status : '').toLowerCase();
+    if (user && (role === 'admin' || role === 'superadmin') && status !== 'pending_approval' && status !== 'pending') {
+        window.location.href = 'pages/admin/super-admin.html';
+    } else {
+        window.location.href = 'pages/admin/admin-login.html';
+    }
+}
+window.handleAdminPortalLaunch = handleAdminPortalLaunch;
+
 window.addEventListener('DOMContentLoaded', () => {
     if (window.AuthSession) {
         window.AuthSession.applyGlobalBranding();

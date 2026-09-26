@@ -9,7 +9,7 @@
   <script src="../../assets/js/auth-session.js"></script>
   <script>
     (function() {
-      const user = window.AuthSession ? window.AuthSession.requireAuth('finance-login.html', true) : null;
+      const user = window.AuthSession ? window.AuthSession.requireAuth('finance-login.html', 'finance') : null;
     })();
   </script>
 
@@ -108,6 +108,37 @@
     body::after { bottom: 0; right: -100px; }
 
     /* VERTICAL LEFT SIDEBAR */
+    
+    /* Universal Side Hover Rail for Finance Dashboard */
+    header {
+      width: 72px !important;
+      padding: 20px 10px !important;
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease !important;
+      z-index: 1000 !important;
+      overflow-x: hidden !important;
+    }
+    header:hover {
+      width: 270px !important;
+      padding: 22px 16px !important;
+      box-shadow: 14px 0 35px rgba(0, 0, 0, 0.25) !important;
+    }
+    main {
+      margin-left: 72px !important;
+      width: calc(100% - 72px) !important;
+      max-width: calc(100% - 72px) !important;
+      transition: margin-left 0.3s ease !important;
+    }
+    header .brand div, header .session-badge, header .nav-divider, header nav ul li a {
+      white-space: nowrap;
+    }
+    header .brand div, header .session-badge, header .nav-divider {
+      opacity: 0;
+      transition: opacity 0.2s 0.05s ease;
+    }
+    header:hover .brand div, header:hover .session-badge, header:hover .nav-divider {
+      opacity: 1;
+    }
+
     header {
       position: fixed;
       top: 0;
@@ -257,6 +288,130 @@
     .btn-action.success-btn:hover { background: #059669; }
     .btn-action.warning-btn { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #F59E0B; }
     .btn-action.warning-btn:hover { background: rgba(245, 158, 11, 0.25); }
+
+    /* TOP NAVIGATION BAR */
+    .top-nav-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 18px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+      flex-wrap: wrap;
+    }
+
+    .top-nav-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .top-nav-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-left: auto;
+    }
+
+    .topbar-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 7px 13px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .topbar-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .topbar-btn.supabase-btn {
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.08);
+      font-weight: 700;
+    }
+    .topbar-btn.supabase-btn:hover {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: #10b981;
+    }
+
+    .topbar-btn.notif-btn {
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.08);
+      font-weight: 700;
+    }
+    .topbar-btn.notif-btn:hover {
+      background: rgba(245, 158, 11, 0.18);
+      border-color: #f59e0b;
+    }
+
+    .notif-pill {
+      background: #f59e0b;
+      color: #0f172a;
+      padding: 1px 7px;
+      font-size: 10px;
+      font-weight: 800;
+      border-radius: 9999px;
+      margin-left: 2px;
+    }
+
+    .topbar-curr-wrap {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      border-radius: 9px;
+      padding: 4px 10px;
+      gap: 4px;
+    }
+
+    .curr-label {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .topbar-curr-wrap select {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      outline: none;
+    }
+    .topbar-curr-wrap select option {
+      background: #0f172a;
+      color: #fff;
+    }
+
+    .topbar-btn.logout-btn:hover {
+      background: rgba(239, 68, 68, 0.18);
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #ef4444;
+    }
 
     /* TOP STATS BAR IN MAIN */
     .top-bursary-bar {
@@ -692,56 +847,19 @@
       </nav>
     </div>
 
-    <div class="header-actions">
-        <button type="button" class="btn-action" onclick="SlideOver.openNotifications()"><i class="fa-solid fa-bell"></i> Audit &amp; Alerts</button>
-        <button type="button" class="btn-action" onclick="SlideOver.openGuide('finance')"><i class="fa-solid fa-book-open"></i> Treasury Guide</button>
-        <button type="button" class="btn-action" onclick="SlideOver.openWorkspaceDirectory()"><i class="fa-solid fa-building-columns"></i> Workspaces</button>
-      <!-- Live Sync Status Badge -->
-      <button class="btn-action" id="cloudSyncBtn" onclick="openCloudModal()" title="Supabase Cloud Synchronization" style="border: 1px solid rgba(16, 185, 129, 0.4); color: #10b981; background: rgba(16, 185, 129, 0.08); border-radius: 9999px; padding: 6px 12px; font-weight: 700; font-size: 11.5px; display: inline-flex; align-items: center; gap: 7px; cursor: pointer;">
-        <i class="fa-solid fa-cloud" id="cloudSyncIcon"></i> <span id="cloudSyncLabel">Connect Supabase</span>
-      </button>
-
-      <!-- Notifications Arrived Trigger -->
-      <button class="btn-action" id="financeTopbarNotifBtn" onclick="if(window.QuickDock){window.QuickDock.openNotifications();}" title="Notifications Arrived" style="border: 1px solid rgba(251, 191, 36, 0.4); color: #fbbf24; background: rgba(251, 191, 36, 0.08); border-radius: 9999px; padding: 6px 12px; font-weight: 700; font-size: 11.5px; display: inline-flex; align-items: center; gap: 7px; cursor: pointer;">
-        <i class="fa-solid fa-bell"></i> <span>Notifications</span>
-        <span id="financeTopbarNotifBadge" style="background:#fbbf24; color:#0f172a; padding:1px 6px; font-size:10.5px; font-weight:800; border-radius:10px;">0</span>
-      </button>
-
-      <!-- Currency Switcher -->
-      <div style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; padding: 2px 8px;">
-        <span style="font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.6); margin-right: 4px;">CURR:</span>
-        <select id="currSelect" onchange="changeCurrency(this.value)" style="background: transparent; border: none; color: #fff; font-size: 11.5px; font-weight: 700; cursor: pointer; outline: none;">
-          <option value="GHS" style="background:#0b0f19; color:#fff;">GHS (GH₵)</option>
-          <option value="USD" style="background:#0b0f19; color:#fff;">USD ($)</option>
-          <option value="EUR" style="background:#0b0f19; color:#fff;">EUR (€)</option>
-          <option value="GBP" style="background:#0b0f19; color:#fff;">GBP (£)</option>
-        </select>
-      </div>
-
-      <button class="btn-action" id="themeBtn" onclick="toggleTheme()">
-        <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
-      </button>
-
-      <button class="btn-action logout" id="logoutBtn" onclick="logout()">
-        <i class="fa-solid fa-right-from-bracket"></i>
-        <span>Logout</span>
-      </button>
-
-      <div id="topRightProfileContainer" class="fg-top-profile-container"></div>
-    </div>
   </header>
 
   <!-- MAIN CONTAINER -->
   <main>
-    <!-- TOP STATS BAR -->
-    <div class="top-bursary-bar" data-aos="fade-down" data-aos-duration="500">
-      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-        <div class="org-badge" id="displayOrg" style="font-size: 12px; background: var(--glass-glow); border: 1px solid var(--card-border); padding: 5px 12px; border-radius: 20px; font-weight: 700; color: var(--accent);">
-          <i class="fa-solid fa-school"></i> Institution: Flawless Graphics Academy
+    <!-- TOP NAVIGATION BAR (HORIZONTALLY ALIGNED) -->
+    <div class="top-nav-bar" id="financeTopNavBar" data-aos="fade-down" data-aos-duration="500">
+      <div class="top-nav-left">
+        <div class="org-badge" id="displayOrg" style="font-size: 12px; background: var(--glass-glow); border: 1px solid var(--card-border); padding: 6px 14px; border-radius: 20px; font-weight: 700; color: var(--accent); display: inline-flex; align-items: center; gap: 7px;">
+          <i class="fa-solid fa-school"></i> <span>Institution: Flawless Graphics Academy</span>
         </div>
         <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted);">
           <span>Academic Term:</span>
-          <select id="termSelect" onchange="switchAcademicTerm(this.value)" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-main); font-weight: 700; font-size: 12px; border-radius: 6px; padding: 4px 8px; outline: none; cursor: pointer;">
+          <select id="termSelect" onchange="switchAcademicTerm(this.value)" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-main); font-weight: 700; font-size: 12px; border-radius: 8px; padding: 5px 10px; outline: none; cursor: pointer;">
             <option value="Term 2">2026/2027 • Term 2 (Current Active)</option>
             <option value="Term 1">2026/2027 • Term 1 (Archived)</option>
             <option value="Term 3">2026/2027 • Term 3 (Upcoming Billing)</option>
@@ -749,17 +867,70 @@
         </div>
       </div>
 
-      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-        <button class="btn-action success-btn" style="padding: 7px 14px; font-size: 12px; width:auto;" onclick="openModal('studentFeeModal')">
-          <i class="fa-solid fa-receipt"></i> Collect Student Fee
+      <div class="top-nav-right">
+        <!-- 1. Audit & Alerts -->
+        <button type="button" class="topbar-btn" onclick="SlideOver.openNotifications()" title="Audit Logs & Alerts">
+          <i class="fa-solid fa-bell"></i> <span>Audit &amp; Alerts</span>
         </button>
-        <button class="btn-action" style="background: var(--accent-gradient); padding: 7px 14px; font-size: 12px; width:auto;" onclick="openPrepareSalaryModal()">
-          <i class="fa-solid fa-hand-holding-dollar"></i> Prepare Payroll
+
+        <!-- 2. Treasury Guide -->
+        <button type="button" class="topbar-btn" onclick="SlideOver.openGuide('finance')" title="Treasury Documentation Guide">
+          <i class="fa-solid fa-book-open"></i> <span>Treasury Guide</span>
         </button>
-        <button class="btn-action warning-btn" style="padding: 7px 14px; font-size: 12px; width:auto;" onclick="openModal('invoiceModal')">
-          <i class="fa-solid fa-file-invoice"></i> Generate Invoice
+
+        <!-- 3. Workspaces -->
+        <button type="button" class="topbar-btn" onclick="SlideOver.openWorkspaceDirectory()" title="Switch Workspace">
+          <i class="fa-solid fa-building-columns"></i> <span>Workspaces</span>
         </button>
+
+        <!-- 4. Connect Supabase -->
+        <button class="topbar-btn supabase-btn" id="cloudSyncBtn" onclick="openCloudModal()" title="Supabase Cloud Synchronization">
+          <i class="fa-solid fa-cloud" id="cloudSyncIcon"></i> <span id="cloudSyncLabel">Connect Supabase</span>
+        </button>
+
+        <!-- 5. Notifications -->
+        <button class="topbar-btn notif-btn" id="financeTopbarNotifBtn" onclick="if(window.QuickDock){window.QuickDock.openNotifications();}" title="Notifications Arrived">
+          <i class="fa-solid fa-bell"></i> <span>Notifications</span>
+          <span id="financeTopbarNotifBadge" class="notif-pill">0</span>
+        </button>
+
+        <!-- 6. Currency Switcher -->
+        <div class="topbar-curr-wrap">
+          <span class="curr-label">CURR:</span>
+          <select id="currSelect" onchange="changeCurrency(this.value)">
+            <option value="GHS">GHS (GH₵)</option>
+            <option value="USD">USD ($)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="GBP">GBP (£)</option>
+          </select>
+        </div>
+
+        <!-- 7. Theme Toggle -->
+        <button class="topbar-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>
+        </button>
+
+        <!-- 8. Logout -->
+        <button class="topbar-btn logout-btn" id="logoutBtn" onclick="logout()" title="End Session">
+          <i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span>
+        </button>
+
+        <!-- 9. User Profile Avatar -->
+        <div id="topRightProfileContainer" class="fg-top-profile-container"></div>
       </div>
+    </div>
+
+    <!-- QUICK ACTIONS BAR -->
+    <div style="display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: 22px; flex-wrap: wrap;">
+      <button class="btn-action success-btn" style="padding: 7px 15px; font-size: 12px; width:auto; border-radius: 9px;" onclick="openModal('studentFeeModal')">
+        <i class="fa-solid fa-receipt"></i> Collect Student Fee
+      </button>
+      <button class="btn-action" style="background: var(--accent-gradient); padding: 7px 15px; font-size: 12px; width:auto; border-radius: 9px;" onclick="openPrepareSalaryModal()">
+        <i class="fa-solid fa-hand-holding-dollar"></i> Prepare Payroll
+      </button>
+      <button class="btn-action warning-btn" style="padding: 7px 15px; font-size: 12px; width:auto; border-radius: 9px;" onclick="openModal('invoiceModal')">
+        <i class="fa-solid fa-file-invoice"></i> Generate Invoice
+      </button>
     </div>
 
     <!-- ========================================== -->
@@ -1971,6 +2142,9 @@
 
     const CURRENCY_SYMBOLS = { GHS: 'GH₵', USD: '$', EUR: '€', GBP: '£' };
     const CURRENCY_RATES = { GHS: 1.0, USD: 0.065, EUR: 0.060, GBP: 0.052 };
+
+    const activeFinanceUser = (window.AuthSession ? window.AuthSession.getUser() : null) || JSON.parse(localStorage.getItem('active_finance') || 'null');
+    const ACTIVE_ORG = (activeFinanceUser && activeFinanceUser.org) || (window.AuthSession ? window.AuthSession.getOrg() : null) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
 
     // INITIAL INSTITUTIONAL DATA (Clean slate for new institution workspaces)
     const isRootOrg = (ACTIVE_ORG || '').toUpperCase() === 'FLAWLESS GRAPHICS';

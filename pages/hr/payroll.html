@@ -26,6 +26,16 @@
   <!-- Short Skeletal Loading Stylesheet -->
   <link rel="stylesheet" href="../../assets/css/skeleton.css">
 
+  <!-- Unified AuthSession & Synchronous Route Guard -->
+  <script src="../../assets/js/auth-session.js"></script>
+  <script>
+    (function() {
+      if (window.AuthSession) {
+        window.AuthSession.requireAuth('hr-login.html', 'hr');
+      }
+    })();
+  </script>
+
   <style>
     .payroll-summary-grid {
       display: grid;

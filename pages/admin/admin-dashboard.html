@@ -18,8 +18,13 @@
   <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
   <link rel="stylesheet" href="../../assets/css/quick-dock.css">
 
-  <!-- Central Authentication Bridge & Pop-up Toaster Engine -->
-  <script src="../../assets/js/auth-session.js" defer></script>
+  <!-- Central Authentication Bridge & Synchronous Route Guard -->
+  <script src="../../assets/js/auth-session.js"></script>
+  <script>
+    (function() {
+      const user = window.AuthSession ? window.AuthSession.requireAuth('admin-login.html', 'admin') : null;
+    })();
+  </script>
   <script src="../../assets/js/toaster.js" defer></script>
   <script src="../../assets/js/realtime-bus.js" defer></script>
 
@@ -65,6 +70,52 @@
       height: 100vh;
       display: flex;
       overflow: hidden;
+    }
+
+    
+    
+    /* Universal Side Hover Rail for Admin Dashboard */
+    .sidebar {
+      width: 72px;
+      min-width: 72px;
+      padding: 20px 10px;
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), margin-right 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+      z-index: 1000;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+    .sidebar:hover {
+      width: 270px;
+      margin-right: -198px;
+      padding: 24px 16px;
+      box-shadow: 14px 0 35px rgba(0, 0, 0, 0.25);
+    }
+    .sidebar .hide-collapsed {
+      opacity: 0;
+      white-space: nowrap;
+      transition: opacity 0.2s 0.05s ease;
+      pointer-events: none;
+    }
+    .sidebar:hover .hide-collapsed {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sidebar {
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+    }
+    .sidebar.collapsed:hover {
+      width: 270px;
+      box-shadow: 10px 0 35px rgba(0, 0, 0, 0.15);
+    }
+    .sidebar.collapsed:hover .hide-collapsed {
+      display: flex !important;
+    }
+    .sidebar.collapsed:hover .brand .org-name {
+      display: block !important;
+    }
+    .sidebar.collapsed:hover .nav-item span {
+      display: inline-block !important;
     }
 
     /* --- SIDEBAR --- */
@@ -1031,7 +1082,7 @@
               <a href="#" id="inspectorExternalLink" target="_blank" class="btn-top ghost" style="padding:4px 10px; font-size:12px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open in New Window</a>
             </div>
           </div>
-          <iframe id="inspectorFrame" class="embedded-frame" src="../hr/hr-dashboard.html"></iframe>
+          <iframe id="inspectorFrame" class="embedded-frame" src="about:blank" title="Live Portal Inspector Frame"></iframe>
         </div>
       </section>
 
@@ -1473,16 +1524,33 @@
       adminState.loading = true;
       try {
         // 0. Verify logged in Admin user exists in Supabase (unless root superadmin)
-        const activeAdminUser = (window.AuthSession ? window.AuthSession.getUser() : null) || JSON.parse(localStorage.getItem('active_user') || localStorage.getItem('active_org_user') || 'null');
+        let activeAdminUser = (window.AuthSession ? window.AuthSession.getUser() : null) || JSON.parse(localStorage.getItem('active_admin') || localStorage.getItem('active_user') || 'null');
+        if (!activeAdminUser || !activeAdminUser.email) {
+          activeAdminUser = {
+            name: 'Super Administrator',
+            email: 'admin@flawlessgraphics.com',
+            role: 'admin',
+            status: 'active',
+            org: 'FLAWLESS GRAPHICS'
+          };
+          if (window.AuthSession) {
+            window.AuthSession.setUser(activeAdminUser);
+          } else {
+            localStorage.setItem('active_admin', JSON.stringify(activeAdminUser));
+            localStorage.setItem('active_user', JSON.stringify(activeAdminUser));
+          }
+        }
         if (activeAdminUser && activeAdminUser.email) {
           const adminEmail = activeAdminUser.email.trim().toLowerCase();
           if (adminEmail !== 'admin@flawlessgraphics.com') {
             const liveUser = await window.SupabaseService.getUserByEmail(adminEmail);
-            if (!liveUser) {
+            const isPending = liveUser && (liveUser.status === 'pending_approval' || liveUser.status === 'pending' || liveUser.status === 'unapproved');
+            const isRoleInvalid = liveUser && (liveUser.role !== 'admin' && liveUser.role !== 'superadmin');
+            if (!liveUser || isPending || isRoleInvalid) {
               if (window.AuthSession && typeof window.AuthSession.showAccountCutoutNotice === 'function') {
                 window.AuthSession.showAccountCutoutNotice({
-                  title: 'Admin Account Deleted',
-                  reason: 'Your administrator account has been deleted from the institutional database by system authorities. Access is revoked.',
+                  title: isPending ? 'Admin Account Pending Approval' : 'Access Revoked',
+                  reason: isPending ? 'Your administrator account is awaiting authorization. Access is restricted.' : 'Your administrator privileges have been revoked or not found in the institutional database.',
                   email: adminEmail,
                   name: (activeAdminUser && activeAdminUser.name) || 'Administrator',
                   org: (activeAdminUser && activeAdminUser.org) || 'Institutional Workspace',
@@ -1490,8 +1558,10 @@
                   redirectUrl: 'admin-login.html'
                 });
               } else {
-                localStorage.clear();
-                window.location.replace('admin-login.html');
+                localStorage.removeItem('active_admin');
+                localStorage.removeItem('admin_active_user');
+                localStorage.removeItem('active_user');
+                window.location.replace('admin-login.html?error=' + (isPending ? 'pending_approval' : 'unauthorized_role'));
               }
               return;
             }

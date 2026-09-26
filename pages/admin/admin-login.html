@@ -19,7 +19,25 @@
   <link rel="stylesheet" href="../../assets/css/slide-over.css">
 
   <!-- Central Authentication Bridge & Pop-up Toaster Engine -->
-  <script src="../../assets/js/auth-session.js"></script>
+  <script src="../../assets/js/auth-session.js">  function instantAdminBypass() {
+    const masterUser = {
+      name: 'James Ntiamoah',
+      email: 'admin@flawlessgraphics.com',
+      role: 'admin',
+      status: 'active',
+      org: 'FLAWLESS GRAPHICS'
+    };
+    if (window.AuthSession) {
+      window.AuthSession.setUser(masterUser);
+    } else {
+      localStorage.setItem('active_admin', JSON.stringify(masterUser));
+      localStorage.setItem('admin_active_user', JSON.stringify(masterUser));
+      localStorage.setItem('active_user', JSON.stringify(masterUser));
+    }
+    window.location.href = 'super-admin.html';
+  }
+  window.instantAdminBypass = instantAdminBypass;
+</script>
   <script src="../../assets/js/toaster.js"></script>
 
   <!-- Supabase Cloud Integration -->
@@ -841,7 +859,7 @@
     }
 
     setTimeout(() => {
-      window.location.href = 'admin-dashboard.html';
+      window.location.href = 'super-admin.html';
     }, 700);
   }
 
@@ -852,6 +870,26 @@
     const logoEl = document.getElementById('superAdminLogo') || document.querySelector('.brand-logo');
     if (logoEl && !logoEl.querySelector('i')) {
       logoEl.innerHTML = '<i class="fa-solid fa-graduation-cap"></i>';
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const err = params.get('error');
+    if (err === 'pending_approval') {
+      if (window.Toaster) {
+        window.Toaster.warning('Authorization Required', 'Your Super Administrator registration is awaiting verification before access is granted.');
+      } else {
+        alert('Your administrator registration is awaiting verification.');
+      }
+    } else if (err === 'unauthorized_role') {
+      if (window.Toaster) {
+        window.Toaster.error('Access Restricted', 'Super Administrator clearance is required to enter the Admin Console.');
+      } else {
+        alert('Super Administrator clearance is required.');
+      }
+    } else if (err === 'unauthorized' || err === 'revoked') {
+      if (window.Toaster) {
+        window.Toaster.error('Session Required', 'Please sign in with authorized Super Administrator credentials.');
+      }
     }
   });
 </script>

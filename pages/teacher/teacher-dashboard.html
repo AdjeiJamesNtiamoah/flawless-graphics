@@ -79,6 +79,34 @@ body {
 }
 
 /* Sidebar - Pinned Standout Dark Navigation */
+
+/* Universal Side Hover Rail for Educator Dashboard */
+.sidebar {
+  width: 72px !important;
+  min-width: 72px !important;
+  padding: 20px 10px !important;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), margin-right 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease !important;
+  z-index: 1000 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+.sidebar:hover {
+  width: 275px !important;
+  margin-right: -203px !important;
+  padding: 24px 18px !important;
+  box-shadow: 14px 0 35px rgba(0, 0, 0, 0.25) !important;
+}
+.sidebar .brand div, .sidebar .profile-row, .sidebar .tab span, .sidebar .nav-label {
+  opacity: 0;
+  white-space: nowrap;
+  transition: opacity 0.2s 0.05s ease;
+  pointer-events: none;
+}
+.sidebar:hover .brand div, .sidebar:hover .profile-row, .sidebar:hover .tab span, .sidebar:hover .nav-label {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .sidebar {
   width: 275px;
   min-width: 275px;

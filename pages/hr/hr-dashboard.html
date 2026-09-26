@@ -21,8 +21,13 @@
   <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
   <link rel="stylesheet" href="../../assets/css/quick-dock.css">
 
-  <!-- Central Authentication Bridge & Pop-up Toaster Engine -->
-  <script src="../../assets/js/auth-session.js" defer></script>
+  <!-- Central Authentication Bridge & Synchronous Route Guard -->
+  <script src="../../assets/js/auth-session.js"></script>
+  <script>
+    (function() {
+      const user = window.AuthSession ? window.AuthSession.requireAuth('hr-login.html', 'hr') : null;
+    })();
+  </script>
   <script src="../../assets/js/toaster.js" defer></script>
   <script src="../../assets/js/realtime-bus.js" defer></script>
 
@@ -67,6 +72,34 @@
     }
 
     /* --- SIDEBAR --- */
+    
+    /* Universal Side Hover Rail for HR Dashboard */
+    .sidebar {
+      width: 72px !important;
+      min-width: 72px !important;
+      padding: 20px 10px !important;
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), margin-right 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease !important;
+      z-index: 1000 !important;
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
+    }
+    .sidebar:hover {
+      width: 260px !important;
+      margin-right: -188px !important;
+      padding: 24px 16px !important;
+      box-shadow: 14px 0 35px rgba(0, 0, 0, 0.25) !important;
+    }
+    .sidebar .hide-collapsed {
+      opacity: 0;
+      white-space: nowrap;
+      transition: opacity 0.2s 0.05s ease;
+      pointer-events: none;
+    }
+    .sidebar:hover .hide-collapsed {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
     .sidebar {
       width: 260px;
       background: var(--sidebar-bg);
@@ -1487,10 +1520,6 @@
           <span class="nav-bullet">◆</span>
           <span class="nav-label hide-collapsed">HR Sign In</span>
         </button>
-        <button type="button" class="nav-sub-item" onclick="window.location.href='../admin/admin-dashboard.html'" data-tooltip="Dedicated Super Administrator Portal">
-          <span class="nav-bullet">◆</span>
-          <span class="nav-label hide-collapsed" style="color:#a5b4fc; font-weight:700;"><i class="fa-solid fa-crown" style="font-size:11px; margin-right:4px;"></i>Super Admin Portal</span>
-        </button>
       </div>
     </div>
 
@@ -1539,10 +1568,6 @@
       </button>
 
       <select id="orgSwitcher" class="select" title="Active Organization"></select>
-
-      <a href="../admin/admin-dashboard.html" class="btn ghost" title="Dedicated Super Admin Portal" style="border: 1px solid rgba(99, 91, 252, 0.4); color: #635bfc; background: rgba(99, 91, 252, 0.08); border-radius: 9999px; padding: 6px 14px; font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; gap: 7px; text-decoration: none;">
-        <i class="fa-solid fa-crown" style="color: #635bfc;"></i> <span class="hide-collapsed">Super Admin Portal</span>
-      </a>
 
       <div id="topRightProfileContainer" class="fg-top-profile-container"></div>
     </div>
@@ -1815,7 +1840,6 @@
           <option value="hr">HR Manager</option>
           <option value="teacher">Teacher / Academic</option>
           <option value="finance">Finance / Bursar</option>
-          <option value="admin">Super Admin (Protected Root)</option>
         </select>
         <select id="filterUserStatus" class="select" onchange="renderUsers()">
           <option value="">All Statuses</option>
@@ -4523,17 +4547,26 @@ function save(k, v) {
 async function loadHRCloudData() {
   if (!window.SupabaseService) return;
   try {
-    // 0. Verify logged in HR user exists in Supabase
-    const activeHrUser = (window.AuthSession ? window.AuthSession.getUser() : null) || JSON.parse(localStorage.getItem('activeHR') || localStorage.getItem('active_user') || 'null');
+    const activeHrUser = (window.AuthSession ? window.AuthSession.getUser() : null) || JSON.parse(localStorage.getItem('activeHR') || 'null');
+    const isFrame = (typeof window !== 'undefined' && window.self !== window.top);
+    const r = (activeHrUser && activeHrUser.role ? activeHrUser.role : '').toLowerCase();
+    const isSuperAdmin = (r === 'admin' || r === 'superadmin');
+    if (!activeHrUser || !activeHrUser.email) {
+      if (!isFrame) {
+        window.location.replace('hr-login.html');
+      }
+      return;
+    }
     if (activeHrUser && activeHrUser.email) {
       const hrEmail = activeHrUser.email.trim().toLowerCase();
-      if (hrEmail !== 'admin@flawlessgraphics.com') {
+      if (hrEmail !== 'admin@flawlessgraphics.com' && !isSuperAdmin && !isFrame) {
         const liveUser = await window.SupabaseService.getUserByEmail(hrEmail);
-        if (!liveUser) {
+        const isPending = liveUser && (liveUser.status === 'pending_approval' || liveUser.status === 'pending' || liveUser.status === 'unapproved');
+        if (!liveUser || isPending) {
           if (window.AuthSession && typeof window.AuthSession.showAccountCutoutNotice === 'function') {
             window.AuthSession.showAccountCutoutNotice({
-              title: 'HR Account Deleted',
-              reason: 'Your HR administrator account has been deleted from the institutional database by administrators. Access is revoked.',
+              title: isPending ? 'Account Pending Approval' : 'HR Account Revoked',
+              reason: isPending ? 'Your HR administrator account is pending approval by the Super Administrator. Access is locked until approved.' : 'Your HR administrator account has been deleted or revoked from the institutional database. Access is revoked.',
               email: hrEmail,
               name: (activeHrUser && activeHrUser.name) || 'HR Officer',
               org: (activeHrUser && activeHrUser.org) || 'Institutional Workspace',
@@ -4541,8 +4574,9 @@ async function loadHRCloudData() {
               redirectUrl: 'hr-login.html'
             });
           } else {
-            localStorage.clear();
-            window.location.replace('hr-login.html');
+            localStorage.removeItem('activeHR');
+            localStorage.removeItem('hr_active_user');
+            window.location.replace('hr-login.html?error=' + (isPending ? 'pending_approval' : 'unauthorized'));
           }
           return;
         }
@@ -6520,7 +6554,13 @@ function getSystemUsers() {
 
 function renderUsers() {
   const users = getSystemUsers();
-  const orgUsers = users.filter(u => !u.org || u.org === ACTIVE_ORG || u.org === 'FLAWLESS GRAPHICS');
+  const activeOrgLower = (ACTIVE_ORG || '').toLowerCase().trim();
+  const orgUsers = users.filter(u => {
+    if (!u.org && !u.org_id) return true;
+    const uOrg = (u.org || '').toLowerCase().trim();
+    const uOrgId = (u.org_id || '').toLowerCase().trim();
+    return uOrg === activeOrgLower || uOrgId === activeOrgLower || uOrg === 'flawless graphics' || activeOrgLower === 'flawless graphics';
+  });
 
   // Metrics
   const total = orgUsers.length;
@@ -6715,10 +6755,8 @@ function renderUsers() {
             <td style="text-align:right">
               ${isSuperAdmin ? `
                 <div style="display:inline-flex; gap:6px; align-items:center;">
-                  <span style="background:rgba(99,91,252,0.12); color:#635bfc; font-size:11.5px; font-weight:800; padding:4px 10px; border-radius:8px; display:inline-flex; align-items:center; gap:5px;"><i class="fa-solid fa-crown" style="font-size:10px;"></i> Root Admin</span>
-                  <a href="../admin/admin-dashboard.html" class="btn ghost btn-sm" style="padding:5px 10px; font-size:11.5px; color:#635bfc; text-decoration:none; font-weight:700; border:1px solid rgba(99,91,252,0.3); border-radius:8px; display:inline-flex; align-items:center; gap:5px;" title="Manage via dedicated Super Admin Portal">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Admin Portal
-                  </a>
+                  <span style="background:rgba(99,91,252,0.12); color:#635bfc; font-size:11.5px; font-weight:800; padding:4px 10px; border-radius:8px; display:inline-flex; align-items:center; gap:5px;"><i class="fa-solid fa-shield-halved" style="font-size:10px;"></i> Master Super Admin</span>
+                  <span class="badge" style="background:rgba(255,255,255,0.06); color:#94a3b8; font-size:11px; border:1px solid rgba(255,255,255,0.1); padding:3px 8px; border-radius:6px;">Isolated Domain</span>
                 </div>
               ` : `
                 <div style="display:inline-flex; gap:6px; align-items:center;">
@@ -6904,10 +6942,17 @@ window.seedSamplePendingUser = seedSamplePendingUser;
 function updatePendingBanners() {
   try {
     const users = getSystemUsers();
+    const activeOrgLower = (ACTIVE_ORG || '').toLowerCase().trim();
     const pending = users.filter(u => {
       const s = (u.status || '').toLowerCase();
       const r = (u.role || '').toLowerCase();
       if (r === 'admin' || r === 'super_admin' || r === 'superadmin' || r === 'hr') return false;
+      if (u.org || u.org_id) {
+        const uOrg = (u.org || '').toLowerCase().trim();
+        const uOrgId = (u.org_id || '').toLowerCase().trim();
+        const match = uOrg === activeOrgLower || uOrgId === activeOrgLower || uOrg === 'flawless graphics' || activeOrgLower === 'flawless graphics';
+        if (!match) return false;
+      }
       return s === 'pending_approval' || s === 'pending';
     });
     const pendingCount = pending.length;

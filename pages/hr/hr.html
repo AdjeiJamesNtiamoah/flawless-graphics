@@ -18,6 +18,16 @@
   <!-- Floating Quick Assistant Stylesheet -->
   <link rel="stylesheet" href="../../assets/css/quick-assistant.css">
 
+  <!-- Unified AuthSession & Synchronous Route Guard -->
+  <script src="../../assets/js/auth-session.js"></script>
+  <script>
+    (function() {
+      if (window.AuthSession) {
+        window.AuthSession.requireAuth('hr-login.html', 'hr');
+      }
+    })();
+  </script>
+
   <style>
     .hub-grid {
       display: grid;

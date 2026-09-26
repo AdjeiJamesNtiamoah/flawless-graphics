@@ -1286,6 +1286,22 @@
     if (window.AuthSession) {
       window.AuthSession.applyGlobalBranding();
     }
+
+    const params = new URLSearchParams(window.location.search);
+    const err = params.get('error');
+    if (err === 'pending_approval') {
+      showError('Access Pending Approval: Your Finance & Bursary account has not yet been approved by the Administrator. Access is restricted.');
+      if (window.Toaster) {
+        window.Toaster.warning('Authorization Required', 'Your registration is awaiting approval before access is granted.');
+      }
+    } else if (err === 'unauthorized_role') {
+      showError('Access Denied: Your current account role does not have approved permissions to access the Bursary & Treasury Console.');
+      if (window.Toaster) {
+        window.Toaster.error('Access Restricted', 'Finance officer or Bursar clearance is required.');
+      }
+    } else if (err === 'unauthorized' || err === 'revoked') {
+      showError('Session Required: Please sign in with an approved Finance or Bursary account to continue.');
+    }
   });
 </script>
 

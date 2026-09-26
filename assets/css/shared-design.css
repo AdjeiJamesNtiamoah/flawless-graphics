@@ -332,19 +332,84 @@ body.embedded-mode .main-wrapper {
 @media (max-width: 900px) {
   body {
     flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
   }
   .site-header {
-    position: static;
+    position: sticky;
+    top: 0;
     width: 100%;
     height: auto;
     border-right: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px 16px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    z-index: 1000;
+  }
+  .brand-wrapper {
+    padding-bottom: 0;
+    border-bottom: none;
+    gap: 8px;
+  }
+  .brand-badge {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+  }
+  .brand-info h1 {
+    font-size: 13.5px;
+  }
+  .brand-tagline {
+    font-size: 9px;
+  }
+  .nav-menu {
+    flex-direction: row;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 6px;
+    width: 100%;
+    order: 3;
+    padding: 4px 0 2px;
+  }
+  .nav-menu::-webkit-scrollbar {
+    display: none;
+  }
+  .nav-link {
+    padding: 7px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    gap: 6px;
+  }
+  .nav-link i {
+    width: auto;
+    font-size: 13px;
+  }
+  .header-actions {
+    flex-direction: row;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+    width: auto;
+    gap: 6px;
+  }
+  .theme-pill-btn, .hub-pill-btn {
+    padding: 6px 10px;
+    font-size: 11px;
+    width: auto;
   }
   .main-wrapper {
     margin-left: 0;
     max-width: 100%;
     width: 100%;
-    padding: 24px 18px;
+    padding: 18px 16px;
+    margin: 0;
   }
 }
 
@@ -671,11 +736,54 @@ body.embedded-mode .main-wrapper {
 .modern-toast.success { border-left: 4px solid var(--success); }
 .modern-toast.error { border-left: 4px solid var(--danger); }
 
-/* Responsive adjustments */
-@media (max-width: 900px) {
-  .site-header { padding: 12px 20px; flex-wrap: wrap; gap: 12px; }
-  .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
-  .main-wrapper { padding: 0 16px; margin: 20px auto; }
+/* ==========================================================================
+   RESPONSIVE DESIGN SYSTEM — ALL DEVICE SUITES
+   Supports: JioPhone 2 (240px), Foldables (Z Fold 5/6, Surface Duo, Pixel Fold),
+   Phones (iPhone SE/12-16 Pro Max, Pixels, Galaxies, Moto G),
+   Tablets (iPad Mini, Tab S4, Surface Pro 7/10, iPad Pro 13),
+   Smart Displays (Nest Hub Max 1280x800) & Zenbook Fold
+   ========================================================================== */
+
+/* Touch Smart Displays (e.g. Google Nest Hub Max 1280x800) */
+@media (max-height: 850px) and (min-width: 1024px) {
+  .main-wrapper { padding: 20px 28px; }
+  .glass-card { padding: 20px; }
+  .stat-card { padding: 14px 18px; }
+}
+
+/* Tablets & Foldables Unfolded (iPad Mini 768px, Galaxy Tab S4 711px/800px, Surface Pro 7/10 912px, Surface Duo dual 1114px, Z Fold unfolded 768px-820px) */
+@media (max-width: 1024px) and (min-width: 641px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .main-wrapper { padding: 22px 20px; }
+}
+
+/* Standard Smartphones (iPhone 12-16, Pixel 7/8/9/10, Galaxy A55/S8/S20, Moto G, Surface Duo single 540px, Facebook on Android) */
+@media (max-width: 640px) {
+  .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; gap: 14px; }
+  .glass-card { padding: 18px 16px; border-radius: var(--radius-lg); }
+  .glass-card-header { margin-bottom: 14px; gap: 10px; }
+  .glass-card-title { font-size: 17px; }
+  .stat-card { padding: 14px 16px; gap: 14px; }
+  .stat-icon-box { width: 44px; height: 44px; font-size: 18px; }
+  .stat-value { font-size: 22px; }
+  .modern-table th, .modern-table td { padding: 10px 12px; font-size: 12px; }
+  .btn-modern { min-height: 44px; padding: 10px 16px; }
+  .form-control { font-size: 16px !important; min-height: 44px; }
+}
+
+/* Ultra-Compact Feature Phones (JioPhone 2: 240x320px) */
+@media (max-width: 320px) {
+  .site-header { padding: 8px 6px; }
+  .main-wrapper { padding: 10px 6px; }
+  .glass-card { padding: 12px 10px; border-radius: 12px; }
+  .glass-card-title { font-size: 15px; }
+  .stat-card { padding: 10px; gap: 8px; flex-direction: column; align-items: flex-start; }
+  .stat-icon-box { width: 36px; height: 36px; font-size: 16px; }
+  .stat-value { font-size: 18px; }
+  .modern-table th, .modern-table td { padding: 8px 6px; font-size: 11px; }
+  .badge-pill { font-size: 9.5px; padding: 3px 6px; }
 }
 
 /* ==========================================================================

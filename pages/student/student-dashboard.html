@@ -393,6 +393,33 @@
   }
 
   /* Sidebar - Pinned Standout Executive Navigation */
+  
+  /* Universal Side Hover Rail for Student Dashboard */
+  .app-sidebar {
+    width: 72px !important;
+    min-width: 72px !important;
+    padding: 20px 10px !important;
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), margin-right 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease !important;
+    z-index: 1000 !important;
+    overflow-x: hidden !important;
+  }
+  .app-sidebar:hover {
+    width: 260px !important;
+    margin-right: -188px !important;
+    padding: 20px 14px !important;
+    box-shadow: 14px 0 35px rgba(0, 0, 0, 0.25) !important;
+  }
+  .app-sidebar .sidebar-section-title, .app-sidebar .nav-item-btn {
+    white-space: nowrap;
+  }
+  .app-sidebar .sidebar-section-title {
+    opacity: 0;
+    transition: opacity 0.2s 0.05s ease;
+  }
+  .app-sidebar:hover .sidebar-section-title {
+    opacity: 1;
+  }
+
   .app-sidebar {
     width: 260px;
     height: 100%;

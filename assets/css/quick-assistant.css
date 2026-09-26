@@ -1089,5 +1089,39 @@ body.has-messenger .quick-assistant-fab {
   box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
 }
 
+@media (max-width: 480px) {
+  .quick-assistant-fab {
+    bottom: 18px;
+    right: 14px;
+    width: 46px;
+    height: 46px;
+  }
+  .quick-assistant-panel {
+    bottom: 74px;
+    right: 12px;
+    width: calc(100vw - 24px);
+    max-width: calc(100vw - 24px);
+    max-height: 85vh;
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 320px) {
+  .quick-assistant-fab {
+    bottom: 10px;
+    right: 8px;
+    width: 40px;
+    height: 40px;
+  }
+  .quick-assistant-panel {
+    bottom: 56px;
+    right: 6px;
+    width: calc(100vw - 12px);
+    max-width: calc(100vw - 12px);
+    max-height: 88vh;
+    border-radius: 12px;
+  }
+}
+
 
 

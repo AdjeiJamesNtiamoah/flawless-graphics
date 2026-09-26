@@ -663,5 +663,21 @@
   }
   .quick-dock-menu {
     width: 240px;
+    max-width: calc(100vw - 20px);
+  }
+}
+
+@media (max-width: 320px) {
+  .floating-quick-dock {
+    bottom: 8px;
+  }
+  .quick-dock-trigger {
+    width: 48px;
+    height: 28px;
+  }
+  .quick-dock-menu {
+    width: calc(100vw - 12px);
+    max-width: calc(100vw - 12px);
+    padding: 6px;
   }
 }

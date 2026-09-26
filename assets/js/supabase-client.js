@@ -554,8 +554,8 @@
     async getUsers(orgId = null) {
       try {
         let endpoint = 'users?order=created_at.desc';
-        if (orgId) {
-          endpoint += `&org=eq.${encodeURIComponent(orgId)}`;
+        if (orgId && orgId !== 'FLAWLESS GRAPHICS' && orgId !== 'all') {
+          endpoint += `&or=(org.eq.${encodeURIComponent(orgId)},org.ilike.${encodeURIComponent(orgId)})`;
         }
         const data = await this.query(endpoint);
         return Array.isArray(data) ? data : [];
@@ -1205,6 +1205,11 @@
         console.error('[Supabase] Failed to save teacher:', err.message);
         throw err;
       }
+    }
+
+    async createTeacher(teacher) {
+      const org = teacher.org || teacher.org_id || 'FLAWLESS GRAPHICS';
+      return this.saveTeacher(org, teacher);
     }
 
     async deleteTeacher(orgId, teacherId) {

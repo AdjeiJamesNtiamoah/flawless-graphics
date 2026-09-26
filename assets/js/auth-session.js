@@ -13,10 +13,15 @@
     const ACTIVE_USER_KEY = 'active_user';
     const ACTIVE_ORG_KEY = 'active_org';
     const ACTIVE_HR_KEY = 'activeHR';
+    const HR_USER_KEY = 'hr_active_user';
+    const ACTIVE_FINANCE_KEY = 'active_finance';
+    const FINANCE_USER_KEY = 'finance_active_user';
     const ACTIVE_TEACHER_KEY = 'active_teacher';
     const TEACHER_USER_KEY = 'teacher_active_user';
     const ACTIVE_STUDENT_KEY = 'active_student';
     const STUDENT_USER_KEY = 'student_active_user';
+    const ACTIVE_ADMIN_KEY = 'active_admin';
+    const ADMIN_USER_KEY = 'admin_active_user';
 
     // 1. Immediate Purge of all legacy local-only data arrays
     const LEGACY_STORAGE_KEYS = [
@@ -48,26 +53,52 @@
 
             let prioritizedKeys = [];
             if (path.includes('/student/')) {
-                prioritizedKeys = [ACTIVE_STUDENT_KEY, STUDENT_USER_KEY, 'student_user', ACTIVE_USER_KEY, ACTIVE_ORG_USER_KEY];
+                prioritizedKeys = [ACTIVE_STUDENT_KEY, STUDENT_USER_KEY, 'student_user', ACTIVE_ADMIN_KEY, ADMIN_USER_KEY];
             } else if (path.includes('/teacher/')) {
-                prioritizedKeys = [ACTIVE_TEACHER_KEY, TEACHER_USER_KEY, 'teacher_user', ACTIVE_USER_KEY, ACTIVE_ORG_USER_KEY];
+                prioritizedKeys = [ACTIVE_TEACHER_KEY, TEACHER_USER_KEY, 'teacher_user', ACTIVE_ADMIN_KEY, ADMIN_USER_KEY];
             } else if (path.includes('/hr/')) {
-                prioritizedKeys = [ACTIVE_HR_KEY, 'hr_active_user', ACTIVE_ORG_USER_KEY, ACTIVE_USER_KEY];
+                prioritizedKeys = [ACTIVE_HR_KEY, HR_USER_KEY, 'hr_user', ACTIVE_ADMIN_KEY, ADMIN_USER_KEY];
             } else if (path.includes('/finance/')) {
-                prioritizedKeys = ['active_finance', 'finance_active_user', 'finance_user', ACTIVE_ORG_USER_KEY, ACTIVE_USER_KEY];
-            } else if (path.includes('/admin/')) {
-                prioritizedKeys = [ACTIVE_ORG_USER_KEY, ACTIVE_USER_KEY];
+                prioritizedKeys = [ACTIVE_FINANCE_KEY, FINANCE_USER_KEY, 'finance_user', ACTIVE_ADMIN_KEY, ADMIN_USER_KEY];
+            } else if (path.includes('/admin/') || path.includes('super-admin')) {
+                prioritizedKeys = [ACTIVE_ADMIN_KEY, ADMIN_USER_KEY, ACTIVE_ORG_USER_KEY, ACTIVE_USER_KEY];
             } else {
-                prioritizedKeys = [ACTIVE_ORG_USER_KEY, ACTIVE_USER_KEY, ACTIVE_HR_KEY, ACTIVE_TEACHER_KEY, TEACHER_USER_KEY, ACTIVE_STUDENT_KEY, STUDENT_USER_KEY];
+                prioritizedKeys = [ACTIVE_ADMIN_KEY, ADMIN_USER_KEY, ACTIVE_ORG_USER_KEY, ACTIVE_USER_KEY, ACTIVE_HR_KEY, ACTIVE_FINANCE_KEY, ACTIVE_TEACHER_KEY, TEACHER_USER_KEY, ACTIVE_STUDENT_KEY, STUDENT_USER_KEY];
             }
 
             for (const k of prioritizedKeys) {
                 const parsed = safeParse(localStorage.getItem(k));
                 if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && (parsed.org || parsed.email || parsed.name || parsed.fullName || parsed.firstName)) {
+                    // When on admin routes, strictly reject non-admin sessions from general storage keys
+                    if (path.includes('/admin/') || path.includes('super-admin')) {
+                        const r = (parsed.role || '').toLowerCase();
+                        if (r !== 'admin' && r !== 'superadmin') {
+                            continue;
+                        }
+                    }
                     user = parsed;
                     break;
                 }
             }
+
+            // Fallback for general session if portal key was not specific, BUT strictly verify role compatibility
+            if (!user && (path.includes('/hr/') || path.includes('/finance/'))) {
+                const generalUser = safeParse(localStorage.getItem(ACTIVE_ORG_USER_KEY)) || safeParse(localStorage.getItem(ACTIVE_USER_KEY));
+                if (generalUser && typeof generalUser === 'object') {
+                    const r = (generalUser.role || '').toLowerCase();
+                    if (path.includes('/hr/') && (r === 'hr' || r === 'admin' || r === 'superadmin' || r === 'hr admin')) {
+                        user = generalUser;
+                    } else if (path.includes('/finance/') && (r === 'finance' || r === 'bursar' || r === 'accountant' || r === 'admin' || r === 'superadmin')) {
+                        user = generalUser;
+                    }
+                }
+            } else if (!user && !path.includes('/admin/')) {
+                const generalUser = safeParse(localStorage.getItem(ACTIVE_ORG_USER_KEY)) || safeParse(localStorage.getItem(ACTIVE_USER_KEY));
+                if (generalUser && typeof generalUser === 'object') {
+                    user = generalUser;
+                }
+            }
+
             return user;
         },
 
@@ -282,15 +313,47 @@
                 localStorage.setItem('org_logo', normalizedUser.logo);
             }
 
-            // 3. Department specific sessions
-            if (normalizedUser.role === 'admin' || normalizedUser.role === 'hr') {
-                localStorage.setItem(ACTIVE_HR_KEY, JSON.stringify({
+            // 3. Department specific sessions - strictly decoupled
+            if (normalizedUser.role === 'hr' || normalizedUser.role === 'hr admin') {
+                const hrSession = {
                     name: normalizedUser.name,
                     email: normalizedUser.email,
-                    role: normalizedUser.role === 'hr' ? 'HR Admin' : 'Super Admin',
+                    role: 'HR Admin',
                     org: normalizedUser.org,
-                    photo: normalizedUser.photo || normalizedUser.logo || null
-                }));
+                    photo: normalizedUser.photo || normalizedUser.logo || null,
+                    status: normalizedUser.status || 'active'
+                };
+                localStorage.setItem(ACTIVE_HR_KEY, JSON.stringify(hrSession));
+                localStorage.setItem(HR_USER_KEY, JSON.stringify(hrSession));
+                localStorage.setItem('hr_user', JSON.stringify(hrSession));
+            }
+
+            if (normalizedUser.role === 'finance' || normalizedUser.role === 'bursar' || normalizedUser.role === 'accountant') {
+                const financeSession = {
+                    name: normalizedUser.name,
+                    email: normalizedUser.email,
+                    org: normalizedUser.org,
+                    role: normalizedUser.role || 'Finance Bursar',
+                    photo: normalizedUser.photo || normalizedUser.logo || null,
+                    status: normalizedUser.status || 'active'
+                };
+                localStorage.setItem(ACTIVE_FINANCE_KEY, JSON.stringify(financeSession));
+                localStorage.setItem(FINANCE_USER_KEY, JSON.stringify(financeSession));
+                localStorage.setItem('finance_user', JSON.stringify(financeSession));
+            }
+
+            if (normalizedUser.role === 'admin' || normalizedUser.role === 'superadmin') {
+                const adminSession = {
+                    name: normalizedUser.name,
+                    email: normalizedUser.email,
+                    org: normalizedUser.org || 'FLAWLESS GRAPHICS',
+                    role: 'admin',
+                    photo: normalizedUser.photo || normalizedUser.logo || null,
+                    status: normalizedUser.status || 'active'
+                };
+                localStorage.setItem(ACTIVE_ADMIN_KEY, JSON.stringify(adminSession));
+                localStorage.setItem(ADMIN_USER_KEY, JSON.stringify(adminSession));
+                localStorage.setItem('admin_user', JSON.stringify(adminSession));
             }
 
             if (normalizedUser.role === 'teacher') {
@@ -357,14 +420,81 @@
         },
 
         /**
-         * Check if authenticated; if not, redirect gracefully
+         * Check if authenticated with approved access; if not, redirect immediately to login
          */
-        requireAuth: function(redirectUrl = 'site-login.html') {
+        requireAuth: function(redirectUrl = 'site-login.html', requiredRole = null) {
+            const path = (typeof window !== 'undefined' && window.location ? (window.location.pathname || '') : '').toLowerCase();
+            let effectiveRedirect = redirectUrl;
+
+            // Automatically deduce expected portal role if not explicitly passed
+            let expectedRole = requiredRole;
+            if (!expectedRole || typeof expectedRole === 'boolean') {
+                if (path.includes('/hr/')) expectedRole = 'hr';
+                else if (path.includes('/finance/')) expectedRole = 'finance';
+                else if (path.includes('/admin/') || path.includes('super-admin')) expectedRole = 'admin';
+                else if (path.includes('/teacher/')) expectedRole = 'teacher';
+                else if (path.includes('/student/')) expectedRole = 'student';
+            }
+
+            // Default fallback redirects if generic
+            if (!effectiveRedirect || effectiveRedirect === 'site-login.html') {
+                if (path.includes('/hr/')) effectiveRedirect = 'hr-login.html';
+                else if (path.includes('/finance/')) effectiveRedirect = 'finance-login.html';
+                else if (path.includes('/admin/') || path.includes('super-admin')) effectiveRedirect = path.includes('/pages/admin/') ? 'admin-login.html' : 'pages/admin/admin-login.html';
+                else if (path.includes('/teacher/')) effectiveRedirect = 'teacher-login.html';
+                else if (path.includes('/student/')) effectiveRedirect = 'student-login.html';
+            }
+
             let user = this.getUser();
-            if (!user) {
-                window.location.href = redirectUrl;
+
+            function doRedirect(targetUrl) {
+                if (typeof window !== 'undefined' && window.location) {
+                    // Prevent embedded inspection iframes from hijacking the parent window
+                    window.location.replace(targetUrl);
+                }
+            }
+
+            // 1. Not logged in -> Redirect immediately to portal login
+            if (!user || (!user.email && !user.name && !user.fullName && !user.org)) {
+                doRedirect(effectiveRedirect);
                 return null;
             }
+
+            // 2. Check approved access status (pending approval accounts cannot access protected portals)
+            const status = (user.status || '').toLowerCase();
+            if (status === 'pending_approval' || status === 'pending' || status === 'unapproved') {
+                console.warn('[AuthSession] Account pending administrator approval. Redirecting to login.');
+                doRedirect(effectiveRedirect + (effectiveRedirect.includes('?') ? '&' : '?') + 'error=pending_approval');
+                return null;
+            }
+
+            // 3. Check role approval for target portal
+            const userRole = (user.role || '').toLowerCase();
+            if (expectedRole) {
+                const target = expectedRole.toLowerCase();
+                let isApproved = false;
+
+                if (target === 'hr') {
+                    isApproved = (userRole === 'hr' || userRole === 'admin' || userRole === 'superadmin' || userRole === 'hr admin');
+                } else if (target === 'finance') {
+                    isApproved = (userRole === 'finance' || userRole === 'bursar' || userRole === 'accountant' || userRole === 'admin' || userRole === 'superadmin');
+                } else if (target === 'admin') {
+                    isApproved = (userRole === 'admin' || userRole === 'superadmin');
+                } else if (target === 'teacher') {
+                    isApproved = (userRole === 'teacher' || userRole === 'admin' || userRole === 'superadmin');
+                } else if (target === 'student') {
+                    isApproved = (userRole === 'student' || userRole === 'admin' || userRole === 'superadmin');
+                } else {
+                    isApproved = (userRole === target || userRole === 'admin');
+                }
+
+                if (!isApproved) {
+                    console.warn(`[AuthSession] Access Denied: User role "${userRole}" is not approved for "${target}" portal. Redirecting.`);
+                    doRedirect(effectiveRedirect + (effectiveRedirect.includes('?') ? '&' : '?') + 'error=unauthorized_role');
+                    return null;
+                }
+            }
+
             return user;
         },
 
@@ -377,10 +507,21 @@
             localStorage.removeItem(ACTIVE_ORG_KEY);
             localStorage.removeItem('activeOrg');
             localStorage.removeItem(ACTIVE_HR_KEY);
+            localStorage.removeItem(HR_USER_KEY);
+            localStorage.removeItem('hr_active_user');
+            localStorage.removeItem('hr_user');
+            localStorage.removeItem(ACTIVE_FINANCE_KEY);
+            localStorage.removeItem(FINANCE_USER_KEY);
+            localStorage.removeItem('finance_user');
             localStorage.removeItem(ACTIVE_TEACHER_KEY);
             localStorage.removeItem(TEACHER_USER_KEY);
+            localStorage.removeItem('teacher_user');
             localStorage.removeItem(ACTIVE_STUDENT_KEY);
             localStorage.removeItem(STUDENT_USER_KEY);
+            localStorage.removeItem('student_user');
+            localStorage.removeItem(ACTIVE_ADMIN_KEY);
+            localStorage.removeItem(ADMIN_USER_KEY);
+            localStorage.removeItem('admin_user');
             if (redirectUrl) {
                 window.location.href = redirectUrl;
             }
@@ -648,7 +789,9 @@
         getLoginUrlByRole: function(role = 'user') {
             const r = String(role || '').toLowerCase();
             const href = (typeof window !== 'undefined' && window.location ? window.location.href : '').toLowerCase();
-            if (href.includes('/pages/admin/') || r.includes('admin')) return 'admin-login.html';
+            if (href.includes('/pages/admin/') || href.includes('super-admin') || r.includes('admin') || r.includes('super')) {
+                return href.includes('/pages/admin/') ? 'admin-login.html' : 'pages/admin/admin-login.html';
+            }
             if (href.includes('/pages/hr/') || r.includes('hr')) return 'hr-login.html';
             if (href.includes('/pages/teacher/') || r.includes('teacher')) return 'teacher-login.html';
             if (href.includes('/pages/student/') || r.includes('student')) return 'student-login.html';
@@ -679,7 +822,7 @@
             }
 
             // Don't render on unauthenticated login / splash / registration pages inside portals
-            if (path.includes('-login') || path.includes('register') || path.includes('signup') || path.includes('landing.html') || path.endsWith('/teacher.html')) {
+            if (path.includes('-login') || path.includes('register') || path.includes('signup') || path.endsWith('/teacher.html')) {
                 return;
             }
 
@@ -1107,7 +1250,7 @@
             function isDashboardPage() {
                 try {
                     const href = (window.location.href || '').toLowerCase();
-                    if (href.includes('-login.html') || href.includes('landing.html') || href.endsWith('index.html') || href.endsWith('/')) {
+                    if (href.includes('-login.html') || href.endsWith('index.html') || href.endsWith('/')) {
                         return false;
                     }
                     return href.includes('/pages/') || href.includes('welcome.html');
