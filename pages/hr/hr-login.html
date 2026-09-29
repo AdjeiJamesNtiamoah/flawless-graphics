@@ -888,6 +888,7 @@
             </div>
           </div>
 
+          <!-- HR Profile Photo Upload (Registration Mode) -->
           <div class="form-group" id="hrPhotoGroup" style="display: none;">
             <label class="form-label">HR Officer Profile Photo (Optional)</label>
             <div style="display: flex; align-items: center; gap: 14px; padding: 10px 14px; background: #FAF8F5; border: 1.5px dashed #DDD5C7; border-radius: 12px;">
@@ -902,6 +903,61 @@
                   <i class="fa-solid fa-trash"></i>
                 </button>
                 <input type="file" id="hrPhotoFile" accept="image/*" style="display: none;" onchange="handleHrPhotoUpload(event)">
+              </div>
+            </div>
+          </div>
+
+          <!-- Registration: Full Legal Name -->
+          <div class="form-group" id="hrFullNameGroup" style="display: none;">
+            <label class="form-label" for="hrFullName">Full Legal Name</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-user-tie field-icon"></i>
+              <input type="text" id="hrFullName" class="form-control" placeholder="e.g. Dr. Kwesi Mensah" autocomplete="name" />
+            </div>
+          </div>
+
+          <!-- Registration: Staff ID & Phone (Grid) -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group" id="hrStaffIdGroup" style="display: none;">
+              <label class="form-label" for="hrStaffId">Staff / Employee ID</label>
+              <div class="input-wrap">
+                <i class="fa-solid fa-id-card field-icon"></i>
+                <input type="text" id="hrStaffId" class="form-control" placeholder="HR-2026-004" />
+              </div>
+            </div>
+            <div class="form-group" id="hrPhoneGroup" style="display: none;">
+              <label class="form-label" for="hrPhone">Phone Number</label>
+              <div class="input-wrap">
+                <i class="fa-solid fa-phone field-icon"></i>
+                <input type="tel" id="hrPhone" class="form-control" placeholder="+233 54 511 5799" autocomplete="tel" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Registration: Designation & Department (Grid) -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group" id="hrDesignationGroup" style="display: none;">
+              <label class="form-label" for="hrDesignation">Role / Designation</label>
+              <div class="input-wrap">
+                <i class="fa-solid fa-briefcase field-icon"></i>
+                <select id="hrDesignation" class="form-control" style="cursor: pointer; padding-left: 40px;">
+                  <option value="Director of Human Resources">Director of Human Resources</option>
+                  <option value="Senior HR Officer">Senior HR Officer</option>
+                  <option value="HR & Compliance Specialist">HR & Compliance Specialist</option>
+                  <option value="Talent & Faculty Coordinator">Talent & Faculty Coordinator</option>
+                  <option value="Academic Registrar">Academic Registrar</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" id="hrDepartmentGroup" style="display: none;">
+              <label class="form-label" for="hrDepartment">Department / Directorate</label>
+              <div class="input-wrap">
+                <i class="fa-solid fa-building-user field-icon"></i>
+                <select id="hrDepartment" class="form-control" style="cursor: pointer; padding-left: 40px;">
+                  <option value="Human Resources Directorate">Human Resources Directorate</option>
+                  <option value="Faculty Governance & Registry">Faculty Governance & Registry</option>
+                  <option value="Administration & Operations">Administration & Operations</option>
+                </select>
               </div>
             </div>
           </div>
@@ -1076,6 +1132,17 @@
     const photoGroup = document.getElementById('hrPhotoGroup');
     if (photoGroup) photoGroup.style.display = signUp ? 'block' : 'none';
 
+    ['hrFullNameGroup', 'hrStaffIdGroup', 'hrPhoneGroup', 'hrDesignationGroup', 'hrDepartmentGroup'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = signUp ? 'block' : 'none';
+    });
+
+    const hrFullNameInp = document.getElementById('hrFullName');
+    if (hrFullNameInp) {
+      if (signUp) hrFullNameInp.setAttribute('required', 'true');
+      else hrFullNameInp.removeAttribute('required');
+    }
+
     if (signUp) {
       tabSignUp.classList.add('active');
       tabSignIn.classList.remove('active');
@@ -1155,13 +1222,23 @@
       ? (orgSelect.selectedOptions[0].dataset.name || orgSelect.value)
       : (pendingHrUser.org || 'FLAWLESS GRAPHICS');
 
+    const hrFullName = (document.getElementById('hrFullName')?.value || '').trim();
+    const hrStaffId = (document.getElementById('hrStaffId')?.value || '').trim();
+    const hrPhone = (document.getElementById('hrPhone')?.value || '').trim();
+    const hrDesignation = (document.getElementById('hrDesignation')?.value || 'Director of Human Resources').trim();
+    const hrDepartment = (document.getElementById('hrDepartment')?.value || 'Human Resources Directorate').trim();
+
     const hrRecord = {
       org: selectedOrgName,
       org_id: orgSelect ? orgSelect.value : undefined,
-      name: pendingHrUser.email.split('@')[0],
+      name: hrFullName || (pendingHrUser && pendingHrUser.name) || pendingHrUser.email.split('@')[0],
       email: pendingHrUser.email.toLowerCase(),
       password: pendingHrUser.password,
       role: 'hr',
+      phone: hrPhone || null,
+      designation: hrDesignation,
+      department: hrDepartment,
+      linked_staff_id: hrStaffId || null,
       photo_url: currentHrPhotoBase64 || null,
       status: 'pending_approval'
     };
@@ -1200,6 +1277,17 @@
     }
 
     if (isSignUpMode) {
+      const hrFullName = (document.getElementById('hrFullName')?.value || '').trim();
+      const hrStaffId = (document.getElementById('hrStaffId')?.value || '').trim();
+      const hrPhone = (document.getElementById('hrPhone')?.value || '').trim();
+      const hrDesignation = (document.getElementById('hrDesignation')?.value || 'Director of Human Resources').trim();
+      const hrDepartment = (document.getElementById('hrDepartment')?.value || 'Human Resources Directorate').trim();
+
+      if (!hrFullName) {
+        showError('Please enter your full legal name.');
+        return;
+      }
+
       if (window.StrongPassword) {
         const pwCheck = window.StrongPassword.validate(password);
         if (!pwCheck.valid) {
@@ -1214,14 +1302,26 @@
         return;
       }
 
+      let uploadedPhoto = currentHrPhotoBase64;
+      if (uploadedPhoto && window.SupabaseService && typeof window.SupabaseService.uploadProfilePhoto === 'function') {
+        try {
+          const cloudPic = await window.SupabaseService.uploadProfilePhoto(uploadedPhoto, hrEmail, 'staff');
+          if (cloudPic) uploadedPhoto = cloudPic;
+        } catch (_) {}
+      }
+
       const hrRecord = {
         org: selectedOrgName,
         org_id: orgName,
-        name: hrEmail.split('@')[0],
+        name: hrFullName,
         email: hrEmail.toLowerCase(),
         password: password,
         role: 'hr',
-        photo_url: currentHrPhotoBase64 || null,
+        phone: hrPhone || null,
+        designation: hrDesignation,
+        department: hrDepartment,
+        linked_staff_id: hrStaffId || null,
+        photo_url: uploadedPhoto || null,
         status: 'pending_approval'
       };
 
@@ -1250,7 +1350,7 @@
         return;
       }
 
-      openHrOtpModal({ org: selectedOrgName, email: hrEmail, password: password });
+      openHrOtpModal({ org: selectedOrgName, email: hrEmail, password: password, name: hrFullName });
       return;
     }
 

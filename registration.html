@@ -1940,6 +1940,31 @@
             }
 
             // Persist pending organization to Supabase Cloud
+            let uploadedLogoUrl = pendingUserData.logo_url || currentLogoBase64 || null;
+            if (uploadedLogoUrl && window.SupabaseService && typeof window.SupabaseService.uploadOrgLogo === 'function') {
+                try {
+                    const cloudLogo = await window.SupabaseService.uploadOrgLogo(uploadedLogoUrl, pendingUserData.org_slug || pendingUserData.org_name);
+                    if (cloudLogo) {
+                        uploadedLogoUrl = cloudLogo;
+                    }
+                } catch (e) {
+                    console.warn('Logo pre-upload warning:', e);
+                }
+            }
+
+            // Also upload admin profile photo if provided
+            let uploadedPhotoUrl = pendingUserData.photo_url || currentAdminPhotoBase64 || null;
+            if (uploadedPhotoUrl && window.SupabaseService && typeof window.SupabaseService.uploadProfilePhoto === 'function') {
+                try {
+                    const cloudPhoto = await window.SupabaseService.uploadProfilePhoto(uploadedPhotoUrl, pendingUserData.email, 'staff');
+                    if (cloudPhoto) {
+                        uploadedPhotoUrl = cloudPhoto;
+                    }
+                } catch(e) {
+                    console.warn('Admin photo pre-upload warning:', e);
+                }
+            }
+
             const orgPayload = {
                 name: pendingUserData.org_name,
                 org_name: pendingUserData.org_name,
@@ -1948,8 +1973,17 @@
                 phone: pendingUserData.phone || null,
                 org_id: pendingUserData.org_slug || null,
                 code: (pendingUserData.org_slug || 'ORG').toUpperCase(),
+                logo_path: uploadedLogoUrl || null,
+                logo_url: uploadedLogoUrl || null,
                 status: 'pending_approval'
             };
+
+            if (uploadedLogoUrl) {
+                try {
+                    localStorage.setItem('active_org_logo', uploadedLogoUrl);
+                    localStorage.setItem('org_logo', uploadedLogoUrl);
+                } catch (_) {}
+            }
 
             try {
                 if (window.SupabaseService && typeof window.SupabaseService.saveOrganization === 'function') {

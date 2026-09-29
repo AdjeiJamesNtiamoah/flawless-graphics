@@ -803,6 +803,59 @@
                         </div>
                     </div>
 
+                    <!-- Student Gender & Date of Birth (Registration Mode Grid) -->
+                    <div class="form-group" id="studentGenderDobGroup" style="display: none;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div>
+                                <label for="studentGender" style="display: block; font-size: 11px; font-weight: 700; color: #64748B; margin-bottom: 6px; text-transform: uppercase;">Gender</label>
+                                <div class="input-wrapper">
+                                    <select id="studentGender" style="width: 100%; background: #FAF8F5; border: 1px solid #E5DFD5; border-radius: 10px; padding: 11px 14px 11px 40px; color: #0F172A; font-size: 13px; outline: none;">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    <i class="fa-solid fa-venus-mars field-icon"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="studentDob" style="display: block; font-size: 11px; font-weight: 700; color: #64748B; margin-bottom: 6px; text-transform: uppercase;">Date of Birth</label>
+                                <div class="input-wrapper">
+                                    <input type="date" id="studentDob" style="width: 100%; background: #FAF8F5; border: 1px solid #E5DFD5; border-radius: 10px; padding: 10px 14px 10px 40px; color: #0F172A; font-size: 13px; outline: none;">
+                                    <i class="fa-solid fa-cake-candles field-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Guardian / Emergency Contact & Phone (Registration Mode Grid) -->
+                    <div class="form-group" id="studentGuardianGroup" style="display: none;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div>
+                                <label for="studentGuardianName" style="display: block; font-size: 11px; font-weight: 700; color: #64748B; margin-bottom: 6px; text-transform: uppercase;">Parent / Guardian Name</label>
+                                <div class="input-wrapper">
+                                    <input type="text" id="studentGuardianName" placeholder="e.g. Samuel Mensah (Father)">
+                                    <i class="fa-solid fa-user-shield field-icon"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="studentGuardianPhone" style="display: block; font-size: 11px; font-weight: 700; color: #64748B; margin-bottom: 6px; text-transform: uppercase;">Guardian Phone</label>
+                                <div class="input-wrapper">
+                                    <input type="tel" id="studentGuardianPhone" placeholder="+233 24 987 6543">
+                                    <i class="fa-solid fa-phone field-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Residential Address (Registration Mode) -->
+                    <div class="form-group" id="studentAddressGroup" style="display: none;">
+                        <label for="studentAddress">Residential Address</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="studentAddress" placeholder="e.g. House No. 24, Ridge Residential Area, Accra">
+                            <i class="fa-solid fa-location-dot field-icon"></i>
+                        </div>
+                    </div>
+
                     <!-- Sign-In Identifier (Roll or Email) -->
                     <div class="form-group" id="identifierGroup">
                         <label for="identifier" id="labelIdentifier">Student Roll Number / Email</label>
@@ -936,6 +989,9 @@ function switchMode(mode) {
     const photoGroup = document.getElementById('studentPhotoGroup');
     const nameGroup = document.getElementById('studentNameGroup');
     const classGroup = document.getElementById('studentClassGroup');
+    const genderDobGroup = document.getElementById('studentGenderDobGroup');
+    const guardianGroup = document.getElementById('studentGuardianGroup');
+    const addressGroup = document.getElementById('studentAddressGroup');
     const identifierGroup = document.getElementById('identifierGroup');
     const regEmailGroup = document.getElementById('regEmailGroup');
     const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
@@ -959,6 +1015,9 @@ function switchMode(mode) {
         photoGroup.style.display = 'block';
         nameGroup.style.display = 'block';
         classGroup.style.display = 'block';
+        if (genderDobGroup) genderDobGroup.style.display = 'block';
+        if (guardianGroup) guardianGroup.style.display = 'block';
+        if (addressGroup) addressGroup.style.display = 'block';
         identifierGroup.style.display = 'none';
         regEmailGroup.style.display = 'block';
         confirmPasswordGroup.style.display = 'block';
@@ -979,6 +1038,9 @@ function switchMode(mode) {
         photoGroup.style.display = 'none';
         nameGroup.style.display = 'none';
         classGroup.style.display = 'none';
+        if (genderDobGroup) genderDobGroup.style.display = 'none';
+        if (guardianGroup) guardianGroup.style.display = 'none';
+        if (addressGroup) addressGroup.style.display = 'none';
         identifierGroup.style.display = 'block';
         regEmailGroup.style.display = 'none';
         confirmPasswordGroup.style.display = 'none';
@@ -1035,6 +1097,11 @@ async function handleStudentRegistration() {
     const classVal = (document.getElementById('studentClassSelect').value || 'cls_1|Grade 10 - Graphic Arts & Visual Identity').split('|');
     const classId = classVal[0];
     const className = classVal[1] || 'Grade 10';
+    const gender = document.getElementById('studentGender') ? document.getElementById('studentGender').value : 'Not Specified';
+    const dob = document.getElementById('studentDob') ? document.getElementById('studentDob').value : null;
+    const guardianName = document.getElementById('studentGuardianName') ? document.getElementById('studentGuardianName').value.trim() : '';
+    const guardianPhone = document.getElementById('studentGuardianPhone') ? document.getElementById('studentGuardianPhone').value.trim() : '';
+    const address = document.getElementById('studentAddress') ? document.getElementById('studentAddress').value.trim() : '';
     const submitBtn = document.getElementById('submitBtn');
 
     if (!selectedOrgSlug && !selectedOrgName) {
@@ -1055,6 +1122,16 @@ async function handleStudentRegistration() {
 
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Registering Student Account...';
+
+    // 1. Upload student photo to Supabase storage if provided
+    let uploadedPhotoUrl = currentStudentPhotoBase64;
+    if (currentStudentPhotoBase64 && currentStudentPhotoBase64.startsWith('data:') && window.SupabaseRestClient && typeof window.SupabaseRestClient.uploadProfilePhoto === 'function') {
+        try {
+            uploadedPhotoUrl = await window.SupabaseRestClient.uploadProfilePhoto(currentStudentPhotoBase64, email, 'student');
+        } catch (err) {
+            console.warn('[StudentSignup] Supabase photo upload fallback:', err);
+        }
+    }
 
     const nameParts = fullName.split(' ');
     const firstName = nameParts[0] || 'Student';
@@ -1084,14 +1161,21 @@ async function handleStudentRegistration() {
         classId: classId,
         className: className,
         grade: className.split('-')[0].trim(),
-        gender: 'Not Specified',
+        gender: gender,
+        dob: dob,
+        date_of_birth: dob,
+        guardianName: guardianName,
+        guardianPhone: guardianPhone,
+        parent_name: guardianName,
+        parent_phone: guardianPhone,
+        address: address,
         status: 'Active',
         approvalStatus: 'approved',
         attendanceRate: 100.0,
         attendanceStreak: 1,
         gpa: 4.00,
-        photo: currentStudentPhotoBase64 || null,
-        photo_url: currentStudentPhotoBase64 || null,
+        photo: uploadedPhotoUrl || null,
+        photo_url: uploadedPhotoUrl || null,
         createdAt: Date.now()
     };
 
@@ -1106,15 +1190,16 @@ async function handleStudentRegistration() {
                 password: password,
                 role: 'student',
                 roll: rollNum,
+                phone: guardianPhone || '',
                 classId: classId,
                 className: className,
-                photo: currentStudentPhotoBase64 || null,
-                photo_url: currentStudentPhotoBase64 || null,
+                photo: uploadedPhotoUrl || null,
+                photo_url: uploadedPhotoUrl || null,
                 status: 'approved'
             }).catch(console.warn);
 
             if (typeof window.SupabaseService.saveStudent === 'function') {
-                await window.SupabaseService.saveStudent(newStudent).catch(console.warn);
+                await window.SupabaseService.saveStudent(selectedOrgSlug || selectedOrgName, newStudent).catch(console.warn);
             }
         } catch(e) {
             console.warn('Supabase student save warning:', e);
@@ -1172,169 +1257,14 @@ function createStudentSmartId(roll, name) {
 }
 
 // Default Institutional Students Roster with Cryptographic Smart IDs
-const DEFAULT_STUDENTS = [
-    {
-        id: 's_101',
-        roll: 'STU-2026-001',
-        enrollment_code: 'STU-2026-001',
-        smartIdNumber: 'FG-STU-2026-849201',
-        rfidUid: 'E0:04:01:8A:2F:91',
-        barcode: '*FG-STU-2026-849201*',
-        qrData: 'https://verify.flawlessgraphics.com/id/FG-STU-2026-849201?u=Samuel%20Kofi%20Mensah',
-        issueDate: '2026-09-01',
-        expiryDate: '2029-08-31',
-        securityHash: 'SEC-7F2A-STU001',
-        firstName: 'Samuel',
-        middleName: 'Kofi',
-        lastName: 'Mensah',
-        name: 'Samuel Kofi Mensah',
-        email: 's.mensah@student.flawless.edu',
-        classId: 'cls_2',
-        className: 'Grade 11 - Web Systems & Client Architecture',
-        grade: 'Grade 11',
-        gender: 'Male',
-        dob: '2008-04-12',
-        bloodGroup: 'O+',
-        status: 'Active',
-        approvalStatus: 'approved',
-        guardianName: 'Mary Mensah',
-        guardianRel: 'Mother',
-        emergencyPhone: '+233 24 123 4567',
-        address: 'House No. 24, Ring Road, Accra',
-        attendanceRate: 96.4,
-        attendanceStreak: 18,
-        gpa: 3.82,
-        photo: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80'
-    },
-    {
-        id: 's_102',
-        roll: 'STU-2026-002',
-        enrollment_code: 'STU-2026-002',
-        smartIdNumber: 'FG-STU-2026-849202',
-        rfidUid: 'E0:04:01:9B:3C:82',
-        barcode: '*FG-STU-2026-849202*',
-        qrData: 'https://verify.flawlessgraphics.com/id/FG-STU-2026-849202?u=Yaa%20Asantewaa',
-        issueDate: '2026-09-01',
-        expiryDate: '2029-08-31',
-        securityHash: 'SEC-91DE-STU002',
-        firstName: 'Yaa',
-        middleName: '',
-        lastName: 'Asantewaa',
-        name: 'Yaa Asantewaa',
-        email: 'y.asantewaa@student.flawless.edu',
-        classId: 'cls_1',
-        className: 'Grade 10 - Graphic Arts & Visual Identity',
-        grade: 'Grade 10',
-        gender: 'Female',
-        dob: '2009-02-18',
-        bloodGroup: 'A+',
-        status: 'Active',
-        approvalStatus: 'approved',
-        guardianName: 'Nana Asantewaa',
-        guardianRel: 'Mother',
-        emergencyPhone: '+233 24 222 3344',
-        address: 'Plot 12, Airport Residential Area',
-        attendanceRate: 98.1,
-        attendanceStreak: 24,
-        gpa: 3.95,
-        photo: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80'
-    },
-    {
-        id: 's_103',
-        roll: 'STU-2026-003',
-        enrollment_code: 'STU-2026-003',
-        smartIdNumber: 'FG-STU-2026-849203',
-        rfidUid: 'E0:04:01:C4:7D:63',
-        barcode: '*FG-STU-2026-849203*',
-        qrData: 'https://verify.flawlessgraphics.com/id/FG-STU-2026-849203?u=Kwabena%20J.%20Darko',
-        issueDate: '2026-09-01',
-        expiryDate: '2029-08-31',
-        securityHash: 'SEC-63FA-STU003',
-        firstName: 'Kwabena',
-        middleName: 'J.',
-        lastName: 'Darko',
-        name: 'Kwabena J. Darko',
-        email: 'k.darko@student.flawless.edu',
-        classId: 'cls_3',
-        className: 'Grade 12 - Digital Animation & 3D Modeling',
-        grade: 'Grade 12',
-        gender: 'Male',
-        dob: '2007-11-20',
-        bloodGroup: 'B+',
-        status: 'Active',
-        approvalStatus: 'approved',
-        guardianName: 'Samuel Darko',
-        guardianRel: 'Father',
-        emergencyPhone: '+233 55 333 4455',
-        address: 'Block 4, Cantonments, Accra',
-        attendanceRate: 92.0,
-        attendanceStreak: 12,
-        gpa: 3.65,
-        photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80'
-    },
-    {
-        id: 's_104',
-        roll: 'STU-2026-004',
-        enrollment_code: 'STU-2026-004',
-        smartIdNumber: 'FG-STU-2026-849204',
-        rfidUid: 'E0:04:01:E2:1A:54',
-        barcode: '*FG-STU-2026-849204*',
-        qrData: 'https://verify.flawlessgraphics.com/id/FG-STU-2026-849204?u=Akua%20Serwaa%20Donkor',
-        issueDate: '2026-09-01',
-        expiryDate: '2029-08-31',
-        securityHash: 'SEC-54BC-STU004',
-        firstName: 'Akua',
-        middleName: 'Serwaa',
-        lastName: 'Donkor',
-        name: 'Akua Serwaa Donkor',
-        email: 'a.donkor@student.flawless.edu',
-        classId: 'cls_5',
-        className: 'Grade 10 - UI/UX Interactive Prototyping',
-        grade: 'Grade 10',
-        gender: 'Female',
-        dob: '2008-08-30',
-        bloodGroup: 'O+',
-        status: 'Scholarship',
-        approvalStatus: 'approved',
-        guardianName: 'Mercy Donkor',
-        guardianRel: 'Mother',
-        emergencyPhone: '+233 26 444 5566',
-        address: 'Spintex Road, Community 18',
-        attendanceRate: 99.4,
-        attendanceStreak: 32,
-        gpa: 4.00,
-        photo: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80'
-    }
-];
+const DEFAULT_STUDENTS = [];
 
 function getStoredStudents() {
     try {
         let list = JSON.parse(localStorage.getItem(STUD_KEY) || '[]');
-        if (!Array.isArray(list) || list.length === 0) {
-            list = [...DEFAULT_STUDENTS];
-            localStorage.setItem(STUD_KEY, JSON.stringify(list));
-            return list;
-        }
-
-        // Ensure institutional demo students exist in the roster so one-click demo access is 100% reliable
-        let modified = false;
-        DEFAULT_STUDENTS.forEach(def => {
-            const exists = list.some(s => 
-                s.id === def.id || 
-                (s.roll && def.roll && s.roll.toLowerCase() === def.roll.toLowerCase())
-            );
-            if (!exists) {
-                list.push(def);
-                modified = true;
-            }
-        });
-
-        if (modified) {
-            localStorage.setItem(STUD_KEY, JSON.stringify(list));
-        }
-        return list;
+        return Array.isArray(list) ? list : [];
     } catch(e) {
-        return [...DEFAULT_STUDENTS];
+        return [];
     }
 }
 
@@ -1381,8 +1311,27 @@ async function handleStudentAuth() {
             const authRes = await window.SupabaseService.authenticate(ident, pw, null, 'student');
             if (authRes.success) {
                 found = authRes.user;
+                try {
+                    const orgStudents = await window.SupabaseService.getStudents(authRes.user.org || selectedOrgName);
+                    const staffId = authRes.user.linked_staff_id || '';
+                    const match = (orgStudents || []).find(s => 
+                        (s.roll && (s.roll.toLowerCase() === ident || s.roll.toLowerCase() === staffId.toLowerCase())) ||
+                        (s.enrollment_code && (s.enrollment_code.toLowerCase() === ident || s.enrollment_code.toLowerCase() === staffId.toLowerCase())) ||
+                        (s.id && String(s.id) === staffId)
+                    );
+                    if (match) {
+                        found = Object.assign({}, match, found, {
+                            id: match.id || found.id,
+                            name: match.student_name || [match.firstName, match.middleName, match.lastName].filter(Boolean).join(' ') || found.full_name || found.name || 'Student',
+                            roll: match.roll || match.enrollment_code || staffId || ident,
+                            classId: match.classId || match.class_id,
+                            className: match.className || match.class_name,
+                            photo: match.photo || match.photo_url || found.photo || null
+                        });
+                    }
+                } catch(e) {}
             } else {
-                const cloudStudents = await window.SupabaseService.getStudents();
+                const cloudStudents = await window.SupabaseService.getStudents(selectedOrgName);
                 found = cloudStudents.find(s => 
                     (s.roll && s.roll.toLowerCase() === ident) || 
                     (s.enrollment_code && s.enrollment_code.toLowerCase() === ident) || 

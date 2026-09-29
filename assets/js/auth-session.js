@@ -43,6 +43,21 @@
         }
     }
 
+    /**
+     * Determine if a given string/URL is an organization branding logo rather than an individual's photo
+     */
+    function isOrgLogoUrl(url) {
+        if (!url || typeof url !== 'string') return false;
+        const clean = url.trim().toLowerCase();
+        if (clean.includes('/school-assets/logos/') || clean.includes('/logos/')) return true;
+        if (clean.includes('cape-coast-university-logo') || clean.includes('flawless-logo')) return true;
+        try {
+            const activeLogo = (localStorage.getItem('active_org_logo') || localStorage.getItem('org_logo') || '').trim().toLowerCase();
+            if (activeLogo && clean === activeLogo) return true;
+        } catch(e) {}
+        return false;
+    }
+
     const AuthSession = {
         /**
          * Retrieve current active user session (Context & Portal Aware)
@@ -99,6 +114,31 @@
                 }
             }
 
+            // Purge organization logos from user profile photos & auto-recover real photos
+            if (user && typeof user === 'object') {
+                if (isOrgLogoUrl(user.photo)) user.photo = null;
+                if (isOrgLogoUrl(user.photo_url)) user.photo_url = null;
+                if (isOrgLogoUrl(user.photoBase64)) user.photoBase64 = null;
+
+                if (!user.photo && user.photo_url) user.photo = user.photo_url;
+                if (!user.photo_url && user.photo) user.photo_url = user.photo;
+
+                if (!user.photo && !user.photo_url) {
+                    const fallbackKeys = [ACTIVE_ORG_USER_KEY, ACTIVE_USER_KEY, ACTIVE_HR_KEY, ACTIVE_FINANCE_KEY, ACTIVE_TEACHER_KEY, ACTIVE_STUDENT_KEY, 'hr_user', 'finance_user', 'teacher_user', 'student_user'];
+                    for (const fk of fallbackKeys) {
+                        const fallbackObj = safeParse(localStorage.getItem(fk));
+                        if (fallbackObj && typeof fallbackObj === 'object') {
+                            const candidate = fallbackObj.photo_url || fallbackObj.photo || fallbackObj.photoBase64;
+                            if (candidate && typeof candidate === 'string' && candidate.trim() && !isOrgLogoUrl(candidate) && !candidate.includes('/avatars/')) {
+                                user.photo = candidate.trim();
+                                user.photo_url = candidate.trim();
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
             return user;
         },
 
@@ -116,6 +156,22 @@
         /**
          * Get active organization logo (Base64 or URL)
          */
+        getMainLogoPath: function() {
+            if (typeof window !== 'undefined' && window.STORAGE_ASSETS && window.STORAGE_ASSETS.logos && window.STORAGE_ASSETS.logos.primaryPng) {
+                return window.STORAGE_ASSETS.logos.primaryPng;
+            }
+            return 'https://wmvsujwgvlosfjdlhadu.supabase.co/storage/v1/object/public/school-assets/logos/flawless-logo.png';
+        },
+
+        getEffectiveLogo: function() {
+            const custom = this.getLogo();
+            const activeOrg = (this.getOrg() || '').trim().toUpperCase();
+            if (custom && custom.trim() && (custom.startsWith('data:image/') || custom.startsWith('http') || activeOrg !== 'FLAWLESS GRAPHICS')) {
+                return custom;
+            }
+            return this.getMainLogoPath();
+        },
+
         getLogo: function() {
             const user = this.getUser();
             return (user && user.logo)
@@ -160,11 +216,116 @@
         },
 
         /**
-         * Get user profile photo
+         * Get canonical SVG avatar URL for a given role from Supabase Cloud Storage
          */
-        getUserPhoto: function() {
+        getRoleAvatar: function(role) {
+            const r = (role || '').toLowerCase();
+            if (typeof window !== 'undefined' && window.STORAGE_ASSETS && typeof window.STORAGE_ASSETS.getAvatarForRole === 'function') {
+                return window.STORAGE_ASSETS.getAvatarForRole(r);
+            }
+            const baseStorage = 'https://wmvsujwgvlosfjdlhadu.supabase.co/storage/v1/object/public';
+            if (r.includes('super')) return `${baseStorage}/staff-photos/avatars/super-admin-avatar.svg`;
+            if (r.includes('admin')) return `${baseStorage}/staff-photos/avatars/admin-avatar.svg`;
+            if (r.includes('hr')) return `${baseStorage}/staff-photos/avatars/hr-avatar.svg`;
+            if (r.includes('fin') || r.includes('bursar') || r.includes('account')) return `${baseStorage}/staff-photos/avatars/finance-avatar.svg`;
+            if (r.includes('stud') || r.includes('scholar')) return `${baseStorage}/student-photos/avatars/student-avatar.svg`;
+            if (r.includes('teach') || r.includes('faculty') || r.includes('educat')) return `${baseStorage}/staff-photos/avatars/teacher-avatar.svg`;
+            return `${baseStorage}/staff-photos/avatars/teacher-avatar.svg`;
+        },
+
+        /**
+         * Detect active role from page path if not available in session
+         */
+        detectCurrentRole: function() {
+            if (typeof window === 'undefined' || !window.location) return 'teacher';
+            const path = (window.location.pathname || '').toLowerCase();
+            if (path.includes('/admin/')) return 'admin';
+            if (path.includes('/hr/')) return 'hr';
+            if (path.includes('/teacher/')) return 'teacher';
+            if (path.includes('/student/')) return 'student';
+            if (path.includes('/finance/')) return 'finance';
+            return 'teacher';
+        },
+
+        /**
+         * Check if a given URL is an organization logo rather than a user photo
+         */
+        isOrgLogo: function(url) {
+            return isOrgLogoUrl(url);
+        },
+
+        /**
+         * Get user profile photo
+         * Returns uploaded photo if user has one; otherwise returns role avatar
+         */
+        getUserPhoto: function(roleOverride = null) {
+            const display = this.getUserDisplayPhoto(roleOverride);
+            return display.photo;
+        },
+
+        /**
+         * Detailed profile photo resolution:
+         * Returns { photo: string, isUploaded: boolean, roleAvatar: string }
+         */
+        getUserDisplayPhoto: function(roleOverride = null) {
             const user = this.getUser();
-            return (user && (user.photo || user.photoBase64 || user.photo_url || user.avatar || user.avatar_url || user.profilePhoto)) || null;
+            const role = roleOverride || (user && user.role) || this.detectCurrentRole();
+            const roleAvatar = this.getRoleAvatar(role);
+
+            const uploaded = (user && (user.photo_url || user.photo || user.photoBase64 || user.avatar || user.avatar_url || user.profilePhoto)) || null;
+            if (uploaded && typeof uploaded === 'string' && uploaded.trim() 
+                && !uploaded.includes('unsplash.com') 
+                && !uploaded.includes('/avatars/')
+                && !this.isOrgLogo(uploaded)) {
+                return {
+                    photo: uploaded.trim(),
+                    isUploaded: true,
+                    roleAvatar: roleAvatar
+                };
+            }
+
+            return {
+                photo: (uploaded && (uploaded.includes('/avatars/') || uploaded.startsWith('data:image/svg+xml'))) ? uploaded.trim() : roleAvatar,
+                isUploaded: false,
+                roleAvatar: roleAvatar
+            };
+        },
+
+        /**
+         * Dynamically update all profile photo instances across the active page
+         */
+        updateActiveProfilePhotos: function(userObj = null) {
+            const displayInfo = this.getUserDisplayPhoto();
+            const photoUrl = displayInfo.photo;
+            const fallbackAvatar = displayInfo.roleAvatar;
+
+            // Target elements across all dashboards
+            const photoElementSelectors = [
+                '#sidePhoto', '#profilePhoto', '#profilePreview', 
+                '#idCardPhoto', '#studentSettingsPhotoPreview', 
+                '#financePhoto', '#adminPhoto', '#sideAdminPhoto', '#topNavAvatar', '#headerUserAvatar',
+                '.profile-thumb', '.sidebar-profile-thumb', '.sidebar-profile img'
+            ];
+
+            photoElementSelectors.forEach(sel => {
+                document.querySelectorAll(sel).forEach(el => {
+                    if (!el || el.tagName !== 'IMG') return;
+                    el.src = photoUrl;
+                    el.onerror = function() {
+                        this.onerror = null;
+                        this.src = fallbackAvatar;
+                    };
+                });
+            });
+
+            // Update top-right profile pill & dropdown if rendered
+            document.querySelectorAll('.fg-avatar-img').forEach(img => {
+                img.src = photoUrl;
+                img.onerror = function() {
+                    this.onerror = null;
+                    this.src = fallbackAvatar;
+                };
+            });
         },
 
         /**
@@ -174,6 +335,7 @@
             const user = this.getUser();
             if (user) {
                 user.photo = photoBase64 || null;
+                user.photo_url = photoBase64 || null;
                 user.photoBase64 = photoBase64 || null;
                 this.setUser(user);
             }
@@ -200,16 +362,25 @@
                     const cloudOrgs = await window.SupabaseService.getOrganizations();
                     const cachedOrg = localStorage.getItem(ACTIVE_ORG_KEY) || localStorage.getItem('activeOrg');
 
-                    if (cachedOrg && Array.isArray(cloudOrgs) && cloudOrgs.length > 0) {
+                    if (cachedOrg && cachedOrg.toUpperCase() !== 'FLAWLESS GRAPHICS') {
                         const cleanCached = cachedOrg.trim().toLowerCase();
-                        const matched = cloudOrgs.find(o => {
+                        const matched = Array.isArray(cloudOrgs) ? cloudOrgs.find(o => {
                             const oName = (o.org_name || o.name || '').trim().toLowerCase();
                             const oSlug = (o.slug || o.org_id || '').trim().toLowerCase();
                             return oName === cleanCached || oSlug === cleanCached || cleanCached.includes(oName) || (oName && oName.includes(cleanCached));
-                        });
+                        }) : null;
+
                         if (matched) {
                             org = matched.org_name || matched.name;
                             logo = matched.logo_url || matched.logo_path || matched.logo || localStorage.getItem('active_org_logo');
+                        } else {
+                            // Organization was deleted from Supabase! Clean up stale storage.
+                            localStorage.removeItem(ACTIVE_ORG_KEY);
+                            localStorage.removeItem('activeOrg');
+                            localStorage.removeItem('active_org_logo');
+                            localStorage.removeItem('org_logo');
+                            org = 'FLAWLESS GRAPHICS';
+                            logo = null;
                         }
                     }
                 } catch (e) {
@@ -219,60 +390,75 @@
 
             if (!org) {
                 const user = this.getUser();
-                org = (user && user.org) || localStorage.getItem(ACTIVE_ORG_KEY) || localStorage.getItem('activeOrg');
+                org = (user && user.org) || localStorage.getItem(ACTIVE_ORG_KEY) || localStorage.getItem('activeOrg') || 'FLAWLESS GRAPHICS';
                 logo = (user && user.logo) || localStorage.getItem('active_org_logo') || localStorage.getItem('org_logo');
             }
 
-            // If no verified organization from Supabase or storage, preserve default template text & icons
-            if (!org) return;
+            // Determine effective logo: custom uploaded organization logo vs main project logo
+            const mainLogo = this.getMainLogoPath();
+            const cleanOrgUpper = (org || 'FLAWLESS GRAPHICS').trim().toUpperCase();
+            let effectiveLogo = mainLogo;
+            let isCustom = false;
+
+            if (logo && logo.trim()) {
+                if (logo.startsWith('data:image/') || cleanOrgUpper !== 'FLAWLESS GRAPHICS') {
+                    effectiveLogo = logo;
+                    isCustom = true;
+                }
+            }
 
             // 1. Text branding targets (strictly exclude SELECT, INPUT, and TEXTAREA elements)
             const textSelectors = [
                 '#orgTitle', '#headerOrgTitle', '#orgNameDisplay', '#summaryOrgName', '#orgName',
-                '.brand-title', '.org-title-text', '.header-org-title'
+                '.brand-title', '.org-title-text', '.header-org-title', '.nav-brand-title',
+                '#sideOrgName', '#sideOrg', '#sideOrgTitle'
             ];
             textSelectors.forEach(sel => {
                 document.querySelectorAll(sel).forEach(el => {
                     if (!el) return;
                     if (el.tagName === 'SELECT' || el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') return;
                     if (!el.getAttribute('data-preserve-title')) {
-                        el.textContent = org.toUpperCase();
+                        el.textContent = (org || 'FLAWLESS GRAPHICS').toUpperCase();
                     }
                 });
             });
 
             // Specific header checks where brand names are displayed
-            document.querySelectorAll('.brand, .brand-wrapper, .brand-logo-container').forEach(brandEl => {
-                const title = brandEl.querySelector('h1, h2, .brand-title, #orgName, #headerOrgTitle, #orgTitle, span.org-name');
+            document.querySelectorAll('.brand, .brand-wrapper, .brand-logo-container, .nav-brand').forEach(brandEl => {
+                const title = brandEl.querySelector('h1, h2, .brand-title, .nav-brand-title, #orgName, #headerOrgTitle, #orgTitle, span.org-name');
                 if (title && title.tagName !== 'SELECT' && title.tagName !== 'INPUT' && title.tagName !== 'TEXTAREA' && !title.getAttribute('data-preserve-title')) {
-                    title.textContent = org.toUpperCase();
+                    title.textContent = (org || 'FLAWLESS GRAPHICS').toUpperCase();
                 }
             });
 
-            // 2. Logo branding targets
-            if (logo) {
-                const logoSelectors = [
-                    '#orgLogoBox', '#headerOrgLogo', '.logo-circle', '.org-logo-preview',
-                    '.brand .logo', '.header-left .logo', '.brand-logo-container .org-logo-preview',
-                    '.brand-icon', '.brand-badge'
-                ];
+            // 2. Logo branding targets: switches between main Flawless Graphics logo and custom uploaded org logo
+            const logoSelectors = [
+                '#orgLogoBox', '#headerOrgLogo', '.logo-circle', '.org-logo-preview',
+                '.brand .logo', '.header-left .logo', '.brand-logo-container .org-logo-preview',
+                '.brand-icon', '.brand-badge', '.brand-logo-badge', '.brand-logo',
+                '.nav-brand-logo', '#brandingPreviewBox', '.sidebar .brand .logo'
+            ];
 
-                logoSelectors.forEach(sel => {
-                    document.querySelectorAll(sel).forEach(el => {
-                        if (!el) return;
-                        if (el.id === 'orgLogoBox') {
-                            el.innerHTML = `<img src="${logo}" alt="${org}" style="width:100%; height:100%; object-fit:contain; border-radius:inherit; display:block;">`;
+            const altText = isCustom ? ((org || 'Organization') + ' Crest') : 'Flawless Graphics';
+
+            logoSelectors.forEach(sel => {
+                document.querySelectorAll(sel).forEach(el => {
+                    if (!el) return;
+                    if (el.getAttribute('data-preserve-logo') === 'true') return;
+                    
+                    if (el.id === 'orgLogoBox') {
+                        el.innerHTML = '<img src="' + effectiveLogo + '" alt="' + altText + '" class="org-brand-logo" style="width:100%; height:100%; object-fit:contain; border-radius:inherit; display:block;">';
+                    } else {
+                        let img = el.querySelector('img.org-brand-logo');
+                        if (!img) {
+                            el.innerHTML = '<img src="' + effectiveLogo + '" alt="' + altText + '" class="org-brand-logo" style="width:100%; height:100%; object-fit:contain; border-radius:inherit; display:block; padding:2px;">';
                         } else {
-                            let img = el.querySelector('img.org-brand-logo');
-                            if (!img) {
-                                el.innerHTML = `<img src="${logo}" alt="${org}" class="org-brand-logo" style="width:100%; height:100%; object-fit:contain; border-radius:inherit; display:block; padding:2px;">`;
-                            } else {
-                                img.src = logo;
-                            }
+                            img.src = effectiveLogo;
+                            img.alt = altText;
                         }
-                    });
+                    }
                 });
-            }
+            });
 
             // Universal Top-Right Profile Widget & Online Status render
             try {
@@ -289,13 +475,28 @@
             if (!user || typeof user !== 'object') return;
 
             const existingLogo = this.getLogo();
+            
+            // Clean & extract user photo - NEVER accept an organization logo as a personal photo!
+            let cleanPhoto = user.photo_url || user.photo || user.photoBase64 || user.avatar || user.avatar_url || user.profilePhoto || null;
+            if (cleanPhoto && typeof cleanPhoto === 'string') {
+                cleanPhoto = cleanPhoto.trim();
+                if (isOrgLogoUrl(cleanPhoto)) {
+                    cleanPhoto = null;
+                }
+            } else {
+                cleanPhoto = null;
+            }
+
             const normalizedUser = {
                 org: (user.org || user.organization || '').trim(),
                 name: (user.name || user.fullName || 'User').trim(),
                 email: (user.email || '').trim().toLowerCase(),
                 role: (user.role || 'user').toLowerCase(),
+                status: user.status || 'active',
                 logo: user.logo || existingLogo || null,
-                photo: user.photo || user.photoBase64 || null,
+                photo: cleanPhoto,
+                photo_url: cleanPhoto,
+                photoBase64: cleanPhoto,
                 createdAt: user.createdAt || Date.now()
             };
 
@@ -313,14 +514,15 @@
                 localStorage.setItem('org_logo', normalizedUser.logo);
             }
 
-            // 3. Department specific sessions - strictly decoupled
+            // 3. Department specific sessions - strictly decoupled & NEVER fall back photo to organization logo!
             if (normalizedUser.role === 'hr' || normalizedUser.role === 'hr admin') {
                 const hrSession = {
                     name: normalizedUser.name,
                     email: normalizedUser.email,
                     role: 'HR Admin',
                     org: normalizedUser.org,
-                    photo: normalizedUser.photo || normalizedUser.logo || null,
+                    photo: normalizedUser.photo || null,
+                    photo_url: normalizedUser.photo_url || null,
                     status: normalizedUser.status || 'active'
                 };
                 localStorage.setItem(ACTIVE_HR_KEY, JSON.stringify(hrSession));
@@ -334,7 +536,8 @@
                     email: normalizedUser.email,
                     org: normalizedUser.org,
                     role: normalizedUser.role || 'Finance Bursar',
-                    photo: normalizedUser.photo || normalizedUser.logo || null,
+                    photo: normalizedUser.photo || null,
+                    photo_url: normalizedUser.photo_url || null,
                     status: normalizedUser.status || 'active'
                 };
                 localStorage.setItem(ACTIVE_FINANCE_KEY, JSON.stringify(financeSession));
@@ -348,7 +551,8 @@
                     email: normalizedUser.email,
                     org: normalizedUser.org || 'FLAWLESS GRAPHICS',
                     role: 'admin',
-                    photo: normalizedUser.photo || normalizedUser.logo || null,
+                    photo: normalizedUser.photo || null,
+                    photo_url: normalizedUser.photo_url || null,
                     status: normalizedUser.status || 'active'
                 };
                 localStorage.setItem(ACTIVE_ADMIN_KEY, JSON.stringify(adminSession));
@@ -362,10 +566,13 @@
                     email: normalizedUser.email,
                     org: normalizedUser.org,
                     role: 'teacher',
-                    photoBase64: normalizedUser.photo || normalizedUser.logo || ''
+                    photo: normalizedUser.photo || null,
+                    photo_url: normalizedUser.photo_url || null,
+                    photoBase64: normalizedUser.photo || ''
                 };
                 localStorage.setItem(ACTIVE_TEACHER_KEY, JSON.stringify(teacherSession));
                 localStorage.setItem(TEACHER_USER_KEY, JSON.stringify(teacherSession));
+                localStorage.setItem('teacher_user', JSON.stringify(teacherSession));
             }
 
             if (normalizedUser.role === 'student') {
@@ -374,11 +581,16 @@
                     email: normalizedUser.email,
                     org: normalizedUser.org,
                     role: 'student',
-                    photo: normalizedUser.photo || ''
+                    photo: normalizedUser.photo || null,
+                    photo_url: normalizedUser.photo_url || null
                 };
                 localStorage.setItem(ACTIVE_STUDENT_KEY, JSON.stringify(studentSession));
                 localStorage.setItem(STUDENT_USER_KEY, JSON.stringify(studentSession));
+                localStorage.setItem('student_user', JSON.stringify(studentSession));
             }
+
+            // Immediately synchronize visual photo elements across the active page
+            this.updateActiveProfilePhotos(normalizedUser);
 
             // Dynamically refresh branding
             this.applyGlobalBranding();
@@ -1105,14 +1317,14 @@
                 document.head.appendChild(styleEl);
             }
 
-            // Build HTML
-            const avatarHtml = photo
-                ? `<img src="${photo}" alt="${this.escapeHtml(name)}" class="fg-avatar-img">`
-                : `<div class="fg-avatar-initials">${initials}</div>`;
+            // Build HTML: uploaded photo if present, canonical role avatar if absent
+            const displayPhotoInfo = this.getUserDisplayPhoto(rawRole);
+            const displayPhoto = displayPhotoInfo.photo;
+            const fallbackAvatar = displayPhotoInfo.roleAvatar;
 
-            const dropdownAvatarHtml = photo
-                ? `<img src="${photo}" alt="${this.escapeHtml(name)}" class="fg-avatar-img" style="border-width:2.5px;">`
-                : `<div class="fg-avatar-initials" style="font-size:17px;">${initials}</div>`;
+            const avatarHtml = `<img src="${displayPhoto}" alt="${this.escapeHtml(name)}" class="fg-avatar-img" onerror="this.onerror=null; this.src='${fallbackAvatar}';">`;
+
+            const dropdownAvatarHtml = `<img src="${displayPhoto}" alt="${this.escapeHtml(name)}" class="fg-avatar-img" style="border-width:2.5px;" onerror="this.onerror=null; this.src='${fallbackAvatar}';">`;
 
             const widgetHtml = `
                 <div class="fg-top-profile-pill standalone" id="fgTopProfilePill" title="Active Session: ${this.escapeHtml(name)} (${roleLabel})">
@@ -1226,7 +1438,7 @@
 
         getProfilePathByRole: function(role = 'user') {
             const r = String(role || '').toLowerCase();
-            const href = (typeof window !== 'undefined' && window.location ? window.location.href : '').toLowerCase();
+            const href = String((typeof window !== 'undefined' && window.location && (window.location.href || window.location.pathname)) || '').toLowerCase();
             if (href.includes('/pages/teacher/') || r.includes('teacher')) return 'teacher-profile.html';
             if (href.includes('/pages/student/') || r.includes('student')) return 'javascript:if(window.showSection){showSection("profile");}';
             if (href.includes('/pages/admin/') || r.includes('admin')) return 'javascript:if(window.switchSection){switchSection("superAdminsSection");}';
@@ -1336,6 +1548,33 @@
                             AuthSession.logout(null);
                             return false;
                         }
+                        // Live profile photo synchronization directly from Supabase Cloud
+                        const cloudPhoto = liveUser.photo_url || liveUser.photo || liveUser.photoBase64 || liveUser.avatar || null;
+                        const isLogo = cloudPhoto && isOrgLogoUrl(cloudPhoto);
+                        const cleanCloudPhoto = (!isLogo && typeof cloudPhoto === 'string' && cloudPhoto.trim()) ? cloudPhoto.trim() : null;
+
+                        let needsSync = false;
+                        if (cleanCloudPhoto && (currentUser.photo !== cleanCloudPhoto || currentUser.photo_url !== cleanCloudPhoto)) {
+                            currentUser.photo = cleanCloudPhoto;
+                            currentUser.photo_url = cleanCloudPhoto;
+                            currentUser.photoBase64 = cleanCloudPhoto;
+                            needsSync = true;
+                        } else if (!cleanCloudPhoto && currentUser.photo && isOrgLogoUrl(currentUser.photo)) {
+                            currentUser.photo = null;
+                            currentUser.photo_url = null;
+                            currentUser.photoBase64 = null;
+                            needsSync = true;
+                        }
+
+                        if (liveUser.name && liveUser.name !== currentUser.name) {
+                            currentUser.name = liveUser.name;
+                            needsSync = true;
+                        }
+
+                        if (needsSync) {
+                            AuthSession.setUser(currentUser);
+                            AuthSession.updateActiveProfilePhotos(currentUser);
+                        }
                     }
                 }
 
@@ -1368,6 +1607,7 @@
 
                 // 3. Re-synchronize branding for active cloud organization
                 await AuthSession.applyGlobalBranding();
+                AuthSession.updateActiveProfilePhotos();
                 return true;
             } catch (err) {
                 console.warn('[AuthSession] Cloud validation error:', err);
@@ -1392,11 +1632,13 @@
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
         setTimeout(() => {
             triggerThrottledValidation(true);
+            AuthSession.updateActiveProfilePhotos();
             AuthSession.renderTopRightProfileWidget();
         }, 10);
     } else {
         window.addEventListener('DOMContentLoaded', () => {
             triggerThrottledValidation(true);
+            AuthSession.updateActiveProfilePhotos();
             AuthSession.renderTopRightProfileWidget();
         }, { once: true });
     }

@@ -77,55 +77,142 @@
     .sidebar {
       width: 72px !important;
       min-width: 72px !important;
-      padding: 20px 10px !important;
-      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), margin-right 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease !important;
-      z-index: 1000 !important;
-      overflow-x: hidden !important;
-      overflow-y: auto !important;
-    }
-    .sidebar:hover {
-      width: 260px !important;
-      margin-right: -188px !important;
-      padding: 24px 16px !important;
-      box-shadow: 14px 0 35px rgba(0, 0, 0, 0.25) !important;
-    }
-    .sidebar .hide-collapsed {
-      opacity: 0;
-      white-space: nowrap;
-      transition: opacity 0.2s 0.05s ease;
-      pointer-events: none;
-    }
-    .sidebar:hover .hide-collapsed {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .sidebar {
-      width: 260px;
       background: var(--sidebar-bg);
       border-right: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       flex-direction: column;
-      padding: 24px 16px;
-      gap: 14px;
-      transition: var(--transition);
-      z-index: 10;
+      padding: 20px 10px !important;
+      gap: 10px;
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), margin-right 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease !important;
+      z-index: 1100 !important;
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
       flex-shrink: 0;
       color: #ffffff;
       scrollbar-width: none;
       -ms-overflow-style: none;
     }
     .sidebar::-webkit-scrollbar { display: none; width: 0; height: 0; }
-    .sidebar .org-name { color: #ffffff; }
-    .sidebar .profile-row {
+
+    /* When expanded (manually locked open) */
+    .sidebar.expanded {
+      width: 260px !important;
+      min-width: 260px !important;
+      margin-right: 0 !important;
+      padding: 24px 16px !important;
+      box-shadow: 6px 0 25px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    /* Universal Side Hover Rail: expands on hover */
+    .sidebar:hover {
+      width: 260px !important;
+      margin-right: -188px !important;
+      padding: 24px 16px !important;
+      box-shadow: 14px 0 38px rgba(0, 0, 0, 0.35) !important;
+    }
+
+    /* Resting State: Hidden elements */
+    .sidebar .hide-collapsed {
+      opacity: 0;
+      max-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      transition: opacity 0.2s 0.05s ease, max-width 0.25s ease;
+      pointer-events: none;
+      display: none;
+    }
+
+    .sidebar .nav-chevron,
+    .sidebar .nav-category-header,
+    .sidebar .profile-row,
+    .sidebar .nav-sub-menu {
+      display: none;
+    }
+
+    .sidebar .nav-group-header {
+      justify-content: center;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    .sidebar .nav-group-header-left {
+      gap: 0;
+    }
+
+    /* HOVER & EXPANDED STATES: Show all labels, chevrons, headers, and submenus! */
+    .sidebar:hover .hide-collapsed,
+    .sidebar.expanded .hide-collapsed {
+      opacity: 1 !important;
+      max-width: 220px !important;
+      display: inline-block !important;
+      pointer-events: auto !important;
+      overflow: visible !important;
+    }
+
+    .sidebar:hover .profile-row,
+    .sidebar.expanded .profile-row {
+      display: flex !important;
       background: rgba(255, 255, 255, 0.06);
       border-color: rgba(255, 255, 255, 0.1);
       color: #ffffff;
+      padding: 10px;
+      border-radius: 12px;
+      gap: 10px;
+      align-items: center;
     }
+
+    .sidebar:hover .brand,
+    .sidebar.expanded .brand {
+      justify-content: flex-start !important;
+      gap: 12px !important;
+    }
+
+    .sidebar:hover .brand .hide-collapsed,
+    .sidebar.expanded .brand .hide-collapsed {
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    .sidebar:hover .nav-category-header,
+    .sidebar.expanded .nav-category-header {
+      display: block !important;
+      opacity: 1 !important;
+    }
+
+    .sidebar:hover .nav-chevron,
+    .sidebar.expanded .nav-chevron {
+      display: inline-block !important;
+      opacity: 1 !important;
+    }
+
+    .sidebar:hover .nav-group-header,
+    .sidebar.expanded .nav-group-header {
+      justify-content: space-between !important;
+      padding: 9px 12px !important;
+    }
+
+    .sidebar:hover .nav-group-header-left,
+    .sidebar.expanded .nav-group-header-left {
+      gap: 12px !important;
+    }
+
+    .sidebar:hover .nav-group-header-left span,
+    .sidebar.expanded .nav-group-header-left span {
+      display: inline-block !important;
+      opacity: 1 !important;
+    }
+
+    /* Sub-menu when group is open during hover or expanded state */
+    .sidebar:hover .nav-group.open > .nav-sub-menu,
+    .sidebar.expanded .nav-group.open > .nav-sub-menu {
+      display: flex !important;
+    }
+
+    .sidebar .org-name { color: #ffffff; }
     .sidebar .nav button,
     .sidebar .nav a {
       color: rgba(255, 255, 255, 0.75);
       text-decoration: none;
+      cursor: pointer;
     }
     .sidebar .nav button:hover,
     .sidebar .nav a:hover {
@@ -137,41 +224,20 @@
       background: rgba(255, 255, 255, 0.08);
       border-color: rgba(255, 255, 255, 0.15);
       color: rgba(255, 255, 255, 0.7);
-    }
-    .sidebar.collapsed { width: 78px; padding: 20px 10px; }
-    .sidebar.collapsed .hide-collapsed { display: none !important; }
-    .sidebar.collapsed .brand { justify-content: center; padding: 0; }
-    .sidebar.collapsed .nav-category-header,
-    .sidebar.collapsed .nav-sub-menu,
-    .sidebar.collapsed .nav-chevron { display: none !important; }
-    .sidebar.collapsed .nav-group-header {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
       justify-content: center;
-      padding: 12px;
-      position: relative;
-    }
-    .sidebar.collapsed .nav-group-header-left { gap: 0; }
-    .sidebar.collapsed .nav-group-header-left span { display: none !important; }
-    .sidebar.collapsed .nav-group-header i.group-icon { margin: 0; font-size: 18px; }
-    .sidebar.collapsed .nav-group-header:hover::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      left: calc(100% + 14px);
-      top: 50%;
-      transform: translateY(-50%);
-      background: #0f172a;
-      color: #ffffff;
-      padding: 7px 14px;
+      padding: 8px;
       border-radius: 8px;
-      font-size: 12px;
-      white-space: nowrap;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-      z-index: 99999;
-      pointer-events: none;
-      font-weight: 700;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      margin-top: auto;
     }
-
-    /* Topbar Search, Session Badge & Quick Actions */
+    .sidebar .nav-group-header i.group-icon {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
     .quick-search-box {
       position: relative;
       display: flex;
@@ -1274,7 +1340,7 @@
   </a>
 
   <div class="profile-row hide-collapsed">
-    <img id="sidePhoto" class="profile-thumb" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80" alt="photo">
+    <img id="sidePhoto" class="profile-thumb" src="https://wmvsujwgvlosfjdlhadu.supabase.co/storage/v1/object/public/staff-photos/avatars/hr-avatar.svg" alt="photo">
     <div style="overflow:hidden">
       <div id="sideName" style="font-weight:700;font-size:13px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden">HR Administrator</div>
       <div class="small" id="sideEmail" style="white-space:nowrap;text-overflow:ellipsis;overflow:hidden">hr@flawless.org</div>
@@ -4037,6 +4103,82 @@
   </div>
 </div>
 
+<!-- STUDENT PORTAL ACCESS & CREDENTIALS HANDOUT MODAL -->
+<div class="custom-modal-overlay" id="studentCredentialsModal" onclick="if(event.target===this)closeStudentCredentialsModal()">
+  <div class="modal-card" style="max-width:540px; background:var(--card-bg, #ffffff); border-radius:18px; box-shadow:0 24px 60px rgba(0,0,0,0.25); border:1px solid var(--border); overflow:hidden;">
+    <div style="background:linear-gradient(135deg, #0284c7 0%, #2563eb 100%); padding:22px 24px; color:#fff; position:relative;">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div style="width:48px; height:48px; border-radius:14px; background:rgba(255,255,255,0.2); backdrop-filter:blur(10px); display:flex; align-items:center; justify-content:center; font-size:24px; color:#fff;">
+          <i class="fa-solid fa-key"></i>
+        </div>
+        <div>
+          <h3 style="margin:0; font-size:18px; font-weight:800; letter-spacing:-0.3px;">Student Portal Credentials</h3>
+          <div style="font-size:12px; opacity:0.9; margin-top:2px;">Auto-generated student login handout &amp; access credentials</div>
+        </div>
+      </div>
+      <button type="button" onclick="closeStudentCredentialsModal()" style="position:absolute; top:20px; right:20px; background:rgba(255,255,255,0.2); border:none; color:#fff; width:32px; height:32px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:14px;"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div style="padding:22px 24px;">
+      <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+        <i class="fa-solid fa-circle-check" style="color:#16a34a; font-size:20px; flex-shrink:0;"></i>
+        <div style="font-size:12.5px; color:#15803d; font-weight:600;">
+          Student account created and synced to Supabase Cloud! The student can immediately log in to the Student Portal.
+        </div>
+      </div>
+
+      <div style="background:rgba(0,0,0,0.03); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:18px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+          <div>
+            <div style="font-size:11px; text-transform:uppercase; color:var(--muted); font-weight:700; letter-spacing:0.5px;">Student Full Name</div>
+            <div id="sc_name" style="font-size:14.5px; font-weight:800; color:var(--text); margin-top:2px;">--</div>
+          </div>
+          <div>
+            <div style="font-size:11px; text-transform:uppercase; color:var(--muted); font-weight:700; letter-spacing:0.5px;">Class / Grade</div>
+            <div id="sc_class" style="font-size:13.5px; font-weight:700; color:var(--primary); margin-top:2px;">--</div>
+          </div>
+        </div>
+
+        <div style="border-top:1px dashed var(--border); padding-top:12px; display:flex; flex-direction:column; gap:10px;">
+          <div>
+            <div style="font-size:11px; text-transform:uppercase; color:var(--muted); font-weight:700; letter-spacing:0.5px;">Student ID / Roll Number (Login ID)</div>
+            <div style="display:flex; align-items:center; justify-content:space-between; background:var(--card-bg, #fff); border:1px solid var(--border); border-radius:8px; padding:7px 12px; margin-top:3px;">
+              <code id="sc_roll" style="font-size:13.5px; font-weight:700; color:#0284c7;">--</code>
+              <button type="button" class="btn ghost btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('sc_roll').innerText); showToast('Student ID copied!');" style="padding:2px 8px; font-size:11px;"><i class="fa-solid fa-copy"></i> Copy</button>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:11px; text-transform:uppercase; color:var(--muted); font-weight:700; letter-spacing:0.5px;">Generated Portal Password</div>
+            <div style="display:flex; align-items:center; justify-content:space-between; background:var(--card-bg, #fff); border:1px solid var(--border); border-radius:8px; padding:7px 12px; margin-top:3px;">
+              <code id="sc_pass" style="font-size:14.5px; font-weight:800; color:#dc2626; letter-spacing:1px;">--</code>
+              <button type="button" class="btn ghost btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('sc_pass').innerText); showToast('Password copied!');" style="padding:2px 8px; font-size:11px;"><i class="fa-solid fa-copy"></i> Copy</button>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:11px; text-transform:uppercase; color:var(--muted); font-weight:700; letter-spacing:0.5px;">Student Portal URL</div>
+            <div style="font-size:11.5px; color:var(--muted); margin-top:3px; font-family:monospace; word-break:break-all;">
+              pages/student/student-login.html
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        <button type="button" class="btn ghost" onclick="copyFullCredentialSlip()" style="font-size:12px;">
+          <i class="fa-solid fa-clipboard-list"></i> Copy Complete Slip
+        </button>
+        <div style="display:flex; gap:10px;">
+          <button type="button" class="btn" style="background:#0284c7; color:#fff; font-size:12px;" onclick="closeStudentCredentialsModal()">
+            <i class="fa-solid fa-check"></i> Done &amp; Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- SYSTEM USER ACCOUNT MANAGEMENT MODAL -->
 <div class="custom-modal-overlay" id="userModal" onclick="if(event.target===this)closeUserModal()">
   <div class="modal-card" style="max-width: 580px;">
@@ -4622,6 +4764,11 @@ async function loadHRCloudData() {
     const students = await window.SupabaseService.getStudents(ACTIVE_ORG);
     hrStore[STUD_KEY] = students;
 
+    const liveClasses = await window.SupabaseService.getClasses(ACTIVE_ORG);
+    if (Array.isArray(liveClasses) && liveClasses.length > 0) {
+      hrStore[CLASSES_STORAGE_KEY] = liveClasses;
+    }
+
     const payroll = await window.SupabaseService.getPayroll(ACTIVE_ORG);
     hrStore['fg_payroll'] = payroll;
 
@@ -4727,6 +4874,25 @@ if (user && user.name) {
   document.getElementById('sideEmail').textContent = user.email || 'hr@flawless.org';
 }
 
+// Display uploaded HR profile photo if present, else role avatar
+const defaultHrAvatar = (window.STORAGE_ASSETS && window.STORAGE_ASSETS.avatars && window.STORAGE_ASSETS.avatars.hr)
+  ? window.STORAGE_ASSETS.avatars.hr
+  : 'https://wmvsujwgvlosfjdlhadu.supabase.co/storage/v1/object/public/staff-photos/avatars/hr-avatar.svg';
+const sidePhotoEl = document.getElementById('sidePhoto');
+if (sidePhotoEl) {
+  let hrPhoto = null;
+  if (window.AuthSession && typeof window.AuthSession.getUserPhoto === 'function') {
+    hrPhoto = window.AuthSession.getUserPhoto('hr');
+  }
+  if (!hrPhoto || (window.AuthSession && window.AuthSession.isOrgLogo && window.AuthSession.isOrgLogo(hrPhoto))) {
+    const raw = user && (user.photo_url || user.photo || user.photoBase64 || user.avatar);
+    const isLogo = raw && (String(raw).includes('/school-assets/logos/') || String(raw).includes('/logos/'));
+    hrPhoto = (!isLogo && raw) ? raw : defaultHrAvatar;
+  }
+  sidePhotoEl.src = hrPhoto;
+  sidePhotoEl.onerror = function() { this.src = defaultHrAvatar; };
+}
+
 // Org Switcher
 const orgSwitcher = document.getElementById('orgSwitcher');
 const orgList = [ACTIVE_ORG, 'FLAWLESS GRAPHICS', 'CREATIVE CAMPUS', 'ENTERPRISE TECH'];
@@ -4739,12 +4905,17 @@ uniqueOrgs.forEach(o => {
   orgSwitcher.appendChild(opt);
 });
 orgSwitcher.addEventListener('change', () => {
+  const selectedOrg = orgSwitcher.value;
+  localStorage.setItem('active_org', selectedOrg);
+  localStorage.setItem('activeOrg', selectedOrg);
   if (window.AuthSession) {
     const curr = window.AuthSession.getUser() || {};
-    curr.org = orgSwitcher.value;
+    curr.org = selectedOrg;
     window.AuthSession.setUser(curr);
   }
-  localStorage.setItem('active_org', orgSwitcher.value);
+  if (window.RealtimeAuth && typeof window.RealtimeAuth.applyOrgBranding === 'function') {
+    window.RealtimeAuth.applyOrgBranding(selectedOrg);
+  }
   location.reload();
 });
 
@@ -4757,6 +4928,7 @@ let isCollapsed = localStorage.getItem('hr_sidebar_collapsed') === 'true';
 function setSidebarCollapsed(collapsed) {
   isCollapsed = collapsed;
   sidebar.classList.toggle('collapsed', isCollapsed);
+  sidebar.classList.toggle('expanded', !isCollapsed);
   if (collapseBtn) {
     collapseBtn.innerHTML = isCollapsed ? '<i class="fa-solid fa-angle-right"></i>' : '<i class="fa-solid fa-angle-left"></i>';
   }
@@ -5001,7 +5173,12 @@ function showSection(name) {
 window.toggleNavGroup = function(headerBtn) {
   const group = headerBtn.closest('.nav-group');
   if (group) {
-    group.classList.toggle('open');
+    const wasOpen = group.classList.contains('open');
+    group.classList.toggle('open', !wasOpen);
+    // If sidebar is resting in collapsed state, expand it so user sees and can click the sub-menu items
+    if (sidebar && sidebar.classList.contains('collapsed')) {
+      setSidebarCollapsed(false);
+    }
   }
 };
 
@@ -5736,7 +5913,7 @@ document.getElementById('filterRole')?.addEventListener('change', renderTeachers
 document.getElementById('addTeacherBtn')?.addEventListener('click', () => openTeacherModal());
 
 let currentTeacherModalPhoto = null;
-const DEFAULT_TEACHER_PHOTO = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80';
+const DEFAULT_TEACHER_PHOTO = (window.STORAGE_ASSETS && window.STORAGE_ASSETS.avatars && window.STORAGE_ASSETS.avatars.teacher) ? window.STORAGE_ASSETS.avatars.teacher : 'https://wmvsujwgvlosfjdlhadu.supabase.co/storage/v1/object/public/staff-photos/avatars/teacher-avatar.svg';
 
 function handleTeacherModalPhoto(e) {
   const file = e.target.files[0];
@@ -5899,7 +6076,7 @@ async function deleteEmp(id) {
    SECTION 3: COMPREHENSIVE STUDENT REGISTRATION & ENROLLMENT
    (Synced with Teacher Dashboard Form & Institutional Roster)
 ------------------------------------------------------------- */
-const DEFAULT_STUDENT_AVATAR = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80';
+const DEFAULT_STUDENT_AVATAR = (window.STORAGE_ASSETS && window.STORAGE_ASSETS.avatars && window.STORAGE_ASSETS.avatars.student) ? window.STORAGE_ASSETS.avatars.student : 'https://wmvsujwgvlosfjdlhadu.supabase.co/storage/v1/object/public/student-photos/avatars/student-avatar.svg';
 let currentStudentPhotoBase64 = null;
 
 function handleStudentPhotoChange(e) {
@@ -6164,7 +6341,7 @@ function editHRStudent(code) {
   openAddStudentModal(code);
 }
 
-function saveStudentDetailForm(e) {
+async function saveStudentDetailForm(e) {
   if (e && e.preventDefault) e.preventDefault();
 
   const classSelect = document.getElementById('sm_classId');
@@ -6217,7 +6394,15 @@ function saveStudentDetailForm(e) {
     return;
   }
 
+  const saveBtn = document.getElementById('sm_saveBtn');
+  const origBtnText = saveBtn ? saveBtn.innerHTML : '';
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving to Cloud...';
+  }
+
   const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ');
+  const isEdit = Boolean(studentId);
   const recordId = studentId || ('s_' + Date.now());
 
   const studentRecord = {
@@ -6232,7 +6417,10 @@ function saveStudentDetailForm(e) {
     dob: dob,
     bloodGroup: bloodGroup,
     classId: classId,
+    class_id: classId,
     class_name: className,
+    className: className,
+    grade: className,
     status: status,
     term: term,
     enrollmentDate: enrollmentDate,
@@ -6250,51 +6438,120 @@ function saveStudentDetailForm(e) {
     medicalNotes: medicalNotes,
     notes: notes,
     photo: currentStudentPhotoBase64 || DEFAULT_STUDENT_AVATAR,
+    photo_url: currentStudentPhotoBase64 || DEFAULT_STUDENT_AVATAR,
     updatedAt: Date.now()
   };
 
-  // 1. Update in STUD_KEY
-  let studs = read(STUD_KEY);
-  if (!Array.isArray(studs)) studs = [];
-  const existingIdx = studs.findIndex(s => (s.id === recordId || (s.roll && s.roll === roll) || (s.enrollment_code && s.enrollment_code === roll)));
-  if (existingIdx !== -1) {
-    studs[existingIdx] = Object.assign({}, studs[existingIdx], studentRecord);
-  } else {
-    studentRecord.createdAt = Date.now();
-    studs.unshift(studentRecord);
-  }
-  save(STUD_KEY, studs);
-
-  // 2. Cross-portal sync: Update into target class in CLASSES_STORAGE_KEY
-  let classes = typeof getClassesList === 'function' ? getClassesList() : (read(CLASSES_STORAGE_KEY) || []);
-  if (Array.isArray(classes)) {
-    let targetClass = classes.find(c => c.id === classId || c.name === className);
-    if (targetClass) {
-      targetClass.students = targetClass.students || [];
-      const cIdx = targetClass.students.findIndex(s => s.id === recordId || s.roll === roll);
-      if (cIdx !== -1) {
-        targetClass.students[cIdx] = Object.assign({}, targetClass.students[cIdx], studentRecord);
+  try {
+    let cloudEnrollResult = null;
+    if (window.SupabaseService) {
+      if (isEdit) {
+        await window.SupabaseService.saveStudent(ACTIVE_ORG, studentRecord);
       } else {
-        targetClass.students.push(studentRecord);
+        cloudEnrollResult = await window.SupabaseService.createStudentWithAccount(ACTIVE_ORG, studentRecord);
       }
-      targetClass.enrolled = targetClass.students.length;
-      save(CLASSES_STORAGE_KEY, classes);
+    }
+
+    // 1. Update in STUD_KEY
+    let studs = read(STUD_KEY);
+    if (!Array.isArray(studs)) studs = [];
+    const existingIdx = studs.findIndex(s => (s.id === recordId || (s.roll && s.roll === roll) || (s.enrollment_code && s.enrollment_code === roll)));
+    if (existingIdx !== -1) {
+      studs[existingIdx] = Object.assign({}, studs[existingIdx], studentRecord);
+    } else {
+      studentRecord.createdAt = Date.now();
+      studs.unshift(studentRecord);
+    }
+    save(STUD_KEY, studs);
+
+    // 2. Cross-portal sync: Update into target class in CLASSES_STORAGE_KEY
+    let classes = typeof getClassesList === 'function' ? getClassesList() : (read(CLASSES_STORAGE_KEY) || []);
+    if (Array.isArray(classes)) {
+      let targetClass = classes.find(c => c.id === classId || c.name === className);
+      if (targetClass) {
+        targetClass.students = targetClass.students || [];
+        const cIdx = targetClass.students.findIndex(s => s.id === recordId || s.roll === roll);
+        if (cIdx !== -1) {
+          targetClass.students[cIdx] = Object.assign({}, targetClass.students[cIdx], studentRecord);
+        } else {
+          targetClass.students.push(studentRecord);
+        }
+        targetClass.enrolled = targetClass.students.length;
+        save(CLASSES_STORAGE_KEY, classes);
+      }
+    }
+
+    closeStudentModal();
+    loadHRStudents();
+    renderDashboard();
+
+    if (!isEdit && cloudEnrollResult) {
+      showStudentCredentialsModal({
+        name: fullName,
+        roll: roll,
+        className: className,
+        generatedPassword: cloudEnrollResult.generatedPassword,
+        email: cloudEnrollResult.email || (roll + '@student.flawless.edu'),
+        phone: phone,
+        guardianName: guardianName
+      });
+    } else {
+      if (window.Toaster && typeof window.Toaster.success === 'function') {
+        window.Toaster.success(
+          isEdit ? 'Student Profile Updated' : 'Student Enrolled Successfully',
+          `${fullName} (${roll}) saved into ${className}.`
+        );
+      } else {
+        showToast(`Student ${fullName} (${roll}) saved successfully!`);
+      }
+    }
+  } catch (err) {
+    console.error('Error saving student:', err);
+    showToast('Notice saving student: ' + (err.message || err), 'warning');
+  } finally {
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = origBtnText;
     }
   }
+}
 
-  // Toast confirmation
-  if (window.Toaster && typeof window.Toaster.success === 'function') {
-    window.Toaster.success(
-      studentId ? 'Student Profile Updated' : 'Student Enrolled Successfully',
-      `${fullName} (${roll}) registered into ${className}.`
-    );
-  } else {
-    showToast(`Student ${fullName} (${roll}) saved successfully!`);
-  }
+function showStudentCredentialsModal(data) {
+  const modal = document.getElementById('studentCredentialsModal');
+  if (!modal) return;
+  document.getElementById('sc_name').textContent = data.name || '--';
+  document.getElementById('sc_class').textContent = data.className || '--';
+  document.getElementById('sc_roll').textContent = data.roll || '--';
+  document.getElementById('sc_pass').textContent = data.generatedPassword || '--';
+  
+  window._lastStudentCredentials = data;
+  modal.classList.add('active');
+}
 
-  closeStudentModal();
-  loadHRStudents();
-  renderDashboard();
+function closeStudentCredentialsModal() {
+  const modal = document.getElementById('studentCredentialsModal');
+  if (modal) modal.classList.remove('active');
+}
+
+function copyFullCredentialSlip() {
+  const d = window._lastStudentCredentials || {};
+  const text = `======================================
+STUDENT PORTAL ACCESS CREDENTIALS
+Institution: ${ACTIVE_ORG}
+======================================
+Student Name: ${d.name || '--'}
+Student ID / Roll: ${d.roll || '--'}
+Class / Stream: ${d.className || '--'}
+Portal URL: pages/student/student-login.html
+Generated Password: ${d.generatedPassword || '--'}
+Guardian: ${d.guardianName || '--'} (${d.phone || '--'})
+======================================
+Please keep this slip safe. Student can sign in using their Student ID or Email and this password.`;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Student Credential Slip copied to clipboard!');
+  }).catch(() => {
+    showToast('Failed to copy slip.', 'warning');
+  });
 }
 
 function submitStudentAdmission() {

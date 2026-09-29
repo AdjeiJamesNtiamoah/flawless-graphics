@@ -322,7 +322,128 @@
       }
     }
 
+    /**
+     * Upload asset (File, Blob, or base64 data URI) directly to Supabase Storage bucket
+     */
+    async uploadToStorage(bucket, pathInBucket, fileOrBase64, contentType = 'image/png') {
+      if (!fileOrBase64) return null;
+      if (typeof fileOrBase64 === 'string' && (fileOrBase64.startsWith('http://') || fileOrBase64.startsWith('https://'))) {
+        return fileOrBase64;
+      }
+
+      let bodyData = null;
+      let finalContentType = contentType;
+
+      if (typeof Blob !== 'undefined' && fileOrBase64 instanceof Blob) {
+        bodyData = fileOrBase64;
+        finalContentType = fileOrBase64.type || contentType;
+      } else if (typeof fileOrBase64 === 'string' && fileOrBase64.startsWith('data:')) {
+        const parts = fileOrBase64.split(',');
+        const mimeMatch = parts[0].match(/:(.*?);/);
+        finalContentType = mimeMatch ? mimeMatch[1] : contentType;
+        const b64 = parts[1];
+        if (typeof window !== 'undefined' && typeof window.atob === 'function') {
+          const binary = atob(b64);
+          const len = binary.length;
+          const u8arr = new Uint8Array(len);
+          for (let i = 0; i < len; i++) {
+            u8arr[i] = binary.charCodeAt(i);
+          }
+          bodyData = new Blob([u8arr], { type: finalContentType });
+        } else if (typeof Buffer !== 'undefined') {
+          bodyData = Buffer.from(b64, 'base64');
+        }
+      }
+
+      if (!bodyData) return null;
+
+      try {
+        const baseUrl = Config.getUrl().replace(/\/$/, '');
+        const key = Config.getAnonKey();
+        const cleanPath = pathInBucket.replace(/^\/+/, '');
+        const targetUrl = `${baseUrl}/storage/v1/object/${bucket}/${cleanPath}`;
+
+        const res = await fetch(targetUrl, {
+          method: 'POST',
+          headers: {
+            'apikey': key,
+            'Authorization': `Bearer ${key}`,
+            'Content-Type': finalContentType,
+            'x-upsert': 'true'
+          },
+          body: bodyData
+        });
+
+        if (!res.ok) {
+          const errText = await res.text().catch(() => '');
+          console.warn(`[Supabase Storage] Upload failed for ${bucket}/${cleanPath}:`, res.status, errText);
+          return null;
+        }
+
+        const publicUrl = `${baseUrl}/storage/v1/object/public/${bucket}/${cleanPath}`;
+        return publicUrl;
+      } catch (err) {
+        console.warn(`[Supabase Storage] Network error uploading to ${bucket}/${pathInBucket}:`, err.message);
+        return null;
+      }
+    }
+
+    /**
+     * Upload organization logo to 'school-assets' bucket
+     */
+    async uploadOrgLogo(fileOrBase64, orgNameOrSlug) {
+      if (!fileOrBase64) return null;
+      if (typeof fileOrBase64 === 'string' && (fileOrBase64.startsWith('http://') || fileOrBase64.startsWith('https://'))) {
+        return fileOrBase64;
+      }
+      const rawSlug = (orgNameOrSlug || 'org').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'institution';
+      let ext = 'png';
+      if (typeof fileOrBase64 === 'string' && fileOrBase64.startsWith('data:image/')) {
+        const mime = fileOrBase64.substring(11, fileOrBase64.indexOf(';'));
+        if (mime === 'jpeg' || mime === 'jpg') ext = 'jpg';
+        else if (mime === 'svg+xml') ext = 'svg';
+        else if (mime === 'webp') ext = 'webp';
+      }
+      const destPath = `logos/${rawSlug}-logo.${ext}`;
+      return await this.uploadToStorage('school-assets', destPath, fileOrBase64, `image/${ext === 'svg' ? 'svg+xml' : (ext === 'jpg' ? 'jpeg' : ext)}`);
+    }
+
+    /**
+     * Upload user profile photo to 'staff-photos' or 'student-photos' bucket
+     */
+    async uploadProfilePhoto(fileOrBase64, identifier, role = 'staff') {
+      if (!fileOrBase64) return null;
+      if (typeof fileOrBase64 === 'string' && (fileOrBase64.startsWith('http://') || fileOrBase64.startsWith('https://'))) {
+        return fileOrBase64;
+      }
+      const cleanId = (identifier || 'user').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'avatar';
+      const bucket = role === 'student' ? 'student-photos' : 'staff-photos';
+      let ext = 'jpg';
+      if (typeof fileOrBase64 === 'string' && fileOrBase64.startsWith('data:image/')) {
+        const mime = fileOrBase64.substring(11, fileOrBase64.indexOf(';'));
+        if (mime === 'png') ext = 'png';
+        else if (mime === 'webp') ext = 'webp';
+      }
+      const destPath = `profiles/${cleanId}.${ext}`;
+      return await this.uploadToStorage(bucket, destPath, fileOrBase64, `image/${ext === 'jpg' ? 'jpeg' : ext}`);
+    }
+
     async saveOrganization(orgData) {
+      let logoUrl = orgData.logo_url || orgData.logo_path || orgData.logo || null;
+
+      // Automatically upload file or base64 data to Supabase Storage bucket 'school-assets'
+      if (logoUrl && (typeof logoUrl === 'object' || (typeof logoUrl === 'string' && logoUrl.startsWith('data:image')))) {
+        try {
+          const orgIdentifier = orgData.org_id || orgData.slug || orgData.org_name || orgData.name || 'org';
+          const uploadedUrl = await this.uploadOrgLogo(logoUrl, orgIdentifier);
+          if (uploadedUrl) {
+            logoUrl = uploadedUrl;
+          }
+        } catch (err) {
+          console.warn('[Supabase] Automatic logo upload notice:', err.message);
+        }
+      }
+
       const payload = {
         id: orgData.id || undefined,
         org_name: orgData.org_name || orgData.org || orgData.name || 'FLAWLESS GRAPHICS',
@@ -333,7 +454,8 @@
         email: (orgData.email || '').trim().toLowerCase(),
         phone: orgData.phone || null,
         address: orgData.address || null,
-        logo_path: orgData.logo_path || orgData.logo || null,
+        logo_path: logoUrl,
+        logo_url: logoUrl,
         status: orgData.status || 'pending_approval',
         updated_at: new Date().toISOString()
       };
@@ -343,6 +465,12 @@
           'Prefer': 'resolution=merge-duplicates,return=representation'
         });
         const saved = Array.isArray(res) && res.length > 0 ? res[0] : payload;
+        if (logoUrl) {
+          try {
+            localStorage.setItem('active_org_logo', logoUrl);
+            localStorage.setItem('org_logo', logoUrl);
+          } catch (_) {}
+        }
         this.broadcastChange(saved.status === 'pending_approval' ? 'ORG_REGISTERED' : 'ORG_SAVED', 'organizations', saved);
         return saved;
       } catch (err) {
@@ -495,31 +623,121 @@
 
     async deleteOrganization(orgIdOrName) {
       if (!orgIdOrName) return false;
-      const cleanName = orgIdOrName.trim();
-      if (cleanName.toUpperCase() === 'FLAWLESS GRAPHICS') {
-        throw new Error('Root organization cannot be deleted.');
+      const cleanName = String(orgIdOrName).trim();
+      if (cleanName.toUpperCase() === 'FLAWLESS GRAPHICS' || cleanName === 'fg-main') {
+        throw new Error('Root organization (FLAWLESS GRAPHICS) cannot be deleted.');
       }
 
       try {
-        // Find org record to get both name and id
-        const org = await this.getOrganization(cleanName);
-        const orgName = org ? org.org_name : cleanName;
-        const orgId = org ? org.id : cleanName;
+        const isUuid = (val) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
 
-        // 1. Cascade delete all domain records for this organization in Supabase
-        await this.query(`students?org_id=eq.${encodeURIComponent(orgName)}`, 'DELETE').catch(() => {});
-        await this.query(`teachers?org_id=eq.${encodeURIComponent(orgName)}`, 'DELETE').catch(() => {});
-        await this.query(`classes?org_id=eq.${encodeURIComponent(orgName)}`, 'DELETE').catch(() => {});
-        await this.query(`payroll?org_id=eq.${encodeURIComponent(orgName)}`, 'DELETE').catch(() => {});
-        await this.query(`announcements?org_id=eq.${encodeURIComponent(orgName)}`, 'DELETE').catch(() => {});
-        await this.query(`users?org=eq.${encodeURIComponent(orgName)}`, 'DELETE').catch(() => {});
+        // Find org record to get name, id, and slug
+        let org = null;
+        try {
+          org = await this.getOrganization(cleanName);
+        } catch (_) {}
 
-        // 2. Delete the organization row itself
-        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orgId);
-        const endpoint = isUuid ? `organizations?id=eq.${encodeURIComponent(orgId)}` : `organizations?org_name=eq.${encodeURIComponent(orgName)}`;
-        await this.query(endpoint, 'DELETE');
+        const orgName = org ? (org.org_name || org.name || cleanName) : cleanName;
+        const orgId = org ? (org.id || (isUuid(cleanName) ? cleanName : '')) : (isUuid(cleanName) ? cleanName : '');
+        const orgSlug = org ? (org.org_id || org.code || (orgName ? orgName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') : '')) : cleanName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
-        // 3. Purge corresponding localStorage keys
+        if (orgName.toUpperCase() === 'FLAWLESS GRAPHICS' || orgSlug === 'fg-main') {
+          throw new Error('Root organization (FLAWLESS GRAPHICS) cannot be deleted.');
+        }
+
+        // Collect all distinct string identifier representations (name, id, slug, code)
+        const rawIdentifiers = [orgName, orgId, orgSlug, cleanName, org ? org.code : null].filter(Boolean);
+        const identifiers = Array.from(new Set(rawIdentifiers.map(s => String(s).trim()))).filter(s => s.toUpperCase() !== 'FLAWLESS GRAPHICS');
+
+        console.info(`[Supabase Cascade Purge] Commencing complete purge of all cloud data for: ${orgName} (${orgSlug})`);
+
+        // 1. Cascade delete across ALL domain tables in Supabase PostgREST
+        const cascadeTables = [
+          'students',
+          'teachers',
+          'classes',
+          'attendance_records',
+          'student_fees',
+          'transactions',
+          'payroll',
+          'scholarships',
+          'disbursements',
+          'assignments',
+          'student_assessments',
+          'study_materials',
+          'lesson_notes',
+          'academic_calendar',
+          'announcements',
+          'activity_stream'
+        ];
+
+        for (const tbl of cascadeTables) {
+          const stringIds = identifiers.filter(id => !isUuid(id) || tbl === 'teachers' || tbl === 'students');
+          if (stringIds.length > 0) {
+            const orConditions = stringIds.map(id => `org_id.eq.${encodeURIComponent(id)},org_id.ilike.${encodeURIComponent(id)}`).join(',');
+            await this.query(`${tbl}?or=(${orConditions})`, 'DELETE').catch((e) => {
+              console.warn(`[Supabase Cascade] Notice for ${tbl}:`, e.message);
+            });
+          }
+        }
+
+        // Delete from users table (checks both 'org' and 'org_id' columns)
+        const userOrConditions = identifiers.map(id => `org.eq.${encodeURIComponent(id)},org.ilike.${encodeURIComponent(id)},org_id.eq.${encodeURIComponent(id)},org_id.ilike.${encodeURIComponent(id)}`).join(',');
+        await this.query(`users?or=(${userOrConditions})`, 'DELETE').catch((e) => {
+          console.warn('[Supabase Cascade] Notice for users table:', e.message);
+        });
+
+        // 2. Delete the organization row itself safely (only matching UUID on id column)
+        const orgConditions = [];
+        identifiers.forEach(id => {
+          if (isUuid(id)) {
+            orgConditions.push(`id.eq.${encodeURIComponent(id)}`);
+          } else {
+            orgConditions.push(`org_name.eq.${encodeURIComponent(id)}`);
+            orgConditions.push(`org_name.ilike.${encodeURIComponent(id)}`);
+            orgConditions.push(`name.eq.${encodeURIComponent(id)}`);
+            orgConditions.push(`name.ilike.${encodeURIComponent(id)}`);
+            orgConditions.push(`code.eq.${encodeURIComponent(id)}`);
+            orgConditions.push(`org_id.eq.${encodeURIComponent(id)}`);
+          }
+        });
+
+        if (orgConditions.length > 0) {
+          await this.query(`organizations?or=(${orgConditions.join(',')})`, 'DELETE').catch((e) => {
+            console.warn('[Supabase Cascade] Notice for organizations table:', e.message);
+          });
+        }
+
+        // 3. Purge storage bucket assets for this organization across all buckets
+        try {
+          const client = this.getClient();
+          const baseUrl = Config.getUrl().replace(/\/$/, '');
+          const key = Config.getAnonKey();
+          const buckets = ['school-assets', 'staff-photos', 'student-photos', 'study-vault'];
+          const orgFiles = [
+            `logos/${orgSlug}_logo.png`,
+            `logos/${orgSlug}_logo.jpg`,
+            `logos/${orgSlug}_crest.png`,
+            `logos/${orgSlug}_crest.jpg`,
+            `logos/${orgName}_logo.png`,
+            `logos/${orgName}_logo.jpg`,
+            `logos/${orgName}_crest.png`
+          ];
+
+          for (const b of buckets) {
+            if (client && client.storage) {
+              await client.storage.from(b).remove(orgFiles).catch(() => {});
+            }
+            for (const f of orgFiles) {
+              await fetch(`${baseUrl}/storage/v1/object/${b}/${f}`, {
+                method: 'DELETE',
+                headers: { 'apikey': key, 'Authorization': `Bearer ${key}` }
+              }).catch(() => {});
+            }
+          }
+        } catch (_) {}
+
+        // 4. Purge corresponding localStorage keys
         try {
           const keysToPurge = [
             `${orgName}_academic_registration_approvals`,
@@ -527,20 +745,49 @@
             `${orgName}_classes`,
             `${orgName}_students`,
             `${orgName}_announcements`,
-            `${orgName}_payroll`
+            `${orgName}_payroll`,
+            `${orgSlug}_teachers`,
+            `${orgSlug}_classes`,
+            `${orgSlug}_students`,
+            `${orgSlug}_announcements`,
+            `${orgSlug}_payroll`
           ];
           keysToPurge.forEach(k => localStorage.removeItem(k));
 
-          const activeOrg = localStorage.getItem('active_org') || localStorage.getItem('activeOrg');
-          if (activeOrg && activeOrg.toLowerCase() === orgName.toLowerCase()) {
+          const activeOrg = (localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || '').toLowerCase().trim();
+          const matchesActive = identifiers.some(id => {
+            const clean = String(id).toLowerCase().trim();
+            return clean && (clean === activeOrg || activeOrg.includes(clean) || clean.includes(activeOrg));
+          });
+          if (matchesActive) {
             localStorage.removeItem('active_org');
             localStorage.removeItem('activeOrg');
             localStorage.removeItem('active_org_logo');
             localStorage.removeItem('org_logo');
+            localStorage.removeItem('active_user');
+            localStorage.removeItem('active_org_user');
+            if (typeof window !== 'undefined' && window.AuthSession && typeof window.AuthSession.setOrgName === 'function') {
+              window.AuthSession.setOrgName('FLAWLESS GRAPHICS');
+            }
           }
         } catch(e) {}
 
-        this.broadcastChange('ORG_DELETED', 'organizations', { id: orgId, name: orgName });
+        this.clearCache();
+
+        // 5. Broadcast global real-time event & LucyBus alert
+        const deletedPayload = { id: orgId, name: orgName, slug: orgSlug };
+        this.broadcastChange('ORG_DELETED', 'organizations', deletedPayload);
+
+        if (window.LucyBus && typeof window.LucyBus.emit === 'function') {
+          window.LucyBus.emit('ORG_DELETED', {
+            title: 'Organization Workspace Purged',
+            message: `Institution '${orgName}' and all associated cloud data in Supabase were permanently erased.`,
+            org: orgName,
+            data: deletedPayload
+          });
+        }
+
+        console.info(`[Supabase Cascade Purge] Successfully purged all cloud data for ${orgName}.`);
         return true;
       } catch (err) {
         console.error('[Supabase] Failed to delete organization:', err.message);
@@ -741,10 +988,10 @@
      */
     async authenticate(email, password, orgId = null, role = null) {
       const cleanEmail = (email || '').trim().toLowerCase();
-      if (!cleanEmail) return { success: false, error: 'Email is required' };
+      if (!cleanEmail) return { success: false, error: 'Identifier (Email or Student ID) is required' };
 
       try {
-        let endpoint = `users?email=eq.${encodeURIComponent(cleanEmail)}`;
+        let endpoint = `users?or=(email.eq.${encodeURIComponent(cleanEmail)},linked_staff_id.eq.${encodeURIComponent(cleanEmail)})`;
         if (orgId) {
           endpoint += `&org=eq.${encodeURIComponent(orgId)}`;
         }
@@ -1287,31 +1534,50 @@
     }
 
     async saveStudent(orgId, studentData) {
-      const fullName = studentData.fullName || studentData.name || `${studentData.firstName || ''} ${studentData.lastName || ''}`.trim() || 'Student';
+      const fullName = studentData.fullName || studentData.name || studentData.student_name || `${studentData.firstName || ''} ${studentData.lastName || ''}`.trim() || 'Student';
       const firstName = studentData.firstName || fullName.split(' ')[0] || '';
       const lastName = studentData.lastName || fullName.split(' ').slice(1).join(' ') || '';
+      const rollNumber = studentData.roll || studentData.roll_number || studentData.enrollment_code || ('STU-' + Math.floor(1000 + Math.random() * 9000));
+
+      const rawClassId = studentData.classId || studentData.class_id;
+      const validClassId = (rawClassId !== null && rawClassId !== undefined && !isNaN(Number(rawClassId)) && String(rawClassId).trim() !== '') ? Number(rawClassId) : null;
+
+      const rawDob = String(studentData.dob || studentData.date_of_birth || '').trim();
+      const validDob = (rawDob && !isNaN(Date.parse(rawDob))) ? rawDob : null;
 
       const payload = {
-        id: (studentData.id && !isNaN(Number(studentData.id))) ? Number(studentData.id) : undefined,
         org_id: orgId || 'FLAWLESS GRAPHICS',
-        roll: studentData.roll || studentData.roll_number || studentData.enrollment_code || ('STU-' + Math.floor(1000 + Math.random() * 9000)),
+        roll: rollNumber,
+        roll_number: rollNumber,
+        enrollment_code: rollNumber,
         first_name: firstName,
         last_name: lastName,
         full_name: fullName,
         student_name: fullName,
-        class_id: studentData.classId || studentData.class_id || null,
+        name: fullName,
+        class_id: validClassId,
         class_name: studentData.className || studentData.class_name || null,
         grade: studentData.grade || studentData.grade_level || 'Level 100',
         gender: studentData.gender || null,
-        guardian_name: studentData.guardianName || studentData.parent_name || null,
-        guardian_phone: studentData.guardianPhone || studentData.parent_phone || null,
-        guardian_email: studentData.guardianEmail || studentData.parent_email || null,
+        dob: validDob,
+        date_of_birth: validDob,
+        address: studentData.address || null,
+        guardian_name: studentData.guardianName || studentData.guardian_name || studentData.parent_name || null,
+        guardian_phone: studentData.guardianPhone || studentData.guardian_phone || studentData.parent_phone || null,
+        guardian_email: studentData.guardianEmail || studentData.guardian_email || studentData.parent_email || null,
+        parent_name: studentData.guardianName || studentData.guardian_name || studentData.parent_name || null,
+        parent_phone: studentData.guardianPhone || studentData.guardian_phone || studentData.parent_phone || null,
+        parent_email: studentData.guardianEmail || studentData.guardian_email || studentData.parent_email || null,
         clearance_status: studentData.clearanceStatus || studentData.clearance_status || 'Cleared',
         status: studentData.status || 'Active',
         approval_status: studentData.approvalStatus || studentData.approval_status || 'approved',
         photo_url: studentData.photo || studentData.photo_url || null,
         updated_at: new Date().toISOString()
       };
+
+      if (studentData.id && !isNaN(Number(studentData.id))) {
+        payload.id = Number(studentData.id);
+      }
 
       try {
         const res = await this.query('students', 'POST', payload, {
@@ -1324,6 +1590,104 @@
         console.error('[Supabase] Failed to save student:', err.message);
         throw err;
       }
+    }
+
+    /**
+     * Complete Student Onboarding Pipeline:
+     * 1. Auto-generates student portal access password
+     * 2. Saves student profile into public.students
+     * 3. Creates/updates student login credentials in public.users
+     * 4. Initializes tuition fee billing in public.student_fees for finance desk
+     * 5. Broadcasts real-time events across all portals
+     */
+    async createStudentWithAccount(orgId, studentData) {
+      const cleanOrg = orgId || 'FLAWLESS GRAPHICS';
+      const roll = (studentData.roll || studentData.roll_number || studentData.enrollment_code || ('STU-' + Math.floor(1000 + Math.random() * 9000))).trim();
+      const fullName = (studentData.fullName || studentData.name || studentData.student_name || `${studentData.firstName || ''} ${studentData.lastName || ''}`.trim() || 'Student').trim();
+      
+      // Auto-generate secure password if not provided
+      const generatedPassword = studentData.password || studentData.pass_hash || ('Stu@' + Math.floor(1000 + Math.random() * 9000));
+      
+      // Determine student login email (either provided, guardian email, or institutional roll email)
+      const orgSlug = cleanOrg.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const studentEmail = (studentData.email || studentData.guardianEmail || studentData.guardian_email || studentData.parent_email || `${roll.toLowerCase().replace(/[^a-z0-9]/g, '')}@student.${orgSlug || 'flawless'}.edu`).trim().toLowerCase();
+
+      // 1. Save Student Roster Record
+      const studentRecord = await this.saveStudent(cleanOrg, Object.assign({}, studentData, {
+        roll: roll,
+        fullName: fullName,
+        guardianEmail: studentEmail,
+        parentEmail: studentEmail
+      }));
+
+      // 2. Provision / Upsert Student Portal User Account in public.users
+      const userPayload = {
+        id: 'u_' + roll.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_' + Date.now().toString(36),
+        name: fullName,
+        email: studentEmail,
+        role: 'student',
+        org: cleanOrg,
+        org_id: cleanOrg,
+        pass_hash: generatedPassword,
+        linked_staff_id: roll,
+        status: 'active',
+        photo_url: studentData.photo || studentData.photo_url || null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      try {
+        await this.query('users', 'POST', userPayload, {
+          'Prefer': 'resolution=merge-duplicates,return=representation'
+        });
+      } catch (err) {
+        console.warn('[Supabase] Warning provisioning student user in users table:', err.message);
+      }
+
+      // 3. Initialize Tuition Fee Record in public.student_fees for Finance desk
+      const feePayload = {
+        id: 'fee_' + roll.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_' + Date.now().toString(36),
+        org_id: cleanOrg,
+        student_id: roll,
+        student_name: fullName,
+        grade: studentData.className || studentData.class_name || studentData.grade || 'General Studies',
+        category: 'Tuition Fee',
+        cat: 'Tuition Fee',
+        billed_amount: Number(studentData.tuitionFee || studentData.billed || 4500),
+        paid_amount: Number(studentData.paidAmount || studentData.amount || 0),
+        balance_amount: Number(studentData.tuitionFee || studentData.billed || 4500) - Number(studentData.paidAmount || studentData.amount || 0),
+        billed: Number(studentData.tuitionFee || studentData.billed || 4500),
+        amount: Number(studentData.paidAmount || studentData.amount || 0),
+        status: Number(studentData.paidAmount || 0) >= Number(studentData.tuitionFee || 4500) ? 'Cleared' : (Number(studentData.paidAmount || 0) > 0 ? 'Partial' : 'Arrears'),
+        academic_term: studentData.term || 'Term 1',
+        academic_year: '2026/2027',
+        date: new Date().toISOString().split('T')[0]
+      };
+
+      try {
+        await this.saveStudentFee(cleanOrg, feePayload);
+      } catch (err) {
+        console.warn('[Supabase] Initial tuition billing notice:', err.message);
+      }
+
+      this.broadcastChange('STUDENT_ENROLLED', 'students', {
+        student: studentRecord,
+        roll: roll,
+        email: studentEmail,
+        password: generatedPassword,
+        classId: studentData.classId || studentData.class_id,
+        className: studentData.className || studentData.class_name,
+        orgId: cleanOrg
+      });
+
+      return {
+        success: true,
+        student: studentRecord,
+        roll: roll,
+        email: studentEmail,
+        password: generatedPassword,
+        fee: feePayload
+      };
     }
 
     async deleteStudent(orgId, studentId) {
@@ -1822,6 +2186,26 @@
     /* =============================================================
        11. SUPABASE STORAGE (IMAGE & ASSET UPLOADS)
     ============================================================= */
+    async uploadLogo(fileOrBase64, orgSlug = 'org') {
+      const cleanSlug = (orgSlug || 'org').toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+      const ext = (typeof fileOrBase64 === 'string' && fileOrBase64.includes('image/png')) ? 'png' : 'jpg';
+      const customPath = `logos/${cleanSlug}_logo_${Date.now()}.${ext}`;
+      return await this.uploadImage('school-assets', fileOrBase64, customPath);
+    }
+
+    async uploadStaffPhoto(fileOrBase64, identifier = 'staff') {
+      const cleanId = (identifier || 'staff').toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+      const ext = (typeof fileOrBase64 === 'string' && fileOrBase64.includes('image/png')) ? 'png' : 'jpg';
+      const customPath = `profiles/${cleanId}_${Date.now()}.${ext}`;
+      return await this.uploadImage('staff-photos', fileOrBase64, customPath);
+    }
+
+    async uploadStudentPhoto(fileOrBase64, identifier = 'student') {
+      const cleanId = (identifier || 'student').toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+      const ext = (typeof fileOrBase64 === 'string' && fileOrBase64.includes('image/png')) ? 'png' : 'jpg';
+      const customPath = `profiles/${cleanId}_${Date.now()}.${ext}`;
+      return await this.uploadImage('student-photos', fileOrBase64, customPath);
+    }
     getPublicUrl(bucket, path) {
       if (!Config.isConfigured() || !bucket || !path) return '';
       const baseUrl = Config.getUrl().replace(/\/$/, '');
@@ -1901,4 +2285,57 @@
 
   // Instantiate and export as global singleton
   window.SupabaseService = new SupabaseRestClient();
+
+  // Export Reusable Supabase Cloud Storage Assets
+  const BASE_STORAGE_URL = 'https://wmvsujwgvlosfjdlhadu.supabase.co/storage/v1/object/public';
+  const STORAGE_ASSETS = {
+    logos: {
+      primaryPng: `${BASE_STORAGE_URL}/school-assets/logos/flawless-logo.png`,
+      primaryJpg: `${BASE_STORAGE_URL}/school-assets/logos/flawless-logo.jpg`,
+      brandCrest: `${BASE_STORAGE_URL}/school-assets/logos/brand-crest.jpg`
+    },
+    backgrounds: {
+      education: `${BASE_STORAGE_URL}/school-assets/backgrounds/education-bg.jpg`,
+      graduation: `${BASE_STORAGE_URL}/school-assets/backgrounds/graduation-bg.jpg`
+    },
+    features: {
+      attendancePayroll: `${BASE_STORAGE_URL}/school-assets/features/employee-attendance-tracking-and-payroll.jpg`,
+      payrollAutomation: `${BASE_STORAGE_URL}/school-assets/features/payroll-automation.jpeg`
+    },
+    icons: {
+      laptopClosing: `${BASE_STORAGE_URL}/school-assets/icons/icons8-laptop-closing.gif`,
+      rhombusLoader: `${BASE_STORAGE_URL}/school-assets/icons/icons8-rhombus-loader.gif`,
+      logGif: `${BASE_STORAGE_URL}/school-assets/icons/log.gif`,
+      logoGif: `${BASE_STORAGE_URL}/school-assets/icons/logo.gif`
+    },
+    avatars: {
+      teacher: `${BASE_STORAGE_URL}/staff-photos/avatars/teacher-avatar.svg`,
+      student: `${BASE_STORAGE_URL}/student-photos/avatars/student-avatar.svg`,
+      admin: `${BASE_STORAGE_URL}/staff-photos/avatars/admin-avatar.svg`,
+      superAdmin: `${BASE_STORAGE_URL}/staff-photos/avatars/super-admin-avatar.svg`,
+      finance: `${BASE_STORAGE_URL}/staff-photos/avatars/finance-avatar.svg`,
+      hr: `${BASE_STORAGE_URL}/staff-photos/avatars/hr-avatar.svg`,
+      studentMale: `${BASE_STORAGE_URL}/student-photos/avatars/student-male-avatar.svg`,
+      studentFemale: `${BASE_STORAGE_URL}/student-photos/avatars/student-female-avatar.svg`,
+      staffMale: `${BASE_STORAGE_URL}/staff-photos/avatars/staff-male-avatar.svg`,
+      staffFemale: `${BASE_STORAGE_URL}/staff-photos/avatars/staff-female-avatar.svg`,
+      marthaAdjei: `${BASE_STORAGE_URL}/staff-photos/profiles/martha-adjei.jpg`
+    }
+  };
+
+  STORAGE_ASSETS.getAvatarForRole = function(role) {
+    const r = (role || '').toLowerCase();
+    if (r.includes('super')) return this.avatars.superAdmin;
+    if (r.includes('admin')) return this.avatars.admin;
+    if (r.includes('hr')) return this.avatars.hr;
+    if (r.includes('fin')) return this.avatars.finance;
+    if (r.includes('teach') || r.includes('faculty') || r.includes('educat')) return this.avatars.teacher;
+    if (r.includes('stud')) return this.avatars.student;
+    return this.avatars.teacher;
+  };
+
+  window.STORAGE_ASSETS = STORAGE_ASSETS;
+  window.SupabaseService.STORAGE_ASSETS = STORAGE_ASSETS;
+  window.SupabaseService.getAvatarForRole = STORAGE_ASSETS.getAvatarForRole.bind(STORAGE_ASSETS);
 })(window);
+

@@ -789,16 +789,33 @@
                     orgs = await window.SupabaseService.getApprovedOrganizations();
                 }
 
-                // If no approved orgs from cloud, fallback to local active_org / default
-                if (!orgs || orgs.length === 0) {
-                    const localOrg = preferredOrg || 'FLAWLESS GRAPHICS';
-                    orgs = [{ org_name: localOrg, name: localOrg, org_id: 'fg-main', status: 'Active' }];
+                // Ensure clean array
+                if (!Array.isArray(orgs)) orgs = [];
+
+                // Root organization FLAWLESS GRAPHICS (fg-main) must ALWAYS exist as headquarters option
+                const hasRoot = orgs.some(o => ((o.org_name || o.name || '').toUpperCase() === 'FLAWLESS GRAPHICS') || ((o.org_id || o.slug || '') === 'fg-main'));
+                if (!hasRoot) {
+                    orgs.unshift({ org_name: 'FLAWLESS GRAPHICS', name: 'FLAWLESS GRAPHICS', org_id: 'fg-main', status: 'Active' });
                 }
 
-                // Ensure root / default exists if needed
-                const hasRoot = orgs.some(o => ((o.org_name || o.name || '').toUpperCase() === 'FLAWLESS GRAPHICS') || ((o.org_id || o.slug || '') === 'fg-main'));
-                if (!hasRoot && (!orgs || orgs.length === 0)) {
-                    orgs.unshift({ org_name: 'FLAWLESS GRAPHICS', name: 'FLAWLESS GRAPHICS', org_id: 'fg-main', status: 'Active' });
+                // Validate preferred organization against active cloud approved list
+                const prefClean = preferredOrg.toLowerCase();
+                const isRootPref = prefClean === 'flawless graphics' || prefClean === 'fg-main' || !prefClean;
+                const matchedOrg = isRootPref ? null : orgs.find(o => {
+                    const n = (o.org_name || o.name || '').toLowerCase();
+                    const s = (o.org_id || o.slug || '').toLowerCase();
+                    return n === prefClean || s === prefClean;
+                });
+
+                // If a non-root organization was cached but does NOT exist in cloud orgs, it was DELETED!
+                if (preferredOrg && !isRootPref && !matchedOrg) {
+                    localStorage.removeItem('active_org');
+                    localStorage.removeItem('activeOrg');
+                    localStorage.removeItem('active_org_logo');
+                    localStorage.removeItem('org_logo');
+                    if (window.AuthSession && typeof window.AuthSession.setOrgName === 'function') {
+                        window.AuthSession.setOrgName('FLAWLESS GRAPHICS');
+                    }
                 }
 
                 selectElement.innerHTML = '<option value="">-- Select Approved Institution Workspace --</option>';
@@ -817,21 +834,25 @@
                     }
                     opt.textContent = `${name} (${slug})`;
 
-                    const prefClean = preferredOrg.toLowerCase();
-                    const slugClean = slug.toLowerCase();
-                    const nameClean = name.toLowerCase();
-
-                    if (prefClean && (prefClean === slugClean || prefClean === nameClean || prefClean.includes(nameClean) || nameClean.includes(prefClean))) {
+                    if (matchedOrg) {
+                        const nameClean = name.toLowerCase();
+                        const slugClean = slug.toLowerCase();
+                        if (slugClean === (matchedOrg.org_id || matchedOrg.slug || '').toLowerCase() || nameClean === (matchedOrg.org_name || matchedOrg.name || '').toLowerCase()) {
+                            opt.selected = true;
+                            matchedIndex = idx + 1;
+                        }
+                    } else if (isRootPref && (slug === 'fg-main' || name.toUpperCase() === 'FLAWLESS GRAPHICS')) {
                         opt.selected = true;
                         matchedIndex = idx + 1;
                     }
+
                     selectElement.appendChild(opt);
                 });
 
-                // Auto-select matched active organization or default if only 1 exists
+                // Auto-select matched active organization or default to fg-main
                 if (matchedIndex > 0) {
                     selectElement.selectedIndex = matchedIndex;
-                } else if (orgs.length === 1) {
+                } else if (orgs.length > 0) {
                     selectElement.selectedIndex = 1;
                 }
 
@@ -846,14 +867,34 @@
                 // Listen to dropdown changes to sync active institution workspace
                 if (!selectElement._hasOrgChangeListener) {
                     selectElement._hasOrgChangeListener = true;
-                    selectElement.addEventListener('change', () => {
+                    selectElement.addEventListener('change', async () => {
                         const selOpt = selectElement.selectedOptions && selectElement.selectedOptions[0];
                         if (selOpt && selOpt.value) {
-                            const newOrgName = selOpt.dataset.name || selOpt.textContent;
-                            const newOrgLogo = selOpt.dataset.logo || '';
+                            const newOrgName = selOpt.dataset.name || selOpt.textContent.replace(/\s*\([^)]*\)$/, '').trim();
+                            let newOrgLogo = selOpt.dataset.logo || '';
+                            
+                            // If logo was not in option dataset, try resolving from cloud
+                            if (!newOrgLogo && window.SupabaseService && typeof window.SupabaseService.getOrganizations === 'function') {
+                                try {
+                                    const orgs = await window.SupabaseService.getOrganizations();
+                                    const cleanName = newOrgName.toLowerCase();
+                                    const matched = (orgs || []).find(o => {
+                                        const oName = (o.org_name || o.name || '').toLowerCase();
+                                        const oSlug = (o.slug || o.id || o.org_id || '').toLowerCase();
+                                        return oName === cleanName || oSlug === cleanName;
+                                    });
+                                    if (matched && (matched.logo_url || matched.logo_path || matched.logo)) {
+                                        newOrgLogo = matched.logo_url || matched.logo_path || matched.logo;
+                                        selOpt.dataset.logo = newOrgLogo;
+                                    }
+                                } catch(e) {}
+                            }
+
                             if (newOrgName && !newOrgName.includes('-- Select Approved')) {
                                 this.applyOrgBranding(newOrgName, newOrgLogo);
                             }
+                        } else {
+                            this.applyOrgBranding('FLAWLESS GRAPHICS', null);
                         }
                     });
                 }
@@ -886,38 +927,48 @@
             if (logoUrl) {
                 localStorage.setItem('active_org_logo', logoUrl);
                 localStorage.setItem('org_logo', logoUrl);
+            } else {
+                localStorage.removeItem('active_org_logo');
+                localStorage.removeItem('org_logo');
             }
             if (window.AuthSession && typeof window.AuthSession.setOrgName === 'function') {
                 window.AuthSession.setOrgName(cleanOrg);
             }
 
-            // 1. Update text elements: #orgTitle, #headerOrgTitle, .brand-title
-            document.querySelectorAll('#orgTitle, #headerOrgTitle, .brand-title, .header-org-title').forEach(el => {
+            // 1. Update text elements: #orgTitle, #headerOrgTitle, .brand-title, .nav-brand-title, #sideOrgName
+            document.querySelectorAll('#orgTitle, #headerOrgTitle, .brand-title, .header-org-title, .nav-brand-title, #sideOrgName, #sideOrg, #sideOrgTitle').forEach(el => {
                 if (el && el.tagName !== 'SELECT' && el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA') {
                     if (el.getAttribute('data-preserve-title') === 'true') return;
                     el.textContent = cleanOrg.toUpperCase();
                 }
             });
 
-            // 2. Update logo elements: #orgLogoBox, #headerOrgLogo
-            const effectiveLogo = logoUrl || localStorage.getItem('active_org_logo') || localStorage.getItem('org_logo');
-            if (effectiveLogo) {
-                document.querySelectorAll('#orgLogoBox, #headerOrgLogo').forEach(el => {
-                    if (el) {
-                        if (el.getAttribute('data-preserve-logo') === 'true') return;
-                        el.innerHTML = `<img src="${effectiveLogo}" alt="${cleanOrg}" style="width:100%; height:100%; object-fit:contain; border-radius:inherit; display:block;">`;
-                    }
-                });
+            // 2. Update logo elements: switches to uploaded logo when present, or main project logo when absent/default
+            const mainLogo = (window.STORAGE_ASSETS && window.STORAGE_ASSETS.logos && window.STORAGE_ASSETS.logos.primaryPng)
+                || 'https://wmvsujwgvlosfjdlhadu.supabase.co/storage/v1/object/public/school-assets/logos/flawless-logo.png';
+            let effectiveLogo = logoUrl || localStorage.getItem('active_org_logo') || localStorage.getItem('org_logo');
+            if (!effectiveLogo || cleanOrg.toUpperCase() === 'FLAWLESS GRAPHICS') {
+                effectiveLogo = mainLogo;
             }
+
+            const logoTargets = [
+                '#orgLogoBox', '#headerOrgLogo', '.brand-logo-badge', '.brand .logo',
+                '.org-logo-preview', '.brand-logo', '.logo-circle', '.nav-brand-logo',
+                '.brand-icon', '.brand-badge', '#brandingPreviewBox', '.sidebar .brand .logo'
+            ];
+
+            document.querySelectorAll(logoTargets.join(', ')).forEach(el => {
+                if (el) {
+                    if (el.getAttribute('data-preserve-logo') === 'true') return;
+                    el.innerHTML = '<img src="' + effectiveLogo + '" alt="' + cleanOrg + '" class="org-brand-logo" style="width:100%; height:100%; object-fit:contain; border-radius:inherit; display:block; padding:2px;">';
+                }
+            });
 
             if (window.AuthSession && typeof window.AuthSession.applyGlobalBranding === 'function') {
                 window.AuthSession.applyGlobalBranding();
             }
         },
 
-        /**
-         * Enforce that a user belongs to and is approved under the specified institution
-         */
         verifyUserOrgMembership: function (user, selectedOrgVal) {
             if (!user) return false;
             if (!selectedOrgVal) return true;
@@ -1101,12 +1152,67 @@
                     if (this._activeWatchers) delete this._activeWatchers[email];
                 }
             };
+        },
+
+        /**
+         * Initialize Global Cross-Tab & Realtime Sync for Deleted Organizations
+         */
+        initRealtimeSync: function() {
+            if (this._realtimeSyncInitialized) return;
+            this._realtimeSyncInitialized = true;
+
+            const handleOrgDeleted = (deletedName) => {
+                const cleanDel = (deletedName || '').toLowerCase().trim();
+                const active = (localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || '').toLowerCase().trim();
+                if (!cleanDel || active === cleanDel || active.includes(cleanDel) || cleanDel.includes(active)) {
+                    localStorage.removeItem('active_org');
+                    localStorage.removeItem('activeOrg');
+                    localStorage.removeItem('active_org_logo');
+                    localStorage.removeItem('org_logo');
+                    if (window.AuthSession && typeof window.AuthSession.setOrgName === 'function') {
+                        window.AuthSession.setOrgName('FLAWLESS GRAPHICS');
+                    }
+                    if (typeof this.applyOrgBranding === 'function') {
+                        this.applyOrgBranding('FLAWLESS GRAPHICS', null);
+                    }
+                }
+                // Refresh all organization dropdowns on page
+                document.querySelectorAll('select#orgSelect, select#org, select.org-select, select[name="organization"]').forEach(sel => {
+                    RealtimeAuth.populateApprovedOrgDropdown(sel);
+                });
+            };
+
+            // 1. In-tab custom event
+            window.addEventListener('fg:realtime-change', (e) => {
+                const detail = e.detail || {};
+                if (detail.action === 'ORG_DELETED') {
+                    const data = detail.data || {};
+                    handleOrgDeleted(data.name || data.org_name || data.slug || data.id);
+                }
+            });
+
+            // 2. Cross-tab storage ping
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'fg_realtime_sync_ping' && e.newValue) {
+                    try {
+                        const ping = JSON.parse(e.newValue);
+                        if (ping.action === 'ORG_DELETED') {
+                            const data = ping.data || {};
+                            handleOrgDeleted(data.name || data.org_name || data.slug || data.id);
+                        }
+                    } catch (_) {}
+                }
+            });
         }
     };
 
     // Attach to global window and AuthSession
     window.StrongPassword = StrongPassword;
     window.RealtimeAuth = RealtimeAuth;
+
+    try {
+        RealtimeAuth.initRealtimeSync();
+    } catch (_) {}
 
     if (window.AuthSession) {
         window.AuthSession.StrongPassword = StrongPassword;

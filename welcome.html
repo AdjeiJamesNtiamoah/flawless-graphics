@@ -977,22 +977,30 @@ document.addEventListener("DOMContentLoaded", async function() {
         const user = window.AuthSession ? window.AuthSession.getUser() : null;
         const validOrgNames = (cloudOrgs || []).map(o => (o.org_name || o.name || '').trim().toLowerCase());
 
+        const isSubdir = window.location.pathname.includes('/pages/');
+        const defaultLogo = isSubdir ? '../../assets/images/flawless-logo.jpg' : 'assets/images/flawless-logo.jpg';
+
         if (user && user.org && validOrgNames.includes(user.org.trim().toLowerCase())) {
             if (userName) userName.textContent = user.name || 'Administrator';
             if (userBadge) userBadge.style.display = "flex";
             if (orgTitle) orgTitle.textContent = user.org.toUpperCase();
-            if (user.logo && orgLogoBox) {
-                orgLogoBox.innerHTML = `<img src="${user.logo}" alt="${user.org}" style="width:100%; height:100%; object-fit:contain; border-radius:inherit;">`;
+            const effectiveLogo = user.logo || localStorage.getItem('active_org_logo') || defaultLogo;
+            if (orgLogoBox) {
+                orgLogoBox.innerHTML = '<img src="' + effectiveLogo + '" alt="' + user.org + '" style="width:100%; height:100%; object-fit:contain; border-radius:inherit;">';
             }
         } else if (cloudOrgs && cloudOrgs.length > 0) {
             const rootOrg = cloudOrgs[0];
             const name = (rootOrg.org_name || rootOrg.name || 'FLAWLESS GRAPHICS').toUpperCase();
             if (orgTitle) orgTitle.textContent = name;
-            if (rootOrg.logo_url && orgLogoBox) {
-                orgLogoBox.innerHTML = `<img src="${rootOrg.logo_url}" alt="${name}" style="width:100%; height:100%; object-fit:contain; border-radius:inherit;">`;
+            const effectiveLogo = rootOrg.logo_url || localStorage.getItem('active_org_logo') || defaultLogo;
+            if (orgLogoBox) {
+                orgLogoBox.innerHTML = '<img src="' + effectiveLogo + '" alt="' + name + '" style="width:100%; height:100%; object-fit:contain; border-radius:inherit;">';
             }
         } else {
-            if (orgTitle) orgTitle.textContent = "ORGANIZATION PLATFORM";
+            if (orgTitle) orgTitle.textContent = "FLAWLESS GRAPHICS";
+            if (orgLogoBox) {
+                orgLogoBox.innerHTML = '<img src="' + defaultLogo + '" alt="Flawless Graphics" style="width:100%; height:100%; object-fit:contain; border-radius:inherit;">';
+            }
         }
     } catch (e) {
         console.warn("Could not load organization session details:", e);

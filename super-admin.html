@@ -1993,9 +1993,15 @@
   async function initSuperAdminPortal() {
     // Fill branding preview
     const cachedLogo = localStorage.getItem('active_org_logo') || localStorage.getItem('org_logo');
-    if (cachedLogo) {
-      const box = document.getElementById('brandingPreviewBox');
-      if (box) box.innerHTML = '<img src="' + cachedLogo + '" style="width:100%; height:100%; object-fit:contain;">';
+    const box = document.getElementById('brandingPreviewBox');
+    if (box) {
+      const isSubdir = window.location.pathname.includes('/pages/');
+      const mainLogo = isSubdir ? '../../assets/images/flawless-logo.jpg' : 'assets/images/flawless-logo.jpg';
+      if (cachedLogo) {
+        box.innerHTML = '<img src="' + cachedLogo + '" style="width:100%; height:100%; object-fit:contain; border-radius:12px;">';
+      } else {
+        box.innerHTML = '<img src="' + mainLogo + '" alt="Flawless Graphics" style="width:100%; height:100%; object-fit:contain; border-radius:12px; padding:4px;">';
+      }
     }
 
     const scopeEl = document.getElementById('scopeDisplay');
@@ -2352,12 +2358,51 @@
   }
 
   async function deleteTenant(id) {
-    if (confirm('Permanently purge this institutional workspace?')) {
-      allTenants = allTenants.filter(t => t.id !== id && t.name !== id && t.org_name !== id);
-      logAudit('Institution Purged', 'Deleted workspace ' + id, 'WARNING');
-      if (window.Toaster) window.Toaster.info('Tenant Removed', 'Workspace purged.');
+    const targetTenant = (allTenants || []).find(t => t.id === id || t.name === id || t.org_name === id || t.slug === id);
+    const targetName = targetTenant ? (targetTenant.org_name || targetTenant.name) : id;
+
+    if (!targetName) return;
+    if (targetName.toUpperCase() === 'FLAWLESS GRAPHICS' || id === 'fg-main') {
+      if (window.Toaster) window.Toaster.warning('Action Blocked', 'Root organization (FLAWLESS GRAPHICS) cannot be deleted.');
+      else alert('Root organization (FLAWLESS GRAPHICS) cannot be deleted.');
+      return;
+    }
+
+    const confirmMsg = `⚠️ PERMANENT CLOUD PURGE:\n\nAre you sure you want to permanently delete organization '${targetName}' from Supabase Cloud?\n\nThis will purge the ENTIRE database under this organization:\n• All member & staff user accounts\n• All faculty & teacher records\n• All student rosters & enrollments\n• All academic classes & cohorts\n• All daily attendance & biometric punches\n• All financial records, fees, scholarships & transactions\n• All employee payroll disbursements\n• All assignments, study vaults & lesson notes\n• All announcements & activity logs\n• All uploaded media & crests in Supabase Storage\n\nThis action cannot be undone. Proceed with total cloud purge?`;
+
+    if (!confirm(confirmMsg)) return;
+
+    try {
+      if (window.Toaster) window.Toaster.info('Purging Cloud Data...', 'Deleting workspace and associated records from Supabase...');
+      if (window.SupabaseService) {
+        await window.SupabaseService.deleteOrganization(id || targetName);
+      }
+      // Purge active organization session if it was the deleted institution
+      const currentActive = (localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || '').toLowerCase().trim();
+      const targetLower = (targetName || '').toLowerCase().trim();
+      const idLower = (id || '').toLowerCase().trim();
+      const slugLower = (targetTenant && targetTenant.slug ? targetTenant.slug : '').toLowerCase().trim();
+
+      if (currentActive && (currentActive === targetLower || currentActive === idLower || currentActive === slugLower || targetLower.includes(currentActive) || currentActive.includes(targetLower))) {
+        localStorage.removeItem('active_org');
+        localStorage.removeItem('activeOrg');
+        localStorage.removeItem('active_org_logo');
+        localStorage.removeItem('org_logo');
+        if (window.AuthSession && typeof window.AuthSession.setOrgName === 'function') {
+          window.AuthSession.setOrgName('FLAWLESS GRAPHICS');
+        }
+      }
+      allTenants = allTenants.filter(t => t.id !== id && t.name !== targetName && t.org_name !== targetName && t.slug !== id);
+      allUsers = (allUsers || []).filter(u => u.org !== targetName && u.org_id !== targetName && u.org !== id);
+      logAudit('Institution Purged', 'Deleted workspace ' + targetName + ' and all cloud data from Supabase', 'WARNING');
+      if (window.Toaster) window.Toaster.success('Institution Purged', 'Workspace and all associated records deleted from Supabase.');
       updateTelemetryAndQueues();
       renderTenantsTable(allTenants);
+      renderUsersTable(allUsers);
+    } catch (err) {
+      console.error('Failed to purge organization:', err);
+      if (window.Toaster) window.Toaster.error('Purge Failed', err.message || 'Could not delete organization from Supabase.');
+      else alert('Failed to delete organization: ' + err.message);
     }
   }
 
@@ -2385,12 +2430,21 @@
   }
 
   async function deleteUser(id) {
-    if (confirm('Revoke and delete this account credentials?')) {
-      allUsers = allUsers.filter(u => u.id !== id && u.email !== id);
-      logAudit('User Revoked', 'Credentials revoked for ' + id, 'WARNING');
-      if (window.Toaster) window.Toaster.info('Credentials Revoked', 'Account purged.');
-      updateTelemetryAndQueues();
-      renderUsersTable(allUsers);
+    if (confirm('Revoke and delete this account credentials from Supabase?')) {
+      try {
+        if (window.SupabaseService) {
+          await window.SupabaseService.deleteUser(id);
+        }
+        allUsers = allUsers.filter(u => u.id !== id && u.email !== id);
+        logAudit('User Revoked', 'Credentials revoked for ' + id, 'WARNING');
+        if (window.Toaster) window.Toaster.info('Credentials Revoked', 'Account purged from Supabase.');
+        updateTelemetryAndQueues();
+        renderUsersTable(allUsers);
+      } catch (err) {
+        console.error('Failed to delete user:', err);
+        if (window.Toaster) window.Toaster.error('Deletion Failed', err.message);
+        else alert('Failed to delete user: ' + err.message);
+      }
     }
   }
 
@@ -2400,20 +2454,46 @@
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function(evt) {
+    reader.onload = async function(evt) {
       const base64 = evt.target.result;
-      document.getElementById('brandingPreviewBox').innerHTML = '<img src="' + base64 + '" style="width:100%; height:100%; object-fit:contain;">';
-      localStorage.setItem('active_org_logo', base64);
-      localStorage.setItem('org_logo', base64);
-      if (window.Toaster) window.Toaster.info('Crest Cached', 'Click "Apply & Propagate" to publish globally.');
+      const box = document.getElementById('brandingPreviewBox');
+      if (box) box.innerHTML = '<img src="' + base64 + '" style="width:100%; height:100%; object-fit:contain; border-radius:12px;">';
+      
+      let cloudUrl = base64;
+      if (window.SupabaseService && typeof window.SupabaseService.uploadOrgLogo === 'function') {
+        const activeOrgName = localStorage.getItem('active_org') || 'org';
+        const uploadRes = await window.SupabaseService.uploadOrgLogo(file, activeOrgName).catch(() => null);
+        if (uploadRes && uploadRes.success && uploadRes.url) {
+          cloudUrl = uploadRes.url;
+          console.info('[Super Admin] Organization logo uploaded to Supabase Storage bucket:', cloudUrl);
+        }
+      }
+
+      localStorage.setItem('active_org_logo', cloudUrl);
+      localStorage.setItem('org_logo', cloudUrl);
+      if (window.AuthSession) {
+        const u = window.AuthSession.getUser() || (typeof adminUser !== 'undefined' ? adminUser : null);
+        if (u) { u.logo = cloudUrl; window.AuthSession.setUser(u); }
+        window.AuthSession.applyGlobalBranding();
+      }
+      if (window.Toaster) window.Toaster.success('Crest Uploaded', 'Organization logo saved to Supabase bucket and propagated.');
     };
     reader.readAsDataURL(file);
   }
 
   function clearBrandLogo() {
-    document.getElementById('brandingPreviewBox').innerHTML = '<i class="fa-solid fa-image" style="font-size:36px; color:var(--text-soft);"></i>';
+    const isSubdir = window.location.pathname.includes('/pages/');
+    const mainLogo = isSubdir ? '../../assets/images/flawless-logo.jpg' : 'assets/images/flawless-logo.jpg';
+    const box = document.getElementById('brandingPreviewBox');
+    if (box) box.innerHTML = '<img src="' + mainLogo + '" alt="Flawless Graphics" style="width:100%; height:100%; object-fit:contain; border-radius:12px; padding:4px;">';
     localStorage.removeItem('active_org_logo');
     localStorage.removeItem('org_logo');
+    if (window.AuthSession) {
+      const u = window.AuthSession.getUser() || (typeof adminUser !== 'undefined' ? adminUser : null);
+      if (u) { u.logo = null; window.AuthSession.setUser(u); }
+      window.AuthSession.applyGlobalBranding();
+    }
+    if (window.Toaster) window.Toaster.info('Logo Reset', 'Reverted to default project logo (Flawless Graphics).');
   }
 
   function saveMasterBranding() {

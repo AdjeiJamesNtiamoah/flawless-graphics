@@ -1829,7 +1829,7 @@
 
           <div class="id-card-body">
             <div style="position: relative;">
-              <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80" alt="Student" class="id-card-photo" id="idCardPhoto">
+              <img src="https://wmvsujwgvlosfjdlhadu.supabase.co/storage/v1/object/public/student-photos/avatars/student-avatar.svg" alt="Student" class="id-card-photo" id="idCardPhoto">
               <!-- Smart Card Gold Microchip Graphic -->
               <div style="width: 32px; height: 24px; border-radius: 4px; background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #d97706 100%); border: 1px solid #b45309; display: flex; align-items: center; justify-content: center; position: absolute; bottom: -8px; right: -8px; box-shadow: 0 2px 6px rgba(0,0,0,0.5);">
                 <i class="fa-solid fa-microchip" style="color: #78350f; font-size: 13px;"></i>
@@ -2159,7 +2159,7 @@
           </div>
 
           <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 16px; padding: 12px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.15); border-radius: 12px;">
-            <img id="studentSettingsPhotoPreview" style="width: 60px; height: 60px; border-radius: 12px; object-fit: cover; border: 2px solid #38bdf8; flex-shrink: 0;" src="../../assets/images/sample-student.jpg" alt="Student avatar">
+            <img id="studentSettingsPhotoPreview" style="width: 60px; height: 60px; border-radius: 12px; object-fit: cover; border: 2px solid #38bdf8; flex-shrink: 0;" src="https://wmvsujwgvlosfjdlhadu.supabase.co/storage/v1/object/public/student-photos/avatars/student-avatar.svg" alt="Student avatar">
             <div style="flex: 1;">
               <div style="font-size: 12px; font-weight: 700; color: #ffffff; margin-bottom: 4px;">Profile Photo</div>
               <input type="file" id="studentPhotoUpload" accept="image/*" style="font-size: 11px; max-width: 190px;" onchange="previewStudentPhoto(event)">
@@ -2861,7 +2861,24 @@ async function loadActiveStudent() {
   // Update Top Navbar and Sidebar
   if (document.getElementById('topNavStudentName')) document.getElementById('topNavStudentName').textContent = activeStudent.name || 'Student';
   if (document.getElementById('topNavStudentRoll')) document.getElementById('topNavStudentRoll').textContent = activeStudent.roll || 'STU-2026-001';
-  if (document.getElementById('topNavAvatar') && activeStudent.photo) document.getElementById('topNavAvatar').src = activeStudent.photo;
+  
+  const defaultStudentAvatar = (window.STORAGE_ASSETS && window.STORAGE_ASSETS.avatars && window.STORAGE_ASSETS.avatars.student)
+    ? window.STORAGE_ASSETS.avatars.student
+    : 'https://wmvsujwgvlosfjdlhadu.supabase.co/storage/v1/object/public/student-photos/avatars/student-avatar.svg';
+  let effectiveStudentPhoto = (window.AuthSession && typeof window.AuthSession.getUserPhoto === 'function')
+    ? window.AuthSession.getUserPhoto('student')
+    : null;
+  if (!effectiveStudentPhoto || (window.AuthSession && window.AuthSession.isOrgLogo && window.AuthSession.isOrgLogo(effectiveStudentPhoto))) {
+    const raw = (activeStudent && (activeStudent.photo_url || activeStudent.photo || activeStudent.photoBase64 || activeStudent.avatar));
+    const isLogo = raw && (String(raw).includes('/school-assets/logos/') || String(raw).includes('/logos/'));
+    effectiveStudentPhoto = (!isLogo && raw) ? raw : defaultStudentAvatar;
+  }
+
+  const topNavAv = document.getElementById('topNavAvatar');
+  if (topNavAv) {
+    topNavAv.src = effectiveStudentPhoto;
+    topNavAv.onerror = function() { this.src = defaultStudentAvatar; };
+  }
 
   if (document.getElementById('streakDaysText')) document.getElementById('streakDaysText').textContent = (activeStudent.attendanceStreak || 18) + '-Day Streak';
   if (document.getElementById('streakRateText')) document.getElementById('streakRateText').textContent = (activeStudent.attendanceRate || 96.4) + '%';
@@ -2894,7 +2911,16 @@ async function loadActiveStudent() {
   if (document.getElementById('idCardSecHash')) {
     document.getElementById('idCardSecHash').textContent = activeStudent.securityHash || 'SEC-7F2A-STU001';
   }
-  if (activeStudent.photo && document.getElementById('idCardPhoto')) document.getElementById('idCardPhoto').src = activeStudent.photo;
+  const idCardPh = document.getElementById('idCardPhoto');
+  if (idCardPh) {
+    idCardPh.src = effectiveStudentPhoto;
+    idCardPh.onerror = function() { this.src = defaultStudentAvatar; };
+  }
+  const setPhotoPrev = document.getElementById('studentSettingsPhotoPreview');
+  if (setPhotoPrev) {
+    setPhotoPrev.src = effectiveStudentPhoto;
+    setPhotoPrev.onerror = function() { this.src = defaultStudentAvatar; };
+  }
   if (activeStudent.bloodGroup && document.getElementById('idCardBlood')) document.getElementById('idCardBlood').textContent = activeStudent.bloodGroup;
   if (activeStudent.emergencyPhone && document.getElementById('idCardEmergencyPhone')) document.getElementById('idCardEmergencyPhone').textContent = activeStudent.emergencyPhone;
 }
@@ -4175,6 +4201,9 @@ function syncStudentSettingsToSupabase() {
 
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(loadStudentSettings, 100);
+  if (window.AuthSession && typeof window.AuthSession.applyGlobalBranding === 'function') {
+    window.AuthSession.applyGlobalBranding();
+  }
 });
 
 </script>

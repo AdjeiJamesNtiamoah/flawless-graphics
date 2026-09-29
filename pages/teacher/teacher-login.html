@@ -1031,10 +1031,76 @@
                     </div>
 
                     <div class="form-group hidden" id="fullNameGroup">
-                        <label for="fullName">Full Name</label>
+                        <label for="fullName">Full Legal Name</label>
                         <div class="input-wrapper">
-                            <input type="text" id="fullName" placeholder="Sarah Jenkins, M.Ed.">
+                            <input type="text" id="fullName" placeholder="Sarah Jenkins, M.Ed." autocomplete="name">
                             <i class="fa-regular fa-user field-icon"></i>
+                        </div>
+                    </div>
+
+                    <!-- Teacher Staff ID & Phone (Grid) -->
+                    <div class="form-group hidden" id="teacherStaffPhoneRow">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div>
+                                <label for="teacherStaffId" style="display: block; font-size: 11px; font-weight: 700; color: #64748B; margin-bottom: 6px; text-transform: uppercase;">Staff / Teacher ID</label>
+                                <div class="input-wrapper">
+                                    <input type="text" id="teacherStaffId" placeholder="TCH-2026-042">
+                                    <i class="fa-solid fa-id-card field-icon"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="teacherPhone" style="display: block; font-size: 11px; font-weight: 700; color: #64748B; margin-bottom: 6px; text-transform: uppercase;">Phone Number</label>
+                                <div class="input-wrapper">
+                                    <input type="tel" id="teacherPhone" placeholder="+233 24 123 4567" autocomplete="tel">
+                                    <i class="fa-solid fa-phone field-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Teacher Subject & Faculty (Grid) -->
+                    <div class="form-group hidden" id="teacherSubjectDeptRow">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div>
+                                <label for="teacherSubject" style="display: block; font-size: 11px; font-weight: 700; color: #64748B; margin-bottom: 6px; text-transform: uppercase;">Subject / Specialization</label>
+                                <div class="input-wrapper">
+                                    <select id="teacherSubject" style="width: 100%; background: #FFFFFF; border: 1px solid #E2DDD5; border-radius: 10px; padding: 11px 14px 11px 40px; color: #0F172A; font-size: 13px; outline: none; cursor: pointer;">
+                                        <option value="Graphic Design & Visual Arts">Graphic Design &amp; Visual Arts</option>
+                                        <option value="Mathematics & Computing">Mathematics &amp; Computing</option>
+                                        <option value="Science & Physics">Science &amp; Physics</option>
+                                        <option value="English & Literature">English &amp; Literature</option>
+                                        <option value="Business & Accounting">Business &amp; Accounting</option>
+                                        <option value="Social Sciences">Social Sciences</option>
+                                    </select>
+                                    <i class="fa-solid fa-book-bookmark field-icon"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="teacherDept" style="display: block; font-size: 11px; font-weight: 700; color: #64748B; margin-bottom: 6px; text-transform: uppercase;">Faculty / Department</label>
+                                <div class="input-wrapper">
+                                    <select id="teacherDept" style="width: 100%; background: #FFFFFF; border: 1px solid #E2DDD5; border-radius: 10px; padding: 11px 14px 11px 40px; color: #0F172A; font-size: 13px; outline: none; cursor: pointer;">
+                                        <option value="Creative Arts & Media">Creative Arts &amp; Media</option>
+                                        <option value="Science & Technology">Science &amp; Technology</option>
+                                        <option value="Humanities & Languages">Humanities &amp; Languages</option>
+                                        <option value="Commercial Studies">Commercial Studies</option>
+                                    </select>
+                                    <i class="fa-solid fa-building-columns field-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Assigned Grade / Cohort -->
+                    <div class="form-group hidden" id="teacherClassGroup">
+                        <label for="teacherAssignedClass">Assigned Grade / Cohort Level</label>
+                        <div class="input-wrapper">
+                            <select id="teacherAssignedClass" style="width: 100%; background: #FFFFFF; border: 1px solid #E2DDD5; border-radius: 10px; padding: 11px 14px 11px 40px; color: #0F172A; font-size: 13px; outline: none; cursor: pointer;">
+                                <option value="Grade 10 - Graphic Arts & Visual Identity">Grade 10 - Graphic Arts &amp; Visual Identity</option>
+                                <option value="Grade 11 - UI/UX & Digital Media">Grade 11 - UI/UX &amp; Digital Media</option>
+                                <option value="Grade 12 - Digital Animation & 3D Modeling">Grade 12 - Digital Animation &amp; 3D Modeling</option>
+                                <option value="Senior Faculty / Department Head">Senior Faculty / Department Head</option>
+                            </select>
+                            <i class="fa-solid fa-chalkboard-user field-icon"></i>
                         </div>
                     </div>
 
@@ -1184,6 +1250,12 @@ function switchTeacherTab(mode) {
     document.getElementById('tabSignUp').classList.toggle('active', !isSignIn);
 
     document.getElementById('fullNameGroup').classList.toggle('hidden', isSignIn);
+    const staffPhoneEl = document.getElementById('teacherStaffPhoneRow');
+    if (staffPhoneEl) staffPhoneEl.classList.toggle('hidden', isSignIn);
+    const subjectDeptEl = document.getElementById('teacherSubjectDeptRow');
+    if (subjectDeptEl) subjectDeptEl.classList.toggle('hidden', isSignIn);
+    const classEl = document.getElementById('teacherClassGroup');
+    if (classEl) classEl.classList.toggle('hidden', isSignIn);
     document.getElementById('teacherPhotoGroup').classList.toggle('hidden', isSignIn);
     document.getElementById('confirmPassGroup').classList.toggle('hidden', isSignIn);
 
@@ -1374,18 +1446,31 @@ async function finalizeTeacherRegistration(teacherData) {
     pendingTeacherData = teacherData;
     pendingTeacherData.status = 'pending_approval';
 
-    // 1. Persist directly to live Supabase Cloud database
+    // 1. Upload profile photo to Supabase storage if provided
+    let uploadedPhotoUrl = teacherData.photo;
+    if (teacherData.photo && teacherData.photo.startsWith('data:') && window.SupabaseRestClient && typeof window.SupabaseRestClient.uploadProfilePhoto === 'function') {
+        try {
+            uploadedPhotoUrl = await window.SupabaseRestClient.uploadProfilePhoto(teacherData.photo, teacherData.email, 'staff');
+        } catch (err) {
+            console.warn('[TeacherSignup] Supabase photo upload fallback:', err);
+        }
+    }
+    teacherData.photo = uploadedPhotoUrl;
+
+    // 2. Persist directly to live Supabase Cloud database
     if (window.SupabaseService) {
         try {
             await window.SupabaseService.saveUser({
                 name: teacherData.name,
                 email: teacherData.email,
+                phone: teacherData.phone || '',
                 password: teacherData.rawPassPreview || undefined,
                 org: targetOrg,
                 role: 'teacher',
-                designation: 'Teacher / Academic',
-                department: 'Academic Staff',
-                photo_url: teacherData.photo || null,
+                designation: teacherData.subject ? `Teacher - ${teacherData.subject}` : 'Teacher / Academic',
+                department: teacherData.department || 'Academic Staff',
+                linked_staff_id: teacherData.staffId || null,
+                photo_url: uploadedPhotoUrl || null,
                 status: 'pending_approval'
             });
 
@@ -1393,10 +1478,13 @@ async function finalizeTeacherRegistration(teacherData) {
                 name: teacherData.name,
                 fullName: teacherData.name,
                 email: teacherData.email,
-                position: 'Teacher / Educator',
-                department: 'Academic Staff',
+                phone: teacherData.phone || '',
+                position: teacherData.subject ? `Teacher of ${teacherData.subject}` : 'Teacher / Educator',
+                department: teacherData.department || 'Academic Staff',
+                subject: teacherData.subject || '',
+                assigned_class: teacherData.assignedClass || '',
                 status: 'pending_approval',
-                photo_url: teacherData.photo || null
+                photo_url: uploadedPhotoUrl || null
             });
             console.info('[TeacherSignup] Saved teacher registration to Supabase Cloud as pending_approval');
         } catch (e) {
@@ -1476,6 +1564,11 @@ async function handleTeacherAuth() {
             }
 
             const name = document.getElementById("fullName").value.trim();
+            const staffId = document.getElementById("teacherStaffId") ? document.getElementById("teacherStaffId").value.trim() : '';
+            const phone = document.getElementById("teacherPhone") ? document.getElementById("teacherPhone").value.trim() : '';
+            const subject = document.getElementById("teacherSubject") ? document.getElementById("teacherSubject").value : '';
+            const department = document.getElementById("teacherDept") ? document.getElementById("teacherDept").value : 'Academic Staff';
+            const assignedClass = document.getElementById("teacherAssignedClass") ? document.getElementById("teacherAssignedClass").value : '';
             const confirmPw = document.getElementById("confirmPassword").value;
 
             if (!name) {
@@ -1517,6 +1610,11 @@ async function handleTeacherAuth() {
             const newTeacher = {
                 name: name,
                 email: email,
+                staffId: staffId,
+                phone: phone,
+                subject: subject,
+                department: department,
+                assignedClass: assignedClass,
                 pass: hashed,
                 rawPassPreview: pw,
                 role: "teacher",

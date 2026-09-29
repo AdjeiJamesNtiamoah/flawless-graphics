@@ -53,11 +53,15 @@ document.getElementById("registerForm")?.addEventListener("submit", async functi
             window.AuthSession.setUser({ org, name, email, role: roleLower });
         }
         if (window.SupabaseService && typeof window.SupabaseService.saveOrganization === 'function') {
+            const orgLogo = (window.AuthSession && typeof window.AuthSession.getLogo === 'function' ? window.AuthSession.getLogo() : null)
+                || localStorage.getItem('active_org_logo')
+                || null;
             window.SupabaseService.saveOrganization({
                 org_name: org,
                 admin_name: name,
                 email: email,
-                logo_path: null
+                logo_path: orgLogo,
+                logo_url: orgLogo
             }).catch(err => console.warn('Supabase org sync notice:', err));
         }
         if (window.Toaster && typeof window.Toaster.success === 'function') {

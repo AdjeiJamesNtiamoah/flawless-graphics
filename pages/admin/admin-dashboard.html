@@ -690,7 +690,7 @@
     </a>
 
     <div class="sidebar-profile hide-collapsed">
-      <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Super Admin" class="profile-thumb" id="sideAdminPhoto">
+      <img src="https://wmvsujwgvlosfjdlhadu.supabase.co/storage/v1/object/public/staff-photos/avatars/admin-avatar.svg" alt="Super Admin" class="profile-thumb" id="sideAdminPhoto">
       <div style="overflow:hidden;">
         <div style="font-weight:800; font-size:13px; color:#fff; white-space:nowrap; text-overflow:ellipsis;" id="sideAdminName">James Ntiamoah</div>
         <div style="font-size:11px; color:var(--muted); white-space:nowrap; text-overflow:ellipsis;" id="sideAdminEmail">admin@flawlessgraphics.com</div>
@@ -1540,6 +1540,14 @@
             localStorage.setItem('active_user', JSON.stringify(activeAdminUser));
           }
         }
+        if (activeAdminUser) {
+          if (document.getElementById('sideAdminName')) document.getElementById('sideAdminName').textContent = activeAdminUser.name || 'Administrator';
+          if (document.getElementById('sideAdminEmail')) document.getElementById('sideAdminEmail').textContent = activeAdminUser.email || 'admin@flawlessgraphics.com';
+          const sideAdminPhotoEl = document.getElementById('sideAdminPhoto');
+          if (sideAdminPhotoEl && window.AuthSession) {
+            sideAdminPhotoEl.src = window.AuthSession.getUserPhoto('admin');
+          }
+        }
         if (activeAdminUser && activeAdminUser.email) {
           const adminEmail = activeAdminUser.email.trim().toLowerCase();
           if (adminEmail !== 'admin@flawlessgraphics.com') {
@@ -1579,7 +1587,8 @@
             code: o.id || 'FG-ROOT',
             tagline: o.tagline || 'Institutional Branch',
             color: o.color || '#635bfc',
-            status: o.status || 'Active'
+            status: o.status || 'Active',
+            logo_url: o.logo_url || o.logo || o.logo_path || ''
           }));
         } else {
           // Seed root organization in Supabase if not yet provisioned
@@ -1635,6 +1644,23 @@
       }
       document.getElementById('sideOrgName').textContent = ACTIVE_ORG;
 
+      // Update admin profile photo: uploaded photo if present, else role avatar
+      const sideAdminPhotoEl = document.getElementById('sideAdminPhoto');
+      if (sideAdminPhotoEl) {
+        const defaultAdminAvatar = (window.STORAGE_ASSETS && window.STORAGE_ASSETS.avatars && window.STORAGE_ASSETS.avatars.admin)
+          ? window.STORAGE_ASSETS.avatars.admin
+          : 'https://wmvsujwgvlosfjdlhadu.supabase.co/storage/v1/object/public/staff-photos/avatars/admin-avatar.svg';
+        const photo = (verifiedUser && (verifiedUser.photo_url || verifiedUser.photo || verifiedUser.photoBase64))
+          || (user && (user.photo || user.photoBase64 || user.photo_url))
+          || (window.AuthSession && window.AuthSession.getUserPhoto && window.AuthSession.getUserPhoto('admin'))
+          || defaultAdminAvatar;
+        sideAdminPhotoEl.src = photo;
+        sideAdminPhotoEl.onerror = function() { this.src = defaultAdminAvatar; };
+      }
+
+      // Update sidebar brand logo with active tenant logo
+      updateAdminBrandLogo(ACTIVE_ORG);
+
       // Populate Tenant Selector
       const sel = document.getElementById('activeTenantSelect');
       if (sel) {
@@ -1654,6 +1680,19 @@
       renderMasterUsersTable();
       renderAuditLogs();
       checkStorageCapacity();
+    }
+
+    function updateAdminBrandLogo(orgName) {
+      const brandLogoEl = document.querySelector('.brand-logo');
+      if (!brandLogoEl) return;
+      const tenants = getTenantsList();
+      const currentTenant = tenants.find(t => (t.name || '').toLowerCase() === (orgName || '').toLowerCase());
+      let logoUrl = (currentTenant && currentTenant.logo_url) || localStorage.getItem('active_org_logo');
+      if (!logoUrl || (orgName || '').toUpperCase() === 'FLAWLESS GRAPHICS') {
+        logoUrl = (window.STORAGE_ASSETS && window.STORAGE_ASSETS.logos && window.STORAGE_ASSETS.logos.primaryPng)
+          || 'https://wmvsujwgvlosfjdlhadu.supabase.co/storage/v1/object/public/school-assets/logos/flawless-logo.png';
+      }
+      brandLogoEl.innerHTML = `<img src="${logoUrl}" alt="${orgName}" class="org-brand-logo" style="width:100%; height:100%; object-fit:contain; border-radius:inherit; display:block; padding:2px;">`;
     }
 
     function switchSection(secId) {
@@ -1690,12 +1729,30 @@
       if (!newOrg) return;
       ACTIVE_ORG = newOrg;
       localStorage.setItem('active_org', newOrg);
+      localStorage.setItem('activeOrg', newOrg);
+
+      const tenants = getTenantsList();
+      const currentTenant = tenants.find(t => (t.name || '').toLowerCase() === newOrg.toLowerCase());
+      if (currentTenant && currentTenant.logo_url) {
+        localStorage.setItem('active_org_logo', currentTenant.logo_url);
+        localStorage.setItem('org_logo', currentTenant.logo_url);
+      } else if (newOrg.toUpperCase() === 'FLAWLESS GRAPHICS') {
+        const rootLogo = (window.STORAGE_ASSETS && window.STORAGE_ASSETS.logos && window.STORAGE_ASSETS.logos.primaryPng) || '';
+        if (rootLogo) {
+          localStorage.setItem('active_org_logo', rootLogo);
+          localStorage.setItem('org_logo', rootLogo);
+        }
+      }
+
       if (window.AuthSession) {
         const curr = window.AuthSession.getUser() || {};
         curr.org = newOrg;
+        if (currentTenant && currentTenant.logo_url) curr.logo = currentTenant.logo_url;
         window.AuthSession.setUser(curr);
+        window.AuthSession.applyGlobalBranding();
       }
       document.getElementById('sideOrgName').textContent = newOrg;
+      updateAdminBrandLogo(newOrg);
       refreshAllStats();
       renderMasterUsersTable();
       logAuditAction('Tenant Switch', `Switched active administrative scope to ${newOrg}`, 'INFO');

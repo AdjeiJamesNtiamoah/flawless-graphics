@@ -848,6 +848,66 @@
             </div>
           </div>
 
+          <!-- Finance Officer Full Name (Registration Mode) -->
+          <div class="form-group" id="financeFullNameGroup" style="display: none;">
+            <label class="form-label" for="financeFullName">Full Legal Name</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-user field-icon"></i>
+              <input type="text" id="financeFullName" class="form-control" placeholder="e.g. Samuel Osei, CA" autocomplete="name" />
+            </div>
+          </div>
+
+          <!-- Staff ID & Phone Number (Registration Mode Grid) -->
+          <div class="form-group" id="financeStaffPhoneRow" style="display: none;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div>
+                <label class="form-label" for="financeStaffId">Staff / Treasury ID</label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-id-card field-icon"></i>
+                  <input type="text" id="financeStaffId" class="form-control" placeholder="FIN-2026-018" />
+                </div>
+              </div>
+              <div>
+                <label class="form-label" for="financePhone">Phone Number</label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-phone field-icon"></i>
+                  <input type="tel" id="financePhone" class="form-control" placeholder="+233 24 555 0192" autocomplete="tel" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Designation & Department (Registration Mode Grid) -->
+          <div class="form-group" id="financeDesignationDeptRow" style="display: none;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div>
+                <label class="form-label" for="financeDesignation">Role / Designation</label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-briefcase field-icon"></i>
+                  <select id="financeDesignation" class="form-control" style="background: #FAF8F5; color: #0F172A; padding-left: 40px; cursor: pointer;">
+                    <option value="Chief Financial Officer (CFO)">Chief Financial Officer (CFO)</option>
+                    <option value="Bursar & Treasury Controller" selected>Bursar &amp; Treasury Controller</option>
+                    <option value="Senior Accountant">Senior Accountant</option>
+                    <option value="Payroll & Accounts Officer">Payroll &amp; Accounts Officer</option>
+                    <option value="Revenue & Audit Officer">Revenue &amp; Audit Officer</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="form-label" for="financeDepartment">Department / Unit</label>
+                <div class="input-wrap">
+                  <i class="fa-solid fa-building-columns field-icon"></i>
+                  <select id="financeDepartment" class="form-control" style="background: #FAF8F5; color: #0F172A; padding-left: 40px; cursor: pointer;">
+                    <option value="Bursary & Treasury" selected>Bursary &amp; Treasury</option>
+                    <option value="Finance & Accounts">Finance &amp; Accounts</option>
+                    <option value="Audit & Compliance">Audit &amp; Compliance</option>
+                    <option value="Procurement & Supplies">Procurement &amp; Supplies</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="form-group" id="financePhotoGroup" style="display: none;">
             <label class="form-label">Finance Officer Profile Photo (Optional)</label>
             <div style="display: flex; align-items: center; gap: 14px; padding: 10px 14px; background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(255, 255, 255, 0.2); border-radius: 12px;">
@@ -1035,6 +1095,17 @@
     if (meter) meter.style.display = signUp ? 'block' : 'none';
     const photoGroup = document.getElementById('financePhotoGroup');
     if (photoGroup) photoGroup.style.display = signUp ? 'block' : 'none';
+    const fullNameGroup = document.getElementById('financeFullNameGroup');
+    if (fullNameGroup) fullNameGroup.style.display = signUp ? 'block' : 'none';
+    const staffPhoneRow = document.getElementById('financeStaffPhoneRow');
+    if (staffPhoneRow) staffPhoneRow.style.display = signUp ? 'block' : 'none';
+    const designationDeptRow = document.getElementById('financeDesignationDeptRow');
+    if (designationDeptRow) designationDeptRow.style.display = signUp ? 'block' : 'none';
+    const fullNameInput = document.getElementById('financeFullName');
+    if (fullNameInput) {
+      if (signUp) fullNameInput.setAttribute('required', 'true');
+      else fullNameInput.removeAttribute('required');
+    }
 
     if (signUp) {
       tabSignUp.classList.add('active');
@@ -1103,7 +1174,7 @@
     if (window.Toaster) window.Toaster.info('New Code Generated', `Code: ${currentFinanceOtpCode}`);
   }
 
-  function submitFinanceOtpVerification() {
+  async function submitFinanceOtpVerification() {
     const code = document.getElementById('financeOtpInput').value.trim();
     if (!code || code.length < 6 || code.length > 10) {
       if (window.Toaster) window.Toaster.warning('Invalid Code', 'Please enter your verification code.');
@@ -1115,19 +1186,33 @@
       ? (orgSelect.selectedOptions[0].dataset.name || orgSelect.value)
       : (pendingFinanceUser.org || 'FLAWLESS GRAPHICS');
 
+    // Upload photo to Supabase storage if provided
+    let uploadedPhotoUrl = currentFinancePhotoBase64;
+    if (currentFinancePhotoBase64 && currentFinancePhotoBase64.startsWith('data:') && window.SupabaseRestClient && typeof window.SupabaseRestClient.uploadProfilePhoto === 'function') {
+      try {
+        uploadedPhotoUrl = await window.SupabaseRestClient.uploadProfilePhoto(currentFinancePhotoBase64, pendingFinanceUser.email, 'staff');
+      } catch (err) {
+        console.warn('[FinanceSignup] Supabase photo upload fallback:', err);
+      }
+    }
+
     const financeRecord = {
       org: selectedOrgName,
       org_id: orgSelect ? orgSelect.value : undefined,
-      name: pendingFinanceUser.email.split('@')[0],
+      name: pendingFinanceUser.name || pendingFinanceUser.email.split('@')[0],
       email: pendingFinanceUser.email.toLowerCase(),
+      phone: pendingFinanceUser.phone || '',
+      designation: pendingFinanceUser.designation || 'Bursar & Treasury Controller',
+      department: pendingFinanceUser.department || 'Bursary & Treasury',
+      linked_staff_id: pendingFinanceUser.staffId || null,
       password: pendingFinanceUser.password,
       role: 'finance',
-      photo_url: currentFinancePhotoBase64 || null,
+      photo_url: uploadedPhotoUrl || null,
       status: 'pending_approval'
     };
 
     if (window.SupabaseService) {
-      window.SupabaseService.saveUser(financeRecord).catch(console.warn);
+      await window.SupabaseService.saveUser(financeRecord).catch(console.warn);
     }
 
     closeFinanceOtpModal();
@@ -1160,6 +1245,17 @@
     }
 
     if (isSignUpMode) {
+      const fullName = (document.getElementById('financeFullName')?.value || '').trim();
+      const staffId = (document.getElementById('financeStaffId')?.value || '').trim();
+      const phone = (document.getElementById('financePhone')?.value || '').trim();
+      const designation = document.getElementById('financeDesignation')?.value || 'Bursar & Treasury Controller';
+      const department = document.getElementById('financeDepartment')?.value || 'Bursary & Treasury';
+
+      if (!fullName) {
+        showError('Please enter your full legal name.');
+        return;
+      }
+
       if (window.StrongPassword) {
         const pwCheck = window.StrongPassword.validate(password);
         if (!pwCheck.valid) {
@@ -1174,14 +1270,28 @@
         return;
       }
 
+      // Upload photo to Supabase storage if provided
+      let uploadedPhotoUrl = currentFinancePhotoBase64;
+      if (currentFinancePhotoBase64 && currentFinancePhotoBase64.startsWith('data:') && window.SupabaseRestClient && typeof window.SupabaseRestClient.uploadProfilePhoto === 'function') {
+        try {
+          uploadedPhotoUrl = await window.SupabaseRestClient.uploadProfilePhoto(currentFinancePhotoBase64, hrEmail, 'staff');
+        } catch (err) {
+          console.warn('[FinanceSignup] Supabase photo upload fallback:', err);
+        }
+      }
+
       const financeRecord = {
         org: selectedOrgName,
         org_id: orgName,
-        name: hrEmail.split('@')[0],
+        name: fullName,
         email: hrEmail.toLowerCase(),
+        phone: phone,
+        designation: designation,
+        department: department,
+        linked_staff_id: staffId || null,
         password: password,
         role: 'finance',
-        photo_url: currentFinancePhotoBase64 || null,
+        photo_url: uploadedPhotoUrl || null,
         status: 'pending_approval'
       };
 
@@ -1204,7 +1314,16 @@
         return;
       }
 
-      openFinanceOtpModal({ org: selectedOrgName, email: hrEmail, password: password });
+      openFinanceOtpModal({
+        org: selectedOrgName,
+        email: hrEmail,
+        password: password,
+        name: fullName,
+        phone: phone,
+        designation: designation,
+        department: department,
+        staffId: staffId
+      });
       return;
     }
 
