@@ -1408,12 +1408,27 @@
       }
     }
 
+    const effectiveWorkingOrg = selectedOrgName || orgName;
+    if (effectiveWorkingOrg && !effectiveWorkingOrg.includes('-- Select Approved')) {
+      localStorage.setItem('active_org', effectiveWorkingOrg);
+      localStorage.setItem('activeOrg', effectiveWorkingOrg);
+      if (matchedUser) {
+        matchedUser.org = effectiveWorkingOrg;
+        matchedUser.org_name = effectiveWorkingOrg;
+        matchedUser.org_id = effectiveWorkingOrg;
+        matchedUser.organization = effectiveWorkingOrg;
+      }
+    }
+
     if (window.AuthSession) {
       window.AuthSession.setUser(matchedUser);
-    } else {
-      localStorage.setItem('active_user', JSON.stringify(matchedUser));
-      localStorage.setItem('active_org', orgName);
+      if (typeof window.AuthSession.setOrgName === 'function' && effectiveWorkingOrg) {
+        window.AuthSession.setOrgName(effectiveWorkingOrg);
+      }
     }
+    localStorage.setItem('active_user', JSON.stringify(matchedUser));
+    localStorage.setItem('activeHR', JSON.stringify(matchedUser));
+    localStorage.setItem('hr_active_user', JSON.stringify(matchedUser));
 
     if (window.Toaster) {
       window.Toaster.success('Welcome to HR Desk', 'Initializing faculty records & payroll...');

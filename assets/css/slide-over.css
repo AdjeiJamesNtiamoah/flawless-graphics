@@ -21,7 +21,7 @@
 /* Dark mode overrides if parent has dark theme */
 [data-theme="dark"],
 .dark-theme,
-body:not(.light-theme):has(.sidebar) {
+body.dark-theme {
   --so-bg: #0F172A;
   --so-bg-subtle: #1E293B;
   --so-header-bg: #0B1120;
@@ -284,8 +284,15 @@ body.slide-over-open {
 .so-select:focus,
 .so-textarea:focus {
   border-color: var(--so-primary);
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
-  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  background: var(--so-bg);
+  color: var(--so-text);
+}
+
+.so-input::placeholder,
+.so-textarea::placeholder {
+  color: var(--so-text-light);
+  opacity: 0.85;
 }
 
 /* List items / checklist */

@@ -394,40 +394,18 @@
 
   /* Sidebar - Pinned Standout Executive Navigation */
   
-  /* Universal Side Hover Rail for Student Dashboard */
+  /* Sidebar - Pinned Standout Executive Navigation */
   .app-sidebar {
-    width: 72px !important;
-    min-width: 72px !important;
-    padding: 20px 10px !important;
-    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), margin-right 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease !important;
-    z-index: 1000 !important;
-    overflow-x: hidden !important;
-  }
-  .app-sidebar:hover {
     width: 260px !important;
-    margin-right: -188px !important;
-    padding: 20px 14px !important;
-    box-shadow: 14px 0 35px rgba(0, 0, 0, 0.25) !important;
-  }
-  .app-sidebar .sidebar-section-title, .app-sidebar .nav-item-btn {
-    white-space: nowrap;
-  }
-  .app-sidebar .sidebar-section-title {
-    opacity: 0;
-    transition: opacity 0.2s 0.05s ease;
-  }
-  .app-sidebar:hover .sidebar-section-title {
-    opacity: 1;
-  }
-
-  .app-sidebar {
-    width: 260px;
+    min-width: 260px !important;
+    max-width: 260px !important;
     height: 100%;
     position: sticky;
     top: 0;
     overflow-y: auto;
+    overflow-x: hidden;
     flex-shrink: 0;
-    background: #0B1120;
+    background: #0B1120 !important;
     border-right: 1px solid rgba(255, 255, 255, 0.08);
     padding: 20px 14px;
     display: flex;
@@ -435,6 +413,18 @@
     justify-content: space-between;
     z-index: 50;
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+  }
+
+  .app-sidebar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .app-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .app-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
   }
 
   .sidebar-section-title {
@@ -1429,6 +1419,8 @@
           <button class="nav-item-btn" id="nav_gpaSim" onclick="showSection('gpaSim')">
             <i class="fa-solid fa-calculator"></i> GPA Simulator
           </button>
+        </li>
+        <li>
           <button class="nav-item-btn" id="nav_settings" onclick="showSection('settings')">
             <i class="fa-solid fa-sliders"></i> Settings &amp; Preferences
           </button>

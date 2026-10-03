@@ -973,9 +973,14 @@
             if (!user) return false;
             if (!selectedOrgVal) return true;
             const val = selectedOrgVal.toLowerCase().trim();
+            const valNorm = val.replace(/[^a-z0-9]/g, '');
             const userOrg = (user.org || user.org_id || user.organization || '').toLowerCase().trim();
+            const userOrgNorm = userOrg.replace(/[^a-z0-9]/g, '');
             const userOrgName = (user.org_name || '').toLowerCase().trim();
-            return userOrg === val || userOrgName === val || val === 'all' || val === 'fg-main';
+            const userOrgNameNorm = userOrgName.replace(/[^a-z0-9]/g, '');
+            return userOrg === val || userOrgName === val ||
+                   (valNorm && (userOrgNorm === valNorm || userOrgNameNorm === valNorm)) ||
+                   val === 'all' || val === 'fg-main' || valNorm === 'fgmain';
         },
 
         /**

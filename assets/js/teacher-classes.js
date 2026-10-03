@@ -12,12 +12,24 @@
 
   function getClasses(){
     let arr = read(CLASSES_KEY);
-    if (!arr || arr.length === 0) {
-      arr = [
-        { name: "Class 1 - Visual Design", subject: "Graphic Arts", teacherName: "James Ntiamoah", students: [1, 2, 3, 4, 5] },
-        { name: "Class 2 - Web Systems", subject: "Frontend Architecture", teacherName: "Kwame Boateng", students: [1, 2, 3, 4] },
-        { name: "Class 3 - Animation & 3D", subject: "Motion Design", teacherName: "Kofi Owusu", students: [1, 2, 3] }
-      ];
+    if (!Array.isArray(arr)) {
+      arr = [];
+    }
+    // Purge any legacy dummy seed classes
+    const dummyIds = new Set(['cls_f2_arts', 'cls_f3_web', 'cls_f1_illust', 'cls_f2_print', 'cls_1', 'cls_2', 'cls_3', 'cls_4', 'cls_5']);
+    const dummyNames = new Set([
+      'grade 10 - graphic arts & visual identity',
+      'grade 11 - web systems & client architecture',
+      'grade 12 - digital animation & 3d modeling',
+      'grade 9 - fundamental design principles',
+      'grade 10 - ui/ux interactive prototyping',
+      'class 1 - visual design',
+      'class 2 - web systems',
+      'class 3 - animation & 3d'
+    ]);
+    const filtered = arr.filter(c => !dummyIds.has(c.id) && !dummyNames.has((c.name || c.className || '').toLowerCase().trim()));
+    if (filtered.length !== arr.length) {
+      arr = filtered;
       save(CLASSES_KEY, arr);
     }
     return arr;
@@ -104,14 +116,17 @@
     renderTable(); renderCards(); renderTimetable();
   };
 
-  // add class form
-  document.getElementById('addClassBtn').addEventListener('click', ()=>{
-    const name = document.getElementById('newClassName').value.trim();
-    if(!name) return alert('Provide class name');
-    const arr = getClasses(); arr.push({ name, subject: document.getElementById('newClassSubject').value.trim(), teacherName: document.getElementById('newClassTeacher').value.trim(), students: [] });
-    saveClasses(arr); renderTable(); renderCards(); renderTimetable();
-    document.getElementById('newClassName').value=''; document.getElementById('newClassSubject').value=''; document.getElementById('newClassTeacher').value='';
-  });
+  // add class restriction (HR only)
+  const addClassBtn = document.getElementById('addClassBtn');
+  if (addClassBtn) {
+    addClassBtn.addEventListener('click', ()=>{
+      if (window.Toaster) {
+        window.Toaster.warning('Action Restricted', 'Academic classrooms can only be created by HR Administrators.');
+      } else {
+        alert('Only HR Administrators can add classes to the organization.');
+      }
+    });
+  }
 
   // simple schedule slot adder
   document.getElementById('addScheduleBtn').addEventListener('click', ()=>{

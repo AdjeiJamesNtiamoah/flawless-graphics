@@ -323,6 +323,13 @@
               <div class="dock-item-desc">Open internal messaging</div>
             </div>
           </button>
+          <button type="button" class="quick-dock-item" id="quickDockAddClassBtn">
+            <div class="dock-item-icon class-icon" style="background:rgba(16, 185, 129, 0.15); color:#10b981;"><i class="fa-solid fa-folder-plus"></i></div>
+            <div>
+              <div class="dock-item-title">Add Academic Classroom</div>
+              <div class="dock-item-desc">Register new subject class cohort</div>
+            </div>
+          </button>
           <div class="quick-dock-divider"></div>
           <button type="button" class="quick-dock-item logout" id="quickDockLogoutBtn">
             <div class="dock-item-icon logout-icon"><i class="fa-solid fa-power-off"></i></div>
@@ -418,6 +425,20 @@
         toggleMenu(false);
         if (typeof config.messagesAction === 'function') {
           config.messagesAction();
+        }
+      });
+    const addClassBtn = dock.querySelector('#quickDockAddClassBtn');
+    if (addClassBtn && !addClassBtn.dataset.dockBound) {
+      addClassBtn.dataset.dockBound = 'true';
+      addClassBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleMenu(false);
+        if (typeof window.openAddClassModal === 'function') {
+          window.openAddClassModal();
+        } else if (window.SlideOver && typeof window.SlideOver.open === 'function') {
+          window.SlideOver.open('addClassDrawer');
+        } else {
+          window.location.href = rootPrefix + 'pages/hr/hr-dashboard.html';
         }
       });
     }

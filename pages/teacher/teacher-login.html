@@ -1095,10 +1095,7 @@
                         <label for="teacherAssignedClass">Assigned Grade / Cohort Level</label>
                         <div class="input-wrapper">
                             <select id="teacherAssignedClass" style="width: 100%; background: #FFFFFF; border: 1px solid #E2DDD5; border-radius: 10px; padding: 11px 14px 11px 40px; color: #0F172A; font-size: 13px; outline: none; cursor: pointer;">
-                                <option value="Grade 10 - Graphic Arts & Visual Identity">Grade 10 - Graphic Arts &amp; Visual Identity</option>
-                                <option value="Grade 11 - UI/UX & Digital Media">Grade 11 - UI/UX &amp; Digital Media</option>
-                                <option value="Grade 12 - Digital Animation & 3D Modeling">Grade 12 - Digital Animation &amp; 3D Modeling</option>
-                                <option value="Senior Faculty / Department Head">Senior Faculty / Department Head</option>
+                                <option value="" disabled selected>Select organization first</option>
                             </select>
                             <i class="fa-solid fa-chalkboard-user field-icon"></i>
                         </div>
@@ -1281,6 +1278,9 @@ function switchTeacherTab(mode) {
 
     if (!isSignIn) {
         document.getElementById('fullName').focus();
+        if (typeof populateTeacherClasses === 'function') {
+            populateTeacherClasses();
+        }
     } else {
         document.getElementById('email').focus();
     }
@@ -1747,6 +1747,69 @@ async function handleTeacherAuth() {
     }
 }
 
+async function populateTeacherClasses(targetOrg = null) {
+    const classSelect = document.getElementById("teacherAssignedClass");
+    if (!classSelect) return;
+
+    const orgSelect = document.getElementById("teacherOrgSelect");
+    const orgName = targetOrg || ((orgSelect && orgSelect.selectedOptions && orgSelect.selectedOptions[0]) 
+        ? (orgSelect.selectedOptions[0].dataset.name || orgSelect.value) 
+        : (orgSelect ? orgSelect.value : '')) || 'FLAWLESS GRAPHICS';
+
+    classSelect.innerHTML = '<option value="" disabled selected>Loading organization classes...</option>';
+
+    let classes = [];
+    const dummyIds = new Set(['cls_f2_arts', 'cls_f3_web', 'cls_f1_illust', 'cls_f2_print', 'cls_1', 'cls_2', 'cls_3', 'cls_4', 'cls_5']);
+    const dummyNames = new Set([
+      'grade 10 - graphic arts & visual identity',
+      'grade 11 - web systems & client architecture',
+      'grade 12 - digital animation & 3d modeling',
+      'grade 9 - fundamental design principles',
+      'grade 10 - ui/ux interactive prototyping',
+      'class 1 - visual design',
+      'class 2 - web systems',
+      'class 3 - animation & 3d'
+    ]);
+
+    // 1. Supabase Cloud query
+    if (window.SupabaseService && typeof window.SupabaseService.getClasses === 'function') {
+        try {
+            const cloudClasses = await window.SupabaseService.getClasses(orgName);
+            if (Array.isArray(cloudClasses) && cloudClasses.length > 0) {
+                classes = cloudClasses;
+            }
+        } catch(e) {}
+    }
+
+    // 2. localStorage fallback for active organization
+    if (classes.length === 0) {
+        try {
+            const local = JSON.parse(localStorage.getItem(`${orgName}_classes`) || localStorage.getItem('classes') || '[]');
+            if (Array.isArray(local) && local.length > 0) {
+                classes = local;
+            }
+        } catch(e) {}
+    }
+
+    // Filter out legacy dummy hardcoded classes
+    classes = classes.filter(c => !dummyIds.has(c.id) && !dummyNames.has((c.name || c.className || '').toLowerCase().trim()));
+
+    let optionsHtml = '';
+    if (classes.length > 0) {
+        optionsHtml += '<option value="" disabled selected>Select assigned class / cohort...</option>';
+        optionsHtml += classes.map(c => {
+            const cName = c.name || c.className || 'Class';
+            const cGrade = c.grade || c.gradeLevel || c.code || 'Cohort';
+            return `<option value="${cName.replace(/"/g, '&quot;')}">${cName} (${cGrade})</option>`;
+        }).join('');
+        optionsHtml += '<option value="Senior Faculty / Department Head">Senior Faculty / Department Head</option>';
+    } else {
+        optionsHtml = '<option value="General Faculty / Unassigned" selected>General Faculty / Unassigned (No classes created yet by HR)</option>';
+        optionsHtml += '<option value="Senior Faculty / Department Head">Senior Faculty / Department Head</option>';
+    }
+    classSelect.innerHTML = optionsHtml;
+}
+
 window.onload = () => {
     const saved = localStorage.getItem("remember_teacher_email");
     if (saved) {
@@ -1760,6 +1823,46 @@ window.onload = () => {
     if (window.RealtimeAuth) {
         window.RealtimeAuth.populateApprovedOrgDropdown(document.getElementById("teacherOrgSelect"));
     }
+
+    const teacherOrgSel = document.getElementById("teacherOrgSelect");
+    if (teacherOrgSel) {
+        teacherOrgSel.addEventListener('change', () => {
+            if (typeof populateTeacherClasses === 'function') {
+                populateTeacherClasses();
+            }
+        });
+    }
+
+    // Purge legacy dummy classes across all localStorage keys on boot
+    try {
+        const dummyIds = new Set(['cls_f2_arts', 'cls_f3_web', 'cls_f1_illust', 'cls_f2_print', 'cls_1', 'cls_2', 'cls_3', 'cls_4', 'cls_5']);
+        const dummyNames = new Set([
+            'grade 10 - graphic arts & visual identity',
+            'grade 11 - web systems & client architecture',
+            'grade 12 - digital animation & 3d modeling',
+            'grade 9 - fundamental design principles',
+            'grade 10 - ui/ux interactive prototyping',
+            'class 1 - visual design',
+            'class 2 - web systems',
+            'class 3 - animation & 3d'
+        ]);
+        Object.keys(localStorage).forEach(k => {
+            if (k && (k.endsWith('_classes') || k === 'classes')) {
+                try {
+                    const raw = localStorage.getItem(k);
+                    if (raw) {
+                        const list = JSON.parse(raw);
+                        if (Array.isArray(list)) {
+                            const cleaned = list.filter(c => !dummyIds.has(c.id) && !dummyNames.has((c.name || c.className || '').toLowerCase().trim()));
+                            if (cleaned.length !== list.length) {
+                                localStorage.setItem(k, JSON.stringify(cleaned));
+                            }
+                        }
+                    }
+                } catch(e) {}
+            }
+        });
+    } catch(e) {}
 
     // Apply active institution branding
     if (window.AuthSession) {

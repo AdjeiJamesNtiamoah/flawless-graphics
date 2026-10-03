@@ -922,7 +922,7 @@
 
     <!-- QUICK ACTIONS BAR -->
     <div style="display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: 22px; flex-wrap: wrap;">
-      <button class="btn-action success-btn" style="padding: 7px 15px; font-size: 12px; width:auto; border-radius: 9px;" onclick="openModal('studentFeeModal')">
+      <button class="btn-action success-btn" style="padding: 7px 15px; font-size: 12px; width:auto; border-radius: 9px;" onclick="openStudentFeeDrawer()">
         <i class="fa-solid fa-receipt"></i> Collect Student Fee
       </button>
       <button class="btn-action" style="background: var(--accent-gradient); padding: 7px 15px; font-size: 12px; width:auto; border-radius: 9px;" onclick="openPrepareSalaryModal()">
@@ -1117,7 +1117,7 @@
           <div style="font-size:13px; color:var(--text-muted)">Monitor student tuition fees, lab dues, outstanding balances, and issue official receipts</div>
         </div>
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-          <button class="btn-action success-btn" style="padding:8px 16px; font-size:12px; width:auto;" onclick="openModal('studentFeeModal')">
+          <button class="btn-action success-btn" style="padding:8px 16px; font-size:12px; width:auto;" onclick="openStudentFeeDrawer()">
             <i class="fa-solid fa-plus-circle"></i> Record Fee Payment
           </button>
           <button class="btn-action" style="padding:8px 14px; font-size:12px; width:auto;" onclick="exportFeeCSV()">
@@ -1596,68 +1596,157 @@
   <!-- MODALS                                     -->
   <!-- ========================================== -->
 
-  <!-- 1. RECORD STUDENT FEE MODAL -->
-  <div class="modal-overlay" id="studentFeeModal">
-    <div class="modal-card">
-      <h3 style="font-size:17px; font-weight:800; margin-bottom:16px;"><i class="fa-solid fa-graduation-cap"></i> Record Student Fee Payment</h3>
+  <!-- 1. RECORD STUDENT FEE SLIDE-OVER DRAWER & BACKDROP -->
+  <div class="slide-over-backdrop" id="studentFeeDrawerBackdrop" onclick="closeStudentFeeDrawer()"></div>
+  <div class="modal-overlay" id="studentFeeModal" style="display:none;" aria-hidden="true"></div>
+
+  <div class="slide-over-panel slide-over-wide" id="studentFeeDrawer" role="dialog" aria-modal="true" aria-labelledby="studentFeeDrawerTitle">
+    <!-- Header -->
+    <div class="slide-over-header" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(6, 182, 212, 0.05) 100%);">
+      <div class="slide-over-header-left">
+        <div class="slide-over-icon-box" style="background: rgba(16, 185, 129, 0.16); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">
+          <i class="fa-solid fa-receipt"></i>
+        </div>
+        <div class="slide-over-header-titles">
+          <h3 class="slide-over-title" id="studentFeeDrawerTitle" style="font-size: 17.5px; font-weight: 800; color: var(--so-text, var(--text-main));">Record Student Fee Payment</h3>
+          <div class="slide-over-subtitle" style="font-size: 12px; color: var(--so-text-muted, var(--text-muted));">Bursary Billing &bull; Instant Receipt Voucher &bull; Pure Cloud Sync</div>
+        </div>
+      </div>
+      <button type="button" class="slide-over-close-btn" onclick="closeStudentFeeDrawer()" title="Close Drawer (Esc)">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="slide-over-body" style="padding: 20px 24px; overflow-y: auto;">
       <form id="studentFeeForm" onsubmit="addStudentFee(event)">
-        <div class="form-group">
-          <label class="form-label">Select Enrolled Student</label>
-          <select id="studentSelect" class="form-select" onchange="handleStudentSelect(this)">
-            <option value="">Loading student roster...</option>
+        <!-- Step 1: Enrolled Student Selection (Registered Only) -->
+        <div class="so-form-group" style="margin-bottom: 16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+            <label class="so-label" style="margin-bottom:0;"><i class="fa-solid fa-user-graduate" style="color:#10b981; margin-right:5px;"></i> Select Enrolled Student (Registered Only) *</label>
+            <span id="registeredStudentBadge" class="badge-pill badge-green" style="font-size: 10.5px; padding: 2px 8px;"><i class="fa-solid fa-database"></i> Registered Roster</span>
+          </div>
+          <select id="studentSelect" class="so-select" style="font-weight:600; width:100%;" required onchange="handleStudentSelect(this)">
+            <option value="">-- Choose Registered Student --</option>
           </select>
         </div>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-          <div class="form-group">
-            <label class="form-label">Student ID #</label>
-            <input type="text" id="feeStudentId" class="form-input" placeholder="e.g. STU-2026-088" required>
+        <!-- Live Registered Student Identity & Bursary Card -->
+        <div id="selectedStudentCard" style="display:none; margin-bottom:18px; padding:14px 16px; border-radius:12px; background:rgba(16, 185, 129, 0.05); border:1px solid rgba(16, 185, 129, 0.22);">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div id="stuCardAvatar" style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; box-shadow:0 4px 12px rgba(16, 185, 129, 0.25);">ST</div>
+              <div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <strong id="stuCardName" style="font-size:14.5px; color:var(--text-main);">Student Full Name</strong>
+                  <span class="badge-pill badge-green" style="font-size:10px; padding:2px 6px;"><i class="fa-solid fa-circle-check"></i> Enrolled</span>
+                </div>
+                <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">
+                  ID: <span id="stuCardId" style="font-weight:700; color:var(--text-main); font-family:'JetBrains Mono', monospace;">STU-2026-001</span> &bull; <span id="stuCardGrade">Level 200 / Graphic Design</span>
+                </div>
+              </div>
+            </div>
+            <div id="stuCardStatusBadge" class="badge danger" style="font-size:11px; padding:4px 8px;">Arrears Pending</div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Student Full Name</label>
-            <input type="text" id="feeStudentName" class="form-input" placeholder="e.g. Student Full Name" required>
+          <!-- Financial Balance Strip -->
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; padding-top:10px; border-top:1px dashed rgba(16, 185, 129, 0.2); font-size:11.5px;">
+            <div>
+              <div style="color:var(--text-muted); font-size:10.5px;">Billed Tariff</div>
+              <strong style="color:var(--text-main);">GH₵ <span id="stuCardBilled">4,500.00</span></strong>
+            </div>
+            <div>
+              <div style="color:var(--text-muted); font-size:10.5px;">Paid to Date</div>
+              <strong style="color:#10b981;">GH₵ <span id="stuCardPaid">0.00</span></strong>
+            </div>
+            <div>
+              <div style="color:var(--text-muted); font-size:10.5px;">Balance Due</div>
+              <strong style="color:#ef4444;">GH₵ <span id="stuCardBalance">4,500.00</span></strong>
+            </div>
           </div>
         </div>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-          <div class="form-group">
-            <label class="form-label">Grade / Class Level</label>
-            <input type="text" id="feeGrade" class="form-input" placeholder="e.g. Level 200 / Grade 11" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Fee Category</label>
-            <select id="feeCategory" class="form-select" required>
+        <!-- Hidden Inputs Bound to Registered Record -->
+        <input type="hidden" id="feeStudentId" required>
+        <input type="hidden" id="feeStudentName" required>
+        <input type="hidden" id="feeGrade" required>
+
+        <!-- Step 2: Fee Category & Academic Term -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom: 16px;">
+          <div class="so-form-group" style="margin-bottom:0;">
+            <label class="so-label"><i class="fa-solid fa-tags" style="color:#10b981; margin-right:4px;"></i> Fee Category *</label>
+            <select id="feeCategory" class="so-select" required>
               <option value="Tuition Fee">Tuition Fee</option>
               <option value="Facility & Lab Fee">Facility & Lab Fee</option>
               <option value="Examination Fee">Examination Fee</option>
               <option value="Library Fee">Library Fee</option>
+              <option value="Creative Software Licenses">Creative Software Licenses</option>
               <option value="Sports & Extra-curricular">Sports & Extra-curricular</option>
+            </select>
+          </div>
+          <div class="so-form-group" style="margin-bottom:0;">
+            <label class="so-label"><i class="fa-solid fa-calendar-day" style="color:#10b981; margin-right:4px;"></i> Academic Term</label>
+            <select id="feeAcademicTerm" class="so-select">
+              <option value="Term 2" selected>AY 2026/2027 — Term 2</option>
+              <option value="Term 1">AY 2026/2027 — Term 1</option>
+              <option value="Term 3">AY 2026/2027 — Term 3</option>
             </select>
           </div>
         </div>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-          <div class="form-group">
-            <label class="form-label">Amount Paid (<span class="curr">GHS</span>)</label>
-            <input type="number" id="feeAmount" class="form-input" step="0.01" min="1" placeholder="0.00" required>
+        <!-- Step 3: Amount Paid & Quick Fill Presets -->
+        <div class="so-form-group" style="margin-bottom: 16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label class="so-label" style="margin-bottom:0;"><i class="fa-solid fa-coins" style="color:#10b981; margin-right:4px;"></i> Amount Paid (<span class="curr">GH₵</span>) *</label>
+            <span style="font-size:11px; color:var(--text-muted);">Enter amount or click quick preset</span>
           </div>
-          <div class="form-group">
-            <label class="form-label">Payment Method</label>
-            <select id="feeMethod" class="form-select">
+          <div style="position:relative;">
+            <input type="number" id="feeAmount" class="so-input" step="0.01" min="1" placeholder="0.00" required style="font-size:16px; font-weight:700; padding-left:44px; width:100%;">
+            <span style="position:absolute; left:14px; top:50%; transform:translateY(-50%); font-weight:700; color:var(--text-muted); font-size:14px;" class="curr">GH₵</span>
+          </div>
+          <!-- Quick Amount Presets -->
+          <div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:7px;">
+            <button type="button" class="preset-chip" style="font-size:11px; padding:3px 9px;" onclick="applyFeePreset('full')"><i class="fa-solid fa-check-double"></i> Full Balance</button>
+            <button type="button" class="preset-chip" style="font-size:11px; padding:3px 9px;" onclick="applyFeePreset('half')"><i class="fa-solid fa-percent"></i> 50% Deposit</button>
+            <button type="button" class="preset-chip" style="font-size:11px; padding:3px 9px;" onclick="applyFeePreset(1000)">GH₵ 1,000</button>
+            <button type="button" class="preset-chip" style="font-size:11px; padding:3px 9px;" onclick="applyFeePreset(2500)">GH₵ 2,500</button>
+            <button type="button" class="preset-chip" style="font-size:11px; padding:3px 9px;" onclick="applyFeePreset(4500)">GH₵ 4,500</button>
+          </div>
+        </div>
+
+        <!-- Step 4: Payment Method & Reference -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom: 16px;">
+          <div class="so-form-group" style="margin-bottom:0;">
+            <label class="so-label"><i class="fa-solid fa-credit-card" style="color:#10b981; margin-right:4px;"></i> Payment Method *</label>
+            <select id="feeMethod" class="so-select">
               <option value="Bank Transfer">Bank Transfer (Stanbic/GCB)</option>
               <option value="Mobile Money (MoMo)">MTN MoMo / Telecel Cash</option>
-              <option value="Credit / Debit Card">Credit / Debit Card</option>
+              <option value="Credit / Debit Card">Credit / Debit Card (Visa/Mastercard)</option>
               <option value="Connected Gateway">Paystack Connected Gateway</option>
               <option value="Cash">Cash at Bursary Counter</option>
             </select>
           </div>
+          <div class="so-form-group" style="margin-bottom:0;">
+            <label class="so-label"><i class="fa-solid fa-hashtag" style="color:#10b981; margin-right:4px;"></i> Transaction / Slip Ref</label>
+            <input type="text" id="feeReference" class="so-input" placeholder="e.g. STB-774920 or MoMo Ref">
+          </div>
         </div>
 
-        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-          <button type="button" class="btn-action" style="width:auto; padding:8px 16px; color:var(--text-main); background:var(--input-bg); border-color:var(--card-border);" onclick="closeModal('studentFeeModal')">Cancel</button>
-          <button type="submit" class="btn-action success-btn" style="width:auto; padding:8px 20px;">Save Payment Record</button>
+        <!-- Live Sync Notice -->
+        <div class="so-card" style="background:rgba(16, 185, 129, 0.06); border:1px solid rgba(16, 185, 129, 0.2); border-radius:10px; padding:11px 14px; font-size:11.5px; color:var(--text-main); display:flex; align-items:center; gap:10px; margin-top:8px;">
+          <i class="fa-solid fa-cloud-arrow-up" style="color:#10b981; font-size:17px; flex-shrink:0;"></i>
+          <div>
+            <strong>Instant Bursary Clearance:</strong> Processing this payment updates the student's exam ledger, logs an immutable treasury entry, and generates an official printable tax receipt.
+          </div>
         </div>
       </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="slide-over-footer">
+      <button type="button" class="so-btn so-btn-ghost" onclick="closeStudentFeeDrawer()">Cancel</button>
+      <button type="submit" form="studentFeeForm" class="so-btn so-btn-primary" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#fff; border:none; box-shadow:0 4px 14px rgba(16, 185, 129, 0.35);">
+        <i class="fa-solid fa-check"></i> Save &amp; Issue Receipt
+      </button>
     </div>
   </div>
 
@@ -1912,33 +2001,97 @@
     </div>
   </div>
 
-  <!-- 7. PREPARE SALARY PAYMENT MODAL -->
-  <div class="modal-overlay" id="prepareSalaryModal">
-    <div class="modal-card">
-      <h3 style="font-size:17px; font-weight:800; margin-bottom:14px;"><i class="fa-solid fa-hand-holding-dollar"></i> Prepare Faculty Payroll Batch</h3>
-      <form id="prepareSalaryForm" onsubmit="processPreparedSalary(event)">
-        <div class="form-group">
-          <label class="form-label">Pay Period Month</label>
-          <input type="month" id="salaryPayPeriod" class="form-input" required>
-        </div>
+  <!-- 7. PREPARE SALARY PAYMENT SLIDE-OVER DRAWER & BACKDROP -->
+  <div class="slide-over-backdrop" id="prepareSalaryDrawerBackdrop" onclick="closePrepareSalaryDrawer()"></div>
+  <div class="modal-overlay" id="prepareSalaryModal" style="display:none;" aria-hidden="true"></div>
 
-        <div class="form-group">
-          <label class="form-label">Staff Members Included in Batch</label>
-          <div style="max-height:160px; overflow-y:auto; border:1px solid var(--card-border); border-radius:var(--radius-md); padding:8px; background:var(--input-bg);" id="salaryTeacherList">
-            <!-- Populated via JS -->
+  <div class="slide-over-panel slide-over-wide" id="prepareSalaryDrawer" role="dialog" aria-modal="true" aria-labelledby="prepareSalaryDrawerTitle">
+    <!-- Header -->
+    <div class="slide-over-header" style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(99, 102, 241, 0.05) 100%);">
+      <div class="slide-over-header-left">
+        <div class="slide-over-icon-box" style="background: rgba(37, 99, 235, 0.16); color: #2563eb; border: 1px solid rgba(37, 99, 235, 0.3);">
+          <i class="fa-solid fa-hand-holding-dollar"></i>
+        </div>
+        <div class="slide-over-header-titles">
+          <h3 class="slide-over-title" id="prepareSalaryDrawerTitle" style="font-size: 17.5px; font-weight: 800; color: var(--so-text, var(--text-main));">Prepare Faculty Payroll Batch</h3>
+          <div class="slide-over-subtitle" style="font-size: 12px; color: var(--so-text-muted, var(--text-muted));">Authorize faculty compensation, calculate statutory withholding &amp; SSNIT</div>
+        </div>
+      </div>
+      <button type="button" class="slide-over-close-btn" onclick="closePrepareSalaryDrawer()" title="Close Drawer (Esc)">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="slide-over-body" style="padding: 20px 24px; overflow-y: auto;">
+      <form id="prepareSalaryForm" onsubmit="processPreparedSalary(event)">
+        <!-- Step 1: Pay Period Month & Statutory Tax Rate -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom: 16px;">
+          <div class="so-form-group" style="margin-bottom:0;">
+            <label class="so-label"><i class="fa-solid fa-calendar-check" style="color:var(--accent); margin-right:4px;"></i> Pay Period Month *</label>
+            <input type="month" id="salaryPayPeriod" class="so-input" style="font-weight:600;" required>
+          </div>
+          <div class="so-form-group" style="margin-bottom:0;">
+            <label class="so-label"><i class="fa-solid fa-percent" style="color:var(--accent); margin-right:4px;"></i> Applied Statutory SSNIT / Tax Rate (%) *</label>
+            <input type="number" id="salaryTaxRate" class="so-input" step="0.1" value="13.5" required oninput="recalcBatchPayrollSummary()">
+            <div style="display:flex; gap:4px; margin-top:5px;">
+              <button type="button" class="preset-chip" style="font-size:10px; padding:2px 7px;" onclick="setSalaryTaxPreset(13.5)">13.5% Standard</button>
+              <button type="button" class="preset-chip" style="font-size:10px; padding:2px 7px;" onclick="setSalaryTaxPreset(15.0)">15.0%</button>
+              <button type="button" class="preset-chip" style="font-size:10px; padding:2px 7px;" onclick="setSalaryTaxPreset(0)">0% Exempt</button>
+            </div>
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Applied Statutory SSNIT/Tax Rate (%)</label>
-          <input type="number" id="salaryTaxRate" class="form-input" step="0.1" value="13.5" required>
+        <!-- Step 2: Staff Members Included in Batch (Called from Registered Only) -->
+        <div class="so-form-group" style="margin-bottom: 16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+            <div>
+              <label class="so-label" style="margin-bottom:0;"><i class="fa-solid fa-users" style="color:var(--accent); margin-right:4px;"></i> Registered Faculty Members in Batch *</label>
+              <div style="font-size:11px; color:var(--text-muted);">Loaded from active faculty registry</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <button type="button" onclick="toggleAllPayrollStaff(true)" style="background:none; border:none; color:var(--accent); font-size:11.5px; font-weight:700; cursor:pointer; padding:0;">Select All</button>
+              <span style="color:var(--card-border);">|</span>
+              <button type="button" onclick="toggleAllPayrollStaff(false)" style="background:none; border:none; color:var(--text-muted); font-size:11.5px; font-weight:700; cursor:pointer; padding:0;">Deselect All</button>
+            </div>
+          </div>
+
+          <!-- Staff Checkbox Cards Container -->
+          <div id="salaryTeacherList" style="max-height:260px; overflow-y:auto; border:1px solid var(--card-border); border-radius:12px; padding:8px; background:var(--input-bg); display:flex; flex-direction:column; gap:6px;">
+            <!-- Populated via JS with rich registered faculty rows -->
+          </div>
         </div>
 
-        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px;">
-          <button type="button" class="btn-action" style="background:var(--input-bg); color:var(--text-main); border-color:var(--card-border); width:auto; padding:6px 14px;" onclick="closeModal('prepareSalaryModal')">Cancel</button>
-          <button type="submit" class="btn-action" style="background:var(--accent-gradient); width:auto; padding:6px 18px;">Submit for Clearance</button>
+        <!-- Real-Time Batch Financial Computation Card -->
+        <div style="padding:14px 16px; border-radius:12px; background:rgba(37, 99, 235, 0.05); border:1px solid rgba(37, 99, 235, 0.2); margin-top:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <strong style="font-size:13px; color:var(--text-main);"><i class="fa-solid fa-calculator" style="color:var(--accent); margin-right:5px;"></i> Batch Summary Preview</strong>
+            <span id="batchCountBadge" class="badge-pill badge-blue" style="font-size:11px; padding:2px 8px;">0 Faculty Selected</span>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; font-size:12px;">
+            <div>
+              <div style="color:var(--text-muted); font-size:11px;">Total Gross</div>
+              <strong style="color:var(--text-main); font-size:13.5px;">GH₵ <span id="batchGrossTotal">0.00</span></strong>
+            </div>
+            <div>
+              <div style="color:var(--text-muted); font-size:11px;">Statutory Tax</div>
+              <strong style="color:#ef4444; font-size:13.5px;">GH₵ <span id="batchTaxTotal">0.00</span></strong>
+            </div>
+            <div>
+              <div style="color:var(--text-muted); font-size:11px;">Net Payout</div>
+              <strong style="color:#10b981; font-size:13.5px;">GH₵ <span id="batchNetTotal">0.00</span></strong>
+            </div>
+          </div>
         </div>
       </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="slide-over-footer">
+      <button type="button" class="so-btn so-btn-ghost" onclick="closePrepareSalaryDrawer()">Cancel</button>
+      <button type="submit" form="prepareSalaryForm" class="so-btn so-btn-primary" style="background:var(--accent-gradient); color:#fff; border:none; box-shadow:0 4px 14px rgba(37, 99, 235, 0.35);">
+        <i class="fa-solid fa-paper-plane"></i> Submit for Clearance
+      </button>
     </div>
   </div>
 
@@ -2268,7 +2421,28 @@
         financeStore.studentFees = feeList;
 
         const payroll = await window.SupabaseService.getPayroll(activeOrg);
-        financeStore.payroll = Array.isArray(payroll) ? payroll : [];
+        const teachers = await window.SupabaseService.getTeachers(activeOrg);
+        let payrollList = Array.isArray(payroll) ? [...payroll] : [];
+        if (Array.isArray(teachers) && teachers.length > 0) {
+          teachers.forEach(t => {
+            const tId = t.id || t.email;
+            const exists = payrollList.some(p => p.id === tId || (p.email && p.email === t.email) || (p.name && p.name.toLowerCase() === (t.name || '').toLowerCase()));
+            if (!exists) {
+              payrollList.push({
+                id: tId,
+                name: t.name || t.fullName,
+                role: t.role || t.position || 'Faculty Educator',
+                dept: t.dept || t.department || 'Visual Arts & Media',
+                gross: Number(t.salary) > 0 ? Number(t.salary) : 8500,
+                email: t.email || '',
+                approved: false
+              });
+            }
+          });
+        } else if (payrollList.length === 0 && defaultFacultyStaff.length > 0) {
+          payrollList = [...defaultFacultyStaff];
+        }
+        financeStore.payroll = payrollList;
 
         const txs = await window.SupabaseService.getTransactions(activeOrg);
         financeStore.scholarships = Array.isArray(txs) ? txs : [];
@@ -2339,28 +2513,116 @@
       const feeData = financeStore.studentFees;
 
       if (select) {
-        select.innerHTML = '<option value="">-- Choose Enrolled Student --</option>';
+        select.innerHTML = '<option value="">-- Choose Registered Student (' + feeData.length + ' Enrolled) --</option>';
         feeData.forEach(s => {
-          select.innerHTML += `<option value="${s.studentId}">${s.name} (${s.studentId} - ${s.grade})</option>`;
+          const sId = s.studentId || s.student_id;
+          const sName = s.name || s.student_name;
+          const sGrade = s.grade || s.class_name || 'Graphic Arts';
+          select.innerHTML += `<option value="${sId}">${sName} (${sId} • ${sGrade})</option>`;
         });
       }
 
       if (schSelect) {
-        schSelect.innerHTML = '<option value="">-- Choose Beneficiary Student --</option>';
+        schSelect.innerHTML = '<option value="">-- Choose Beneficiary Student (' + feeData.length + ' Enrolled) --</option>';
         feeData.forEach(s => {
-          schSelect.innerHTML += `<option value="${s.studentId}">${s.name} (${s.studentId})</option>`;
+          const sId = s.studentId || s.student_id;
+          const sName = s.name || s.student_name;
+          schSelect.innerHTML += `<option value="${sId}">${sName} (${sId})</option>`;
         });
       }
     }
 
     function handleStudentSelect(selectEl) {
       const feeData = financeStore.studentFees;
-      const student = feeData.find(s => s.studentId === selectEl.value);
-      if (student) {
-        document.getElementById('feeStudentId').value = student.studentId;
-        document.getElementById('feeStudentName').value = student.name;
-        document.getElementById('feeGrade').value = student.grade;
+      const sId = selectEl.value;
+      const student = feeData.find(s => (s.studentId === sId || s.student_id === sId));
+      const card = document.getElementById('selectedStudentCard');
+
+      if (!student) {
+        if (card) card.style.display = 'none';
+        document.getElementById('feeStudentId').value = '';
+        document.getElementById('feeStudentName').value = '';
+        document.getElementById('feeGrade').value = '';
+        return;
       }
+
+      const idVal = student.studentId || student.student_id;
+      const nameVal = student.name || student.student_name;
+      const gradeVal = student.grade || student.class_name || 'General Studies';
+      
+      document.getElementById('feeStudentId').value = idVal;
+      document.getElementById('feeStudentName').value = nameVal;
+      document.getElementById('feeGrade').value = gradeVal;
+
+      if (card) {
+        card.style.display = 'block';
+        const initials = nameVal.split(' ').filter(Boolean).map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'ST';
+        document.getElementById('stuCardAvatar').innerText = initials;
+        document.getElementById('stuCardName').innerText = nameVal;
+        document.getElementById('stuCardId').innerText = idVal;
+        document.getElementById('stuCardGrade').innerText = gradeVal;
+
+        const billed = parseFloat(student.billed || student.billed_amount || 4500);
+        const paid = parseFloat(student.amount || student.paid_amount || 0);
+        const bal = Math.max(0, billed - paid);
+
+        document.getElementById('stuCardBilled').innerText = billed.toLocaleString('en-US', { minimumFractionDigits: 2 });
+        document.getElementById('stuCardPaid').innerText = paid.toLocaleString('en-US', { minimumFractionDigits: 2 });
+        document.getElementById('stuCardBalance').innerText = bal.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+        const badge = document.getElementById('stuCardStatusBadge');
+        if (badge) {
+          if (bal === 0 || student.status === 'Cleared') {
+            badge.className = 'badge success';
+            badge.innerHTML = '<i class="fa-solid fa-check-circle"></i> Fees Fully Cleared';
+          } else {
+            badge.className = 'badge danger';
+            badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Arrears: GH₵ ' + bal.toLocaleString('en-US', { minimumFractionDigits: 2 });
+          }
+        }
+      }
+    }
+
+    function applyFeePreset(val) {
+      const feeInput = document.getElementById('feeAmount');
+      if (!feeInput) return;
+      
+      if (val === 'full' || val === 'half') {
+        const studentId = document.getElementById('feeStudentId')?.value;
+        const student = financeStore.studentFees.find(s => (s.studentId === studentId || s.student_id === studentId));
+        const billed = student ? parseFloat(student.billed || student.billed_amount || 4500) : 4500;
+        const paid = student ? parseFloat(student.amount || student.paid_amount || 0) : 0;
+        const bal = Math.max(0, billed - paid) || 4500;
+        
+        feeInput.value = val === 'full' ? bal.toFixed(2) : (bal / 2).toFixed(2);
+      } else {
+        feeInput.value = parseFloat(val).toFixed(2);
+      }
+      feeInput.focus();
+    }
+
+    function openStudentFeeDrawer() {
+      fetchStudents();
+      const drawer = document.getElementById('studentFeeDrawer');
+      const backdrop = document.getElementById('studentFeeDrawerBackdrop');
+      if (drawer) drawer.classList.add('active');
+      if (backdrop) backdrop.classList.add('active');
+      document.body.classList.add('slide-over-open');
+      if (window.SlideOver && typeof window.SlideOver.open === 'function') {
+        window.SlideOver.open('studentFeeDrawer');
+      }
+    }
+
+    function closeStudentFeeDrawer() {
+      const drawer = document.getElementById('studentFeeDrawer');
+      const backdrop = document.getElementById('studentFeeDrawerBackdrop');
+      if (drawer) drawer.classList.remove('active');
+      if (backdrop) backdrop.classList.remove('active');
+      document.body.classList.remove('slide-over-open');
+      if (window.SlideOver && typeof window.SlideOver.close === 'function') {
+        window.SlideOver.close('studentFeeDrawer');
+      }
+      document.getElementById('studentFeeModal')?.classList.remove('active');
     }
 
     // NAVIGATION TABS
@@ -2608,12 +2870,28 @@
       }
     }
 
-    // MODAL HELPERS
+    // MODAL HELPERS & SLIDE-OVER ROUTING
     function openModal(id) {
+      if (id === 'studentFeeModal' || id === 'studentFeeDrawer') {
+        openStudentFeeDrawer();
+        return;
+      }
+      if (id === 'prepareSalaryModal' || id === 'prepareSalaryDrawer') {
+        openPrepareSalaryDrawer();
+        return;
+      }
       const el = document.getElementById(id);
       if (el) el.classList.add('active');
     }
     function closeModal(id) {
+      if (id === 'studentFeeModal' || id === 'studentFeeDrawer') {
+        closeStudentFeeDrawer();
+        return;
+      }
+      if (id === 'prepareSalaryModal' || id === 'prepareSalaryDrawer') {
+        closePrepareSalaryDrawer();
+        return;
+      }
       const el = document.getElementById(id);
       if (el) el.classList.remove('active');
     }
@@ -2627,6 +2905,15 @@
       const cat = document.getElementById('feeCategory').value;
       const method = document.getElementById('feeMethod').value;
       const amount = parseFloat(document.getElementById('feeAmount').value);
+
+      if (!studentId || !name) {
+        if (window.Toaster) {
+          window.Toaster.warning('Registered Student Required', 'Please select a registered student from the roster.');
+        } else {
+          alert('Please select a registered student from the roster.');
+        }
+        return;
+      }
 
       const feeData = financeStore.studentFees;
       const newRec = {
@@ -2844,23 +3131,122 @@
       openModal('payslipModal');
     }
 
-    // PAYROLL ACTIONS
+    // PAYROLL ACTIONS & SLIDE-OVER DRAWER
+    function openPrepareSalaryDrawer() {
+      openPrepareSalaryModal();
+    }
+
+    function closePrepareSalaryDrawer() {
+      const drawer = document.getElementById('prepareSalaryDrawer');
+      const backdrop = document.getElementById('prepareSalaryDrawerBackdrop');
+      if (drawer) drawer.classList.remove('active');
+      if (backdrop) backdrop.classList.remove('active');
+      document.body.classList.remove('slide-over-open');
+      if (window.SlideOver && typeof window.SlideOver.close === 'function') {
+        window.SlideOver.close('prepareSalaryDrawer');
+      }
+      document.getElementById('prepareSalaryModal')?.classList.remove('active');
+    }
+
     function openPrepareSalaryModal() {
       const payrollData = financeStore.payroll;
       const container = document.getElementById('salaryTeacherList');
       if (!container) return;
       container.innerHTML = '';
 
-      payrollData.forEach(emp => {
-        container.innerHTML += `
-          <div style="display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px dashed var(--card-border); font-size:12px;">
-            <input type="checkbox" id="chk_${emp.id}" value="${emp.id}" checked>
-            <label for="chk_${emp.id}"><strong>${emp.name}</strong> — ${emp.role} (GH₵ ${emp.gross.toLocaleString()})</label>
+      if (payrollData.length === 0) {
+        container.innerHTML = `
+          <div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 12.5px;">
+            <i class="fa-solid fa-user-slash" style="font-size: 26px; color: var(--text-muted); margin-bottom: 8px; display: block;"></i>
+            No registered faculty or staff members found in this institution workspace.
           </div>
         `;
+      } else {
+        const taxRate = parseFloat(document.getElementById('salaryTaxRate')?.value || currentTaxRate || 13.5);
+        payrollData.forEach((emp) => {
+          const initials = (emp.name || 'EM').split(' ').filter(Boolean).map(n => n[0]).join('').substring(0, 2).toUpperCase();
+          const gross = parseFloat(emp.gross || 8500);
+          const ded = gross * (taxRate / 100);
+          const net = Math.max(0, gross - ded);
+          const isChecked = emp.approved !== true;
+
+          container.innerHTML += `
+            <label for="chk_${emp.id}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 12px; background:var(--card-bg); border:1px solid var(--card-border); border-radius:10px; cursor:pointer; transition:all 0.2s ease;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="checkbox" id="chk_${emp.id}" value="${emp.id}" ${isChecked ? 'checked' : ''} onchange="recalcBatchPayrollSummary()" style="accent-color:var(--accent); width:16px; height:16px; cursor:pointer;">
+                <div style="width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg, #2563eb 0%, #6366f1 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex-shrink:0;">${initials}</div>
+                <div>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <strong style="color:var(--text-main); font-size:13px;">${emp.name}</strong>
+                    <span style="font-size:10px; color:var(--text-muted); font-family:'JetBrains Mono', monospace;">${emp.id}</span>
+                  </div>
+                  <div style="font-size:11.5px; color:var(--text-muted);">${emp.role || 'Educator'} &bull; <span style="color:var(--accent);">${emp.dept || 'Academics'}</span></div>
+                </div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:12.5px; font-weight:700; color:var(--text-main);">GH₵ ${gross.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                <div style="font-size:10.5px; color:#10b981;">Net: GH₵ ${net.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+              </div>
+            </label>
+          `;
+        });
+      }
+
+      recalcBatchPayrollSummary();
+
+      const drawer = document.getElementById('prepareSalaryDrawer');
+      const backdrop = document.getElementById('prepareSalaryDrawerBackdrop');
+      if (drawer) drawer.classList.add('active');
+      if (backdrop) backdrop.classList.add('active');
+      document.body.classList.add('slide-over-open');
+      if (window.SlideOver && typeof window.SlideOver.open === 'function') {
+        window.SlideOver.open('prepareSalaryDrawer');
+      }
+    }
+
+    function recalcBatchPayrollSummary() {
+      const payrollData = financeStore.payroll;
+      const taxRate = parseFloat(document.getElementById('salaryTaxRate')?.value || 13.5) / 100;
+      let totalGross = 0;
+      let selectedCount = 0;
+
+      payrollData.forEach(emp => {
+        const chk = document.getElementById('chk_' + emp.id);
+        if (chk && chk.checked) {
+          totalGross += parseFloat(emp.gross || 0);
+          selectedCount++;
+        }
       });
 
-      openModal('prepareSalaryModal');
+      const totalTax = totalGross * taxRate;
+      const totalNet = Math.max(0, totalGross - totalTax);
+
+      const countBadge = document.getElementById('batchCountBadge');
+      if (countBadge) countBadge.innerText = `${selectedCount} Faculty Selected`;
+
+      const grossEl = document.getElementById('batchGrossTotal');
+      if (grossEl) grossEl.innerText = totalGross.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+      const taxEl = document.getElementById('batchTaxTotal');
+      if (taxEl) taxEl.innerText = totalTax.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+      const netEl = document.getElementById('batchNetTotal');
+      if (netEl) netEl.innerText = totalNet.toLocaleString('en-US', { minimumFractionDigits: 2 });
+    }
+
+    function toggleAllPayrollStaff(selectAll) {
+      const payrollData = financeStore.payroll;
+      payrollData.forEach(emp => {
+        const chk = document.getElementById('chk_' + emp.id);
+        if (chk) chk.checked = selectAll;
+      });
+      recalcBatchPayrollSummary();
+    }
+
+    function setSalaryTaxPreset(rate) {
+      const input = document.getElementById('salaryTaxRate');
+      if (input) input.value = rate;
+      recalcBatchPayrollSummary();
     }
 
     function processPreparedSalary(e) {
@@ -2873,26 +3259,34 @@
       if (setTax) setTax.value = currentTaxRate;
 
       let payrollData = financeStore.payroll;
+      let countPrepared = 0;
       payrollData = payrollData.map(emp => {
         const chk = document.getElementById('chk_' + emp.id);
         if (chk && chk.checked) {
+          countPrepared++;
           return { ...emp, approved: false };
         }
         return emp;
       });
+
+      if (countPrepared === 0) {
+        if (window.Toaster) window.Toaster.warning('No Staff Selected', 'Please select at least one faculty member for payroll batch clearance.');
+        else alert('Please select at least one faculty member.');
+        return;
+      }
 
       financeStore.payroll = payrollData;
       if (window.SupabaseService) {
         const lastPay = payrollData[0];
         if (lastPay) window.SupabaseService.savePayroll(activeOrg, lastPay).catch(console.warn);
       }
-      addAuditLog(`Payroll batch prepared for period ${period} with tax deduction ${currentTaxRate}%`);
+      addAuditLog(`Payroll batch prepared for period ${period} with ${countPrepared} staff (${currentTaxRate}% statutory deduction)`);
 
-      closeModal('prepareSalaryModal');
+      closePrepareSalaryDrawer();
       renderAll();
       switchTab('approval');
       if (window.Toaster) {
-        window.Toaster.info('Payroll Prepared', 'Staff payroll batch submitted for Bursar authorization');
+        window.Toaster.info('Payroll Batch Submitted', `${countPrepared} faculty payroll vouchers queued for Bursar clearance.`);
       }
     }
 

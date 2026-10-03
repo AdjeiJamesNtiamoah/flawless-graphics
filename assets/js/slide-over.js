@@ -915,6 +915,16 @@
     SlideOver.openNewAssessment();
   };
 
+  window.openAddClassModal = window.openAddClassModal || function () {
+    const existing = document.getElementById('addClassDrawer');
+    if (existing) {
+      SlideOver.open(existing);
+      if (typeof window.updateAddClassPreview === 'function') window.updateAddClassPreview();
+    } else {
+      window.location.href = (typeof getRootPrefix === 'function' ? getRootPrefix() : '../../') + 'pages/hr/hr-dashboard.html';
+    }
+  };
+
 })();
 
 // Live Realtime updater for SlideOver notifications

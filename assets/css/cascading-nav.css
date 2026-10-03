@@ -5,11 +5,6 @@
  */
 
 /* --- Parent Menu Item Enhancements --- */
-.sidebar, .app-sidebar, header nav {
-    position: relative;
-    overflow: visible !important; /* Allow flyout to float outside sidebar bounds */
-}
-
 .nav-item-wrapper {
     position: relative;
     width: 100%;

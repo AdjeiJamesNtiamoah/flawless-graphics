@@ -33,15 +33,8 @@
   // --- Students API ---
   window.getStudents = ()=> {
     let arr = read(STUD_KEY);
-    if (!arr || arr.length === 0) {
-      arr = [
-        { id: 1, firstName: "Kojo", lastName: "Antwi", class: "Class 1", roll: "101", createdAt: Date.now() },
-        { id: 2, firstName: "Yaa", lastName: "Asantewaa", class: "Class 1", roll: "102", createdAt: Date.now() },
-        { id: 3, firstName: "Kwabena", lastName: "Darko", class: "Class 2", roll: "201", createdAt: Date.now() },
-        { id: 4, firstName: "Akua", lastName: "Donkor", class: "Class 2", roll: "202", createdAt: Date.now() },
-        { id: 5, firstName: "Fiifi", lastName: "Baffour", class: "Class 3", roll: "301", createdAt: Date.now() }
-      ];
-      save(STUD_KEY, arr);
+    if (!Array.isArray(arr)) {
+      arr = [];
     }
     return arr;
   };
@@ -71,16 +64,15 @@
     }
   };
 
-  // --- Classes API (extend existing) ---
+  // --- Classes API (read-only for teachers, managed by HR) ---
   window.getClasses = ()=> read(CLASS_KEY);
   window.saveClasses = (arr)=> save(CLASS_KEY, arr);
   window.addClass = (c) => {
-    if (window.Toaster && typeof window.Toaster.success === 'function') {
-      window.Toaster.success('Classroom Added', `Class "${c.name || 'New Class'}" created successfully!`);
+    if (window.Toaster && typeof window.Toaster.warning === 'function') {
+      window.Toaster.warning('Action Restricted', 'Only HR Administrators can add classrooms for the organization.');
+    } else {
+      alert('Only HR Administrators can add classes to the organization.');
     }
-    const arr = getClasses();
-    arr.push(Object.assign({ id: Date.now() }, c));
-    saveClasses(arr);
   };
 
   // --- Schedule API ---

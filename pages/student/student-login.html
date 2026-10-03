@@ -794,10 +794,7 @@
                         <label for="studentClassSelect">Academic Class / Grade</label>
                         <div class="input-wrapper">
                             <select id="studentClassSelect" style="width: 100%; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; padding: 11px 14px 11px 40px; color: #ffffff; font-size: 13.5px; outline: none;">
-                                <option value="cls_1|Grade 10 - Graphic Arts & Visual Identity">Grade 10 - Graphic Arts &amp; Visual Identity</option>
-                                <option value="cls_5|Grade 10 - UI/UX Interactive Prototyping">Grade 10 - UI/UX Interactive Prototyping</option>
-                                <option value="cls_2|Grade 11 - Web Systems & Client Architecture">Grade 11 - Web Systems &amp; Client Architecture</option>
-                                <option value="cls_3|Grade 12 - Digital Animation & 3D Modeling">Grade 12 - Digital Animation &amp; 3D Modeling</option>
+                                <option value="" disabled selected>Select organization first</option>
                             </select>
                             <i class="fa-solid fa-graduation-cap field-icon"></i>
                         </div>
@@ -1028,6 +1025,7 @@ function switchMode(mode) {
         if (confirmPasswordInput) confirmPasswordInput.setAttribute('required', 'true');
 
         submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Register & Create Student ID';
+        populateStudentClasses();
     } else {
         tabSignIn.classList.add('active');
         tabRegister.classList.remove('active');
@@ -1083,6 +1081,66 @@ function showMessage(text, isError = true) {
     el.style.display = 'block';
 }
 
+async function populateStudentClasses(targetOrg = null) {
+    const classSelect = document.getElementById('studentClassSelect');
+    if (!classSelect) return;
+
+    const orgSelect = document.getElementById('studentOrgSelect');
+    const orgName = targetOrg || ((orgSelect && orgSelect.selectedOptions && orgSelect.selectedOptions[0]) 
+        ? (orgSelect.selectedOptions[0].dataset.name || orgSelect.value) 
+        : (orgSelect ? orgSelect.value : '')) || 'FLAWLESS GRAPHICS';
+
+    classSelect.innerHTML = '<option value="" disabled selected>Loading available classes...</option>';
+
+    let classes = [];
+    const dummyIds = new Set(['cls_f2_arts', 'cls_f3_web', 'cls_f1_illust', 'cls_f2_print', 'cls_1', 'cls_2', 'cls_3', 'cls_4', 'cls_5']);
+    const dummyNames = new Set([
+      'grade 10 - graphic arts & visual identity',
+      'grade 11 - web systems & client architecture',
+      'grade 12 - digital animation & 3d modeling',
+      'grade 9 - fundamental design principles',
+      'grade 10 - ui/ux interactive prototyping',
+      'class 1 - visual design',
+      'class 2 - web systems',
+      'class 3 - animation & 3d'
+    ]);
+
+    // 1. Supabase Cloud query
+    if (window.SupabaseService && typeof window.SupabaseService.getClasses === 'function') {
+        try {
+            const cloudClasses = await window.SupabaseService.getClasses(orgName);
+            if (Array.isArray(cloudClasses) && cloudClasses.length > 0) {
+                classes = cloudClasses;
+            }
+        } catch(e) {}
+    }
+
+    // 2. localStorage fallback for active organization
+    if (classes.length === 0) {
+        try {
+            const local = JSON.parse(localStorage.getItem(`${orgName}_classes`) || localStorage.getItem('classes') || '[]');
+            if (Array.isArray(local) && local.length > 0) {
+                classes = local;
+            }
+        } catch(e) {}
+    }
+
+    // Filter out legacy dummy hardcoded classes
+    classes = classes.filter(c => !dummyIds.has(c.id) && !dummyNames.has((c.name || c.className || '').toLowerCase().trim()));
+
+    if (classes.length > 0) {
+        classSelect.innerHTML = '<option value="" disabled selected>Select assigned class...</option>' + 
+            classes.map(c => {
+                const cId = c.id;
+                const cName = c.name || c.className || 'Class';
+                const cGrade = c.grade || c.gradeLevel || c.code || 'Cohort';
+                return `<option value="${cId}|${cName.replace(/"/g, '&quot;')}">${cName} (${cGrade})</option>`;
+            }).join('');
+    } else {
+        classSelect.innerHTML = '<option value="" disabled selected>No classrooms registered yet (Contact HR)</option>';
+    }
+}
+
 async function handleStudentRegistration() {
     const orgSelect = document.getElementById('studentOrgSelect');
     const selectedOrgSlug = orgSelect ? orgSelect.value.trim() : '';
@@ -1094,9 +1152,14 @@ async function handleStudentRegistration() {
     const email = (document.getElementById('regEmail').value || '').trim().toLowerCase();
     const password = document.getElementById('password').value || '';
     const confirmPassword = document.getElementById('confirmPassword').value || '';
-    const classVal = (document.getElementById('studentClassSelect').value || 'cls_1|Grade 10 - Graphic Arts & Visual Identity').split('|');
-    const classId = classVal[0];
-    const className = classVal[1] || 'Grade 10';
+    const classSelect = document.getElementById('studentClassSelect');
+    const classVal = (classSelect ? classSelect.value : '').split('|');
+    const classId = classVal[0] ? classVal[0].trim() : '';
+    const className = classVal[1] ? classVal[1].trim() : '';
+
+    if (!classId) {
+        return showMessage('Please select an active academic class. If no classes are available, contact your HR Administrator to create one.', true);
+    }
     const gender = document.getElementById('studentGender') ? document.getElementById('studentGender').value : 'Not Specified';
     const dob = document.getElementById('studentDob') ? document.getElementById('studentDob').value : null;
     const guardianName = document.getElementById('studentGuardianName') ? document.getElementById('studentGuardianName').value.trim() : '';
@@ -1259,10 +1322,59 @@ function createStudentSmartId(roll, name) {
 // Default Institutional Students Roster with Cryptographic Smart IDs
 const DEFAULT_STUDENTS = [];
 
-function getStoredStudents() {
+function getStoredUsers() {
     try {
-        let list = JSON.parse(localStorage.getItem(STUD_KEY) || '[]');
+        let list = JSON.parse(localStorage.getItem('organizations_users') || '[]');
         return Array.isArray(list) ? list : [];
+    } catch(e) {
+        return [];
+    }
+}
+
+function getStoredStudents(targetOrg = null) {
+    try {
+        const orgSelect = document.getElementById('studentOrgSelect');
+        const selName = targetOrg || ((orgSelect && orgSelect.selectedOptions && orgSelect.selectedOptions[0]) 
+            ? (orgSelect.selectedOptions[0].dataset.name || orgSelect.value) 
+            : '');
+        const selSlug = (orgSelect ? orgSelect.value : '') || '';
+
+        const allStudents = [];
+
+        // 1. Selected org key
+        if (selName) {
+            const list = JSON.parse(localStorage.getItem(`${selName}_students`) || '[]');
+            if (Array.isArray(list)) allStudents.push(...list);
+        }
+        if (selSlug && selSlug !== selName) {
+            const list = JSON.parse(localStorage.getItem(`${selSlug}_students`) || '[]');
+            if (Array.isArray(list)) allStudents.push(...list);
+        }
+
+        // 2. Default key
+        const defList = JSON.parse(localStorage.getItem(STUD_KEY) || '[]');
+        if (Array.isArray(defList)) allStudents.push(...defList);
+
+        // 3. Scan all localStorage *_students keys
+        for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k && k.endsWith('_students') && k !== STUD_KEY) {
+                try {
+                    const l = JSON.parse(localStorage.getItem(k) || '[]');
+                    if (Array.isArray(l)) allStudents.push(...l);
+                } catch(e) {}
+            }
+        }
+
+        // Deduplicate by roll or id
+        const seen = new Set();
+        return allStudents.filter(s => {
+            if (!s) return false;
+            const uid = s.roll || s.enrollment_code || s.id;
+            if (!uid || seen.has(uid)) return false;
+            seen.add(uid);
+            return true;
+        });
     } catch(e) {
         return [];
     }
@@ -1289,7 +1401,7 @@ function togglePasswordVisibility() {
 
 async function handleStudentAuth() {
     const ident = (document.getElementById('identifier').value || '').trim().toLowerCase();
-    const pw = document.getElementById('password').value || '';
+    const pw = (document.getElementById('password').value || '').trim();
     const submitBtn = document.getElementById('submitBtn');
 
     if (!ident || !pw) {
@@ -1306,10 +1418,12 @@ async function handleStudentAuth() {
         : selectedOrgSlug;
 
     let found = null;
+
+    // 1. Supabase Cloud Authentication
     if (window.SupabaseService) {
         try {
             const authRes = await window.SupabaseService.authenticate(ident, pw, null, 'student');
-            if (authRes.success) {
+            if (authRes && authRes.success) {
                 found = authRes.user;
                 try {
                     const orgStudents = await window.SupabaseService.getStudents(authRes.user.org || selectedOrgName);
@@ -1324,45 +1438,138 @@ async function handleStudentAuth() {
                             id: match.id || found.id,
                             name: match.student_name || [match.firstName, match.middleName, match.lastName].filter(Boolean).join(' ') || found.full_name || found.name || 'Student',
                             roll: match.roll || match.enrollment_code || staffId || ident,
+                            org: match.org_name || match.org_id || found.org || selectedOrgName,
+                            org_name: match.org_name || match.org_id || found.org_name || selectedOrgName,
+                            org_id: match.org_id || match.org_name || found.org_id || selectedOrgName,
+                            organization: match.org_name || match.org_id || found.organization || selectedOrgName,
                             classId: match.classId || match.class_id,
                             className: match.className || match.class_name,
                             photo: match.photo || match.photo_url || found.photo || null
                         });
                     }
                 } catch(e) {}
-            } else {
-                const cloudStudents = await window.SupabaseService.getStudents(selectedOrgName);
-                found = cloudStudents.find(s => 
-                    (s.roll && s.roll.toLowerCase() === ident) || 
-                    (s.enrollment_code && s.enrollment_code.toLowerCase() === ident) || 
-                    (s.email && s.email.toLowerCase() === ident) ||
-                    (s.guardianEmail && s.guardianEmail.toLowerCase() === ident)
-                );
+            } else if (authRes && authRes.error && authRes.error.toLowerCase().includes('invalid password')) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace';
+                return showMessage('Invalid password. Please check your credentials slip and re-enter.', true);
             }
         } catch(e) {
             console.warn('Student Supabase auth check:', e);
         }
     }
 
+    // 2. Direct Cloud Students & Credentials Verification (when user account lookup is delayed)
+    if (!found && window.SupabaseService && selectedOrgName) {
+        try {
+            const cloudStudents = await window.SupabaseService.getStudents(selectedOrgName);
+            const stu = (cloudStudents || []).find(s => 
+                (s.roll && (s.roll.toLowerCase() === ident || s.roll.toLowerCase().replace(/[^a-z0-9]/g, '') === ident.replace(/[^a-z0-9]/g, ''))) || 
+                (s.enrollment_code && (s.enrollment_code.toLowerCase() === ident || s.enrollment_code.toLowerCase().replace(/[^a-z0-9]/g, '') === ident.replace(/[^a-z0-9]/g, ''))) || 
+                (s.email && s.email.toLowerCase() === ident) ||
+                (s.guardianEmail && s.guardianEmail.toLowerCase() === ident)
+            );
+            if (stu) {
+                const rollVal = stu.roll || stu.enrollment_code || ident;
+                const cloudUsers = await window.SupabaseService.query(`users?linked_staff_id=ilike.${encodeURIComponent(rollVal)}`);
+                const matchedCloudUser = Array.isArray(cloudUsers) && cloudUsers.length > 0 ? cloudUsers[0] : null;
+                const validPass = matchedCloudUser ? (matchedCloudUser.pass_hash || matchedCloudUser.password) : (stu.password || stu.pass_hash);
+                if (validPass && validPass !== pw) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace';
+                    return showMessage('Invalid password. Please check your credentials slip and re-enter.', true);
+                }
+                found = Object.assign({}, stu, matchedCloudUser || {}, {
+                    org: selectedOrgName,
+                    org_name: selectedOrgName,
+                    org_id: selectedOrgName,
+                    organization: selectedOrgName,
+                    status: (matchedCloudUser && matchedCloudUser.status) || stu.status || 'Active',
+                    approvalStatus: stu.approvalStatus || 'approved'
+                });
+            }
+        } catch(e) {
+            console.warn('Direct cloud student check:', e);
+        }
+    }
+
+    // 3. Local System Users Storage ('organizations_users')
     if (!found) {
-        // Fallback local students check
-        const students = getStoredStudents();
-        found = students.find(s => 
+        const users = getStoredUsers();
+        const matchedUser = users.find(u => 
+            (u.role === 'student' || !u.role) &&
+            ((u.linkedStaffId && u.linkedStaffId.toLowerCase() === ident) ||
+             (u.linked_staff_id && u.linked_staff_id.toLowerCase() === ident) ||
+             (u.email && u.email.toLowerCase() === ident) ||
+             (u.id && u.id.toLowerCase() === ident))
+        );
+        if (matchedUser) {
+            const storedPw = matchedUser.pass || matchedUser.pass_hash || matchedUser.rawPassPreview;
+            if (storedPw && storedPw !== pw) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace';
+                return showMessage('Invalid password. Please check your credentials slip and re-enter.', true);
+            }
+            found = matchedUser;
+            // Enrich with details from local student rosters if present
+            const localStudents = getStoredStudents(selectedOrgName);
+            const stuMatch = localStudents.find(s => 
+                (s.roll && (s.roll.toLowerCase() === ident || s.roll.toLowerCase() === (matchedUser.linkedStaffId || '').toLowerCase())) ||
+                (s.enrollment_code && s.enrollment_code.toLowerCase() === ident)
+            );
+            if (stuMatch) {
+                found = Object.assign({}, stuMatch, found);
+            }
+            if (selectedOrgName && (!found.org || found.org === 'FLAWLESS GRAPHICS')) {
+                found.org = selectedOrgName;
+                found.org_name = selectedOrgName;
+                found.org_id = selectedOrgName;
+                found.organization = selectedOrgName;
+            }
+        }
+    }
+
+    // 4. Local Enrolled Students Roster
+    if (!found) {
+        const students = getStoredStudents(selectedOrgName);
+        const stu = students.find(s => 
             (s.roll && s.roll.toLowerCase() === ident) || 
             (s.enrollment_code && s.enrollment_code.toLowerCase() === ident) || 
             (s.email && s.email.toLowerCase() === ident) ||
             (s.guardianEmail && s.guardianEmail.toLowerCase() === ident)
         );
+        if (stu) {
+            const stuPw = stu.password || stu.pass_hash;
+            if (stuPw && stuPw !== pw) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace';
+                return showMessage('Invalid password. Please check your credentials slip and re-enter.', true);
+            }
+            found = stu;
+            if (selectedOrgName) {
+                found.org = selectedOrgName;
+                found.org_name = selectedOrgName;
+                found.org_id = selectedOrgName;
+                found.organization = selectedOrgName;
+            }
+        }
     }
 
     if (!found) {
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Student Workspace';
-        return showMessage('No student account found in institutional database.');
+        return showMessage('No student account found in institutional database. Please verify your Student Roll Number or check with HR.');
+    }
+
+    // Guarantee org metadata on found student object
+    if (!found.org && !found.org_id && !found.organization) {
+        found.org = selectedOrgName || selectedOrgSlug || ORG;
+        found.org_id = selectedOrgSlug || selectedOrgName || ORG;
+        found.org_name = selectedOrgName || selectedOrgSlug || ORG;
+        found.organization = selectedOrgName || selectedOrgSlug || ORG;
     }
 
     // Verify Institution Workspace Membership
-    if (window.RealtimeAuth && selectedOrgSlug) {
+    if (window.RealtimeAuth && (selectedOrgSlug || selectedOrgName)) {
         const isMember = window.RealtimeAuth.verifyUserOrgMembership(found, selectedOrgSlug) ||
                          window.RealtimeAuth.verifyUserOrgMembership(found, selectedOrgName);
         if (!isMember) {
@@ -1394,25 +1601,29 @@ async function handleStudentAuth() {
     }
 
     // Authenticate student session
-    authenticateStudentSession(found);
+    authenticateStudentSession(found, selectedOrgName);
 }
 
-function authenticateStudentSession(student) {
+function authenticateStudentSession(student, chosenOrg = null) {
+    const studentOrg = student.org || student.org_id || student.org_name || student.organization || chosenOrg || ORG;
     try {
-        // Persist active student profile
+        // Persist active student and org profiles
+        localStorage.setItem('active_org', studentOrg);
+        localStorage.setItem('activeOrg', studentOrg);
         localStorage.setItem('active_student', JSON.stringify(student));
+        localStorage.setItem('student_active_user', JSON.stringify(student));
         
         // Also persist active_user role compatibility
         localStorage.setItem('active_user', JSON.stringify({
-            org: ORG,
+            org: studentOrg,
             id: student.id,
-            name: student.name,
-            email: student.email,
+            name: student.name || student.student_name || 'Student',
+            email: student.email || student.guardianEmail || '',
             role: 'student',
-            roll: student.roll,
-            classId: student.classId,
-            className: student.className,
-            photo: student.photo || null
+            roll: student.roll || student.enrollment_code || '',
+            classId: student.classId || student.class_id || '',
+            className: student.className || student.class_name || '',
+            photo: student.photo || student.photo_url || null
         }));
     } catch(e) {
         console.warn('Storage persistence error in authenticateStudentSession', e);
@@ -1422,16 +1633,19 @@ function authenticateStudentSession(student) {
     try {
         if (window.AuthSession && typeof window.AuthSession.setUser === 'function') {
             window.AuthSession.setUser({
-                org: ORG,
+                org: studentOrg,
                 id: student.id,
-                name: student.name,
-                email: student.email,
+                name: student.name || student.student_name || 'Student',
+                email: student.email || student.guardianEmail || '',
                 role: 'student',
-                roll: student.roll,
-                classId: student.classId,
-                className: student.className,
-                photo: student.photo || null
+                roll: student.roll || student.enrollment_code || '',
+                classId: student.classId || student.class_id || '',
+                className: student.className || student.class_name || '',
+                photo: student.photo || student.photo_url || null
             });
+        }
+        if (window.AuthSession && typeof window.AuthSession.setOrgName === 'function') {
+            window.AuthSession.setOrgName(studentOrg);
         }
     } catch(err) {
         console.warn('AuthSession sync warning', err);
@@ -1440,11 +1654,11 @@ function authenticateStudentSession(student) {
     // Optional Toaster notification
     try {
         if (window.Toaster && typeof window.Toaster.success === 'function') {
-            window.Toaster.success('Access Granted', `Welcome back, ${student.name}!`);
+            window.Toaster.success('Access Granted', `Welcome back, ${student.name || student.student_name || 'Student'}!`);
         }
     } catch(e) {}
 
-    showMessage(`Welcome back, ${student.name}! Launching your workspace...`, false);
+    showMessage(`Welcome back, ${student.name || student.student_name || 'Student'}! Launching your workspace...`, false);
 
     // Immediate redirection to student dashboard
     setTimeout(() => {
@@ -1457,10 +1671,82 @@ function authenticateStudentSession(student) {
 
 // Dismiss skeleton loader immediately and populate approved institutions
 window.addEventListener('DOMContentLoaded', () => {
+    // Self-healing: Ensure any existing students in localStorage have org properties set
+    try {
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.endsWith('_students')) {
+                const orgName = key.replace(/_students$/, '');
+                try {
+                    const raw = localStorage.getItem(key);
+                    let list = JSON.parse(raw || '[]');
+                    if (Array.isArray(list) && list.length > 0) {
+                        let changed = false;
+                        list.forEach(s => {
+                            if (s && !s.org) {
+                                s.org = orgName;
+                                s.org_id = orgName;
+                                s.org_name = orgName;
+                                s.organization = orgName;
+                                s.approvalStatus = s.approvalStatus || 'approved';
+                                s.approval_status = s.approval_status || 'approved';
+                                changed = true;
+                            }
+                        });
+                        if (changed) {
+                            localStorage.setItem(key, JSON.stringify(list));
+                        }
+                    }
+                } catch(e) {}
+            }
+        }
+    } catch(e) {}
+
     getStoredStudents();
     if (window.RealtimeAuth && typeof window.RealtimeAuth.populateApprovedOrgDropdown === 'function') {
         window.RealtimeAuth.populateApprovedOrgDropdown(document.getElementById('studentOrgSelect'));
     }
+
+    const studOrgSelect = document.getElementById('studentOrgSelect');
+    if (studOrgSelect) {
+        studOrgSelect.addEventListener('change', () => {
+            if (typeof populateStudentClasses === 'function') {
+                populateStudentClasses();
+            }
+        });
+    }
+
+    // Purge legacy hardcoded dummy classes across all localStorage keys on boot
+    try {
+        const dummyIds = new Set(['cls_f2_arts', 'cls_f3_web', 'cls_f1_illust', 'cls_f2_print', 'cls_1', 'cls_2', 'cls_3', 'cls_4', 'cls_5']);
+        const dummyNames = new Set([
+            'grade 10 - graphic arts & visual identity',
+            'grade 11 - web systems & client architecture',
+            'grade 12 - digital animation & 3d modeling',
+            'grade 9 - fundamental design principles',
+            'grade 10 - ui/ux interactive prototyping',
+            'class 1 - visual design',
+            'class 2 - web systems',
+            'class 3 - animation & 3d'
+        ]);
+        Object.keys(localStorage).forEach(k => {
+            if (k && (k.endsWith('_classes') || k === 'classes')) {
+                try {
+                    const raw = localStorage.getItem(k);
+                    if (raw) {
+                        const list = JSON.parse(raw);
+                        if (Array.isArray(list)) {
+                            const cleaned = list.filter(c => !dummyIds.has(c.id) && !dummyNames.has((c.name || c.className || '').toLowerCase().trim()));
+                            if (cleaned.length !== list.length) {
+                                localStorage.setItem(k, JSON.stringify(cleaned));
+                            }
+                        }
+                    }
+                } catch(e) {}
+            }
+        });
+    } catch(e) {}
+
     const sk = document.getElementById('skeletonLoader');
     if (sk) {
         sk.classList.add('fade-out');

@@ -1711,11 +1711,21 @@ window.addEventListener('DOMContentLoaded', () => {
 
     <!-- STUDENTS SECTION -->
     <section id="studentsSection" class="card view-panel" style="display:none">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px">
-        <h3 style="margin:0">Student Directory</h3>
-        <div style="display:flex; gap:8px">
-          <select id="selectClassForStudents" style="width: 200px;"></select>
-          <button class="btn prim" id="newStudentBtn"><i class="fa-solid fa-user-plus"></i> Add Student</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px">
+        <div>
+          <h3 style="margin:0; display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-user-graduate" style="color:var(--accent1);"></i> Student Directory
+          </h3>
+          <div class="tiny" style="color:var(--text-muted); margin-top:2px;">
+            Live classroom roster of all students registered and assigned by HR administration
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <select id="selectClassForStudents" style="width: 230px; padding:6px 12px; font-size:12.5px; border-radius:8px; border:1px solid var(--card-border); background:var(--card-bg);" onchange="renderStudentsForClass(this.value)"></select>
+          <button class="btn ghost btn-sm" id="syncHrStudentsBtn" onclick="syncStudentsFromHR()" title="Refresh and sync all student rosters assigned by HR" style="display:flex; align-items:center; gap:6px;">
+            <i class="fa-solid fa-cloud-arrow-down"></i> Sync from HR
+          </button>
+          <button class="btn prim btn-sm" id="newStudentBtn"><i class="fa-solid fa-user-plus"></i> Add Student</button>
         </div>
       </div>
       <div class="table-scroll">
@@ -1725,8 +1735,9 @@ window.addEventListener('DOMContentLoaded', () => {
               <th>#</th>
               <th>Student Name</th>
               <th>ID / Roll</th>
+              <th>Class Stream</th>
               <th>Gender</th>
-              <th>Guardian & Contact</th>
+              <th>Guardian &amp; Contact</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -3017,6 +3028,11 @@ if (window.SupabaseService) {
   loadTeacherCloudData().then(() => {
     if (typeof renderClasses === 'function') renderClasses();
     if (typeof renderAttendance === 'function') renderAttendance();
+    if (typeof populateClassSelects === 'function') populateClassSelects();
+    if (typeof renderStudentsForClass === 'function') {
+      const cur = document.getElementById('selectClassForStudents')?.value || 'all';
+      renderStudentsForClass(cur);
+    }
   });
 }
 document.getElementById('teacherNameSmall').textContent = teacher.name || teacher.email;
@@ -3066,6 +3082,11 @@ document.querySelectorAll('.tab').forEach(btn=>{
     }
     if (sec === 'broadcasts') {
       renderTeacherBroadcasts();
+    }
+    if (sec === 'students') {
+      populateClassSelects();
+      const sel = document.getElementById('selectClassForStudents')?.value || 'all';
+      renderStudentsForClass(sel);
     }
     const mainEl = document.querySelector('.main');
     if (mainEl) mainEl.scrollTop = 0;
@@ -3142,83 +3163,67 @@ function openModal(title, fields, onConfirm) {
   CLASSES CRUD
 ------------------------- */
 function seedDefaultEducatorClasses(forceReset = false) {
-  if (!forceReset) {
-    const existing = read(CLASSES_KEY);
-    if (Array.isArray(existing) && existing.length > 0) return existing;
-  }
-
-  const defaultClasses = [
-    {
-      id: 'cls_f2_arts',
-      name: 'Form 2 Visual Arts & Creative Systems',
-      subject: 'Graphic Design & Digital Media',
-      room: 'Studio Suite 3B',
-      syllabusPct: 75,
-      avgScore: 84,
-      status: 'Active',
-      approvalStatus: 'approved',
-      teacherName: (typeof teacher !== 'undefined' && teacher && teacher.name) || 'Faculty Instructor',
-      teacherEmail: (typeof teacher !== 'undefined' && teacher && teacher.email) || '',
-      students: []
-    },
-    {
-      id: 'cls_f3_web',
-      name: 'Form 3 Web Architecture & Front-End UI',
-      subject: 'Computer Studies & Web Engineering',
-      room: 'Innovation Lab 2',
-      syllabusPct: 82,
-      avgScore: 79,
-      status: 'Active',
-      approvalStatus: 'approved',
-      teacherName: (typeof teacher !== 'undefined' && teacher && teacher.name) || 'Faculty Instructor',
-      teacherEmail: (typeof teacher !== 'undefined' && teacher && teacher.email) || '',
-      students: []
-    },
-    {
-      id: 'cls_f1_illust',
-      name: 'Form 1 Digital Illustration & Brand Identity',
-      subject: 'Visual Arts Core',
-      room: 'Studio Suite 1A',
-      syllabusPct: 65,
-      avgScore: 83,
-      status: 'Active',
-      approvalStatus: 'approved',
-      teacherName: (typeof teacher !== 'undefined' && teacher && teacher.name) || 'Faculty Instructor',
-      teacherEmail: (typeof teacher !== 'undefined' && teacher && teacher.email) || '',
-      students: []
-    },
-    {
-      id: 'cls_f2_print',
-      name: 'Form 2 Commercial Print & Typography',
-      subject: 'Applied Graphic Media',
-      room: 'Production Lab',
-      syllabusPct: 70,
-      avgScore: 76,
-      status: 'Active',
-      approvalStatus: 'approved',
-      teacherName: (typeof teacher !== 'undefined' && teacher && teacher.name) || 'Faculty Instructor',
-      teacherEmail: (typeof teacher !== 'undefined' && teacher && teacher.email) || '',
-      students: []
-    }
-  ];
-
-  save(CLASSES_KEY, defaultClasses);
-  if (forceReset) {
-    toast('Academic curriculum streams restored.');
-    renderClasses();
-    updateKPIs();
-  }
-  return defaultClasses;
+  return [];
 }
 
 function getClasses(){
   let arr = read(CLASSES_KEY);
-  if (!arr || !Array.isArray(arr) || arr.length === 0) {
-    arr = seedDefaultEducatorClasses(false);
+  if (!arr || !Array.isArray(arr)) {
+    arr = [];
+  }
+  // Purge any legacy dummy seed classes so table is purely HR-assigned
+  const dummyIds = new Set(['cls_f2_arts', 'cls_f3_web', 'cls_f1_illust', 'cls_f2_print', 'cls_1', 'cls_2', 'cls_3', 'cls_4', 'cls_5']);
+  const dummyNames = new Set([
+    'grade 10 - graphic arts & visual identity',
+    'grade 11 - web systems & client architecture',
+    'grade 12 - digital animation & 3d modeling',
+    'grade 9 - fundamental design principles',
+    'grade 10 - ui/ux interactive prototyping',
+    'class 1 - visual design',
+    'class 2 - web systems',
+    'class 3 - animation & 3d'
+  ]);
+  const filtered = arr.filter(c => !dummyIds.has(c.id) && !dummyNames.has((c.name || c.className || '').toLowerCase().trim()));
+  if (filtered.length !== arr.length) {
+    arr = filtered;
+    save(CLASSES_KEY, arr);
   }
   return arr;
 }
 function saveClasses(arr){ save(CLASSES_KEY, arr) }
+
+// Purge legacy dummy classes across all localStorage keys on boot
+(function purgeLegacyDummyClasses() {
+  try {
+    const dummyIds = new Set(['cls_f2_arts', 'cls_f3_web', 'cls_f1_illust', 'cls_f2_print', 'cls_1', 'cls_2', 'cls_3', 'cls_4', 'cls_5']);
+    const dummyNames = new Set([
+      'grade 10 - graphic arts & visual identity',
+      'grade 11 - web systems & client architecture',
+      'grade 12 - digital animation & 3d modeling',
+      'grade 9 - fundamental design principles',
+      'grade 10 - ui/ux interactive prototyping',
+      'class 1 - visual design',
+      'class 2 - web systems',
+      'class 3 - animation & 3d'
+    ]);
+    Object.keys(localStorage).forEach(k => {
+      if (k && (k.endsWith('_classes') || k === 'classes')) {
+        try {
+          const raw = localStorage.getItem(k);
+          if (raw) {
+            const list = JSON.parse(raw);
+            if (Array.isArray(list)) {
+              const cleaned = list.filter(c => !dummyIds.has(c.id) && !dummyNames.has((c.name || c.className || '').toLowerCase().trim()));
+              if (cleaned.length !== list.length) {
+                localStorage.setItem(k, JSON.stringify(cleaned));
+              }
+            }
+          }
+        } catch(e) {}
+      }
+    });
+  } catch(e) {}
+})();
 
 const REGISTRATION_APPROVALS_KEY = `${ORG}_academic_registration_approvals`;
 function getHRRegistrationApprovals(){ return safeParse(localStorage.getItem(REGISTRATION_APPROVALS_KEY)) || [] }
@@ -3524,56 +3529,202 @@ function renderClassPreview(){
 /* -------------------------
   STUDENTS CRUD & API SYNC
 ------------------------- */
+function getAllAssignedStudents() {
+  const arr = getClasses();
+  const studentMap = new Map();
+
+  // 1. Collect from curriculum classes
+  arr.forEach(cls => {
+    (cls.students || []).forEach(s => {
+      const key = String(s.id || s.roll || s.enrollment_code || Math.random());
+      if (!studentMap.has(key)) {
+        studentMap.set(key, Object.assign({}, s, {
+          classId: s.classId || s.class_id || cls.id,
+          className: s.className || s.class_name || cls.name,
+          classCode: cls.code || ''
+        }));
+      }
+    });
+  });
+
+  // 2. Collect from teacherStore and localStorage (direct HR registered students)
+  const rawList = teacherStore[`${ORG}_students`] || read(`${ORG}_students`) || read('FLAWLESS GRAPHICS_students') || [];
+  if (Array.isArray(rawList)) {
+    rawList.forEach(s => {
+      const key = String(s.id || s.roll || s.enrollment_code || Math.random());
+      if (!studentMap.has(key)) {
+        const matchCls = arr.find(c => 
+          String(c.id) === String(s.classId || s.class_id) || 
+          (c.code && String(c.code) === String(s.classId || s.class_id)) ||
+          (c.name && s.className && c.name.toLowerCase().includes(String(s.className).toLowerCase())) ||
+          (c.name && s.class_name && c.name.toLowerCase().includes(String(s.class_name).toLowerCase())) ||
+          (c.name && s.grade && c.name.toLowerCase().includes(String(s.grade).toLowerCase()))
+        );
+        studentMap.set(key, Object.assign({}, s, {
+          classId: s.classId || s.class_id || (matchCls ? matchCls.id : ''),
+          className: s.className || s.class_name || (matchCls ? matchCls.name : (s.grade || 'Assigned Stream')),
+          classCode: matchCls ? matchCls.code : ''
+        }));
+      }
+    });
+  }
+
+  return Array.from(studentMap.values());
+}
+
+async function syncStudentsFromHR() {
+  const btn = document.getElementById('syncHrStudentsBtn');
+  const origHtml = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Syncing from HR...';
+  }
+  try {
+    await loadTeacherCloudData();
+    populateClassSelects();
+    renderClasses();
+    const curVal = document.getElementById('selectClassForStudents')?.value || 'all';
+    renderStudentsForClass(curVal);
+    updateKPIs();
+    const all = getAllAssignedStudents();
+    if (window.Toaster) {
+      window.Toaster.success('Roster Synchronized', `Loaded ${all.length} student${all.length === 1 ? '' : 's'} assigned by HR administration.`);
+    } else {
+      toast(`Loaded ${all.length} students assigned by HR`);
+    }
+  } catch (err) {
+    console.error('Error syncing students from HR:', err);
+    if (window.Toaster) window.Toaster.error('Sync Alert', 'Could not sync from HR: ' + (err.message || err));
+    else toast('Sync alert: ' + (err.message || err));
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = origHtml;
+    }
+  }
+}
+
 function populateClassSelects(){
   const ids = ['selectClassForStudents','attClassSelect','assignClassSelect','noteClassSelect','ttClassSelect'];
   const arr = getClasses();
-  ids.forEach(id=>{
-    const el = document.getElementById(id); if(!el) return;
+  const allStudents = getAllAssignedStudents();
+
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
     const currentVal = el.value;
-    el.innerHTML = '<option value="">-- Select Class --</option>';
-    arr.forEach(c => el.appendChild(Object.assign(document.createElement('option'), { value:c.id, textContent:c.name })));
-    if(currentVal) el.value = currentVal;
+    el.innerHTML = '';
+
+    if (id === 'selectClassForStudents') {
+      const allOpt = document.createElement('option');
+      allOpt.value = 'all';
+      allOpt.textContent = `★ All Assigned Students (${allStudents.length})`;
+      el.appendChild(allOpt);
+
+      arr.forEach(c => {
+        const cCount = (c.students || []).length;
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `${c.code ? c.code + ' — ' : ''}${c.name} (${cCount} Students)`;
+        el.appendChild(opt);
+      });
+
+      if (currentVal && (currentVal === 'all' || arr.some(c => String(c.id) === String(currentVal)))) {
+        el.value = currentVal;
+      } else {
+        el.value = 'all';
+      }
+    } else {
+      el.innerHTML = '<option value="">-- Select Class --</option>';
+      arr.forEach(c => el.appendChild(Object.assign(document.createElement('option'), { value: c.id, textContent: c.name })));
+      if (currentVal) el.value = currentVal;
+    }
   });
 }
 
 function renderStudentsForClass(classId){
-  const arr = getClasses(); const cls = arr.find(c=>c.id===classId);
-  const tbody = document.querySelector('#studentsTable tbody'); tbody.innerHTML = '';
-  if(!cls){ tbody.innerHTML = '<tr><td colspan="7" class="tiny" style="text-align:center; padding:18px;">Select a class to view enrollment</td></tr>'; return; }
-  const students = cls.students || [];
-  if(students.length === 0){
-    tbody.innerHTML = '<tr><td colspan="7" class="tiny" style="text-align:center; padding:24px; color:var(--text-muted);"><i class="fa-solid fa-user-graduate" style="font-size:26px; margin-bottom:8px; display:block; opacity:0.5;"></i>No students registered in this class yet. Click "Add Student" to register.</td></tr>';
-    updateKPIs(); renderClassPreview(); return;
+  const arr = getClasses();
+  const tbody = document.querySelector('#studentsTable tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  let students = [];
+  const isAll = (!classId || classId === 'all');
+  let currentClassName = 'All Assigned Students';
+
+  if (isAll) {
+    students = getAllAssignedStudents();
+  } else {
+    const cls = arr.find(c => String(c.id) === String(classId) || (c.code && String(c.code) === String(classId)));
+    if (!cls) {
+      students = getAllAssignedStudents();
+    } else {
+      currentClassName = cls.name;
+      students = (cls.students && cls.students.length > 0) ? cls.students : getAllAssignedStudents().filter(s => 
+        String(s.classId) === String(classId) || 
+        (cls.code && String(s.classId) === String(cls.code)) || 
+        (s.className && String(s.className).toLowerCase().includes(String(cls.name).toLowerCase())) ||
+        (s.grade && String(s.grade).toLowerCase().includes(String(cls.name).toLowerCase()))
+      );
+    }
   }
-  students.forEach((s,i)=>{
-    const fullName = escapeHtml([s.firstName, s.middleName, s.lastName].filter(Boolean).join(' '));
+
+  if (students.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" class="tiny" style="text-align:center; padding:32px 18px; color:var(--text-muted);">
+          <i class="fa-solid fa-user-graduate" style="font-size:32px; margin-bottom:10px; display:block; opacity:0.4; color:var(--accent1);"></i>
+          <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:4px;">No Students Found in Roster</div>
+          <div>No students have been assigned by HR to ${escapeHtml(currentClassName)} yet.</div>
+          <div style="margin-top:12px; display:flex; justify-content:center; gap:8px;">
+            <button type="button" class="btn ghost btn-sm" onclick="syncStudentsFromHR()"><i class="fa-solid fa-cloud-arrow-down"></i> Sync from HR</button>
+            <button type="button" class="btn prim btn-sm" onclick="openStudentModal('${isAll ? '' : classId}')"><i class="fa-solid fa-user-plus"></i> Add Student</button>
+          </div>
+        </td>
+      </tr>
+    `;
+    updateKPIs();
+    renderClassPreview();
+    return;
+  }
+
+  students.forEach((s, i) => {
+    const fullName = escapeHtml(s.name || [s.firstName, s.middleName, s.lastName].filter(Boolean).join(' ') || 'Student');
     const status = s.status || 'Active';
     const isPending = s.approvalStatus === 'pending' || status === 'Pending HR Approval';
     const statusClass = (status || 'Active').toLowerCase().replace(/[^a-z0-9]/g, '-');
-    const guardianInfo = s.guardianName ? `${escapeHtml(s.guardianName)} (${escapeHtml(s.phone||'No phone')})` : escapeHtml(s.phone||'—');
+    const guardianInfo = s.guardianName ? `${escapeHtml(s.guardianName)} (${escapeHtml(s.phone || 'No phone')})` : escapeHtml(s.phone || '—');
     const statusHtml = isPending ?
-      `<span class="badge" style="background:rgba(245,158,11,0.18); color:#f59e0b; border:1px solid rgba(245,158,11,0.35); font-weight:800; font-size:11px;"><i class="fa-solid fa-clock"></i> Pending HR Approval</span>` :
+      `<span class="badge" style="background:rgba(245,158,11,0.18); color:#f59e0b; border:1px solid rgba(245,158,11,0.35); font-weight:800; font-size:11px;"><i class="fa-solid fa-clock"></i> Pending HR</span>` :
       `<span class="student-badge-status status-${statusClass}">${escapeHtml(status)}</span>`;
+
+    const classNameDisplay = escapeHtml(s.className || s.class_name || s.grade || currentClassName || 'Academic Stream');
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${i+1}</td>
+      <td>${i + 1}</td>
       <td>
         <div style="display:flex; align-items:center; gap:10px;">
           ${s.photo ? `
             <img src="${s.photo}" alt="${fullName}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; flex-shrink:0; border:1px solid var(--card-border); box-shadow:0 2px 6px rgba(0,0,0,0.1);">
           ` : `
             <div style="width:36px; height:36px; border-radius:50%; background:var(--accent-gradient); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex-shrink:0;">
-              ${escapeHtml((s.firstName?.[0]||'S') + (s.lastName?.[0]||''))}
+              ${escapeHtml((s.firstName?.[0] || 'S') + (s.lastName?.[0] || ''))}
             </div>
           `}
           <div>
-            <div style="font-weight:700;">${fullName}</div>
-            <div class="tiny" style="color:var(--text-muted);">${escapeHtml(s.guardianRel ? s.guardianRel + "'s Child" : 'Student')}</div>
+            <div style="font-weight:700; color:var(--text);">${fullName}</div>
+            <div class="tiny" style="color:var(--text-muted);">${escapeHtml(s.guardianRel ? s.guardianRel + "'s Ward" : 'Enrolled Student')}</div>
           </div>
         </div>
       </td>
-      <td><span class="badge" style="font-family:monospace; font-weight:700;">${escapeHtml(s.roll||'—')}</span></td>
-      <td>${escapeHtml(s.gender||'—')}</td>
+      <td><span class="badge" style="font-family:monospace; font-weight:700; letter-spacing:0.5px;">${escapeHtml(s.roll || s.enrollment_code || '—')}</span></td>
+      <td>
+        <span class="badge" style="background:rgba(99,102,241,0.08); color:var(--accent1); border:1px solid rgba(99,102,241,0.22); font-weight:700; font-size:11px;">
+          <i class="fa-solid fa-graduation-cap" style="margin-right:4px;"></i>${classNameDisplay}
+        </span>
+      </td>
+      <td>${escapeHtml(s.gender || '—')}</td>
       <td>
         <div>${guardianInfo}</div>
         ${s.guardianEmail ? `<div class="tiny" style="color:var(--text-muted);">${escapeHtml(s.guardianEmail)}</div>` : ''}
@@ -3581,9 +3732,9 @@ function renderStudentsForClass(classId){
       <td>${statusHtml}</td>
       <td>
         <div style="display:flex; gap:4px;">
-          <button class="btn ghost" style="padding:4px 8px;" title="View Full Details" onclick="viewStudentDetails('${classId}','${s.id}')"><i class="fa-solid fa-eye"></i></button>
-          <button class="btn ghost" style="padding:4px 8px;" title="Edit Student" onclick="openStudentModal('${classId}','${s.id}')"><i class="fa-solid fa-pen"></i></button>
-          <button class="btn ghost" style="padding:4px 8px; color:var(--danger)" title="Delete Student" onclick="deleteStudent('${classId}','${s.id}')"><i class="fa-solid fa-trash"></i></button>
+          <button class="btn ghost" style="padding:4px 8px;" title="View Full Details" onclick="viewStudentDetails('${s.classId || classId}','${s.id}')"><i class="fa-solid fa-eye"></i></button>
+          <button class="btn ghost" style="padding:4px 8px;" title="Edit Student" onclick="openStudentModal('${s.classId || classId}','${s.id}')"><i class="fa-solid fa-pen"></i></button>
+          <button class="btn ghost" style="padding:4px 8px; color:var(--danger)" title="Delete Student" onclick="deleteStudent('${s.classId || classId}','${s.id}')"><i class="fa-solid fa-trash"></i></button>
         </div>
       </td>`;
     tbody.appendChild(tr);
@@ -6044,11 +6195,35 @@ function updateKPIs() {
 
 // Initial Boot Sequence
 renderClasses();
+populateClassSelects();
+renderStudentsForClass('all');
 renderActivity();
 renderAssignments();
 renderMessages();
 renderNotes();
 renderTimetable();
+
+// Cross-Portal Synchronization Event Listeners
+window.addEventListener('storage', (e) => {
+  if (e.key && (e.key.endsWith('_students') || e.key.endsWith('_classes') || e.key === 'students' || e.key === 'classes')) {
+    loadTeacherCloudData().then(() => {
+      renderClasses();
+      populateClassSelects();
+      const selVal = document.getElementById('selectClassForStudents')?.value || 'all';
+      renderStudentsForClass(selVal);
+      updateKPIs();
+    });
+  }
+});
+
+window.addEventListener('fg:class-updated', () => syncStudentsFromHR());
+window.addEventListener('fg:student-updated', () => syncStudentsFromHR());
+
+if (window.RealtimeBus && typeof window.RealtimeBus.on === 'function') {
+  window.RealtimeBus.on('class:assigned', () => syncStudentsFromHR());
+  window.RealtimeBus.on('student:created', () => syncStudentsFromHR());
+  window.RealtimeBus.on('class:created', () => syncStudentsFromHR());
+}
 renderPeriodMatrix();
 renderTeacherCalendarReview();
 renderTeacherAssessments();

@@ -991,9 +991,9 @@
       if (!cleanEmail) return { success: false, error: 'Identifier (Email or Student ID) is required' };
 
       try {
-        let endpoint = `users?or=(email.eq.${encodeURIComponent(cleanEmail)},linked_staff_id.eq.${encodeURIComponent(cleanEmail)})`;
+        let endpoint = `users?or=(email.ilike.${encodeURIComponent(cleanEmail)},linked_staff_id.ilike.${encodeURIComponent(cleanEmail)})`;
         if (orgId) {
-          endpoint += `&org=eq.${encodeURIComponent(orgId)}`;
+          endpoint += `&org=ilike.${encodeURIComponent(orgId)}`;
         }
         const users = await this.query(endpoint);
         if (!Array.isArray(users) || users.length === 0) {
@@ -1504,11 +1504,15 @@
     ============================================================= */
     async getStudents(orgId = 'FLAWLESS GRAPHICS') {
       try {
-        const data = await this.query(`students?org_id=eq.${encodeURIComponent(orgId)}&order=created_at.desc`);
+        const data = await this.query(`students?or=(org_id.eq.${encodeURIComponent(orgId)},org_name.eq.${encodeURIComponent(orgId)})&order=created_at.desc`);
         if (!Array.isArray(data)) return [];
 
         return data.map(s => ({
           id: s.id,
+          org: s.org_name || s.org_id || orgId,
+          org_id: s.org_id || s.org_name || orgId,
+          org_name: s.org_name || s.org_id || orgId,
+          organization: s.org_name || s.org_id || orgId,
           roll: s.roll || s.roll_number || s.enrollment_code || 'STU-2026',
           name: s.full_name || s.student_name || `${s.first_name || ''} ${s.last_name || ''}`.trim() || 'Student',
           fullName: s.full_name || s.student_name || `${s.first_name || ''} ${s.last_name || ''}`.trim() || 'Student',
@@ -1521,6 +1525,7 @@
           status: s.status || 'Active',
           clearanceStatus: s.clearance_status || 'Cleared',
           approvalStatus: s.approval_status || 'approved',
+          approval_status: s.approval_status || 'approved',
           guardianName: s.guardian_name || s.parent_name || '',
           guardianPhone: s.guardian_phone || s.parent_phone || '',
           guardianEmail: s.guardian_email || s.parent_email || '',
@@ -1534,6 +1539,7 @@
     }
 
     async saveStudent(orgId, studentData) {
+      const targetOrg = orgId || studentData.org || studentData.org_name || studentData.org_id || 'FLAWLESS GRAPHICS';
       const fullName = studentData.fullName || studentData.name || studentData.student_name || `${studentData.firstName || ''} ${studentData.lastName || ''}`.trim() || 'Student';
       const firstName = studentData.firstName || fullName.split(' ')[0] || '';
       const lastName = studentData.lastName || fullName.split(' ').slice(1).join(' ') || '';
@@ -1546,7 +1552,8 @@
       const validDob = (rawDob && !isNaN(Date.parse(rawDob))) ? rawDob : null;
 
       const payload = {
-        org_id: orgId || 'FLAWLESS GRAPHICS',
+        org_id: targetOrg,
+        org_name: targetOrg,
         roll: rollNumber,
         roll_number: rollNumber,
         enrollment_code: rollNumber,
@@ -1583,7 +1590,11 @@
         const res = await this.query('students', 'POST', payload, {
           'Prefer': 'resolution=merge-duplicates,return=representation'
         });
-        const saved = Array.isArray(res) && res.length > 0 ? res[0] : payload;
+        const saved = Array.isArray(res) && res.length > 0 ? Object.assign({}, payload, res[0]) : payload;
+        saved.org = saved.org_name || saved.org_id || targetOrg;
+        saved.org_id = saved.org_id || targetOrg;
+        saved.org_name = saved.org_name || targetOrg;
+        saved.organization = saved.org_name || targetOrg;
         this.broadcastChange('STUDENT_SAVED', 'students', saved);
         return saved;
       } catch (err) {
@@ -1608,21 +1619,34 @@
       // Auto-generate secure password if not provided
       const generatedPassword = studentData.password || studentData.pass_hash || ('Stu@' + Math.floor(1000 + Math.random() * 9000));
       
-      // Determine student login email (either provided, guardian email, or institutional roll email)
+      // Determine student login email (guaranteed unique institutional email if guardian email collides)
       const orgSlug = cleanOrg.toLowerCase().replace(/[^a-z0-9]/g, '');
-      const studentEmail = (studentData.email || studentData.guardianEmail || studentData.guardian_email || studentData.parent_email || `${roll.toLowerCase().replace(/[^a-z0-9]/g, '')}@student.${orgSlug || 'flawless'}.edu`).trim().toLowerCase();
+      const rollSlug = roll.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const institutionalEmail = `${rollSlug}@student.${orgSlug || 'flawless'}.edu`;
+      const guardianEmailClean = (studentData.guardianEmail || studentData.guardian_email || studentData.parent_email || studentData.guardian_phone || '').trim().toLowerCase();
+      let studentEmail = (studentData.studentEmail || studentData.student_email || '').trim().toLowerCase();
+      if (!studentEmail && studentData.email && studentData.email.trim().toLowerCase() !== guardianEmailClean) {
+        studentEmail = studentData.email.trim().toLowerCase();
+      }
+      if (!studentEmail) {
+        studentEmail = institutionalEmail;
+      }
 
       // 1. Save Student Roster Record
       const studentRecord = await this.saveStudent(cleanOrg, Object.assign({}, studentData, {
         roll: roll,
         fullName: fullName,
-        guardianEmail: studentEmail,
-        parentEmail: studentEmail
+        org: cleanOrg,
+        org_id: cleanOrg,
+        org_name: cleanOrg,
+        organization: cleanOrg,
+        guardianEmail: guardianEmailClean || studentEmail,
+        parentEmail: guardianEmailClean || studentEmail
       }));
 
       // 2. Provision / Upsert Student Portal User Account in public.users
       const userPayload = {
-        id: 'u_' + roll.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_' + Date.now().toString(36),
+        id: 'u_' + rollSlug + '_' + Date.now().toString(36),
         name: fullName,
         email: studentEmail,
         role: 'student',
@@ -1637,9 +1661,32 @@
       };
 
       try {
-        await this.query('users', 'POST', userPayload, {
-          'Prefer': 'resolution=merge-duplicates,return=representation'
-        });
+        const existingUsers = await this.query(`users?linked_staff_id=ilike.${encodeURIComponent(roll)}`);
+        if (Array.isArray(existingUsers) && existingUsers.length > 0) {
+          await this.query(`users?id=eq.${encodeURIComponent(existingUsers[0].id)}`, 'PATCH', {
+            name: fullName,
+            pass_hash: generatedPassword,
+            org: cleanOrg,
+            org_id: cleanOrg,
+            status: 'active',
+            updated_at: new Date().toISOString()
+          });
+        } else {
+          try {
+            await this.query('users', 'POST', userPayload, {
+              'Prefer': 'resolution=merge-duplicates,return=representation'
+            });
+          } catch (postErr) {
+            if (studentEmail !== institutionalEmail) {
+              userPayload.email = institutionalEmail;
+              await this.query('users', 'POST', userPayload, {
+                'Prefer': 'resolution=merge-duplicates,return=representation'
+              });
+            } else {
+              throw postErr;
+            }
+          }
+        }
       } catch (err) {
         console.warn('[Supabase] Warning provisioning student user in users table:', err.message);
       }
@@ -1738,7 +1785,7 @@
     ============================================================= */
     async getClasses(orgId = 'FLAWLESS GRAPHICS') {
       try {
-        const data = await this.query(`classes?org_id=eq.${encodeURIComponent(orgId)}&order=created_at.desc`);
+        const data = await this.query(`classes?or=(org_id.ilike.${encodeURIComponent(orgId)},org_name.ilike.${encodeURIComponent(orgId)})&order=created_at.desc`);
         if (!Array.isArray(data)) return [];
 
         return data.map(c => ({
@@ -1746,14 +1793,19 @@
           name: c.name || c.class_name || 'Class Cohort',
           className: c.name || c.class_name || 'Class Cohort',
           code: c.code || '',
+          grade: c.grade_level || '',
           gradeLevel: c.grade_level || '',
+          subject: c.subject || '',
           section: c.section || 'A',
           room: c.room || 'Room 101',
+          schedule: c.schedule || '',
           teacherId: c.teacher_id || '',
-          teacherName: c.teacher_name || 'Assigned Instructor',
+          teacherName: c.teacher_name || '',
           capacity: Number(c.capacity || 35),
+          enrolled: Number(c.enrolled || 0),
           academicYear: c.academic_year || '2026/2027',
-          status: c.status || 'Active'
+          status: c.status || 'Active',
+          approvalStatus: c.approval_status || 'approved'
         }));
       } catch (err) {
         console.error('[Supabase] Failed to fetch classes:', err.message);
@@ -1762,14 +1814,16 @@
     }
 
     async saveClass(orgId, classData) {
+      const targetOrg = orgId || classData.org || classData.org_id || classData.org_name || 'FLAWLESS GRAPHICS';
       const name = classData.name || classData.className || 'Class Cohort';
       const payload = {
-        id: String(classData.id || ('cls_' + Date.now())),
-        org_id: orgId || 'FLAWLESS GRAPHICS',
+        org_id: targetOrg,
+        org_name: targetOrg,
         name: name,
         class_name: name,
         code: classData.code || ('CLS-' + Math.floor(100 + Math.random() * 900)),
         grade_level: classData.gradeLevel || classData.grade_level || classData.grade || 'Level 100',
+        subject: classData.subject || null,
         section: classData.section || 'A',
         room: classData.room || 'Room 101',
         teacher_id: classData.teacherId || classData.teacher_id || null,
@@ -1777,14 +1831,22 @@
         capacity: Number(classData.capacity || 35),
         academic_year: classData.academicYear || classData.academic_year || '2026/2027',
         status: classData.status || 'Active',
+        approval_status: 'approved',
         updated_at: new Date().toISOString()
       };
+
+      if (classData.id && !isNaN(Number(classData.id))) {
+        payload.id = Number(classData.id);
+      }
 
       try {
         const res = await this.query('classes', 'POST', payload, {
           'Prefer': 'resolution=merge-duplicates,return=representation'
         });
-        const saved = Array.isArray(res) && res.length > 0 ? res[0] : payload;
+        const saved = Array.isArray(res) && res.length > 0 ? Object.assign({}, payload, res[0]) : payload;
+        saved.org = targetOrg;
+        saved.org_id = targetOrg;
+        saved.org_name = targetOrg;
         this.broadcastChange('CLASS_SAVED', 'classes', saved);
         return saved;
       } catch (err) {
@@ -1812,6 +1874,67 @@
       } catch (err) {
         console.error('[Supabase] Failed to delete class:', err.message);
         throw err;
+      }
+    }
+
+    async getSubjects(orgId = 'FLAWLESS GRAPHICS') {
+      try {
+        const data = await this.query(`subjects?or=(org_id.eq.${encodeURIComponent(orgId)},org_name.eq.${encodeURIComponent(orgId)})&order=name.asc`);
+        if (!Array.isArray(data)) return [];
+        return data.map(s => ({
+          id: s.id,
+          code: s.code || '',
+          name: s.name || s.title || 'Subject',
+          department: s.department || 'General',
+          grade: s.grade || s.grade_level || '',
+          credits: s.credits || 3,
+          description: s.description || '',
+          status: s.status || 'Active'
+        }));
+      } catch (err) {
+        console.warn('[Supabase] Failed to fetch subjects:', err.message);
+        return [];
+      }
+    }
+
+    async saveSubject(orgId, subjectData) {
+      const targetOrg = orgId || subjectData.org || subjectData.org_id || 'FLAWLESS GRAPHICS';
+      const payload = {
+        org_id: targetOrg,
+        org_name: targetOrg,
+        code: subjectData.code || ('SUB-' + Math.floor(100 + Math.random() * 900)),
+        name: subjectData.name || subjectData.title || 'Subject',
+        department: subjectData.department || 'General',
+        grade_level: subjectData.grade || subjectData.grade_level || '',
+        credits: Number(subjectData.credits || 3),
+        description: subjectData.description || '',
+        status: subjectData.status || 'Active',
+        updated_at: new Date().toISOString()
+      };
+      if (subjectData.id && !isNaN(Number(subjectData.id))) {
+        payload.id = Number(subjectData.id);
+      }
+      try {
+        const res = await this.query('subjects', 'POST', payload, {
+          'Prefer': 'resolution=merge-duplicates,return=representation'
+        });
+        const saved = Array.isArray(res) && res.length > 0 ? Object.assign({}, payload, res[0]) : payload;
+        this.broadcastChange('SUBJECT_SAVED', 'subjects', saved);
+        return saved;
+      } catch (err) {
+        console.warn('[Supabase] Save subject notice:', err.message);
+        return payload;
+      }
+    }
+
+    async deleteSubject(orgId, subjectId) {
+      try {
+        await this.query(`subjects?id=eq.${encodeURIComponent(subjectId)}&org_id=eq.${encodeURIComponent(orgId)}`, 'DELETE');
+        this.broadcastChange('SUBJECT_DELETED', 'subjects', { id: subjectId, orgId });
+        return true;
+      } catch (err) {
+        console.warn('[Supabase] Delete subject notice:', err.message);
+        return false;
       }
     }
 

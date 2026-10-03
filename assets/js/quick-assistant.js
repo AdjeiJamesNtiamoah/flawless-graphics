@@ -270,6 +270,11 @@
                 <strong>Finance Treasury</strong>
                 <span>Fee Ledger & Reports</span>
               </a>
+              <a href="javascript:void(0)" class="essential-card" onclick="window.QuickAssistant.toggle(false); if(typeof window.openAddClassModal==='function'){window.openAddClassModal();}else if(window.SlideOver){window.SlideOver.open('addClassDrawer');}else{window.location.href='${rootPrefix}pages/hr/hr-dashboard.html';}">
+                <i class="fa-solid fa-folder-plus" style="color:#10b981;"></i>
+                <strong>Add Classroom</strong>
+                <span>New Academic Cohort</span>
+              </a>
             </div>
 
             <div style="font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#64748b; margin:14px 0 8px;">Organization Identity & Logo</div>
