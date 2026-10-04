@@ -1794,7 +1794,7 @@ document.getElementById('photoUpload').addEventListener('change', (e)=>{
 
 document.getElementById('logoutBtn').addEventListener('click', ()=>{
   localStorage.removeItem('active_teacher');
-  window.location.href = 'teacher-login.html';
+  if (window.AuthSession) { window.AuthSession.logout(); } else { window.location.href = '../../index.html#unifiedLoginSection'; }
 });
 
 /* -------------------------

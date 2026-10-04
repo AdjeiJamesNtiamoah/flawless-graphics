@@ -788,9 +788,9 @@
     function handleLogout() {
       if (confirm('Are you sure you want to log out of Finance Operations?')) {
         if (window.AuthSession && typeof window.AuthSession.logout === 'function') {
-          window.AuthSession.logout('finance-login.html');
+          window.AuthSession.logout();
         } else {
-          window.location.href = 'finance-login.html';
+          window.location.href = '../../index.html?role=finance#unifiedLoginSection';
         }
       }
     }

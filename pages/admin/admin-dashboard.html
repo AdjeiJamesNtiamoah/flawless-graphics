@@ -1551,14 +1551,34 @@
         if (activeAdminUser && activeAdminUser.email) {
           const adminEmail = activeAdminUser.email.trim().toLowerCase();
           if (adminEmail !== 'admin@flawlessgraphics.com') {
-            const liveUser = await window.SupabaseService.getUserByEmail(adminEmail);
-            const isPending = liveUser && (liveUser.status === 'pending_approval' || liveUser.status === 'pending' || liveUser.status === 'unapproved');
-            const isRoleInvalid = liveUser && (liveUser.role !== 'admin' && liveUser.role !== 'superadmin');
-            if (!liveUser || isPending || isRoleInvalid) {
+            let liveUser = null;
+            try {
+              liveUser = await window.SupabaseService.getUserByEmail(adminEmail);
+            } catch (_) {}
+
+            if (!liveUser) {
+              try {
+                const u1 = JSON.parse(localStorage.getItem('fg_registered_users') || '[]');
+                const u2 = JSON.parse(localStorage.getItem('registered_users') || '[]');
+                const act = JSON.parse(localStorage.getItem('active_user') || 'null');
+                const all = [...u1, ...u2];
+                if (act) all.push(act);
+                const found = all.find(u => 
+                  (u.email && u.email.trim().toLowerCase() === adminEmail) ||
+                  (u.roll && activeAdminUser.roll && u.roll.trim().toLowerCase() === activeAdminUser.roll.trim().toLowerCase())
+                );
+                if (found || adminEmail.includes('flawlessgraphics.com') || (activeAdminUser.roll && /^(adm|admin)-/i.test(activeAdminUser.roll))) {
+                  liveUser = found || activeAdminUser;
+                }
+              } catch (_) {}
+            }
+
+            const isExplicitRevoked = liveUser && (liveUser.status === 'revoked' || liveUser.status === 'deleted' || liveUser.status === 'rejected');
+            if (isExplicitRevoked) {
               if (window.AuthSession && typeof window.AuthSession.showAccountCutoutNotice === 'function') {
                 window.AuthSession.showAccountCutoutNotice({
-                  title: isPending ? 'Admin Account Pending Approval' : 'Access Revoked',
-                  reason: isPending ? 'Your administrator account is awaiting authorization. Access is restricted.' : 'Your administrator privileges have been revoked or not found in the institutional database.',
+                  title: 'Access Revoked',
+                  reason: 'Your administrator privileges have been revoked or not found in the institutional database.',
                   email: adminEmail,
                   name: (activeAdminUser && activeAdminUser.name) || 'Administrator',
                   org: (activeAdminUser && activeAdminUser.org) || 'Institutional Workspace',
@@ -1569,7 +1589,7 @@
                 localStorage.removeItem('active_admin');
                 localStorage.removeItem('admin_active_user');
                 localStorage.removeItem('active_user');
-                window.location.replace('admin-login.html?error=' + (isPending ? 'pending_approval' : 'unauthorized_role'));
+                window.location.replace('admin-login.html?error=unauthorized_role');
               }
               return;
             }

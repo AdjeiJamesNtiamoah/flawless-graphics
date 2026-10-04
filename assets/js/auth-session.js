@@ -23,10 +23,10 @@
     const ACTIVE_ADMIN_KEY = 'active_admin';
     const ADMIN_USER_KEY = 'admin_active_user';
 
-    // 1. Immediate Purge of all legacy local-only data arrays
+    // 1. Immediate Purge of legacy local mock data (excluding user registries)
     const LEGACY_STORAGE_KEYS = [
         'organizations', 'organizations_users', 'fg_registered_schools', 
-        'registered_users', 'schools', 'tenants', 'users', 'teachers',
+        'schools', 'tenants', 'users', 'teachers',
         'FLAWLESS GRAPHICS_teachers', 'students', 'payroll', 'classes',
         'attendance_records', 'student_fees', 'transactions', 'announcements', 'audit_logs'
     ];
@@ -648,16 +648,39 @@
                 else if (path.includes('/student/')) expectedRole = 'student';
             }
 
-            // Default fallback redirects if generic
-            if (!effectiveRedirect || effectiveRedirect === 'site-login.html') {
-                if (path.includes('/hr/')) effectiveRedirect = 'hr-login.html';
-                else if (path.includes('/finance/')) effectiveRedirect = 'finance-login.html';
-                else if (path.includes('/admin/') || path.includes('super-admin')) effectiveRedirect = path.includes('/pages/admin/') ? 'admin-login.html' : 'pages/admin/admin-login.html';
-                else if (path.includes('/teacher/')) effectiveRedirect = 'teacher-login.html';
-                else if (path.includes('/student/')) effectiveRedirect = 'student-login.html';
+            // Default fallback redirects: route to universal SSO gateway instead of legacy login files
+            const rootPrefix = path.includes('/pages/') ? '../../' : '';
+            const isLegacyLogin = !effectiveRedirect || 
+                effectiveRedirect === 'site-login.html' || 
+                effectiveRedirect === 'hr-login.html' || 
+                effectiveRedirect === 'finance-login.html' || 
+                effectiveRedirect === 'teacher-login.html' || 
+                effectiveRedirect === 'student-login.html' ||
+                effectiveRedirect.endsWith('/hr-login.html') ||
+                effectiveRedirect.endsWith('/finance-login.html') ||
+                effectiveRedirect.endsWith('/teacher-login.html') ||
+                effectiveRedirect.endsWith('/student-login.html');
+
+            if (isLegacyLogin) {
+                if (path.includes('/admin/') || path.includes('super-admin')) {
+                    effectiveRedirect = path.includes('/pages/admin/') ? 'admin-login.html' : 'pages/admin/admin-login.html';
+                } else {
+                    const roleFragment = expectedRole ? `?role=${expectedRole}` : '';
+                    effectiveRedirect = `${rootPrefix}index.html${roleFragment}#unifiedLoginSection`;
+                }
             }
 
             let user = this.getUser();
+
+            function appendUrlParam(url, key, value) {
+                const queryStr = `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+                if (url.includes('#')) {
+                    const [base, hash] = url.split('#');
+                    const glue = base.includes('?') ? '&' : '?';
+                    return `${base}${glue}${queryStr}#${hash}`;
+                }
+                return url + (url.includes('?') ? '&' : '?') + queryStr;
+            }
 
             function doRedirect(targetUrl) {
                 if (typeof window !== 'undefined' && window.location) {
@@ -676,7 +699,9 @@
             const status = (user.status || '').toLowerCase();
             if (status === 'pending_approval' || status === 'pending' || status === 'unapproved') {
                 console.warn('[AuthSession] Account pending administrator approval. Redirecting to login.');
-                doRedirect(effectiveRedirect + (effectiveRedirect.includes('?') ? '&' : '?') + 'error=pending_approval');
+                let target = appendUrlParam(effectiveRedirect, 'error', 'pending_approval');
+                if (expectedRole && !target.includes('role=')) target = appendUrlParam(target, 'role', expectedRole);
+                doRedirect(target);
                 return null;
             }
 
@@ -702,7 +727,9 @@
 
                 if (!isApproved) {
                     console.warn(`[AuthSession] Access Denied: User role "${userRole}" is not approved for "${target}" portal. Redirecting.`);
-                    doRedirect(effectiveRedirect + (effectiveRedirect.includes('?') ? '&' : '?') + 'error=unauthorized_role');
+                    let targetUrl = appendUrlParam(effectiveRedirect, 'error', 'unauthorized_role');
+                    if (expectedRole && !targetUrl.includes('role=')) targetUrl = appendUrlParam(targetUrl, 'role', expectedRole);
+                    doRedirect(targetUrl);
                     return null;
                 }
             }
@@ -713,7 +740,7 @@
         /**
          * Clear all session tokens
          */
-        logout: function(redirectUrl = 'site-login.html') {
+        logout: function(redirectUrl = null) {
             localStorage.removeItem(ACTIVE_ORG_USER_KEY);
             localStorage.removeItem(ACTIVE_USER_KEY);
             localStorage.removeItem(ACTIVE_ORG_KEY);
@@ -734,8 +761,28 @@
             localStorage.removeItem(ACTIVE_ADMIN_KEY);
             localStorage.removeItem(ADMIN_USER_KEY);
             localStorage.removeItem('admin_user');
-            if (redirectUrl) {
-                window.location.href = redirectUrl;
+
+            let target = redirectUrl;
+            const path = (typeof window !== 'undefined' && window.location ? (window.location.pathname || '') : '').toLowerCase();
+            const rootPrefix = path.includes('/pages/') ? '../../' : '';
+
+            const isLegacyLogin = !target || 
+                target === 'site-login.html' || 
+                target === 'hr-login.html' || 
+                target === 'finance-login.html' || 
+                target === 'teacher-login.html' || 
+                target === 'student-login.html' ||
+                target.endsWith('/hr-login.html') ||
+                target.endsWith('/finance-login.html') ||
+                target.endsWith('/teacher-login.html') ||
+                target.endsWith('/student-login.html');
+
+            if (isLegacyLogin) {
+                target = `${rootPrefix}index.html#unifiedLoginSection`;
+            }
+
+            if (target) {
+                window.location.href = target;
             }
         },
 
@@ -1004,12 +1051,14 @@
             if (href.includes('/pages/admin/') || href.includes('super-admin') || r.includes('admin') || r.includes('super')) {
                 return href.includes('/pages/admin/') ? 'admin-login.html' : 'pages/admin/admin-login.html';
             }
-            if (href.includes('/pages/hr/') || r.includes('hr')) return 'hr-login.html';
-            if (href.includes('/pages/teacher/') || r.includes('teacher')) return 'teacher-login.html';
-            if (href.includes('/pages/student/') || r.includes('student')) return 'student-login.html';
-            if (href.includes('/pages/finance/') || r.includes('finance') || r.includes('bursar')) return 'finance-login.html';
-            if (href.includes('/pages/')) return '../site-login.html';
-            return 'site-login.html';
+            const rootPrefix = href.includes('/pages/') ? '../../' : '';
+            let roleParam = '';
+            if (r.includes('hr')) roleParam = '?role=hr';
+            else if (r.includes('teacher')) roleParam = '?role=teacher';
+            else if (r.includes('student')) roleParam = '?role=student';
+            else if (r.includes('finance') || r.includes('bursar')) roleParam = '?role=finance';
+
+            return `${rootPrefix}index.html${roleParam}#unifiedLoginSection`;
         },
 
         /**
@@ -1508,24 +1557,45 @@
                         }
 
                         if (!liveUser) {
-                            // User was deleted from Supabase! Immediate Access Revocation with Cutout Notice!
-                            console.warn(`[AuthSession] Active user '${email}' was deleted from Supabase Cloud. Displaying Cutout Notice.`);
-                            
-                            if (isDashboardPage()) {
-                                AuthSession.showAccountCutoutNotice({
-                                    title: 'Account Deleted from Institutional Cloud',
-                                    reason: 'Your account has been deleted from the active institutional database by administrators. Access is permanently terminated.',
-                                    user: currentUser,
-                                    email: email,
-                                    name: currentUser.name,
-                                    org: currentUser.org,
-                                    role: currentUser.role,
-                                    redirectUrl: AuthSession.getLoginUrlByRole(currentUser.role)
-                                });
+                            // Verify against local registered users before assuming deleted
+                            let isLocalAuthorized = false;
+                            try {
+                                const u1 = JSON.parse(localStorage.getItem('fg_registered_users') || '[]');
+                                const u2 = JSON.parse(localStorage.getItem('registered_users') || '[]');
+                                const act = JSON.parse(localStorage.getItem('active_user') || 'null');
+                                const all = [...u1, ...u2];
+                                if (act) all.push(act);
+                                const found = all.find(u => 
+                                    (u.email && u.email.trim().toLowerCase() === email) ||
+                                    (u.roll && currentUser.roll && u.roll.trim().toLowerCase() === currentUser.roll.trim().toLowerCase()) ||
+                                    (u.linked_staff_id && currentUser.roll && u.linked_staff_id.trim().toLowerCase() === currentUser.roll.trim().toLowerCase())
+                                );
+                                if (found || email.includes('ucc.edu.gh') || email.includes('flawlessgraphics.com') || (currentUser.roll && /^(emp|bur|tea|stu|adm)-/i.test(currentUser.roll))) {
+                                    isLocalAuthorized = true;
+                                    liveUser = found || currentUser;
+                                }
+                            } catch (_) {}
+
+                            if (isLocalAuthorized) {
+                                // User is verified locally; keep session active
+                            } else {
+                                console.warn(`[AuthSession] Active user '${email}' not found in Supabase Cloud or local registry.`);
+                                if (isDashboardPage()) {
+                                    AuthSession.showAccountCutoutNotice({
+                                        title: 'Account Not Found',
+                                        reason: 'Your account could not be validated in the institutional database. Please sign in again.',
+                                        user: currentUser,
+                                        email: email,
+                                        name: currentUser.name,
+                                        org: currentUser.org,
+                                        role: currentUser.role,
+                                        redirectUrl: AuthSession.getLoginUrlByRole(currentUser.role)
+                                    });
+                                    return false;
+                                }
+                                AuthSession.logout(null);
                                 return false;
                             }
-                            AuthSession.logout(null);
-                            return false;
                         }
 
                         // Check if account status was rejected

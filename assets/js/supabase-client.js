@@ -837,6 +837,7 @@
         email: email,
         pass_hash: rawPass,
         role: (userData.role || 'teacher').toLowerCase(),
+        linked_staff_id: userData.linked_staff_id || userData.roll || userData.id || null,
         status: userData.status || 'pending_approval',
         designation: userData.designation || userData.position || '',
         department: userData.department || userData.dept || '',

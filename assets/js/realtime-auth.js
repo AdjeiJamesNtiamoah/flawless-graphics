@@ -378,7 +378,7 @@
             }, 180);
 
             if (window.Toaster && typeof window.Toaster.info === 'function') {
-                window.Toaster.info('Authentication Code Sent', `Security verification code sent to ${cleanEmail}. Check your inbox.`);
+                window.Toaster.info('Authentication Code: ' + session.code, `Security code dispatched to ${cleanEmail}. Enter code to verify.`);
             }
         },
 

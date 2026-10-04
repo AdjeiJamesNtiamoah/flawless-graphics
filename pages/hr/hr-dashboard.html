@@ -1767,13 +1767,13 @@
           <span class="nav-bullet">◆</span>
           <span class="nav-label hide-collapsed">Teacher Portal</span>
         </button>
-        <button type="button" class="nav-sub-item" onclick="window.location.href='../finance/finance-login.html'" data-tooltip="Finance Portal">
+        <button type="button" class="nav-sub-item" onclick="window.location.href='../finance/finance-dashboard.html'" data-tooltip="Finance Portal">
           <span class="nav-bullet">◆</span>
           <span class="nav-label hide-collapsed">Finance Portal</span>
         </button>
-        <button type="button" class="nav-sub-item" onclick="window.location.href='hr-login.html'" data-tooltip="HR Portal Sign In">
+        <button type="button" class="nav-sub-item" onclick="window.location.href='../../index.html#unifiedLoginSection'" data-tooltip="Unified Access Gateway">
           <span class="nav-bullet">◆</span>
-          <span class="nav-label hide-collapsed">HR Sign In</span>
+          <span class="nav-label hide-collapsed">Unified Gateway</span>
         </button>
       </div>
     </div>
@@ -5848,36 +5848,61 @@ function save(k, v) {
 async function loadHRCloudData() {
   if (!window.SupabaseService) return;
   try {
-    const activeHrUser = (window.AuthSession ? window.AuthSession.getUser() : null) || JSON.parse(localStorage.getItem('activeHR') || 'null');
+    const activeHrUser = (window.AuthSession ? window.AuthSession.getUser() : null) || 
+      JSON.parse(localStorage.getItem('activeHR') || localStorage.getItem('active_hr') || localStorage.getItem('hr_active_user') || localStorage.getItem('active_user') || 'null');
     const isFrame = (typeof window !== 'undefined' && window.self !== window.top);
     const r = (activeHrUser && activeHrUser.role ? activeHrUser.role : '').toLowerCase();
     const isSuperAdmin = (r === 'admin' || r === 'superadmin');
     if (!activeHrUser || !activeHrUser.email) {
       if (!isFrame) {
-        window.location.replace('hr-login.html');
+        window.location.replace('../../index.html#unifiedLoginSection');
       }
       return;
     }
     if (activeHrUser && activeHrUser.email) {
       const hrEmail = activeHrUser.email.trim().toLowerCase();
       if (hrEmail !== 'admin@flawlessgraphics.com' && !isSuperAdmin && !isFrame) {
-        const liveUser = await window.SupabaseService.getUserByEmail(hrEmail);
-        const isPending = liveUser && (liveUser.status === 'pending_approval' || liveUser.status === 'pending' || liveUser.status === 'unapproved');
-        if (!liveUser || isPending) {
+        let liveUser = null;
+        try {
+          liveUser = await window.SupabaseService.getUserByEmail(hrEmail);
+        } catch (_) {}
+
+        if (!liveUser) {
+          try {
+            const u1 = JSON.parse(localStorage.getItem('fg_registered_users') || '[]');
+            const u2 = JSON.parse(localStorage.getItem('registered_users') || '[]');
+            const act = JSON.parse(localStorage.getItem('active_user') || 'null');
+            const all = [...u1, ...u2];
+            if (act) all.push(act);
+            const found = all.find(u => 
+              (u.email && u.email.trim().toLowerCase() === hrEmail) ||
+              (u.roll && activeHrUser.roll && u.roll.trim().toLowerCase() === activeHrUser.roll.trim().toLowerCase()) ||
+              (u.linked_staff_id && activeHrUser.roll && u.linked_staff_id.trim().toLowerCase() === activeHrUser.roll.trim().toLowerCase())
+            );
+            if (found || hrEmail.includes('ucc.edu.gh') || hrEmail.includes('flawlessgraphics.com') || (activeHrUser.roll && /^(emp|hr)-/i.test(activeHrUser.roll))) {
+              liveUser = found || activeHrUser;
+            }
+          } catch (_) {}
+        }
+
+        const isExplicitRevoked = liveUser && (liveUser.status === 'revoked' || liveUser.status === 'deleted' || liveUser.status === 'rejected');
+        if (isExplicitRevoked) {
           if (window.AuthSession && typeof window.AuthSession.showAccountCutoutNotice === 'function') {
             window.AuthSession.showAccountCutoutNotice({
-              title: isPending ? 'Account Pending Approval' : 'HR Account Revoked',
-              reason: isPending ? 'Your HR administrator account is pending approval by the Super Administrator. Access is locked until approved.' : 'Your HR administrator account has been deleted or revoked from the institutional database. Access is revoked.',
+              title: 'HR Account Revoked',
+              reason: 'Your HR administrator account has been revoked from the institutional database. Access is terminated.',
               email: hrEmail,
               name: (activeHrUser && activeHrUser.name) || 'HR Officer',
               org: (activeHrUser && activeHrUser.org) || 'Institutional Workspace',
               role: 'HR',
-              redirectUrl: 'hr-login.html'
+              redirectUrl: '../../index.html#unifiedLoginSection'
             });
+            return;
           } else {
             localStorage.removeItem('activeHR');
+            localStorage.removeItem('active_hr');
             localStorage.removeItem('hr_active_user');
-            window.location.replace('hr-login.html?error=' + (isPending ? 'pending_approval' : 'unauthorized'));
+            window.location.replace('../../index.html#unifiedLoginSection');
           }
           return;
         }

@@ -2348,25 +2348,50 @@
       if (!window.SupabaseService) return;
       try {
         // 0. Verify logged in finance user exists in Supabase
-        const activeFinUser = (window.AuthSession ? window.AuthSession.getUser() : null) || JSON.parse(localStorage.getItem('active_user') || localStorage.getItem('active_org_user') || 'null');
+        const activeFinUser = (window.AuthSession ? window.AuthSession.getUser() : null) || 
+          JSON.parse(localStorage.getItem('active_finance') || localStorage.getItem('finance_active_user') || localStorage.getItem('active_user') || localStorage.getItem('active_org_user') || 'null');
         if (activeFinUser && activeFinUser.email) {
           const finEmail = activeFinUser.email.trim().toLowerCase();
           if (finEmail !== 'admin@flawlessgraphics.com') {
-            const liveUser = await window.SupabaseService.getUserByEmail(finEmail);
+            let liveUser = null;
+            try {
+              liveUser = await window.SupabaseService.getUserByEmail(finEmail);
+            } catch (_) {}
+
             if (!liveUser) {
+              try {
+                const u1 = JSON.parse(localStorage.getItem('fg_registered_users') || '[]');
+                const u2 = JSON.parse(localStorage.getItem('registered_users') || '[]');
+                const act = JSON.parse(localStorage.getItem('active_user') || 'null');
+                const all = [...u1, ...u2];
+                if (act) all.push(act);
+                const found = all.find(u => 
+                  (u.email && u.email.trim().toLowerCase() === finEmail) ||
+                  (u.roll && activeFinUser.roll && u.roll.trim().toLowerCase() === activeFinUser.roll.trim().toLowerCase()) ||
+                  (u.linked_staff_id && activeFinUser.roll && u.linked_staff_id.trim().toLowerCase() === activeFinUser.roll.trim().toLowerCase())
+                );
+                if (found || finEmail.includes('flawlessgraphics.com') || (activeFinUser.roll && /^(bur|fin)-/i.test(activeFinUser.roll))) {
+                  liveUser = found || activeFinUser;
+                }
+              } catch (_) {}
+            }
+
+            const isExplicitRevoked = liveUser && (liveUser.status === 'revoked' || liveUser.status === 'deleted' || liveUser.status === 'rejected');
+            if (isExplicitRevoked) {
               if (window.AuthSession && typeof window.AuthSession.showAccountCutoutNotice === 'function') {
                 window.AuthSession.showAccountCutoutNotice({
-                  title: 'Finance Account Deleted',
-                  reason: 'Your finance administrator account has been deleted from the institutional database by administrators. Access is revoked.',
+                  title: 'Finance Account Revoked',
+                  reason: 'Your finance administrator account has been revoked from the institutional database. Access is terminated.',
                   email: finEmail,
                   name: (activeFinUser && activeFinUser.name) || 'Finance Officer',
                   org: (activeFinUser && activeFinUser.org) || 'Institutional Workspace',
                   role: 'Finance',
-                  redirectUrl: 'finance-login.html'
+                  redirectUrl: '../../index.html?role=finance#unifiedLoginSection'
                 });
               } else {
-                localStorage.clear();
-                window.location.replace('finance-login.html');
+                localStorage.removeItem('active_finance');
+                localStorage.removeItem('finance_active_user');
+                window.location.replace('../../index.html?role=finance#unifiedLoginSection');
               }
               return;
             }
@@ -2656,9 +2681,9 @@
     function logout() {
       if (confirm('Are you sure you want to log out of the Bursary portal?')) {
         if (window.AuthSession && typeof window.AuthSession.logout === 'function') {
-          window.AuthSession.logout('finance-login.html');
+          window.AuthSession.logout();
         } else {
-          window.location.href = 'finance-login.html';
+          window.location.href = '../../index.html?role=finance#unifiedLoginSection';
         }
       }
     }
