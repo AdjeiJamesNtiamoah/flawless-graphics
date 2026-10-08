@@ -480,6 +480,32 @@
           <div class="tour-roll-progress-fill" id="tourRollProgressFill"></div>
         </div>
       </div>
+
+      <!-- First-Time Onboarding Welcome Modal -->
+      <div class="tour-welcome-backdrop" id="tourWelcomeBackdrop" onclick="if(event.target===this) window.QuickAssistant.dismissWelcomeModal(true)">
+        <div class="tour-welcome-modal" id="tourWelcomeModal" role="dialog" aria-modal="true" aria-labelledby="tourWelcomeTitle" onclick="event.stopPropagation()">
+          <button type="button" class="tour-welcome-close" onclick="window.QuickAssistant.dismissWelcomeModal(true)" title="Skip Tour (Esc)">&times;</button>
+          <div class="tour-welcome-header">
+            <div class="tour-welcome-crest" id="tourWelcomeCrest">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <div class="tour-welcome-badge" id="tourWelcomeBadge">NEW PORTAL ACCESS</div>
+            <h3 class="tour-welcome-title" id="tourWelcomeTitle">Welcome to Your Portal!</h3>
+            <p class="tour-welcome-subtitle" id="tourWelcomeSub">Since this is your first time signing into your workspace, let's take a quick 1-minute guided tour of your essential tools and features.</p>
+          </div>
+          <div class="tour-welcome-highlights" id="tourWelcomeHighlights">
+            <!-- Injected dynamically per role -->
+          </div>
+          <div class="tour-welcome-actions">
+            <button type="button" class="tour-btn-start" id="tourWelcomeStartBtn" onclick="window.QuickAssistant.startTourFromWelcome()">
+              <i class="fa-solid fa-play"></i> Launch Guided Tour
+            </button>
+            <button type="button" class="tour-btn-skip" onclick="window.QuickAssistant.dismissWelcomeModal(true)">
+              Explore On My Own
+            </button>
+          </div>
+        </div>
+      </div>
     `;
 
     document.body.appendChild(container);
@@ -494,139 +520,237 @@
   const AUTO_ROLL_DURATION = 4200; // 4.2 seconds per button
 
   function getContextTourSteps() {
-    // 1. HR Dashboard context (checks for HR navigation or controls)
-    if (document.getElementById('addTeacherBtn') || document.querySelector('#nav button[data-section="dashboard"]')) {
+    const p = window.location.pathname.replace(/\\/g, '/').toLowerCase();
+
+    // 1. HR Dashboard context
+    if (p.includes('/pages/hr/') || document.getElementById('addTeacherBtn') || document.querySelector('[data-section="dashboard"]')) {
       return [
         {
-          selector: '#nav button[data-section="dashboard"]',
-          title: 'Workforce Dashboard',
-          badge: 'Overview',
+          selector: '#nav button[data-section="dashboard"], [data-section="dashboard"]',
+          title: 'Workforce Executive Command',
+          badge: 'HR Hub',
           placement: 'right',
-          content: 'Central command panel tracking staff headcount, real-time attendance averages, departmental staffing distributions, and gross payroll.'
+          content: 'Central workforce intelligence dashboard tracking active staff headcount, attendance telemetry, department allocations, and gross payroll.'
         },
         {
-          selector: '#topbarFeaturesDropdown, .features-btn',
-          title: 'All Integrated Features',
-          badge: 'Services Hub',
-          placement: 'bottom',
-          content: 'Hover here anytime to reveal the consolidated services suite merged from the public portal: Attendance, Payroll, Directory, Analytics, and Treasury.'
-        },
-        {
-          selector: '#nav button[data-section="classes"]',
-          title: 'Classroom & Teacher Allocation',
-          badge: 'Academics',
+          selector: '#navGroupRegister, #addTeacherBtn, #navAddStudentBtn',
+          title: 'Personnel & Class Registration',
+          badge: 'Onboarding',
           placement: 'right',
-          content: 'Assign lead instructors to classrooms, manage student capacities, and schedule weekly class slots across subjects.'
+          content: 'Register new teachers, enrol students, and provision academic cohorts, classes, and subjects with instant credential generation.'
         },
         {
-          selector: '#nav button[data-section="teachers"]',
-          title: 'Staff Directory & Personnel',
+          selector: '#nav button[data-section="teachers"], [data-section="teachers"]',
+          title: 'Staff Directory & Credentials',
           badge: 'Workforce',
           placement: 'right',
-          content: 'Comprehensive staff database with Ghana Card identification, contact details, designations, and academic qualifications.'
+          content: 'Comprehensive faculty database with verified Ghana Card identification, contact details, designations, and academic qualifications.'
         },
         {
-          selector: '#nav button[data-section="students"]',
-          title: 'Students Roster & Profiles',
-          badge: 'Students',
-          placement: 'right',
-          content: 'Enrolled student profiles with pinned form headers that never scroll out of view, guardian details, and photo avatars.'
-        },
-        {
-          selector: '#nav button[data-section="attendance"]',
-          title: 'Attendance Analytics & Logs',
+          selector: '#nav button[data-section="attendance"], [data-section="attendance"]',
+          title: 'Attendance Analytics & Biometrics',
           badge: 'Operations',
           placement: 'right',
-          content: 'Track daily staff clock-ins, monitor punctuality rates, and analyze monthly attendance compliance.'
+          content: 'Monitor daily staff roll calls, punch clock logs, punctuality rates, and monthly statutory attendance compliance.'
         },
         {
-          selector: '#nav button[data-section="payroll"]',
-          title: 'Ghana SSNIT & GRA Payroll',
-          badge: 'Treasury',
+          selector: '#nav button[data-section="payroll"], [data-section="payroll"], #payrollStatutoryCard',
+          title: 'SSNIT & GRA Statutory Payroll Engine',
+          badge: 'Compensation',
           placement: 'right',
-          content: 'Automates Ghanaian payroll compliance: SSNIT Tier 1 & 2 contributions, GRA PAYE progressive tax brackets, and printable payslips.'
+          content: 'Automates Ghanaian payroll compliance: SSNIT Tier 1 & 2 contributions, progressive GRA PAYE tax brackets, and official printable payslips.'
         },
         {
-          selector: '#nav button[data-section="analytics"]',
-          title: 'Workforce Performance Scoring',
-          badge: 'Appraisals',
-          placement: 'right',
-          content: 'Conduct teacher appraisals, track departmental productivity, and review workforce performance indicators.'
-        },
-        {
-          selector: '#nav button[data-section="announcements"]',
-          title: 'Broadcasts & Circulars',
-          badge: 'Communications',
-          placement: 'right',
-          content: 'Publish school-wide circulars, emergency announcements, and term notices with instant staff visibility.'
-        },
-        {
-          selector: '#addTeacherBtn',
-          title: '+ Add Teacher Enrolment',
-          badge: 'Action Button',
-          placement: 'bottom',
-          content: 'Click here anytime to enrol a new teacher using the professional 5-section form with photo upload and credential management.'
-        },
-        {
-          selector: '#cloudSyncBtn',
+          selector: '#cloudSyncBtn, .supabase-btn',
           title: 'Live Supabase Cloud Sync',
           badge: 'Cloud Sync',
           placement: 'bottom',
           content: 'Connect to Supabase to enable real-time multi-device cloud synchronization for workforce and student records.'
         },
         {
-          selector: '[onclick*="SchoolMessenger"]',
-          title: 'Staff Messenger & Chat',
-          badge: 'Messaging',
-          placement: 'bottom',
-          content: 'Open the dedicated school staff chat to message instructors, departments, and administrators in real time.'
+          selector: '#quickAssistantFab',
+          title: 'Quick Assistant & Help Desk',
+          badge: 'Support Desk',
+          placement: 'left',
+          content: 'Tap this magic wand or press Alt + A anytime to open help guides, re-launch this tour, or test system diagnostics.'
         }
       ];
     }
 
-    // 2. Teacher Dashboard context
-    if (document.getElementById('teacherProfile') || document.querySelector('.nav .tab[data-section="classes"]')) {
+    // 2. Finance / Bursary Dashboard context
+    if (p.includes('/pages/finance/') || document.getElementById('navStudentBilling') || document.getElementById('navDashboard')) {
       return [
         {
-          selector: '.tab[data-section="overview"]',
-          title: 'Teacher Academic Hub',
+          selector: '#navDashboard, #tabDashboard',
+          title: 'Bursary & Treasury Command',
+          badge: 'Treasury Hub',
+          placement: 'right',
+          content: 'Welcome to your financial console. Monitor total operating budget, fees collected, outstanding student arrears, and net institutional liquidity.'
+        },
+        {
+          selector: '#navStudentBilling, .btn-action.success-btn',
+          title: 'Student Fee Billing & Collections',
+          badge: 'Fee Ledger',
+          placement: 'right',
+          content: 'Record student tuition payments, manage itemized fee schedules, and issue instant certified digital receipts with verification seals.'
+        },
+        {
+          selector: '#navClearanceDesk',
+          title: 'Exam Hall Clearance Desk',
+          badge: 'Exam Passes',
+          placement: 'right',
+          content: 'Authorize and issue cryptographic examination hall passes and fee clearance slips to students prior to exam periods.'
+        },
+        {
+          selector: '#navApproval, [onclick*="openPrepareSalaryModal"]',
+          title: 'Faculty & Staff Payroll Audit',
+          badge: 'Payroll Desk',
+          placement: 'right',
+          content: 'Audit monthly staff salary allocations, review statutory SSNIT/GRA deductions, and authorize banking disbursement schedules.'
+        },
+        {
+          selector: '#navFeeTariff, #navScholarships',
+          title: 'Tariffs & Scholarship Grants',
+          badge: 'Institutional',
+          placement: 'right',
+          content: 'Configure tuition rates per cohort and administer financial aid packages, bursary waivers, and merit scholarships.'
+        },
+        {
+          selector: '#cloudSyncBtn, .supabase-btn',
+          title: 'Cloud Vault Synchronization',
+          badge: 'Cloud Vault',
+          placement: 'bottom',
+          content: 'Ensure all tuition ledger entries and financial transactions are securely synced to Supabase cloud storage.'
+        },
+        {
+          selector: '#quickAssistantFab',
+          title: 'Quick Assistant & Help Desk',
+          badge: 'Support Desk',
+          placement: 'left',
+          content: 'Need help or want to replay this tour? Press Alt + A or click this button anytime to access the quick assistance hub.'
+        }
+      ];
+    }
+
+    // 3. Teacher Dashboard context
+    if (p.includes('/pages/teacher/') || document.getElementById('teacherProfile') || document.querySelector('.tab[data-section="classes"]') || document.getElementById('kpis')) {
+      return [
+        {
+          selector: '.tab[data-section="overview"], #kpis',
+          title: 'Educator Academic Hub',
           badge: 'Overview',
           placement: 'right',
-          content: 'Your primary instructor command center showing active student counts, today’s classes, and urgent notes.'
+          content: 'Your primary instructor command center showing active student counts, today’s classes, and urgent academic alerts.'
         },
         {
           selector: '.tab[data-section="classes"]',
           title: 'My Classes & Timetable',
           badge: 'Classroom',
           placement: 'right',
-          content: 'View enrolled student rosters, schedule slots, and lesson timetables for your assigned subjects.'
+          content: 'View enrolled student rosters, schedule slots, and weekly lesson timetables for your assigned subjects.'
         },
         {
           selector: '.tab[data-section="students"]',
           title: 'Enrolled Students & Photos',
           badge: 'Roster',
           placement: 'right',
-          content: 'Comprehensive student roster with uploaded student avatars, medical remarks, and guardian contacts.'
+          content: 'Comprehensive student roster with uploaded student avatars, medical remarks, and guardian emergency contacts.'
         },
         {
-          selector: '.tab[data-section="attendance"]',
+          selector: '.tab[data-section="attendance"], .quick-action-pill[onclick*="attendance"]',
           title: 'Daily Class Attendance',
-          badge: 'Attendance',
+          badge: 'Roll Call',
           placement: 'right',
-          content: 'Mark and submit daily classroom attendance with single-click present/absent registers.'
+          content: 'Mark and submit daily classroom attendance with single-click present/absent registers and attendance streak tracking.'
         },
         {
-          selector: '#btnNewStudent, #addStudentBtn, .btn-primary',
-          title: '+ Add Student Record',
-          badge: 'Action',
-          placement: 'bottom',
-          content: 'Enrol students using the pinned-header detail modal with photo upload and emergency contacts.'
+          selector: '.tab[data-section="assessments"], .quick-action-pill[onclick*="Assessment"]',
+          title: 'Continuous Assessment & WAEC Grades',
+          badge: 'Grading',
+          placement: 'right',
+          content: 'Record class tests, homework scores, and terminal exam grades calibrated to official WAEC 9-point rubrics.'
+        },
+        {
+          selector: '.tab[data-section="lessons"], .tab[data-section="broadcasts"]',
+          title: 'Lesson Notes & Campus Directives',
+          badge: 'Curriculum',
+          placement: 'right',
+          content: 'Prepare structured lesson notes and stay updated with institutional circulars, memos, and term schedules.'
+        },
+        {
+          selector: '#quickAssistantFab',
+          title: 'Quick Assistant & Help Desk',
+          badge: 'Support Desk',
+          placement: 'left',
+          content: 'Press Alt + A or tap this magic wand anytime to find answers, check diagnostics, or re-run this interactive tour.'
         }
       ];
     }
 
-    // 3. Public Home context
-    if (document.getElementById('openDashboardBtn') || document.getElementById('addEmpShortcut')) {
+    // 4. Student Dashboard context
+    if (p.includes('/pages/student/') || document.getElementById('nav_overview') || document.getElementById('nav_courses')) {
+      return [
+        {
+          selector: '#nav_overview, .academic-breadcrumb',
+          title: 'Student Academy Hub',
+          badge: 'Welcome',
+          placement: 'right',
+          content: 'Welcome to your personalized student portal. View your academic summary, term announcements, and class schedule.'
+        },
+        {
+          selector: '#nav_courses',
+          title: 'My Courses & Syllabi',
+          badge: 'Courses',
+          placement: 'right',
+          content: 'Explore your enrolled subjects, course outlines, recommended textbooks, and teacher contact channels.'
+        },
+        {
+          selector: '#nav_timetable',
+          title: 'Live Class Timetable',
+          badge: 'Timetable',
+          placement: 'right',
+          content: 'Never miss a lecture with your real-time daily class timetable and classroom location guide.'
+        },
+        {
+          selector: '#nav_assignments',
+          title: 'Assignments & Continuous Assessment',
+          badge: 'Homework',
+          placement: 'right',
+          content: 'Track upcoming assignment deadlines, submit completed coursework online, and review teacher scoring feedback.'
+        },
+        {
+          selector: '#nav_grades, #nav_gpaSim',
+          title: 'WAEC Broadsheet & GPA Simulator',
+          badge: 'Grades',
+          placement: 'right',
+          content: 'Review verified terminal grades, WAEC continuous assessment scores, and simulate your projected cumulative GPA.'
+        },
+        {
+          selector: '#nav_fees',
+          title: 'Tuition Fee Ledger & Clearance',
+          badge: 'Bursary',
+          placement: 'right',
+          content: 'View your tuition billing status, download verified official payment receipts, and verify your exam hall clearance.'
+        },
+        {
+          selector: '#nav_profile',
+          title: 'Digital Student Smart ID Card',
+          badge: 'Smart ID',
+          placement: 'right',
+          content: 'Access your official digital student ID badge featuring cryptographic QR and RFID verification codes.'
+        },
+        {
+          selector: '#quickAssistantFab',
+          title: 'Quick Assistant & Help Desk',
+          badge: 'Support Desk',
+          placement: 'left',
+          content: 'Press Alt + A or tap this magic wand anytime to view student guides or replay this interactive tour.'
+        }
+      ];
+    }
+
+    // 5. Public Home context
+    if (document.getElementById('openDashboardBtn') || document.getElementById('addEmpShortcut') || document.getElementById('unifiedLoginConsole')) {
       return [
         {
           selector: '#orgLogoBox, .brand',
@@ -636,37 +760,37 @@
           content: 'Central enterprise brand reflection showcasing your uploaded organization logo and name across the portal.'
         },
         {
-          selector: '#openDashboardBtn',
-          title: 'Launch HR Workspace',
-          badge: 'Dashboard',
+          selector: '#openDashboardBtn, .tab-btn[data-role="hr"]',
+          title: 'HR & Faculty Portal',
+          badge: 'HR Hub',
           placement: 'bottom',
-          content: 'One-click gateway into the workforce management portal, payroll analytics, and staff directory.'
+          content: 'One-click gateway into workforce management, statutory Ghanaian payroll, and staff credentials.'
         },
         {
-          selector: '#openTeacherBtn',
+          selector: '#openTeacherBtn, .tab-btn[data-role="teacher"]',
           title: 'Teacher & Classroom Portal',
           badge: 'Academics',
           placement: 'bottom',
-          content: 'Direct entry for educators to access student rosters, lesson plans, and daily roll calls.'
+          content: 'Direct entry for educators to access student rosters, lesson plans, continuous assessments, and roll calls.'
         },
         {
-          selector: '#addEmpShortcut, #addEmpShortcutBtn',
-          title: 'Quick Personnel Enrolment',
-          badge: 'Quick Action',
-          placement: 'top',
-          content: 'Instant shortcut to register teachers and team members with photo verification.'
+          selector: '.tab-btn[data-role="finance"]',
+          title: 'Bursary & Treasury Operations',
+          badge: 'Treasury',
+          placement: 'bottom',
+          content: 'Dedicated accounting portal for student fee collections, exam clearance passes, and cash flows.'
         },
         {
-          selector: '.shortcuts div:nth-child(2)',
-          title: 'Payroll Analytics Review',
-          badge: 'Compensation',
-          placement: 'top',
-          content: 'Deep-dive into departmental salary distributions, SSNIT contributions, and financial trends.'
+          selector: '.tab-btn[data-role="student"]',
+          title: 'Student Academy Portal',
+          badge: 'Student',
+          placement: 'bottom',
+          content: 'Scholar workstation for course syllabi, live timetables, WAEC grading broadsheets, and digital smart IDs.'
         }
       ];
     }
 
-    // 4. Default fallback: query prominent navigation and action buttons
+    // 6. Default fallback: query prominent navigation and action buttons
     const buttons = Array.from(document.querySelectorAll('button:not(#quickAssistantFab):not(.assistant-btn-primary):not(.assistant-btn-outline), nav a, .btn'));
     if (buttons.length > 0) {
       return buttons.slice(0, 6).map((btn, idx) => ({
@@ -704,6 +828,7 @@
       if (window.AuthSession && typeof window.AuthSession.applyGlobalBranding === 'function') {
         window.AuthSession.applyGlobalBranding();
       }
+      this.checkFirstTimeTour();
     },
 
     bindEvents: function () {
@@ -986,9 +1111,10 @@
     },
 
     // Interactive Project Tour Logic (Dynamic Button-Pointing & Auto-Roll)
-    startProjectTour: function () {
+    startProjectTour: function (customSteps = null) {
       this.close();
-      activeTourSteps = getContextTourSteps();
+      this.dismissWelcomeModal(false);
+      activeTourSteps = (Array.isArray(customSteps) && customSteps.length > 0) ? customSteps : getContextTourSteps();
       currentTourIndex = 0;
       const overlay = document.getElementById('tourSpotlightOverlay');
       if (overlay) overlay.classList.add('active');
@@ -1225,6 +1351,7 @@
       if (beacon) beacon.classList.remove('active');
       if (card) card.classList.remove('active');
       this.unbindTourKeyEvents();
+      this.markTourCompleted();
     },
 
     bindTourKeyEvents: function () {
@@ -1244,6 +1371,196 @@
       if (this._tourKeyHandler) {
         window.removeEventListener('keydown', this._tourKeyHandler);
         this._tourKeyHandler = null;
+      }
+    },
+
+    // =========================================================================
+    // FIRST-TIME USER ONBOARDING TOUR CONTROLLER (HR, Finance, Teacher, Student)
+    // =========================================================================
+    _currentWelcomeRole: null,
+    _currentWelcomeUser: null,
+
+    detectCurrentRole: function () {
+      const p = window.location.pathname.replace(/\\/g, '/').toLowerCase();
+      if (p.includes('/pages/hr/') || document.querySelector('#navGroupRegister') || document.querySelector('[data-section="dashboard"]')) return 'hr';
+      if (p.includes('/pages/finance/') || document.querySelector('#navStudentBilling') || document.querySelector('#navDashboard')) return 'finance';
+      if (p.includes('/pages/teacher/') || document.querySelector('.tab[data-section="classes"]') || document.getElementById('kpis')) return 'teacher';
+      if (p.includes('/pages/student/') || document.querySelector('#nav_overview') || document.querySelector('#nav_courses')) return 'student';
+      return null;
+    },
+
+    checkFirstTimeTour: function () {
+      const role = this.detectCurrentRole();
+      if (!role) return;
+
+      let user = null;
+      if (window.AuthSession && typeof window.AuthSession.getUser === 'function') {
+        user = window.AuthSession.getUser();
+      }
+      if (!user) {
+        try {
+          user = JSON.parse(localStorage.getItem('active_' + role) || localStorage.getItem('active_user') || '{}');
+        } catch (_) {}
+      }
+      user = user || {};
+
+      const cleanId = (user.id || user.roll || user.linked_staff_id || user.email || 'user').toString().trim().toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+      const tourKey = `fg_tour_seen_${role}_${cleanId}`;
+      const generalTourKey = `fg_tour_seen_${role}`;
+
+      const alreadySeen = localStorage.getItem(tourKey) || (user.id && localStorage.getItem('fg_tour_seen_' + user.id));
+      const isNewRegistration = !!(user.is_new_registration || user.first_login || sessionStorage.getItem('fg_new_registered_user'));
+
+      if (!alreadySeen || isNewRegistration) {
+        // Trigger welcome modal after gentle delay so skeleton fades cleanly
+        setTimeout(() => {
+          this.showWelcomeModal(role, user);
+        }, 700);
+      }
+    },
+
+    showWelcomeModal: function (role, user) {
+      const backdrop = document.getElementById('tourWelcomeBackdrop');
+      if (!backdrop) return;
+
+      const userName = (user && (user.name || user.fullName || user.firstName)) || 'Colleague';
+
+      const configs = {
+        hr: {
+          crest: '<i class="fa-solid fa-users-gear"></i>',
+          crestGrad: 'linear-gradient(135deg, #e11d48 0%, #ec4899 100%)',
+          crestShadow: 'rgba(225, 29, 72, 0.45)',
+          badge: 'HR & FACULTY PAYROLL PORTAL',
+          badgeColor: '#e11d48',
+          badgeBg: 'rgba(225, 29, 72, 0.1)',
+          title: `Welcome to HR Operations, ${userName}!`,
+          sub: "Your workforce management workspace is active. Let's take a quick 1-minute guided tour of your staff directory, attendance telemetry, and Ghana SSNIT / GRA payroll engines.",
+          highlights: [
+            { icon: 'fa-id-card', text: '<strong>Staff Directory:</strong> Credentials & Ghana Card identification.' },
+            { icon: 'fa-user-clock', text: '<strong>Attendance Tracking:</strong> Daily biometric roll call & punctuality.' },
+            { icon: 'fa-money-bill-transfer', text: '<strong>Statutory Payroll:</strong> SSNIT Tier 1/2 & GRA PAYE compliance.' },
+            { icon: 'fa-cloud-arrow-up', text: '<strong>Supabase Cloud:</strong> Real-time synchronization & offline backup.' }
+          ]
+        },
+        finance: {
+          crest: '<i class="fa-solid fa-file-invoice-dollar"></i>',
+          crestGrad: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
+          crestShadow: 'rgba(217, 119, 6, 0.45)',
+          badge: 'BURSARY & TREASURY PORTAL',
+          badgeColor: '#d97706',
+          badgeBg: 'rgba(217, 119, 6, 0.1)',
+          title: `Welcome to Bursary & Treasury, ${userName}!`,
+          sub: "Your institutional financial console is initialized. Take a quick interactive tour to explore student fee billing, certified receipts, exam clearance, and liquidity charts.",
+          highlights: [
+            { icon: 'fa-receipt', text: '<strong>Fee Billing:</strong> Student ledger & certified digital receipts.' },
+            { icon: 'fa-stamp', text: '<strong>Exam Clearance:</strong> Cryptographic exam passes for paid students.' },
+            { icon: 'fa-hand-holding-dollar', text: '<strong>Payroll Audit:</strong> Staff salary approvals & disbursements.' },
+            { icon: 'fa-chart-pie', text: '<strong>Treasury Telemetry:</strong> Live operating budgets & cash flows.' }
+          ]
+        },
+        teacher: {
+          crest: '<i class="fa-solid fa-chalkboard-user"></i>',
+          crestGrad: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+          crestShadow: 'rgba(99, 102, 241, 0.45)',
+          badge: 'EDUCATOR & CLASSROOM PORTAL',
+          badgeColor: '#6366f1',
+          badgeBg: 'rgba(99, 102, 241, 0.1)',
+          title: `Welcome to Your Classroom Hub, ${userName}!`,
+          sub: "Your educator workstation is ready. Let's take a quick tour of your assigned cohorts, student rosters, daily roll call, and WAEC continuous assessment scoring.",
+          highlights: [
+            { icon: 'fa-chalkboard', text: '<strong>Classes & Cohorts:</strong> Subjects, rosters, and lesson slots.' },
+            { icon: 'fa-user-graduate', text: '<strong>Student Rosters:</strong> Profiles, avatars, and guardian contacts.' },
+            { icon: 'fa-clipboard-user', text: '<strong>Roll Call:</strong> 1-click classroom attendance registers.' },
+            { icon: 'fa-award', text: '<strong>WAEC Grading:</strong> Continuous assessment & rubric scoring.' }
+          ]
+        },
+        student: {
+          crest: '<i class="fa-solid fa-user-graduate"></i>',
+          crestGrad: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+          crestShadow: 'rgba(5, 150, 105, 0.45)',
+          badge: 'STUDENT ACADEMY PORTAL',
+          badgeColor: '#059669',
+          badgeBg: 'rgba(5, 150, 105, 0.1)',
+          title: `Welcome to Student Academy, ${userName}!`,
+          sub: "Your student learning portal is active. Let's take a quick guided tour of your enrolled courses, daily class timetable, continuous assessment grades, and smart digital ID.",
+          highlights: [
+            { icon: 'fa-book-open', text: '<strong>My Courses:</strong> Syllabi, recommended notes, and lectures.' },
+            { icon: 'fa-calendar-days', text: '<strong>Daily Timetable:</strong> Live class schedules and room venues.' },
+            { icon: 'fa-graduation-cap', text: '<strong>Grades & GPA:</strong> WAEC broadsheet & GPA simulator.' },
+            { icon: 'fa-id-badge', text: '<strong>Smart ID Badge:</strong> NFC / RFID verified campus pass.' }
+          ]
+        }
+      };
+
+      const cfg = configs[role] || configs['hr'];
+
+      const crest = document.getElementById('tourWelcomeCrest');
+      const badge = document.getElementById('tourWelcomeBadge');
+      const title = document.getElementById('tourWelcomeTitle');
+      const sub = document.getElementById('tourWelcomeSub');
+      const highlights = document.getElementById('tourWelcomeHighlights');
+      const startBtn = document.getElementById('tourWelcomeStartBtn');
+
+      if (crest) {
+        crest.innerHTML = cfg.crest;
+        crest.style.background = cfg.crestGrad;
+        crest.style.boxShadow = `0 12px 28px -6px ${cfg.crestShadow}`;
+      }
+      if (badge) {
+        badge.textContent = cfg.badge;
+        badge.style.color = cfg.badgeColor;
+        badge.style.background = cfg.badgeBg;
+      }
+      if (title) title.textContent = cfg.title;
+      if (sub) sub.textContent = cfg.sub;
+      if (startBtn) startBtn.style.background = cfg.crestGrad;
+
+      if (highlights) {
+        highlights.innerHTML = cfg.highlights.map(h => `
+          <div class="tour-welcome-highlight-item">
+            <i class="fa-solid ${h.icon}" style="color:${cfg.badgeColor};"></i>
+            <div>${h.text}</div>
+          </div>
+        `).join('');
+      }
+
+      this._currentWelcomeRole = role;
+      this._currentWelcomeUser = user;
+
+      backdrop.classList.add('active');
+    },
+
+    startTourFromWelcome: function () {
+      this.dismissWelcomeModal(false);
+      this.startProjectTour();
+    },
+
+    dismissWelcomeModal: function (markComplete = true) {
+      const backdrop = document.getElementById('tourWelcomeBackdrop');
+      if (backdrop) backdrop.classList.remove('active');
+      if (markComplete) {
+        this.markTourCompleted();
+        this.showNotification('You can relaunch the guided tour anytime from the Quick Assistant or the Tour button.', 'info');
+      }
+    },
+
+    markTourCompleted: function () {
+      const role = this._currentWelcomeRole || this.detectCurrentRole() || 'general';
+      let user = this._currentWelcomeUser;
+      if (!user && window.AuthSession && typeof window.AuthSession.getUser === 'function') {
+        user = window.AuthSession.getUser();
+      }
+      const cleanId = (user && (user.id || user.roll || user.linked_staff_id || user.email) || 'user').toString().trim().toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+
+      localStorage.setItem(`fg_tour_seen_${role}_${cleanId}`, 'true');
+      localStorage.setItem(`fg_tour_seen_${role}`, 'true');
+      sessionStorage.removeItem('fg_new_registered_user');
+
+      if (user && user.is_new_registration) {
+        user.is_new_registration = false;
+        if (window.AuthSession && typeof window.AuthSession.setUser === 'function') {
+          window.AuthSession.setUser(user);
+        }
       }
     },
 

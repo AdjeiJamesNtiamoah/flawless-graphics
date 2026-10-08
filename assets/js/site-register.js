@@ -42,6 +42,8 @@ document.getElementById("registerForm")?.addEventListener("submit", async functi
         rawPassPreview: pass,
         role: roleLower,
         status: status,
+        is_new_registration: true,
+        first_login: true,
         createdAt: Date.now()
     };
 

@@ -19,6 +19,9 @@
 <link rel="stylesheet" href="assets/css/quick-dock.css">
 <!-- Pop-up Toaster System -->
 <link rel="stylesheet" href="assets/css/toaster.css">
+<!-- Shared Portal Canopy: Greeting, Calendar Date & Live Clock -->
+<link rel="stylesheet" href="assets/css/portal-canopy.css">
+<script src="assets/js/portal-canopy.js" defer></script>
 <script src="assets/js/toaster.js" defer></script>
 
 <style>
@@ -642,6 +645,25 @@
                 <a href="pages/public/home.html" class="window-nav-link"><i class="fa-solid fa-house"></i> Main Site</a>
                 <a href="site-login.html" class="window-nav-link"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
             </nav>
+        </div>
+                <div class="portal-canopy-bar" style="margin-left: auto; margin-right: 14px;">
+            <div class="portal-greeting-badge">
+                <i class="fa-solid fa-heart portal-heart-icon"></i>
+                <span class="portal-greeting-highlight" data-portal-role="Executive Leader">Good evening, Executive Leader</span>
+                <span class="portal-badge-dot">&bull;</span>
+                <span class="portal-greeting-brand">Flawless Graphyx</span>
+            </div>
+            <div class="portal-datetime-group">
+                <div class="portal-date-chip">
+                    <i class="fa-regular fa-calendar-days"></i>
+                    <span class="portal-live-date-text">Sunday, 4 Oct 2026</span>
+                </div>
+                <div class="portal-clock-chip">
+                    <span class="portal-clock-pulse"></span>
+                    <i class="fa-regular fa-clock"></i>
+                    <span class="portal-live-clock-text">21:35:00 GMT</span>
+                </div>
+            </div>
         </div>
         <div class="user-badge" id="userBadge" style="display: none;">
             <i class="fa-solid fa-circle-user"></i>

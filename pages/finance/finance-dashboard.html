@@ -768,6 +768,8 @@
   </style>
   <link rel="stylesheet" href="../../assets/css/cascading-nav.css">
   <link rel="stylesheet" href="../../assets/css/slide-over.css">
+  <link rel="stylesheet" href="../../assets/css/portal-canopy.css">
+  <script src="../../assets/js/portal-canopy.js" defer></script>
 </head>
 <body>
 
@@ -867,13 +869,37 @@
         </div>
       </div>
 
+      <!-- Finance Portal Greeting, Date & Live Clock Canopy -->
+      <div class="portal-canopy-bar" style="margin: 0 auto;">
+        <div class="portal-greeting-badge">
+          <i class="fa-solid fa-heart portal-heart-icon"></i>
+          <span class="portal-greeting-highlight" data-portal-role="Bursar">Good evening, Bursar</span>
+          <span class="portal-badge-dot">&bull;</span>
+          <span class="portal-greeting-brand">Treasury Operations</span>
+        </div>
+        <div class="portal-datetime-group">
+          <div class="portal-date-chip">
+            <i class="fa-regular fa-calendar-days"></i>
+            <span class="portal-live-date-text">Sunday, 4 Oct 2026</span>
+          </div>
+          <div class="portal-clock-chip">
+            <span class="portal-clock-pulse"></span>
+            <i class="fa-regular fa-clock"></i>
+            <span class="portal-live-clock-text">21:26:00 GMT</span>
+          </div>
+        </div>
+      </div>
+
       <div class="top-nav-right">
         <!-- 1. Audit & Alerts -->
         <button type="button" class="topbar-btn" onclick="SlideOver.openNotifications()" title="Audit Logs & Alerts">
           <i class="fa-solid fa-bell"></i> <span>Audit &amp; Alerts</span>
         </button>
 
-        <!-- 2. Treasury Guide -->
+        <!-- 2. Treasury Guide & Guided Tour -->
+        <button type="button" class="topbar-btn" onclick="window.QuickAssistant?.startProjectTour()" title="Start Interactive Tour" style="color: #2563EB; font-weight: 700;">
+          <i class="fa-solid fa-compass"></i> <span>Tour</span>
+        </button>
         <button type="button" class="topbar-btn" onclick="SlideOver.openGuide('finance')" title="Treasury Documentation Guide">
           <i class="fa-solid fa-book-open"></i> <span>Treasury Guide</span>
         </button>

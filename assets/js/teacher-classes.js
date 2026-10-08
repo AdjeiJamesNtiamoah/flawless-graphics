@@ -10,31 +10,71 @@
   const CLASSES_KEY = `${ACTIVE_ORG}_classes`;
   const SCHEDULE_KEY = `${ACTIVE_ORG}_class_schedule`;
 
-  function getClasses(){
-    let arr = read(CLASSES_KEY);
-    if (!Array.isArray(arr)) {
-      arr = [];
-    }
-    // Purge any legacy dummy seed classes
-    const dummyIds = new Set(['cls_f2_arts', 'cls_f3_web', 'cls_f1_illust', 'cls_f2_print', 'cls_1', 'cls_2', 'cls_3', 'cls_4', 'cls_5']);
-    const dummyNames = new Set([
-      'grade 10 - graphic arts & visual identity',
-      'grade 11 - web systems & client architecture',
-      'grade 12 - digital animation & 3d modeling',
-      'grade 9 - fundamental design principles',
-      'grade 10 - ui/ux interactive prototyping',
-      'class 1 - visual design',
-      'class 2 - web systems',
-      'class 3 - animation & 3d'
-    ]);
-    const filtered = arr.filter(c => !dummyIds.has(c.id) && !dummyNames.has((c.name || c.className || '').toLowerCase().trim()));
-    if (filtered.length !== arr.length) {
-      arr = filtered;
-      save(CLASSES_KEY, arr);
-    }
-    return arr;
+  const user = (window.AuthSession ? window.AuthSession.getUser() : null) 
+    || safeParse(localStorage.getItem('teacher_active_user')) 
+    || safeParse(localStorage.getItem('active_teacher')) 
+    || safeParse(localStorage.getItem('active_org_user'));
+
+  function isSameEducator(educatorObj, targetTeacher) {
+    if (!educatorObj || !targetTeacher) return false;
+    const tEmail = (targetTeacher.email || '').toLowerCase().trim();
+    const tName = (targetTeacher.name || '').toLowerCase().trim();
+    const tId = String(targetTeacher.id || targetTeacher.empId || targetTeacher.staffId || '').trim();
+
+    const eEmail = (educatorObj.email || '').toLowerCase().trim();
+    const eName = (educatorObj.name || '').toLowerCase().trim();
+    const eId = String(educatorObj.id || educatorObj.empId || educatorObj.staffId || '').trim();
+
+    if (tEmail && eEmail && (tEmail === eEmail || tEmail.includes(eEmail) || eEmail.includes(tEmail))) return true;
+    if (tName && eName && (tName === eName || tName.includes(eName) || eName.includes(tName))) return true;
+    if (tId && eId && tId === eId) return true;
+    return false;
   }
-  function saveClasses(a){ save(CLASSES_KEY,a) }
+
+  function isTeacherAssignedToClass(c, t = user) {
+    if (!c || !t) return false;
+    const tEmail = (t.email || '').toLowerCase().trim();
+    const tName = (t.name || '').toLowerCase().trim();
+    const tId = String(t.id || t.empId || t.staffId || '').trim();
+
+    if (Array.isArray(c.teachers) && c.teachers.length > 0) {
+      if (c.teachers.some(item => isSameEducator(item, t))) return true;
+    }
+    if (c.teacherEmail && tEmail) {
+      const emails = String(c.teacherEmail).toLowerCase().split(',').map(x => x.trim());
+      if (emails.some(e => e === tEmail || e.includes(tEmail) || tEmail.includes(e))) return true;
+    }
+    if (c.teacherName && tName) {
+      const names = String(c.teacherName).toLowerCase().split(',').map(x => x.trim());
+      if (names.some(n => n === tName || n.includes(tName) || tName.includes(n))) return true;
+    }
+    if (c.teacherId && tId && String(c.teacherId).trim() === tId) return true;
+    if (c.submittedByEmail && tEmail && (c.submittedByEmail || '').toLowerCase().trim() === tEmail) return true;
+    if (c.submittedBy && tName && (c.submittedBy || '').toLowerCase().trim() === tName) return true;
+    return false;
+  }
+
+  function getAllOrgClasses(){
+    let arr = read(CLASSES_KEY);
+    if (!Array.isArray(arr)) arr = [];
+    const dummyIds = new Set(['cls_f2_arts', 'cls_f3_web', 'cls_f1_illust', 'cls_f2_print', 'cls_1', 'cls_2', 'cls_3', 'cls_4', 'cls_5']);
+    return arr.filter(c => !dummyIds.has(c.id));
+  }
+
+  function getClasses(){
+    return getAllOrgClasses().filter(c => isTeacherAssignedToClass(c, user));
+  }
+  function saveClasses(a){
+    const allOrg = getAllOrgClasses();
+    const updatedMap = new Map((Array.isArray(a) ? a : []).map(c => [String(c.id), c]));
+    let merged = allOrg.map(c => updatedMap.has(String(c.id)) ? updatedMap.get(String(c.id)) : c);
+    (Array.isArray(a) ? a : []).forEach(c => {
+      if (!allOrg.some(existing => String(existing.id) === String(c.id))) {
+        merged.push(c);
+      }
+    });
+    save(CLASSES_KEY, merged);
+  }
   function getSchedule(){ return read(SCHEDULE_KEY) }
   function saveSchedule(a){ save(SCHEDULE_KEY,a) }
 

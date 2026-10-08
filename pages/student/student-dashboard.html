@@ -1257,6 +1257,8 @@
 </style>
   <link rel="stylesheet" href="../../assets/css/cascading-nav.css">
   <link rel="stylesheet" href="../../assets/css/slide-over.css">
+  <link rel="stylesheet" href="../../assets/css/portal-canopy.css">
+  <script src="../../assets/js/portal-canopy.js" defer></script>
 </head>
 
 <body>
@@ -1303,6 +1305,27 @@
     </div>
   </div>
 
+  <!-- Student Portal Greeting, Date & Live Clock Canopy -->
+  <div class="portal-canopy-bar" style="margin: 0 auto;">
+    <div class="portal-greeting-badge">
+      <i class="fa-solid fa-heart portal-heart-icon"></i>
+      <span class="portal-greeting-highlight" data-portal-role="Scholar">Good evening, Scholar</span>
+      <span class="portal-badge-dot">&bull;</span>
+      <span class="portal-greeting-brand">Student Command Workspace</span>
+    </div>
+    <div class="portal-datetime-group">
+      <div class="portal-date-chip">
+        <i class="fa-regular fa-calendar-days"></i>
+        <span class="portal-live-date-text">Sunday, 4 Oct 2026</span>
+      </div>
+      <div class="portal-clock-chip">
+        <span class="portal-clock-pulse"></span>
+        <i class="fa-regular fa-clock"></i>
+        <span class="portal-live-clock-text">21:26:00 GMT</span>
+      </div>
+    </div>
+  </div>
+
   <div class="nav-right">
     <!-- Attendance Streak Pill -->
     <div class="streak-pill" id="attendanceStreakPill" title="Consecutive Attendance Streak">
@@ -1311,6 +1334,11 @@
     </div>
 
     <!-- Quick Action Bar -->
+    <button type="button" class="quick-action-btn" onclick="window.QuickAssistant?.startProjectTour()" title="Start Guided Tour" style="color: var(--accent); font-weight: 700;">
+      <i class="fa-solid fa-compass"></i>
+      <span>Tour</span>
+    </button>
+
     <button type="button" class="quick-action-btn" onclick="openSubmitAssignmentModal()">
       <i class="fa-solid fa-cloud-arrow-up" style="color: var(--accent);"></i>
       <span>+ Submit Work</span>
@@ -4217,6 +4245,10 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 </script>
+  <script src="../../assets/js/toaster.js"></script>
+  <script src="../../assets/js/skeleton-loader.js"></script>
+  <script src="../../assets/js/quick-assistant.js"></script>
+  <script src="../../assets/js/quick-dock.js"></script>
   <script src="../../assets/js/cascading-nav.js" defer></script>
   <script src="../../assets/js/slide-over.js"></script>
 </body>

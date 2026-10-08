@@ -584,10 +584,96 @@
     }
     .collapse-btn:hover { color: var(--primary); }
 
-    /* --- MAIN CONTENT AREA --- */
+    /* --- MAIN CONTENT AREA & TOPBAR REARRANGEMENT --- */
     main { flex: 1; overflow-y: auto; padding: 28px 32px; }
-    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px; }
-    .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .topbar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 24px;
+      width: 100%;
+    }
+    .topbar-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .topbar-title-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .topbar-controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .controls-left-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+    .controls-right-group {
+      display: flex;
+      align-items: center;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+    #topRightProfileContainer {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+    }
+    #topRightProfileContainer .fg-avatar-wrap {
+      width: 54px !important;
+      height: 54px !important;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+    }
+    #topRightProfileContainer .fg-avatar-img {
+      width: 54px !important;
+      height: 54px !important;
+      border-radius: 50% !important;
+      border: 2.5px solid #ffffff !important;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.16), 0 0 0 1.5px rgba(99, 91, 252, 0.25) !important;
+      object-fit: cover;
+    }
+    #topRightProfileContainer .fg-avatar-initials {
+      width: 54px !important;
+      height: 54px !important;
+      border-radius: 50% !important;
+      border: 2.5px solid #ffffff !important;
+      font-size: 18px !important;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.16), 0 0 0 1.5px rgba(99, 91, 252, 0.25) !important;
+    }
+    #topRightProfileContainer .fg-online-dot {
+      width: 15px !important;
+      height: 15px !important;
+      border: 2.5px solid #ffffff !important;
+      bottom: 1px !important;
+      right: 1px !important;
+    }
+    #topRightProfileContainer .fg-top-profile-pill:hover .fg-avatar-wrap {
+      transform: scale(1.08);
+      box-shadow: 0 6px 20px rgba(99, 91, 252, 0.28);
+    }
     
     .select, input, textarea {
       padding: 10px 14px;
@@ -759,7 +845,7 @@
     /* --- MODALS & OVERLAYS --- */
     .modal-backdrop {
       position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(6px);
-      display: none; align-items: center; justify-content: center; z-index: 100; opacity: 0; transition: opacity 0.25s ease;
+      display: none; align-items: center; justify-content: center; z-index: 99990; opacity: 0; transition: opacity 0.25s ease;
     }
     .modal-backdrop.show { display: flex; opacity: 1; }
     .modal {
@@ -811,7 +897,7 @@
     .custom-modal-overlay {
       position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65);
       backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-      display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+      display: none; align-items: center; justify-content: center; z-index: 99995; padding: 20px;
     }
     .custom-modal-overlay.active {
       display: flex !important;
@@ -1236,6 +1322,7 @@
        RIGHT FLOATING NAVIGATION BAR & QUICK ACTIONS DOCK
        ========================================================================== */
     .right-floating-nav-bar {
+      display: none !important;
       position: fixed;
       right: 22px;
       bottom: 96px;
@@ -1415,6 +1502,8 @@
 </style>
   <!-- Floating 3-Dots Quick Dock Stylesheet -->
   <link rel="stylesheet" href="../../assets/css/quick-dock.css">
+  <link rel="stylesheet" href="../../assets/css/portal-canopy.css">
+  <script src="../../assets/js/portal-canopy.js" defer></script>
 </head>
 <body>
 
@@ -1801,30 +1890,63 @@
 <!-- MAIN WORKSPACE -->
 <main>
   <div class="topbar">
-    <div style="display:flex;align-items:center;gap:16px;">
-      <div>
-        <h2 id="pageTitle" style="margin:0;font-size:24px;font-weight:800;letter-spacing:-0.5px">Dashboard</h2>
-        <div class="small">Workforce Intelligence & School Administration</div>
+    <!-- Row 1: Page Title & Greeting / Live Clock Canopy -->
+    <div class="topbar-header-row">
+      <div class="topbar-title-group">
+        <div>
+          <h2 id="pageTitle" style="margin:0;font-size:24px;font-weight:800;letter-spacing:-0.5px">Dashboard</h2>
+          <div class="small">Workforce Intelligence & School Administration</div>
+        </div>
+        <div class="session-pill">
+          <i class="fa-solid fa-graduation-cap" style="color:var(--primary)"></i>
+          <span>2026/2027 Academic Session • Term 2</span>
+        </div>
       </div>
-      <div class="session-pill">
-        <i class="fa-solid fa-graduation-cap" style="color:var(--primary)"></i>
-        <span>2026/2027 Academic Session • Term 2</span>
+
+      <!-- HR Portal Greeting, Date & Live Clock Canopy -->
+      <div class="portal-canopy-bar">
+        <div class="portal-greeting-badge">
+          <i class="fa-solid fa-heart portal-heart-icon"></i>
+          <span class="portal-greeting-highlight" data-portal-role="HR Director">Good evening, HR Director</span>
+          <span class="portal-badge-dot">&bull;</span>
+          <span class="portal-greeting-brand">Workforce Intelligence Hub</span>
+        </div>
+        <div class="portal-datetime-group">
+          <div class="portal-date-chip">
+            <i class="fa-regular fa-calendar-days"></i>
+            <span class="portal-live-date-text">Sunday, 4 Oct 2026</span>
+          </div>
+          <div class="portal-clock-chip">
+            <span class="portal-clock-pulse"></span>
+            <i class="fa-regular fa-clock"></i>
+            <span class="portal-live-clock-text">21:26:00 GMT</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="controls">
-      <div class="quick-search-box">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" class="quick-search-input" id="globalQuickSearch" placeholder="Find staff, student, class... (Ctrl+K)">
+    <!-- Row 2: Search, Utilities & Far-Right Profile Picture -->
+    <div class="controls topbar-controls-row">
+      <div class="controls-left-group">
+        <div class="quick-search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" class="quick-search-input" id="globalQuickSearch" placeholder="Find staff, student, class... (Ctrl+K)">
+        </div>
+
+        <button class="btn ghost" id="tourGuideBtn" onclick="window.QuickAssistant?.startProjectTour()" title="Start Guided Tour" style="border: 1px solid rgba(99, 91, 252, 0.4); color: var(--primary); background: rgba(99, 91, 252, 0.08); border-radius: 9999px; padding: 6px 14px; font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; gap: 7px; cursor: pointer;">
+          <i class="fa-solid fa-compass"></i> <span>Tour</span>
+        </button>
+
+        <button class="btn ghost" id="cloudSyncBtn" onclick="openCloudModal()" title="Supabase Cloud Synchronization" style="border: 1px solid rgba(16, 185, 129, 0.4); color: #10b981; background: rgba(16, 185, 129, 0.08); border-radius: 9999px; padding: 6px 14px; font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; gap: 7px; cursor: pointer;">
+          <i class="fa-solid fa-cloud" id="cloudSyncIcon"></i> <span id="cloudSyncLabel">Connect Supabase</span>
+        </button>
+
+        <select id="orgSwitcher" class="select" title="Active Organization"></select>
       </div>
 
-      <button class="btn ghost" id="cloudSyncBtn" onclick="openCloudModal()" title="Supabase Cloud Synchronization" style="border: 1px solid rgba(16, 185, 129, 0.4); color: #10b981; background: rgba(16, 185, 129, 0.08); border-radius: 9999px; padding: 6px 14px; font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; gap: 7px; cursor: pointer;">
-        <i class="fa-solid fa-cloud" id="cloudSyncIcon"></i> <span id="cloudSyncLabel">Connect Supabase</span>
-      </button>
-
-      <select id="orgSwitcher" class="select" title="Active Organization"></select>
-
-      <div id="topRightProfileContainer" class="fg-top-profile-container"></div>
+      <div class="controls-right-group">
+        <div id="topRightProfileContainer" class="fg-top-profile-container"></div>
+      </div>
     </div>
   </div>
 
@@ -1956,22 +2078,24 @@
       </div>
 
       <!-- Table -->
-      <div style="overflow-x:auto">
-        <table>
-          <thead>
-            <tr>
-              <th>Class Code & Title</th>
-              <th>Subject / Field</th>
-              <th>Grade</th>
-              <th>Assigned Teacher</th>
-              <th>Room & Schedule</th>
-              <th>Enrollment</th>
-              <th>Status</th>
-              <th style="text-align:right">Action</th>
-            </tr>
-          </thead>
-          <tbody id="classesTableBody"></tbody>
-        </table>
+      <div style="background:var(--card-bg, #ffffff); border:1px solid var(--border, #e2e8f0); border-radius:12px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; text-align:left;">
+            <thead>
+              <tr style="background:#f8fafc; border-bottom:1px solid #e2e8f0;">
+                <th style="padding:12px 16px; font-size:11px; font-weight:700; color:#64748b; letter-spacing:0.05em; text-transform:uppercase; min-width:180px;">Class Code &amp; Title</th>
+                <th style="padding:12px 16px; font-size:11px; font-weight:700; color:#64748b; letter-spacing:0.05em; text-transform:uppercase; min-width:210px;">Curriculum Subject(s)</th>
+                <th style="padding:12px 16px; font-size:11px; font-weight:700; color:#64748b; letter-spacing:0.05em; text-transform:uppercase; min-width:100px;">Grade</th>
+                <th style="padding:12px 16px; font-size:11px; font-weight:700; color:#64748b; letter-spacing:0.05em; text-transform:uppercase; min-width:250px;">Assigned Teacher</th>
+                <th style="padding:12px 16px; font-size:11px; font-weight:700; color:#64748b; letter-spacing:0.05em; text-transform:uppercase; min-width:160px;">Room &amp; Schedule</th>
+                <th style="padding:12px 16px; font-size:11px; font-weight:700; color:#64748b; letter-spacing:0.05em; text-transform:uppercase; min-width:140px;">Enrollment</th>
+                <th style="padding:12px 16px; font-size:11px; font-weight:700; color:#64748b; letter-spacing:0.05em; text-transform:uppercase; min-width:120px;">Status</th>
+                <th style="padding:12px 16px; font-size:11px; font-weight:700; color:#64748b; letter-spacing:0.05em; text-transform:uppercase; text-align:right; min-width:130px;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="classesTableBody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -4116,12 +4240,23 @@
             <i class="fa-solid fa-users" style="margin-right:3px;"></i> <span id="acp_seats">0 / 35 Enrolled</span>
           </div>
         </div>
+
+        <!-- Multi-Class Toggle Option (One Teacher to Many Classes) -->
+        <div style="margin-top:8px;">
+          <button type="button" class="preset-chip" id="toggleMultiClassBtn" onclick="toggleMultiClassOptions()" style="font-size:11px; padding:4px 10px; border-radius:6px; cursor:pointer; color:var(--primary); border:1px solid rgba(99,102,241,0.3); background:rgba(99,102,241,0.06); font-weight:700;">
+            <i class="fa-solid fa-copy"></i> + Assign to Multiple Classes (One Teacher to Many Classes)
+          </button>
+          <div id="multi_class_options_wrap" style="display:none; margin-top:8px; padding:10px 12px; background:rgba(99,102,241,0.04); border:1px dashed rgba(99,102,241,0.25); border-radius:8px;">
+            <div style="font-size:11.5px; font-weight:700; color:var(--text); margin-bottom:6px;">Select additional classrooms to assign this educator to:</div>
+            <div id="multi_class_checkboxes" style="display:flex; flex-direction:column; gap:6px; max-height:120px; overflow-y:auto;"></div>
+          </div>
+        </div>
       </div>
 
-      <!-- Field 2: Assigned Curriculum Subject -->
+      <!-- Field 2: Assigned Curriculum Subject(s) -->
       <div class="so-form-group" style="margin-bottom: 16px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
-          <label class="so-label" style="margin-bottom:0;"><i class="fa-solid fa-book-bookmark" style="color:#a855f7; margin-right:4px;"></i> Assigned Curriculum Subject *</label>
+          <label class="so-label" style="margin-bottom:0;"><i class="fa-solid fa-book-bookmark" style="color:#a855f7; margin-right:4px;"></i> Primary Curriculum Subject *</label>
           <button type="button" onclick="closeAssignModal(); openAddSubjectModal();" style="background:none; border:none; color:#a855f7; font-size:11.5px; font-weight:700; cursor:pointer; padding:0; display:flex; align-items:center; gap:4px;">
             <i class="fa-solid fa-plus-circle"></i> New Subject
           </button>
@@ -4138,12 +4273,31 @@
             <i class="fa-solid fa-building-columns" style="margin-right:3px;"></i> <span id="asp_department">Visual Arts</span>
           </div>
         </div>
+
+        <!-- Additional Subjects for Teacher (One Teacher to Many Subjects) -->
+        <div style="margin-top:8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <span style="font-size:11px; font-weight:700; color:var(--muted);"><i class="fa-solid fa-layer-group"></i> Also Assign Additional Subjects to this Teacher:</span>
+          </div>
+          <div id="assign_multi_subjects_wrap" style="display:flex; flex-wrap:wrap; gap:4px; max-height:90px; overflow-y:auto; padding:2px 0;"></div>
+        </div>
       </div>
 
-      <!-- Field 3: Assigned Educator -->
+      <!-- Field 3: Lead Educator & Role -->
       <div class="so-form-group" style="margin-bottom: 16px;">
         <label class="so-label"><i class="fa-solid fa-user-tie" style="color:var(--primary); margin-right:4px;"></i> Assigned Lead Educator *</label>
         <select id="assign_teacher_select" class="so-select" style="font-weight:600;" required onchange="handleAssignTeacherChange()"></select>
+
+        <div style="margin-top:6px; display:flex; gap:8px; align-items:center;">
+          <label style="font-size:11.5px; font-weight:700; color:var(--muted); white-space:nowrap;">Educator Role:</label>
+          <select id="assign_teacher_role" class="so-select" style="font-size:11.5px; padding:4px 8px; height:auto; font-weight:600;">
+            <option value="Lead Educator">Lead Educator</option>
+            <option value="Subject Specialist">Subject Specialist</option>
+            <option value="Department Head">Department Head</option>
+            <option value="Senior Lecturer">Senior Lecturer</option>
+            <option value="Instructor">Instructor</option>
+          </select>
+        </div>
 
         <!-- Live Teacher Workload Strip -->
         <div id="assign_teacher_preview_box" style="margin-top:8px; padding:10px 14px; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.18); border-radius:10px; display:flex; justify-content:space-between; align-items:center; font-size:12px;">
@@ -4158,7 +4312,39 @@
         </div>
       </div>
 
-      <!-- Field 3 & 4: Room & Schedule Grid -->
+      <!-- Field 4: Paired Co-Teacher (Co-Teaching / Pairing to Subject) -->
+      <div class="so-form-group" style="margin-bottom: 16px; background: rgba(168,85,247,0.05); border: 1px solid rgba(168,85,247,0.22); border-radius: 10px; padding: 12px 14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+          <label class="so-label" style="margin-bottom:0; color:#a855f7; font-weight:800;">
+            <i class="fa-solid fa-user-group"></i> Pair Co-Teacher to this Subject (Co-Teaching)
+          </label>
+          <span class="badge-pill badge-purple" style="font-size:10px; font-weight:700;"><i class="fa-solid fa-link"></i> Co-Instruction</span>
+        </div>
+        <div style="font-size:11.5px; color:var(--muted); margin-bottom:8px;">
+          Pair two educators to the same subject for collaborative instruction, team syllabus delivery, or studio assistance.
+        </div>
+        <select id="assign_paired_teacher_select" class="so-select" style="font-weight:600;" onchange="handleAssignPairedTeacherChange()">
+          <option value="">-- No Paired Co-Teacher (Solo Instruction) --</option>
+        </select>
+        <div id="paired_teacher_options_box" style="display:none; margin-top:8px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div>
+              <label class="so-label" style="font-size:11px; margin-bottom:3px;">Paired Co-Teacher Role</label>
+              <select id="assign_paired_teacher_role" class="so-select" style="font-size:12px; padding:6px 10px;">
+                <option value="Co-Educator">Co-Educator (Team Teaching)</option>
+                <option value="Assistant Instructor">Assistant Instructor</option>
+                <option value="Paired Specialist">Paired Subject Specialist</option>
+                <option value="Lab Demonstrator">Lab / Studio Demonstrator</option>
+              </select>
+            </div>
+            <div id="paired_teacher_preview" style="font-size:11.5px; color:var(--muted); display:flex; align-items:center; padding-top:16px;">
+              <span class="badge-pill badge-green" style="font-size:11px;"><i class="fa-solid fa-check"></i> Paired on selected subject</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Field 5 & 6: Room & Schedule Grid -->
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom: 16px;">
         <div class="so-form-group" style="margin-bottom:0;">
           <label class="so-label"><i class="fa-solid fa-door-open" style="color:var(--primary); margin-right:4px;"></i> Room / Facility *</label>
@@ -4184,7 +4370,18 @@
         </div>
       </div>
 
-      <!-- Field 5: Directives & Special Notes -->
+      <!-- Field 7: Active Allocations in this Classroom (One Class to Many Teachers) -->
+      <div class="so-form-group" style="margin-bottom: 16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+          <label class="so-label" style="margin-bottom:0;"><i class="fa-solid fa-users-rectangle" style="color:var(--primary); margin-right:4px;"></i> Active Faculty Allocations in this Classroom</label>
+          <span class="badge-pill badge-purple" id="cur_class_alloc_count" style="font-size:10.5px;">0 Faculty</span>
+        </div>
+        <div id="current_class_allocations_box" style="padding:10px 12px; background:rgba(99,102,241,0.04); border:1px solid rgba(99,102,241,0.18); border-radius:10px; font-size:12px; min-height:48px;">
+          <div style="color:var(--muted); font-size:12px; text-align:center; padding:10px;">No faculty assigned to this classroom yet.</div>
+        </div>
+      </div>
+
+      <!-- Field 8: Directives & Special Notes -->
       <div class="so-form-group" style="margin-bottom: 18px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
           <label class="so-label" style="margin-bottom:0;"><i class="fa-solid fa-clipboard-list" style="color:var(--primary); margin-right:4px;"></i> Assignment Directives &amp; Special Directives</label>
@@ -4203,7 +4400,7 @@
       <div class="so-card" style="background:rgba(99,91,252,0.06); border:1px solid rgba(99,91,252,0.18); border-radius:10px; padding:12px 14px; font-size:12px; color:var(--text); display:flex; align-items:center; gap:10px; margin-bottom:0;">
         <i class="fa-solid fa-cloud-arrow-up" style="color:var(--primary); font-size:18px; flex-shrink:0;"></i>
         <div>
-          <strong>Live Synchronization:</strong> Saving will immediately assign this class to the teacher, grant roster access in their <strong>Teacher Portal</strong>, and replicate to Supabase Cloud.
+          <strong>Live Synchronization:</strong> Saving immediately allocates this class to the teacher(s), pairs co-instructors for curriculum subjects, grants student roster access in each teacher's portal, and replicates to Supabase Cloud.
         </div>
       </div>
     </form>
@@ -4213,7 +4410,7 @@
   <div class="slide-over-footer">
     <button type="button" class="so-btn so-btn-ghost" onclick="closeAssignModal()">Cancel</button>
     <button type="button" class="so-btn so-btn-primary" id="assignSubmitBtn" onclick="submitTeacherAssignment()" style="background:linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); color:#fff;">
-      <i class="fa-solid fa-check"></i> Save Assignment &amp; Notify
+      <i class="fa-solid fa-check"></i> Save Assignment &amp; Pair Educators
     </button>
   </div>
 </div>
@@ -4288,23 +4485,53 @@
         </div>
       </div>
 
-      <!-- Row 2: Subject Field & Grade Level -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-        <div class="so-form-group" style="margin-bottom: 0;">
-          <label class="so-label">Subject Field *</label>
-          <input id="new_class_subject" class="so-input" placeholder="Computer Science" required oninput="updateAddClassPreview()">
+      <!-- Row 2: Multi-Subject Registration & Grade Level -->
+      <div style="margin-bottom: 14px;">
+        <div class="so-form-group" style="margin-bottom: 8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label class="so-label" style="margin-bottom:0;">Curriculum Subjects (Multi-Subject Supported) *</label>
+            <span style="font-size:11px; color:var(--muted); font-weight:600;"><i class="fa-solid fa-layer-group" style="color:var(--primary); margin-right:3px;"></i> Select or register multiple</span>
+          </div>
+
+          <!-- Active Selected Subject Pills / Tags Display -->
+          <div id="classSelectedSubjectPills" style="min-height:42px; padding:6px 10px; background:var(--surface); border:1px solid var(--border); border-radius:8px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-bottom:8px;">
+            <span id="noSubjectPlaceholder" style="font-size:12px; color:var(--muted); font-style:italic;">No subjects selected yet &bull; Click below or type to add</span>
+          </div>
+
+          <!-- Input to add subject by name / comma -->
+          <div style="display:flex; gap:6px;">
+            <input id="new_class_subject_input" class="so-input" placeholder="Type subject name (e.g. Mathematics, English) and click Add or press Enter..." style="flex:1;" onkeydown="if(event.key==='Enter'||event.key===','){event.preventDefault(); addCustomClassSubject();}">
+            <button type="button" class="btn" onclick="addCustomClassSubject()" style="padding:0 14px; font-size:12px; white-space:nowrap; background:var(--primary); color:#fff; border:none; border-radius:8px; font-weight:700;">
+              <i class="fa-solid fa-plus"></i> Add
+            </button>
+          </div>
+          <!-- Hidden synced input for backward compatibility and forms -->
+          <input type="hidden" id="new_class_subject" value="Computer Science">
         </div>
-        <div class="so-form-group" style="margin-bottom: 0;">
-          <label class="so-label">Grade Level *</label>
-          <select id="new_class_grade" class="so-select" required onchange="updateAddClassPreview()">
-            <option value="Grade 9">Grade 9</option>
-            <option value="Grade 10" selected>Grade 10</option>
-            <option value="Grade 11">Grade 11</option>
-            <option value="Grade 12">Grade 12</option>
-            <option value="Advanced Lab">Advanced Lab</option>
-            <option value="Tertiary & Vocational">Tertiary &amp; Vocational</option>
-          </select>
+
+        <!-- Dynamic Quick-Pick Curriculum Subject Chips -->
+        <div style="margin-top:6px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+            <span style="font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px;">Curriculum Subject Quick-Select:</span>
+            <button type="button" onclick="selectAllCoreCurriculumSubjects()" style="background:none; border:none; color:var(--primary); font-size:11px; font-weight:700; cursor:pointer; padding:0;">+ Add All Core</button>
+          </div>
+          <div id="classCurriculumSubjectChips" style="display:flex; flex-wrap:wrap; gap:6px; max-height:100px; overflow-y:auto; padding-bottom:2px;">
+            <!-- Dynamically populated from getSubjectsList() on drawer open -->
+          </div>
         </div>
+      </div>
+
+      <!-- Grade Level Selector -->
+      <div class="so-form-group" style="margin-bottom: 14px;">
+        <label class="so-label">Grade Level *</label>
+        <select id="new_class_grade" class="so-select" required onchange="updateAddClassPreview()">
+          <option value="Grade 9">Grade 9</option>
+          <option value="Grade 10" selected>Grade 10</option>
+          <option value="Grade 11">Grade 11</option>
+          <option value="Grade 12">Grade 12</option>
+          <option value="Advanced Lab">Advanced Lab</option>
+          <option value="Tertiary & Vocational">Tertiary &amp; Vocational</option>
+        </select>
       </div>
 
       <!-- Grade Level Preset Pills -->
@@ -4535,26 +4762,7 @@
   </div>
 </div>
 
-<!-- RIGHT FLOATING QUICK NAVIGATION BAR -->
-<div class="right-floating-nav-bar" id="rightFloatingNavBar" aria-label="Quick Actions Navigation">
-  <button type="button" class="rf-nav-item rf-add-class" id="rfAddClassBtn" onclick="openAddClassModal()" title="Add Academic Classroom" aria-label="Add Academic Classroom">
-    <span class="rf-nav-label">Add Classroom</span>
-    <span class="rf-nav-icon"><i class="fa-solid fa-folder-plus"></i></span>
-    <span class="rf-nav-pulse"></span>
-  </button>
-  <button type="button" class="rf-nav-item rf-add-subject" id="rfAddSubjectBtn" onclick="openAddSubjectModal()" title="Add Curriculum Subject" aria-label="Add Subject">
-    <span class="rf-nav-label">Add Subject</span>
-    <span class="rf-nav-icon"><i class="fa-solid fa-book-bookmark"></i></span>
-  </button>
-  <button type="button" class="rf-nav-item rf-assign-teacher" id="rfAssignTeacherBtn" onclick="openAssignModal()" title="Assign Teacher to Class" aria-label="Assign Teacher">
-    <span class="rf-nav-label">Assign Teacher</span>
-    <span class="rf-nav-icon"><i class="fa-solid fa-chalkboard-user"></i></span>
-  </button>
-  <button type="button" class="rf-nav-item rf-enroll-student" id="rfEnrollStudentBtn" onclick="openRegisterStudentModal()" title="Enroll New Student" aria-label="Enroll Student">
-    <span class="rf-nav-label">Enroll Student</span>
-    <span class="rf-nav-icon"><i class="fa-solid fa-user-plus"></i></span>
-  </button>
-</div>
+<!-- RIGHT FLOATING QUICK NAVIGATION BAR REMOVED PER USER REQUEST -->
 
 <!-- PROFESSIONAL REGISTER STUDENT PROFILE MODAL (Matching teacher-dashboard.html) -->
 <div class="custom-modal-overlay" id="studentModal" onclick="if(event.target===this)closeStudentModal()">
@@ -5840,9 +6048,18 @@
 ------------------------------------------------------------- */
 function safeParse(s) { try { return JSON.parse(s); } catch (e) { return null; } }
 const hrStore = {};
-function read(k) { return hrStore[k] || []; }
+function read(k) {
+  if (hrStore[k] !== undefined && hrStore[k] !== null) return hrStore[k];
+  const local = safeParse(localStorage.getItem(k));
+  if (local !== null && local !== undefined) {
+    hrStore[k] = local;
+    return local;
+  }
+  return [];
+}
 function save(k, v) { 
   hrStore[k] = v;
+  try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {}
 }
 
 async function loadHRCloudData() {
@@ -5934,29 +6151,106 @@ async function loadHRCloudData() {
           orgSwitcher.appendChild(opt);
         });
       }
+
+      // Purge any localStorage keys from deleted organizations
+      try {
+        const validOrgNames = new Set(orgs.map(o => (o.org_name || o.name || '').toLowerCase().trim()).filter(Boolean));
+        validOrgNames.add('flawless graphics');
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+          const k = localStorage.key(i);
+          if (!k) continue;
+          const m = k.match(/^(.*?)_(classes|students|teachers|subjects|attendance_records|departments|messages|announcements|payroll|student_fees)$/i);
+          if (m) {
+            const orgPrefix = m[1].toLowerCase().trim();
+            if (!validOrgNames.has(orgPrefix) && orgPrefix !== 'fg') {
+              localStorage.removeItem(k);
+            }
+          }
+        }
+      } catch (_) {}
     }
 
+    // Always purge global un-scoped cross-org pollution keys
+    try {
+      ['fg_classes', 'classes', 'teachers', 'students', 'fg_student_fees'].forEach(pk => localStorage.removeItem(pk));
+    } catch (_) {}
+
     const teachers = await window.SupabaseService.getTeachers(ACTIVE_ORG);
-    hrStore[EMP_KEY] = teachers;
+    hrStore[EMP_KEY] = Array.isArray(teachers) ? teachers : [];
+    save(EMP_KEY, hrStore[EMP_KEY]);
 
     const att = await window.SupabaseService.getAttendance(ACTIVE_ORG);
-    hrStore[ATT_KEY] = att;
+    hrStore[ATT_KEY] = Array.isArray(att) ? att : [];
+    save(ATT_KEY, hrStore[ATT_KEY]);
 
     const ann = await window.SupabaseService.getAnnouncements(ACTIVE_ORG);
-    hrStore[ANNOUNCE_KEY] = ann;
+    hrStore[ANNOUNCE_KEY] = Array.isArray(ann) ? ann : [];
+    save(ANNOUNCE_KEY, hrStore[ANNOUNCE_KEY]);
 
     const students = await window.SupabaseService.getStudents(ACTIVE_ORG);
-    hrStore[STUD_KEY] = students;
+    hrStore[STUD_KEY] = Array.isArray(students) ? students : [];
+    save(STUD_KEY, hrStore[STUD_KEY]);
 
+    // Live Supabase classes sync:
     const liveClasses = await window.SupabaseService.getClasses(ACTIVE_ORG);
-    hrStore[CLASSES_STORAGE_KEY] = Array.isArray(liveClasses) ? liveClasses : [];
-    save(CLASSES_STORAGE_KEY, hrStore[CLASSES_STORAGE_KEY]);
+    let verifiedClasses = Array.isArray(liveClasses) ? liveClasses : [];
+
+    // Safely preserve recently assigned faculty to prevent transient race conditions or wipeouts
+    const activeClassKey = `${ACTIVE_ORG}_classes`;
+    const currentLocalClasses = read(activeClassKey) || read(CLASSES_STORAGE_KEY) || [];
+    if (Array.isArray(currentLocalClasses) && currentLocalClasses.length > 0) {
+      verifiedClasses = verifiedClasses.map(liveItem => {
+        const localMatch = currentLocalClasses.find(loc => 
+          (loc.id && String(loc.id) === String(liveItem.id)) || 
+          (loc.code && String(loc.code).trim().toLowerCase() === String(liveItem.code).trim().toLowerCase()) ||
+          (loc.name && String(loc.name).trim().toLowerCase() === String(liveItem.name).trim().toLowerCase())
+        );
+        if (localMatch) {
+          const localHasTeachers = (Array.isArray(localMatch.teachers) && localMatch.teachers.length > 0) || Boolean(localMatch.teacherName && localMatch.teacherName.trim() !== '');
+          const liveHasTeachers = (Array.isArray(liveItem.teachers) && liveItem.teachers.length > 0) || Boolean(liveItem.teacherName && liveItem.teacherName.trim() !== '');
+
+          if (localHasTeachers && !liveHasTeachers) {
+            return Object.assign({}, liveItem, {
+              teachers: localMatch.teachers || [],
+              teacherName: localMatch.teacherName || '',
+              teacherEmail: localMatch.teacherEmail || localMatch.teacherId || '',
+              teacherId: localMatch.teacherId || localMatch.teacherEmail || '',
+              status: localMatch.status || 'Active',
+              assignmentNotes: localMatch.assignmentNotes || ''
+            });
+          }
+        }
+        return liveItem;
+      });
+    }
+
+    hrStore[CLASSES_STORAGE_KEY] = verifiedClasses;
+    hrStore[activeClassKey] = verifiedClasses;
+    save(CLASSES_STORAGE_KEY, verifiedClasses);
+    save(activeClassKey, verifiedClasses);
+    try {
+      localStorage.setItem(activeClassKey, JSON.stringify(verifiedClasses));
+      localStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(verifiedClasses));
+    } catch (e) {}
+
+    // Subjects from Supabase Cloud
+    let cloudSubjects = [];
+    if (window.SupabaseService && typeof window.SupabaseService.getSubjects === 'function') {
+      try {
+        cloudSubjects = await window.SupabaseService.getSubjects(ACTIVE_ORG);
+      } catch (_) {}
+    }
+    const verifiedSubjects = Array.isArray(cloudSubjects) ? cloudSubjects : [];
+    hrStore[SUBJECTS_STORAGE_KEY] = verifiedSubjects;
+    save(SUBJECTS_STORAGE_KEY, verifiedSubjects);
 
     const payroll = await window.SupabaseService.getPayroll(ACTIVE_ORG);
-    hrStore['fg_payroll'] = payroll;
+    hrStore['fg_payroll'] = Array.isArray(payroll) ? payroll : [];
+    save('fg_payroll', hrStore['fg_payroll']);
 
     const users = await window.SupabaseService.getUsers(ACTIVE_ORG);
-    hrStore[USERS_STORAGE_KEY] = users;
+    hrStore[USERS_STORAGE_KEY] = Array.isArray(users) ? users : [];
+    save(USERS_STORAGE_KEY, hrStore[USERS_STORAGE_KEY]);
   } catch (err) {
     console.warn('[HR Supabase] Load error:', err);
   }
@@ -6036,6 +6330,9 @@ const STUD_KEY = `${ACTIVE_ORG}_students`;
 const PERF_KEY = `${ACTIVE_ORG}_performance_reviews`;
 const CALENDAR_KEY = `${ACTIVE_ORG}_academic_calendar`;
 const ASSESS_KEY = `${ACTIVE_ORG}_student_assessments`;
+const CLASSES_STORAGE_KEY = `${ACTIVE_ORG}_classes`;
+const SUBJECTS_STORAGE_KEY = `${ACTIVE_ORG}_subjects`;
+const USERS_STORAGE_KEY = 'organizations_users';
 
 /* -------------------------------------------------------------
    DEFAULT SEED DATA
@@ -6078,7 +6375,7 @@ if (sidePhotoEl) {
 
 // Org Switcher
 const orgSwitcher = document.getElementById('orgSwitcher');
-const orgList = [ACTIVE_ORG, 'FLAWLESS GRAPHICS', 'CREATIVE CAMPUS', 'ENTERPRISE TECH'];
+const orgList = [ACTIVE_ORG];
 const uniqueOrgs = [...new Set(orgList)];
 uniqueOrgs.forEach(o => {
   const opt = document.createElement('option');
@@ -6405,19 +6702,8 @@ window.open = function(url, target, features) {
 /* -------------------------------------------------------------
    CURRICULUM SUBJECTS & ALLOCATION ENGINE
 ------------------------------------------------------------- */
-const SUBJECTS_STORAGE_KEY = `${ACTIVE_ORG}_subjects`;
-
 function getSubjectsList() {
   let subjects = read(SUBJECTS_STORAGE_KEY);
-  if (!Array.isArray(subjects) || subjects.length === 0) {
-    try {
-      const stored = JSON.parse(localStorage.getItem(SUBJECTS_STORAGE_KEY) || '[]');
-      if (Array.isArray(stored) && stored.length > 0) {
-        subjects = stored;
-        save(SUBJECTS_STORAGE_KEY, subjects);
-      }
-    } catch(e) {}
-  }
   if (!Array.isArray(subjects)) {
     subjects = [];
     save(SUBJECTS_STORAGE_KEY, subjects);
@@ -6443,22 +6729,10 @@ function saveSubjectsList(list) {
   try {
     if (window.SupabaseService && typeof window.SupabaseService.getSubjects === 'function') {
       const cloudSubjects = await window.SupabaseService.getSubjects(ACTIVE_ORG);
-      if (Array.isArray(cloudSubjects) && cloudSubjects.length > 0) {
-        const local = getSubjectsList();
-        const localMap = new Map(local.map(s => [s.name.toLowerCase(), s]));
-        let updated = false;
-        cloudSubjects.forEach(cs => {
-          if (!localMap.has(cs.name.toLowerCase())) {
-            local.push(cs);
-            updated = true;
-          }
-        });
-        if (updated) {
-          saveSubjectsList(local);
-          if (document.getElementById('subjectsTableBody')) {
-            renderSubjectsTab();
-          }
-        }
+      const verified = Array.isArray(cloudSubjects) ? cloudSubjects : [];
+      saveSubjectsList(verified);
+      if (document.getElementById('subjectsTableBody')) {
+        renderSubjectsTab();
       }
     }
   } catch(e) {
@@ -6469,40 +6743,19 @@ function saveSubjectsList(list) {
 /* -------------------------------------------------------------
    CLASSROOM & TEACHER ASSIGNMENT ENGINE
 ------------------------------------------------------------- */
-const CLASSES_STORAGE_KEY = `${ACTIVE_ORG}_classes`;
-
 function getDefaultAcademicClasses() {
   return [];
 }
 
 function getClassesList() {
   let classes = read(CLASSES_STORAGE_KEY);
-  if (!Array.isArray(classes) || classes.length === 0) {
-    try {
-      const stored = JSON.parse(localStorage.getItem(CLASSES_STORAGE_KEY) || '[]');
-      if (Array.isArray(stored) && stored.length > 0) {
-        classes = stored;
-        save(CLASSES_STORAGE_KEY, classes);
-      }
-    } catch(e) {}
-  }
   if (!Array.isArray(classes)) {
     classes = [];
     save(CLASSES_STORAGE_KEY, classes);
   }
-  // Purge any legacy dummy seed classes so table is purely HR-created
+  // Purge only known legacy test dummy IDs
   const dummyIds = new Set(['cls_f2_arts', 'cls_f3_web', 'cls_f1_illust', 'cls_f2_print', 'cls_1', 'cls_2', 'cls_3', 'cls_4', 'cls_5']);
-  const dummyNames = new Set([
-    'grade 10 - graphic arts & visual identity',
-    'grade 11 - web systems & client architecture',
-    'grade 12 - digital animation & 3d modeling',
-    'grade 9 - fundamental design principles',
-    'grade 10 - ui/ux interactive prototyping',
-    'class 1 - visual design',
-    'class 2 - web systems',
-    'class 3 - animation & 3d'
-  ]);
-  const filtered = classes.filter(c => !dummyIds.has(c.id) && !dummyNames.has((c.name || c.className || '').toLowerCase().trim()));
+  const filtered = classes.filter(c => !dummyIds.has(c.id));
   if (filtered.length !== classes.length) {
     classes = filtered;
     save(CLASSES_STORAGE_KEY, classes);
@@ -6516,7 +6769,7 @@ function saveClassesList(list) {
   try {
     localStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(list));
     const activeHrUser = (window.AuthSession ? window.AuthSession.getUser() : null) || JSON.parse(localStorage.getItem('activeHR') || 'null');
-    const hrOrg = (activeHrUser && activeHrUser.org) || localStorage.getItem('active_org') || ACTIVE_ORG;
+    const hrOrg = (activeHrUser && (activeHrUser.org || activeHrUser.org_id || activeHrUser.organization)) || localStorage.getItem('active_org') || ACTIVE_ORG;
     if (hrOrg && `${hrOrg}_classes` !== CLASSES_STORAGE_KEY) {
       save(`${hrOrg}_classes`, list);
       localStorage.setItem(`${hrOrg}_classes`, JSON.stringify(list));
@@ -6558,7 +6811,7 @@ function saveClassesList(list) {
 })();
 
 function getAvailableTeachers() {
-  const registeredTeachers = read(EMP_KEY) || read('teachers') || [];
+  const registeredTeachers = read(EMP_KEY) || [];
   const map = new Map();
   if (Array.isArray(registeredTeachers)) {
     registeredTeachers.forEach(t => {
@@ -6667,7 +6920,7 @@ function renderClassesSection() {
   }
 
   const gradeSelect = document.getElementById('filterClassGrade');
-  if (gradeSelect && gradeSelect.options.length <= 1) {
+  if (gradeSelect && gradeSelect.options && gradeSelect.options.length <= 1) {
     const grades = [...new Set(classes.map(c => c.grade).filter(Boolean))];
     grades.forEach(g => {
       const opt = document.createElement('option');
@@ -6678,7 +6931,7 @@ function renderClassesSection() {
   }
 
   const teacherSelect = document.getElementById('filterClassTeacher');
-  if (teacherSelect && teacherSelect.options.length <= 1) {
+  if (teacherSelect && teacherSelect.options && teacherSelect.options.length <= 1) {
     const teachers = [...new Set(classes.map(c => c.teacherName).filter(Boolean))];
     teachers.forEach(t => {
       const opt = document.createElement('option');
@@ -6689,7 +6942,12 @@ function renderClassesSection() {
   }
 
   const filtered = classes.filter(c => {
-    const matchSearch = !search || c.name.toLowerCase().includes(search) || (c.code && c.code.toLowerCase().includes(search)) || (c.subject && c.subject.toLowerCase().includes(search)) || (c.teacherName && c.teacherName.toLowerCase().includes(search));
+    const matchSearch = !search ||
+      c.name.toLowerCase().includes(search) ||
+      (c.code && c.code.toLowerCase().includes(search)) ||
+      (Array.isArray(c.subjects) && c.subjects.some(s => s.toLowerCase().includes(search))) ||
+      (c.subject && c.subject.toLowerCase().includes(search)) ||
+      (c.teacherName && c.teacherName.toLowerCase().includes(search));
     const matchGrade = !gradeFilter || c.grade === gradeFilter;
     const matchTeacher = !teacherFilter || c.teacherName === teacherFilter;
     return matchSearch && matchGrade && matchTeacher;
@@ -6707,7 +6965,7 @@ function renderClassesSection() {
         </div>
         <div style="font-size:15px; font-weight:800; color:var(--text); margin-bottom:6px;">No Academic Classrooms Added Yet</div>
         <div style="font-size:12.5px; color:var(--muted); max-width:420px; margin:0 auto 16px;">
-          Your curriculum currently has no registered classrooms. Click below or use the right floating navigation bar to add a classroom.
+          Your curriculum currently has no registered classrooms. Click below to add your first academic classroom.
         </div>
         <button type="button" class="btn" onclick="openAddClassModal()" style="font-size:12.5px; padding:8px 18px;">
           <i class="fa-solid fa-folder-plus"></i> Add Classroom
@@ -6719,69 +6977,183 @@ function renderClassesSection() {
 
   filtered.forEach(c => {
     const isPending = c.approvalStatus === 'pending' || c.status === 'Pending HR Approval';
-    const isAssigned = Boolean(c.teacherName && c.teacherName.trim() !== '');
+    const isAssigned = Boolean((Array.isArray(c.teachers) && c.teachers.length > 0) || (c.teacherName && c.teacherName.trim() !== ''));
     const enrolled = Number(c.enrolled || (c.students || []).length || 0);
     const capacity = Number(c.capacity || 30);
     const pct = Math.min(100, Math.round((enrolled / capacity) * 100));
 
-    const statusBadgeHtml = isPending ?
-      `<span class="badge-pill badge-orange" style="background:rgba(245,158,11,0.2); color:#f59e0b; font-weight:700;"><i class="fa-solid fa-clock"></i> Pending HR Approval</span>` :
-      `<span class="badge-pill ${isAssigned ? 'badge-green' : 'badge-orange'}"><i class="fa-solid ${isAssigned ? 'fa-circle-check' : 'fa-clock'}"></i> ${isAssigned ? 'Assigned' : 'Unassigned'}</span>`;
-
     const tr = document.createElement('tr');
-    if (isPending) tr.style.background = 'rgba(245,158,11,0.04)';
+    tr.style.borderBottom = '1px solid #f1f5f9';
+    tr.style.transition = 'background 0.15s ease';
+    if (isPending) tr.style.background = 'rgba(245,158,11,0.03)';
+    tr.onmouseover = function() { tr.style.background = '#f8fafc'; };
+    tr.onmouseout = function() { tr.style.background = isPending ? 'rgba(245,158,11,0.03)' : '#ffffff'; };
+
     tr.innerHTML = `
-      <td>
-        <div style="font-weight:700;font-size:13.5px;">${escapeHtml(c.name)}</div>
-        <div class="small" style="color:var(--muted);"><span class="badge-pill badge-purple" style="font-size:10px;padding:2px 6px;">${escapeHtml(c.code || c.id || 'CLS')}</span></div>
-      </td>
-      <td><strong>${escapeHtml(c.subject || 'General')}</strong></td>
-      <td><span class="badge-pill" style="background:rgba(99,91,252,0.1);color:var(--primary);">${escapeHtml(c.grade || 'Grade 10')}</span></td>
-      <td>
-        ${isAssigned || c.submittedBy ? `
-          <div class="teacher-badge-wrap">
-            <div class="teacher-avatar-sm">${escapeHtml((c.teacherName || c.submittedBy || 'T').substring(0,2).toUpperCase())}</div>
-            <div>
-              <div style="font-weight:700;font-size:13px;">${escapeHtml(c.teacherName || c.submittedBy)}</div>
-              <div class="small" style="color:var(--muted);">${escapeHtml(c.teacherEmail || c.submittedByEmail || (isPending ? 'Faculty Submission' : ''))}</div>
+      <td style="padding:14px 16px; vertical-align:middle;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg, #6366f1 0%, #4338ca 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; box-shadow:0 2px 5px rgba(99,102,241,0.25); flex-shrink:0;">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <div style="min-width:0;">
+            <div style="font-weight:800; font-size:13.5px; color:var(--text); line-height:1.25;">${escapeHtml(c.name)}</div>
+            <div style="display:flex; align-items:center; gap:6px; margin-top:4px;">
+              <span style="font-size:10.5px; font-weight:700; color:#4f46e5; background:#eef2ff; border:1px solid #e0e7ff; padding:1px 6px; border-radius:4px; font-family:monospace; letter-spacing:0.03em;">
+                #${escapeHtml(c.code || c.id || 'CLS')}
+              </span>
+              <span style="font-size:11px; color:var(--muted);">${escapeHtml(c.section ? `Sec ${c.section}` : 'Standard')}</span>
             </div>
           </div>
+        </div>
+      </td>
+      <td style="padding:14px 16px; vertical-align:middle;">
+        ${(() => {
+          const classSubjects = (Array.isArray(c.subjects) && c.subjects.length > 0)
+            ? c.subjects
+            : (c.subject ? String(c.subject).split(',').map(s => s.trim()).filter(Boolean) : ['General']);
+          const maxShow = 3;
+          const shown = classSubjects.slice(0, maxShow);
+          const remaining = classSubjects.length - maxShow;
+          return `
+            <div style="display:flex; flex-wrap:wrap; gap:5px; max-width:240px; align-items:center;">
+              ${shown.map(sub => `
+                <span style="font-size:11px; font-weight:600; padding:3px 8px; border-radius:6px; background:#f1f5f9; color:#334155; border:1px solid #e2e8f0; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 2px rgba(0,0,0,0.02);">
+                  <i class="fa-solid fa-book-bookmark" style="font-size:9px; color:#6366f1;"></i> ${escapeHtml(sub)}
+                </span>
+              `).join('')}
+              ${remaining > 0 ? `
+                <span title="${escapeHtml(classSubjects.join(', '))}" style="font-size:10.5px; font-weight:700; padding:3px 7px; border-radius:6px; background:#ede9fe; color:#6d28d9; border:1px solid #ddd6fe; cursor:help;">
+                  +${remaining} more
+                </span>
+              ` : ''}
+            </div>
+          `;
+        })()}
+      </td>
+      <td style="padding:14px 16px; vertical-align:middle;">
+        <span style="font-size:11px; font-weight:700; padding:4px 9px; border-radius:6px; background:#eff6ff; color:#2563eb; border:1px solid #dbeafe; display:inline-flex; align-items:center; gap:5px;">
+          <i class="fa-solid fa-layer-group" style="font-size:9.5px; opacity:0.8;"></i> ${escapeHtml(c.grade || c.gradeLevel || 'Grade 10')}
+        </span>
+      </td>
+      <td style="padding:14px 16px; vertical-align:middle; min-width:250px;">
+        ${(() => {
+          let teacherList = Array.isArray(c.teachers) && c.teachers.length > 0 ? c.teachers : [];
+          if (teacherList.length === 0 && (c.teacherName || c.teacherEmail)) {
+            teacherList = [{
+              name: c.teacherName || 'Assigned Educator',
+              email: c.teacherEmail || c.teacherId || '',
+              role: 'Lead Educator',
+              subjects: Array.isArray(c.subjects) ? c.subjects : (c.subject ? [c.subject] : ['Core Curriculum'])
+            }];
+          }
+
+          if (teacherList.length > 0) {
+            return `
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                ${teacherList.map(t => {
+                  const initials = (t.name || 'ED').split(' ').filter(Boolean).map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'ED';
+                  const isPaired = (Array.isArray(t.pairedWith) && t.pairedWith.length > 0) || (t.role && t.role.toLowerCase().includes('co-'));
+                  const roleLabel = isPaired ? '👥 Co-Educator' : (escapeHtml(t.role || 'Lead Educator'));
+                  const classSubs = (Array.isArray(c.subjects) && c.subjects.length > 0) ? c.subjects : (c.subject ? [c.subject] : []);
+                  const subs = Array.isArray(t.subjects) && t.subjects.length > 0 ? t.subjects : classSubs;
+                  const subsStr = Array.isArray(subs) ? subs.join(', ') : String(subs || '');
+                  return `
+                    <div style="display:flex; align-items:center; gap:9px; padding:6px 10px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+                      <div style="width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:10.5px; flex-shrink:0; box-shadow:0 2px 4px rgba(79,70,229,0.2);">
+                        ${escapeHtml(initials)}
+                      </div>
+                      <div style="min-width:0; flex:1;">
+                        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                          <span style="font-weight:700; font-size:12.5px; color:var(--text); line-height:1.2;">${escapeHtml(t.name)}</span>
+                          <span style="font-size:9.5px; font-weight:700; padding:1px 6px; border-radius:4px; background:${isPaired ? '#faf5ff' : '#ecfdf5'}; color:${isPaired ? '#7e22ce' : '#059669'}; border:1px solid ${isPaired ? '#e9d5ff' : '#a7f3d0'};">
+                            ${roleLabel}
+                          </span>
+                        </div>
+                        <div style="font-size:11px; color:#64748b; margin-top:2px; display:flex; align-items:center; gap:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(subsStr)}">
+                          <i class="fa-solid fa-chalkboard-user" style="font-size:9px; color:#94a3b8; flex-shrink:0;"></i>
+                          <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:170px;">${escapeHtml(subsStr || 'All Subjects')}</span>
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+                <button type="button" class="btn ghost btn-sm" style="padding:3px 9px; font-size:11px; font-weight:600; color:#4f46e5; background:rgba(99,102,241,0.05); border:1px dashed rgba(99,102,241,0.3); border-radius:6px; align-self:flex-start; margin-top:2px; display:inline-flex; align-items:center; gap:5px; transition:all 0.15s ease;" onclick="openAssignModal('${c.id}')" onmouseover="this.style.background='rgba(99,102,241,0.1)'" onmouseout="this.style.background='rgba(99,102,241,0.05)'">
+                  <i class="fa-solid fa-plus-circle"></i> + Add / Pair Teacher
+                </button>
+              </div>
+            `;
+          } else if (c.submittedBy) {
+            return `
+              <div style="display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:8px; background:#fffbeb; border:1px solid #fef3c7;">
+                <div style="width:28px; height:28px; border-radius:50%; background:#f59e0b; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:10px; flex-shrink:0;">
+                  ${escapeHtml(c.submittedBy.substring(0,2).toUpperCase())}
+                </div>
+                <div>
+                  <div style="font-weight:700; font-size:12px; color:var(--text);">${escapeHtml(c.submittedBy)}</div>
+                  <div style="font-size:10.5px; color:var(--muted);">${escapeHtml(c.submittedByEmail || 'Faculty Submission')}</div>
+                </div>
+              </div>
+            `;
+          } else {
+            return `
+              <button class="btn btn-sm" style="padding:6px 14px; font-size:11.5px; font-weight:700; background:linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); color:#fff; border:none; border-radius:6px; box-shadow:0 2px 4px rgba(79,70,229,0.25); display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="openAssignModal('${c.id}')">
+                <i class="fa-solid fa-user-plus"></i> Assign Now
+              </button>
+            `;
+          }
+        })()}
+      </td>
+      <td style="padding:14px 16px; vertical-align:middle;">
+        <div style="display:flex; flex-direction:column; gap:3px;">
+          <div style="font-weight:700; font-size:12.5px; color:var(--text); display:flex; align-items:center; gap:6px;">
+            <i class="fa-solid fa-door-open" style="color:#6366f1; font-size:11px;"></i> ${escapeHtml(c.room || 'Room 101')}
+          </div>
+          <div style="font-size:11px; color:var(--muted); display:flex; align-items:center; gap:5px;">
+            <i class="fa-regular fa-calendar-days" style="font-size:10px; opacity:0.7;"></i> ${escapeHtml(c.schedule || 'Schedule pending')}
+          </div>
+        </div>
+      </td>
+      <td style="padding:14px 16px; vertical-align:middle; min-width:130px;">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; font-size:11.5px; margin-bottom:4px;">
+          <span style="font-weight:700; color:var(--text);">${enrolled} <span style="font-weight:400; color:var(--muted);">/ ${capacity}</span></span>
+          <span style="font-weight:700; font-size:10.5px; color:${pct >= 90 ? '#ef4444' : pct >= 50 ? '#059669' : '#64748b'};">${pct}%</span>
+        </div>
+        <div style="height:6px; background:#e2e8f0; border-radius:999px; overflow:hidden;">
+          <div style="height:100%; width:${pct}%; background:${pct >= 90 ? 'linear-gradient(90deg, #f59e0b, #ef4444)' : 'linear-gradient(90deg, #6366f1, #10b981)'}; border-radius:999px; transition:width 0.3s ease;"></div>
+        </div>
+      </td>
+      <td style="padding:14px 16px; vertical-align:middle;">
+        ${isPending ? `
+          <span style="display:inline-flex; align-items:center; gap:6px; padding:4px 9px; border-radius:999px; font-size:11px; font-weight:700; background:#fffbeb; color:#d97706; border:1px solid #fde68a;">
+            <span style="width:6px; height:6px; border-radius:50%; background:#d97706;"></span> Pending Review
+          </span>
+        ` : isAssigned ? `
+          <span style="display:inline-flex; align-items:center; gap:6px; padding:4px 9px; border-radius:999px; font-size:11px; font-weight:700; background:#ecfdf5; color:#059669; border:1px solid #a7f3d0;">
+            <span style="width:6px; height:6px; border-radius:50%; background:#10b981;"></span> Assigned
+          </span>
         ` : `
-          <button class="btn" style="padding:6px 12px;font-size:11px;" onclick="openAssignModal('${c.id}')">
-            <i class="fa-solid fa-user-plus"></i> Assign Now
-          </button>
+          <span style="display:inline-flex; align-items:center; gap:6px; padding:4px 9px; border-radius:999px; font-size:11px; font-weight:700; background:#fffbeb; color:#b45309; border:1px solid #fef3c7;">
+            <span style="width:6px; height:6px; border-radius:50%; background:#f59e0b;"></span> Unassigned
+          </span>
         `}
       </td>
-      <td>
-        <div style="font-weight:600;font-size:12.5px;"><i class="fa-solid fa-door-open" style="color:var(--muted);margin-right:4px;"></i> ${escapeHtml(c.room || 'TBD')}</div>
-        <div class="small" style="color:var(--muted);">${escapeHtml(c.schedule || 'Schedule pending')}</div>
-      </td>
-      <td style="min-width:120px;">
-        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px;">
-          <span>${enrolled} / ${capacity}</span>
-          <span>${pct}%</span>
-        </div>
-        <div class="capacity-bar">
-          <div class="capacity-fill" style="width:${pct}%"></div>
-        </div>
-      </td>
-      <td>
-        ${statusBadgeHtml}
-      </td>
-      <td style="text-align:right;">
-        <div style="display:inline-flex;gap:6px;">
+      <td style="padding:14px 16px; vertical-align:middle; text-align:right;">
+        <div style="display:inline-flex; align-items:center; gap:6px;">
           ${isPending ? `
-            <button class="btn btn-sm" style="background:#10b981; border-color:#059669; color:#fff; font-weight:800; padding:5px 12px; font-size:11px;" title="Approve & Officially Register Class" onclick="approveClassRegistration('${c.id}')">
+            <button class="btn btn-sm" style="background:#10b981; border:none; color:#fff; font-weight:700; padding:5px 12px; font-size:11px; border-radius:6px; cursor:pointer;" title="Approve Registration" onclick="approveClassRegistration('${c.id}')">
               <i class="fa-solid fa-check"></i> Approve
             </button>
-            <button class="btn ghost btn-sm" style="padding:5px 9px; font-size:11px; color:var(--accent-red);" title="Decline Class Registration" onclick="rejectClassRegistration('${c.id}')">
+            <button class="btn ghost btn-sm" style="padding:5px 9px; font-size:11px; color:#ef4444; border-radius:6px; cursor:pointer;" title="Reject Registration" onclick="rejectClassRegistration('${c.id}')">
               <i class="fa-solid fa-xmark"></i> Reject
             </button>
           ` : `
-            <button class="btn ghost" style="padding:6px 10px;font-size:11px;" title="Reassign / Change Teacher" onclick="openAssignModal('${c.id}')">
-              <i class="fa-solid fa-pencil"></i>
+            <button class="btn ghost btn-sm" style="padding:6px 9px; font-size:12px; color:#4f46e5; background:rgba(99,102,241,0.06); border:1px solid rgba(99,102,241,0.15); border-radius:6px; cursor:pointer;" title="Manage Classroom &amp; Add Subjects" onclick="openAddClassModal('${c.id}')">
+              <i class="fa-solid fa-sliders"></i>
             </button>
-            <button class="btn ghost" style="padding:6px 10px;font-size:11px;color:var(--accent-red);" title="Remove Class" onclick="deleteClassroom('${c.id}')">
+            <button class="btn ghost btn-sm" style="padding:6px 9px; font-size:12px; color:#059669; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.15); border-radius:6px; cursor:pointer;" title="Assign / Pair Teacher" onclick="openAssignModal('${c.id}')">
+              <i class="fa-solid fa-chalkboard-user"></i>
+            </button>
+            <button class="btn ghost btn-sm" style="padding:6px 9px; font-size:12px; color:#ef4444; background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.15); border-radius:6px; cursor:pointer;" title="Remove Class" onclick="deleteClassroom('${c.id}')">
               <i class="fa-solid fa-trash-can"></i>
             </button>
           `}
@@ -6824,7 +7196,12 @@ function updateAssignmentClassPreview() {
   }
 
   if (gradeEl) gradeEl.textContent = c.grade || c.gradeLevel || 'Form 2';
-  if (subjectEl) subjectEl.textContent = c.subject || c.name || 'Core Curriculum';
+  if (subjectEl) {
+    const classSubs = (Array.isArray(c.subjects) && c.subjects.length > 0)
+      ? c.subjects
+      : (c.subject ? String(c.subject).split(',').map(s => s.trim()).filter(Boolean) : []);
+    subjectEl.textContent = classSubs.length > 0 ? classSubs.join(' • ') : (c.name || 'Core Curriculum');
+  }
   if (seatsEl) {
     const enrolled = Number(c.enrolled || (c.students || []).length || 0);
     const cap = Number(c.capacity || 35);
@@ -6851,6 +7228,340 @@ function updateAssignmentTeacherPreview() {
   if (emailEl) emailEl.textContent = t.email || '';
 }
 
+function populateAssignSubjectSelect(targetClass, preselectedSubject = null) {
+  const subjectSelect = document.getElementById('assign_subject_select');
+  if (!subjectSelect) return;
+
+  const catalogSubjects = typeof getSubjectsList === 'function' ? getSubjectsList() : [];
+  const allClasses = typeof getClassesList === 'function' ? getClassesList() : [];
+  
+  // Extract individual subjects registered under this classroom
+  let classSubs = [];
+  if (targetClass) {
+    if (Array.isArray(targetClass.subjects) && targetClass.subjects.length > 0) {
+      classSubs = targetClass.subjects;
+    } else if (targetClass.subject) {
+      classSubs = String(targetClass.subject).split(',').map(s => s.trim()).filter(Boolean);
+    }
+  }
+
+  // Extract all subjects created across other classes in the school
+  const otherClassSubs = [];
+  allClasses.forEach(c => {
+    let subs = [];
+    if (Array.isArray(c.subjects)) subs = c.subjects;
+    else if (c.subject) subs = String(c.subject).split(',').map(s => s.trim()).filter(Boolean);
+    subs.forEach(s => {
+      if (!classSubs.some(cs => cs.toLowerCase() === s.toLowerCase()) && 
+          !otherClassSubs.some(ocs => ocs.toLowerCase() === s.toLowerCase())) {
+        otherClassSubs.push(s);
+      }
+    });
+  });
+
+  const standardCurriculum = [
+    'Computer Science', 'Mathematics', 'English Language', 
+    'Integrated Science', 'Physics', 'Visual Arts', 'Graphic Design'
+  ];
+
+  let html = '<option value="">-- Select Subject to Assign --</option>';
+
+  if (classSubs.length > 0) {
+    html += `<optgroup label="Subjects Registered for ${escapeHtml(targetClass.name || 'this Class')}">`;
+    classSubs.forEach(sub => {
+      const isSel = preselectedSubject ? (sub.toLowerCase() === preselectedSubject.toLowerCase()) : false;
+      html += `<option value="${escapeHtml(sub)}" ${isSel ? 'selected' : ''}>${escapeHtml(sub)}</option>`;
+    });
+    html += '</optgroup>';
+  }
+
+  if (otherClassSubs.length > 0) {
+    html += '<optgroup label="Other Created Subjects Across School">';
+    otherClassSubs.forEach(sub => {
+      const isSel = preselectedSubject && sub.toLowerCase() === preselectedSubject.toLowerCase();
+      html += `<option value="${escapeHtml(sub)}" ${isSel ? 'selected' : ''}>${escapeHtml(sub)}</option>`;
+    });
+    html += '</optgroup>';
+  }
+
+  // Curriculum catalog & standard syllabus
+  const allCurriculumPool = Array.from(new Set([
+    ...catalogSubjects.map(s => s.name),
+    ...standardCurriculum
+  ])).filter(s => 
+    !classSubs.some(cs => cs.toLowerCase() === s.toLowerCase()) &&
+    !otherClassSubs.some(ocs => ocs.toLowerCase() === s.toLowerCase())
+  );
+
+  if (allCurriculumPool.length > 0) {
+    html += '<optgroup label="Standard Curriculum Syllabus">';
+    allCurriculumPool.forEach(subName => {
+      const catObj = catalogSubjects.find(cs => cs.name.toLowerCase() === subName.toLowerCase());
+      const isSel = preselectedSubject && subName.toLowerCase() === preselectedSubject.toLowerCase();
+      const codeStr = catObj && catObj.code ? catObj.code + ' — ' : '';
+      const deptStr = catObj && catObj.department ? ` (${escapeHtml(catObj.department)})` : '';
+      html += `<option value="${escapeHtml(subName)}" ${isSel ? 'selected' : ''}>${codeStr}${escapeHtml(subName)}${deptStr}</option>`;
+    });
+    html += '</optgroup>';
+  }
+
+  if (classSubs.length === 0 && otherClassSubs.length === 0 && allCurriculumPool.length === 0) {
+    html = '<option value="">No subjects registered yet — Click \'+ New Subject\'</option>';
+  }
+
+  subjectSelect.innerHTML = html;
+
+  if (preselectedSubject) {
+    subjectSelect.value = preselectedSubject;
+  } else if (classSubs.length > 0) {
+    subjectSelect.value = classSubs[0];
+  }
+}
+
+let _currentMultiClassIds = new Set();
+let _currentMultiSubjects = new Set();
+
+function toggleMultiClassOptions() {
+  const wrap = document.getElementById('multi_class_options_wrap');
+  if (!wrap) return;
+  const isHidden = (wrap.style.display === 'none' || !wrap.style.display);
+  wrap.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) {
+    populateMultiClassCheckboxes();
+  }
+}
+
+function populateMultiClassCheckboxes() {
+  const container = document.getElementById('multi_class_checkboxes');
+  if (!container) return;
+  const classes = getClassesList();
+  const currentClassId = document.getElementById('assign_class_select')?.value;
+  const otherClasses = classes.filter(c => String(c.id) !== String(currentClassId));
+
+  if (otherClasses.length === 0) {
+    container.innerHTML = '<span style="font-size:11.5px; color:var(--muted); font-style:italic;">No other classes created yet.</span>';
+    return;
+  }
+
+  container.innerHTML = otherClasses.map(c => `
+    <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;">
+      <input type="checkbox" class="multi-class-cb" value="${escapeHtml(c.id)}" ${_currentMultiClassIds.has(String(c.id)) ? 'checked' : ''} onchange="toggleMultiClassTarget('${escapeHtml(c.id)}', this.checked)">
+      <span style="font-weight:600; color:var(--text);">${c.code ? c.code + ' — ' : ''}${escapeHtml(c.name)}</span>
+      <span class="badge-pill badge-purple" style="font-size:9.5px; padding:1px 6px;">${escapeHtml(c.grade || 'Cohort')}</span>
+    </label>
+  `).join('');
+}
+
+function toggleMultiClassTarget(classId, isChecked) {
+  if (isChecked) {
+    _currentMultiClassIds.add(String(classId));
+  } else {
+    _currentMultiClassIds.delete(String(classId));
+  }
+}
+
+function populateAssignMultiSubjects(targetClass) {
+  const container = document.getElementById('assign_multi_subjects_wrap');
+  if (!container) return;
+
+  const catalogSubjects = typeof getSubjectsList === 'function' ? getSubjectsList() : [];
+  let availableSubs = [];
+  if (targetClass) {
+    if (Array.isArray(targetClass.subjects)) availableSubs = [...targetClass.subjects];
+    else if (targetClass.subject) availableSubs = String(targetClass.subject).split(',').map(s => s.trim()).filter(Boolean);
+  }
+  catalogSubjects.forEach(s => {
+    if (!availableSubs.some(cs => cs.toLowerCase() === s.name.toLowerCase())) {
+      availableSubs.push(s.name);
+    }
+  });
+
+  const primarySub = (document.getElementById('assign_subject_select')?.value || '').trim();
+
+  container.innerHTML = availableSubs.map(s => {
+    if (s.toLowerCase() === primarySub.toLowerCase()) return '';
+    const isChecked = _currentMultiSubjects.has(s);
+    return `
+      <button type="button" class="preset-chip ${isChecked ? 'active' : ''}" style="font-size:10.5px; padding:3px 8px; ${isChecked ? 'background:var(--primary); color:#fff; font-weight:700;' : ''}" onclick="toggleAssignAdditionalSubject('${escapeHtml(s)}')">
+        ${isChecked ? '✓ ' : '+ '}${escapeHtml(s)}
+      </button>
+    `;
+  }).filter(Boolean).join('');
+}
+
+function toggleAssignAdditionalSubject(subName) {
+  if (_currentMultiSubjects.has(subName)) {
+    _currentMultiSubjects.delete(subName);
+  } else {
+    _currentMultiSubjects.add(subName);
+  }
+  const currentClass = getClassesList().find(c => String(c.id) === String(document.getElementById('assign_class_select')?.value));
+  populateAssignMultiSubjects(currentClass);
+}
+
+function populateAssignPairedTeacherSelect() {
+  const pairedSelect = document.getElementById('assign_paired_teacher_select');
+  if (!pairedSelect) return;
+  const currentLeadEmail = (document.getElementById('assign_teacher_select')?.value || '').toLowerCase().trim();
+  const teachers = getAvailableTeachers();
+
+  const currentPairedVal = pairedSelect.value;
+  pairedSelect.innerHTML = '<option value="">-- No Paired Co-Teacher (Solo Instruction) --</option>' + 
+    teachers
+      .filter(t => (t.email || '').toLowerCase().trim() !== currentLeadEmail)
+      .map(t => `<option value="${escapeHtml(t.email)}" data-name="${escapeHtml(t.name)}" data-role="${escapeHtml(t.role)}">👥 ${escapeHtml(t.name)} (${escapeHtml(t.role)})</option>`)
+      .join('');
+
+  if (currentPairedVal && currentPairedVal.toLowerCase() !== currentLeadEmail) {
+    pairedSelect.value = currentPairedVal;
+  }
+  handleAssignPairedTeacherChange();
+}
+
+function handleAssignPairedTeacherChange() {
+  const pairedSelect = document.getElementById('assign_paired_teacher_select');
+  const optionsBox = document.getElementById('paired_teacher_options_box');
+  if (!optionsBox) return;
+  const hasPaired = Boolean(pairedSelect && pairedSelect.value);
+  optionsBox.style.display = hasPaired ? 'block' : 'none';
+}
+
+function renderCurrentClassAllocations(targetClass) {
+  const container = document.getElementById('current_class_allocations_box');
+  const badge = document.getElementById('cur_class_alloc_count');
+  if (!container) return;
+
+  if (!targetClass) {
+    container.innerHTML = '<div style="color:var(--muted); font-size:12px; text-align:center; padding:10px;">Select a classroom to view active allocations.</div>';
+    if (badge) badge.textContent = '0 Faculty';
+    return;
+  }
+
+  let teacherList = [];
+  if (Array.isArray(targetClass.teachers) && targetClass.teachers.length > 0) {
+    teacherList = targetClass.teachers;
+  } else if (targetClass.teacherEmail || targetClass.teacherName) {
+    teacherList = [{
+      name: targetClass.teacherName || targetClass.teacherEmail,
+      email: targetClass.teacherEmail || '',
+      role: 'Lead Educator',
+      subjects: Array.isArray(targetClass.subjects) ? targetClass.subjects : (targetClass.subject ? String(targetClass.subject).split(',').map(s=>s.trim()) : ['General']),
+      room: targetClass.room || 'Room 101',
+      schedule: targetClass.schedule || ''
+    }];
+  }
+
+  if (badge) badge.textContent = `${teacherList.length} Educator${teacherList.length === 1 ? '' : 's'}`;
+
+  if (teacherList.length === 0) {
+    container.innerHTML = `
+      <div style="color:var(--muted); font-size:12px; text-align:center; padding:12px 6px;">
+        <i class="fa-solid fa-chalkboard-user" style="opacity:0.4; font-size:16px; margin-bottom:4px; display:block;"></i>
+        No educators currently allocated to <strong>${escapeHtml(targetClass.name)}</strong>.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      ${teacherList.map(t => {
+        const initials = (t.name || 'ED').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        const subs = Array.isArray(t.subjects) ? t.subjects.join(', ') : (t.subject || 'All Subjects');
+        const isPaired = Array.isArray(t.pairedWith) && t.pairedWith.length > 0;
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:center; background:var(--card-bg, #ffffff); border:1px solid rgba(99,102,241,0.18); border-radius:8px; padding:8px 10px; gap:8px;">
+            <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+              <div style="width:28px; height:28px; border-radius:50%; background:var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:10px; flex-shrink:0;">${escapeHtml(initials)}</div>
+              <div style="min-width:0;">
+                <div style="font-weight:700; font-size:12px; color:var(--text); display:flex; align-items:center; gap:6px;">
+                  <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(t.name)}</span>
+                  <span class="badge-pill" style="font-size:9.5px; padding:1px 5px; background:${isPaired ? 'rgba(168,85,247,0.15)' : 'rgba(16,185,129,0.15)'}; color:${isPaired ? '#a855f7' : '#10b981'}; font-weight:700;">
+                    ${isPaired ? '👥 Paired' : (escapeHtml(t.role || 'Lead'))}
+                  </span>
+                </div>
+                <div class="small" style="color:var(--muted); font-size:10.5px; margin-top:1px;">
+                  <i class="fa-solid fa-book-bookmark" style="font-size:9px; margin-right:3px;"></i>${escapeHtml(subs)}
+                </div>
+              </div>
+            </div>
+            <button type="button" class="btn ghost btn-sm" style="padding:4px 7px; color:var(--accent-red); font-size:11px; flex-shrink:0;" title="Unassign Educator from this Class" onclick="unassignTeacherFromClass('${escapeHtml(targetClass.id)}', '${escapeHtml(t.email)}')">
+              <i class="fa-solid fa-user-xmark"></i>
+            </button>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+async function unassignTeacherFromClass(classId, teacherEmail, subjectName = null) {
+  if (!confirm('Unassign this educator from this academic class?')) return;
+  const classes = getClassesList();
+  const targetClass = classes.find(c => String(c.id) === String(classId));
+  if (!targetClass) return;
+
+  const tEmail = (teacherEmail || '').toLowerCase().trim();
+  let teacherList = Array.isArray(targetClass.teachers) ? targetClass.teachers : [];
+
+  if (subjectName) {
+    const tObj = teacherList.find(t => (t.email || '').toLowerCase().trim() === tEmail);
+    if (tObj && Array.isArray(tObj.subjects)) {
+      tObj.subjects = tObj.subjects.filter(s => s.toLowerCase() !== subjectName.toLowerCase());
+      if (tObj.subjects.length === 0) {
+        teacherList = teacherList.filter(t => (t.email || '').toLowerCase().trim() !== tEmail);
+      }
+    }
+  } else {
+    teacherList = teacherList.filter(t => (t.email || '').toLowerCase().trim() !== tEmail);
+  }
+
+  // Clean up pairedWith references
+  teacherList.forEach(t => {
+    if (Array.isArray(t.pairedWith)) {
+      t.pairedWith = t.pairedWith.filter(e => (e || '').toLowerCase().trim() !== tEmail);
+    }
+  });
+
+  targetClass.teachers = teacherList;
+  targetClass.teacherName = teacherList.map(t => t.name).join(', ');
+  targetClass.teacherEmail = teacherList.map(t => t.email).join(', ');
+  targetClass.teacherId = teacherList.length > 0 ? teacherList[0].email : null;
+  if (teacherList.length === 0) {
+    targetClass.status = 'Unassigned';
+  }
+
+  saveClassesList(classes);
+
+  if (window.SupabaseService && typeof window.SupabaseService.saveClass === 'function') {
+    try {
+      await window.SupabaseService.saveClass(ACTIVE_ORG, {
+        id: !isNaN(Number(targetClass.id)) ? Number(targetClass.id) : undefined,
+        name: targetClass.name,
+        className: targetClass.name,
+        code: targetClass.code,
+        gradeLevel: targetClass.grade,
+        subject: targetClass.subject,
+        subjects: targetClass.subjects,
+        teachers: targetClass.teachers,
+        teacherId: targetClass.teacherId,
+        teacherName: targetClass.teacherName,
+        status: targetClass.status
+      });
+    } catch(e) {}
+  }
+
+  renderCurrentClassAllocations(targetClass);
+  renderClassesSection();
+  renderSubjectsTab();
+
+  if (window.Toaster) {
+    window.Toaster.info('Allocation Updated', 'The educator was unassigned from the classroom stream.');
+  } else {
+    showToast('Educator unassigned successfully', 'info');
+  }
+}
+
 function handleAssignClassChange() {
   const classSelect = document.getElementById('assign_class_select');
   if (!classSelect) return;
@@ -6861,33 +7572,26 @@ function handleAssignClassChange() {
     document.getElementById('assign_schedule').value = selClass.schedule || 'Mon, Wed, Fri 09:00 AM';
     if (selClass.teacherEmail) {
       const tSelect = document.getElementById('assign_teacher_select');
-      if (tSelect) tSelect.value = selClass.teacherEmail;
-    }
-    if (selClass.subject) {
-      const sSelect = document.getElementById('assign_subject_select');
-      if (sSelect) {
-        let matched = false;
-        for (let i = 0; i < sSelect.options.length; i++) {
-          if (sSelect.options[i].value.toLowerCase() === selClass.subject.toLowerCase()) {
-            sSelect.selectedIndex = i;
-            matched = true;
-            break;
-          }
-        }
-        if (!matched && selClass.subject) {
-          const opt = new Option(`${selClass.subject} (Current)`, selClass.subject, true, true);
-          sSelect.add(opt, 1);
-        }
+      if (tSelect && selClass.teachers && selClass.teachers.length > 0) {
+        tSelect.value = selClass.teachers[0].email;
+      } else if (tSelect && selClass.teacherEmail) {
+        tSelect.value = selClass.teacherEmail.split(',')[0].trim();
       }
     }
+    populateAssignSubjectSelect(selClass);
+    populateAssignMultiSubjects(selClass);
+    populateMultiClassCheckboxes();
+    renderCurrentClassAllocations(selClass);
   }
   updateAssignmentClassPreview();
   updateAssignmentTeacherPreview();
   handleAssignSubjectChange();
+  populateAssignPairedTeacherSelect();
 }
 
 function handleAssignTeacherChange() {
   updateAssignmentTeacherPreview();
+  populateAssignPairedTeacherSelect();
 }
 
 function handleAssignSubjectChange() {
@@ -6917,13 +7621,21 @@ function handleAssignSubjectChange() {
     if (aspName) aspName.textContent = 'Unassigned Subject';
     if (aspDept) aspDept.textContent = 'None';
   }
+
+  const currentClass = getClassesList().find(c => String(c.id) === String(document.getElementById('assign_class_select')?.value));
+  populateAssignMultiSubjects(currentClass);
 }
 
 function openAssignModalForSubject(subjectName) {
   openAssignModal(null, subjectName);
 }
 
-function openAssignModal(preselectedClassId = null, preselectedSubjectName = null) {
+function openAssignModal(preselectedClassId = null, preselectedSubjectName = null, preselectedTeacherEmail = null) {
+  _currentMultiClassIds.clear();
+  _currentMultiSubjects.clear();
+  const multiWrap = document.getElementById('multi_class_options_wrap');
+  if (multiWrap) multiWrap.style.display = 'none';
+
   let classes = getClassesList();
   const teachers = getAvailableTeachers();
   const subjects = getSubjectsList();
@@ -6943,10 +7655,10 @@ function openAssignModal(preselectedClassId = null, preselectedSubjectName = nul
     if (seatsEl) seatsEl.textContent = '0 / 0 Seats';
   } else {
     classSelect.innerHTML = classes.map(c => {
-      const isAssigned = Boolean(c.teacherName && c.teacherName.trim() !== '');
-      const assignTag = isAssigned ? ` • Assigned to ${c.teacherName}` : ' • Unassigned';
+      const isAssigned = Boolean((c.teachers && c.teachers.length > 0) || (c.teacherName && c.teacherName.trim() !== ''));
+      const teacherCount = (c.teachers && c.teachers.length > 0) ? `${c.teachers.length} Faculty Assigned` : (c.teacherName ? `Assigned to ${c.teacherName}` : 'Unassigned');
       return `<option value="${c.id}" ${preselectedClassId && String(c.id) === String(preselectedClassId) ? 'selected' : ''}>
-        ${c.code ? c.code + ' — ' : ''}${escapeHtml(c.name)} (${escapeHtml(c.grade || 'Form 2')}${escapeHtml(assignTag)})
+        ${c.code ? c.code + ' — ' : ''}${escapeHtml(c.name)} (${escapeHtml(c.grade || 'Form 2')} • ${escapeHtml(teacherCount)})
       </option>`;
     }).join('');
 
@@ -6956,40 +7668,28 @@ function openAssignModal(preselectedClassId = null, preselectedSubjectName = nul
   }
 
   teacherSelect.innerHTML = teachers.map(t => `
-    <option value="${escapeHtml(t.email)}" data-name="${escapeHtml(t.name)}" data-role="${escapeHtml(t.role)}">
+    <option value="${escapeHtml(t.email)}" data-name="${escapeHtml(t.name)}" data-role="${escapeHtml(t.role)}" ${preselectedTeacherEmail && (t.email.toLowerCase() === preselectedTeacherEmail.toLowerCase()) ? 'selected' : ''}>
       ${escapeHtml(t.name)} (${escapeHtml(t.role)})
     </option>
   `).join('');
 
+  if (preselectedTeacherEmail) {
+    teacherSelect.value = preselectedTeacherEmail;
+  }
+
   const targetClass = classes.find(c => String(c.id) === String(preselectedClassId || classSelect.value)) || classes[0];
 
-  if (subjectSelect) {
-    if (subjects.length === 0) {
-      subjectSelect.innerHTML = `
-        <option value="">No subjects registered yet — Click '+ New Subject'</option>
-        ${targetClass && targetClass.subject ? `<option value="${escapeHtml(targetClass.subject)}" selected>${escapeHtml(targetClass.subject)} (Current)</option>` : ''}
-      `;
-    } else {
-      let optionsHtml = '<option value="">-- Select Curriculum Subject --</option>';
-      optionsHtml += subjects.map(s => {
-        const isSelected = (preselectedSubjectName && s.name.toLowerCase() === preselectedSubjectName.toLowerCase()) ||
-                           (!preselectedSubjectName && targetClass && targetClass.subject && targetClass.subject.toLowerCase() === s.name.toLowerCase());
-        return `<option value="${escapeHtml(s.name)}" data-code="${escapeHtml(s.code)}" data-dept="${escapeHtml(s.department || 'General')}" ${isSelected ? 'selected' : ''}>
-          ${s.code ? s.code + ' — ' : ''}${escapeHtml(s.name)} (${escapeHtml(s.department || 'General')})
-        </option>`;
-      }).join('');
-      if (targetClass && targetClass.subject && !subjects.some(s => s.name.toLowerCase() === targetClass.subject.toLowerCase())) {
-        optionsHtml = `<option value="${escapeHtml(targetClass.subject)}" selected>${escapeHtml(targetClass.subject)} (Custom)</option>` + optionsHtml;
-      }
-      subjectSelect.innerHTML = optionsHtml;
-    }
-  }
+  populateAssignSubjectSelect(targetClass, preselectedSubjectName);
+  populateAssignMultiSubjects(targetClass);
+  populateAssignPairedTeacherSelect();
+  populateMultiClassCheckboxes();
+  renderCurrentClassAllocations(targetClass);
 
   if (classes.length > 0 && targetClass) {
     document.getElementById('assign_room').value = targetClass.room || 'Studio Suite 3B';
     document.getElementById('assign_schedule').value = targetClass.schedule || 'Mon, Wed, Fri 09:00 AM';
-    if (targetClass.teacherEmail) {
-      teacherSelect.value = targetClass.teacherEmail;
+    if (targetClass.teacherEmail && !preselectedTeacherEmail) {
+      teacherSelect.value = targetClass.teachers && targetClass.teachers[0] ? targetClass.teachers[0].email : targetClass.teacherEmail.split(',')[0].trim();
     }
     if (targetClass.assignmentNotes) {
       document.getElementById('assign_notes').value = targetClass.assignmentNotes;
@@ -7024,129 +7724,236 @@ function closeAssignModal() {
 }
 
 async function submitTeacherAssignment() {
-  const classId = document.getElementById('assign_class_select').value;
+  const primaryClassId = document.getElementById('assign_class_select').value;
   const teacherSelect = document.getElementById('assign_teacher_select');
   const teacherEmail = teacherSelect.value;
   const selectedTeacherOpt = teacherSelect.options[teacherSelect.selectedIndex];
   const teacherName = selectedTeacherOpt ? (selectedTeacherOpt.dataset.name || selectedTeacherOpt.text.split('(')[0].trim()) : '';
+  const teacherRole = document.getElementById('assign_teacher_role')?.value || 'Lead Educator';
+
+  const pairedTeacherSelect = document.getElementById('assign_paired_teacher_select');
+  const pairedEmail = pairedTeacherSelect ? pairedTeacherSelect.value : '';
+  let pairedName = '';
+  let pairedRole = document.getElementById('assign_paired_teacher_role')?.value || 'Co-Educator';
+  if (pairedEmail) {
+    const pairedOpt = pairedTeacherSelect.options[pairedTeacherSelect.selectedIndex];
+    pairedName = pairedOpt ? (pairedOpt.dataset.name || pairedOpt.text.replace('👥', '').split('(')[0].trim()) : '';
+  }
+
   const room = document.getElementById('assign_room').value.trim() || 'Studio Suite 3B';
   const schedule = document.getElementById('assign_schedule').value.trim() || 'Mon, Wed, Fri 09:00 AM';
   const notes = document.getElementById('assign_notes').value.trim();
 
-  if (!classId) {
+  if (!primaryClassId) {
     if (window.Toaster) window.Toaster.warning('Selection Required', 'Please select an academic class.');
     else showToast('Please select an academic class', 'warning');
     return;
   }
   if (!teacherEmail) {
-    if (window.Toaster) window.Toaster.warning('Selection Required', 'Please select a teacher to assign.');
-    else showToast('Please select a teacher to assign', 'warning');
+    if (window.Toaster) window.Toaster.warning('Selection Required', 'Please select an educator to assign.');
+    else showToast('Please select an educator to assign', 'warning');
     return;
   }
+
+  const primarySubject = (document.getElementById('assign_subject_select')?.value || '').trim();
+  const assignedSubjects = new Set();
+  if (primarySubject) assignedSubjects.add(primarySubject);
+  _currentMultiSubjects.forEach(s => assignedSubjects.add(s));
+
+  if (assignedSubjects.size === 0) {
+    if (window.Toaster) window.Toaster.warning('Subject Required', 'Please select at least one curriculum subject.');
+    else showToast('Please select at least one curriculum subject', 'warning');
+    return;
+  }
+
+  const targetClassIds = Array.from(new Set([String(primaryClassId), ...Array.from(_currentMultiClassIds)]));
 
   const submitBtn = document.getElementById('assignSubmitBtn');
   const origBtnText = submitBtn ? submitBtn.innerHTML : '';
   if (submitBtn) {
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Deploying Educator...';
+    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Deploying Faculty & Pairing...';
   }
 
   try {
     const classes = getClassesList();
-    let idx = classes.findIndex(c => String(c.id) === String(classId));
-    if (idx === -1) {
-      idx = classes.findIndex(c => (c.code && String(c.code) === String(classId)) || (c.name && String(c.name).toLowerCase() === String(classId).toLowerCase()));
-    }
-    if (idx === -1 && classes.length > 0) {
-      idx = 0;
-    }
+    const assignedSubjectsArr = Array.from(assignedSubjects);
+    const updatedClasses = [];
 
-    if (idx === -1) {
-      if (window.Toaster) window.Toaster.error('Class Not Found', 'Could not locate the selected classroom record.');
-      else showToast('Could not locate the selected classroom record', 'error');
-      return;
-    }
+    for (const targetId of targetClassIds) {
+      let idx = classes.findIndex(c => String(c.id) === String(targetId));
+      if (idx === -1) {
+        idx = classes.findIndex(c => (c.code && String(c.code) === String(targetId)) || (c.name && String(c.name).toLowerCase() === String(targetId).toLowerCase()));
+      }
+      if (idx === -1) continue;
 
-    const subjectSelect = document.getElementById('assign_subject_select');
-    const subjectVal = subjectSelect ? subjectSelect.value.trim() : '';
+      // 1. Preserve and append to class subjects (One class to many subjects)
+      let currentSubs = [];
+      if (Array.isArray(classes[idx].subjects) && classes[idx].subjects.length > 0) {
+        currentSubs = [...classes[idx].subjects];
+      } else if (classes[idx].subject) {
+        currentSubs = String(classes[idx].subject).split(',').map(s => s.trim()).filter(Boolean);
+      }
+      assignedSubjectsArr.forEach(sub => {
+        if (!currentSubs.some(s => s.toLowerCase() === sub.toLowerCase())) {
+          currentSubs.push(sub);
+        }
+      });
+      classes[idx].subjects = currentSubs;
+      classes[idx].subject = currentSubs.join(', ');
 
-    if (subjectVal) {
-      classes[idx].subject = subjectVal;
+      // 2. Multi-Teacher Array on Class (One class to many teachers)
+      let teachersList = Array.isArray(classes[idx].teachers) ? [...classes[idx].teachers] : [];
+      if (teachersList.length === 0 && classes[idx].teacherEmail) {
+        teachersList.push({
+          email: classes[idx].teacherEmail,
+          name: classes[idx].teacherName || classes[idx].teacherEmail,
+          role: 'Lead Educator',
+          subjects: currentSubs.length > 0 ? [...currentSubs] : ['General'],
+          room: classes[idx].room || room,
+          schedule: classes[idx].schedule || schedule,
+          pairedWith: []
+        });
+      }
+
+      // Add/Update Lead Teacher
+      let leadIdx = teachersList.findIndex(t => (t.email || '').toLowerCase().trim() === teacherEmail.toLowerCase().trim());
+      if (leadIdx !== -1) {
+        const existingSubs = Array.isArray(teachersList[leadIdx].subjects) ? teachersList[leadIdx].subjects : [];
+        assignedSubjectsArr.forEach(s => {
+          if (!existingSubs.some(es => es.toLowerCase() === s.toLowerCase())) existingSubs.push(s);
+        });
+        teachersList[leadIdx].subjects = existingSubs;
+        teachersList[leadIdx].role = teacherRole;
+        teachersList[leadIdx].room = room;
+        teachersList[leadIdx].schedule = schedule;
+        if (pairedEmail) {
+          teachersList[leadIdx].pairedWith = Array.from(new Set([...(teachersList[leadIdx].pairedWith || []), pairedEmail]));
+        }
+      } else {
+        teachersList.push({
+          email: teacherEmail,
+          name: teacherName,
+          role: teacherRole,
+          subjects: [...assignedSubjectsArr],
+          room: room,
+          schedule: schedule,
+          pairedWith: pairedEmail ? [pairedEmail] : [],
+          assignedAt: Date.now()
+        });
+      }
+
+      // Add/Update Paired Co-Teacher ("pearing teachers to one subject")
+      if (pairedEmail) {
+        let pairedIdx = teachersList.findIndex(t => (t.email || '').toLowerCase().trim() === pairedEmail.toLowerCase().trim());
+        if (pairedIdx !== -1) {
+          const existingSubs = Array.isArray(teachersList[pairedIdx].subjects) ? teachersList[pairedIdx].subjects : [];
+          assignedSubjectsArr.forEach(s => {
+            if (!existingSubs.some(es => es.toLowerCase() === s.toLowerCase())) existingSubs.push(s);
+          });
+          teachersList[pairedIdx].subjects = existingSubs;
+          teachersList[pairedIdx].role = pairedRole;
+          teachersList[pairedIdx].room = room;
+          teachersList[pairedIdx].schedule = schedule;
+          teachersList[pairedIdx].pairedWith = Array.from(new Set([...(teachersList[pairedIdx].pairedWith || []), teacherEmail]));
+        } else {
+          teachersList.push({
+            email: pairedEmail,
+            name: pairedName,
+            role: pairedRole,
+            subjects: [...assignedSubjectsArr],
+            room: room,
+            schedule: schedule,
+            pairedWith: [teacherEmail],
+            assignedAt: Date.now()
+          });
+        }
+      }
+
+      classes[idx].teachers = teachersList;
+      classes[idx].teacherName = teachersList.map(t => t.name).join(', ');
+      classes[idx].teacherEmail = teachersList.map(t => t.email).join(', ');
+      classes[idx].teacherId = teachersList[0] ? teachersList[0].email : teacherEmail;
+      classes[idx].room = room;
+      classes[idx].schedule = schedule;
+      classes[idx].status = 'Active';
+      classes[idx].approvalStatus = 'approved';
+      classes[idx].assignmentNotes = notes;
+      classes[idx].assignedAt = Date.now();
+
+      updatedClasses.push(classes[idx]);
     }
-    classes[idx].teacherName = teacherName;
-    classes[idx].teacherEmail = teacherEmail;
-    classes[idx].room = room;
-    classes[idx].schedule = schedule;
-    classes[idx].status = 'Active';
-    classes[idx].approvalStatus = 'approved';
-    classes[idx].assignmentNotes = notes;
-    classes[idx].assignedAt = Date.now();
 
     saveClassesList(classes);
 
-    // 1. Sync to Supabase Cloud
-    if (window.SupabaseService && typeof window.SupabaseService.saveClass === 'function') {
-      try {
-        await window.SupabaseService.saveClass(ACTIVE_ORG, {
-          id: !isNaN(Number(classes[idx].id)) ? Number(classes[idx].id) : undefined,
-          name: classes[idx].name,
-          className: classes[idx].name,
-          code: classes[idx].code,
-          grade: classes[idx].grade,
-          gradeLevel: classes[idx].grade,
-          subject: subjectVal || classes[idx].subject || 'General',
-          room: room,
-          schedule: schedule,
-          teacherId: teacherEmail,
-          teacherName: teacherName,
-          status: 'Active',
-          capacity: classes[idx].capacity || 35
-        });
-      } catch (err) {
-        console.warn('[HR Supabase] Save class to cloud notice:', err.message);
+    // Sync each updated class to Supabase Cloud
+    for (const c of updatedClasses) {
+      if (window.SupabaseService && typeof window.SupabaseService.saveClass === 'function') {
+        try {
+          await window.SupabaseService.saveClass(ACTIVE_ORG, {
+            id: c.id,
+            name: c.name,
+            className: c.name,
+            code: c.code,
+            grade: c.grade,
+            gradeLevel: c.grade,
+            subject: c.subject,
+            subjects: c.subjects,
+            teachers: c.teachers,
+            room: c.room,
+            schedule: c.schedule,
+            teacherId: c.teacherId,
+            teacherEmail: c.teacherEmail,
+            teacherName: c.teacherName,
+            status: 'Active',
+            capacity: c.capacity || 35
+          });
+        } catch(e) {
+          console.warn('[HR Supabase] Save class to cloud notice:', e.message);
+        }
+
+        try {
+          if (typeof window.SupabaseService.broadcastChange === 'function') {
+            window.SupabaseService.broadcastChange('CLASS_ASSIGNED', 'classes', {
+              classId: c.id,
+              className: c.name,
+              subjects: c.subjects,
+              teachers: c.teachers,
+              teacherName: c.teacherName,
+              teacherEmail: c.teacherEmail,
+              paired: Boolean(pairedEmail),
+              orgId: ACTIVE_ORG
+            });
+          }
+        } catch(e) {}
       }
 
-      // 2. Broadcast live event across all portals
-      try {
-        if (typeof window.SupabaseService.broadcastChange === 'function') {
-          window.SupabaseService.broadcastChange('CLASS_ASSIGNED', 'classes', {
-            classId: classes[idx].id,
-            className: classes[idx].name,
-            subject: subjectVal || classes[idx].subject,
-            teacherName: teacherName,
-            teacherEmail: teacherEmail,
-            room: room,
-            schedule: schedule,
-            orgId: ACTIVE_ORG
-          });
-        }
-      } catch(e) {}
+      if (window.RealtimeBus && typeof window.RealtimeBus.emit === 'function') {
+        window.RealtimeBus.emit('class:assigned', c);
+      }
+      window.dispatchEvent(new CustomEvent('fg:class-updated', { detail: c }));
     }
-
-    // 3. Dispatch local bus events
-    if (window.RealtimeBus && typeof window.RealtimeBus.emit === 'function') {
-      window.RealtimeBus.emit('class:assigned', classes[idx]);
-    }
-    window.dispatchEvent(new CustomEvent('fg:class-updated', { detail: classes[idx] }));
 
     closeAssignModal();
     renderClassesSection();
     renderSubjectsTab();
 
+    const classNamesStr = updatedClasses.map(c => c.name).join(', ');
+    const pairMsg = pairedName ? ` and paired with ${pairedName} (Co-Educator)` : '';
+    const successTitle = targetClassIds.length > 1 ? 'Multi-Class Allocation Complete!' : 'Faculty Allocation Complete!';
+    const successDesc = `${teacherName}${pairMsg} assigned to ${classNamesStr} for [${assignedSubjectsArr.join(', ')}].`;
+
     if (window.Toaster && typeof window.Toaster.success === 'function') {
-      window.Toaster.success(
-        'Assignment & Allocation Complete!',
-        `${teacherName} has been assigned to ${classes[idx].name} for "${classes[idx].subject || 'Curriculum'}" in ${room} (${schedule}).`
-      );
+      window.Toaster.success(successTitle, successDesc);
     } else {
-      showToast(`Assigned ${teacherName} to ${classes[idx].name} for ${classes[idx].subject || 'Curriculum'}`);
+      showToast(successDesc);
     }
 
     if (window.SchoolMessenger && typeof window.SchoolMessenger.sendSystemNotification === 'function') {
       try {
         window.SchoolMessenger.sendSystemNotification(
           'chan-teachers',
-          `Official Academic Allocation: ${teacherName} has been assigned as Lead Educator for ${classes[idx].name} in ${room} (${schedule}).`
+          `Official Academic Allocation: ${teacherName}${pairMsg} assigned to ${classNamesStr} for ${assignedSubjectsArr.join(', ')}.`
         );
       } catch(e) {}
     }
@@ -7162,7 +7969,120 @@ async function submitTeacherAssignment() {
   }
 }
 
-function openAddClassModal() {
+let _currentClassSubjects = ['Computer Science'];
+
+function renderClassSubjectPills() {
+  const container = document.getElementById('classSelectedSubjectPills');
+  const hiddenInput = document.getElementById('new_class_subject');
+  if (!container) return;
+
+  if (_currentClassSubjects.length === 0) {
+    container.innerHTML = '<span id="noSubjectPlaceholder" style="font-size:12px; color:var(--muted); font-style:italic;">No subjects selected yet &bull; Click below or type to add</span>';
+    if (hiddenInput) hiddenInput.value = '';
+  } else {
+    container.innerHTML = _currentClassSubjects.map((sub, idx) => `
+      <span class="badge-pill badge-purple" style="font-size:11.5px; padding:3px 10px; display:inline-flex; align-items:center; gap:6px; font-weight:700; background:rgba(99,91,252,0.12); color:var(--primary); border:1px solid rgba(99,91,252,0.25); border-radius:14px;">
+        <i class="fa-solid fa-book-bookmark" style="font-size:10px;"></i>
+        <span>${escapeHtml(sub)}</span>
+        <button type="button" onclick="removeClassSubject(${idx})" style="background:none; border:none; color:var(--muted); cursor:pointer; padding:0; margin-left:2px; font-size:12px; line-height:1;" title="Remove ${escapeHtml(sub)}">&times;</button>
+      </span>
+    `).join('');
+    if (hiddenInput) hiddenInput.value = _currentClassSubjects.join(', ');
+  }
+
+  // Update chip active states
+  document.querySelectorAll('.class-subject-pick-chip').forEach(chip => {
+    const chipSub = chip.getAttribute('data-subject');
+    if (_currentClassSubjects.some(s => s.toLowerCase() === (chipSub || '').toLowerCase())) {
+      chip.classList.add('active');
+      chip.style.background = 'var(--primary)';
+      chip.style.color = '#fff';
+      chip.style.borderColor = 'var(--primary)';
+    } else {
+      chip.classList.remove('active');
+      chip.style.background = 'var(--surface)';
+      chip.style.color = 'var(--text)';
+      chip.style.borderColor = 'var(--border)';
+    }
+  });
+
+  updateAddClassPreview();
+}
+
+function addCustomClassSubject() {
+  const input = document.getElementById('new_class_subject_input');
+  if (!input) return;
+  const raw = (input.value || '').trim();
+  if (!raw) return;
+
+  const parts = raw.split(',').map(s => s.trim()).filter(Boolean);
+  parts.forEach(part => {
+    if (!_currentClassSubjects.some(s => s.toLowerCase() === part.toLowerCase())) {
+      _currentClassSubjects.push(part);
+    }
+  });
+
+  input.value = '';
+  renderClassSubjectPills();
+}
+
+function toggleClassSubject(subjectName) {
+  const clean = (subjectName || '').trim();
+  if (!clean) return;
+  const idx = _currentClassSubjects.findIndex(s => s.toLowerCase() === clean.toLowerCase());
+  if (idx >= 0) {
+    _currentClassSubjects.splice(idx, 1);
+  } else {
+    _currentClassSubjects.push(clean);
+  }
+  renderClassSubjectPills();
+}
+
+function removeClassSubject(idx) {
+  if (idx >= 0 && idx < _currentClassSubjects.length) {
+    _currentClassSubjects.splice(idx, 1);
+    renderClassSubjectPills();
+  }
+}
+
+function selectAllCoreCurriculumSubjects() {
+  const subjects = typeof getSubjectsList === 'function' ? getSubjectsList() : [];
+  const defaultCores = ['Mathematics', 'English Language', 'Integrated Science', 'Computer Science'];
+  const pool = subjects.length > 0 ? subjects.map(s => s.name) : defaultCores;
+  pool.forEach(sub => {
+    if (!_currentClassSubjects.some(s => s.toLowerCase() === sub.toLowerCase())) {
+      _currentClassSubjects.push(sub);
+    }
+  });
+  renderClassSubjectPills();
+}
+
+function populateAddClassSubjectChips() {
+  const container = document.getElementById('classCurriculumSubjectChips');
+  if (!container) return;
+
+  const catalog = typeof getSubjectsList === 'function' ? getSubjectsList() : [];
+  const defaultSubs = [
+    'Computer Science', 'Mathematics', 'English Language', 
+    'Integrated Science', 'Physics', 'Visual Arts', 'Graphic Design'
+  ];
+
+  const allSubs = Array.from(new Set([
+    ...catalog.map(s => s.name),
+    ...defaultSubs
+  ])).filter(Boolean);
+
+  container.innerHTML = allSubs.map(s => {
+    const isSel = _currentClassSubjects.some(item => item.toLowerCase() === s.toLowerCase());
+    return `
+      <button type="button" class="preset-chip class-subject-pick-chip ${isSel ? 'active' : ''}" data-subject="${escapeHtml(s)}" onclick="toggleClassSubject(this.getAttribute('data-subject'))" style="font-size:11px; padding:3px 9px; border-radius:6px; cursor:pointer;">
+        + ${escapeHtml(s)}
+      </button>
+    `;
+  }).join('');
+}
+
+function openAddClassModal(classId = null) {
   const drawer = document.getElementById('addClassDrawer');
   const backdrop = document.getElementById('addClassDrawerBackdrop');
   if (drawer) drawer.classList.add('active');
@@ -7171,6 +8091,45 @@ function openAddClassModal() {
   if (window.SlideOver && typeof window.SlideOver.open === 'function') {
     window.SlideOver.open('addClassDrawer');
   }
+
+  const form = document.getElementById('addClassForm');
+  if (classId) {
+    const classes = getClassesList();
+    const c = classes.find(item => String(item.id) === String(classId));
+    if (c) {
+      if (form) form.dataset.editingId = c.id;
+      if (document.getElementById('new_class_code')) document.getElementById('new_class_code').value = c.code || '';
+      if (document.getElementById('new_class_name')) document.getElementById('new_class_name').value = c.name || '';
+      if (document.getElementById('new_class_room')) document.getElementById('new_class_room').value = c.room || 'Room 101';
+      if (document.getElementById('new_class_schedule')) document.getElementById('new_class_schedule').value = c.schedule || 'Tue, Thu 10am';
+      if (document.getElementById('new_class_capacity')) document.getElementById('new_class_capacity').value = c.capacity || 30;
+      if (document.getElementById('new_class_grade')) document.getElementById('new_class_grade').value = c.grade || 'Grade 10';
+      selectClassGradePill(c.grade || 'Grade 10');
+
+      if (Array.isArray(c.subjects) && c.subjects.length > 0) {
+        _currentClassSubjects = [...c.subjects];
+      } else if (c.subject) {
+        _currentClassSubjects = String(c.subject).split(',').map(s => s.trim()).filter(Boolean);
+      } else {
+        _currentClassSubjects = [];
+      }
+
+      const titleEl = document.getElementById('addClassDrawerTitle');
+      if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-layer-group" style="color:var(--primary); margin-right:6px;"></i> Manage Class: ' + escapeHtml(c.name);
+      const submitBtn = document.getElementById('addClassSubmitBtn');
+      if (submitBtn) submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Save Classroom Subjects';
+    }
+  } else {
+    if (form) delete form.dataset.editingId;
+    _currentClassSubjects = ['Computer Science'];
+    const titleEl = document.getElementById('addClassDrawerTitle');
+    if (titleEl) titleEl.textContent = 'Add Academic Classroom';
+    const submitBtn = document.getElementById('addClassSubmitBtn');
+    if (submitBtn) submitBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Create Classroom';
+  }
+
+  populateAddClassSubjectChips();
+  renderClassSubjectPills();
   updateAddClassPreview();
 }
 
@@ -7189,7 +8148,10 @@ function closeAddClassModal() {
 function updateAddClassPreview() {
   const code = (document.getElementById('new_class_code')?.value || 'CLS-11A').trim().toUpperCase();
   const name = (document.getElementById('new_class_name')?.value || 'Grade 11 - Web Engineering').trim();
-  const subject = (document.getElementById('new_class_subject')?.value || 'Computer Science').trim();
+  const subCount = _currentClassSubjects.length;
+  const subject = subCount === 0 
+    ? (document.getElementById('new_class_subject')?.value || 'None')
+    : (subCount === 1 ? _currentClassSubjects[0] : `${subCount} Subjects (${_currentClassSubjects.slice(0, 2).join(', ')}${subCount > 2 ? '...' : ''})`);
   const grade = document.getElementById('new_class_grade')?.value || 'Grade 10';
   const room = (document.getElementById('new_class_room')?.value || 'Room 101').trim();
   const schedule = (document.getElementById('new_class_schedule')?.value || 'Tue, Thu 10am').trim();
@@ -7243,6 +8205,8 @@ function setPresetClass(code, title, subject, grade, room, schedule) {
   if (document.getElementById('new_class_code')) document.getElementById('new_class_code').value = code;
   if (document.getElementById('new_class_name')) document.getElementById('new_class_name').value = title;
   if (document.getElementById('new_class_subject')) document.getElementById('new_class_subject').value = subject;
+  _currentClassSubjects = subject.split(',').map(s => s.trim()).filter(Boolean);
+  renderClassSubjectPills();
   if (document.getElementById('new_class_grade')) document.getElementById('new_class_grade').value = grade;
   if (document.getElementById('new_class_room')) document.getElementById('new_class_room').value = room;
   if (document.getElementById('new_class_schedule')) document.getElementById('new_class_schedule').value = schedule;
@@ -7315,7 +8279,11 @@ async function submitAddClass() {
 
   const code = (codeInput?.value || '').trim().toUpperCase();
   const name = (nameInput?.value || '').trim();
-  const subject = (subjectInput?.value || '').trim();
+  const subjectsArray = _currentClassSubjects.slice();
+  if (subjectsArray.length === 0 && subjectInput?.value) {
+    subjectInput.value.split(',').map(s => s.trim()).filter(Boolean).forEach(s => subjectsArray.push(s));
+  }
+  const subject = subjectsArray.join(', ');
   const grade = gradeInput?.value || 'Grade 10';
   const room = (roomInput?.value || '').trim() || 'Room 101';
   const schedule = (scheduleInput?.value || '').trim() || 'Tue, Thu 10:00 AM';
@@ -7333,10 +8301,11 @@ async function submitAddClass() {
     if (nameInput) nameInput.focus();
     return;
   }
-  if (!subject) {
-    if (window.Toaster) window.Toaster.warning('Subject Required', 'Please specify a subject field for this class.');
-    else showToast('Please enter a subject', 'warning');
-    if (subjectInput) subjectInput.focus();
+  if (!subject || subjectsArray.length === 0) {
+    if (window.Toaster) window.Toaster.warning('Subjects Required', 'Please register at least one curriculum subject for this class.');
+    else showToast('Please select or register at least one subject', 'warning');
+    const subInput = document.getElementById('new_class_subject_input');
+    if (subInput) subInput.focus();
     return;
   }
 
@@ -7352,56 +8321,103 @@ async function submitAddClass() {
     const registeringHrOrg = (activeHrUser && (activeHrUser.org || activeHrUser.org_id || activeHrUser.organization)) || localStorage.getItem('active_org') || ACTIVE_ORG;
 
     const classes = getClassesList();
-    const tempId = 'cls_' + Date.now();
-    const newClass = {
-      id: tempId,
-      code: code,
-      name: name,
-      className: name,
-      subject: subject,
-      grade: grade,
-      gradeLevel: grade,
-      room: room,
-      schedule: schedule,
-      capacity: capacity,
-      enrolled: 0,
-      teacherName: '',
-      teacherEmail: '',
-      status: 'Unassigned',
-      org: registeringHrOrg,
-      org_id: registeringHrOrg,
-      org_name: registeringHrOrg,
-      createdAt: Date.now()
-    };
+    const editingId = document.getElementById('addClassForm')?.dataset?.editingId || null;
+    
+    // Check if this class already exists (by ID, code, or title)
+    const existingIdx = classes.findIndex(c => 
+      (editingId && String(c.id) === String(editingId)) ||
+      (code && c.code && c.code.trim().toUpperCase() === code.trim().toUpperCase()) ||
+      (name && c.name && c.name.trim().toLowerCase() === name.trim().toLowerCase())
+    );
+
+    let targetClass;
+    if (existingIdx !== -1) {
+      // CLASS ALREADY EXISTS: MERGE & ADD TO EXISTING SUBJECTS!
+      let currentSubs = [];
+      if (Array.isArray(classes[existingIdx].subjects) && classes[existingIdx].subjects.length > 0) {
+        currentSubs = [...classes[existingIdx].subjects];
+      } else if (classes[existingIdx].subject) {
+        currentSubs = String(classes[existingIdx].subject).split(',').map(s => s.trim()).filter(Boolean);
+      }
+      subjectsArray.forEach(sub => {
+        if (!currentSubs.some(s => s.toLowerCase() === sub.toLowerCase())) {
+          currentSubs.push(sub);
+        }
+      });
+      classes[existingIdx].subjects = currentSubs;
+      classes[existingIdx].subject = currentSubs.join(', ');
+      classes[existingIdx].code = code;
+      classes[existingIdx].name = name;
+      classes[existingIdx].className = name;
+      classes[existingIdx].grade = grade;
+      classes[existingIdx].gradeLevel = grade;
+      if (room) classes[existingIdx].room = room;
+      if (schedule) classes[existingIdx].schedule = schedule;
+      if (capacity) classes[existingIdx].capacity = capacity;
+      targetClass = classes[existingIdx];
+    } else {
+      // BRAND NEW CLASS
+      targetClass = {
+        id: 'cls_' + Date.now(),
+        code: code,
+        name: name,
+        className: name,
+        subject: subjectsArray.join(', '),
+        subjects: subjectsArray,
+        grade: grade,
+        gradeLevel: grade,
+        room: room,
+        schedule: schedule,
+        capacity: capacity,
+        enrolled: 0,
+        teacherName: '',
+        teacherEmail: '',
+        status: 'Unassigned',
+        org: registeringHrOrg,
+        org_id: registeringHrOrg,
+        org_name: registeringHrOrg,
+        createdAt: Date.now()
+      };
+      classes.push(targetClass);
+    }
 
     // Persist directly to Supabase Cloud
     if (window.SupabaseService && typeof window.SupabaseService.saveClass === 'function') {
       try {
         const cloudSaved = await window.SupabaseService.saveClass(registeringHrOrg, {
-          code: newClass.code,
-          name: newClass.name,
-          className: newClass.name,
-          subject: newClass.subject,
-          gradeLevel: newClass.grade,
-          room: newClass.room,
-          schedule: newClass.schedule,
-          capacity: newClass.capacity,
+          id: !isNaN(Number(targetClass.id)) ? Number(targetClass.id) : undefined,
+          code: targetClass.code,
+          name: targetClass.name,
+          className: targetClass.name,
+          subject: targetClass.subject,
+          subjects: targetClass.subjects,
+          gradeLevel: targetClass.grade,
+          room: targetClass.room,
+          schedule: targetClass.schedule,
+          capacity: targetClass.capacity,
           status: 'Active',
           academicYear: '2026/2027'
         });
         if (cloudSaved && cloudSaved.id) {
-          newClass.id = cloudSaved.id;
+          targetClass.id = cloudSaved.id;
         }
       } catch (err) {
         console.warn('Supabase saveClass notice:', err);
       }
     }
 
-    classes.push(newClass);
     saveClassesList(classes);
     if (registeringHrOrg && `${registeringHrOrg}_classes` !== CLASSES_STORAGE_KEY) {
       save(`${registeringHrOrg}_classes`, classes);
       try { localStorage.setItem(`${registeringHrOrg}_classes`, JSON.stringify(classes)); } catch(e) {}
+    }
+    try {
+      localStorage.setItem(`${ACTIVE_ORG}_classes`, JSON.stringify(classes));
+    } catch(e) {}
+
+    // Populate student modal select immediately
+    if (typeof populateStudentClassSelect === 'function') {
+      populateStudentClassSelect(newClass.id);
     }
 
     // Broadcast change
@@ -7677,12 +8693,24 @@ async function submitAddSubject() {
     }
     window.dispatchEvent(new CustomEvent('fg:subject-updated', { detail: newSubject }));
 
-    // 3. Handle immediate Class & Teacher allocation if selected
+    // 3. Handle immediate Class & Teacher allocation if selected - ADD TO EXISTING, NEVER REPLACE!
     if (assignClassId) {
       const classes = getClassesList();
       const targetClassIdx = classes.findIndex(c => String(c.id) === String(assignClassId));
       if (targetClassIdx !== -1) {
-        classes[targetClassIdx].subject = name;
+        // Collect existing subjects of this class
+        let currentSubs = [];
+        if (Array.isArray(classes[targetClassIdx].subjects) && classes[targetClassIdx].subjects.length > 0) {
+          currentSubs = [...classes[targetClassIdx].subjects];
+        } else if (classes[targetClassIdx].subject) {
+          currentSubs = String(classes[targetClassIdx].subject).split(',').map(s => s.trim()).filter(Boolean);
+        }
+        // ADD NEW SUBJECT TO THE OLD ONES (NO OVERWRITE!)
+        if (!currentSubs.some(s => s.toLowerCase() === name.toLowerCase())) {
+          currentSubs.push(name);
+        }
+        classes[targetClassIdx].subjects = currentSubs;
+        classes[targetClassIdx].subject = currentSubs.join(', ');
         classes[targetClassIdx].subjectCode = code;
 
         let allocatedTeacherName = '';
@@ -7697,7 +8725,7 @@ async function submitAddSubject() {
 
         saveClassesList(classes);
 
-        // Sync updated class to cloud
+        // Sync updated class to cloud with multi-subjects preserved
         if (window.SupabaseService && typeof window.SupabaseService.saveClass === 'function') {
           try {
             await window.SupabaseService.saveClass(registeringHrOrg, {
@@ -7707,11 +8735,12 @@ async function submitAddSubject() {
               code: classes[targetClassIdx].code,
               grade: classes[targetClassIdx].grade,
               gradeLevel: classes[targetClassIdx].grade,
-              subject: name,
+              subject: classes[targetClassIdx].subject,
+              subjects: classes[targetClassIdx].subjects,
               room: classes[targetClassIdx].room || 'Room 101',
               schedule: classes[targetClassIdx].schedule || 'Tue, Thu 10:00 AM',
-              teacherId: assignTeacherEmail || null,
-              teacherName: allocatedTeacherName || null,
+              teacherId: assignTeacherEmail || classes[targetClassIdx].teacherEmail || null,
+              teacherName: allocatedTeacherName || classes[targetClassIdx].teacherName || null,
               status: 'Active'
             });
           } catch(e) {}
@@ -7781,7 +8810,7 @@ function renderSubjectsTab() {
 
   // Populate department filter dynamically if needed
   const deptSelect = document.getElementById('filterSubjectDept');
-  if (deptSelect && deptSelect.options.length <= 1) {
+  if (deptSelect && deptSelect.options && deptSelect.options.length <= 1) {
     const depts = [...new Set(subjects.map(s => s.department).filter(Boolean))];
     depts.forEach(d => {
       const opt = document.createElement('option');
@@ -7793,7 +8822,7 @@ function renderSubjectsTab() {
 
   // Populate grade filter dynamically if needed
   const gradeSelect = document.getElementById('filterSubjectGrade');
-  if (gradeSelect && gradeSelect.options.length <= 1) {
+  if (gradeSelect && gradeSelect.options && gradeSelect.options.length <= 1) {
     const grades = [...new Set(subjects.map(s => s.grade).filter(Boolean))];
     grades.forEach(g => {
       const opt = document.createElement('option');
@@ -7804,7 +8833,18 @@ function renderSubjectsTab() {
   }
 
   // Calculate allocation metrics
-  const allocatedSubjects = subjects.filter(s => classes.some(c => (c.subject || '').toLowerCase() === s.name.toLowerCase()));
+  const isSubjectInClass = (cl, subName) => {
+    const target = (subName || '').toLowerCase().trim();
+    if (Array.isArray(cl.subjects)) {
+      if (cl.subjects.some(s => String(s).toLowerCase().trim() === target)) return true;
+    }
+    if (cl.subject) {
+      const parts = String(cl.subject).split(',').map(s => s.trim().toLowerCase());
+      if (parts.includes(target) || cl.subject.toLowerCase().trim() === target) return true;
+    }
+    return false;
+  };
+  const allocatedSubjects = subjects.filter(s => classes.some(c => isSubjectInClass(c, s.name)));
   const unallocatedCount = subjects.length - allocatedSubjects.length;
   const uniqueDepts = new Set(subjects.map(s => s.department).filter(Boolean)).size;
 
@@ -7876,15 +8916,40 @@ function renderSubjectsTab() {
   }
 
   filtered.forEach(s => {
-    const linkedClasses = classes.filter(c => (c.subject || '').toLowerCase() === s.name.toLowerCase());
+    const linkedClasses = classes.filter(c => isSubjectInClass(c, s.name));
     const isAllocated = linkedClasses.length > 0;
     
     const teachersList = [];
     const teacherSeen = new Set();
     linkedClasses.forEach(c => {
-      if (c.teacherName && !teacherSeen.has(c.teacherName.toLowerCase())) {
-        teacherSeen.add(c.teacherName.toLowerCase());
-        teachersList.push({ name: c.teacherName, email: c.teacherEmail || '' });
+      if (Array.isArray(c.teachers) && c.teachers.length > 0) {
+        c.teachers.forEach(t => {
+          const teachesThisSubject = !t.subjects || t.subjects.length === 0 || t.subjects.some(sub => sub.toLowerCase().trim() === s.name.toLowerCase().trim());
+          if (teachesThisSubject) {
+            const key = (t.email || t.name).toLowerCase();
+            if (!teacherSeen.has(key)) {
+              teacherSeen.add(key);
+              teachersList.push({
+                name: t.name || t.email,
+                email: t.email || '',
+                role: t.role || 'Educator',
+                className: c.name,
+                pairedWith: Array.isArray(t.pairedWith) ? t.pairedWith : []
+              });
+            }
+          }
+        });
+      } else if (c.teacherName) {
+        const names = String(c.teacherName).split(',').map(x => x.trim());
+        const emails = String(c.teacherEmail || '').split(',').map(x => x.trim());
+        names.forEach((tName, idx) => {
+          const tEmail = emails[idx] || '';
+          const key = (tEmail || tName).toLowerCase();
+          if (tName && !teacherSeen.has(key)) {
+            teacherSeen.add(key);
+            teachersList.push({ name: tName, email: tEmail, role: idx === 0 ? 'Lead Educator' : 'Co-Educator', className: c.name, pairedWith: [] });
+          }
+        });
       }
     });
 
@@ -7928,11 +8993,22 @@ function renderSubjectsTab() {
               <div class="teacher-badge-wrap" style="gap:6px;">
                 <div class="teacher-avatar-sm" style="width:26px; height:26px; font-size:10px;">${escapeHtml(t.name.substring(0,2).toUpperCase())}</div>
                 <div>
-                  <div style="font-weight:700; font-size:12.5px;">${escapeHtml(t.name)}</div>
+                  <div style="font-weight:700; font-size:12.5px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                    ${escapeHtml(t.name)}
+                    ${t.role ? `<span class="badge-pill" style="font-size:9.5px; padding:1px 5px; background:rgba(99,91,252,0.1); color:var(--primary); font-weight:700;">${escapeHtml(t.role)}</span>` : ''}
+                  </div>
                   <div class="small" style="color:var(--muted); font-size:10.5px;">${escapeHtml(t.email)}</div>
+                  ${t.pairedWith && t.pairedWith.length > 0 ? `
+                    <div style="font-size:10px; color:#4338ca; font-weight:600; margin-top:2px; display:flex; align-items:center; gap:3px;">
+                      <i class="fa-solid fa-user-group" style="font-size:9px;"></i> Paired: ${escapeHtml(t.pairedWith.join(', '))}
+                    </div>
+                  ` : ''}
                 </div>
               </div>
             `).join('')}
+            <button type="button" class="btn ghost btn-sm" style="padding:2px 8px; font-size:10.5px; align-self:flex-start; margin-top:2px; color:var(--primary);" onclick="openAssignModal(null, '${escapeHtml(s.name)}')">
+              <i class="fa-solid fa-plus"></i> Add / Pair Teacher
+            </button>
           </div>
         ` : `
           <button class="btn" style="padding:5px 10px; font-size:11px; background:linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); color:#fff; border:none;" onclick="openAssignModal(null, '${escapeHtml(s.name)}')">
@@ -8210,7 +9286,7 @@ async function renderTeachers() {
 
   // Populate filter dropdowns if needed
   const deptSelect = document.getElementById('filterDept');
-  if (deptSelect && deptSelect.options.length <= 1) {
+  if (deptSelect && deptSelect.options && deptSelect.options.length <= 1) {
     deptSet.forEach(d => {
       const opt = document.createElement('option');
       opt.value = d;
@@ -8220,7 +9296,7 @@ async function renderTeachers() {
   }
 
   const roleSelect = document.getElementById('filterRole');
-  if (roleSelect && roleSelect.options.length <= 1) {
+  if (roleSelect && roleSelect.options && roleSelect.options.length <= 1) {
     roleSet.forEach(r => {
       const opt = document.createElement('option');
       opt.value = r;
@@ -8258,6 +9334,7 @@ async function renderTeachers() {
       <td style="font-weight:700">GHS ${Number(e.salary || 0).toLocaleString()}</td>
       <td><span class="badge-pill badge-green"><i class="fa-solid fa-circle" style="font-size:7px"></i> Active</span></td>
       <td style="text-align:right">
+        <button class="btn ghost" style="padding:5px 9px;color:var(--primary)" onclick="openAssignModal(null, null, '${escapeHtml(e.email)}')" title="Assign Classrooms & Subjects"><i class="fa-solid fa-chalkboard-user"></i></button>
         <button class="btn ghost" style="padding:5px 9px" onclick="openEmpModalById('${e.id}')" title="Edit Profile"><i class="fa-solid fa-pen"></i></button>
         <button class="btn ghost" style="padding:5px 9px" onclick="openChatWith('${e.id}')" title="Send Message"><i class="fa-solid fa-comment" style="color:var(--primary)"></i></button>
         <button class="btn ghost" style="padding:5px 9px;color:var(--accent-red)" onclick="deleteEmp('${e.id}')" title="Remove"><i class="fa-solid fa-trash"></i></button>
@@ -8489,12 +9566,17 @@ function getEnrolledStudentsList() {
   let studs = read(STUD_KEY);
   if (!Array.isArray(studs)) studs = [];
 
-  // Also harvest any students stored inside classes
+  // Also harvest any students stored inside classes of the active organization
   const classes = typeof getClassesList === 'function' ? getClassesList() : (read(CLASSES_STORAGE_KEY) || []);
   let merged = [...studs];
+  const activeOrgNorm = (ACTIVE_ORG || '').toLowerCase().trim();
   classes.forEach(c => {
+    const classOrg = (c.org || c.org_id || c.org_name || '').toLowerCase().trim();
+    if (classOrg && classOrg !== activeOrgNorm && activeOrgNorm !== 'flawless graphics') return;
     if (Array.isArray(c.students)) {
       c.students.forEach(cs => {
+        const csOrg = (cs.org || cs.org_id || cs.org_name || '').toLowerCase().trim();
+        if (csOrg && csOrg !== activeOrgNorm && activeOrgNorm !== 'flawless graphics') return;
         const rollId = cs.roll || cs.id || cs.enrollment_code;
         const existingIdx = merged.findIndex(s => (s.roll || s.id || s.enrollment_code) === rollId);
         if (existingIdx === -1) {
@@ -9455,6 +10537,38 @@ function toggleStudentFormPasswordVis() {
   }
 }
 
+function populateStudentClassSelect(selectedClassId = null) {
+  const classSelect = document.getElementById('sm_classId');
+  if (!classSelect) return;
+
+  let classes = typeof getClassesList === 'function' ? getClassesList() : (read(CLASSES_STORAGE_KEY) || []);
+
+  const renderOpts = (list) => {
+    if (Array.isArray(list) && list.length > 0) {
+      classSelect.innerHTML = list.map(c => `
+        <option value="${c.id}" data-name="${escapeHtml(c.name || c.className || 'Class')}" ${(selectedClassId && (String(c.id) === String(selectedClassId) || c.name === selectedClassId)) ? 'selected' : ''}>${escapeHtml(c.name || c.className || 'Class')} (${escapeHtml(c.grade || c.gradeLevel || c.code || 'Class')})</option>
+      `).join('');
+    } else {
+      classSelect.innerHTML = `
+        <option value="" disabled selected>No classrooms registered yet — Please add a classroom first</option>
+      `;
+    }
+  };
+
+  renderOpts(classes);
+
+  // Background hydration from Supabase if empty
+  if ((!classes || classes.length === 0) && window.SupabaseService && typeof window.SupabaseService.getClasses === 'function') {
+    window.SupabaseService.getClasses(ACTIVE_ORG).then(live => {
+      if (Array.isArray(live) && live.length > 0) {
+        saveClassesList(live);
+        renderOpts(live);
+      }
+    }).catch(console.warn);
+  }
+}
+window.populateStudentClassSelect = populateStudentClassSelect;
+
 function openRegisterStudentModal(studentOrCode = null) {
   openAddStudentModal(studentOrCode);
 }
@@ -9469,21 +10583,6 @@ function openAddStudentModal(studentOrCode = null) {
 
   const titleEl = document.getElementById('studentModalTitle');
   const saveBtn = document.getElementById('sm_saveBtn');
-  const classSelect = document.getElementById('sm_classId');
-
-  // Populate Classes dropdown from classes store
-  if (classSelect) {
-    const classes = typeof getClassesList === 'function' ? getClassesList() : (read(CLASSES_STORAGE_KEY) || []);
-    if (classes.length > 0) {
-      classSelect.innerHTML = classes.map(c => `
-        <option value="${c.id}" data-name="${escapeHtml(c.name)}">${escapeHtml(c.name)} (${escapeHtml(c.grade || c.code || 'Class')})</option>
-      `).join('');
-    } else {
-      classSelect.innerHTML = `
-        <option value="" disabled selected>No classrooms registered yet — Please add a classroom first</option>
-      `;
-    }
-  }
 
   let student = null;
   if (studentOrCode) {
@@ -9494,6 +10593,11 @@ function openAddStudentModal(studentOrCode = null) {
       student = allStuds.find(s => (s.roll || s.id || s.enrollment_code) === studentOrCode);
     }
   }
+
+  // Populate Classes dropdown dynamically with student's class pre-selected if available
+  const initialClassId = student ? (student.classId || student.class_name) : null;
+  populateStudentClassSelect(initialClassId);
+  const classSelect = document.getElementById('sm_classId');
 
   if (student) {
     // Edit Mode
@@ -10189,15 +11293,40 @@ document.getElementById('studentModal')?.addEventListener('click', (e) => {
    SECTION 3B: USER ACCOUNTS & ACCESS CONTROL MANAGEMENT
    (Super Admin & HR Access Control for Portal Logins)
 ------------------------------------------------------------- */
-const USERS_STORAGE_KEY = 'organizations_users';
-
 function getSystemUsers() {
+  let list = [];
   if (hrStore[USERS_STORAGE_KEY] && Array.isArray(hrStore[USERS_STORAGE_KEY])) {
-    return hrStore[USERS_STORAGE_KEY];
+    list = [...hrStore[USERS_STORAGE_KEY]];
+  } else {
+    let users = read(USERS_STORAGE_KEY);
+    if (Array.isArray(users)) list = [...users];
   }
-  let users = read(USERS_STORAGE_KEY);
-  if (!Array.isArray(users)) users = [];
-  return users;
+
+  // Resiliently merge pending teacher and finance registrations for this organization
+  try {
+    const u1 = JSON.parse(localStorage.getItem('fg_registered_users') || '[]');
+    const u2 = JSON.parse(localStorage.getItem('registered_users') || '[]');
+    const activeOrgNorm = (ACTIVE_ORG || '').toLowerCase().trim();
+    [...u1, ...u2].forEach(reg => {
+      if (!reg || (!reg.email && !reg.roll)) return;
+      const regOrg = (reg.org || reg.org_id || reg.organization || '').toLowerCase().trim();
+      if (regOrg && regOrg !== activeOrgNorm && activeOrgNorm !== 'flawless graphics') return;
+      const rEmail = (reg.email || '').toLowerCase().trim();
+      const rRoll = (reg.roll || reg.linked_staff_id || '').toLowerCase().trim();
+      const idx = list.findIndex(u => {
+        const uEmail = (u.email || '').toLowerCase().trim();
+        const uRoll = (u.roll || u.linked_staff_id || '').toLowerCase().trim();
+        return (rEmail && uEmail === rEmail) || (rRoll && uRoll === rRoll);
+      });
+      if (idx === -1) {
+        list.push(reg);
+      } else {
+        list[idx] = Object.assign({}, reg, list[idx]);
+      }
+    });
+  } catch (_) {}
+
+  return list;
 }
 
 function renderUsers() {
@@ -10454,23 +11583,42 @@ async function approveStaffUser(email) {
   if (!target) return;
   target.status = 'active';
   target.approvedAt = Date.now();
-  target.approvedBy = 'Human Resources';
+  target.approvedBy = 'Human Resources Directorate';
   save(USERS_STORAGE_KEY, users);
 
   if (window.SupabaseService) {
     await window.SupabaseService.approveUser(target.id || target.email, 'HR Directorate').catch(console.warn);
   }
 
-  // Sync to employee roster if teacher
+  // Update in local registries (fg_registered_users & registered_users)
+  try {
+    ['fg_registered_users', 'registered_users'].forEach(storageKey => {
+      const list = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      let changed = false;
+      list.forEach(u => {
+        if ((u.email && target.email && u.email.toLowerCase() === target.email.toLowerCase()) ||
+            (u.roll && target.roll && u.roll.toLowerCase() === target.roll.toLowerCase())) {
+          u.status = 'active';
+          u.approvedAt = Date.now();
+          u.approvedBy = 'Human Resources Directorate';
+          changed = true;
+        }
+      });
+      if (changed) localStorage.setItem(storageKey, JSON.stringify(list));
+    });
+  } catch (_) {}
+
+  // Sync to employee roster if teacher or finance
   const staffList = read(EMP_KEY) || [];
   let emp = staffList.find(e => (e.email || '').toLowerCase() === email.toLowerCase());
+  const roleLower = (target.role || '').toLowerCase();
   if (emp) {
     emp.status = 'Active';
-  } else if ((target.role || '').toLowerCase() === 'teacher') {
+  } else if (roleLower === 'teacher' || roleLower === 'educator' || roleLower === 'faculty') {
     const newStaff = {
       id: target.id || ('e' + (staffList.length + 1)),
-      name: target.name,
-      fullName: target.name,
+      name: target.name || target.fullName || 'Academic Educator',
+      fullName: target.name || target.fullName || 'Academic Educator',
       role: target.designation || 'Academic Faculty Instructor',
       position: target.designation || 'Academic Faculty Instructor',
       dept: target.department || 'Academic Staff',
@@ -10478,12 +11626,27 @@ async function approveStaffUser(email) {
       email: target.email,
       salary: 4900,
       status: 'Active',
-      photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80'
+      photo: target.photo_url || target.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80'
     };
     staffList.push(newStaff);
-    if (window.SupabaseService) {
+    if (window.SupabaseService && typeof window.SupabaseService.saveTeacher === 'function') {
       window.SupabaseService.saveTeacher(ACTIVE_ORG, newStaff).catch(console.warn);
     }
+  } else if (roleLower === 'finance' || roleLower === 'bursar') {
+    const newStaff = {
+      id: target.id || ('e' + (staffList.length + 1)),
+      name: target.name || target.fullName || 'Finance Officer',
+      fullName: target.name || target.fullName || 'Finance Officer',
+      role: 'Bursar & Treasury Officer',
+      position: 'Bursar & Treasury Officer',
+      dept: target.department || 'Bursary & Treasury',
+      department: target.department || 'Bursary & Treasury',
+      email: target.email,
+      salary: 5200,
+      status: 'Active',
+      photo: target.photo_url || target.photo || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80'
+    };
+    staffList.push(newStaff);
   }
   save(EMP_KEY, staffList);
 
@@ -10507,8 +11670,8 @@ async function approveStaffUser(email) {
   }
 
   if (window.SupabaseService) {
-    const updatedUsers = await window.SupabaseService.getUsers(ACTIVE_ORG);
-    hrStore[USERS_STORAGE_KEY] = updatedUsers;
+    const updatedUsers = await window.SupabaseService.getUsers(ACTIVE_ORG).catch(() => null);
+    if (updatedUsers) hrStore[USERS_STORAGE_KEY] = updatedUsers;
   }
   renderUsers();
 }
@@ -10526,6 +11689,24 @@ async function rejectStaffUser(email) {
   if (window.SupabaseService) {
     await window.SupabaseService.rejectUser(target.id || target.email, 'HR Directorate').catch(console.warn);
   }
+
+  // Update in local registries
+  try {
+    ['fg_registered_users', 'registered_users'].forEach(storageKey => {
+      const list = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      let changed = false;
+      list.forEach(u => {
+        if ((u.email && target.email && u.email.toLowerCase() === target.email.toLowerCase()) ||
+            (u.roll && target.roll && u.roll.toLowerCase() === target.roll.toLowerCase())) {
+          u.status = 'rejected';
+          u.rejectedAt = Date.now();
+          u.rejectedBy = 'HR Directorate';
+          changed = true;
+        }
+      });
+      if (changed) localStorage.setItem(storageKey, JSON.stringify(list));
+    });
+  } catch (_) {}
 
   // Sync to employee roster
   const staffList = read(EMP_KEY) || [];
@@ -10554,8 +11735,8 @@ async function rejectStaffUser(email) {
   }
 
   if (window.SupabaseService) {
-    const updatedUsers = await window.SupabaseService.getUsers(ACTIVE_ORG);
-    hrStore[USERS_STORAGE_KEY] = updatedUsers;
+    const updatedUsers = await window.SupabaseService.getUsers(ACTIVE_ORG).catch(() => null);
+    if (updatedUsers) hrStore[USERS_STORAGE_KEY] = updatedUsers;
   }
   renderUsers();
 }
@@ -13056,17 +14237,21 @@ function updateCloudSyncStatus() {
   const btn = document.getElementById('cloudSyncBtn');
 
   if (isConn) {
-    label.textContent = 'Supabase Cloud: Active';
-    icon.className = 'fa-solid fa-cloud-check';
-    btn.style.color = '#10b981';
-    btn.style.borderColor = '#10b981';
-    btn.style.background = 'rgba(16, 185, 129, 0.15)';
+    if (label) label.textContent = 'Supabase Cloud: Active';
+    if (icon) icon.className = 'fa-solid fa-cloud-check';
+    if (btn) {
+      btn.style.color = '#10b981';
+      btn.style.borderColor = '#10b981';
+      btn.style.background = 'rgba(16, 185, 129, 0.15)';
+    }
   } else {
-    label.textContent = 'Connect Supabase';
-    icon.className = 'fa-solid fa-cloud';
-    btn.style.color = '#10b981';
-    btn.style.borderColor = 'rgba(16, 185, 129, 0.4)';
-    btn.style.background = 'rgba(16, 185, 129, 0.08)';
+    if (label) label.textContent = 'Connect Supabase';
+    if (icon) icon.className = 'fa-solid fa-cloud';
+    if (btn) {
+      btn.style.color = '#10b981';
+      btn.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+      btn.style.background = 'rgba(16, 185, 129, 0.08)';
+    }
   }
 }
 
@@ -13747,18 +14932,20 @@ function approveStudentAssessment(id) {
    INITIAL BOOTSTRAP
 ------------------------------------------------------------- */
 async function bootstrapApp() {
+  // 1. Snappy zero-delay local render: immediate interactivity on first load
   try {
-    await loadHRCloudData();
     updateCloudSyncStatus();
     renderDashboard();
     renderCharts();
     renderTeachers();
     renderUsers();
     updatePendingBanners();
+    renderClassesSection();
+    renderSubjectsTab();
     loadHRStudents();
     initPayrollSection();
-  } catch (err) {
-    console.error('HR Dashboard Bootstrap Error:', err);
+  } catch (localErr) {
+    console.warn('[HR Bootstrap] Local cache render notice:', localErr);
   } finally {
     // Guarantees skeleton loader overlay is dismissed immediately
     const sk = document.getElementById('skeletonLoader');
@@ -13770,6 +14957,23 @@ async function bootstrapApp() {
         }
       }, 300);
     }
+  }
+
+  // 2. Non-blocking cloud synchronization in background
+  try {
+    await loadHRCloudData();
+    updateCloudSyncStatus();
+    renderDashboard();
+    renderCharts();
+    renderTeachers();
+    renderUsers();
+    updatePendingBanners();
+    renderClassesSection();
+    renderSubjectsTab();
+    loadHRStudents();
+    initPayrollSection();
+  } catch (cloudErr) {
+    console.warn('[HR Bootstrap] Cloud sync notice:', cloudErr);
   }
 }
 
@@ -13799,6 +15003,8 @@ window.addEventListener('fg:realtime-change', async (e) => {
     renderTeachers();
     renderUsers();
     updatePendingBanners();
+    renderClassesSection();
+    renderSubjectsTab();
     loadHRStudents();
     initPayrollSection();
     if (window.QuickDock && typeof window.QuickDock.refreshNotifications === 'function') {

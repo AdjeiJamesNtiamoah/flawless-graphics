@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Teacher Profile — FLAWLESS GRAPHICS</title>
 
+<!-- Central Authentication Bridge & Route Guard -->
+<script src="../../assets/js/auth-session.js"></script>
+<script src="../../assets/js/supabase-config.js"></script>
+<script src="../../assets/js/supabase-client.js"></script>
+<script>
+  (function() {
+    const user = window.AuthSession ? window.AuthSession.requireAuth('teacher-login.html', true) : null;
+  })();
+</script>
+
 <!-- Fonts & Icons -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1018,6 +1028,7 @@ if(!teacher){
 }
 
 const ORG = teacher.org || localStorage.getItem('active_org') || 'FLAWLESS';
+const ACTIVE_ORG = ORG;
 
 /* ORG Storage Keys */
 const CLASSES_KEY = `${ORG}_classes`;
@@ -1124,15 +1135,132 @@ function openModal(title, fields, onConfirm) {
 /* -------------------------
   CLASSES CRUD
 ------------------------- */
-function getClasses(){ return read(CLASSES_KEY) }
-function saveClasses(arr){ save(CLASSES_KEY, arr) }
+function getAllOrgClasses(){
+  let arr = read(CLASSES_KEY);
+  if (!Array.isArray(arr)) arr = [];
+  return arr;
+}
+
+function isSameEducator(educatorObj, targetTeacher) {
+  if (!educatorObj || !targetTeacher) return false;
+  const tEmail = (targetTeacher.email || '').toLowerCase().trim();
+  const tName = (targetTeacher.name || '').toLowerCase().trim();
+  const tId = String(targetTeacher.id || targetTeacher.empId || targetTeacher.staffId || '').trim();
+
+  const eEmail = (educatorObj.email || '').toLowerCase().trim();
+  const eName = (educatorObj.name || '').toLowerCase().trim();
+  const eId = String(educatorObj.id || educatorObj.empId || educatorObj.staffId || '').trim();
+
+  if (tEmail && eEmail && (tEmail === eEmail || tEmail.includes(eEmail) || eEmail.includes(tEmail))) return true;
+  if (tName && eName && (tName === eName || tName.includes(eName) || eName.includes(tName))) return true;
+  if (tId && eId && tId === eId) return true;
+  return false;
+}
+
+function isTeacherAssignedToClass(c, t = teacher) {
+  if (!c || !t) return false;
+  const tEmail = (t.email || '').toLowerCase().trim();
+  const tName = (t.name || '').toLowerCase().trim();
+  const tId = String(t.id || t.empId || t.staffId || '').trim();
+
+  if (Array.isArray(c.teachers) && c.teachers.length > 0) {
+    if (c.teachers.some(item => isSameEducator(item, t))) return true;
+  }
+  if (c.teacherEmail && tEmail) {
+    const emails = String(c.teacherEmail).toLowerCase().split(',').map(x => x.trim());
+    if (emails.some(e => e === tEmail || e.includes(tEmail) || tEmail.includes(e))) return true;
+  }
+  if (c.teacherName && tName) {
+    const names = String(c.teacherName).toLowerCase().split(',').map(x => x.trim());
+    if (names.some(n => n === tName || n.includes(tName) || tName.includes(n))) return true;
+  }
+  if (c.teacherId && tId && String(c.teacherId).trim() === tId) return true;
+  if (c.submittedByEmail && tEmail && (c.submittedByEmail || '').toLowerCase().trim() === tEmail) return true;
+  if (c.submittedBy && tName && (c.submittedBy || '').toLowerCase().trim() === tName) return true;
+  return false;
+}
+
+function getTeacherClassSubjects(c, t = teacher) {
+  if (!c) return ['Academic Core'];
+  if (Array.isArray(c.teachers) && c.teachers.length > 0) {
+    const matched = c.teachers.find(item => isSameEducator(item, t));
+    if (matched && Array.isArray(matched.subjects) && matched.subjects.length > 0) {
+      return matched.subjects;
+    }
+  }
+  if (Array.isArray(c.subjects) && c.subjects.length > 0) {
+    return c.subjects;
+  }
+  if (c.subject) {
+    return String(c.subject).split(',').map(s => s.trim()).filter(Boolean);
+  }
+  return ['Academic Core'];
+}
+
+function getTeacherClassPairedInfo(c, t = teacher) {
+  if (!c || !Array.isArray(c.teachers)) {
+    return { role: 'Lead Educator', coTeachers: [], mySubjects: getTeacherClassSubjects(c, t) };
+  }
+  const matched = c.teachers.find(item => isSameEducator(item, t));
+  const myRole = (matched && matched.role) ? matched.role : 'Lead Educator';
+  const mySubjects = (matched && Array.isArray(matched.subjects)) ? matched.subjects : getTeacherClassSubjects(c, t);
+  const myPairedWith = (matched && Array.isArray(matched.pairedWith)) ? matched.pairedWith.map(x => x.toLowerCase().trim()) : [];
+
+  const coTeachers = c.teachers.filter(other => {
+    if (isSameEducator(other, t)) return false;
+    const otherEmail = (other.email || '').toLowerCase().trim();
+    const otherName = (other.name || '').toLowerCase().trim();
+    if (myPairedWith.includes(otherEmail) || myPairedWith.includes(otherName)) return true;
+    if (Array.isArray(other.pairedWith) && (
+      (t.email && other.pairedWith.some(x => x.toLowerCase().trim() === (t.email || '').toLowerCase().trim())) ||
+      (t.name && other.pairedWith.some(x => x.toLowerCase().trim() === (t.name || '').toLowerCase().trim()))
+    )) return true;
+    if (Array.isArray(other.subjects) && mySubjects.some(sub => other.subjects.includes(sub))) return true;
+    return false;
+  });
+
+  return { role: myRole, coTeachers, mySubjects };
+}
+
+function getClasses(){
+  return getAllOrgClasses().filter(c => isTeacherAssignedToClass(c, teacher));
+}
+function saveClasses(arr){
+  const allOrg = getAllOrgClasses();
+  const updatedMap = new Map((Array.isArray(arr) ? arr : []).map(c => [String(c.id), c]));
+  let merged = allOrg.map(c => updatedMap.has(String(c.id)) ? updatedMap.get(String(c.id)) : c);
+  (Array.isArray(arr) ? arr : []).forEach(c => {
+    if (!allOrg.some(existing => String(existing.id) === String(c.id))) {
+      merged.push(c);
+    }
+  });
+  save(CLASSES_KEY, merged);
+  try {
+    localStorage.setItem(CLASSES_KEY, JSON.stringify(merged));
+    localStorage.setItem(`${ORG}_classes`, JSON.stringify(merged));
+  } catch(e) {}
+}
 
 function renderClasses(){
   const tb = document.querySelector('#classesTable tbody'); tb.innerHTML = '';
   const arr = getClasses();
+  if (arr.length === 0) {
+    tb.innerHTML = '<tr><td colspan="5" class="tiny" style="text-align:center; padding:18px; color:var(--text-muted);">No classrooms currently assigned to your educator profile.</td></tr>';
+    updateKPIs();
+    populateClassSelects();
+    renderClassPreview();
+    return;
+  }
   arr.forEach((c,i)=>{
+    const mySubs = getTeacherClassSubjects(c, teacher);
+    const paired = getTeacherClassPairedInfo(c, teacher);
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td><td><strong>${escapeHtml(c.name)}</strong></td><td>${escapeHtml(c.subject||'')}</td><td><span class="badge">${(c.students||[]).length}</span></td>
+    tr.innerHTML = `<td>${i+1}</td><td><strong>${escapeHtml(c.name)}</strong></td>
+      <td>
+        <div>${escapeHtml(mySubs.join(', ') || c.subject || '')}</div>
+        ${paired.coTeachers && paired.coTeachers.length > 0 ? `<div class="tiny" style="color:var(--text-muted);">Co-Taught: ${escapeHtml(paired.coTeachers.map(ct=>ct.name||ct.email).join(', '))}</div>` : ''}
+      </td>
+      <td><span class="badge">${(c.students||[]).length}</span></td>
       <td>
         <button class="btn ghost" style="padding:4px 8px;" onclick="editClass('${c.id}')"><i class="fa-solid fa-pen"></i></button>
         <button class="btn ghost" style="padding:4px 8px;" onclick="manageStudents('${c.id}')"><i class="fa-solid fa-users"></i></button>
@@ -1149,24 +1277,55 @@ document.getElementById('newClassBtn').addEventListener('click', ()=>{
   openModal('Create New Class', [{name:'name', label:'Class Name'}, {name:'subject', label:'Subject'}], (data)=>{
     if(!data.name) return toast('Class name required');
     const arr = getClasses();
-    arr.push({ id:'c_'+Date.now(), name: data.name, subject: data.subject, students:[] });
+    const subs = data.subject ? [data.subject.trim()] : ['General Studies'];
+    arr.push({
+      id:'c_'+Date.now(),
+      name: data.name,
+      subject: data.subject || 'General Studies',
+      subjects: subs,
+      teacherName: teacher.name || '',
+      teacherEmail: teacher.email || '',
+      teachers: [{
+        email: teacher.email || '',
+        name: teacher.name || '',
+        role: 'Lead Educator',
+        subjects: subs,
+        pairedWith: []
+      }],
+      students:[]
+    });
     saveClasses(arr); renderClasses(); pushActivity(`Created class: ${data.name}`); toast('Class created');
   });
 });
 
 function editClass(id){
   const arr = getClasses(); const c = arr.find(x=>x.id===id); if(!c) return;
-  openModal('Edit Class', [{name:'name', label:'Class Name', value:c.name}, {name:'subject', label:'Subject', value:c.subject}], (data)=>{
+  const currentSubs = getTeacherClassSubjects(c, teacher);
+  openModal('Edit Class', [{name:'name', label:'Class Name', value:c.name}, {name:'subject', label:'Subject (or comma-separated)', value:currentSubs.join(', ')}], (data)=>{
     if(!data.name) return;
-    c.name = data.name; c.subject = data.subject;
+    c.name = data.name.trim();
+    if (data.subject) {
+      const subs = data.subject.split(',').map(s=>s.trim()).filter(Boolean);
+      c.subjects = subs;
+      c.subject = subs.join(', ');
+      if (Array.isArray(c.teachers)) {
+        const matchT = c.teachers.find(item => isSameEducator(item, teacher));
+        if (matchT) matchT.subjects = subs;
+      }
+    }
     saveClasses(arr); renderClasses(); pushActivity(`Updated class: ${c.name}`); toast('Class updated');
   });
 }
 
 function deleteClass(id){
   if(!confirm('Delete this class?')) return;
-  const arr = getClasses().filter(x=>x.id!==id);
-  saveClasses(arr); renderClasses(); pushActivity('Deleted class'); toast('Class removed');
+  const arr = getAllOrgClasses().filter(x=>x.id!==id);
+  save(CLASSES_KEY, arr);
+  try {
+    localStorage.setItem(CLASSES_KEY, JSON.stringify(arr));
+    localStorage.setItem(`${ORG}_classes`, JSON.stringify(arr));
+  } catch(e) {}
+  renderClasses(); pushActivity('Deleted class'); toast('Class removed');
 }
 
 function manageStudents(classId){
@@ -1181,7 +1340,13 @@ function renderClassPreview(){
   if(!sel) { container.innerHTML = '<div class="tiny">No class active</div>'; return; }
   const c = getClasses().find(x=>x.id===sel);
   if(!c) return;
-  container.innerHTML = `<strong>${escapeHtml(c.name)}</strong><div class="tiny">${escapeHtml(c.subject||'Unassigned')}</div>
+  const mySubs = getTeacherClassSubjects(c, teacher);
+  const pairedInfo = getTeacherClassPairedInfo(c, teacher);
+  container.innerHTML = `<strong>${escapeHtml(c.name)}</strong>
+  <div class="tiny" style="color:var(--accent1); font-weight:700;">${escapeHtml(mySubs.join(', ') || 'Unassigned')}</div>
+  ${pairedInfo.coTeachers && pairedInfo.coTeachers.length > 0 ? `
+    <div class="tiny" style="color:#4338ca; font-weight:600; margin-top:3px;"><i class="fa-solid fa-user-group"></i> Co-Taught with ${escapeHtml(pairedInfo.coTeachers.map(ct=>ct.name||ct.email).join(', '))}</div>
+  ` : ''}
   <div style="margin-top:12px;" class="tiny">Students Enrolled:</div>
   <div style="margin-top:6px">${(c.students||[]).map(s=>`<span class="badge" style="margin:2px;">${escapeHtml(s.firstName+' '+(s.lastName||''))}</span>`).join('') || '<span class="tiny">No students enrolled</span>'}</div>`;
 }
@@ -1195,8 +1360,16 @@ function populateClassSelects(){
   ids.forEach(id=>{
     const el = document.getElementById(id); if(!el) return;
     const currentVal = el.value;
-    el.innerHTML = '<option value="">-- Select Class --</option>';
-    arr.forEach(c => el.appendChild(Object.assign(document.createElement('option'), { value:c.id, textContent:c.name })));
+    if (arr.length === 0) {
+      el.innerHTML = '<option value="">-- No Classes Assigned --</option>';
+    } else {
+      el.innerHTML = '<option value="">-- Select Class --</option>';
+      arr.forEach(c => {
+        const mySubs = getTeacherClassSubjects(c, teacher);
+        const subText = mySubs.length ? ` (${mySubs.join(', ')})` : '';
+        el.appendChild(Object.assign(document.createElement('option'), { value:c.id, textContent:`${c.name}${subText}` }));
+      });
+    }
     if(currentVal) el.value = currentVal;
   });
 }

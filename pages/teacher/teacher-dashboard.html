@@ -11,7 +11,7 @@
 <script src="../../assets/js/supabase-client.js"></script>
 <script>
   (function() {
-    const user = window.AuthSession ? window.AuthSession.requireAuth('teacher-login.html', true) : null;
+    const user = window.AuthSession ? window.AuthSession.requireAuth('../../site-login.html', true) : null;
   })();
 </script>
 
@@ -1264,6 +1264,8 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
   <link rel="stylesheet" href="../../assets/css/cascading-nav.css">
   <link rel="stylesheet" href="../../assets/css/slide-over.css">
+  <link rel="stylesheet" href="../../assets/css/portal-canopy.css">
+  <script src="../../assets/js/portal-canopy.js" defer></script>
 </head>
 <body>
 
@@ -1419,7 +1421,30 @@ window.addEventListener('DOMContentLoaded', () => {
           <span id="teacherDutyPill" class="duty-pill on-duty"><span class="duty-dot"></span> On Campus / Duty Active</span>
         </div>
       </div>
+
+      <!-- Teacher Portal Greeting, Date & Live Clock Canopy -->
+      <div class="portal-canopy-bar" style="margin: 0 16px;">
+        <div class="portal-greeting-badge">
+          <i class="fa-solid fa-heart portal-heart-icon"></i>
+          <span class="portal-greeting-highlight" data-portal-role="Educator">Good evening, Educator</span>
+          <span class="portal-badge-dot">&bull;</span>
+          <span class="portal-greeting-brand">Academic Faculty Workspace</span>
+        </div>
+        <div class="portal-datetime-group">
+          <div class="portal-date-chip">
+            <i class="fa-regular fa-calendar-days"></i>
+            <span class="portal-live-date-text">Sunday, 4 Oct 2026</span>
+          </div>
+          <div class="portal-clock-chip">
+            <span class="portal-clock-pulse"></span>
+            <i class="fa-regular fa-clock"></i>
+            <span class="portal-live-clock-text">21:26:00 GMT</span>
+          </div>
+        </div>
+      </div>
+
       <div class="header-actions-group">
+        <button type="button" class="quick-action-pill" onclick="window.QuickAssistant?.startProjectTour()" title="Start Guided Tour" style="color:var(--accent1); font-weight:700;"><i class="fa-solid fa-compass"></i> Tour</button>
         <button type="button" class="quick-action-pill" onclick="openNewAssessmentModal()" title="Record Assessment"><i class="fa-solid fa-stamp" style="color:var(--accent1);"></i> + Grade</button>
         <button type="button" class="quick-action-pill" onclick="openAssignmentCreateModal()" title="Create Assignment"><i class="fa-solid fa-plus" style="color:#10b981;"></i> + Assignment</button>
         <button type="button" class="quick-action-pill" onclick="document.querySelector('[data-section=\'attendance\']').click()" title="Classroom Roll Call"><i class="fa-solid fa-clipboard-user" style="color:#f59e0b;"></i> Roll Call</button>
@@ -2840,13 +2865,13 @@ window.addEventListener('DOMContentLoaded', () => {
 function safeParse(s){ try{return JSON.parse(s)}catch(e){return null} }
 const teacherStore = {};
 function read(k){ 
-  if (teacherStore[k] && Array.isArray(teacherStore[k]) && teacherStore[k].length > 0) return teacherStore[k];
+  if (teacherStore[k] !== undefined && teacherStore[k] !== null) return teacherStore[k];
   const local = safeParse(localStorage.getItem(k));
-  if (local && Array.isArray(local) && local.length > 0) {
+  if (local !== null && local !== undefined) {
     teacherStore[k] = local;
     return local;
   }
-  return teacherStore[k] || local || [];
+  return [];
 }
 function save(k,v){ 
   teacherStore[k] = v;
@@ -2869,16 +2894,16 @@ async function loadTeacherCloudData() {
       }
     }
 
-    // 2. Fetch teachers and verify current teacher
+    // 2. Fetch teachers from Supabase and sync profile if matched
     const cloudTeachers = await window.SupabaseService.getTeachers(ORG);
     if (Array.isArray(cloudTeachers) && cloudTeachers.length > 0) {
       const matchT = cloudTeachers.find(t => teacher && t.email && t.email.toLowerCase() === (teacher.email || '').toLowerCase());
       if (matchT) {
         teacher = {
-          name: matchT.full_name || matchT.name || 'Educator',
-          email: matchT.email || '',
+          name: matchT.full_name || matchT.name || teacher.name || 'Educator',
+          email: matchT.email || teacher.email || '',
           org: matchT.org_id || ORG,
-          photoBase64: matchT.photo_url || ''
+          photoBase64: matchT.photo_url || teacher.photoBase64 || ''
         };
         localStorage.setItem('active_teacher', JSON.stringify(teacher));
         localStorage.setItem('teacher_active_user', JSON.stringify(teacher));
@@ -2892,46 +2917,44 @@ async function loadTeacherCloudData() {
           const pPhoto = document.getElementById('profilePhoto');
           if (pPhoto) pPhoto.src = matchT.photo_url;
         }
-      } else {
-        // Check local registry before assuming deleted
-        let localT = null;
-        try {
-          const u1 = JSON.parse(localStorage.getItem('fg_registered_users') || '[]');
-          const u2 = JSON.parse(localStorage.getItem('registered_users') || '[]');
-          const act = JSON.parse(localStorage.getItem('active_teacher') || localStorage.getItem('active_user') || 'null');
-          const all = [...u1, ...u2];
-          if (act) all.push(act);
-          localT = all.find(u => 
-            (u.email && teacher.email && u.email.trim().toLowerCase() === teacher.email.trim().toLowerCase()) ||
-            (u.roll && teacher.roll && u.roll.trim().toLowerCase() === teacher.roll.trim().toLowerCase())
-          );
-        } catch (_) {}
-
-        if (localT || (teacher.roll && /^(tea|fac)-/i.test(teacher.roll))) {
-          // Keep active
-        } else {
-          if (window.AuthSession && typeof window.AuthSession.showAccountCutoutNotice === 'function') {
-            window.AuthSession.showAccountCutoutNotice({
-              title: 'Educator Account Revoked',
-              reason: 'Your teacher / educator account has been revoked from the institutional database. Access is terminated.',
-              email: teacher.email,
-              name: teacher.name || 'Educator',
-              org: ORG || 'Institutional Workspace',
-              role: 'Teacher',
-              redirectUrl: '../../index.html?role=teacher#unifiedLoginSection'
-            });
-          } else {
-            ['active_teacher', 'teacher_active_user', 'active_user', 'active_org_user'].forEach(k => localStorage.removeItem(k));
-            window.location.replace('../../index.html?role=teacher#unifiedLoginSection');
-          }
-          return;
-        }
       }
-    } else {
+    }
+
+    // 3. Resilient user status check - ONLY revoke if explicitly deleted, revoked, or rejected
+    let liveUser = null;
+    const teacherEmail = (teacher && teacher.email ? teacher.email.trim().toLowerCase() : '');
+    const teacherRoll = (teacher && teacher.roll ? teacher.roll.trim().toLowerCase() : '');
+
+    if (teacherEmail && typeof window.SupabaseService.getUserByEmail === 'function') {
+      try {
+        liveUser = await window.SupabaseService.getUserByEmail(teacherEmail);
+      } catch (_) {}
+    }
+    if (!liveUser && teacherRoll && typeof window.SupabaseService.findUser === 'function') {
+      try {
+        liveUser = await window.SupabaseService.findUser(teacherRoll);
+      } catch (_) {}
+    }
+    if (!liveUser) {
+      try {
+        const u1 = JSON.parse(localStorage.getItem('fg_registered_users') || '[]');
+        const u2 = JSON.parse(localStorage.getItem('registered_users') || '[]');
+        const act = JSON.parse(localStorage.getItem('active_teacher') || localStorage.getItem('active_user') || 'null');
+        const all = [...u1, ...u2];
+        if (act) all.push(act);
+        liveUser = all.find(u => 
+          (u.email && teacherEmail && u.email.trim().toLowerCase() === teacherEmail) ||
+          (u.roll && teacherRoll && u.roll.trim().toLowerCase() === teacherRoll)
+        );
+      } catch (_) {}
+    }
+
+    const isExplicitRevoked = liveUser && (liveUser.status === 'revoked' || liveUser.status === 'deleted' || liveUser.status === 'rejected');
+    if (isExplicitRevoked) {
       if (window.AuthSession && typeof window.AuthSession.showAccountCutoutNotice === 'function') {
         window.AuthSession.showAccountCutoutNotice({
-          title: 'Educator Account Deleted',
-          reason: 'Your teacher / educator account has been deleted from the institutional database by administrators. Access is revoked.',
+          title: 'Educator Account Revoked',
+          reason: 'Your teacher / educator account has been revoked from the institutional database. Access is terminated.',
           email: teacher.email,
           name: teacher.name || 'Educator',
           org: ORG || 'Institutional Workspace',
@@ -2947,9 +2970,13 @@ async function loadTeacherCloudData() {
 
     const classes = await window.SupabaseService.getClasses(ORG);
     const students = await window.SupabaseService.getStudents(ORG);
-    teacherStore[`${ORG}_students`] = students || [];
+    teacherStore[`${ORG}_students`] = Array.isArray(students) ? students : [];
+    save(`${ORG}_students`, teacherStore[`${ORG}_students`]);
 
-    let activeClasses = Array.isArray(classes) && classes.length > 0 ? classes : seedDefaultEducatorClasses(false);
+    const liveClasses = Array.isArray(classes) ? classes : [];
+    teacherStore[CLASSES_KEY] = liveClasses;
+    save(CLASSES_KEY, liveClasses);
+    let activeClasses = liveClasses;
     
     // Map live Supabase students into curriculum classes
     const studentList = Array.isArray(students) ? students : [];
@@ -3016,7 +3043,7 @@ const sessionCandidates = ['active_teacher','teacher_active_user','active_user',
 let teacher = null;
 for(const k of sessionCandidates){ const v = safeParse(localStorage.getItem(k)); if(v && (v.email || v.name)){ teacher = v; break; } }
 if(!teacher || !teacher.email){
-  window.location.replace('teacher-login.html');
+  window.location.replace('../../index.html?role=teacher#unifiedLoginSection');
 }
 localStorage.setItem('active_teacher', JSON.stringify(teacher));
 localStorage.setItem('teacher_active_user', JSON.stringify(teacher));
@@ -3183,31 +3210,140 @@ function seedDefaultEducatorClasses(forceReset = false) {
   return [];
 }
 
-function getClasses(){
-  let arr = read(CLASSES_KEY);
+function isSameEducator(educatorObj, targetTeacher) {
+  if (!educatorObj || !targetTeacher) return false;
+  const tEmail = (targetTeacher.email || '').toLowerCase().trim();
+  const tName = (targetTeacher.name || '').toLowerCase().trim();
+  const tId = String(targetTeacher.id || targetTeacher.empId || targetTeacher.staffId || '').trim();
+
+  const eEmail = (educatorObj.email || '').toLowerCase().trim();
+  const eName = (educatorObj.name || '').toLowerCase().trim();
+  const eId = String(educatorObj.id || educatorObj.empId || educatorObj.staffId || '').trim();
+
+  if (tEmail && eEmail && (tEmail === eEmail || tEmail.includes(eEmail) || eEmail.includes(tEmail))) return true;
+  if (tName && eName && (tName === eName || tName.includes(eName) || eName.includes(tName))) return true;
+  if (tId && eId && tId === eId) return true;
+  return false;
+}
+
+function isTeacherAssignedToClass(c, t = teacher) {
+  if (!c || !t) return false;
+  const tEmail = (t.email || '').toLowerCase().trim();
+  const tName = (t.name || '').toLowerCase().trim();
+  const tId = String(t.id || t.empId || t.staffId || '').trim();
+
+  // 1. Check c.teachers array (Multi-teacher / Co-teacher support)
+  if (Array.isArray(c.teachers) && c.teachers.length > 0) {
+    if (c.teachers.some(item => isSameEducator(item, t))) return true;
+  }
+
+  // 2. Check c.teacherEmail (may contain comma-separated emails)
+  if (c.teacherEmail && tEmail) {
+    const emails = String(c.teacherEmail).toLowerCase().split(',').map(x => x.trim());
+    if (emails.some(e => e === tEmail || e.includes(tEmail) || tEmail.includes(e))) return true;
+  }
+
+  // 3. Check c.teacherName (may contain comma-separated names)
+  if (c.teacherName && tName) {
+    const names = String(c.teacherName).toLowerCase().split(',').map(x => x.trim());
+    if (names.some(n => n === tName || n.includes(tName) || tName.includes(n))) return true;
+  }
+
+  // 4. Check c.teacherId
+  if (c.teacherId && tId && String(c.teacherId).trim() === tId) return true;
+
+  // 5. Check submittedByEmail / submittedBy (e.g. self-registered classes awaiting HR approval)
+  if (c.submittedByEmail && tEmail && (c.submittedByEmail || '').toLowerCase().trim() === tEmail) return true;
+  if (c.submittedBy && tName && (c.submittedBy || '').toLowerCase().trim() === tName) return true;
+
+  return false;
+}
+
+function getTeacherClassSubjects(c, t = teacher) {
+  if (!c) return ['Academic Core'];
+  if (Array.isArray(c.teachers) && c.teachers.length > 0) {
+    const matched = c.teachers.find(item => isSameEducator(item, t));
+    if (matched && Array.isArray(matched.subjects) && matched.subjects.length > 0) {
+      return matched.subjects;
+    }
+  }
+  if (Array.isArray(c.subjects) && c.subjects.length > 0) {
+    return c.subjects;
+  }
+  if (c.subject) {
+    return String(c.subject).split(',').map(s => s.trim()).filter(Boolean);
+  }
+  return ['Academic Core'];
+}
+
+function getTeacherClassPairedInfo(c, t = teacher) {
+  if (!c || !Array.isArray(c.teachers)) {
+    return { role: 'Lead Educator', coTeachers: [], mySubjects: getTeacherClassSubjects(c, t) };
+  }
+  const matched = c.teachers.find(item => isSameEducator(item, t));
+  const myRole = (matched && matched.role) ? matched.role : 'Lead Educator';
+  const mySubjects = (matched && Array.isArray(matched.subjects)) ? matched.subjects : getTeacherClassSubjects(c, t);
+  const myPairedWith = (matched && Array.isArray(matched.pairedWith)) ? matched.pairedWith.map(x => x.toLowerCase().trim()) : [];
+
+  const coTeachers = c.teachers.filter(other => {
+    if (isSameEducator(other, t)) return false;
+    const otherEmail = (other.email || '').toLowerCase().trim();
+    const otherName = (other.name || '').toLowerCase().trim();
+    if (myPairedWith.includes(otherEmail) || myPairedWith.includes(otherName)) return true;
+    if (Array.isArray(other.pairedWith) && (
+      (t.email && other.pairedWith.some(x => x.toLowerCase().trim() === (t.email || '').toLowerCase().trim())) ||
+      (t.name && other.pairedWith.some(x => x.toLowerCase().trim() === (t.name || '').toLowerCase().trim()))
+    )) return true;
+    if (Array.isArray(other.subjects) && mySubjects.some(sub => other.subjects.includes(sub))) return true;
+    return false;
+  });
+
+  return {
+    role: myRole,
+    coTeachers,
+    mySubjects
+  };
+}
+
+function getAllOrgClasses() {
+  let arr = (typeof teacherStore !== 'undefined' && teacherStore[CLASSES_KEY]) ? teacherStore[CLASSES_KEY] : read(CLASSES_KEY);
   if (!arr || !Array.isArray(arr)) {
     arr = [];
   }
-  // Purge any legacy dummy seed classes so table is purely HR-assigned
   const dummyIds = new Set(['cls_f2_arts', 'cls_f3_web', 'cls_f1_illust', 'cls_f2_print', 'cls_1', 'cls_2', 'cls_3', 'cls_4', 'cls_5']);
-  const dummyNames = new Set([
-    'grade 10 - graphic arts & visual identity',
-    'grade 11 - web systems & client architecture',
-    'grade 12 - digital animation & 3d modeling',
-    'grade 9 - fundamental design principles',
-    'grade 10 - ui/ux interactive prototyping',
-    'class 1 - visual design',
-    'class 2 - web systems',
-    'class 3 - animation & 3d'
-  ]);
-  const filtered = arr.filter(c => !dummyIds.has(c.id) && !dummyNames.has((c.name || c.className || '').toLowerCase().trim()));
-  if (filtered.length !== arr.length) {
-    arr = filtered;
-    save(CLASSES_KEY, arr);
-  }
-  return arr;
+  return arr.filter(c => !dummyIds.has(c.id));
 }
-function saveClasses(arr){ save(CLASSES_KEY, arr) }
+
+function getClasses() {
+  const allOrg = getAllOrgClasses();
+  return allOrg.filter(c => isTeacherAssignedToClass(c, teacher));
+}
+
+function saveClasses(arr) {
+  const allOrg = getAllOrgClasses();
+  const updatedMap = new Map((Array.isArray(arr) ? arr : []).map(c => [String(c.id), c]));
+  let merged = allOrg.map(c => updatedMap.has(String(c.id)) ? updatedMap.get(String(c.id)) : c);
+  (Array.isArray(arr) ? arr : []).forEach(c => {
+    if (!allOrg.some(existing => String(existing.id) === String(c.id))) {
+      merged.push(c);
+    }
+  });
+
+  if (typeof teacherStore !== 'undefined') {
+    teacherStore[CLASSES_KEY] = merged;
+  }
+  save(CLASSES_KEY, merged);
+  try {
+    localStorage.setItem(CLASSES_KEY, JSON.stringify(merged));
+    localStorage.setItem(`${ORG}_classes`, JSON.stringify(merged));
+  } catch(e) {}
+
+  if (window.SupabaseService && window.SupabaseConfig && window.SupabaseConfig.isConfigured()) {
+    (Array.isArray(arr) ? arr : []).forEach(c => {
+      window.SupabaseService.saveClass(c, ORG).catch(err => console.warn('Supabase saveClass err:', err));
+    });
+  }
+}
 
 // Purge legacy dummy classes across all localStorage keys on boot
 (function purgeLegacyDummyClasses() {
@@ -3303,7 +3439,7 @@ function renderClasses(){
   // Populate subject filter options dynamically if needed
   if (subjectFilter) {
     const currentSubject = subjectFilter.value;
-    const subjects = Array.from(new Set(all.map(c => c.subject).filter(Boolean)));
+    const subjects = Array.from(new Set(all.flatMap(c => getTeacherClassSubjects(c, teacher)).filter(Boolean)));
     subjectFilter.innerHTML = '<option value="">All Academic Disciplines</option>';
     subjects.forEach(sub => {
       const opt = document.createElement('option');
@@ -3319,9 +3455,10 @@ function renderClasses(){
   const selectedSub = (subjectFilter ? subjectFilter.value : '').trim().toLowerCase();
 
   let filtered = all.filter(c => {
-    if (selectedSub && (c.subject || '').toLowerCase() !== selectedSub) return false;
+    const cSubs = getTeacherClassSubjects(c, teacher).map(s => s.toLowerCase());
+    if (selectedSub && !cSubs.some(s => s === selectedSub || s.includes(selectedSub))) return false;
     if (query) {
-      const targetStr = `${c.name || ''} ${c.subject || ''} ${c.room || ''}`.toLowerCase();
+      const targetStr = `${c.name || ''} ${cSubs.join(' ')} ${c.room || ''}`.toLowerCase();
       if (!targetStr.includes(query)) return false;
     }
     return true;
@@ -3354,20 +3491,20 @@ function renderClasses(){
           <div class="classes-empty-state-icon">
             <i class="fa-solid fa-chalkboard-user"></i>
           </div>
-          <h4 style="margin: 0 0 6px; font-size: 17px; font-weight: 800;">No Classroom Streams Found</h4>
+          <h4 style="margin: 0 0 6px; font-size: 17px; font-weight: 800;">${all.length === 0 ? 'No Classrooms Assigned to Your Account' : 'No Classroom Streams Found'}</h4>
           <p style="margin: 0 0 18px; font-size: 13px; color: var(--text-muted); max-width: 440px; margin-inline: auto;">
-            ${query || selectedSub ? 'No classroom matches your current search filters. Try clearing your search term.' : 'There are currently no active classroom streams assigned. Register a new class or restore the standard curriculum streams.'}
+            ${all.length === 0 ? 'You are currently not allocated to any classroom streams or curriculum subjects. Once an administrator or HR Director assigns you to teaching streams, they will appear here automatically.' : (query || selectedSub ? 'No classroom matches your current search filters. Try clearing your search term.' : 'There are currently no active classroom streams assigned.')}
           </p>
           <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
             ${query || selectedSub ? '<button type="button" class="btn ghost btn-sm" onclick="document.getElementById(\'classesSearchInput\').value=\'\'; document.getElementById(\'classesSubjectFilter\').value=\'\'; renderClasses();"><i class="fa-solid fa-xmark"></i> Clear Filters</button>' : ''}
             <button type="button" class="btn prim btn-sm" onclick="document.getElementById('newClassBtn').click()"><i class="fa-solid fa-plus"></i> New Class</button>
-            <button type="button" class="btn ghost btn-sm" onclick="seedDefaultEducatorClasses(true)"><i class="fa-solid fa-rotate"></i> Restore Standard Streams</button>
+            <button type="button" class="btn ghost btn-sm" onclick="seedDefaultEducatorClasses(true)"><i class="fa-solid fa-rotate"></i> Refresh Streams</button>
           </div>
         </div>
       `;
     }
     if (tb) {
-      tb.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 24px; color:var(--text-muted);">No classroom streams match your criteria.</td></tr>`;
+      tb.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 24px; color:var(--text-muted);">${all.length === 0 ? 'No classrooms currently assigned to your educator profile.' : 'No classroom streams match your criteria.'}</td></tr>`;
     }
     updateKPIs();
     populateClassSelects();
@@ -3386,6 +3523,9 @@ function renderClasses(){
       `<span class="badge" style="background:rgba(245,158,11,0.18); color:#f59e0b; border:1px solid rgba(245,158,11,0.35); font-weight:800; font-size:11px;"><i class="fa-solid fa-clock"></i> Pending HR Approval</span>` :
       `<span class="badge" style="background:rgba(16,185,129,0.12); color:#10b981; border:1px solid rgba(16,185,129,0.3); font-weight:700; font-size:11px;"><i class="fa-solid fa-check"></i> Active Stream</span>`;
 
+    const mySubjects = getTeacherClassSubjects(c, teacher);
+    const pairedInfo = getTeacherClassPairedInfo(c, teacher);
+
     // Cards Grid Item
     if (cardsContainer) {
       const card = document.createElement('div');
@@ -3394,12 +3534,26 @@ function renderClasses(){
         <div>
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
             <div>
-              <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
-                <span class="badge" style="background:rgba(2,132,199,0.12); color:var(--accent1); font-weight:700;">${escapeHtml(c.subject || 'Academic Core')}</span>
+              <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px; flex-wrap:wrap;">
+                ${mySubjects.map(sub => `
+                  <span class="badge" style="background:rgba(2,132,199,0.12); color:var(--accent1); font-weight:700;">
+                    <i class="fa-solid fa-book-open" style="font-size:10px; margin-right:3px;"></i>${escapeHtml(sub)}
+                  </span>
+                `).join('')}
+                ${pairedInfo.role ? `
+                  <span class="badge" style="background:rgba(99,91,252,0.12); color:var(--accent2); font-weight:700;">
+                    ${escapeHtml(pairedInfo.role)}
+                  </span>
+                ` : ''}
                 ${isPending ? `<span class="badge" style="background:rgba(245,158,11,0.18); color:#f59e0b; border:1px solid rgba(245,158,11,0.35); font-weight:700; font-size:11px;"><i class="fa-solid fa-clock"></i> Pending HR</span>` : ''}
               </div>
               <h4 style="margin:0; font-size:16px; font-weight:800; line-height:1.3;">${escapeHtml(c.name)}</h4>
               <div class="tiny" style="color:var(--text-muted); margin-top:4px;"><i class="fa-solid fa-location-dot" style="color:var(--accent1);"></i> Room: ${escapeHtml(c.room || 'Studio Unassigned')}</div>
+              ${pairedInfo.coTeachers && pairedInfo.coTeachers.length > 0 ? `
+                <div class="tiny" style="color:#4338ca; font-weight:700; margin-top:4px; display:flex; align-items:center; gap:4px;">
+                  <i class="fa-solid fa-user-group" style="font-size:10px;"></i> Co-Taught with: ${escapeHtml(pairedInfo.coTeachers.map(ct => ct.name || ct.email).join(', '))}
+                </div>
+              ` : ''}
             </div>
             <span class="badge" style="background:rgba(99,91,252,0.12); color:var(--accent2); font-weight:800; white-space:nowrap;">
               <i class="fa-solid fa-users"></i> ${studentCount} Scholars
@@ -3435,7 +3589,18 @@ function renderClasses(){
       tr.innerHTML = `
         <td>${i+1}</td>
         <td><strong>${escapeHtml(c.name)}</strong></td>
-        <td>${escapeHtml(c.subject || 'Core')}</td>
+        <td>
+          <div style="display:flex; flex-direction:column; gap:3px;">
+            <div style="display:flex; flex-wrap:wrap; gap:4px;">
+              ${mySubjects.map(sub => `<span class="badge" style="font-size:11px; padding:2px 6px;">${escapeHtml(sub)}</span>`).join('')}
+            </div>
+            ${pairedInfo.coTeachers && pairedInfo.coTeachers.length > 0 ? `
+              <div class="tiny" style="color:var(--text-muted); display:flex; align-items:center; gap:3px;">
+                <i class="fa-solid fa-user-group" style="color:#10b981; font-size:9.5px;"></i> ${escapeHtml(pairedInfo.coTeachers.map(ct => ct.name || ct.email).join(', '))}
+              </div>
+            ` : ''}
+          </div>
+        </td>
         <td><span class="tiny">${escapeHtml(c.room || 'Studio')}</span></td>
         <td>
           <div style="display:flex; align-items:center; gap:8px;">
@@ -3513,17 +3678,40 @@ document.getElementById('newClassBtn').addEventListener('click', ()=>{
 
 function editClass(id){
   const arr = getClasses(); const c = arr.find(x=>x.id===id); if(!c) return;
-  openModal('Edit Class', [{name:'name', label:'Class Name', value:c.name}, {name:'subject', label:'Subject', value:c.subject}], (data)=>{
+  const currentSubs = getTeacherClassSubjects(c, teacher);
+  openModal('Edit Class', [{name:'name', label:'Class Name', value:c.name}, {name:'subject', label:'Subject (or comma-separated)', value:currentSubs.join(', ')}], (data)=>{
     if(!data.name) return;
-    c.name = data.name; c.subject = data.subject;
+    c.name = data.name.trim();
+    if (data.subject) {
+      const subs = data.subject.split(',').map(s=>s.trim()).filter(Boolean);
+      c.subjects = subs;
+      c.subject = subs.join(', ');
+      if (Array.isArray(c.teachers)) {
+        const matchT = c.teachers.find(item => isSameEducator(item, teacher));
+        if (matchT) matchT.subjects = subs;
+      }
+    }
     saveClasses(arr); renderClasses(); pushActivity(`Updated class: ${c.name}`); toast('Class updated');
   });
 }
 
 function deleteClass(id){
   if(!confirm('Delete this class?')) return;
-  const arr = getClasses().filter(x=>x.id!==id);
-  saveClasses(arr); renderClasses(); pushActivity('Deleted class'); toast('Class removed');
+  let allOrg = getAllOrgClasses().filter(x=>x.id!==id);
+  if (typeof teacherStore !== 'undefined') {
+    teacherStore[CLASSES_KEY] = allOrg;
+  }
+  save(CLASSES_KEY, allOrg);
+  try {
+    localStorage.setItem(CLASSES_KEY, JSON.stringify(allOrg));
+    localStorage.setItem(`${ORG}_classes`, JSON.stringify(allOrg));
+  } catch(e) {}
+  if (window.SupabaseService && window.SupabaseConfig && window.SupabaseConfig.isConfigured()) {
+    window.SupabaseService.deleteClass(id, ORG).catch(err => console.warn('deleteClass Supabase err:', err));
+  }
+  renderClasses();
+  pushActivity('Deleted class');
+  toast('Class removed');
 }
 
 function manageStudents(classId){
@@ -3538,7 +3726,13 @@ function renderClassPreview(){
   if(!sel) { container.innerHTML = '<div class="tiny">No class active</div>'; return; }
   const c = getClasses().find(x=>x.id===sel);
   if(!c) return;
-  container.innerHTML = `<strong>${escapeHtml(c.name)}</strong><div class="tiny">${escapeHtml(c.subject||'Unassigned')}</div>
+  const mySubs = getTeacherClassSubjects(c, teacher);
+  const pairedInfo = getTeacherClassPairedInfo(c, teacher);
+  container.innerHTML = `<strong>${escapeHtml(c.name)}</strong>
+  <div class="tiny" style="color:var(--accent1); font-weight:700;">${escapeHtml(mySubs.join(', ') || 'Unassigned')}</div>
+  ${pairedInfo.coTeachers && pairedInfo.coTeachers.length > 0 ? `
+    <div class="tiny" style="color:#4338ca; font-weight:600; margin-top:3px;"><i class="fa-solid fa-user-group"></i> Co-Taught with ${escapeHtml(pairedInfo.coTeachers.map(ct=>ct.name||ct.email).join(', '))}</div>
+  ` : ''}
   <div style="margin-top:12px;" class="tiny">Students Enrolled:</div>
   <div style="margin-top:6px">${(c.students||[]).map(s=>`<span class="badge" style="margin:2px;">${escapeHtml(s.firstName+' '+(s.lastName||''))}</span>`).join('') || '<span class="tiny">No students enrolled</span>'}</div>`;
 }
@@ -3550,7 +3744,7 @@ function getAllAssignedStudents() {
   const arr = getClasses();
   const studentMap = new Map();
 
-  // 1. Collect from curriculum classes
+  // 1. Collect from curriculum classes assigned to this educator
   arr.forEach(cls => {
     (cls.students || []).forEach(s => {
       const key = String(s.id || s.roll || s.enrollment_code || Math.random());
@@ -3564,24 +3758,30 @@ function getAllAssignedStudents() {
     });
   });
 
-  // 2. Collect from teacherStore and localStorage (direct HR registered students)
+  // 2. Collect from teacherStore and localStorage ONLY if matching one of this educator's assigned classes
   const rawList = teacherStore[`${ORG}_students`] || read(`${ORG}_students`) || read('FLAWLESS GRAPHICS_students') || [];
   if (Array.isArray(rawList)) {
     rawList.forEach(s => {
-      const key = String(s.id || s.roll || s.enrollment_code || Math.random());
-      if (!studentMap.has(key)) {
-        const matchCls = arr.find(c => 
-          String(c.id) === String(s.classId || s.class_id) || 
-          (c.code && String(c.code) === String(s.classId || s.class_id)) ||
-          (c.name && s.className && c.name.toLowerCase().includes(String(s.className).toLowerCase())) ||
-          (c.name && s.class_name && c.name.toLowerCase().includes(String(s.class_name).toLowerCase())) ||
-          (c.name && s.grade && c.name.toLowerCase().includes(String(s.grade).toLowerCase()))
-        );
-        studentMap.set(key, Object.assign({}, s, {
-          classId: s.classId || s.class_id || (matchCls ? matchCls.id : ''),
-          className: s.className || s.class_name || (matchCls ? matchCls.name : (s.grade || 'Assigned Stream')),
-          classCode: matchCls ? matchCls.code : ''
-        }));
+      const sClassId = String(s.classId || s.class_id || '');
+      const sClassName = String(s.className || s.class_name || '').toLowerCase().trim();
+      const sGrade = String(s.grade || '').toLowerCase().trim();
+
+      const matchCls = arr.find(c => 
+        (sClassId && (String(c.id) === sClassId || (c.code && String(c.code) === sClassId))) || 
+        (sClassName && c.name && (c.name.toLowerCase().trim() === sClassName || c.name.toLowerCase().includes(sClassName) || sClassName.includes(c.name.toLowerCase()))) ||
+        (sGrade && c.name && c.name.toLowerCase().includes(sGrade))
+      );
+
+      // STRICT ISOLATION: Only add if student belongs to an assigned class!
+      if (matchCls) {
+        const key = String(s.id || s.roll || s.enrollment_code || Math.random());
+        if (!studentMap.has(key)) {
+          studentMap.set(key, Object.assign({}, s, {
+            classId: s.classId || s.class_id || matchCls.id,
+            className: s.className || s.class_name || matchCls.name,
+            classCode: matchCls.code || ''
+          }));
+        }
       }
     });
   }
@@ -3652,8 +3852,16 @@ function populateClassSelects(){
         el.value = 'all';
       }
     } else {
-      el.innerHTML = '<option value="">-- Select Class --</option>';
-      arr.forEach(c => el.appendChild(Object.assign(document.createElement('option'), { value: c.id, textContent: c.name })));
+      if (arr.length === 0) {
+        el.innerHTML = '<option value="">-- No Classes Assigned --</option>';
+      } else {
+        el.innerHTML = '<option value="">-- Select Class --</option>';
+        arr.forEach(c => {
+          const mySubs = getTeacherClassSubjects(c, teacher);
+          const subText = mySubs.length ? ` (${mySubs.join(', ')})` : '';
+          el.appendChild(Object.assign(document.createElement('option'), { value: c.id, textContent: `${c.name}${subText}` }));
+        });
+      }
       if (currentVal) el.value = currentVal;
     }
   });
@@ -3762,22 +3970,44 @@ function renderStudentsForClass(classId){
 
 /* Comprehensive Student Registration Modal Logic */
 function openStudentModal(classId, studentId = null) {
-  const arr = getClasses();
-  if (!classId) {
-    classId = document.getElementById('selectClassForStudents').value || (arr[0] && arr[0].id);
+  let arr = getClasses();
+
+  if (!classId || classId === 'all') {
+    const selVal = document.getElementById('selectClassForStudents')?.value;
+    classId = (selVal && selVal !== 'all') ? selVal : (arr[0] && arr[0].id);
   }
-  if (!classId) return toast('Please create and select a class first');
 
   // Populate class dropdown in modal
   const classSelect = document.getElementById('sm_classId');
-  classSelect.innerHTML = '';
-  arr.forEach(c => {
-    const opt = document.createElement('option');
-    opt.value = c.id;
-    opt.textContent = c.name + (c.subject ? ` (${c.subject})` : '');
-    if (c.id === classId) opt.selected = true;
-    classSelect.appendChild(opt);
-  });
+  if (classSelect) {
+    classSelect.innerHTML = '';
+    arr.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      const mySubs = getTeacherClassSubjects(c, teacher);
+      opt.textContent = (c.name || c.className || 'Class') + (mySubs.length ? ` (${mySubs.join(', ')})` : '');
+      if (String(c.id) === String(classId)) opt.selected = true;
+      classSelect.appendChild(opt);
+    });
+  }
+
+  // Background hydration from Supabase if classes list is currently empty
+  if ((!arr || arr.length === 0) && window.SupabaseService && typeof window.SupabaseService.getClasses === 'function') {
+    window.SupabaseService.getClasses(ORG).then(live => {
+      if (Array.isArray(live) && live.length > 0) {
+        saveClasses(live);
+        populateClassSelects();
+        renderClasses();
+        if (classSelect) {
+          classSelect.innerHTML = live.map(c => `
+            <option value="${c.id}" ${(String(c.id) === String(classId)) ? 'selected' : ''}>${escapeHtml(c.name || c.className || 'Class')}${c.subject ? ` (${escapeHtml(c.subject)})` : ''}</option>
+          `).join('');
+        }
+      }
+    }).catch(console.warn);
+  }
+
+  if (!classId && (!arr || arr.length === 0)) return toast('Please create and select a class first');
 
   const form = document.getElementById('studentDetailForm');
   form.reset();
@@ -4488,7 +4718,14 @@ function openAssignmentCreateModal(editId = null) {
   const classSelect = document.getElementById('am_classSelect');
   if (classSelect) {
     const classes = getClasses();
-    classSelect.innerHTML = classes.map(c => `<option value="${c.id}">${escapeHtml(c.name)} (${escapeHtml(c.subject || 'Core')})</option>`).join('');
+    if (classes.length === 0) {
+      classSelect.innerHTML = '<option value="">No Classes Assigned</option>';
+    } else {
+      classSelect.innerHTML = classes.map(c => {
+        const mySubs = getTeacherClassSubjects(c, teacher);
+        return `<option value="${c.id}">${escapeHtml(c.name)} (${mySubs.map(escapeHtml).join(', ')})</option>`;
+      }).join('');
+    }
   }
 
   const editIdInput = document.getElementById('am_editId');
@@ -4719,7 +4956,14 @@ function populateBatchClassSelect() {
   const sel = document.getElementById('batchClassSelect');
   if (!sel) return;
   const classes = getClasses();
-  sel.innerHTML = classes.map(c => `<option value="${c.id}">${escapeHtml(c.name)} (${escapeHtml(c.subject || 'Core')})</option>`).join('');
+  if (classes.length === 0) {
+    sel.innerHTML = '<option value="">No Classes Assigned</option>';
+    return;
+  }
+  sel.innerHTML = classes.map(c => {
+    const mySubs = getTeacherClassSubjects(c, teacher);
+    return `<option value="${c.id}">${escapeHtml(c.name)} (${mySubs.map(escapeHtml).join(', ')})</option>`;
+  }).join('');
 }
 
 function renderBatchScoreTable() {
@@ -5671,8 +5915,9 @@ function exportActiveStudentsCSV() {
   const classes = getClasses();
   let csv = 'Student ID,First Name,Middle Name,Last Name,Gender,Class,Subject,Guardian Name,Guardian Phone,Status\n';
   classes.forEach(c => {
+    const subs = getTeacherClassSubjects(c, teacher);
     (c.students || []).forEach(s => {
-      csv += `"${s.roll || ''}","${s.firstName || ''}","${s.middleName || ''}","${s.lastName || ''}","${s.gender || ''}","${c.name}","${c.subject || ''}","${s.guardianName || ''}","${s.phone || ''}","${s.status || 'Active'}"\n`;
+      csv += `"${s.roll || ''}","${s.firstName || ''}","${s.middleName || ''}","${s.lastName || ''}","${s.gender || ''}","${c.name}","${subs.join('; ')}","${s.guardianName || ''}","${s.phone || ''}","${s.status || 'Active'}"\n`;
     });
   });
 
@@ -5712,7 +5957,8 @@ document.getElementById('photoUpload')?.addEventListener('change', (e) => {
 
 document.getElementById('logoutBtn')?.addEventListener('click', () => {
   localStorage.removeItem('active_teacher');
-  window.location.href = 'teacher-login.html';
+  localStorage.removeItem('teacher_active_user');
+  window.location.href = '../../index.html?role=teacher#unifiedLoginSection';
 });
 
 /* -------------------------------------------------------------

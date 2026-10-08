@@ -103,6 +103,8 @@ ALTER TABLE public.classes ADD COLUMN IF NOT EXISTS room TEXT;
 ALTER TABLE public.classes ADD COLUMN IF NOT EXISTS teacher_id TEXT;
 ALTER TABLE public.classes ADD COLUMN IF NOT EXISTS teacher_name TEXT;
 ALTER TABLE public.classes ADD COLUMN IF NOT EXISTS capacity INT DEFAULT 35;
+ALTER TABLE public.classes ADD COLUMN IF NOT EXISTS teachers JSONB;
+ALTER TABLE public.classes ADD COLUMN IF NOT EXISTS subjects JSONB;
 ALTER TABLE public.classes ADD COLUMN IF NOT EXISTS academic_year TEXT DEFAULT '2026/2027';
 ALTER TABLE public.classes ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'Active';
 ALTER TABLE public.classes ADD COLUMN IF NOT EXISTS approval_status TEXT DEFAULT 'approved';

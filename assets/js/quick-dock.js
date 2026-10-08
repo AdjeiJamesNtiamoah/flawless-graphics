@@ -54,7 +54,7 @@
   function getContextConfig() {
     let role = 'HR';
     let roleDesc = 'End HR session securely';
-    let loginTarget = 'hr-login.html';
+    let loginTarget = rootPrefix + 'index.html?role=hr#unifiedLoginSection';
     let panelSub = 'Real-time Staff & System Telemetry';
     let tab1Filter = 'approvals';
     let tab1Label = 'Approvals';
@@ -89,7 +89,7 @@
     if (currentPath.includes('/pages/admin/') || currentPath.includes('super-admin') || currentPath.includes('admin-dashboard')) {
       role = 'Super Admin';
       roleDesc = 'End Super Admin session securely';
-      loginTarget = currentPath.includes('/pages/admin/') ? 'admin-login.html' : 'pages/admin/admin-login.html';
+      loginTarget = rootPrefix + (currentPath.includes('/pages/admin/') ? 'admin-login.html' : 'pages/admin/admin-login.html');
       panelSub = 'Super Admin Telemetry & User Governance';
       tab1Filter = 'approvals';
       tab1Label = 'Approvals';
@@ -114,7 +114,7 @@
     } else if (currentPath.includes('/pages/teacher/')) {
       role = 'Teacher';
       roleDesc = 'End Teacher session securely';
-      loginTarget = 'teacher-login.html';
+      loginTarget = rootPrefix + 'index.html?role=teacher#unifiedLoginSection';
       panelSub = 'Teacher Directives, Submissions & Calendar';
       tab1Filter = 'directives';
       tab1Label = 'Directives';
@@ -142,7 +142,7 @@
     } else if (currentPath.includes('/pages/finance/')) {
       role = 'Finance';
       roleDesc = 'End Finance session securely';
-      loginTarget = 'finance-login.html';
+      loginTarget = rootPrefix + 'index.html?role=finance#unifiedLoginSection';
       panelSub = 'Disbursements, Collections & Ledger Alerts';
       tab1Filter = 'disbursements';
       tab1Label = 'Disbursements';
@@ -166,7 +166,7 @@
     } else if (currentPath.includes('/pages/student/')) {
       role = 'Student';
       roleDesc = 'End Student session securely';
-      loginTarget = 'student-login.html';
+      loginTarget = rootPrefix + 'index.html?role=student#unifiedLoginSection';
       panelSub = 'Academic Directives, Coursework & Results';
       tab1Filter = 'coursework';
       tab1Label = 'Coursework';
@@ -427,6 +427,8 @@
           config.messagesAction();
         }
       });
+    }
+
     const addClassBtn = dock.querySelector('#quickDockAddClassBtn');
     if (addClassBtn && !addClassBtn.dataset.dockBound) {
       addClassBtn.dataset.dockBound = 'true';
@@ -518,25 +520,57 @@
       const list = [];
       const activeOrg = (window.AuthSession && typeof window.AuthSession.getOrg === 'function' ? window.AuthSession.getOrg() : null) || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
 
-      // 1. Pending registration approvals from real organizations_users / Supabase
+      // 1. Pending registration approvals from real registries & Supabase
       try {
         let users = [];
         if (window.hrStore && Array.isArray(window.hrStore['organizations_users'])) {
-          users = window.hrStore['organizations_users'];
+          users = [...window.hrStore['organizations_users']];
         } else if (window.__masterUsersList && Array.isArray(window.__masterUsersList)) {
-          users = window.__masterUsersList;
+          users = [...window.__masterUsersList];
+        } else if (window.adminState && Array.isArray(window.adminState.users)) {
+          users = [...window.adminState.users];
         } else {
           try {
             users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
           } catch (_) { users = []; }
         }
+
+        // Resiliently merge from registered users cache (from signup drawer & Supabase live records)
+        try {
+          const u1 = JSON.parse(localStorage.getItem('fg_registered_users') || '[]');
+          const u2 = JSON.parse(localStorage.getItem('registered_users') || '[]');
+          [...u1, ...u2].forEach(reg => {
+            if (!reg) return;
+            const rEmail = (reg.email || '').toLowerCase().trim();
+            const rRoll = (reg.roll || reg.linked_staff_id || '').toLowerCase().trim();
+            const exists = users.some(x => {
+              const xEmail = (x.email || '').toLowerCase().trim();
+              const xRoll = (x.roll || x.linked_staff_id || '').toLowerCase().trim();
+              return (rEmail && xEmail === rEmail) || (rRoll && xRoll === rRoll);
+            });
+            if (!exists) users.push(reg);
+          });
+        } catch (_) {}
+
         const pendingUsers = users.filter(u => {
           const s = (u.status || '').toLowerCase();
           const r = (u.role || '').toLowerCase();
           const uOrg = (u.org || u.org_id || '').toLowerCase().trim();
           const orgMatch = !uOrg || uOrg === activeOrg.toLowerCase().trim() || activeOrg === 'FLAWLESS GRAPHICS';
           if (!orgMatch) return false;
-          if (config.role === 'HR' && (r === 'admin' || r === 'super_admin' || r === 'superadmin' || r === 'hr')) return false;
+
+          // HR Directorate is the sole authority for Teacher and Finance approvals
+          if (config.role === 'HR') {
+            if (r === 'admin' || r === 'super_admin' || r === 'superadmin' || r === 'hr') return false;
+            return s === 'pending_approval' || s === 'pending';
+          }
+
+          // Super Admin must NOT approve Teacher or Finance registrations
+          if (config.role === 'Super Admin') {
+            if (r === 'teacher' || r === 'educator' || r === 'faculty' || r === 'finance' || r === 'bursar' || r === 'student') return false;
+            return s === 'pending_approval' || s === 'pending';
+          }
+
           return s === 'pending_approval' || s === 'pending';
         });
         pendingUsers.forEach(u => {
@@ -551,6 +585,7 @@
             actionLabel: 'Review Request',
             actionType: 'approve_user',
             userEmail: u.email,
+            userRole: u.role,
             unread: true
           });
         });
@@ -827,41 +862,126 @@
     }
 
     // Direct 1-click approve from notification card
+    // Direct 1-click approve from notification card
     function approveUserFromDock(email) {
       try {
-        if (typeof window.approveUserAccount === 'function') {
-          window.approveUserAccount(email);
-          renderNotifications();
-          return;
+        // Enforce: Super Admin must NOT approve Teacher or Finance registrations
+        if (config.role === 'Super Admin') {
+          let allUsers = [];
+          if (window.adminState && Array.isArray(window.adminState.users)) allUsers = window.adminState.users;
+          try {
+            const regs = JSON.parse(localStorage.getItem('fg_registered_users') || '[]');
+            allUsers = [...allUsers, ...regs];
+          } catch (_) {}
+
+          const target = allUsers.find(x => (x.email || '').toLowerCase() === email.toLowerCase());
+          const r = (target?.role || '').toLowerCase();
+          if (r === 'teacher' || r === 'educator' || r === 'faculty' || r === 'finance' || r === 'bursar') {
+            const warningMsg = 'Educator and Finance registrations must be reviewed and approved strictly by the HR Directorate.';
+            if (window.Toaster && typeof window.Toaster.warning === 'function') {
+              window.Toaster.warning('HR Governance Required', warningMsg);
+            } else if (typeof window.showToast === 'function') {
+              window.showToast(warningMsg, 'warning');
+            } else {
+              alert(warningMsg);
+            }
+            return;
+          }
+
+          if (typeof window.approveUserAccount === 'function') {
+            window.approveUserAccount(email);
+            renderNotifications();
+            return;
+          }
         }
+
+        // HR Directorate Approval Flow
         if (typeof window.approveStaffUser === 'function') {
           window.approveStaffUser(email);
           renderNotifications();
           return;
         }
 
-        let users = JSON.parse(localStorage.getItem('organizations_users') || '[]');
-        const u = users.find(x => (x.email || '').toLowerCase() === email.toLowerCase());
-        if (u) {
-          u.status = 'active';
-          u.approvedAt = Date.now();
-          localStorage.setItem('organizations_users', JSON.stringify(users));
+        // Direct resilient multi-tier approval
+        let users = [];
+        try { users = JSON.parse(localStorage.getItem('organizations_users') || '[]'); } catch (_) {}
+        let regUsers = [];
+        try { regUsers = JSON.parse(localStorage.getItem('fg_registered_users') || '[]'); } catch (_) {}
 
-          // Also activate in org teachers roster if teacher
-          const org = u.org || 'FLAWLESS GRAPHICS';
-          try {
-            let staff = JSON.parse(localStorage.getItem(`${org}_teachers`) || '[]');
-            const sIdx = staff.findIndex(s => (s.email || '').toLowerCase() === email.toLowerCase());
-            if (sIdx >= 0) {
-              staff[sIdx].status = 'Active';
+        let target = users.find(x => (x.email || '').toLowerCase() === email.toLowerCase()) ||
+                     regUsers.find(x => (x.email || '').toLowerCase() === email.toLowerCase());
+
+        if (target) {
+          target.status = 'active';
+          target.approvedAt = Date.now();
+          target.approvedBy = 'Human Resources Directorate';
+
+          // 1. Supabase Cloud Approval
+          if (window.SupabaseService && typeof window.SupabaseService.approveUser === 'function') {
+            window.SupabaseService.approveUser(target.id || target.email, 'HR Directorate').catch(console.warn);
+          }
+
+          // 2. Local resilient registries update
+          ['fg_registered_users', 'registered_users'].forEach(k => {
+            try {
+              const list = JSON.parse(localStorage.getItem(k) || '[]');
+              let changed = false;
+              list.forEach(u => {
+                if ((u.email && target.email && u.email.toLowerCase() === target.email.toLowerCase()) ||
+                    (u.roll && target.roll && u.roll.toLowerCase() === target.roll.toLowerCase())) {
+                  u.status = 'active';
+                  u.approvedAt = Date.now();
+                  u.approvedBy = 'Human Resources Directorate';
+                  changed = true;
+                }
+              });
+              if (changed) localStorage.setItem(k, JSON.stringify(list));
+            } catch (_) {}
+          });
+
+          const uIdx = users.findIndex(x => (x.email || '').toLowerCase() === email.toLowerCase());
+          if (uIdx >= 0) {
+            users[uIdx].status = 'active';
+            users[uIdx].approvedAt = Date.now();
+            users[uIdx].approvedBy = 'Human Resources Directorate';
+            localStorage.setItem('organizations_users', JSON.stringify(users));
+          }
+
+          // 3. Sync to org teachers roster if educator
+          const org = target.org || 'FLAWLESS GRAPHICS';
+          const r = (target.role || '').toLowerCase();
+          if (r === 'teacher' || r === 'educator' || r === 'faculty') {
+            try {
+              let staff = JSON.parse(localStorage.getItem(`${org}_teachers`) || '[]');
+              const sIdx = staff.findIndex(s => (s.email || '').toLowerCase() === email.toLowerCase());
+              if (sIdx >= 0) {
+                staff[sIdx].status = 'Active';
+              } else {
+                staff.push({
+                  id: target.id || ('tea_' + Date.now()),
+                  name: target.name,
+                  fullName: target.name,
+                  email: target.email,
+                  role: 'Teacher',
+                  status: 'Active'
+                });
+              }
               localStorage.setItem(`${org}_teachers`, JSON.stringify(staff));
-            }
-          } catch(e) {}
+              if (window.SupabaseService && typeof window.SupabaseService.saveTeacher === 'function') {
+                window.SupabaseService.saveTeacher(org, {
+                  id: target.id,
+                  name: target.name,
+                  email: target.email,
+                  status: 'Active'
+                }).catch(console.warn);
+              }
+            } catch (_) {}
+          }
 
           if (typeof window.showToast === 'function') {
-            window.showToast(`Account approved for ${u.name || email}. Access granted!`, 'success');
+            window.showToast(`Account approved for ${target.name || email}. Access granted!`, 'success');
           } else if (window.Toaster && typeof window.Toaster.success === 'function') {
-            window.Toaster.success(`Account approved for ${u.name || email}. Access granted!`);
+            window.Toaster.success('Account Approved', `Access granted for ${target.name || email}.`);
           }
 
           if (typeof window.renderUsers === 'function') window.renderUsers();

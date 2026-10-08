@@ -623,33 +623,52 @@
 
     async deleteOrganization(orgIdOrName) {
       if (!orgIdOrName) return false;
-      const cleanName = String(orgIdOrName).trim();
-      if (cleanName.toUpperCase() === 'FLAWLESS GRAPHICS' || cleanName === 'fg-main') {
+      const cleanInput = String(orgIdOrName).trim();
+      if (cleanInput.toUpperCase() === 'FLAWLESS GRAPHICS' || cleanInput === 'fg-main') {
         throw new Error('Root organization (FLAWLESS GRAPHICS) cannot be deleted.');
       }
 
       try {
         const isUuid = (val) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
 
+        // Helper to safely format string literals for PostgREST logic filters (or= / and=)
+        const quotePg = (val) => `"${String(val == null ? '' : val).replace(/"/g, '""')}"`;
+        const encQuoted = (val) => encodeURIComponent(quotePg(val));
+
         // Find org record to get name, id, and slug
         let org = null;
         try {
-          org = await this.getOrganization(cleanName);
+          org = await this.getOrganization(cleanInput);
         } catch (_) {}
 
-        const orgName = org ? (org.org_name || org.name || cleanName) : cleanName;
-        const orgId = org ? (org.id || (isUuid(cleanName) ? cleanName : '')) : (isUuid(cleanName) ? cleanName : '');
-        const orgSlug = org ? (org.org_id || org.code || (orgName ? orgName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') : '')) : cleanName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        // Fallback lookups if getOrganization didn't find the record directly
+        if (!org) {
+          if (isUuid(cleanInput)) {
+            const byId = await this.query(`organizations?id=eq.${encodeURIComponent(cleanInput)}&limit=1`).catch(() => []);
+            if (Array.isArray(byId) && byId.length > 0) org = byId[0];
+          } else {
+            const byName = await this.query(`organizations?org_name=eq.${encodeURIComponent(cleanInput)}&limit=1`).catch(() => []);
+            if (Array.isArray(byName) && byName.length > 0) org = byName[0];
+            if (!org) {
+              const byNameAlt = await this.query(`organizations?name=eq.${encodeURIComponent(cleanInput)}&limit=1`).catch(() => []);
+              if (Array.isArray(byNameAlt) && byNameAlt.length > 0) org = byNameAlt[0];
+            }
+          }
+        }
+
+        const orgName = org ? (org.org_name || org.name || cleanInput) : cleanInput;
+        const orgId = org ? (org.id || (isUuid(cleanInput) ? cleanInput : '')) : (isUuid(cleanInput) ? cleanInput : '');
+        const orgSlug = org ? (org.org_id || org.code || (orgName ? orgName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') : '')) : cleanInput.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
         if (orgName.toUpperCase() === 'FLAWLESS GRAPHICS' || orgSlug === 'fg-main') {
           throw new Error('Root organization (FLAWLESS GRAPHICS) cannot be deleted.');
         }
 
         // Collect all distinct string identifier representations (name, id, slug, code)
-        const rawIdentifiers = [orgName, orgId, orgSlug, cleanName, org ? org.code : null].filter(Boolean);
+        const rawIdentifiers = [orgName, orgId, orgSlug, cleanInput, org ? org.code : null, org ? org.name : null, org ? org.org_name : null].filter(Boolean);
         const identifiers = Array.from(new Set(rawIdentifiers.map(s => String(s).trim()))).filter(s => s.toUpperCase() !== 'FLAWLESS GRAPHICS');
 
-        console.info(`[Supabase Cascade Purge] Commencing complete purge of all cloud data for: ${orgName} (${orgSlug})`);
+        console.info(`[Supabase Cascade Purge] Commencing complete purge of all cloud data for: ${orgName} (${orgSlug}) [ID: ${orgId || 'n/a'}]`);
 
         // 1. Cascade delete across ALL domain tables in Supabase PostgREST
         const cascadeTables = [
@@ -672,39 +691,96 @@
         ];
 
         for (const tbl of cascadeTables) {
-          const stringIds = identifiers.filter(id => !isUuid(id) || tbl === 'teachers' || tbl === 'students');
-          if (stringIds.length > 0) {
-            const orConditions = stringIds.map(id => `org_id.eq.${encodeURIComponent(id)},org_id.ilike.${encodeURIComponent(id)}`).join(',');
-            await this.query(`${tbl}?or=(${orConditions})`, 'DELETE').catch((e) => {
-              console.warn(`[Supabase Cascade] Notice for ${tbl}:`, e.message);
+          // Direct column deletes (bulletproof against comma parsing in or= clauses)
+          for (const idVal of identifiers) {
+            await this.query(`${tbl}?org_id=eq.${encodeURIComponent(idVal)}`, 'DELETE').catch((e) => {
+              console.warn(`[Supabase Cascade] Direct delete on ${tbl}.org_id for "${idVal}":`, e.message);
+            });
+            if (tbl === 'classes' || tbl === 'students') {
+              await this.query(`${tbl}?org_name=eq.${encodeURIComponent(idVal)}`, 'DELETE').catch((e) => {
+                console.warn(`[Supabase Cascade] Direct delete on ${tbl}.org_name for "${idVal}":`, e.message);
+              });
+            }
+          }
+
+          // Also execute quoted or=(...) delete to capture any ilike variations
+          const conditions = [];
+          identifiers.forEach(idVal => {
+            const q = encQuoted(idVal);
+            conditions.push(`org_id.eq.${q}`);
+            conditions.push(`org_id.ilike.${q}`);
+            if (tbl === 'classes' || tbl === 'students') {
+              conditions.push(`org_name.eq.${q}`);
+              conditions.push(`org_name.ilike.${q}`);
+            }
+          });
+          if (conditions.length > 0) {
+            await this.query(`${tbl}?or=(${conditions.join(',')})`, 'DELETE').catch((e) => {
+              console.warn(`[Supabase Cascade] Quoted or-delete for ${tbl}:`, e.message);
             });
           }
         }
 
         // Delete from users table (checks both 'org' and 'org_id' columns)
-        const userOrConditions = identifiers.map(id => `org.eq.${encodeURIComponent(id)},org.ilike.${encodeURIComponent(id)},org_id.eq.${encodeURIComponent(id)},org_id.ilike.${encodeURIComponent(id)}`).join(',');
-        await this.query(`users?or=(${userOrConditions})`, 'DELETE').catch((e) => {
-          console.warn('[Supabase Cascade] Notice for users table:', e.message);
+        for (const idVal of identifiers) {
+          await this.query(`users?org=eq.${encodeURIComponent(idVal)}`, 'DELETE').catch((e) => {
+            console.warn(`[Supabase Cascade] Direct delete on users.org for "${idVal}":`, e.message);
+          });
+          await this.query(`users?org_id=eq.${encodeURIComponent(idVal)}`, 'DELETE').catch((e) => {
+            console.warn(`[Supabase Cascade] Direct delete on users.org_id for "${idVal}":`, e.message);
+          });
+        }
+        const userConditions = [];
+        identifiers.forEach(idVal => {
+          const q = encQuoted(idVal);
+          userConditions.push(`org.eq.${q}`);
+          userConditions.push(`org.ilike.${q}`);
+          userConditions.push(`org_id.eq.${q}`);
+          userConditions.push(`org_id.ilike.${q}`);
         });
+        if (userConditions.length > 0) {
+          await this.query(`users?or=(${userConditions.join(',')})`, 'DELETE').catch((e) => {
+            console.warn('[Supabase Cascade] Quoted or-delete for users table:', e.message);
+          });
+        }
 
-        // 2. Delete the organization row itself safely (only matching UUID on id column)
+        // 2. Delete the organization row itself safely
+        // A. Primary Key UUID / ID delete (definitive)
+        if (orgId) {
+          await this.query(`organizations?id=eq.${encodeURIComponent(orgId)}`, 'DELETE').catch((e) => {
+            console.warn(`[Supabase Cascade] Direct delete on organizations.id for "${orgId}":`, e.message);
+          });
+        }
+
+        // B. Direct parameter deletes by org_name, name, code, org_id
+        for (const idVal of identifiers) {
+          await this.query(`organizations?org_name=eq.${encodeURIComponent(idVal)}`, 'DELETE').catch(() => {});
+          await this.query(`organizations?name=eq.${encodeURIComponent(idVal)}`, 'DELETE').catch(() => {});
+          await this.query(`organizations?org_id=eq.${encodeURIComponent(idVal)}`, 'DELETE').catch(() => {});
+          if (isUuid(idVal)) {
+            await this.query(`organizations?id=eq.${encodeURIComponent(idVal)}`, 'DELETE').catch(() => {});
+          }
+        }
+
+        // C. Quoted or=(...) delete
         const orgConditions = [];
-        identifiers.forEach(id => {
-          if (isUuid(id)) {
-            orgConditions.push(`id.eq.${encodeURIComponent(id)}`);
+        identifiers.forEach(idVal => {
+          if (isUuid(idVal)) {
+            orgConditions.push(`id.eq.${encodeURIComponent(idVal)}`);
           } else {
-            orgConditions.push(`org_name.eq.${encodeURIComponent(id)}`);
-            orgConditions.push(`org_name.ilike.${encodeURIComponent(id)}`);
-            orgConditions.push(`name.eq.${encodeURIComponent(id)}`);
-            orgConditions.push(`name.ilike.${encodeURIComponent(id)}`);
-            orgConditions.push(`code.eq.${encodeURIComponent(id)}`);
-            orgConditions.push(`org_id.eq.${encodeURIComponent(id)}`);
+            const q = encQuoted(idVal);
+            orgConditions.push(`org_name.eq.${q}`);
+            orgConditions.push(`org_name.ilike.${q}`);
+            orgConditions.push(`name.eq.${q}`);
+            orgConditions.push(`name.ilike.${q}`);
+            orgConditions.push(`code.eq.${q}`);
+            orgConditions.push(`org_id.eq.${q}`);
           }
         });
 
         if (orgConditions.length > 0) {
           await this.query(`organizations?or=(${orgConditions.join(',')})`, 'DELETE').catch((e) => {
-            console.warn('[Supabase Cascade] Notice for organizations table:', e.message);
+            console.warn('[Supabase Cascade] Quoted or-delete for organizations table:', e.message);
           });
         }
 
@@ -737,22 +813,37 @@
           }
         } catch (_) {}
 
-        // 4. Purge corresponding localStorage keys
+        // 4. Purge corresponding localStorage keys across all domains for this organization
         try {
-          const keysToPurge = [
-            `${orgName}_academic_registration_approvals`,
-            `${orgName}_teachers`,
-            `${orgName}_classes`,
-            `${orgName}_students`,
-            `${orgName}_announcements`,
-            `${orgName}_payroll`,
-            `${orgSlug}_teachers`,
-            `${orgSlug}_classes`,
-            `${orgSlug}_students`,
-            `${orgSlug}_announcements`,
-            `${orgSlug}_payroll`
-          ];
-          keysToPurge.forEach(k => localStorage.removeItem(k));
+          const orgPrefixes = identifiers.map(id => String(id).toLowerCase().trim()).filter(Boolean);
+          for (let i = localStorage.length - 1; i >= 0; i--) {
+            const k = localStorage.key(i);
+            if (!k) continue;
+            const kLower = k.toLowerCase().trim();
+            const matches = orgPrefixes.some(p => kLower.startsWith(`${p}_`) || kLower === p);
+            if (matches) {
+              localStorage.removeItem(k);
+            }
+          }
+          // Also purge global legacy un-scoped cache keys that might hold deleted org records
+          ['fg_classes', 'classes', 'teachers', 'students', 'fg_student_fees'].forEach(k => localStorage.removeItem(k));
+
+          // Purge users belonging to this deleted organization from registered user lists
+          ['fg_registered_users', 'registered_users'].forEach(k => {
+            try {
+              const raw = localStorage.getItem(k);
+              if (raw) {
+                const arr = JSON.parse(raw);
+                if (Array.isArray(arr)) {
+                  const filtered = arr.filter(u => {
+                    const uOrg = String(u.org || u.org_name || '').toLowerCase().trim();
+                    return !orgPrefixes.some(p => uOrg === p || uOrg.includes(p));
+                  });
+                  localStorage.setItem(k, JSON.stringify(filtered));
+                }
+              }
+            } catch (_) {}
+          });
 
           const activeOrg = (localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || '').toLowerCase().trim();
           const matchesActive = identifiers.some(id => {
@@ -774,7 +865,31 @@
 
         this.clearCache();
 
-        // 5. Broadcast global real-time event & LucyBus alert
+        // 5. Verification check: ensure organization is truly purged from Supabase
+        let stillExists = null;
+        try {
+          if (orgId && isUuid(orgId)) {
+            const checkRes = await this.query(`organizations?id=eq.${encodeURIComponent(orgId)}&limit=1`);
+            if (Array.isArray(checkRes) && checkRes.length > 0) stillExists = checkRes[0];
+          }
+          if (!stillExists) {
+            const checkName = await this.query(`organizations?org_name=eq.${encodeURIComponent(orgName)}&limit=1`);
+            if (Array.isArray(checkName) && checkName.length > 0) stillExists = checkName[0];
+          }
+        } catch (_) {}
+
+        if (stillExists) {
+          // If still exists, make one more explicit attempt on the exact id found
+          if (stillExists.id) {
+            await this.query(`organizations?id=eq.${encodeURIComponent(stillExists.id)}`, 'DELETE').catch(() => {});
+          }
+          const finalCheck = await this.getOrganization(orgId || orgName).catch(() => null);
+          if (finalCheck) {
+            throw new Error(`Failed to delete organization '${orgName}' from Supabase Cloud. The record could not be removed.`);
+          }
+        }
+
+        // 6. Broadcast global real-time event & LucyBus alert
         const deletedPayload = { id: orgId, name: orgName, slug: orgSlug };
         this.broadcastChange('ORG_DELETED', 'organizations', deletedPayload);
 
@@ -802,7 +917,8 @@
       try {
         let endpoint = 'users?order=created_at.desc';
         if (orgId && orgId !== 'FLAWLESS GRAPHICS' && orgId !== 'all') {
-          endpoint += `&or=(org.eq.${encodeURIComponent(orgId)},org.ilike.${encodeURIComponent(orgId)})`;
+          const encQuoted = encodeURIComponent(`"${String(orgId).trim().replace(/"/g, '""')}"`);
+          endpoint += `&or=(org.eq.${encQuoted},org.ilike.${encQuoted},org_id.eq.${encQuoted},org_id.ilike.${encQuoted})`;
         }
         const data = await this.query(endpoint);
         return Array.isArray(data) ? data : [];
@@ -823,6 +939,33 @@
         return Array.isArray(data) && data.length > 0 ? data[0] : null;
       } catch (err) {
         console.error('[Supabase] Failed to fetch user by email:', err.message);
+        return null;
+      }
+    }
+
+    async findUser(identifier) {
+      if (!identifier) return null;
+      const clean = String(identifier).trim().toLowerCase();
+      try {
+        const encQuoted = encodeURIComponent(`"${clean.replace(/"/g, '""')}"`);
+        const endpoint = `users?or=(email.ilike.${encQuoted},linked_staff_id.ilike.${encQuoted},id.ilike.${encQuoted},name.ilike.${encQuoted})&limit=1`;
+        const data = await this.query(endpoint);
+        if (Array.isArray(data) && data.length > 0) return data[0];
+
+        const all = await this.getUsers();
+        if (Array.isArray(all) && all.length > 0) {
+          const found = all.find(u => {
+            const uEmail = (u.email || '').trim().toLowerCase();
+            const uStaff = (u.linked_staff_id || u.roll || '').trim().toLowerCase();
+            const uId = (u.id || '').trim().toLowerCase();
+            const uName = (u.name || u.fullName || '').trim().toLowerCase();
+            return uEmail === clean || uStaff === clean || uId === clean || uName === clean;
+          });
+          if (found) return found;
+        }
+        return null;
+      } catch (err) {
+        console.warn('[Supabase] findUser error:', err.message);
         return null;
       }
     }
@@ -859,6 +1002,46 @@
         console.error('[Supabase] Failed to save user:', err.message);
         throw err;
       }
+    }
+
+    async approveUser(userIdOrEmail, approvedBy = 'Human Resources Directorate') {
+      if (!userIdOrEmail) return false;
+      const cleanVal = String(userIdOrEmail).trim();
+      try {
+        let targetUser = await this.findUser(cleanVal);
+        if (!targetUser && cleanVal.includes('@')) {
+          targetUser = await this.getUserByEmail(cleanVal);
+        }
+
+        if (targetUser) {
+          const role = (targetUser.role || '').toLowerCase();
+          const approver = String(approvedBy || '').toLowerCase();
+          const isSuperAdminApprover = approver.includes('super admin') || approver.includes('superadmin');
+          const isTeacherOrFinance = role === 'teacher' || role === 'educator' || role === 'faculty' || role === 'finance' || role === 'bursar';
+
+          // Both Super Admin and HR are authorized to approve staff registrations
+          // (Allows executive oversight and campus onboarding)
+
+          const endpoint = targetUser.id ? `users?id=eq.${encodeURIComponent(targetUser.id)}` : `users?email=eq.${encodeURIComponent(targetUser.email)}`;
+          await this.query(endpoint, 'PATCH', {
+            status: 'active',
+            approved_at: new Date().toISOString(),
+            approved_by: approvedBy || 'Human Resources Directorate'
+          }, { 'Prefer': 'return=representation' });
+
+          if (role === 'teacher' || role === 'educator' || role === 'faculty') {
+            try {
+              await this.query(`teachers?email=eq.${encodeURIComponent(targetUser.email)}`, 'PATCH', { status: 'Active' });
+            } catch (_) {}
+          }
+          this.broadcastChange('USER_SAVED', 'users', Object.assign({}, targetUser, { status: 'active' }));
+          return true;
+        }
+      } catch (err) {
+        console.error('[Supabase] Failed to approve user:', err.message);
+        throw err;
+      }
+      return false;
     }
 
     async deleteUser(userIdOrEmail) {
@@ -928,8 +1111,18 @@
       }
     }
 
-    async approveUser(userIdOrEmail, approvedBy = 'Super Admin') {
+    async approveUser(userIdOrEmail, approvedBy = 'Human Resources Directorate') {
       try {
+        if (approvedBy === 'Super Admin') {
+          let checkEndpoint = `users?id=eq.${encodeURIComponent(userIdOrEmail)}&select=role`;
+          if (typeof userIdOrEmail === 'string' && userIdOrEmail.includes('@')) {
+            checkEndpoint = `users?email=eq.${encodeURIComponent(userIdOrEmail.trim().toLowerCase())}&select=role`;
+          }
+          const userRec = await this.query(checkEndpoint).catch(() => null);
+          const userRole = Array.isArray(userRec) && userRec[0] ? (userRec[0].role || '').toLowerCase() : '';
+          // Both Super Admin and HR are authorized to approve staff registrations
+        }
+
         let endpoint = `users?id=eq.${encodeURIComponent(userIdOrEmail)}`;
         if (typeof userIdOrEmail === 'string' && userIdOrEmail.includes('@')) {
           endpoint = `users?email=eq.${encodeURIComponent(userIdOrEmail.trim().toLowerCase())}`;
@@ -943,18 +1136,56 @@
 
         if (Array.isArray(res) && res.length > 0) {
           const u = res[0];
-          if (u.role === 'teacher') {
-            await this.query(`teachers?email=eq.${encodeURIComponent(u.email)}`, 'PATCH', {
+          const r = (u.role || '').toLowerCase();
+          if (r === 'teacher' || r === 'educator' || r === 'faculty') {
+            const tchPayload = {
+              id: u.linked_staff_id || u.id || ('tch_' + Date.now()),
+              org_id: u.org || 'FLAWLESS GRAPHICS',
+              full_name: u.name,
+              name: u.name,
+              department: u.department || 'Academic Staff',
+              position: u.designation || 'Educator',
+              role: 'Educator',
+              email: u.email,
+              phone: u.phone || '',
+              salary: Number(u.salary || 4800),
               status: 'Active',
+              photo_url: u.photo_url || null,
+              created_at: u.created_at || new Date().toISOString(),
               updated_at: new Date().toISOString()
-            }).catch(() => {});
-          } else if (u.role === 'student') {
+            };
+            await this.query('teachers', 'POST', tchPayload, {
+              'Prefer': 'resolution=merge-duplicates,return=representation'
+            }).catch(() => {
+              return this.query(`teachers?email=eq.${encodeURIComponent(u.email)}`, 'PATCH', { status: 'Active' });
+            });
+          } else if (r === 'student') {
             await this.query(`students?email=eq.${encodeURIComponent(u.email)}`, 'PATCH', {
               status: 'Active',
               updated_at: new Date().toISOString()
             }).catch(() => {});
           }
         }
+
+        // Also synchronize local storage so local cached registered users are immediately updated
+        try {
+          const cleanId = String(userIdOrEmail).trim().toLowerCase();
+          ['registered_users', 'fg_registered_users'].forEach(storageKey => {
+            const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            const updated = stored.map(item => {
+              const mId = (item.id || '').trim().toLowerCase();
+              const mEmail = (item.email || '').trim().toLowerCase();
+              const mRoll = (item.roll || item.linked_staff_id || '').trim().toLowerCase();
+              const mName = (item.name || item.fullName || '').trim().toLowerCase();
+              if (mId === cleanId || mEmail === cleanId || mRoll === cleanId || mName === cleanId) {
+                return Object.assign({}, item, { status: 'active' });
+              }
+              return item;
+            });
+            localStorage.setItem(storageKey, JSON.stringify(updated));
+          });
+        } catch (_) {}
+
         const result = Array.isArray(res) && res.length > 0 ? res[0] : true;
         this.broadcastChange('USER_APPROVED', 'users', { id: userIdOrEmail, approved_by: approvedBy, status: 'active' });
         return result;
@@ -992,11 +1223,24 @@
       if (!cleanEmail) return { success: false, error: 'Identifier (Email or Student ID) is required' };
 
       try {
-        let endpoint = `users?or=(email.ilike.${encodeURIComponent(cleanEmail)},linked_staff_id.ilike.${encodeURIComponent(cleanEmail)})`;
+        const encQuoted = encodeURIComponent(`"${cleanEmail.replace(/"/g, '""')}"`);
+        let endpoint = `users?or=(email.ilike.${encQuoted},linked_staff_id.ilike.${encQuoted},id.ilike.${encQuoted},name.ilike.${encQuoted})`;
         if (orgId) {
           endpoint += `&org=ilike.${encodeURIComponent(orgId)}`;
         }
-        const users = await this.query(endpoint);
+        let users = await this.query(endpoint);
+        if (!Array.isArray(users) || users.length === 0) {
+          const allUsers = await this.getUsers(orgId);
+          if (Array.isArray(allUsers) && allUsers.length > 0) {
+            users = allUsers.filter(u => {
+              const uEmail = (u.email || '').trim().toLowerCase();
+              const uStaff = (u.linked_staff_id || u.roll || '').trim().toLowerCase();
+              const uId = (u.id || '').trim().toLowerCase();
+              const uName = (u.name || u.fullName || '').trim().toLowerCase();
+              return uEmail === cleanEmail || uStaff === cleanEmail || uId === cleanEmail || uName === cleanEmail;
+            });
+          }
+        }
         if (!Array.isArray(users) || users.length === 0) {
           return { success: false, error: 'Account not found in institutional database. Please register.' };
         }
@@ -1099,18 +1343,23 @@
       const cleanEmail = (email || '').trim().toLowerCase();
       try {
         const role = (metadata.role || 'admin').toLowerCase();
+        const isInstitutionReg = role === 'institution' || role === 'organization' || metadata.is_institution_only;
         const isSuperAdminSeed = role === 'admin' && cleanEmail === 'admin@flawlessgraphics.com';
         const initialStatus = isSuperAdminSeed ? 'active' : 'pending_approval';
 
-        const userRecord = await this.saveUser({
-          email: cleanEmail,
-          pass_hash: password,
-          password: password,
-          name: metadata.admin_name || metadata.name || cleanEmail.split('@')[0],
-          org: metadata.org_name || 'FLAWLESS GRAPHICS',
-          role: role,
-          status: initialStatus
-        });
+        let userRecord = null;
+        // Do not auto-generate an admin user for newly registered organizations
+        if (!isInstitutionReg && (role !== 'admin' || isSuperAdminSeed)) {
+          userRecord = await this.saveUser({
+            email: cleanEmail,
+            pass_hash: password,
+            password: password,
+            name: metadata.admin_name || metadata.name || cleanEmail.split('@')[0],
+            org: metadata.org_name || 'FLAWLESS GRAPHICS',
+            role: role || 'teacher',
+            status: initialStatus
+          });
+        }
 
         if (metadata.org_name) {
           await this.saveOrganization({
@@ -1130,7 +1379,7 @@
           status: initialStatus,
           message: isSuperAdminSeed
             ? 'Root Super Admin account active.'
-            : 'Registration submitted! Awaiting institutional approval.'
+            : (isInstitutionReg ? 'Institution application submitted! Awaiting Super Admin certification.' : 'Registration submitted! Awaiting institutional approval.')
         };
       } catch (err) {
         console.error('[Supabase] Sign up error:', err.message);
@@ -1284,10 +1533,46 @@
     ============================================================= */
     async getPendingTeachers(orgId = null) {
       try {
-        let endpoint = 'teachers?status=eq.pending_approval&order=created_at.desc';
-        if (orgId) endpoint += `&org_id=eq.${encodeURIComponent(orgId)}`;
-        const data = await this.query(endpoint);
-        return Array.isArray(data) ? data : [];
+        let targetOrg = orgId;
+        if (!targetOrg || targetOrg === 'all') {
+          targetOrg = (window.AuthSession ? (window.AuthSession.getUser()?.org || localStorage.getItem('active_org')) : localStorage.getItem('active_org')) || null;
+        }
+
+        // 1. Query users with pending_approval role teacher
+        let uEndpoint = 'users?status=eq.pending_approval&or=(role.eq.teacher,role.eq.educator,role.eq.faculty)&order=created_at.desc';
+        if (targetOrg && targetOrg !== 'all') {
+          const encTarget = encodeURIComponent(`"${String(targetOrg).trim().replace(/"/g, '""')}"`);
+          uEndpoint = `users?and=(status.eq.pending_approval,or(role.eq.teacher,role.eq.educator,role.eq.faculty),or(org.eq.${encTarget},org.ilike.${encTarget},org_id.eq.${encTarget},org_id.ilike.${encTarget}))&order=created_at.desc`;
+        }
+        const uPending = await this.query(uEndpoint).catch(() => []);
+
+        // 2. Query teachers table with pending_approval
+        let tEndpoint = 'teachers?status=eq.pending_approval&order=created_at.desc';
+        if (targetOrg && targetOrg !== 'all') {
+          const encTarget = encodeURIComponent(`"${String(targetOrg).trim().replace(/"/g, '""')}"`);
+          tEndpoint = `teachers?or=(org_id.eq.${encTarget},org_id.ilike.${encTarget})&status=eq.pending_approval&order=created_at.desc`;
+        }
+        const tPending = await this.query(tEndpoint).catch(() => []);
+
+        const map = new Map();
+        [...tPending, ...uPending].forEach(item => {
+          const key = (item.email || item.id || '').trim().toLowerCase();
+          if (key && !map.has(key)) {
+            map.set(key, {
+              id: item.id || item.linked_staff_id,
+              name: item.name || item.fullName || item.full_name,
+              fullName: item.name || item.fullName || item.full_name,
+              email: item.email,
+              phone: item.phone || '',
+              role: item.role || item.position || 'Educator',
+              org: item.org || item.org_id || targetOrg,
+              org_id: item.org || item.org_id || targetOrg,
+              status: 'pending_approval',
+              created_at: item.created_at
+            });
+          }
+        });
+        return Array.from(map.values());
       } catch (err) {
         console.error('[Supabase] Failed to fetch pending teachers:', err.message);
         return [];
@@ -1396,29 +1681,131 @@
       }
     }
 
-    async getTeachers(orgId = 'FLAWLESS GRAPHICS') {
+    async getTeachers(orgId = null) {
       try {
-        const data = await this.query(`teachers?org_id=eq.${encodeURIComponent(orgId)}&order=created_at.desc`);
-        if (!Array.isArray(data)) return [];
+        let targetOrg = orgId;
+        if (!targetOrg || targetOrg === 'all') {
+          targetOrg = (window.AuthSession ? (window.AuthSession.getUser()?.org || localStorage.getItem('active_org')) : localStorage.getItem('active_org')) || null;
+        }
 
-        return data.map(e => ({
-          id: e.id,
-          fullName: e.full_name || e.name || 'Faculty Member',
-          name: e.full_name || e.name || 'Faculty Member',
-          department: e.department || 'General',
-          dept: e.department || 'General',
-          position: e.position || e.role || 'Educator',
-          role: e.position || e.role || 'Educator',
-          email: e.email || '',
-          phone: e.phone || '',
-          salary: Number(e.salary || 0),
-          status: e.status || 'Active',
-          photo: e.photo_url || e.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
-          created_at: e.created_at
-        }));
+        // 1. Query teachers table
+        let teacherEndpoint = 'teachers?order=created_at.desc';
+        if (targetOrg && targetOrg !== 'all') {
+          const encTarget = encodeURIComponent(`"${String(targetOrg).trim().replace(/"/g, '""')}"`);
+          teacherEndpoint = `teachers?or=(org_id.eq.${encTarget},org_id.ilike.${encTarget})&order=created_at.desc`;
+        }
+        const teacherData = await this.query(teacherEndpoint).catch(() => []);
+
+        // 2. Query users table for all registered teachers/educators/faculty
+        let userEndpoint = 'users?or=(role.eq.teacher,role.eq.educator,role.eq.faculty)&order=created_at.desc';
+        if (targetOrg && targetOrg !== 'all') {
+          const encTarget = encodeURIComponent(`"${String(targetOrg).trim().replace(/"/g, '""')}"`);
+          userEndpoint = `users?and=(or(role.eq.teacher,role.eq.educator,role.eq.faculty),or(org.eq.${encTarget},org.ilike.${encTarget},org_id.eq.${encTarget},org_id.ilike.${encTarget}))&order=created_at.desc`;
+        }
+        const userData = await this.query(userEndpoint).catch(() => []);
+
+        // 3. Merge, deduplicate, and auto-sync
+        const teacherMap = new Map();
+
+        if (Array.isArray(teacherData)) {
+          teacherData.forEach(e => {
+            const key = (e.email || e.id || '').trim().toLowerCase();
+            if (!key) return;
+            teacherMap.set(key, {
+              id: e.id,
+              fullName: e.full_name || e.name || 'Faculty Member',
+              name: e.full_name || e.name || 'Faculty Member',
+              department: e.department || e.dept || 'Academic Staff',
+              dept: e.department || e.dept || 'Academic Staff',
+              position: e.position || e.role || 'Educator',
+              role: e.position || e.role || 'Educator',
+              email: e.email || '',
+              phone: e.phone || '',
+              salary: Number(e.salary || 4800),
+              status: e.status || 'Active',
+              photo: e.photo_url || e.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+              photo_url: e.photo_url || e.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+              org: e.org_id || targetOrg,
+              org_id: e.org_id || targetOrg,
+              linked_staff_id: e.linked_staff_id || e.id,
+              created_at: e.created_at
+            });
+          });
+        }
+
+        if (Array.isArray(userData)) {
+          for (const u of userData) {
+            const key = (u.email || u.id || '').trim().toLowerCase();
+            if (!key) continue;
+            const uStat = (u.status || 'active').toLowerCase();
+            const isApproved = uStat === 'active' || uStat === 'approved' || (u.approved_by && uStat !== 'rejected' && uStat !== 'pending_approval');
+
+            const existing = teacherMap.get(key);
+            if (!existing && isApproved) {
+              const mapped = {
+                id: u.linked_staff_id || u.id,
+                fullName: u.name || u.fullName || 'Faculty Member',
+                name: u.name || u.fullName || 'Faculty Member',
+                department: u.department || 'Academic Staff',
+                dept: u.department || 'Academic Staff',
+                position: u.designation || 'Educator',
+                role: u.designation || 'Educator',
+                email: u.email || '',
+                phone: u.phone || '',
+                salary: Number(u.salary || 4800),
+                status: 'Active',
+                photo: u.photo_url || u.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+                photo_url: u.photo_url || u.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+                org: u.org || targetOrg,
+                org_id: u.org || targetOrg,
+                linked_staff_id: u.linked_staff_id || u.roll || u.id,
+                created_at: u.created_at
+              };
+              teacherMap.set(key, mapped);
+
+              // Auto-sync into teachers table in Supabase in background
+              this.query('teachers', 'POST', {
+                id: mapped.id,
+                org_id: mapped.org_id,
+                full_name: mapped.name,
+                name: mapped.name,
+                department: mapped.dept,
+                position: mapped.role,
+                role: mapped.role,
+                email: mapped.email,
+                phone: mapped.phone,
+                salary: mapped.salary,
+                status: 'Active',
+                photo_url: mapped.photo_url
+              }, { 'Prefer': 'resolution=merge-duplicates,return=minimal' }).catch(() => {});
+            } else if (existing && isApproved) {
+              existing.status = 'Active';
+              if (u.name) { existing.fullName = u.name; existing.name = u.name; }
+              if (u.photo_url) { existing.photo = u.photo_url; existing.photo_url = u.photo_url; }
+              if (u.linked_staff_id) { existing.linked_staff_id = u.linked_staff_id; }
+            }
+          }
+        }
+
+        const result = Array.from(teacherMap.values());
+
+        // Cache in local storage for instant offline display
+        if (targetOrg) {
+          try {
+            localStorage.setItem(`${targetOrg}_teachers`, JSON.stringify(result));
+            localStorage.setItem('fg_teachers', JSON.stringify(result));
+          } catch (_) {}
+        }
+
+        return result;
       } catch (err) {
         console.error('[Supabase] Failed to fetch teachers:', err.message);
-        return [];
+        try {
+          const targetOrg = orgId || localStorage.getItem('active_org') || 'FLAWLESS GRAPHICS';
+          return JSON.parse(localStorage.getItem(`${targetOrg}_teachers`) || '[]');
+        } catch (_) {
+          return [];
+        }
       }
     }
 
@@ -1505,7 +1892,16 @@
     ============================================================= */
     async getStudents(orgId = 'FLAWLESS GRAPHICS') {
       try {
-        const data = await this.query(`students?or=(org_id.eq.${encodeURIComponent(orgId)},org_name.eq.${encodeURIComponent(orgId)})&order=created_at.desc`);
+        const cleanOrg = String(orgId || 'FLAWLESS GRAPHICS').trim();
+        const safeOrgStr = cleanOrg.replace(/"/g, '""');
+        const encQuoted = encodeURIComponent(`"${safeOrgStr}"`);
+        let data = await this.query(`students?or=(org_id.eq.${encQuoted},org_name.eq.${encQuoted})&order=created_at.desc`).catch(() => null);
+        if (!Array.isArray(data) || data.length === 0) {
+          data = await this.query(`students?org_name=eq.${encodeURIComponent(cleanOrg)}&order=created_at.desc`).catch(() => null);
+        }
+        if (!Array.isArray(data) || data.length === 0) {
+          data = await this.query(`students?org_id=eq.${encodeURIComponent(cleanOrg)}&order=created_at.desc`).catch(() => null);
+        }
         if (!Array.isArray(data)) return [];
 
         return data.map(s => ({
@@ -1786,28 +2182,87 @@
     ============================================================= */
     async getClasses(orgId = 'FLAWLESS GRAPHICS') {
       try {
-        const data = await this.query(`classes?or=(org_id.ilike.${encodeURIComponent(orgId)},org_name.ilike.${encodeURIComponent(orgId)})&order=created_at.desc`);
+        const cleanOrg = String(orgId || 'FLAWLESS GRAPHICS').trim();
+        const safeOrgStr = cleanOrg.replace(/"/g, '""');
+        const encQuoted = encodeURIComponent(`"${safeOrgStr}"`);
+        let data = await this.query(`classes?or=(org_id.ilike.${encQuoted},org_name.ilike.${encQuoted})&order=created_at.desc`).catch(() => null);
+        if (!Array.isArray(data) || data.length === 0) {
+          data = await this.query(`classes?org_name=eq.${encodeURIComponent(cleanOrg)}&order=created_at.desc`).catch(() => null);
+        }
+        if (!Array.isArray(data) || data.length === 0) {
+          data = await this.query(`classes?org_id=eq.${encodeURIComponent(cleanOrg)}&order=created_at.desc`).catch(() => null);
+        }
+        if (!Array.isArray(data) || data.length === 0) {
+          const all = await this.query('classes?order=created_at.desc&limit=100').catch(() => []);
+          if (Array.isArray(all)) {
+            const norm = cleanOrg.toLowerCase();
+            data = all.filter(c => {
+              const cId = (c.org_id || '').toLowerCase();
+              const cName = (c.org_name || '').toLowerCase();
+              return cId === norm || cName === norm || (cId && norm.includes(cId)) || (cName && norm.includes(cName));
+            });
+          }
+        }
         if (!Array.isArray(data)) return [];
 
-        return data.map(c => ({
-          id: c.id,
-          name: c.name || c.class_name || 'Class Cohort',
-          className: c.name || c.class_name || 'Class Cohort',
-          code: c.code || '',
-          grade: c.grade_level || '',
-          gradeLevel: c.grade_level || '',
-          subject: c.subject || '',
-          section: c.section || 'A',
-          room: c.room || 'Room 101',
-          schedule: c.schedule || '',
-          teacherId: c.teacher_id || '',
-          teacherName: c.teacher_name || '',
-          capacity: Number(c.capacity || 35),
-          enrolled: Number(c.enrolled || 0),
-          academicYear: c.academic_year || '2026/2027',
-          status: c.status || 'Active',
-          approvalStatus: c.approval_status || 'approved'
-        }));
+        return data.map(c => {
+          const rawSubj = c.subject || '';
+          let subjectsArr = [];
+          if (Array.isArray(c.subjects)) {
+            subjectsArr = c.subjects;
+          } else if (rawSubj) {
+            subjectsArr = rawSubj.split(',').map(s => s.trim()).filter(Boolean);
+          }
+          let teachersArr = [];
+          if (Array.isArray(c.teachers)) {
+            teachersArr = c.teachers;
+          } else if (typeof c.teachers === 'string') {
+            try { teachersArr = JSON.parse(c.teachers); } catch(_) {}
+          }
+
+          if (teachersArr.length === 0 && (c.teacher_name || c.teacher_id)) {
+            teachersArr = [{
+              name: c.teacher_name || 'Educator',
+              email: c.teacher_id || '',
+              role: 'Lead Educator',
+              subjects: subjectsArr.length > 0 ? [...subjectsArr] : ['General']
+            }];
+          } else if (teachersArr.length > 0) {
+            teachersArr = teachersArr.map(t => ({
+              name: t.name || c.teacher_name || 'Educator',
+              email: t.email || t.teacherEmail || t.teacher_id || c.teacher_id || '',
+              role: t.role || 'Lead Educator',
+              subjects: Array.isArray(t.subjects) && t.subjects.length > 0 ? t.subjects : (subjectsArr.length > 0 ? [...subjectsArr] : ['General']),
+              pairedWith: Array.isArray(t.pairedWith) ? t.pairedWith : []
+            }));
+          }
+
+          const primaryTeacherName = c.teacher_name || (teachersArr.length > 0 ? teachersArr.map(t => t.name).join(', ') : '');
+          const primaryTeacherEmail = c.teacher_id || (teachersArr[0] ? teachersArr[0].email : '') || '';
+
+          return {
+            id: c.id,
+            name: c.name || c.class_name || 'Class Cohort',
+            className: c.name || c.class_name || 'Class Cohort',
+            code: c.code || '',
+            grade: c.grade_level || '',
+            gradeLevel: c.grade_level || '',
+            subject: rawSubj,
+            subjects: subjectsArr,
+            teachers: teachersArr,
+            section: c.section || 'A',
+            room: c.room || 'Room 101',
+            schedule: c.schedule || '',
+            teacherId: primaryTeacherEmail,
+            teacherEmail: primaryTeacherEmail,
+            teacherName: primaryTeacherName,
+            capacity: Number(c.capacity || 35),
+            enrolled: Number(c.enrolled || 0),
+            academicYear: c.academic_year || '2026/2027',
+            status: c.status || 'Active',
+            approvalStatus: c.approval_status || 'approved'
+          };
+        });
       } catch (err) {
         console.error('[Supabase] Failed to fetch classes:', err.message);
         return [];
@@ -1817,6 +2272,26 @@
     async saveClass(orgId, classData) {
       const targetOrg = orgId || classData.org || classData.org_id || classData.org_name || 'FLAWLESS GRAPHICS';
       const name = classData.name || classData.className || 'Class Cohort';
+      const subjectsList = Array.isArray(classData.subjects) && classData.subjects.length > 0
+        ? classData.subjects
+        : (classData.subject ? String(classData.subject).split(',').map(s => s.trim()).filter(Boolean) : []);
+      const formattedSubject = subjectsList.length > 0 ? subjectsList.join(', ') : (classData.subject || null);
+
+      let teachersList = [];
+      if (Array.isArray(classData.teachers) && classData.teachers.length > 0) {
+        teachersList = classData.teachers;
+      } else if (classData.teacherName || classData.teacher_name) {
+        teachersList = [{
+          name: classData.teacherName || classData.teacher_name,
+          email: classData.teacherEmail || classData.teacherId || classData.teacher_id || '',
+          role: 'Lead Educator',
+          subjects: subjectsList.length > 0 ? [...subjectsList] : ['General']
+        }];
+      }
+
+      const primaryTeacherName = classData.teacherName || classData.teacher_name || (teachersList.length > 0 ? teachersList.map(t => t.name).join(', ') : null);
+      const primaryTeacherId = classData.teacherId || classData.teacher_id || classData.teacherEmail || (teachersList[0] ? teachersList[0].email : null);
+
       const payload = {
         org_id: targetOrg,
         org_name: targetOrg,
@@ -1824,30 +2299,81 @@
         class_name: name,
         code: classData.code || ('CLS-' + Math.floor(100 + Math.random() * 900)),
         grade_level: classData.gradeLevel || classData.grade_level || classData.grade || 'Level 100',
-        subject: classData.subject || null,
+        subject: formattedSubject,
         section: classData.section || 'A',
         room: classData.room || 'Room 101',
-        teacher_id: classData.teacherId || classData.teacher_id || null,
-        teacher_name: classData.teacherName || classData.teacher_name || null,
+        teacher_id: primaryTeacherId,
+        teacher_name: primaryTeacherName,
         capacity: Number(classData.capacity || 35),
         academic_year: classData.academicYear || classData.academic_year || '2026/2027',
         status: classData.status || 'Active',
         approval_status: 'approved',
+        teachers: teachersList,
         updated_at: new Date().toISOString()
       };
 
+      // 1. Resolve numeric ID if possible
+      let targetNumericId = null;
       if (classData.id && !isNaN(Number(classData.id))) {
-        payload.id = Number(classData.id);
+        targetNumericId = Number(classData.id);
+      } else {
+        // Try finding by code or name in this org
+        try {
+          const matchQuery = classData.code ? `code=eq.${encodeURIComponent(classData.code)}` : `name=eq.${encodeURIComponent(name)}`;
+          const existing = await this.query(`classes?${matchQuery}&limit=1`).catch(() => []);
+          if (Array.isArray(existing) && existing.length > 0 && existing[0].id) {
+            targetNumericId = Number(existing[0].id);
+          }
+        } catch (_) {}
+      }
+
+      if (targetNumericId) {
+        payload.id = targetNumericId;
       }
 
       try {
-        const res = await this.query('classes', 'POST', payload, {
-          'Prefer': 'resolution=merge-duplicates,return=representation'
-        });
+        let res = null;
+        if (targetNumericId) {
+          // Direct PATCH is the most reliable way to update an existing class
+          try {
+            res = await this.query(`classes?id=eq.${targetNumericId}`, 'PATCH', payload);
+          } catch (patchErr) {
+            console.warn('[Supabase] PATCH class fallback to POST:', patchErr.message);
+          }
+        }
+        if (!res || !Array.isArray(res) || res.length === 0) {
+          res = await this.query('classes', 'POST', payload, {
+            'Prefer': 'resolution=merge-duplicates,return=representation'
+          });
+        }
         const saved = Array.isArray(res) && res.length > 0 ? Object.assign({}, payload, res[0]) : payload;
         saved.org = targetOrg;
         saved.org_id = targetOrg;
         saved.org_name = targetOrg;
+        saved.subjects = subjectsList;
+        saved.teachers = teachersList;
+        saved.teacherName = primaryTeacherName;
+        saved.teacherEmail = primaryTeacherId;
+        saved.teacherId = primaryTeacherId;
+
+        // Immediately sync to active organization localStorage to prevent stale overwrites
+        try {
+          const storageKeys = [`${targetOrg}_classes`, 'classes'];
+          storageKeys.forEach(sk => {
+            const raw = localStorage.getItem(sk);
+            if (raw) {
+              const list = JSON.parse(raw);
+              if (Array.isArray(list)) {
+                const idx = list.findIndex(item => (saved.id && item.id === saved.id) || (saved.code && item.code === saved.code));
+                if (idx !== -1) {
+                  list[idx] = Object.assign({}, list[idx], saved);
+                  localStorage.setItem(sk, JSON.stringify(list));
+                }
+              }
+            }
+          });
+        } catch (_) {}
+
         this.broadcastChange('CLASS_SAVED', 'classes', saved);
         return saved;
       } catch (err) {
@@ -1880,7 +2406,16 @@
 
     async getSubjects(orgId = 'FLAWLESS GRAPHICS') {
       try {
-        const data = await this.query(`subjects?or=(org_id.eq.${encodeURIComponent(orgId)},org_name.eq.${encodeURIComponent(orgId)})&order=name.asc`);
+        const cleanOrg = String(orgId || 'FLAWLESS GRAPHICS').trim();
+        const safeOrgStr = cleanOrg.replace(/"/g, '""');
+        const encQuoted = encodeURIComponent(`"${safeOrgStr}"`);
+        let data = await this.query(`subjects?or=(org_id.eq.${encQuoted},org_name.eq.${encQuoted})&order=name.asc`).catch(() => null);
+        if (!Array.isArray(data) || data.length === 0) {
+          data = await this.query(`subjects?org_name=eq.${encodeURIComponent(cleanOrg)}&order=name.asc`).catch(() => null);
+        }
+        if (!Array.isArray(data) || data.length === 0) {
+          data = await this.query(`subjects?org_id=eq.${encodeURIComponent(cleanOrg)}&order=name.asc`).catch(() => null);
+        }
         if (!Array.isArray(data)) return [];
         return data.map(s => ({
           id: s.id,

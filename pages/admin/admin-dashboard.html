@@ -676,6 +676,8 @@
   </style>
   <link rel="stylesheet" href="../../assets/css/cascading-nav.css">
   <link rel="stylesheet" href="../../assets/css/slide-over.css">
+  <link rel="stylesheet" href="../../assets/css/portal-canopy.css">
+  <script src="../../assets/js/portal-canopy.js" defer></script>
 </head>
 <body>
 
@@ -771,6 +773,27 @@
           <span>2025/2026 Academic Session</span>
           <span style="color:#cbd5e1;">•</span>
           <span style="color: #059669; font-weight:700;"><i class="fa-solid fa-cloud-arrow-up"></i> Live Sync</span>
+        </div>
+      </div>
+
+      <!-- Admin Portal Greeting, Date & Live Clock Canopy -->
+      <div class="portal-canopy-bar" style="margin: 0 auto;">
+        <div class="portal-greeting-badge">
+          <i class="fa-solid fa-heart portal-heart-icon"></i>
+          <span class="portal-greeting-highlight" data-portal-role="Administrator">Good evening, Administrator</span>
+          <span class="portal-badge-dot">&bull;</span>
+          <span class="portal-greeting-brand">Executive Control Deck</span>
+        </div>
+        <div class="portal-datetime-group">
+          <div class="portal-date-chip">
+            <i class="fa-regular fa-calendar-days"></i>
+            <span class="portal-live-date-text">Sunday, 4 Oct 2026</span>
+          </div>
+          <div class="portal-clock-chip">
+            <span class="portal-clock-pulse"></span>
+            <i class="fa-regular fa-clock"></i>
+            <span class="portal-live-clock-text">21:26:00 GMT</span>
+          </div>
         </div>
       </div>
 
@@ -2097,14 +2120,18 @@
           '<span class="badge badge-cyan"><i class="fa-solid fa-chalkboard-user"></i> Teacher</span>'));
 
         const uStat = (u.status || 'active').toLowerCase();
-        const isExcludedFromApproval = role === 'teacher' || role === 'student' || role === 'finance';
-        const isPending = !isExcludedFromApproval && (uStat === 'pending_approval' || uStat === 'pending');
+        const isTeacherOrFinance = role === 'teacher' || role === 'finance' || role === 'educator' || role === 'bursar' || role === 'student';
+        const isPending = (uStat === 'pending_approval' || uStat === 'pending');
         const isSusp = uStat === 'suspended';
         const isRej = uStat === 'rejected';
 
         let statusBadge = '<span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Active</span>';
         if (isPending) {
-          statusBadge = '<span class="badge" style="background:rgba(245, 158, 11, 0.15); color:#d97706; border:1px solid rgba(245, 158, 11, 0.4);"><i class="fa-solid fa-clock"></i> Pending Approval</span>';
+          if (isTeacherOrFinance) {
+            statusBadge = '<span class="badge" style="background:rgba(217, 119, 6, 0.15); color:#d97706; border:1px solid rgba(245, 158, 11, 0.4);"><i class="fa-solid fa-users-gear"></i> Pending HR Approval</span>';
+          } else {
+            statusBadge = '<span class="badge" style="background:rgba(245, 158, 11, 0.15); color:#d97706; border:1px solid rgba(245, 158, 11, 0.4);"><i class="fa-solid fa-clock"></i> Pending Approval</span>';
+          }
         } else if (isSusp) {
           statusBadge = '<span class="badge badge-danger"><i class="fa-solid fa-ban"></i> Suspended</span>';
         } else if (isRej) {
@@ -2133,10 +2160,14 @@
             <td><span style="font-size:12px; color:var(--muted);">${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'Active'}</span></td>
             <td style="text-align:right;">
               <div style="display:inline-flex; gap:6px; align-items:center;">
-                ${isPending ? `
-                  <button class="btn-top primary" style="background:#10b981; border-color:#10b981; padding:4px 10px; font-size:12px; font-weight:700;" title="Approve Registration" onclick="approveUserAccount('${escapeHtml(u.email)}')"><i class="fa-solid fa-check"></i> Approve</button>
-                  <button class="btn-top ghost" style="color:var(--accent-red); padding:4px 8px; font-size:12px;" title="Reject Registration" onclick="rejectUserAccount('${escapeHtml(u.email)}')"><i class="fa-solid fa-xmark"></i> Reject</button>
-                ` : (isRej ? `
+                ${isPending ? (
+                  isTeacherOrFinance ? `
+                    <span style="font-size:11.5px; color:#d97706; font-weight:700; background:rgba(217,119,6,0.1); padding:4px 8px; border-radius:6px; border:1px solid rgba(217,119,6,0.25);" title="Teacher and Finance registrations are approved strictly by the HR Directorate."><i class="fa-solid fa-users-gear"></i> Governed by HR</span>
+                  ` : `
+                    <button class="btn-top primary" style="background:#10b981; border-color:#10b981; padding:4px 10px; font-size:12px; font-weight:700;" title="Approve Registration" onclick="approveUserAccount('${escapeHtml(u.email)}')"><i class="fa-solid fa-check"></i> Approve</button>
+                    <button class="btn-top ghost" style="color:var(--accent-red); padding:4px 8px; font-size:12px;" title="Reject Registration" onclick="rejectUserAccount('${escapeHtml(u.email)}')"><i class="fa-solid fa-xmark"></i> Reject</button>
+                  `
+                ) : (isRej ? `
                   <button class="btn-top ghost" style="color:var(--accent-green); padding:4px 8px; font-size:12px;" title="Approve Account" onclick="approveUserAccount('${escapeHtml(u.email)}')"><i class="fa-solid fa-check"></i> Restore</button>
                 ` : `
                   <button class="btn-top ghost" style="padding:4px 8px; font-size:12px; color:${isSusp ? 'var(--accent-green)' : 'var(--accent-gold)'};" title="${isSusp ? 'Restore Access' : 'Suspend Access'}" onclick="toggleUserStatus('${escapeHtml(u.email)}')"><i class="fa-solid ${isSusp ? 'fa-unlock' : 'fa-ban'}"></i></button>
@@ -2153,6 +2184,18 @@
     async function approveUserAccount(email) {
       const target = adminState.users.find(u => (u.email || '').toLowerCase() === email.toLowerCase());
       if (!target) return;
+
+      const targetRole = (target.role || '').toLowerCase();
+      if (targetRole === 'teacher' || targetRole === 'finance' || targetRole === 'educator' || targetRole === 'bursar') {
+        const msg = 'Educator and Finance staff registrations are approved strictly by the Human Resources (HR) Directorate. Super Admin does not approve faculty or bursary registrations.';
+        if (window.Toaster) {
+          window.Toaster.warning('HR Governance Required', msg);
+        } else {
+          alert(msg);
+        }
+        return;
+      }
+
       target.status = 'active';
       target.approvedAt = Date.now();
 
@@ -2180,9 +2223,21 @@
     }
 
     async function rejectUserAccount(email) {
-      if (!confirm(`Are you sure you want to decline registration for (${email})?`)) return;
       const target = adminState.users.find(u => (u.email || '').toLowerCase() === email.toLowerCase());
       if (!target) return;
+
+      const targetRole = (target.role || '').toLowerCase();
+      if (targetRole === 'teacher' || targetRole === 'finance' || targetRole === 'educator' || targetRole === 'bursar') {
+        const msg = 'Educator and Finance registrations are governed strictly by the Human Resources (HR) Directorate.';
+        if (window.Toaster) {
+          window.Toaster.warning('HR Governance Required', msg);
+        } else {
+          alert(msg);
+        }
+        return;
+      }
+
+      if (!confirm(`Are you sure you want to decline registration for (${email})?`)) return;
       target.status = 'rejected';
       target.rejectedAt = Date.now();
 
@@ -2453,6 +2508,11 @@
         initAdminUI();
         logAuditAction('Tenant Deleted', `Permanently deleted organization ${tenantName} and all records from Supabase Cloud`, 'WARNING');
         if (window.Toaster) window.Toaster.info('Tenant Removed', `${tenantName} and all associated records permanently purged.`);
+        await loadAllAdminData();
+        renderTenantsGrid();
+        renderPendingTenants();
+        renderMasterUsersTable();
+        refreshAllStats();
       } catch (err) {
         console.error('Failed to delete tenant:', err);
         alert('Failed to delete organization: ' + err.message);

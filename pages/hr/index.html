@@ -15,6 +15,9 @@
   <link rel="stylesheet" href="../../assets/css/shared-design.css">
   <!-- Short Skeletal Loading Stylesheet -->
   <link rel="stylesheet" href="../../assets/css/skeleton.css">
+  <!-- Shared Portal Canopy: Greeting, Calendar Date & Live Clock -->
+  <link rel="stylesheet" href="../../assets/css/portal-canopy.css">
+  <script src="../../assets/js/portal-canopy.js" defer></script>
 
   <!-- Unified AuthSession & Synchronous Route Guard -->
   <script src="../../assets/js/auth-session.js"></script>
@@ -177,6 +180,25 @@
       <li><a href="teacher-reports.html" class="nav-link"><i class="fa-solid fa-file-lines"></i> Reports</a></li>
     </ul>
 
+        <div class="portal-canopy-bar" style="margin-left: auto; margin-right: 16px;">
+      <div class="portal-greeting-badge">
+        <i class="fa-solid fa-heart portal-heart-icon"></i>
+        <span class="portal-greeting-highlight" data-portal-role="HR Director">Good evening, HR Director</span>
+        <span class="portal-badge-dot">&bull;</span>
+        <span class="portal-greeting-brand">Flawless Graphyx</span>
+      </div>
+      <div class="portal-datetime-group">
+        <div class="portal-date-chip">
+          <i class="fa-regular fa-calendar-days"></i>
+          <span class="portal-live-date-text">Sunday, 4 Oct 2026</span>
+        </div>
+        <div class="portal-clock-chip">
+          <span class="portal-clock-pulse"></span>
+          <i class="fa-regular fa-clock"></i>
+          <span class="portal-live-clock-text">21:35:00 GMT</span>
+        </div>
+      </div>
+    </div>
     <div class="header-actions">
       <button class="theme-pill-btn" id="themeBtn" title="Toggle Light/Dark Mode">
         <i class="fa-solid fa-moon"></i> <span id="themeText">Dark</span>

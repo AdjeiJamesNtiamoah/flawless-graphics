@@ -1088,6 +1088,8 @@
       cursor: pointer;
     }
   </style>
+  <link rel="stylesheet" href="assets/css/portal-canopy.css">
+  <script src="assets/js/portal-canopy.js" defer></script>
 </head>
 <body>
 
@@ -1186,6 +1188,27 @@
           <span>Super Admin Command Console</span>
         </h1>
         <div class="exec-master-sub">Multi-tenant institutional governance, role authorization, and master branding calibration.</div>
+      </div>
+    </div>
+
+    <!-- Super Admin Portal Greeting, Date & Live Clock Canopy -->
+    <div class="portal-canopy-bar" style="margin: 0 16px;">
+      <div class="portal-greeting-badge">
+        <i class="fa-solid fa-heart portal-heart-icon"></i>
+        <span class="portal-greeting-highlight" data-portal-role="Super Admin">Good evening, Super Admin</span>
+        <span class="portal-badge-dot">&bull;</span>
+        <span class="portal-greeting-brand">Root Sovereignty Deck</span>
+      </div>
+      <div class="portal-datetime-group">
+        <div class="portal-date-chip">
+          <i class="fa-regular fa-calendar-days"></i>
+          <span class="portal-live-date-text">Sunday, 4 Oct 2026</span>
+        </div>
+        <div class="portal-clock-chip">
+          <span class="portal-clock-pulse"></span>
+          <i class="fa-regular fa-clock"></i>
+          <span class="portal-live-clock-text">21:26:00 GMT</span>
+        </div>
       </div>
     </div>
 
@@ -2053,6 +2076,9 @@
     });
     const pendingUsers = allUsers.filter(u => {
       const s = (u.status || '').toLowerCase();
+      const r = (u.role || '').toLowerCase();
+      // Super admin strictly authorizes institutional tenants and admin-tier users, not teacher or finance staff
+      if (r === 'teacher' || r === 'finance' || r === 'educator' || r === 'bursar' || r === 'student') return false;
       return s === 'pending_approval' || s === 'pending' || s === 'unapproved';
     });
 
@@ -2208,16 +2234,29 @@
       const isActive = status === 'active';
       const id = u.id || u.email;
 
-      html += '<tr>' +
-        '<td><strong style="color:var(--text-main); font-size:13.5px;"><i class="fa-solid fa-user" style="color:#0284c7; margin-right:8px;"></i>' + escapeHtml(name) + '</strong></td>' +
-        '<td>' + escapeHtml(email) + '</td>' +
-        '<td>' + escapeHtml(org) + '</td>' +
-        '<td><span style="background:rgba(79,70,229,0.08); color:#4f46e5; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:700;">' + escapeHtml(role) + '</span></td>' +
-        '<td><span style="background:' + (isActive ? 'rgba(5,150,105,0.1)' : 'rgba(217,119,6,0.12)') + '; color:' + (isActive ? '#059669' : '#d97706') + '; padding:3px 8px; border-radius:6px; font-size:11.5px; font-weight:700;">' + (isActive ? 'Active' : 'Pending Authorization') + '</span></td>' +
-        '<td style="text-align:right;">' +
-          (!isActive ? '<button onclick="approveUser(\'' + escapeHtml(id) + '\')" style="background:#059669; color:#fff; border:none; border-radius:6px; padding:5px 10px; font-weight:700; cursor:pointer; font-size:11px; margin-right:6px;">Authorize</button>' : '') +
-          '<button onclick="deleteUser(\'' + escapeHtml(id) + '\')" style="background:transparent; border:1px solid var(--border-card); color:#e11d48; border-radius:6px; padding:5px 10px; font-weight:600; cursor:pointer; font-size:11px;">Revoke</button>' +
-        '</td></tr>';
+        const roleLower = (u.role || '').toLowerCase();
+        const isTeacherOrFinance = roleLower === 'teacher' || roleLower === 'finance' || roleLower === 'educator' || roleLower === 'bursar' || roleLower === 'student';
+        const statusText = isActive ? 'Active' : (isTeacherOrFinance ? 'Pending HR Approval' : 'Pending Authorization');
+
+        let actionBtn = '';
+        if (!isActive) {
+          if (isTeacherOrFinance) {
+            actionBtn = '<span style="font-size:11px; color:#d97706; font-weight:700; background:rgba(217,119,6,0.1); padding:4px 8px; border-radius:6px; margin-right:6px; display:inline-flex; align-items:center; gap:4px;"><i class="fa-solid fa-users-gear"></i> Governed by HR</span>';
+          } else {
+            actionBtn = '<button onclick="approveUser(\'' + escapeHtml(id) + '\')" style="background:#059669; color:#fff; border:none; border-radius:6px; padding:5px 10px; font-weight:700; cursor:pointer; font-size:11px; margin-right:6px;">Authorize</button>';
+          }
+        }
+
+        html += '<tr>' +
+          '<td><strong style="color:var(--text-main); font-size:13.5px;"><i class="fa-solid fa-user" style="color:#0284c7; margin-right:8px;"></i>' + escapeHtml(name) + '</strong></td>' +
+          '<td>' + escapeHtml(email) + '</td>' +
+          '<td>' + escapeHtml(org) + '</td>' +
+          '<td><span style="background:rgba(79,70,229,0.08); color:#4f46e5; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:700;">' + escapeHtml(role) + '</span></td>' +
+          '<td><span style="background:' + (isActive ? 'rgba(5,150,105,0.1)' : 'rgba(217,119,6,0.12)') + '; color:' + (isActive ? '#059669' : '#d97706') + '; padding:3px 8px; border-radius:6px; font-size:11.5px; font-weight:700;">' + statusText + '</span></td>' +
+          '<td style="text-align:right;">' +
+            actionBtn +
+            '<button onclick="deleteUser(\'' + escapeHtml(id) + '\')" style="background:transparent; border:1px solid var(--border-card); color:#e11d48; border-radius:6px; padding:5px 10px; font-weight:600; cursor:pointer; font-size:11px;">Revoke</button>' +
+          '</td></tr>';
     });
     tbody.innerHTML = html;
   }
@@ -2373,7 +2412,7 @@
     try {
       if (window.Toaster) window.Toaster.info('Purging Cloud Data...', 'Deleting workspace and associated records from Supabase...');
       if (window.SupabaseService) {
-        await window.SupabaseService.deleteOrganization(id || targetName);
+        await window.SupabaseService.deleteOrganization(targetTenant?.id || id || targetName);
       }
       // Purge active organization session if it was the deleted institution
       const currentActive = (localStorage.getItem('active_org') || localStorage.getItem('activeOrg') || '').toLowerCase().trim();
@@ -2390,13 +2429,11 @@
           window.AuthSession.setOrgName('FLAWLESS GRAPHICS');
         }
       }
-      allTenants = allTenants.filter(t => t.id !== id && t.name !== targetName && t.org_name !== targetName && t.slug !== id);
-      allUsers = (allUsers || []).filter(u => u.org !== targetName && u.org_id !== targetName && u.org !== id);
       logAudit('Institution Purged', 'Deleted workspace ' + targetName + ' and all cloud data from Supabase', 'WARNING');
       if (window.Toaster) window.Toaster.success('Institution Purged', 'Workspace and all associated records deleted from Supabase.');
-      updateTelemetryAndQueues();
-      renderTenantsTable(allTenants);
-      renderUsersTable(allUsers);
+
+      // Refresh master state directly from Supabase Cloud
+      await loadSuperAdminData();
     } catch (err) {
       console.error('Failed to purge organization:', err);
       if (window.Toaster) window.Toaster.error('Purge Failed', err.message || 'Could not delete organization from Supabase.');
@@ -2406,7 +2443,16 @@
 
   async function approveUser(id) {
     const u = allUsers.find(user => user.id === id || user.email === id);
-    if (u) u.status = 'active';
+    if (u) {
+      const r = (u.role || '').toLowerCase();
+      if (r === 'teacher' || r === 'finance' || r === 'educator' || r === 'bursar') {
+        const warningMsg = 'Educator and Finance registrations are approved strictly by the Human Resources (HR) Directorate. Super Admin does not approve faculty or bursary staff.';
+        if (window.Toaster) window.Toaster.warning('HR Governance Required', warningMsg);
+        else alert(warningMsg);
+        return;
+      }
+      u.status = 'active';
+    }
 
     if (window.SupabaseService) {
       await window.SupabaseService.approveUser(id).catch(console.warn);
@@ -2418,6 +2464,17 @@
   }
 
   async function rejectUser(id) {
+    const u = allUsers.find(user => user.id === id || user.email === id);
+    if (u) {
+      const r = (u.role || '').toLowerCase();
+      if (r === 'teacher' || r === 'finance' || r === 'educator' || r === 'bursar') {
+        const warningMsg = 'Educator and Finance registrations are governed strictly by the Human Resources (HR) Directorate.';
+        if (window.Toaster) window.Toaster.warning('HR Governance Required', warningMsg);
+        else alert(warningMsg);
+        return;
+      }
+    }
+
     if (confirm('Deny access authorization for this account?')) {
       allUsers = allUsers.filter(u => u.id !== id && u.email !== id);
       logAudit('User Rejected', 'Denied access for ' + id, 'WARNING');

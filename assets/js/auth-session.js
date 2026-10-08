@@ -97,13 +97,15 @@
             }
 
             // Fallback for general session if portal key was not specific, BUT strictly verify role compatibility
-            if (!user && (path.includes('/hr/') || path.includes('/finance/'))) {
+            if (!user && (path.includes('/hr/') || path.includes('/finance/') || path.includes('/teacher/'))) {
                 const generalUser = safeParse(localStorage.getItem(ACTIVE_ORG_USER_KEY)) || safeParse(localStorage.getItem(ACTIVE_USER_KEY));
                 if (generalUser && typeof generalUser === 'object') {
                     const r = (generalUser.role || '').toLowerCase();
                     if (path.includes('/hr/') && (r === 'hr' || r === 'admin' || r === 'superadmin' || r === 'hr admin')) {
                         user = generalUser;
                     } else if (path.includes('/finance/') && (r === 'finance' || r === 'bursar' || r === 'accountant' || r === 'admin' || r === 'superadmin')) {
+                        user = generalUser;
+                    } else if (path.includes('/teacher/') && (r === 'teacher' || r === 'educator' || r === 'faculty' || r === 'instructor' || r === 'admin' || r === 'superadmin')) {
                         user = generalUser;
                     }
                 }
@@ -560,12 +562,14 @@
                 localStorage.setItem('admin_user', JSON.stringify(adminSession));
             }
 
-            if (normalizedUser.role === 'teacher') {
+            if (normalizedUser.role === 'teacher' || normalizedUser.role === 'educator' || normalizedUser.role === 'faculty' || normalizedUser.role === 'instructor') {
                 const teacherSession = {
                     name: normalizedUser.name,
                     email: normalizedUser.email,
                     org: normalizedUser.org,
-                    role: 'teacher',
+                    role: normalizedUser.role || 'teacher',
+                    roll: (user && (user.roll || user.linked_staff_id)) || null,
+                    status: normalizedUser.status || 'active',
                     photo: normalizedUser.photo || null,
                     photo_url: normalizedUser.photo_url || null,
                     photoBase64: normalizedUser.photo || ''
@@ -718,7 +722,7 @@
                 } else if (target === 'admin') {
                     isApproved = (userRole === 'admin' || userRole === 'superadmin');
                 } else if (target === 'teacher') {
-                    isApproved = (userRole === 'teacher' || userRole === 'admin' || userRole === 'superadmin');
+                    isApproved = (userRole === 'teacher' || userRole === 'educator' || userRole === 'faculty' || userRole === 'instructor' || userRole === 'admin' || userRole === 'superadmin');
                 } else if (target === 'student') {
                     isApproved = (userRole === 'student' || userRole === 'admin' || userRole === 'superadmin');
                 } else {
@@ -1196,8 +1200,8 @@
                     }
                     .fg-avatar-wrap {
                         position: relative;
-                        width: 48px;
-                        height: 48px;
+                        width: 54px;
+                        height: 54px;
                         border-radius: 50%;
                         flex-shrink: 0;
                     }
@@ -1207,8 +1211,8 @@
                         border-radius: 50%;
                         object-fit: cover;
                         display: block;
-                        border: none;
-                        box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+                        border: 2.5px solid #ffffff;
+                        box-shadow: 0 4px 16px rgba(0,0,0,0.22);
                     }
                     .fg-avatar-initials {
                         width: 100%;
@@ -1217,22 +1221,22 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        font-size: 16px;
+                        font-size: 18px;
                         font-weight: 800;
                         color: #ffffff;
                         background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
-                        border: none;
+                        border: 2.5px solid #ffffff;
                         letter-spacing: 0.5px;
-                        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+                        box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
                     }
                     .fg-online-dot {
                         position: absolute;
-                        bottom: 0px;
-                        right: 0px;
-                        width: 14px;
-                        height: 14px;
+                        bottom: 1px;
+                        right: 1px;
+                        width: 15px;
+                        height: 15px;
                         background: #10b981;
-                        border: none;
+                        border: 2.5px solid #ffffff;
                         border-radius: 50%;
                         animation: fgOnlineRadarPulse 2s infinite ease-out;
                         z-index: 2;
